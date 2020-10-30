@@ -30,7 +30,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.metadata.resource.metadata_factory.yaml', ExtractorResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 40)
-            ->args([ref('api_platform.metadata.extractor.yaml'), ref('api_platform.metadata.resource.metadata_factory.yaml.inner')])
+            ->args([ref('api_platform.metadata.extractor.yaml'), ref('api_platform.metadata.resource.metadata_factory.yaml.inner'), '%api_platform.defaults%'])
 
         ->set('api_platform.metadata.property.name_collection_factory.yaml', ExtractorPropertyNameCollectionFactory::class)
             ->decorate('api_platform.metadata.property.name_collection_factory')

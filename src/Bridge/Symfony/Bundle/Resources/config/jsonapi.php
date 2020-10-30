@@ -40,11 +40,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -800])
 
         ->set('api_platform.jsonapi.normalizer.collection', CollectionNormalizer::class)
-            ->args([ref('api_platform.resource_class_resolver'), param('api_platform.collection.pagination.page_parameter_name')])
+            ->args([ref('api_platform.resource_class_resolver'), '%api_platform.collection.pagination.page_parameter_name%', ref('api_platform.metadata.resource.metadata_factory')])
             ->tag('serializer.normalizer', ['priority' => -985])
 
         ->set('api_platform.jsonapi.normalizer.item', ItemNormalizer::class)
-            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver'), ref('api_platform.property_accessor'), ref('api_platform.jsonapi.name_converter.reserved_attribute_name'), ref('api_platform.metadata.resource.metadata_factory'), [], tagged_iterator('api_platform.data_transformer')->ignoreOnInvalid(), 'false'])
+            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver'), ref('api_platform.property_accessor'), ref('api_platform.jsonapi.name_converter.reserved_attribute_name'), ref('api_platform.metadata.resource.metadata_factory'), [], tagged_iterator('api_platform.data_transformer'), ref('api_platform.security.resource_access_checker')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
@@ -56,14 +56,14 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.jsonapi.normalizer.error', ErrorNormalizer::class)
-            ->args([param('kernel.debug')])
+            ->args(['%kernel.debug%'])
             ->tag('serializer.normalizer', ['priority' => -790])
 
         ->set('api_platform.jsonapi.listener.request.transform_pagination_parameters', TransformPaginationParametersListener::class)
             ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 5])
 
         ->set('api_platform.jsonapi.listener.request.transform_sorting_parameters', TransformSortingParametersListener::class)
-            ->args([param('api_platform.collection.order_parameter_name')])
+            ->args(['%api_platform.collection.order_parameter_name%'])
             ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 5])
 
         ->set('api_platform.jsonapi.listener.request.transform_fieldsets_parameters', TransformFieldsetsParametersListener::class)

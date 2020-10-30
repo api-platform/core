@@ -42,17 +42,17 @@ return static function (ContainerConfigurator $container) {
         ->alias(SubresourceDataProviderInterface::class, 'api_platform.subresource_data_provider')
 
         ->set('api_platform.pagination', Pagination::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), param('api_platform.collection.pagination'), param('api_platform.graphql.collection.pagination')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), '%api_platform.collection.pagination%', '%api_platform.graphql.collection.pagination%'])
         ->alias(Pagination::class, 'api_platform.pagination')
 
         ->set('api_platform.pagination_options', PaginationOptions::class)
             ->args([
-                param('api_platform.collection.pagination.enabled'),
-                param('api_platform.collection.pagination.page_parameter_name'),
-                param('api_platform.collection.pagination.client_items_per_page'),
-                param('api_platform.collection.pagination.items_per_page_parameter_name'),
-                param('api_platform.collection.pagination.client_enabled'),
-                param('api_platform.collection.pagination.enabled_parameter_name'),
+                '%api_platform.collection.pagination.enabled%',
+                '%api_platform.collection.pagination.page_parameter_name%',
+                '%api_platform.collection.pagination.client_items_per_page%',
+                '%api_platform.collection.pagination.items_per_page_parameter_name%',
+                '%api_platform.collection.pagination.client_enabled%',
+                '%api_platform.collection.pagination.enabled_parameter_name%',
             ])
         ->alias(PaginationOptions::class, 'api_platform.pagination_options');
 };

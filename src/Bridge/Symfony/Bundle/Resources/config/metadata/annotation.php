@@ -23,11 +23,11 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.metadata.resource.name_collection_factory.annotation', AnnotationResourceNameCollectionFactory::class)
             ->decorate('api_platform.metadata.resource.name_collection_factory')
-            ->args([ref('annotation_reader'), param('api_platform.resource_class_directories'), ref('api_platform.metadata.resource.name_collection_factory.annotation.inner')])
+            ->args([ref('annotation_reader'), '%api_platform.resource_class_directories%', ref('api_platform.metadata.resource.name_collection_factory.annotation.inner')])
 
         ->set('api_platform.metadata.resource.metadata_factory.annotation', AnnotationResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 40)
-            ->args([ref('annotation_reader'), ref('api_platform.metadata.resource.metadata_factory.annotation.inner'), param('api_platform.defaults')])
+            ->args([ref('annotation_reader'), ref('api_platform.metadata.resource.metadata_factory.annotation.inner'), '%api_platform.defaults%'])
 
         ->set('api_platform.metadata.resource.filter_metadata_factory.annotation', AnnotationResourceFilterMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 20)

@@ -23,7 +23,7 @@ return static function (ContainerConfigurator $container) {
         ->alias('api_platform.security.expression_language', 'security.expression_language')
 
         ->set('api_platform.security.resource_access_checker', ResourceAccessChecker::class)
-            ->args([ref('api_platform.security.expression_language')->nullOnInvalid()(), ref('security.authentication.trust_resolver')->nullOnInvalid(), ref('security.role_hierarchy')->nullOnInvalid(), ref('security.token_storage')->nullOnInvalid(), ref('security.authorization_checker')->nullOnInvalid()])
+            ->args([ref('api_platform.security.expression_language')->nullOnInvalid(), ref('security.authentication.trust_resolver')->nullOnInvalid(), ref('security.role_hierarchy')->nullOnInvalid(), ref('security.token_storage')->nullOnInvalid(), ref('security.authorization_checker')->nullOnInvalid()])
         ->alias(ResourceAccessCheckerInterface::class, 'api_platform.security.resource_access_checker')
 
         ->set('api_platform.security.listener.request.deny_access', DenyAccessListener::class)

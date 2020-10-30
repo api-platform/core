@@ -29,12 +29,12 @@ return static function (ContainerConfigurator $container) {
         ->alias(OpenApiNormalizer::class, 'api_platform.openapi.normalizer')
 
         ->set('api_platform.openapi.options', Options::class)
-            ->args([param('api_platform.title'), param('api_platform.description'), param('api_platform.version'), param('api_platform.oauth.enabled'), param('api_platform.oauth.type'), param('api_platform.oauth.flow'), param('api_platform.oauth.tokenUrl'), param('api_platform.oauth.authorizationUrl'), param('api_platform.oauth.refreshUrl'), param('api_platform.oauth.scopes'), param('api_platform.swagger.api_keys')])
+            ->args(['%api_platform.title%', '%api_platform.description%', '%api_platform.version%', '%api_platform.oauth.enabled%', '%api_platform.oauth.type%', '%api_platform.oauth.flow%', '%api_platform.oauth.tokenUrl%', '%api_platform.oauth.authorizationUrl%', '%api_platform.oauth.refreshUrl%', '%api_platform.oauth.scopes%', '%api_platform.swagger.api_keys%'])
 
         ->alias(Options::class, 'api_platform.openapi.options')
 
         ->set('api_platform.openapi.factory', OpenApiFactory::class)
-            ->args([ref('api_platform.metadata.resource.name_collection_factory'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.json_schema.schema_factory'), ref('api_platform.json_schema.type_factory'), ref('api_platform.operation_path_resolver'), ref('api_platform.filter_locator'), ref('api_platform.subresource_operation_factory'), param('api_platform.formats'), ref('api_platform.openapi.options'), ref('api_platform.pagination_options')])
+            ->args([ref('api_platform.metadata.resource.name_collection_factory'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.json_schema.schema_factory'), ref('api_platform.json_schema.type_factory'), ref('api_platform.operation_path_resolver'), ref('api_platform.filter_locator'), ref('api_platform.subresource_operation_factory'), '%api_platform.formats%', ref('api_platform.openapi.options'), ref('api_platform.pagination_options')])
 
         ->alias(OpenApiFactoryInterface::class, 'api_platform.openapi.factory')
 

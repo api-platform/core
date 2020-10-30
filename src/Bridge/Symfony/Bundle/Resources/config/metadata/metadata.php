@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory;
 use ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory;
@@ -46,11 +48,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.metadata.resource.metadata_factory.operation', OperationResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 10)
-            ->args([ref('api_platform.metadata.resource.metadata_factory.operation.inner'), param('api_platform.patch_formats')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory.operation.inner'), '%api_platform.patch_formats%'])
 
         ->set('api_platform.metadata.resource.metadata_factory.formats', FormatsResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 5)
-            ->args([ref('api_platform.metadata.resource.metadata_factory.formats.inner'), param('api_platform.formats'), param('api_platform.patch_formats')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory.formats.inner'), '%api_platform.formats%', '%api_platform.patch_formats%'])
 
         ->set('api_platform.metadata.resource.metadata_factory.cached', CachedResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, -10)

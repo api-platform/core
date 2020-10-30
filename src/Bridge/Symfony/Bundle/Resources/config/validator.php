@@ -18,7 +18,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\Prop
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Validator;
-use ApiPlatform\Core\Filter\QueryParameterValidateListener;
+use ApiPlatform\Core\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Validator\EventListener\ValidateListener;
 use ApiPlatform\Core\Validator\ValidatorInterface;

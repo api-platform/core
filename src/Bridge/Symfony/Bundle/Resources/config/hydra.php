@@ -34,7 +34,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse'])
 
         ->set('api_platform.hydra.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
-            ->args([ref('api_platform.router'), param('api_platform.validator.serialize_payload_fields'), ref('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([ref('api_platform.router'), '%api_platform.validator.serialize_payload_fields%', ref('api_platform.name_converter')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.hydra.normalizer.entrypoint', EntrypointNormalizer::class)
@@ -42,7 +42,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -800])
 
         ->set('api_platform.hydra.normalizer.error', ErrorNormalizer::class)
-            ->args([ref('api_platform.router'), param('kernel.debug')])
+            ->args([ref('api_platform.router'), '%kernel.debug%'])
             ->tag('serializer.normalizer', ['priority' => -800])
 
         ->set('api_platform.hydra.normalizer.collection', CollectionNormalizer::class)
@@ -51,7 +51,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.hydra.normalizer.partial_collection_view', PartialCollectionViewNormalizer::class)
             ->decorate('api_platform.hydra.normalizer.collection')
-            ->args([ref('api_platform.hydra.normalizer.partial_collection_view.inner'), param('api_platform.collection.pagination.page_parameter_name'), param('api_platform.collection.pagination.enabled_parameter_name'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.property_accessor')])
+            ->args([ref('api_platform.hydra.normalizer.partial_collection_view.inner'), '%api_platform.collection.pagination.page_parameter_name%', '%api_platform.collection.pagination.enabled_parameter_name%', ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.property_accessor')])
 
         ->set('api_platform.hydra.normalizer.collection_filters', CollectionFiltersNormalizer::class)
             ->decorate('api_platform.hydra.normalizer.collection')

@@ -31,6 +31,6 @@ return static function (ContainerConfigurator $container) {
         ->alias(SchemaFactoryInterface::class, 'api_platform.json_schema.schema_factory')
 
         ->set('api_platform.json_schema.json_schema_generate_command', JsonSchemaGenerateCommand::class)
-            ->args([ref('api_platform.json_schema.schema_factory'), param('api_platform.formats')])
+            ->args([ref('api_platform.json_schema.schema_factory'), '%api_platform.formats%'])
             ->tag('console.command');
 };

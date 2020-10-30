@@ -280,7 +280,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ));
         }
 
-        $container->getDefinition('api_platform.metadata.extractor.php')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.extractor.xml')->replaceArgument(0, $xmlResources);
 
         if (class_exists(Annotation::class)) {
             $phpFileLoader->load('metadata/annotation.php');

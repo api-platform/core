@@ -24,10 +24,10 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.encoder')
 
         ->set('api_platform.problem.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
-            ->args([param('api_platform.validator.serialize_payload_fields'), ref('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args(['%api_platform.validator.serialize_payload_fields%', ref('api_platform.name_converter')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.problem.normalizer.error', ErrorNormalizer::class)
-            ->args([param('kernel.debug')])
+            ->args(['%kernel.debug%'])
             ->tag('serializer.normalizer', ['priority' => -810]);
 };
