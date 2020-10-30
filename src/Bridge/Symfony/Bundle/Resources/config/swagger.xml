@@ -50,6 +50,7 @@
             <argument>null</argument>
             <argument>%api_platform.swagger.versions%</argument>
             <tag name="console.command" />
+            <tag name="console.command" command="api:openapi:export" />
         </service>
 
     </services>
