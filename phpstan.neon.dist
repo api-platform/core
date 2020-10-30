@@ -104,6 +104,12 @@ parameters:
 		-
 			message: '#Cannot assign new offset to string\.#'
 			path: src/JsonSchema/SchemaFactory.php
+		-
+			message: '#Instanceof between bool\|float\|int\|null and ArrayObject will always evaluate to false\.#'
+			path: src/JsonApi/Serializer/ItemNormalizer.php
+		-
+			message: '#Instanceof between bool\|float\|int\|null and ArrayObject will always evaluate to false\.#'
+			path: src/Serializer/AbstractItemNormalizer.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
