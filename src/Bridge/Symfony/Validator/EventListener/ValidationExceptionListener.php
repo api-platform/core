@@ -46,7 +46,7 @@ final class ValidationExceptionListener
         if (!$exception instanceof ValidationException) {
             return;
         }
-        $exceptionClass = get_class($exception);
+        $exceptionClass = \get_class($exception);
         $statusCode = Response::HTTP_BAD_REQUEST;
 
         foreach ($this->exceptionToStatus as $class => $status) {
