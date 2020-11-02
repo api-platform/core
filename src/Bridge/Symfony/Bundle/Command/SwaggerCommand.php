@@ -33,6 +33,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class SwaggerCommand extends Command
 {
+    protected static $defaultName = 'api:swagger:export';
+
     private $normalizer;
     private $resourceNameCollectionFactory;
     private $apiTitle;
@@ -67,8 +69,6 @@ final class SwaggerCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('api:openapi:export')
-            ->setAliases(['api:swagger:export'])
             ->setDescription('Dump the OpenAPI documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
             ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, sprintf('OpenAPI version to use (%s)', implode(' or ', $this->swaggerVersions)), $this->swaggerVersions[0] ?? 2)
