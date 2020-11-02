@@ -31,10 +31,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         'type' => 'string',
     ];
     private const BASE_PROPS = [
-        '@context' => self::BASE_PROP,
         '@id' => self::BASE_PROP,
         '@type' => self::BASE_PROP,
     ];
+    private const BASE_ROOT_PROPS = [
+        '@context' => self::BASE_PROP,
+    ] + self::BASE_PROPS;
 
     private $schemaFactory;
 
@@ -59,9 +61,12 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
-            $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
+            $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
 
             return $schema;
+        }
+        if ($key = $schema->getItemsDefinitionKey()) {
+            $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
         }
 
         if (($schema['type'] ?? '') === 'array') {

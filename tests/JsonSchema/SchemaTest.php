@@ -31,6 +31,19 @@ class SchemaTest extends TestCase
         $this->assertSame('Foo', $schema->getRootDefinitionKey());
     }
 
+    /**
+     * @dataProvider versionProvider
+     */
+    public function testCollectionJsonSchemaVersion(string $version, string $ref): void
+    {
+        $schema = new Schema($version);
+        $schema['items']['$ref'] = $ref;
+
+        $this->assertInstanceOf(\ArrayObject::class, $schema);
+        $this->assertSame($version, $schema->getVersion());
+        $this->assertSame('Foo', $schema->getItemsDefinitionKey());
+    }
+
     public function versionProvider(): iterable
     {
         yield [Schema::VERSION_JSON_SCHEMA, '#/definitions/Foo'];
