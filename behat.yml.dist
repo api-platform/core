@@ -14,7 +14,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@legacy'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -48,7 +48,7 @@ postgres:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@legacy'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
 
 mongodb:
   suites:
@@ -67,7 +67,7 @@ mongodb:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@legacy'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&'
 
 elasticsearch:
   suites:
@@ -82,7 +82,7 @@ elasticsearch:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '@elasticsearch&&~@legacy'
+        tags: '@elasticsearch'
 
 default-coverage:
   suites:
@@ -132,16 +132,3 @@ elasticsearch-coverage:
         - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
-
-default-legacy:
-  suites:
-    default:
-      filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch~@legacy'
-
-default-legacy-coverage:
-  suites:
-    default:
-      <<: *default-coverage-suite
-      filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch~@legacy'
