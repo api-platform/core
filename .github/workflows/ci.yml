@@ -37,7 +37,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -98,7 +98,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Disable PHP memory limit
         run: echo 'memory_limit=-1' >> /usr/local/etc/php/php.ini
       - name: Install Composer
@@ -173,7 +173,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1') && !startsWith(matrix.php, 'rc'))
         uses: actions/cache@v2
@@ -319,7 +319,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
         uses: actions/cache@v2
@@ -488,7 +488,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -576,7 +576,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -697,7 +697,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         if: (!startsWith(matrix.php, '7.1'))
         uses: actions/cache@v2
@@ -844,6 +844,7 @@ jobs:
         run: |
           apk add \
             unzip \
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -948,7 +949,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Install PHP extensions
         run: |
           apk add \
@@ -1060,7 +1061,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Install PHP extensions
         run: |
           apk add \
@@ -1197,7 +1198,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Install PHP extensions
         run: |
           apk add \
@@ -1309,7 +1310,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Install PHP extensions
         run: |
           apk add \
@@ -1444,7 +1445,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -1588,7 +1589,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -1765,7 +1766,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -1911,7 +1912,7 @@ jobs:
           apk add \
             bash \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -2072,7 +2073,7 @@ jobs:
         run: |
           apk add \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -2163,7 +2164,7 @@ jobs:
             jq \
             moreutils \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
@@ -2272,7 +2273,7 @@ jobs:
             jq \
             moreutils \
             unzip \
-            git
+            git openssh
       - name: Cache mongodb PHP extension build
         uses: actions/cache@v2
         with:
