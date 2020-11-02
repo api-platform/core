@@ -7,7 +7,7 @@ on:
 env:
   COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
   COMPOSER_INSTALLER_COMMIT: fb22b78362d31c0d2bf516d1f8cdfd2745caa431
-  COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+  COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COVERAGE: '0'
   EXT_MONGODB_VERSION: '1.7.5'
   EXT_PCOV_VERSION: '1.0.6'
