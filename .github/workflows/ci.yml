@@ -261,7 +261,7 @@ jobs:
         run: |
           mkdir -p /tmp/api-platform/core/var
           ln -s /tmp/api-platform/core/var tests/Fixtures/app/var
-          tests/Fixtures/app/console cache:clear --ansi
+          rm -Rf tests/Fixtures/app/var/cache/*
       - name: Enable code coverage
         if: matrix.coverage
         run: echo '::set-env name=COVERAGE::1'
