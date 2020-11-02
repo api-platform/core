@@ -144,6 +144,7 @@ class DocumentationNormalizerTest extends TestCase
             '@type' => 'hydra:ApiDocumentation',
             'hydra:title' => 'Test Api',
             'hydra:description' => 'test ApiGerard',
+            'version' => '0.0.0',
             'hydra:supportedClass' => [
                 [
                     '@id' => '#dummy',
@@ -450,6 +451,7 @@ class DocumentationNormalizerTest extends TestCase
             '@type' => 'hydra:ApiDocumentation',
             'hydra:title' => 'Test Api',
             'hydra:description' => 'test ApiGerard',
+            'version' => '0.0.0',
             'hydra:entrypoint' => '/',
             'hydra:supportedClass' => [
                 [
