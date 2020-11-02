@@ -35,6 +35,7 @@ Feature: Documentation support
     And the JSON node "hydra:description" should contain "This is a test API."
     And the JSON node "hydra:description" should contain "Made with love"
     And the JSON node "hydra:entrypoint" should be equal to "/"
+    And the JSON node "version" should be equal to "0.0.0"
     # Supported classes
     And the Hydra class "The API entrypoint" exists
     And the Hydra class "A constraint violation" exists

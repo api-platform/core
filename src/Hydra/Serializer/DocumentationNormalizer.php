@@ -519,6 +519,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $doc['hydra:description'] = $object->getDescription();
         }
 
+        if ('' !== $object->getVersion()) {
+            $doc['version'] = $object->getVersion();
+        }
+
         $doc['hydra:entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
         $doc['hydra:supportedClass'] = $classes;
 
