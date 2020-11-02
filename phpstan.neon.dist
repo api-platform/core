@@ -96,13 +96,7 @@ parameters:
 			path: tests/GraphQl/Type/TypesContainerTest.php
 		# https://github.com/phpstan/phpstan/issues/2999
 		-
-			message: '#ArrayObject<string, string> does not accept true\.#'
-			path: src/JsonSchema/SchemaFactory.php
-		-
-			message: '#ArrayObject<string, string> does not accept array<string, mixed>\.#'
-			path: src/JsonSchema/SchemaFactory.php
-		-
-			message: '#Cannot assign new offset to string\.#'
+			message: '#ArrayObject<string, bool\|string> does not accept array<string, mixed>\.#'
 			path: src/JsonSchema/SchemaFactory.php
 
 		# Expected, due to optional interfaces
