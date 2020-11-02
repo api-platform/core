@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Behat;
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
 use SebastianBergmann\CodeCoverage\Filter;
 use SebastianBergmann\CodeCoverage\Report\PHP;
 
@@ -39,8 +40,15 @@ final class CoverageContext implements Context
     public static function setup()
     {
         $filter = new Filter();
-        $filter->addDirectoryToWhitelist(__DIR__.'/../../src');
-        self::$coverage = new CodeCoverage(null, $filter);
+        if (method_exists($filter, 'includeDirectory')) {
+            $filter->includeDirectory(__DIR__.'/../../src');
+            self::$coverage = new CodeCoverage((new Selector())->forLineCoverage($filter), $filter);
+
+            return;
+        }
+
+        $filter->addDirectoryToWhitelist(__DIR__.'/../../src'); // @phpstan-ignore-line
+        self::$coverage = new CodeCoverage(null, $filter); // @phpstan-ignore-line
     }
 
     /**

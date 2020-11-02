@@ -96,6 +96,31 @@ class User implements UserInterface
      */
     protected $username;
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
+    }
+
     /**
      * @param string|null $fullname
      *
@@ -106,6 +131,14 @@ class User implements UserInterface
         $this->fullname = $fullname;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFullname()
+    {
+        return $this->fullname;
     }
 
     public function getUsername(): string
