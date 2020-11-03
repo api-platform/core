@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('api_platform.doctrine.listener.mercure.publish', PublishMercureUpdatesListener::class)
+        ->set('api_platform.doctrine.orm.listener.mercure.publish', PublishMercureUpdatesListener::class)
             ->args([ref('api_platform.resource_class_resolver'), ref('api_platform.iri_converter'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.serializer'), '%api_platform.formats%', ref('messenger.default_bus')->ignoreOnInvalid(), ref('mercure.hub.default.publisher'), ref('api_platform.graphql.subscription.subscription_manager')->ignoreOnInvalid(), ref('api_platform.graphql.subscription.mercure_iri_generator')->ignoreOnInvalid()])
             ->tag('doctrine.event_listener', ['event' => 'onFlush'])
             ->tag('doctrine.event_listener', ['event' => 'postFlush'])

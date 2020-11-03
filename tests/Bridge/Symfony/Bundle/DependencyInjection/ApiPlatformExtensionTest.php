@@ -107,6 +107,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
@@ -281,6 +282,25 @@ class ApiPlatformExtensionTest extends TestCase
         $config['api_platform']['enable_profiler'] = true;
 
         $this->extension->load($config, $containerBuilder);
+    }
+
+    public function testFosUserPriority()
+    {
+        $builder = new ContainerBuilder();
+
+        $loader = new PhpFileLoader($builder, new FileLocator(\dirname(__DIR__).'/../../../../src/Bridge/Symfony/Bundle/Resources/config'));
+        $loader->load('api.php');
+        $loader->load('fos_user.php');
+
+        $fosListener = $builder->getDefinition('api_platform.fos_user.event_listener');
+        $viewListener = $builder->getDefinition('api_platform.listener.view.serialize');
+
+        // Ensure FOSUser event listener priority is always greater than the view serialize listener
+        $this->assertGreaterThan(
+            $viewListener->getTag('kernel.event_listener')[0]['priority'],
+            $fosListener->getTag('kernel.event_listener')[0]['priority'],
+            'api_platform.fos_user.event_listener priority needs to be greater than that of api_platform.listener.view.serialize'
+        );
     }
 
     /**
@@ -871,8 +891,6 @@ class ApiPlatformExtensionTest extends TestCase
         } catch (MethodNotFoundException $e) {
             $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
         }
-
-        $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
         $definitions = [
             'api_platform.action.documentation',

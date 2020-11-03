@@ -119,7 +119,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(GroupFilter::class, 'api_platform.serializer.group_filter')
 
         ->set('api_platform.serializer.normalizer.item', ItemNormalizer::class)
-            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver'), ref('api_platform.property_accessor'), ref('api_platform.name_converter')->ignoreOnInvalid(), ref('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), ref('api_platform.item_data_provider')->ignoreOnInvalid(), '%api_platform.allow_plain_identifiers%', null, tagged_iterator('api_platform.data_transformer'), ref('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid(), ref('api_platform.security.resource_access_checker')->ignoreOnInvalid()])
+            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver'), ref('api_platform.property_accessor'), ref('api_platform.name_converter')->ignoreOnInvalid(), ref('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), ref('api_platform.item_data_provider')->ignoreOnInvalid(), '%api_platform.allow_plain_identifiers%', null, tagged_iterator('api_platform.data_transformer'), ref('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid(), ref('api_platform.security.resource_access_checker')])
             ->tag('serializer.normalizer', ['priority' => -895])
 
         ->alias('api_platform.operation_path_resolver', 'api_platform.operation_path_resolver.router')

@@ -83,17 +83,6 @@ parameters:
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
 			path: tests/Util/SortTraitTest.php
-		# https://github.com/phpstan/phpstan-symfony/issues/27
-		-
-			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
-			path: src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
-		-
-			message: '#Service "api_platform\.iri_converter" is private\.#'
-			path: src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
-		# https://github.com/phpstan/phpstan-symfony/issues/76
-		-
-			message: '#Service "api_platform\.graphql\.fields_builder" is private\.#'
-			path: src/GraphQl/Type/TypeBuilder.php
 		-
 			message: '#Service "test" is not registered in the container\.#'
 			path: tests/GraphQl/Type/TypesContainerTest.php
@@ -104,6 +93,14 @@ parameters:
 		-
 			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo::\$fieldMappings \(array.*\)>\) does not accept array\(.*\)\.#'
 			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
+		-
+			message: '#Call to function iterator_to_array\(\) on a separate line has no effect\.#'
+			path: tests/Bridge/Elasticsearch/DataProvider/PaginatorTest.php
+		-
+			message: '#Instanceof between bool\|float\|int\|null and ArrayObject will always evaluate to false\.#'
+			paths:
+				- src/JsonApi/Serializer/ItemNormalizer.php
+				- src/Serializer/AbstractItemNormalizer.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'

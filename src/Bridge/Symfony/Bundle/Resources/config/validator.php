@@ -50,6 +50,6 @@ return static function (ContainerConfigurator $container) {
             ->args([ref('api_platform.filter_locator')])
 
         ->set('api_platform.listener.view.validate_query_parameters', QueryParameterValidateListener::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.filter_locator')])
+            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.validator.query_parameter_validator')])
             ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 16]);
 };

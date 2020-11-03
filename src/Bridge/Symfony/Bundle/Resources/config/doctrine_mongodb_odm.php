@@ -114,7 +114,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(FilterExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter')
 
         ->set('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', PaginationExtension::class)
-            ->args([ref('doctrine_mongodb'), ref('api_platform.pagination')])
+            ->args([ref('doctrine_mongodb'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.pagination')])
             ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection')
         ->alias(PaginationExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination')
 
