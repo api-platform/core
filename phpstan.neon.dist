@@ -36,10 +36,6 @@ parameters:
 	ignoreErrors:
 		# Real problems, hard to fix
 		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
-		-
-			message: '#Return type \(mixed\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(array\|object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
-			path: src/Identifier/Normalizer/IntegerDenormalizer.php
-
 		# False positives
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
