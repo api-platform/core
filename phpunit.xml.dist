@@ -32,6 +32,8 @@
                 <directory>features</directory>
                 <directory>tests</directory>
                 <directory>vendor</directory>
+                <directory>src/Bridge/NelmioApiDoc</directory>
+                <directory>src/Bridge/FosUser</directory>
                 <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
             </exclude>
         </whitelist>

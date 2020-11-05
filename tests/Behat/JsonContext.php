@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use Behat\Gherkin\Node\PyStringNode;
 use Behatch\Context\JsonContext as BaseJsonContext;
@@ -55,20 +57,19 @@ final class JsonContext extends BaseJsonContext
         $array = json_decode($this->httpCallResultPool->getResult()->getValue(), true);
         $subset = json_decode($content->getRaw(), true);
 
-        // Compatibility with PHPUnit 7
-        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array);
+        method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array); // @phpstan-ignore-line Compatibility with PHPUnit 7
     }
 
     private function sortArrays($obj)
     {
-        $isObject = is_object($obj);
+        $isObject = \is_object($obj);
 
         foreach ($obj as $key => $value) {
             if (null === $value || is_scalar($value)) {
                 continue;
             }
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 sort($value);
             }
 

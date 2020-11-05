@@ -238,6 +238,8 @@ class EntrypointActionTest extends TestCase
         $executorProphecy->executeQuery(Argument::is($schema->reveal()), 'graphqlQuery', null, null, $variables, 'graphqlOperationName')->willReturn($executionResultProphecy->reveal());
 
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
+        $twigProphecy->render(Argument::cetera())->willReturn('');
+
         $routerProphecy = $this->prophesize(RouterInterface::class);
 
         $graphiQlAction = new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), true);

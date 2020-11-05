@@ -1,5 +1,6 @@
 imports:
     - { resource: config_common.yml }
+    - { resource: config_behat_orm.yml }
 
 api_platform:
     doctrine_mongodb_odm: false
@@ -7,14 +8,6 @@ api_platform:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
             - '%kernel.project_dir%/config/api_resources_orm.yaml'
-
-fos_user:
-    db_driver:        'orm'
-    firewall_name:    'api'
-    user_class:       'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User'
-    from_email:
-        address:      'no-reply@les-tilleuls.coop'
-        sender_name:  'Kévin Dunglas'
 
 services:
     app.my_dummy_resource.search_filter:

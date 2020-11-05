@@ -11,21 +11,20 @@
 
 declare(strict_types=1);
 
-use Behat\Symfony2Extension\Context\KernelAwareContext;
+namespace ApiPlatform\Core\Tests\Behat;
+
+use Behat\Behat\Context\Context;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class HttpCacheContext implements KernelAwareContext
+final class HttpCacheContext implements Context
 {
-    /**
-     * @var KernelInterface
-     */
     private $kernel;
 
-    public function setKernel(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
     }
@@ -35,7 +34,7 @@ final class HttpCacheContext implements KernelAwareContext
      */
     public function irisShouldBePurged(string $iris)
     {
-        $purger = $this->kernel->getContainer()->get('test.api_platform.http_cache.purger');
+        $purger = $this->kernel->getContainer()->get('behat.driver.service_container')->get('test.api_platform.http_cache.purger');
 
         $purgedIris = implode(',', $purger->getIris());
         $purger->clear();

@@ -20,7 +20,9 @@ use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
@@ -38,11 +40,15 @@ class AddLinkHeaderListenerTest extends TestCase
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/docs')->shouldBeCalled();
 
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
         $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
 
@@ -60,12 +66,16 @@ class AddLinkHeaderListenerTest extends TestCase
         $request->setMethod('OPTIONS');
         $request->headers->set('Access-Control-Request-Method', 'POST');
 
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertFalse($request->attributes->has('_links'));
     }

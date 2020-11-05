@@ -14,3 +14,10 @@ services:
     test.api_platform.elasticsearch.client:
         parent: api_platform.elasticsearch.client
         public: true
+
+    ApiPlatform\Core\Tests\Behat\ElasticsearchContext:
+        public: true
+        arguments:
+            $client: '@test.api_platform.elasticsearch.client'
+            $elasticsearchMappingsPath: '%kernel.project_dir%/../Elasticsearch/Mappings/'
+            $elasticsearchFixturesPath: '%kernel.project_dir%/../Elasticsearch/Fixtures/'
