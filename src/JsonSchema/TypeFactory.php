@@ -161,6 +161,17 @@ final class TypeFactory implements TypeFactoryInterface
             ];
         }
 
+        if ($schema && Schema::VERSION_JSON_SCHEMA === $schema->getVersion()) {
+            return array_merge(
+                $jsonSchema,
+                [
+                    'type' => \is_array($jsonSchema['type'])
+                        ? array_merge($jsonSchema['type'], ['null'])
+                        : [$jsonSchema['type'], 'null'],
+                ]
+            );
+        }
+
         return array_merge($jsonSchema, ['nullable' => true]);
     }
 }
