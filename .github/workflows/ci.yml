@@ -195,6 +195,7 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4'
+          - 'rc'
         include:
           - php: '7.4'
             coverage: true
@@ -381,7 +382,7 @@ jobs:
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
-  behat-postgresql:
+  postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -432,7 +433,7 @@ jobs:
         run: | 
           vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
 
-  behat-mysql:
+  mysql:
     name: Behat (PHP ${{ matrix.php }}) (MySQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -479,7 +480,7 @@ jobs:
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
-  behat-mongodb:
+  mongodb:
     name: Behat (PHP ${{ matrix.php }}) (MongoDB)
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -529,7 +530,7 @@ jobs:
       - name: Run Behat tests
         run: vendor/bin/behat -vv --out=std --format=progress --profile=mongodb --no-interaction
 
-  behat-elasticsearch:
+  elasticsearch:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -687,7 +688,6 @@ jobs:
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-        continue-on-error: true
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
 
@@ -751,7 +751,6 @@ jobs:
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-        continue-on-error: true
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
