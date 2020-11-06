@@ -63,9 +63,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         env:
           SYMFONY_PHPUNIT_VERSION: '9.4'
@@ -85,7 +85,7 @@ jobs:
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.4'
-        run: phpstan analyse --no-progress --no-interaction --ansi
+        run: phpstan analyse --no-interaction --no-progress --no-interaction --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -128,7 +128,7 @@ jobs:
       - name: Remove Doctrine MongoDB ODM
         if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, 'rc'))
         run: |
-          composer remove --dev --no-progress --no-update --ansi \
+          composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
       - name: Set Composer platform config
@@ -136,10 +136,10 @@ jobs:
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -176,7 +176,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-progress --ansi cedx/coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/phpunit/clover.xml
         continue-on-error: true
@@ -221,14 +221,14 @@ jobs:
       - name: Remove Doctrine MongoDB ODM
         if: startsWith(matrix.php, '7.1')
         run: |
-          composer remove --dev --no-progress --no-update --ansi \
+          composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -272,7 +272,7 @@ jobs:
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          composer global require --prefer-dist --no-progress --ansi cedx/coveralls
+          composer global require --prefer-dist --no-interaction --no-progress --ansi cedx/coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           coveralls build/logs/behat/clover.xml
         continue-on-error: true
@@ -326,9 +326,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi --prefer-lowest
+        run: composer update --no-interaction --no-progress --ansi --prefer-lowest
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Install PHPUnit
@@ -365,9 +365,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi --prefer-lowest
+        run: composer update --no-interaction --no-progress --ansi --prefer-lowest
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -414,9 +414,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -461,9 +461,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -506,9 +506,11 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: |
+          composer update --no-interaction --no-progress --ansi
+          composer why doctrine/reflection
+      # - name: Require Symfony Uid
+      #   run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -516,7 +518,7 @@ jobs:
       - name: Run PHPUnit
         run: vendor/bin/simple-phpunit
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=mongodb --no-interaction
+        run: vendor/bin/behat -vv --out=std --format=progress --profile=mongodb --no-interaction
 
   behat-elasticsearch:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)
@@ -559,11 +561,11 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install Elasticsearch-php # there is a version matrix for this package: https://packagist.org/packages/elasticsearch/elasticsearch
-        run: composer require "elasticsearch/elasticsearch:v6.7.2" --no-progress --ansi
+        run: composer require "elasticsearch/elasticsearch:v6.7.2" --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -604,9 +606,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -650,9 +652,9 @@ jobs:
         run: |
           jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -670,7 +672,7 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
 
@@ -710,9 +712,9 @@ jobs:
         run: |
           jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
       - name: Update project dependencies
-        run: composer update --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -730,7 +732,7 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
@@ -766,9 +768,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi --ignore-platform-reqs
+        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -808,9 +810,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-progress --ansi --ignore-platform-reqs
+        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
