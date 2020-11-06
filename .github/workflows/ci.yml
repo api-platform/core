@@ -687,6 +687,7 @@ jobs:
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
+        continue-on-error: true
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit
 
@@ -750,6 +751,7 @@ jobs:
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
+        continue-on-error: true
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
