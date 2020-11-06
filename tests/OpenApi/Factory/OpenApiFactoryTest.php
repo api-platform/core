@@ -177,6 +177,7 @@ class OpenApiFactoryTest extends TestCase
         $dummySchema->setDefinitions(new \ArrayObject([
             'type' => 'object',
             'description' => 'This is a dummy.',
+            'additionalProperties' => false,
             'properties' => [
                 'id' => new \ArrayObject([
                     'type' => 'integer',

@@ -71,7 +71,6 @@ api_platform:
             client_items_per_page:     true
             client_partial:            true
             items_per_page:            3
->>>>>>> upstream/2.5
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST

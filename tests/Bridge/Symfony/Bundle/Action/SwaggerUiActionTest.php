@@ -105,7 +105,7 @@ class SwaggerUiActionTest extends TestCase
                 'path' => '/fs',
                 'method' => 'get',
             ],
-        ])->shouldBeCalled();
+        ])->shouldBeCalled()->willReturn('');
 
         $twigItemProphecy = $this->prophesize(TwigEnvironment::class);
         $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
@@ -138,7 +138,7 @@ class SwaggerUiActionTest extends TestCase
                 'path' => '/fs/{id}',
                 'method' => 'get',
             ],
-        ])->shouldBeCalled();
+        ])->shouldBeCalled()->willReturn('');
 
         return [
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']), $twigCollectionProphecy],
@@ -188,7 +188,7 @@ class SwaggerUiActionTest extends TestCase
                     'scopes' => [],
                 ],
             ],
-        ])->shouldBeCalled();
+        ])->shouldBeCalled()->willReturn('');
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
