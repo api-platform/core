@@ -18,7 +18,7 @@ Feature: JSON API error handling
       }
     }
     """
-    Then the response status code should be 400
+    Then the response status code should be 422
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
     And the JSON should be equal to:
@@ -49,7 +49,7 @@ Feature: JSON API error handling
       }
     }
     """
-    Then the response status code should be 400
+    Then the response status code should be 422
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
     And the JSON should be equal to:
