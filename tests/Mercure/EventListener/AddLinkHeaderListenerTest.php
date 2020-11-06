@@ -22,7 +22,9 @@ use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
@@ -40,12 +42,15 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true]));
 
+        $event = new ResponseEvent(
+          $this->prophesize(HttpKernelInterface::class)->reveal(),
+          $request,
+          HttpKernelInterface::MASTER_REQUEST,
+          new Response()
+        );
+
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
-
-        $eventProphecy = $this->prophesize(ResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-
-        $listener->onKernelResponse($eventProphecy->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
@@ -66,12 +71,15 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
+
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
-
-        $eventProphecy = $this->prophesize(ResponseEvent::class);
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-
-        $listener->onKernelResponse($eventProphecy->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertNull($request->attributes->get('_links'));
     }
@@ -90,12 +98,16 @@ class AddLinkHeaderListenerTest extends TestCase
         $request->setMethod('OPTIONS');
         $request->headers->set('Access-Control-Request-Method', 'POST');
 
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $listener = new AddLinkHeaderListener($resourceMetadataFactory->reveal(), 'http://example.com/.well-known/mercure');
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertFalse($request->attributes->has('_links'));
     }

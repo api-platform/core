@@ -113,14 +113,14 @@ trait ApiTestAssertionsTrait
     {
         $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName);
 
-        static::assertMatchesJsonSchema($schema);
+        static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
         $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName);
 
-        static::assertMatchesJsonSchema($schema);
+        static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     private static function getHttpClient(Client $newClient = null): ?Client

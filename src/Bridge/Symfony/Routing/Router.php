@@ -73,7 +73,10 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     public function match($pathInfo)
     {
         $baseContext = $this->router->getContext();
-        $pathInfo = str_replace($baseContext->getBaseUrl(), '', $pathInfo);
+        $baseUrl = $baseContext->getBaseUrl();
+        if ($baseUrl === substr($pathInfo, 0, \strlen($baseUrl))) {
+            $pathInfo = substr($pathInfo, \strlen($baseUrl));
+        }
 
         $request = Request::create($pathInfo, 'GET', [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
         try {

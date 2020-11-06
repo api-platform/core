@@ -32,6 +32,10 @@ class TraceableChainDataPersisterTest extends TestCase
         $result = $dataPersister->getPersistersResponse();
         $this->assertCount(\count($expected), $result);
         $this->assertEmpty(array_filter($result, function ($key) {
+            if (\PHP_VERSION_ID >= 80000) {
+                return !str_starts_with($key, DataPersisterInterface::class.'@anonymous');
+            }
+
             return 0 !== strpos($key, 'class@anonymous');
         }, ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
@@ -46,6 +50,10 @@ class TraceableChainDataPersisterTest extends TestCase
         $result = $dataPersister->getPersistersResponse();
         $this->assertCount(\count($expected), $result);
         $this->assertEmpty(array_filter($result, function ($key) {
+            if (\PHP_VERSION_ID >= 80000) {
+                return !str_starts_with($key, DataPersisterInterface::class.'@anonymous');
+            }
+
             return 0 !== strpos($key, 'class@anonymous');
         }, ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));

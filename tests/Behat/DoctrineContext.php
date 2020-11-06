@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as AbsoluteUrlDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
@@ -147,10 +149,11 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
@@ -159,7 +162,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 final class DoctrineContext implements Context
 {
     /**
-     * @var EntityManagerInterface|DocumentManager
+     * @var ObjectManager
      */
     private $manager;
     private $doctrine;
@@ -190,10 +193,16 @@ final class DoctrineContext implements Context
      */
     public function createDatabase()
     {
-        $this->isOrm() && $this->schemaTool->dropSchema($this->classes);
-        $this->isOdm() && $this->schemaManager->dropDatabases();
+        if ($this->isOrm()) {
+            $this->schemaTool->dropSchema($this->classes);
+            $this->schemaTool->createSchema($this->classes);
+        }
+
+        if ($this->isOdm()) {
+            $this->schemaManager->dropDatabases();
+        }
+
         $this->doctrine->getManager()->clear();
-        $this->isOrm() && $this->schemaTool->createSchema($this->classes);
     }
 
     /**
@@ -502,7 +511,7 @@ final class DoctrineContext implements Context
         for ($i = 1; $i <= $nb; ++$i) {
             $dummyDto = $this->buildDummyDtoNoOutput();
             $dummyDto->lorem = 'DummyDtoNoOutput foo #'.$i;
-            $dummyDto->ipsum = $i / 3;
+            $dummyDto->ipsum = (string) ($i / 3);
 
             $this->manager->persist($dummyDto);
         }
@@ -661,9 +670,9 @@ final class DoctrineContext implements Context
     {
         $descriptions = ['Smart dummy.', 'Not so smart dummy.'];
 
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -831,9 +840,9 @@ final class DoctrineContext implements Context
      */
     public function thereAreDummyObjectsWithDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -859,9 +868,9 @@ final class DoctrineContext implements Context
      */
     public function thereAreDummyObjectsWithEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -886,9 +895,9 @@ final class DoctrineContext implements Context
      */
     public function thereAreDummyObjectsWithRelationEmbeddedDummyBoolean(int $nb, string $bool)
     {
-        if (in_array($bool, ['true', '1', 1], true)) {
+        if (\in_array($bool, ['true', '1', 1], true)) {
             $bool = true;
-        } elseif (in_array($bool, ['false', '0', 0], true)) {
+        } elseif (\in_array($bool, ['false', '0', 0], true)) {
             $bool = false;
         } else {
             $expected = ['true', 'false', '1', '0'];
@@ -1409,7 +1418,7 @@ final class DoctrineContext implements Context
         for ($i = 0; $i < $nb; ++$i) {
             $dto = $this->isOrm() ? new DummyDtoCustom() : new DummyDtoCustomDocument();
             $dto->lorem = 'test';
-            $dto->ipsum = (string) $i + 1;
+            $dto->ipsum = (string) ($i + 1);
             $this->manager->persist($dto);
         }
 

@@ -11,9 +11,11 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
+use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -25,11 +27,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class CommandContext implements KernelAwareContext
+final class CommandContext implements Context
 {
-    /**
-     * @var KernelInterface
-     */
     private $kernel;
 
     /**
@@ -41,6 +40,11 @@ final class CommandContext implements KernelAwareContext
      * @var CommandTester
      */
     private $commandTester;
+
+    public function __construct(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+    }
 
     /**
      * @When I run the command :command
