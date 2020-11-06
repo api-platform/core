@@ -239,6 +239,8 @@
         </service>
 
         <service id="api_platform.graphql.normalizer.validation_exception" class="ApiPlatform\Core\GraphQl\Serializer\Exception\ValidationExceptionNormalizer">
+            <argument>%api_platform.exception_to_status%</argument>
+
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
