@@ -67,7 +67,7 @@ mongodb:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
 
 elasticsearch:
   suites:

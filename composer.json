@@ -1,6 +1,6 @@
 {
     "name": "api-platform/core",
-    "description": "Build a fully-featured hypermedia or GraphQL API in minutes",
+    "description": "Build a fully-featured hypermedia or GraphQL API in minutes!",
     "type": "library",
     "keywords": ["REST", "GraphQL", "API", "JSON-LD", "Hydra", "JSONAPI", "OpenAPI", "HAL", "Swagger"],
     "homepage": "https://api-platform.com",
