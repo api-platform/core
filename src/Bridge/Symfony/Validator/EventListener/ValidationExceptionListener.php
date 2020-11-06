@@ -47,7 +47,7 @@ final class ValidationExceptionListener
             return;
         }
         $exceptionClass = \get_class($exception);
-        $statusCode = Response::HTTP_BAD_REQUEST;
+        $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
 
         foreach ($this->exceptionToStatus as $class => $status) {
             if (is_a($exceptionClass, $class, true)) {
