@@ -97,7 +97,7 @@ class Dummy
      * @var \DateTime A dummy date
      *
      * @ODM\Field(type="date", nullable=true)
-     * @Assert\DateTime
+     * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;
 

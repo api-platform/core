@@ -654,15 +654,15 @@ jobs:
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Allow unstable project dependencies
+        run: |
+          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Allow unstable project dependencies
-        run: |
-          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
@@ -715,15 +715,15 @@ jobs:
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Allow unstable project dependencies
+        run: |
+          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Allow unstable project dependencies
-        run: |
-          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
