@@ -305,6 +305,20 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $filterFactory,
                 ],
+                'exact (case insensitive, with special characters)' => [
+                    [
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^exact \(special\)$', 'i'),
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
                 'exact (multiple values)' => [
                     [
                         [
