@@ -1,5 +1,6 @@
 imports:
     - { resource: config_common.yml }
+    - { resource: config_behat_mongodb.yml }
 
 parameters:
     env(MONGODB_DB): api_platform_test
@@ -21,14 +22,6 @@ api_platform:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
             - '%kernel.project_dir%/config/api_resources_mongodb_odm.yaml'
-
-fos_user:
-    db_driver:       'mongodb'
-    firewall_name:   'api'
-    user_class:      'ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User'
-    from_email:
-        address:     'no-reply@les-tilleuls.coop'
-        sender_name: 'Kévin Dunglas'
 
 services:
     app.my_dummy_resource.mongodb.boolean_filter:

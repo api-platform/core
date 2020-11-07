@@ -19,8 +19,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
 use Doctrine\ORM\Mapping as ORM;
-use FOS\UserBundle\Model\User as BaseUser;
-use FOS\UserBundle\Model\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -60,7 +59,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class User extends BaseUser
+class User implements UserInterface
 {
     /**
      * @var int
@@ -69,36 +68,61 @@ class User extends BaseUser
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @Groups({"user"})
      */
-    protected $email;
+    private $email;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"user"})
      */
-    protected $fullname;
+    private $fullname;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @Groups({"user-write"})
      */
-    protected $plainPassword;
+    private $plainPassword;
 
     /**
      * @var string
      *
      * @Groups({"user"})
      */
-    protected $username;
+    private $username;
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
+    }
 
     /**
      * @param string|null $fullname
@@ -120,11 +144,27 @@ class User extends BaseUser
         return $this->fullname;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isUser(UserInterface $user = null)
+    public function getUsername(): string
     {
-        return $user instanceof self && $user->id === $this->id;
+        return (string) $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function getPassword()
+    {
+        return null;
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function eraseCredentials()
+    {
     }
 }

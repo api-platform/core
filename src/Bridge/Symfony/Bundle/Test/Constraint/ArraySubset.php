@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint;
 
+use PHPUnit\Runner\Version;
 use PHPUnit\SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\ComparisonFailure as LegacyComparisonFailure;
 
@@ -21,7 +22,7 @@ if (!class_exists(ComparisonFailure::class)) {
 }
 
 // Aliases as string to avoid loading the class
-if (\PHP_VERSION_ID >= 80000 || (float) getenv('SYMFONY_PHPUNIT_VERSION') > 8) {
+if (\PHP_VERSION_ID >= 80000 || (float) Version::series() >= 9) {
     class_alias('ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubsetV9', 'ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubset');
 } else {
     class_alias('ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubsetLegacy', 'ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubset');

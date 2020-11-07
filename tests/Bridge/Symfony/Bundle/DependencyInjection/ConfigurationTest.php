@@ -107,7 +107,7 @@ class ConfigurationTest extends TestCase
                 'serialize_payload_fields' => [],
             ],
             'name_converter' => null,
-            'enable_fos_user' => true,
+            'enable_fos_user' => false,
             'enable_nelmio_api_doc' => false,
             'enable_swagger' => true,
             'enable_swagger_ui' => true,

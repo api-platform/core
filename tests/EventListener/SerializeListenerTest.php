@@ -23,8 +23,8 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -40,17 +40,20 @@ class SerializeListenerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
 
-        $request = new Request();
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new Response());
-        $eventProphecy->getRequest()->willReturn($request);
-
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::cetera());
 
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            null
+        );
+
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     public function testDoNotSerializeWhenRespondFlagIsFalse()
@@ -65,13 +68,17 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_respond' => false]);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn($dummy);
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->setControllerResult(Argument::any())->shouldNotBeCalled();
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     public function testDoNotSerializeWhenDisabledInOperationAttribute()
@@ -91,17 +98,20 @@ class SerializeListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
 
         $dummy = new Dummy();
-
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn($dummy);
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->setControllerResult(Argument::any())->shouldNotBeCalled();
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     public function testSerializeCollectionOperation()
@@ -125,19 +135,22 @@ class SerializeListenerTest extends TestCase
             ->willReturn('bar')
             ->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
-        $request->setRequestFormat('xml');
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new \stdClass())->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $eventProphecy->setControllerResult('bar')->shouldBeCalled();
-
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+        $request->setRequestFormat('xml');
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new \stdClass()
+        );
+
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertSame('bar', $event->getControllerResult());
     }
 
     public function testSerializeCollectionOperationWithOutputClassDisabled()
@@ -145,19 +158,23 @@ class SerializeListenerTest extends TestCase
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'post', 'output' => ['class' => null]];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_output_class' => false]);
-        $request->setRequestFormat('xml');
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new \stdClass());
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->setControllerResult(null)->shouldBeCalled();
-
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_output_class' => false]);
+        $request->setRequestFormat('xml');
+
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new \stdClass()
+        );
+
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertNull($event->getControllerResult());
     }
 
     public function testSerializeItemOperation()
@@ -180,19 +197,22 @@ class SerializeListenerTest extends TestCase
             ->willReturn('bar')
             ->shouldBeCalled();
 
-        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
-        $request->setRequestFormat('xml');
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new \stdClass())->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $eventProphecy->setControllerResult('bar')->shouldBeCalled();
-
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), true, Argument::type('array'))->willReturn($expectedContext)->shouldBeCalled();
 
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
+        $request->setRequestFormat('xml');
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new \stdClass()
+        );
+
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertSame('bar', $event->getControllerResult());
     }
 
     public function testEncode()
@@ -202,17 +222,21 @@ class SerializeListenerTest extends TestCase
         $serializerProphecy->encode(Argument::any(), 'xml')->willReturn('bar')->shouldBeCalled();
         $serializerProphecy->serialize(Argument::cetera())->shouldNotBeCalled();
 
+        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn([])->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
-        $eventProphecy->setControllerResult('bar')->shouldBeCalled();
-
-        $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            []
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+        $listener->onKernelView($event);
+
+        $this->assertSame('bar', $event->getControllerResult());
     }
 }

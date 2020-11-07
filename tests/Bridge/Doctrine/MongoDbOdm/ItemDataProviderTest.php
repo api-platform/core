@@ -28,7 +28,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\Aggregation\Stage\Match;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Match as AggregationMatch;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
@@ -63,7 +63,7 @@ class ItemDataProviderTest extends TestCase
     {
         $context = ['foo' => 'bar', 'fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
-        $matchProphecy = $this->prophesize(Match::class);
+        $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
 
@@ -96,7 +96,7 @@ class ItemDataProviderTest extends TestCase
     {
         $context = ['foo' => 'bar', 'fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
-        $matchProphecy = $this->prophesize(Match::class);
+        $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
 
@@ -132,7 +132,7 @@ class ItemDataProviderTest extends TestCase
 
     public function testGetItemDoubleIdentifier()
     {
-        $matchProphecy = $this->prophesize(Match::class);
+        $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('ida')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->field('idb')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
@@ -191,7 +191,7 @@ class ItemDataProviderTest extends TestCase
 
     public function testAggregationResultExtension()
     {
-        $matchProphecy = $this->prophesize(Match::class);
+        $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
 

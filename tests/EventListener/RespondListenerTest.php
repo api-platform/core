@@ -19,7 +19,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -34,28 +33,25 @@ class RespondListenerTest extends TestCase
 
     public function testDoNotHandleResponse()
     {
-        $request = new Request();
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn(new Response());
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->setResponse(Argument::any())->shouldNotBeCalled();
-
         $listener = new RespondListener();
-        $listener->onKernelView($eventProphecy->reveal());
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, null);
+        $listener->onKernelView($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     public function testDoNotHandleWhenRespondFlagIsFalse()
     {
-        $request = new Request([], [], ['_api_respond' => false]);
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn('foo');
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->setResponse(Argument::any())->shouldNotBeCalled();
-
         $listener = new RespondListener();
-        $listener->onKernelView($eventProphecy->reveal());
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_respond' => false]),
+            HttpKernelInterface::MASTER_REQUEST,
+            'foo'
+        );
+        $listener->onKernelView($event);
+
+        $this->assertNull($event->getResponse());
     }
 
     public function testCreate200Response()
@@ -63,9 +59,8 @@ class RespondListenerTest extends TestCase
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             'foo'
@@ -85,13 +80,11 @@ class RespondListenerTest extends TestCase
 
     public function testPost200WithoutLocation()
     {
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
 
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             'bar'
@@ -109,13 +102,11 @@ class RespondListenerTest extends TestCase
 
     public function testPost301WithLocation()
     {
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
 
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             'bar'
@@ -134,14 +125,12 @@ class RespondListenerTest extends TestCase
 
     public function testCreate201Response()
     {
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-
         $request = new Request([], [], ['_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
         $request->setRequestFormat('xml');
 
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             'foo'
@@ -164,14 +153,12 @@ class RespondListenerTest extends TestCase
 
     public function testCreate204Response()
     {
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
         $request->setMethod('DELETE');
 
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
             HttpKernelInterface::MASTER_REQUEST,
             'foo'
@@ -191,13 +178,9 @@ class RespondListenerTest extends TestCase
 
     public function testSetSunsetHeader()
     {
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
-
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
-            $request,
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
             HttpKernelInterface::MASTER_REQUEST,
             'bar'
         );
@@ -215,13 +198,9 @@ class RespondListenerTest extends TestCase
 
     public function testSetCustomStatus()
     {
-        $kernelProphecy = $this->prophesize(HttpKernelInterface::class);
-
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
-
         $event = new ViewEvent(
-            $kernelProphecy->reveal(),
-            $request,
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
             HttpKernelInterface::MASTER_REQUEST,
             'bar'
         );
@@ -236,14 +215,17 @@ class RespondListenerTest extends TestCase
 
     public function testHandleResponse()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]);
-        $response = new Response();
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn($response);
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->setResponse($response)->shouldBeCalled();
-
         $listener = new RespondListener();
-        $listener->onKernelView($eventProphecy->reveal());
+
+        $response = new Response();
+        $event = new ViewEvent(
+          $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
+        $listener->onKernelView($event);
+
+        $this->assertSame($response, $event->getResponse());
     }
 }

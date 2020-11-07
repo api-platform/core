@@ -19,7 +19,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
-use FOS\UserBundle\FOSUserBundle;
+use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -31,6 +31,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -67,20 +68,20 @@ class AppKernel extends Kernel
             new MercureBundle(),
             new ApiPlatformBundle(),
             new SecurityBundle(),
-            new FOSUserBundle(),
             new WebProfilerBundle(),
+            new FriendsOfBehatSymfonyExtensionBundle(),
         ];
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();
         }
 
-        if ('elasticsearch' !== $this->getEnvironment()) {
-            $bundles[] = new TestBundle();
+        if (class_exists(NelmioApiDocBundle::class)) {
+            $bundles[] = new NelmioApiDocBundle();
         }
 
-        if ($_SERVER['LEGACY'] ?? false) {
-            $bundles[] = new NelmioApiDocBundle();
+        if ('elasticsearch' !== $this->getEnvironment()) {
+            $bundles[] = new TestBundle();
         }
 
         return $bundles;
@@ -91,11 +92,14 @@ class AppKernel extends Kernel
         return __DIR__;
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes)
+    /**
+     * @param RoutingConfigurator|RouteCollectionBuilder $routes
+     */
+    protected function configureRoutes($routes)
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
 
-        if ($_SERVER['LEGACY'] ?? false) {
+        if (class_exists(NelmioApiDocBundle::class)) {
             $routes->import('@NelmioApiDocBundle/Resources/config/routing.yml', '/nelmioapidoc');
         }
     }
@@ -117,7 +121,7 @@ class AppKernel extends Kernel
             'providers' => [
                 'chain_provider' => [
                     'chain' => [
-                        'providers' => ['in_memory', 'fos_userbundle'],
+                        'providers' => ['in_memory', 'entity'],
                     ],
                 ],
                 'in_memory' => [
@@ -128,7 +132,12 @@ class AppKernel extends Kernel
                         ],
                     ],
                 ],
-                'fos_userbundle' => ['id' => 'fos_user.user_provider.username_email'],
+                'entity' => [
+                    'entity' => [
+                        'class' => User::class,
+                        'property' => 'email',
+                    ],
+                ],
             ],
             'firewalls' => [
                 'dev' => [
@@ -168,7 +177,7 @@ class AppKernel extends Kernel
         }
         $c->prependExtensionConfig('twig', $twigConfig);
 
-        if ($_SERVER['LEGACY'] ?? false) {
+        if (class_exists(NelmioApiDocBundle::class)) {
             $c->prependExtensionConfig('nelmio_api_doc', [
                 'sandbox' => [
                     'accept_type' => 'application/json',

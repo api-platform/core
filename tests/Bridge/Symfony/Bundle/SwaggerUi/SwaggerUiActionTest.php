@@ -76,9 +76,9 @@ class SwaggerUiActionTest extends TestCase
     {
         $twigCollectionProphecy = $this->prophesize(TwigEnvironment::class);
         $twigCollectionProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'title' => '',
+            'title' => 'title',
             'description' => '',
-            'formats' => [],
+            'formats' => ['jsonld' => ['application/ld+json']],
             'showWebby' => true,
             'swaggerUiEnabled' => false,
             'reDocEnabled' => false,
@@ -105,13 +105,13 @@ class SwaggerUiActionTest extends TestCase
                 'path' => '/fs',
                 'method' => 'get',
             ],
-        ])->shouldBeCalled();
+        ])->shouldBeCalled()->willReturn('');
 
         $twigItemProphecy = $this->prophesize(TwigEnvironment::class);
         $twigItemProphecy->render('@ApiPlatform/SwaggerUi/index.html.twig', [
-            'title' => '',
+            'title' => 'title',
             'description' => '',
-            'formats' => [],
+            'formats' => ['jsonld' => ['application/ld+json']],
             'swaggerUiEnabled' => false,
             'showWebby' => true,
             'reDocEnabled' => false,
@@ -123,8 +123,8 @@ class SwaggerUiActionTest extends TestCase
                 'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
-                    'clientId' => '',
-                    'clientSecret' => '',
+                    'clientId' => null,
+                    'clientSecret' => null,
                     'type' => '',
                     'flow' => '',
                     'tokenUrl' => '',
@@ -138,7 +138,7 @@ class SwaggerUiActionTest extends TestCase
                 'path' => '/fs/{id}',
                 'method' => 'get',
             ],
-        ])->shouldBeCalled();
+        ])->shouldBeCalled()->willReturn('');
 
         return [
             [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']), $twigCollectionProphecy],
@@ -183,7 +183,7 @@ class SwaggerUiActionTest extends TestCase
                     'scopes' => [],
                 ],
             ],
-        ])->shouldBeCalled();
+        ])->shouldBeCalled()->willReturn('');
 
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();

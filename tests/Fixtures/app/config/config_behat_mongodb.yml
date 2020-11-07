@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    ApiPlatform\Core\Tests\Behat\CommandContext: ~
+    ApiPlatform\Core\Tests\Behat\DoctrineContext:
+        $doctrine: '@doctrine_mongodb'
+    ApiPlatform\Core\Tests\Behat\HttpCacheContext: ~
+    ApiPlatform\Core\Tests\Behat\HydraContext: ~
+    ApiPlatform\Core\Tests\Behat\JsonApiContext:
+        $doctrine: '@doctrine_mongodb'
+        $jsonApiSchemaFile: '%kernel.project_dir%/../JsonSchema/jsonapi.json'
+    ApiPlatform\Core\Tests\Behat\JsonHalContext:
+        $schemaFile: '%kernel.project_dir%/../JsonHal/jsonhal.json'

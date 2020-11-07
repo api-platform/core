@@ -72,12 +72,9 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->setControllerResult(null)->shouldBeCalled();
-        $eventProphecy->getRequest()->willReturn($request);
-        $eventProphecy->getControllerResult()->willReturn($dummy);
 
-        $writeListener->onKernelView($eventProphecy->reveal());
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $writeListener->onKernelView($event);
     }
 
     /**

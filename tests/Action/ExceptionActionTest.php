@@ -17,7 +17,8 @@ use ApiPlatform\Core\Action\ExceptionAction;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -39,8 +40,7 @@ class ExceptionActionTest extends TestCase
         if (!is_a(ExceptionInterface::class, \Throwable::class, true)) {
             $serializerException->willExtend(\Exception::class);
         }
-        $flattenException = FlattenException::create($serializerException->reveal());
-
+        $flattenException = class_exists(FlattenException::class) ? FlattenException::create($serializerException->reveal()) : LegacyFlattenException::create($serializerException->reveal()); /** @phpstan-ignore-line */
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn();
 
@@ -64,8 +64,7 @@ class ExceptionActionTest extends TestCase
             $serializerException->willExtend(\Exception::class);
         }
 
-        $flattenException = FlattenException::create($serializerException->reveal());
-
+        $flattenException = class_exists(FlattenException::class) ? FlattenException::create($serializerException->reveal()) : LegacyFlattenException::create($serializerException->reveal()); /** @phpstan-ignore-line */
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $flattenException->getStatusCode()])->willReturn();
 

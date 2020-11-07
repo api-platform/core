@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,15 +35,16 @@ class AddHeadersListenerTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $request->setMethod('PUT');
-
         $response = new Response();
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldNotBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertNull($response->getEtag());
     }
@@ -50,63 +52,66 @@ class AddHeadersListenerTest extends TestCase
     public function testDoNotSetHeaderOnUnsuccessfulResponse()
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
-
         $response = new Response('{}', Response::HTTP_BAD_REQUEST);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertNull($response->getEtag());
     }
 
     public function testDoNotSetHeaderWhenNotAnApiOperation()
     {
-        $request = new Request();
         $response = new Response();
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldNotBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertNull($response->getEtag());
     }
 
     public function testDoNotSetHeaderWhenNoContent()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response();
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
-
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
         $listener = new AddHeadersListener(true);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertNull($response->getEtag());
     }
 
     public function testAddHeaders()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('"9893532233caff98cd083a116b013c0b"', $response->getEtag());
         $this->assertSame('max-age=100, public, s-maxage=200, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
@@ -115,22 +120,24 @@ class AddHeadersListenerTest extends TestCase
 
     public function testDoNotSetHeaderWhenAlreadySet()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
         $response->setEtag('etag');
         $response->setMaxAge(300);
         // This also calls setPublic
         $response->setSharedMaxAge(400);
 
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('"etag"', $response->getEtag());
         $this->assertSame('max-age=300, public, s-maxage=400, stale-if-error=30, stale-while-revalidate=15', $response->headers->get('Cache-Control'));
@@ -139,19 +146,20 @@ class AddHeadersListenerTest extends TestCase
 
     public function testSetHeadersFromResourceMetadata()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('max-age=123, public, s-maxage=456, stale-if-error=70, stale-while-revalidate=928', $response->headers->get('Cache-Control'));
         $this->assertSame(['Vary-1', 'Vary-2'], $response->getVary());
@@ -159,12 +167,13 @@ class AddHeadersListenerTest extends TestCase
 
     public function testSetHeadersFromResourceMetadataMarkedAsPrivate()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -177,7 +186,7 @@ class AddHeadersListenerTest extends TestCase
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
 
@@ -187,12 +196,13 @@ class AddHeadersListenerTest extends TestCase
 
     public function testSetHeadersFromResourceMetadataMarkedAsPublic()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -205,19 +215,20 @@ class AddHeadersListenerTest extends TestCase
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
     }
 
     public function testSetHeadersFromResourceMetadataWithNoPrivacy()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -229,19 +240,20 @@ class AddHeadersListenerTest extends TestCase
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('max-age=123, public, s-maxage=456', $response->headers->get('Cache-Control'));
     }
 
     public function testSetHeadersFromResourceMetadataWithNoPrivacyDefaultsPrivate()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('some content', 200);
-
-        $event = $this->prophesize(ResponseEvent::class);
-        $event->getRequest()->willReturn($request)->shouldBeCalled();
-        $event->getResponse()->willReturn($response)->shouldBeCalled();
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -253,7 +265,7 @@ class AddHeadersListenerTest extends TestCase
         $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], false, $factory->reveal());
-        $listener->onKernelResponse($event->reveal());
+        $listener->onKernelResponse($event);
 
         $this->assertSame('max-age=123, private', $response->headers->get('Cache-Control'));
 

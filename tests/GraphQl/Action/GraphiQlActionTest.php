@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Action;
 use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -50,6 +51,7 @@ class GraphiQlActionTest extends TestCase
     private function getGraphiQlAction(bool $enabled): GraphiQlAction
     {
         $twigProphecy = $this->prophesize(TwigEnvironment::class);
+        $twigProphecy->render(Argument::cetera())->willReturn('');
         $routerProphecy = $this->prophesize(RouterInterface::class);
 
         return new GraphiQlAction($twigProphecy->reveal(), $routerProphecy->reveal(), $enabled, '');
