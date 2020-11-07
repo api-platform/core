@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @ApiResource(
  *     normalizationContext={
- *         "groups"="contain_non_resource",
+ *         "groups"={"contain_non_resource"},
  *     },
  * )
  *
