@@ -30,6 +30,7 @@ parameters:
 		- src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
 		- tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/ProphecyTrait.php
+		- tests/Behat/CoverageContext.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail

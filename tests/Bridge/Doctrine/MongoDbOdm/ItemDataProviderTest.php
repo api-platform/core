@@ -96,7 +96,7 @@ class ItemDataProviderTest extends TestCase
     {
         $context = ['foo' => 'bar', 'fetch_data' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
-        $matchProphecy = $this->prophesize(Match::class);
+        $matchProphecy = $this->prophesize(AggregationMatch::class);
         $matchProphecy->field('id')->willReturn($matchProphecy)->shouldBeCalled();
         $matchProphecy->equals(1)->shouldBeCalled();
 

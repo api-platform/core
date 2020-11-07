@@ -272,7 +272,7 @@ class SubresourceDataProviderTest extends TestCase
         $dummyLookup->alias('relatedDummies')->shouldBeCalled();
         $dummyAggregationBuilder->lookup('relatedDummies')->shouldBeCalled()->willReturn($dummyLookup->reveal());
 
-        $dummyMatch = $this->prophesize(Match::class);
+        $dummyMatch = $this->prophesize(AggregationMatch::class);
         $dummyMatch->equals(1)->shouldBeCalled();
         $dummyMatch->field('id')->shouldBeCalled()->willReturn($dummyMatch);
         $dummyAggregationBuilder->match()->shouldBeCalled()->willReturn($dummyMatch->reveal());
@@ -296,10 +296,10 @@ class SubresourceDataProviderTest extends TestCase
         $rLookup->alias('thirdLevel')->shouldBeCalled();
         $rAggregationBuilder->lookup('thirdLevel')->shouldBeCalled()->willReturn($rLookup->reveal());
 
-        $rMatch = $this->prophesize(Match::class);
+        $rMatch = $this->prophesize(AggregationMatch::class);
         $rMatch->equals(1)->shouldBeCalled();
         $rMatch->field('id')->shouldBeCalled()->willReturn($rMatch);
-        $previousRMatch = $this->prophesize(Match::class);
+        $previousRMatch = $this->prophesize(AggregationMatch::class);
         $previousRMatch->in([2])->shouldBeCalled();
         $previousRMatch->field('_id')->shouldBeCalled()->willReturn($previousRMatch);
         $rAggregationBuilder->match()->shouldBeCalled()->willReturn($rMatch->reveal(), $previousRMatch->reveal());
@@ -321,7 +321,7 @@ class SubresourceDataProviderTest extends TestCase
         // Origin manager (ThirdLevel)
         $aggregationBuilder = $this->prophesize(Builder::class);
 
-        $match = $this->prophesize(Match::class);
+        $match = $this->prophesize(AggregationMatch::class);
         $match->in([3])->shouldBeCalled();
         $match->field('_id')->shouldBeCalled()->willReturn($match);
         $aggregationBuilder->match()->shouldBeCalled()->willReturn($match);
