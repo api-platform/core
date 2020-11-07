@@ -12,9 +12,8 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher;
+use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mercure\Update;
 
 /**
@@ -22,13 +21,13 @@ use Symfony\Component\Mercure\Update;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class MercureContext implements KernelAwareContext
+final class MercureContext implements Context
 {
-    private $kernel;
+    private $publisher;
 
-    public function setKernel(KernelInterface $kernel): void
+    public function __construct(DummyMercurePublisher $publisher)
     {
-        $this->kernel = $kernel;
+        $this->publisher = $publisher;
     }
 
     /**
@@ -38,11 +37,9 @@ final class MercureContext implements KernelAwareContext
     {
         $topics = explode(',', $topics);
         $update = json_decode($update->getRaw(), true);
-        /** @var DummyMercurePublisher $publisher */
-        $publisher = $this->kernel->getContainer()->get('mercure.hub.default.publisher');
 
         /** @var Update $sentUpdate */
-        foreach ($publisher->getUpdates() as $sentUpdate) {
+        foreach ($this->publisher->getUpdates() as $sentUpdate) {
             $toMatchTopics = count($topics);
             foreach ($sentUpdate->getTopics() as $sentTopic) {
                 foreach ($topics as $topic) {
