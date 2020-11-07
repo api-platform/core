@@ -23,10 +23,6 @@
             <tag name="doctrine.event_listener" event="postFlush" />
         </service>
 
-        <service id="api_platform.doctrine.listener.mercure.publish" alias="api_platform.doctrine.orm.listener.mercure.publish">
-            <deprecated>Using "%alias_id%" service is deprecated since API Platform 2.6. Use "api_platform.doctrine.orm.listener.mercure.publish" instead.</deprecated>
-        </service>
-
     </services>
 
 </container>
