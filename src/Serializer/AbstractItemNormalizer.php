@@ -347,14 +347,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($context['resource_class'], $options);
 
-        $attributesMetadata = $this->classMetadataFactory->getMetadataFor($context['resource_class'])->getAttributesMetadata();
+        $attributesMetadata = $this->classMetadataFactory ?
+            $this->classMetadataFactory->getMetadataFor($context['resource_class'])->getAttributesMetadata() :
+            null;
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
             if (
-                (array_key_exists($propertyName, $attributesMetadata) && !$attributesMetadata[$propertyName]->isIgnored()) &&
+                (null !== $attributesMetadata ? (\array_key_exists($propertyName, $attributesMetadata) && !$attributesMetadata[$propertyName]->isIgnored()) : true) &&
                 $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
                 (
                     isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
