@@ -30,6 +30,13 @@ use Symfony\Component\Validator\ConstraintViolation;
  */
 final class ValidationExceptionNormalizer implements NormalizerInterface
 {
+    private $exceptionToStatus;
+
+    public function __construct(array $exceptionToStatus = [])
+    {
+        $this->exceptionToStatus = $exceptionToStatus;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -39,7 +46,18 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
         $validationException = $object->getPrevious();
         $error = FormattedError::createFromException($object);
         $error['message'] = $validationException->getMessage();
-        $error['extensions']['status'] = Response::HTTP_BAD_REQUEST;
+
+        $exceptionClass = \get_class($validationException);
+        $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+
+        foreach ($this->exceptionToStatus as $class => $status) {
+            if (is_a($exceptionClass, $class, true)) {
+                $statusCode = $status;
+
+                break;
+            }
+        }
+        $error['extensions']['status'] = $statusCode;
         $error['extensions']['category'] = 'user';
         $error['extensions']['violations'] = [];
 

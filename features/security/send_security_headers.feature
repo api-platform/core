@@ -27,7 +27,7 @@ Feature: Send security header
     """
     {"name": ""}
     """
-    Then the response status code should be 400
+    Then the response status code should be 422
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the header "X-Content-Type-Options" should be equal to "nosniff"
     And the header "X-Frame-Options" should be equal to "deny"
