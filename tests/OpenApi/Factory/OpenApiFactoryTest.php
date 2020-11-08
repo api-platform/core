@@ -651,7 +651,7 @@ class OpenApiFactoryTest extends TestCase
         $openApi = $factory(['base_url', '/app_dev.php/']);
 
         $paths = $openApi->getPaths();
-        $pathItem = $paths->getPath('/questions/{id}/answer.{_format}');
+        $pathItem = $paths->getPath('/questions/{id}/answer');
 
         $this->assertEquals($pathItem->getGet(), new Model\Operation(
             'api_questions_answer_get_subresourceQuestionSubresource',
@@ -660,7 +660,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Model\Response(
                     'Question resource',
                     new \ArrayObject([
-                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Question']))),
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Answer']))),
                     ])
                 ),
             ],

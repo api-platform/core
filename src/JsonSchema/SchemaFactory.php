@@ -20,6 +20,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
@@ -218,7 +219,6 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
-
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
@@ -238,8 +238,9 @@ final class SchemaFactory implements SchemaFactoryInterface
             $prefix .= '.'.$format;
         }
 
-        if (isset($serializerContext[DocumentationNormalizer::SWAGGER_DEFINITION_NAME])) {
-            $name = sprintf('%s-%s', $prefix, $serializerContext[DocumentationNormalizer::SWAGGER_DEFINITION_NAME]);
+        $definitionName = $serializerContext[OpenApiFactory::OPENAPI_DEFINITION_NAME] ?? $serializerContext[DocumentationNormalizer::SWAGGER_DEFINITION_NAME] ?? null;
+        if ($definitionName) {
+            $name = sprintf('%s-%s', $prefix, $definitionName);
         } else {
             $groups = (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []);
             $name = $groups ? sprintf('%s-%s', $prefix, implode('_', $groups)) : $prefix;
