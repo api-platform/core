@@ -835,6 +835,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
             'api_platform.http_cache.invalidation.max_header_length' => 7500,
+            'api_platform.asset_package' => null,
             'api_platform.defaults' => ['attributes' => ['stateless' => true]],
             'api_platform.enable_entrypoint' => true,
             'api_platform.enable_docs' => true,
@@ -1139,6 +1140,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.resource_class_directories' => Argument::type('array'),
             'api_platform.validator.serialize_payload_fields' => [],
             'api_platform.elasticsearch.enabled' => false,
+            'api_platform.asset_package' => null,
             'api_platform.defaults' => ['attributes' => ['stateless' => true]],
         ];
 

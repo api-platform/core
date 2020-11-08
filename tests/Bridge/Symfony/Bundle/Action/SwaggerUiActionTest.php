@@ -174,6 +174,7 @@ class SwaggerUiActionTest extends TestCase
             'graphqlEnabled' => false,
             'graphiQlEnabled' => false,
             'graphQlPlaygroundEnabled' => false,
+            'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,

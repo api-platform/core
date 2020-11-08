@@ -206,6 +206,7 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'asset_package' => null,
         ], $config);
     }
 

@@ -61,11 +61,12 @@ final class SwaggerUiAction
     private $graphQlPlaygroundEnabled;
     private $swaggerVersions;
     private $swaggerUiAction;
+    private $assetPackage;
 
     /**
      * @param int[] $swaggerVersions
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -91,6 +92,7 @@ final class SwaggerUiAction
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->swaggerVersions = $swaggerVersions;
         $this->swaggerUiAction = $swaggerUiAction;
+        $this->assetPackage = $assetPackage;
 
         if (null === $this->swaggerUiAction) {
             @trigger_error(sprintf('The use of "%s" is deprecated since API Platform 2.6, use "%s" instead.', __CLASS__, OpenApiSwaggerUiAction::class), E_USER_DEPRECATED);
@@ -143,6 +145,7 @@ final class SwaggerUiAction
             'graphqlEnabled' => $this->graphqlEnabled,
             'graphiQlEnabled' => $this->graphiQlEnabled,
             'graphQlPlaygroundEnabled' => $this->graphQlPlaygroundEnabled,
+            'assetPackage' => $this->assetPackage,
         ];
 
         $swaggerContext = ['spec_version' => $request->query->getInt('spec_version', $this->swaggerVersions[0] ?? 2)];

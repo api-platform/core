@@ -37,6 +37,7 @@
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
             <argument>%api_platform.swagger.versions%</argument>
             <argument type="service" id="api_platform.swagger_ui.action" />
+            <argument>%api_platform.asset_package%</argument>
         </service>
 
         <service id="api_platform.swagger_ui.context" class="ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext">
@@ -46,6 +47,7 @@
             <argument>%api_platform.graphql.enabled%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
+            <argument>%api_platform.asset_package%</argument>
         </service>
 
         <service id="api_platform.swagger_ui.action" class="ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction" public="true">

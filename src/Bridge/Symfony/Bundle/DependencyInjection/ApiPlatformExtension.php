@@ -217,6 +217,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
+        $container->setParameter('api_platform.asset_package', $config['asset_package']);
         $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
     }
 
