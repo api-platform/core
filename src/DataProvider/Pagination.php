@@ -265,6 +265,17 @@ final class Pagination
     private function getParameterFromContext(array $context, string $parameterName, $default = null)
     {
         $filters = $context['filters'] ?? [];
+        $parameterAsArray = explode('.', $parameterName);
+        if (count($parameterAsArray) > 1) {
+            foreach ($parameterAsArray as $key => $parameter) {
+                if (! isset ($filters[$parameterAsArray[$key]])) {
+                    break;
+                }
+                $filters = $filters[$parameterAsArray[$key]];
+            }
+
+            return ! is_array($filters) ? $filters : $default;
+        }
 
         return \array_key_exists($parameterName, $filters) ? $filters[$parameterName] : $default;
     }
