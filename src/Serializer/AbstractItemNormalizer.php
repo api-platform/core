@@ -353,11 +353,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
-            if(
+            if (
                 null != $attributesMetadata && \array_key_exists($propertyName, $attributesMetadata) &&
                 method_exists($attributesMetadata[$propertyName], 'isIgnored') &&
-                $attributesMetadata[$propertyName]->isIgnored())
-            {
+                $attributesMetadata[$propertyName]->isIgnored()) {
                 continue;
             }
 
