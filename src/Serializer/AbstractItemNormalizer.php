@@ -353,10 +353,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
+            if(
+                null != $attributesMetadata && \array_key_exists($propertyName, $attributesMetadata) &&
+                method_exists($attributesMetadata[$propertyName], 'isIgnored') &&
+                $attributesMetadata[$propertyName]->isIgnored())
+            {
+                continue;
+            }
+
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
             if (
-                (null !== $attributesMetadata ? (\array_key_exists($propertyName, $attributesMetadata) && !$attributesMetadata[$propertyName]->isIgnored()) : true) &&
                 $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
                 (
                     isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
