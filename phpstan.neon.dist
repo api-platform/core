@@ -20,6 +20,7 @@ parameters:
 		- src/Bridge/NelmioApiDoc/*
 		- tests/Bridge/NelmioApiDoc/*
 		- src/Bridge/FosUser/*
+		- src/Bridge/Symfony/Bundle/Resources/config/nelmio_api_doc.php
 		# BC layer
 		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
@@ -93,14 +94,6 @@ parameters:
 		-
 			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo::\$fieldMappings \(array.*\)>\) does not accept array\(.*\)\.#'
 			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
-		-
-			message: '#Call to function iterator_to_array\(\) on a separate line has no effect\.#'
-			path: tests/Bridge/Elasticsearch/DataProvider/PaginatorTest.php
-		-
-			message: '#Instanceof between bool\|float\|int\|null and ArrayObject will always evaluate to false\.#'
-			paths:
-				- src/JsonApi/Serializer/ItemNormalizer.php
-				- src/Serializer/AbstractItemNormalizer.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'

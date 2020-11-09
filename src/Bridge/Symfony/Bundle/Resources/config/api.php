@@ -111,7 +111,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.serializer.property_filter', PropertyFilter::class)
             ->abstract()
-            ->args(['$parameterName' => 'properties', '$overrideDefaultProperties' => 'false', '$whitelist' => null, '$nameConverter' => ref('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args(['$parameterName' => 'properties', '$overrideDefaultProperties' => false, '$whitelist' => null, '$nameConverter' => ref('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(PropertyFilter::class, 'api_platform.serializer.property_filter')
 
         ->set('api_platform.serializer.group_filter', GroupFilter::class)
@@ -166,11 +166,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('kernel.event_listener', ['event' => 'kernel.view', 'method' => 'onKernelView', 'priority' => 8])
 
         ->set('api_platform.listener.exception.validation', ValidationExceptionListener::class)
-            ->args([ref('api_platform.serializer'), '%api_platform.error_formats%'])
+            ->args([ref('api_platform.serializer'), '%api_platform.error_formats%', '%api_platform.exception_to_status%'])
             ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'method' => 'onKernelException'])
 
         ->set('api_platform.listener.exception', ExceptionListener::class)
-            ->args(['api_platform.action.exception', ref('logger')->nullOnInvalid(), 'false', ref('exception_listener')->nullOnInvalid()])
+            ->args(['api_platform.action.exception', ref('logger')->nullOnInvalid(), false, ref('exception_listener')->nullOnInvalid()])
             ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'method' => 'onKernelException', 'priority' => -96])
             ->tag('monolog.logger', ['channel' => 'request'])
 
@@ -201,7 +201,7 @@ return static function (ContainerConfigurator $container) {
             ->public()
 
         ->set('api_platform.action.documentation', DocumentationAction::class)
-            ->args([ref('api_platform.metadata.resource.name_collection_factory'), '%api_platform.title%', '%api_platform.description%', '%api_platform.version%', null, '%api_platform.swagger.versions%'])
+            ->args([ref('api_platform.metadata.resource.name_collection_factory'), '%api_platform.title%', '%api_platform.description%', '%api_platform.version%', null, '%api_platform.swagger.versions%', ref('api_platform.openapi.factory')])
             ->public()
 
         ->set('api_platform.action.exception', ExceptionAction::class)

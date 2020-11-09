@@ -153,6 +153,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -790])
 
         ->set('api_platform.graphql.normalizer.validation_exception', ValidationExceptionNormalizer::class)
+            ->args(['%api_platform.exception_to_status%'])
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.graphql.normalizer.http_exception', HttpExceptionNormalizer::class)

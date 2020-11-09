@@ -51,6 +51,7 @@ return static function (ContainerConfigurator $container) {
                 '%api_platform.graphql.graphql_playground.enabled%',
                 '%api_platform.swagger.versions%',
                 ref('api_platform.swagger_ui.action'),
+                '%api_platform.asset_package%',
             ])
             ->public()
 
@@ -62,6 +63,7 @@ return static function (ContainerConfigurator $container) {
                 '%api_platform.graphql.enabled%',
                 '%api_platform.graphql.graphiql.enabled%',
                 '%api_platform.graphql.graphql_playground.enabled%',
+                '%api_platform.asset_package%',
             ])
 
         ->set('api_platform.swagger_ui.action', SwaggerUiAction::class)
