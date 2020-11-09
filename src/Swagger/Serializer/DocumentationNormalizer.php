@@ -793,6 +793,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 continue;
             }
 
+            $propertyName = $propertyMetadata->getSerializedName() ?? $propertyName;
             $linkObject['parameters'][$propertyName] = sprintf('$response.body#/%s', $propertyName);
             $identifiers[] = $propertyName;
         }
@@ -801,7 +802,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return [];
         }
         $linkObject['operationId'] = $operationId;
-        $linkObject['description'] = 1 === \count($identifiers) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', $identifiers[0], $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path);
+        $linkObject['description'] = 1 === \count($identifiers) ? sprintf('The `%1$s` value returned in the response can be used as the `id` parameter in `GET %2$s`.', $identifiers[0], $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path);
 
         return $linkObject;
     }
