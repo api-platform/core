@@ -324,9 +324,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if (OperationType::COLLECTION === $operationType) {
-            $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $resourceShortName);
+            $outputResourseShortName = $resourceMetadata->getCollectionOperations()[$operationName]['output']['name'] ?? $resourceShortName;
+            $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves the collection of %s resources.', $outputResourseShortName);
 
-            $successResponse = ['description' => sprintf('%s collection response', $resourceShortName)];
+            $successResponse = ['description' => sprintf('%s collection response', $outputResourseShortName)];
             [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
 
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
@@ -337,11 +338,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return $pathOperation;
         }
 
-        $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $resourceShortName);
+        $outputResourseShortName = $resourceMetadata->getItemOperations()[$operationName]['output']['name'] ?? $resourceShortName;
+        $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $outputResourseShortName);
 
         $pathOperation = $this->addItemOperationParameters($v3, $pathOperation);
 
-        $successResponse = ['description' => sprintf('%s resource response', $resourceShortName)];
+        $successResponse = ['description' => sprintf('%s resource response', $outputResourseShortName)];
         [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
 
         $pathOperation['responses'] ?? $pathOperation['responses'] = [

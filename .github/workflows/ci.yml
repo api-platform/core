@@ -650,14 +650,11 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
           ini-values: memory_limit=-1
-      - name: Install additional packages
-        run: sudo apt-get install moreutils 
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: Allow unstable project dependencies
-        run: |
-          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
+        run: composer config minimum-stability dev
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
