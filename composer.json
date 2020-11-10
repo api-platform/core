@@ -32,7 +32,7 @@
         "friends-of-behat/mink-browserkit-driver": "^1.3.1",
         "friends-of-behat/mink-extension": "^2.2",
         "friends-of-behat/symfony-extension": "^2.1",
-        "behatch/contexts": "dev-api-platform",
+        "soyuka/contexts": "^3.3.1",
         "doctrine/annotations": "^1.7",
         "doctrine/common": "^2.11 || ^3.0",
         "doctrine/data-fixtures": "^1.2.2",
@@ -114,12 +114,6 @@
             "ApiPlatform\\Core\\Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/dunglas/contexts"
-        }
-    ],
     "config": {
         "preferred-install": {
             "*": "dist"
