@@ -3218,7 +3218,7 @@ class DocumentationNormalizerV3Test extends TestCase
                                     'GetDummyItem' => [
                                         'operationId' => 'getDummyItem',
                                         'parameters' => ['code' => '$response.body#/code'],
-                                        'description' => 'The `code` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.',
+                                        'description' => 'The `code` value returned in the response can be used as the `code` parameter in `GET /dummies/{id}`.',
                                     ],
                                 ],
                             ],
