@@ -1208,6 +1208,10 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testNormalizationWithIgnoreMetadata()
     {
+        if (!method_exists(AttributeMetadata::class, 'setIgnore')) {
+            $this->markTestSkipped();
+        }
+
         $dummy = new Dummy();
 
         $dummyAttributeMetadata = new AttributeMetadata('dummy');
