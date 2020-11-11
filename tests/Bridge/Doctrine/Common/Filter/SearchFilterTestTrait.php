@@ -264,6 +264,30 @@ trait SearchFilterTestTrait
                     'name' => 'partial',
                 ],
             ],
+            'partial (multiple values)' => [
+                [
+                    'id' => null,
+                    'name' => 'partial',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'SENSitive',
+                    ],
+                ],
+            ],
+            'partial (multiple values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'ipartial',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'inSENSitive',
+                    ],
+                ],
+            ],
             'start' => [
                 [
                     'id' => null,
@@ -280,6 +304,30 @@ trait SearchFilterTestTrait
                 ],
                 [
                     'name' => 'partial',
+                ],
+            ],
+            'start (multiple values)' => [
+                [
+                    'id' => null,
+                    'name' => 'start',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'SENSitive',
+                    ],
+                ],
+            ],
+            'start (multiple values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'istart',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'inSENSitive',
+                    ],
                 ],
             ],
             'end' => [
@@ -300,6 +348,30 @@ trait SearchFilterTestTrait
                     'name' => 'partial',
                 ],
             ],
+            'end (multiple values)' => [
+                [
+                    'id' => null,
+                    'name' => 'end',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'SENSitive',
+                    ],
+                ],
+            ],
+            'end (multiple values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'iend',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'inSENSitive',
+                    ],
+                ],
+            ],
             'word_start' => [
                 [
                     'id' => null,
@@ -316,6 +388,30 @@ trait SearchFilterTestTrait
                 ],
                 [
                     'name' => 'partial',
+                ],
+            ],
+            'word_start (multiple values)' => [
+                [
+                    'id' => null,
+                    'name' => 'word_start',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'SENSitive',
+                    ],
+                ],
+            ],
+            'word_start (multiple values; case insensitive)' => [
+                [
+                    'id' => null,
+                    'name' => 'iword_start',
+                ],
+                [
+                    'name' => [
+                        'CaSE',
+                        'inSENSitive',
+                    ],
                 ],
             ],
             'invalid value for relation' => [
