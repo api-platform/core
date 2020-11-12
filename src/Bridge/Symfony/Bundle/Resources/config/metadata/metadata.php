@@ -34,56 +34,56 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.metadata.resource.name_collection_factory.cached', CachedResourceNameCollectionFactory::class)
             ->decorate('api_platform.metadata.resource.name_collection_factory', null, -10)
-            ->args([ref('api_platform.cache.metadata.resource'), ref('api_platform.metadata.resource.name_collection_factory.cached.inner')])
+            ->args([service('api_platform.cache.metadata.resource'), service('api_platform.metadata.resource.name_collection_factory.cached.inner')])
 
         ->alias(ResourceNameCollectionFactoryInterface::class, 'api_platform.metadata.resource.name_collection_factory')
 
         ->set('api_platform.metadata.resource.metadata_factory.input_output', InputOutputResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 30)
-            ->args([ref('api_platform.metadata.resource.metadata_factory.input_output.inner')])
+            ->args([service('api_platform.metadata.resource.metadata_factory.input_output.inner')])
 
         ->set('api_platform.metadata.resource.metadata_factory.short_name', ShortNameResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 20)
-            ->args([ref('api_platform.metadata.resource.metadata_factory.short_name.inner')])
+            ->args([service('api_platform.metadata.resource.metadata_factory.short_name.inner')])
 
         ->set('api_platform.metadata.resource.metadata_factory.operation', OperationResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 10)
-            ->args([ref('api_platform.metadata.resource.metadata_factory.operation.inner'), '%api_platform.patch_formats%'])
+            ->args([service('api_platform.metadata.resource.metadata_factory.operation.inner'), '%api_platform.patch_formats%'])
 
         ->set('api_platform.metadata.resource.metadata_factory.formats', FormatsResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, 5)
-            ->args([ref('api_platform.metadata.resource.metadata_factory.formats.inner'), '%api_platform.formats%', '%api_platform.patch_formats%'])
+            ->args([service('api_platform.metadata.resource.metadata_factory.formats.inner'), '%api_platform.formats%', '%api_platform.patch_formats%'])
 
         ->set('api_platform.metadata.resource.metadata_factory.cached', CachedResourceMetadataFactory::class)
             ->decorate('api_platform.metadata.resource.metadata_factory', null, -10)
-            ->args([ref('api_platform.cache.metadata.resource'), ref('api_platform.metadata.resource.metadata_factory.cached.inner')])
+            ->args([service('api_platform.cache.metadata.resource'), service('api_platform.metadata.resource.metadata_factory.cached.inner')])
         ->alias(ResourceMetadataFactoryInterface::class, 'api_platform.metadata.resource.metadata_factory')
 
         ->alias('api_platform.metadata.property.name_collection_factory', 'api_platform.metadata.property.name_collection_factory.property_info')
         ->alias(PropertyNameCollectionFactoryInterface::class, 'api_platform.metadata.property.name_collection_factory')
 
         ->set('api_platform.metadata.property.name_collection_factory.property_info', PropertyInfoPropertyNameCollectionFactory::class)
-            ->args([ref('api_platform.property_info')])
+            ->args([service('api_platform.property_info')])
 
         ->set('api_platform.metadata.property.name_collection_factory.cached', CachedPropertyNameCollectionFactory::class)
             ->decorate('api_platform.metadata.property.name_collection_factory', null, -10)
-            ->args([ref('api_platform.cache.metadata.property'), ref('api_platform.metadata.property.name_collection_factory.cached.inner')])
+            ->args([service('api_platform.cache.metadata.property'), service('api_platform.metadata.property.name_collection_factory.cached.inner')])
 
         ->set('api_platform.metadata.property.metadata_factory.property_info', PropertyInfoPropertyMetadataFactory::class)
             ->decorate('api_platform.metadata.property.metadata_factory', null, 40)
-            ->args([ref('api_platform.property_info'), ref('api_platform.metadata.property.metadata_factory.property_info.inner')])
+            ->args([service('api_platform.property_info'), service('api_platform.metadata.property.metadata_factory.property_info.inner')])
 
         ->set('api_platform.metadata.property.metadata_factory.serializer', SerializerPropertyMetadataFactory::class)
             ->decorate('api_platform.metadata.property.metadata_factory', null, 30)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('serializer.mapping.class_metadata_factory'), ref('api_platform.metadata.property.metadata_factory.serializer.inner'), ref('api_platform.resource_class_resolver')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('serializer.mapping.class_metadata_factory'), service('api_platform.metadata.property.metadata_factory.serializer.inner'), service('api_platform.resource_class_resolver')])
 
         ->set('api_platform.metadata.property.metadata_factory.cached', CachedPropertyMetadataFactory::class)
             ->decorate('api_platform.metadata.property.metadata_factory', null, -10)
-            ->args([ref('api_platform.cache.metadata.property'), ref('api_platform.metadata.property.metadata_factory.cached.inner')])
+            ->args([service('api_platform.cache.metadata.property'), service('api_platform.metadata.property.metadata_factory.cached.inner')])
 
         ->set('api_platform.metadata.property.metadata_factory.default_property', DefaultPropertyMetadataFactory::class)
             ->decorate('api_platform.metadata.property.metadata_factory', null, 30)
-            ->args([ref('api_platform.metadata.property.metadata_factory.default_property.inner')])
+            ->args([service('api_platform.metadata.property.metadata_factory.default_property.inner')])
 
         ->alias(PropertyMetadataFactoryInterface::class, 'api_platform.metadata.property.metadata_factory')
 

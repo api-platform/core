@@ -25,6 +25,6 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.http_cache.purger.varnish', VarnishPurger::class)
 
         ->set('api_platform.http_cache.listener.response.add_tags', AddTagsListener::class)
-            ->args([ref('api_platform.iri_converter')])
+            ->args([service('api_platform.iri_converter')])
             ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse', 'priority' => -2]);
 };

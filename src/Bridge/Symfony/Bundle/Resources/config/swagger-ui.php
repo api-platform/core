@@ -26,11 +26,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.swagger.action.ui', SwaggerUiActionDeprecated::class)
             ->args([
-                ref('api_platform.metadata.resource.name_collection_factory'),
-                ref('api_platform.metadata.resource.metadata_factory'),
-                ref('api_platform.serializer'),
-                ref('twig'),
-                ref('router'),
+                service('api_platform.metadata.resource.name_collection_factory'),
+                service('api_platform.metadata.resource.metadata_factory'),
+                service('api_platform.serializer'),
+                service('twig'),
+                service('router'),
                 '%api_platform.title%',
                 '%api_platform.description%',
                 '%api_platform.version%',
@@ -50,7 +50,7 @@ return static function (ContainerConfigurator $container) {
                 '%api_platform.graphql.graphiql.enabled%',
                 '%api_platform.graphql.graphql_playground.enabled%',
                 '%api_platform.swagger.versions%',
-                ref('api_platform.swagger_ui.action'),
+                service('api_platform.swagger_ui.action'),
                 '%api_platform.asset_package%',
             ])
             ->public()
@@ -68,13 +68,13 @@ return static function (ContainerConfigurator $container) {
 
         ->set('api_platform.swagger_ui.action', SwaggerUiAction::class)
             ->args([
-                ref('api_platform.metadata.resource.metadata_factory'),
-                ref('twig'),
-                ref('router'),
-                ref('api_platform.serializer'),
-                ref('api_platform.openapi.factory'),
-                ref('api_platform.openapi.options'),
-                ref('api_platform.swagger_ui.context'),
+                service('api_platform.metadata.resource.metadata_factory'),
+                service('twig'),
+                service('router'),
+                service('api_platform.serializer'),
+                service('api_platform.openapi.factory'),
+                service('api_platform.openapi.options'),
+                service('api_platform.swagger_ui.context'),
                 '%api_platform.formats%',
                 '%api_platform.oauth.clientId%',
                 '%api_platform.oauth.clientSecret%',

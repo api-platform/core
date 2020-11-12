@@ -20,15 +20,15 @@ use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.swagger.normalizer.documentation', DocumentationNormalizer::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.json_schema.schema_factory'), ref('api_platform.json_schema.type_factory'), ref('api_platform.operation_path_resolver'), null, ref('api_platform.filter_locator'), null, '%api_platform.oauth.enabled%', '%api_platform.oauth.type%', '%api_platform.oauth.flow%', '%api_platform.oauth.tokenUrl%', '%api_platform.oauth.authorizationUrl%', '%api_platform.oauth.scopes%', '%api_platform.swagger.api_keys%', ref('api_platform.subresource_operation_factory'), '%api_platform.collection.pagination.enabled%', '%api_platform.collection.pagination.page_parameter_name%', '%api_platform.collection.pagination.client_items_per_page%', '%api_platform.collection.pagination.items_per_page_parameter_name%', '%api_platform.formats%', '%api_platform.collection.pagination.client_enabled%', '%api_platform.collection.pagination.enabled_parameter_name%', [], '%api_platform.swagger.versions%'])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.json_schema.schema_factory'), service('api_platform.json_schema.type_factory'), service('api_platform.operation_path_resolver'), null, service('api_platform.filter_locator'), null, '%api_platform.oauth.enabled%', '%api_platform.oauth.type%', '%api_platform.oauth.flow%', '%api_platform.oauth.tokenUrl%', '%api_platform.oauth.authorizationUrl%', '%api_platform.oauth.scopes%', '%api_platform.swagger.api_keys%', service('api_platform.subresource_operation_factory'), '%api_platform.collection.pagination.enabled%', '%api_platform.collection.pagination.page_parameter_name%', '%api_platform.collection.pagination.client_items_per_page%', '%api_platform.collection.pagination.items_per_page_parameter_name%', '%api_platform.formats%', '%api_platform.collection.pagination.client_enabled%', '%api_platform.collection.pagination.enabled_parameter_name%', [], '%api_platform.swagger.versions%'])
             ->tag('serializer.normalizer', ['priority' => -790])
 
         ->set('api_platform.swagger.normalizer.api_gateway', ApiGatewayNormalizer::class)
             ->decorate('api_platform.swagger.normalizer.documentation', null, -1)
-            ->args([ref('api_platform.swagger.normalizer.api_gateway.inner')])
+            ->args([service('api_platform.swagger.normalizer.api_gateway.inner')])
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.swagger.command.swagger_command', SwaggerCommand::class)
-            ->args([ref('api_platform.serializer'), ref('api_platform.metadata.resource.name_collection_factory'), '%api_platform.title%', '%api_platform.description%', '%api_platform.version%', null, '%api_platform.swagger.versions%'])
+            ->args([service('api_platform.serializer'), service('api_platform.metadata.resource.name_collection_factory'), '%api_platform.title%', '%api_platform.description%', '%api_platform.version%', null, '%api_platform.swagger.versions%'])
             ->tag('console.command');
 };

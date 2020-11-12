@@ -25,6 +25,6 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.filter_collection_factory', FilterCollectionFactory::class)
 
         ->set('api_platform.filters', FilterCollection::class)
-            ->factory([ref('api_platform.filter_collection_factory'), 'createFilterCollectionFromLocator'])
-            ->args([ref('api_platform.filter_locator')]);
+            ->factory([service('api_platform.filter_collection_factory'), 'createFilterCollectionFromLocator'])
+            ->args([service('api_platform.filter_locator')]);
 };

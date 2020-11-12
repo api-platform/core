@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.serializer_locator', ServiceLocator::class)
-            ->args([['serializer' => ref('api_platform.serializer')]])
+            ->args([['serializer' => service('api_platform.serializer')]])
             ->tag('container.service_locator')
 
         ->set('api_platform.item_data_provider', ChainItemDataProvider::class)
@@ -42,7 +42,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(SubresourceDataProviderInterface::class, 'api_platform.subresource_data_provider')
 
         ->set('api_platform.pagination', Pagination::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), '%api_platform.collection.pagination%', '%api_platform.graphql.collection.pagination%'])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), '%api_platform.collection.pagination%', '%api_platform.graphql.collection.pagination%'])
         ->alias(Pagination::class, 'api_platform.pagination')
 
         ->set('api_platform.pagination_options', PaginationOptions::class)

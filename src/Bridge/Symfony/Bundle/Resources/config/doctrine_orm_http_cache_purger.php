@@ -18,7 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.doctrine.listener.http_cache.purge', PurgeHttpCacheListener::class)
-            ->args([ref('api_platform.http_cache.purger'), ref('api_platform.iri_converter'), ref('api_platform.resource_class_resolver')])
+            ->args([service('api_platform.http_cache.purger'), service('api_platform.iri_converter'), service('api_platform.resource_class_resolver')])
             ->tag('doctrine.event_listener', ['event' => 'preUpdate'])
             ->tag('doctrine.event_listener', ['event' => 'onFlush'])
             ->tag('doctrine.event_listener', ['event' => 'postFlush']);

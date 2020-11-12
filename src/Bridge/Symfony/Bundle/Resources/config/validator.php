@@ -26,12 +26,12 @@ use ApiPlatform\Core\Validator\ValidatorInterface;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.validator', Validator::class)
-            ->args([ref('validator'), ref('service_container')])
+            ->args([service('validator'), service('service_container')])
         ->alias(ValidatorInterface::class, 'api_platform.validator')
 
         ->set('api_platform.metadata.property.metadata_factory.validator', ValidatorPropertyMetadataFactory::class)
             ->decorate('api_platform.metadata.property.metadata_factory', null, 20)
-            ->args([ref('validator'), ref('api_platform.metadata.property.metadata_factory.validator.inner'), tagged_iterator('api_platform.metadata.property_schema_restriction')])
+            ->args([service('validator'), service('api_platform.metadata.property.metadata_factory.validator.inner'), tagged_iterator('api_platform.metadata.property_schema_restriction')])
 
         ->set('api_platform.metadata.property_schema.length_restriction', PropertySchemaLengthRestriction::class)
             ->tag('api_platform.metadata.property_schema_restriction')
@@ -43,13 +43,13 @@ return static function (ContainerConfigurator $container) {
             ->tag('api_platform.metadata.property_schema_restriction')
 
         ->set('api_platform.listener.view.validate', ValidateListener::class)
-            ->args([ref('api_platform.validator'), ref('api_platform.metadata.resource.metadata_factory')])
+            ->args([service('api_platform.validator'), service('api_platform.metadata.resource.metadata_factory')])
             ->tag('kernel.event_listener', ['event' => 'kernel.view', 'method' => 'onKernelView', 'priority' => 64])
 
         ->set('api_platform.validator.query_parameter_validator', QueryParameterValidator::class)
-            ->args([ref('api_platform.filter_locator')])
+            ->args([service('api_platform.filter_locator')])
 
         ->set('api_platform.listener.view.validate_query_parameters', QueryParameterValidateListener::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.validator.query_parameter_validator')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.validator.query_parameter_validator')])
             ->tag('kernel.event_listener', ['event' => 'kernel.request', 'method' => 'onKernelRequest', 'priority' => 16]);
 };

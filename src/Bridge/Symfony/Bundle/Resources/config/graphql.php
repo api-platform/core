@@ -56,40 +56,40 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.graphql.executor', Executor::class)
 
         ->set('api_platform.graphql.resolver.factory.item', ItemResolverFactory::class)
-            ->args([ref('api_platform.graphql.resolver.stage.read'), ref('api_platform.graphql.resolver.stage.security'), ref('api_platform.graphql.resolver.stage.security_post_denormalize'), ref('api_platform.graphql.resolver.stage.serialize'), ref('api_platform.graphql.query_resolver_locator'), ref('api_platform.metadata.resource.metadata_factory')])
+            ->args([service('api_platform.graphql.resolver.stage.read'), service('api_platform.graphql.resolver.stage.security'), service('api_platform.graphql.resolver.stage.security_post_denormalize'), service('api_platform.graphql.resolver.stage.serialize'), service('api_platform.graphql.query_resolver_locator'), service('api_platform.metadata.resource.metadata_factory')])
 
         ->set('api_platform.graphql.resolver.factory.collection', CollectionResolverFactory::class)
-            ->args([ref('api_platform.graphql.resolver.stage.read'), ref('api_platform.graphql.resolver.stage.security'), ref('api_platform.graphql.resolver.stage.security_post_denormalize'), ref('api_platform.graphql.resolver.stage.serialize'), ref('api_platform.graphql.query_resolver_locator'), ref('api_platform.metadata.resource.metadata_factory'), ref('request_stack')])
+            ->args([service('api_platform.graphql.resolver.stage.read'), service('api_platform.graphql.resolver.stage.security'), service('api_platform.graphql.resolver.stage.security_post_denormalize'), service('api_platform.graphql.resolver.stage.serialize'), service('api_platform.graphql.query_resolver_locator'), service('api_platform.metadata.resource.metadata_factory'), service('request_stack')])
 
         ->set('api_platform.graphql.resolver.factory.item_mutation', ItemMutationResolverFactory::class)
-            ->args([ref('api_platform.graphql.resolver.stage.read'), ref('api_platform.graphql.resolver.stage.security'), ref('api_platform.graphql.resolver.stage.security_post_denormalize'), ref('api_platform.graphql.resolver.stage.serialize'), ref('api_platform.graphql.resolver.stage.deserialize'), ref('api_platform.graphql.resolver.stage.write'), ref('api_platform.graphql.resolver.stage.validate'), ref('api_platform.graphql.mutation_resolver_locator'), ref('api_platform.metadata.resource.metadata_factory')])
+            ->args([service('api_platform.graphql.resolver.stage.read'), service('api_platform.graphql.resolver.stage.security'), service('api_platform.graphql.resolver.stage.security_post_denormalize'), service('api_platform.graphql.resolver.stage.serialize'), service('api_platform.graphql.resolver.stage.deserialize'), service('api_platform.graphql.resolver.stage.write'), service('api_platform.graphql.resolver.stage.validate'), service('api_platform.graphql.mutation_resolver_locator'), service('api_platform.metadata.resource.metadata_factory')])
 
         ->set('api_platform.graphql.resolver.factory.item_subscription', ItemSubscriptionResolverFactory::class)
-            ->args([ref('api_platform.graphql.resolver.stage.read'), ref('api_platform.graphql.resolver.stage.security'), ref('api_platform.graphql.resolver.stage.serialize'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.graphql.subscription.subscription_manager'), ref('api_platform.graphql.subscription.mercure_iri_generator')->ignoreOnInvalid()])
+            ->args([service('api_platform.graphql.resolver.stage.read'), service('api_platform.graphql.resolver.stage.security'), service('api_platform.graphql.resolver.stage.serialize'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.graphql.subscription.subscription_manager'), service('api_platform.graphql.subscription.mercure_iri_generator')->ignoreOnInvalid()])
 
         ->set('api_platform.graphql.resolver.stage.read', ReadStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.collection_data_provider'), ref('api_platform.subresource_data_provider'), ref('api_platform.graphql.serializer.context_builder'), '%api_platform.graphql.nesting_separator%'])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.collection_data_provider'), service('api_platform.subresource_data_provider'), service('api_platform.graphql.serializer.context_builder'), '%api_platform.graphql.nesting_separator%'])
 
         ->set('api_platform.graphql.resolver.stage.security', SecurityStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.security.resource_access_checker')->ignoreOnInvalid()])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.security.resource_access_checker')->ignoreOnInvalid()])
 
         ->set('api_platform.graphql.resolver.stage.security_post_denormalize', SecurityPostDenormalizeStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.security.resource_access_checker')->ignoreOnInvalid()])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.security.resource_access_checker')->ignoreOnInvalid()])
 
         ->set('api_platform.graphql.resolver.stage.serialize', SerializeStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('serializer'), ref('api_platform.graphql.serializer.context_builder'), ref('api_platform.pagination')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('serializer'), service('api_platform.graphql.serializer.context_builder'), service('api_platform.pagination')])
 
         ->set('api_platform.graphql.resolver.stage.deserialize', DeserializeStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('serializer'), ref('api_platform.graphql.serializer.context_builder')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('serializer'), service('api_platform.graphql.serializer.context_builder')])
 
         ->set('api_platform.graphql.resolver.stage.write', WriteStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.data_persister'), ref('api_platform.graphql.serializer.context_builder')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.data_persister'), service('api_platform.graphql.serializer.context_builder')])
 
         ->set('api_platform.graphql.resolver.stage.validate', ValidateStage::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.validator')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.validator')])
 
         ->set('api_platform.graphql.resolver.resource_field', ResourceFieldResolver::class)
-            ->args([ref('api_platform.iri_converter')])
+            ->args([service('api_platform.iri_converter')])
 
         ->set('api_platform.graphql.query_resolver_locator', ServiceLocator::class)
             ->tag('container.service_locator')
@@ -109,44 +109,44 @@ return static function (ContainerConfigurator $container) {
         ->set('api_platform.graphql.types_container', TypesContainer::class)
 
         ->set('api_platform.graphql.types_factory', TypesFactory::class)
-            ->args([ref('api_platform.graphql.type_locator')])
+            ->args([service('api_platform.graphql.type_locator')])
 
         ->set('api_platform.graphql.type_converter', TypeConverter::class)
-            ->args([ref('api_platform.graphql.type_builder'), ref('api_platform.graphql.types_container'), ref('api_platform.metadata.resource.metadata_factory')])
+            ->args([service('api_platform.graphql.type_builder'), service('api_platform.graphql.types_container'), service('api_platform.metadata.resource.metadata_factory')])
 
         ->set('api_platform.graphql.type_builder', TypeBuilder::class)
-            ->args([ref('api_platform.graphql.types_container'), ref('api_platform.graphql.resolver.resource_field'), ref('api_platform.graphql.fields_builder_locator'), ref('api_platform.pagination')])
+            ->args([service('api_platform.graphql.types_container'), service('api_platform.graphql.resolver.resource_field'), service('api_platform.graphql.fields_builder_locator'), service('api_platform.pagination')])
 
         ->set('api_platform.graphql.fields_builder', FieldsBuilder::class)
-            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.graphql.types_container'), ref('api_platform.graphql.type_builder'), ref('api_platform.graphql.type_converter'), ref('api_platform.graphql.resolver.factory.item'), ref('api_platform.graphql.resolver.factory.collection'), ref('api_platform.graphql.resolver.factory.item_mutation'), ref('api_platform.graphql.resolver.factory.item_subscription'), ref('api_platform.filter_locator'), ref('api_platform.pagination'), ref('api_platform.name_converter')->ignoreOnInvalid(), '%api_platform.graphql.nesting_separator%'])
+            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.graphql.types_container'), service('api_platform.graphql.type_builder'), service('api_platform.graphql.type_converter'), service('api_platform.graphql.resolver.factory.item'), service('api_platform.graphql.resolver.factory.collection'), service('api_platform.graphql.resolver.factory.item_mutation'), service('api_platform.graphql.resolver.factory.item_subscription'), service('api_platform.filter_locator'), service('api_platform.pagination'), service('api_platform.name_converter')->ignoreOnInvalid(), '%api_platform.graphql.nesting_separator%'])
 
         ->set('api_platform.graphql.fields_builder_locator', ServiceLocator::class)
-            ->args([[ref('api_platform.graphql.fields_builder')]])
+            ->args([[service('api_platform.graphql.fields_builder')]])
             ->tag('container.service_locator')
 
         ->set('api_platform.graphql.schema_builder', SchemaBuilder::class)
-            ->args([ref('api_platform.metadata.resource.name_collection_factory'), ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.graphql.types_factory'), ref('api_platform.graphql.types_container'), ref('api_platform.graphql.fields_builder')])
+            ->args([service('api_platform.metadata.resource.name_collection_factory'), service('api_platform.metadata.resource.metadata_factory'), service('api_platform.graphql.types_factory'), service('api_platform.graphql.types_container'), service('api_platform.graphql.fields_builder')])
 
         ->set('api_platform.graphql.action.entrypoint', EntrypointAction::class)
-            ->args([ref('api_platform.graphql.schema_builder'), ref('api_platform.graphql.executor'), ref('api_platform.graphql.action.graphiql'), ref('api_platform.graphql.action.graphql_playground'), ref('serializer'), ref('api_platform.graphql.error_handler'), '%kernel.debug%', '%api_platform.graphql.graphiql.enabled%', '%api_platform.graphql.graphql_playground.enabled%', '%api_platform.graphql.default_ide%'])
+            ->args([service('api_platform.graphql.schema_builder'), service('api_platform.graphql.executor'), service('api_platform.graphql.action.graphiql'), service('api_platform.graphql.action.graphql_playground'), service('serializer'), service('api_platform.graphql.error_handler'), '%kernel.debug%', '%api_platform.graphql.graphiql.enabled%', '%api_platform.graphql.graphql_playground.enabled%', '%api_platform.graphql.default_ide%'])
             ->public()
 
         ->set('api_platform.graphql.action.graphiql', GraphiQlAction::class)
-            ->args([ref('twig'), ref('api_platform.router'), '%api_platform.graphql.graphiql.enabled%', '%api_platform.title%'])
+            ->args([service('twig'), service('api_platform.router'), '%api_platform.graphql.graphiql.enabled%', '%api_platform.title%'])
             ->public()
 
         ->set('api_platform.graphql.action.graphql_playground', GraphQlPlaygroundAction::class)
-            ->args([ref('twig'), ref('api_platform.router'), '%api_platform.graphql.graphql_playground.enabled%', '%api_platform.title%'])
+            ->args([service('twig'), service('api_platform.router'), '%api_platform.graphql.graphql_playground.enabled%', '%api_platform.title%'])
             ->public()
 
         ->set('api_platform.graphql.error_handler', ErrorHandler::class)
 
         ->set('api_platform.graphql.normalizer.item', ItemNormalizer::class)
-            ->args([ref('api_platform.metadata.property.name_collection_factory'), ref('api_platform.metadata.property.metadata_factory'), ref('api_platform.iri_converter'), ref('api_platform.identifiers_extractor.cached'), ref('api_platform.resource_class_resolver'), ref('api_platform.property_accessor'), ref('api_platform.name_converter')->ignoreOnInvalid(), ref('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), ref('api_platform.item_data_provider')->ignoreOnInvalid(), '%api_platform.allow_plain_identifiers%', null, tagged_iterator('api_platform.data_transformer'), ref('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid()])
+            ->args([service('api_platform.metadata.property.name_collection_factory'), service('api_platform.metadata.property.metadata_factory'), service('api_platform.iri_converter'), service('api_platform.identifiers_extractor.cached'), service('api_platform.resource_class_resolver'), service('api_platform.property_accessor'), service('api_platform.name_converter')->ignoreOnInvalid(), service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(), service('api_platform.item_data_provider')->ignoreOnInvalid(), '%api_platform.allow_plain_identifiers%', null, tagged_iterator('api_platform.data_transformer'), service('api_platform.metadata.resource.metadata_factory')->ignoreOnInvalid()])
             ->tag('serializer.normalizer', ['priority' => -890])
 
         ->set('api_platform.graphql.normalizer.object', ObjectNormalizer::class)
-            ->args([ref('serializer.normalizer.object'), ref('api_platform.iri_converter'), ref('api_platform.identifiers_extractor.cached')])
+            ->args([service('serializer.normalizer.object'), service('api_platform.iri_converter'), service('api_platform.identifiers_extractor.cached')])
             ->tag('serializer.normalizer', ['priority' => -995])
 
         ->set('api_platform.graphql.normalizer.error', ErrorNormalizer::class)
@@ -163,11 +163,11 @@ return static function (ContainerConfigurator $container) {
             ->tag('serializer.normalizer', ['priority' => -780])
 
         ->set('api_platform.graphql.serializer.context_builder', SerializerContextBuilder::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.name_converter')->ignoreOnInvalid()])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.name_converter')->ignoreOnInvalid()])
         ->alias(SerializerContextBuilderInterface::class, 'api_platform.graphql.serializer.context_builder')
 
         ->set('api_platform.graphql.subscription.subscription_manager', SubscriptionManager::class)
-            ->args([ref('api_platform.graphql.cache.subscription'), ref('api_platform.graphql.subscription.subscription_identifier_generator'), ref('api_platform.graphql.resolver.stage.serialize'), ref('api_platform.iri_converter')])
+            ->args([service('api_platform.graphql.cache.subscription'), service('api_platform.graphql.subscription.subscription_identifier_generator'), service('api_platform.graphql.resolver.stage.serialize'), service('api_platform.iri_converter')])
 
         ->set('api_platform.graphql.subscription.subscription_identifier_generator', SubscriptionIdentifierGenerator::class)
 
@@ -176,6 +176,6 @@ return static function (ContainerConfigurator $container) {
             ->tag('cache.pool')
 
         ->set('api_platform.graphql.command.export_command', GraphQlExportCommand::class)
-            ->args([ref('api_platform.graphql.schema_builder')])
+            ->args([service('api_platform.graphql.schema_builder')])
             ->tag('console.command');
 };

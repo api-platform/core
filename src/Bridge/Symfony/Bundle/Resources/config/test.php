@@ -19,6 +19,6 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('test.api_platform.client', Client::class)
             ->share(false)
-            ->args([ref('test.client')])
+            ->args([service('test.client')])
             ->public();
 };

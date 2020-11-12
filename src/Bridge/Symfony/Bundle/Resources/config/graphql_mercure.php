@@ -18,5 +18,5 @@ use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGenerator;
 return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('api_platform.graphql.subscription.mercure_iri_generator', MercureSubscriptionIriGenerator::class)
-            ->args([ref('router.request_context')]);
+            ->args([service('router.request_context')]);
 };

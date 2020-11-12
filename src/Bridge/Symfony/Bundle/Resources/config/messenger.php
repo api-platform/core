@@ -21,10 +21,10 @@ return static function (ContainerConfigurator $container) {
         ->alias('api_platform.message_bus', 'messenger.default_bus')
 
         ->set('api_platform.messenger.data_persister', DataPersister::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory'), ref('api_platform.message_bus'), ref('api_platform.data_persister')])
+            ->args([service('api_platform.metadata.resource.metadata_factory'), service('api_platform.message_bus'), service('api_platform.data_persister')])
             ->tag('api_platform.data_persister', ['priority' => -900])
 
         ->set('api_platform.messenger.data_transformer', DataTransformer::class)
-            ->args([ref('api_platform.metadata.resource.metadata_factory')])
+            ->args([service('api_platform.metadata.resource.metadata_factory')])
             ->tag('api_platform.data_transformer', ['priority' => -10]);
 };
