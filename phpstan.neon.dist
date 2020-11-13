@@ -92,10 +92,6 @@ parameters:
 		-
 			message: '#Service "test" is not registered in the container\.#'
 			path: tests/GraphQl/Type/TypesContainerTest.php
-		# https://github.com/phpstan/phpstan/issues/2999
-		-
-			message: '#ArrayObject<string, bool\|string> does not accept array<string, mixed>\.#'
-			path: src/JsonSchema/SchemaFactory.php
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
