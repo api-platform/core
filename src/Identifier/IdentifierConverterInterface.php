@@ -30,7 +30,7 @@ interface IdentifierConverterInterface
     /**
      * Takes an array of strings representing identifiers and transform their values to the expected type.
      *
-     * @param string $data  Identifier to convert to php values
+     * @param mixed  $data  Identifier to convert to php values
      * @param string $class The class to which the identifiers belong
      *
      * @throws InvalidIdentifierException

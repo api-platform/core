@@ -236,7 +236,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if (null !== $this->subresourceOperationFactory) {
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
                 $subresourceMetadata = $this->resourceMetadataFactory->create($operation['resource_class']);
-                $propertyMetadata = $this->propertyMetadataFactory->create(end($operation['identifiers'])[1], $operation['property']);
+                $propertyMetadata = $this->propertyMetadataFactory->create(end($operation['identifiers'])[0], $operation['property']);
                 $hydraOperations[] = $this->getHydraOperation($resourceClass, $subresourceMetadata, $operation['route_name'], $operation, "#{$subresourceMetadata->getShortName()}", OperationType::SUBRESOURCE, $propertyMetadata->getSubresource());
             }
         }

@@ -57,7 +57,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $paginationOptions;
     private $identifiersExtractor;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, SubresourceOperationFactoryInterface $subresourceOperationFactory, array $formats = [], Options $openApiOptions, PaginationOptions $paginationOptions, IdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, SubresourceOperationFactoryInterface $subresourceOperationFactory, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -68,10 +68,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->operationPathResolver = $operationPathResolver;
-        $this->openApiOptions = $openApiOptions;
-        $this->paginationOptions = $paginationOptions;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
+        $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
     }
 
     /**
@@ -124,10 +124,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         $rootResourceClass = $resourceClass;
         foreach ($operations as $operationName => $operation) {
-            $identifiers = (array) ($operation['identified_by'] ?? $resourceMetadata->getAttribute('identified_by', $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)));
-            $hasCompositeIdentifiers = \count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
-
-            if ($hasCompositeIdentifiers) {
+            $identifiers = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', null === $this->identifiersExtractor ? ['id'] : $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)));
+            if (\count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false) {
                 $identifiers = ['id'];
             }
 
@@ -152,22 +150,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Set up parameters
             if (OperationType::ITEM === $operationType) {
-                foreach ($identifiers as $identifier) {
-                    $parameters[] = new Model\Parameter($identifier, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                foreach ($identifiers as $parameterName => $identifier) {
+                    $parameters[] = new Model\Parameter(\is_string($parameterName) ? $parameterName : $identifier, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
                 }
                 $links[$operationId] = $this->getLink($resourceClass, $operationId, $path);
             } elseif (OperationType::COLLECTION === $operationType && 'GET' === $method) {
                 $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
             } elseif (OperationType::SUBRESOURCE === $operationType) {
-                // FIXME: In SubresourceOperationFactory identifiers may happen twice
-                $added = [];
-                foreach ($operation['identifiers'] as $identifier) {
-                    if (\in_array($identifier[0], $added, true)) {
-                        continue;
-                    }
-                    $added[] = $identifier[0];
-                    $parameterShortname = $this->resourceMetadataFactory->create($identifier[1])->getShortName();
-                    $parameters[] = new Model\Parameter($identifier[0], 'path', $parameterShortname.' identifier', true, false, false, ['type' => 'string']);
+                foreach ($operation['identifiers'] as $parameterName => [$class, $property]) {
+                    $parameters[] = new Model\Parameter($parameterName, 'path', $this->resourceMetadataFactory->create($class)->getShortName().' identifier', true, false, false, ['type' => 'string']);
                 }
 
                 if ($operation['collection']) {

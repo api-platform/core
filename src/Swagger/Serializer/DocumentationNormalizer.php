@@ -170,11 +170,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->defaultContext[self::SPEC_VERSION] = $swaggerVersions[0] ?? 2;
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
-
-        if (null === $identifiersExtractor) {
-            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.6 and will not be possible anymore in API Platform 3', IdentifierExtractorInterface::class), E_USER_DEPRECATED);
-        }
-
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
@@ -192,7 +187,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             if ($this->identifiersExtractor) {
-                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identified_by' => $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)]);
+                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identifiers' => $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)]);
             }
             $resourceShortName = $resourceMetadata->getShortName();
 
@@ -466,14 +461,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         // Avoid duplicates parameters when there is a filter on a subresource identifier
         $parametersMemory = [];
         $pathOperation['parameters'] = [];
-        foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
-            if (true === $hasIdentifier) {
-                $parameter = ['name' => $identifier, 'in' => 'path', 'required' => true];
-                $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
-                $pathOperation['parameters'][] = $parameter;
-                $parametersMemory[] = $identifier;
+        foreach ($subresourceOperation['identifiers'] as $parameterName => [$class, $identifier, $hasIdentifier]) {
+            if (false === strpos($subresourceOperation['path'], sprintf('{%s}', $parameterName))) {
+                continue;
             }
+
+            $parameter = ['name' => $parameterName, 'in' => 'path', 'required' => true];
+            $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
+            $pathOperation['parameters'][] = $parameter;
+            $parametersMemory[] = $parameterName;
         }
+
         if ($parameters = $this->getFiltersParameters($v3, $subresourceOperation['resource_class'], $operationName, $subResourceMetadata)) {
             foreach ($parameters as $parameter) {
                 if (!\in_array($parameter['name'], $parametersMemory, true)) {
@@ -595,10 +593,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation, string $operationType, string $operationName, ResourceMetadata $resourceMetadata): \ArrayObject
     {
         $identifiers = (array) $resourceMetadata
-                ->getTypedOperationAttribute(OperationType::ITEM, $operationName, 'identified_by', ['id'], true);
-        $hasCompositeIdentifiers = \count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
-
-        if ($hasCompositeIdentifiers) {
+                ->getTypedOperationAttribute(OperationType::ITEM, $operationName, 'identifiers', ['id'], true);
+        if (\count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false) {
             $identifiers = ['id'];
         }
 
@@ -606,9 +602,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $pathOperation['parameters'] = [];
         }
 
-        foreach ($identifiers as $identifier) {
+        foreach ($identifiers as $parameterName => $identifier) {
             $parameter = [
-                'name' => $identifier,
+                'name' => \is_string($parameterName) ? $parameterName : $identifier,
                 'in' => 'path',
                 'required' => true,
             ];

@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Custom Identifier Dummy With Subresource.
  *
- * @ApiResource
+ * @ApiResource(attributes={"identifiers"="slug"})
  * @ORM\Entity
  */
 class SlugParentDummy

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\DataProvider;
 
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 
 /**
@@ -75,15 +76,12 @@ trait OperationDataProviderTrait
             throw new RuntimeException('Subresources not supported');
         }
 
+        // TODO: SubresourceDataProvider wants: ['id' => ['id' => 1], 'relatedDummies' => ['id' => 2]], identifiers is ['id' => 1, 'relatedDummies' => 2]
         $subresourceIdentifiers = [];
-        foreach ($attributes['subresource_context']['identifiers'] as list($identifier, , $isItem, $identifiedBy)) {
-            if ($isItem) {
-                $subresourceIdentifiers[$identifier] = [$identifiedBy[0] => current($identifiers)];
-                next($identifiers);
-                continue;
+        foreach ($attributes['identifiers'] as $parameterName => [$class, $property]) {
+            if (false !== ($attributes['identifiers'][$parameterName][2] ?? null)) {
+                $subresourceIdentifiers[$parameterName] = [$property => $identifiers[$parameterName]];
             }
-
-            $subresourceIdentifiers[$identifier] = [];
         }
 
         return $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $subresourceIdentifiers, $attributes['subresource_context'] + $context, $attributes['subresource_operation_name']);
@@ -96,23 +94,12 @@ trait OperationDataProviderTrait
      */
     private function extractIdentifiers(array $parameters, array $attributes)
     {
-        $identifiersKeys = $attributes['identified_by'] ?? [];
+        $identifiersKeys = $attributes['identifiers'] ?? ['id' => [$attributes['resource_class'], 'id']];
         $identifiers = [];
 
-        if (isset($attributes['subresource_context'])) {
-            $subresourceIdentifiersKeys = [];
-            $i = 0;
-            foreach ($attributes['subresource_context']['identifiers'] as list($identifier, , $isItem)) {
-                if ($isItem) {
-                    $subresourceIdentifiersKeys[] = $identifiersKeys[$i++] ?? $identifier;
-                }
-            }
-            $identifiersKeys = $subresourceIdentifiersKeys;
-        }
-
         $identifiersNumber = \count($identifiersKeys);
-        foreach ($identifiersKeys as $identifier) {
-            if (!isset($parameters[$identifier])) {
+        foreach ($identifiersKeys as $parameterName => $identifiedBy) {
+            if (!isset($parameters[$parameterName])) {
                 if ($attributes['has_composite_identifier']) {
                     $identifiers = CompositeIdentifierParser::parse($parameters['id']);
                     if (($currentIdentifiersNumber = \count($identifiers)) !== $identifiersNumber) {
@@ -122,10 +109,15 @@ trait OperationDataProviderTrait
                     return $identifiers;
                 }
 
-                throw new InvalidIdentifierException(sprintf('Parameter "%s" not found', $identifier));
+                // TODO: Subresources tuple may have a third item representing if it is a "collection", this behavior will be removed in 3.0
+                if (false === ($identifiedBy[2] ?? null)) {
+                    continue;
+                }
+
+                throw new InvalidIdentifierException(sprintf('Parameter "%s" not found', $parameterName));
             }
 
-            $identifiers[$identifier] = $parameters[$identifier];
+            $identifiers[$parameterName] = $parameters[$parameterName];
         }
 
         return $this->identifierConverter->convert($identifiers, $attributes['resource_class']);

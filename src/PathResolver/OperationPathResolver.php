@@ -50,9 +50,9 @@ final class OperationPathResolver implements OperationPathResolverInterface
         $path = '/'.$this->pathSegmentNameGenerator->getSegmentName($resourceShortName);
 
         if (OperationType::ITEM === $operationType) {
-            if (isset($operation['identified_by']) && (\count($operation['identified_by']) <= 1 || false === ($operation['has_composite_identifier'] ?? true))) {
-                foreach ($operation['identified_by'] as $identifier) {
-                    $path .= sprintf('/{%s}', $identifier);
+            if (isset($operation['identifiers']) && (\count($operation['identifiers']) <= 1 || false === ($operation['has_composite_identifier'] ?? true))) {
+                foreach ($operation['identifiers'] as $parameterName => $identifier) {
+                    $path .= sprintf('/{%s}', \is_string($parameterName) ? $parameterName : $identifier);
                 }
             } else {
                 $path .= '/{id}';
