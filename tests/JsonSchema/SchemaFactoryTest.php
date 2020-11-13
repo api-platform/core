@@ -30,6 +30,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class SchemaFactoryTest extends TestCase
 {
@@ -73,7 +74,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey($rootDefinitionKey, $definitions);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
-        $this->assertFalse($definitions[$rootDefinitionKey]['additionalProperties']);
+        $this->assertTrue($definitions[$rootDefinitionKey]['additionalProperties']);
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);
@@ -98,6 +99,7 @@ class SchemaFactoryTest extends TestCase
             'put' => [
                 'normalization_context' => [
                     'groups' => 'overridden_operation_dummy_put',
+                    AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
                 ],
                 'validation_groups' => ['validation_groups_dummy_put'],
             ],
