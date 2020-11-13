@@ -44,7 +44,7 @@ final class VarnishPurger implements PurgerInterface
         }
 
         // Create the regex to purge all tags in just one request
-        $parts = array_map(function ($iri) {
+        $parts = array_map(static function ($iri) {
             return sprintf('(^|\,)%s($|\,)', preg_quote($iri));
         }, $iris);
 

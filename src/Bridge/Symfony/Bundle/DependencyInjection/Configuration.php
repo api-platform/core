@@ -284,7 +284,7 @@ final class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->validate()
-                                ->ifTrue(function ($v) use ($defaultVersions) {
+                                ->ifTrue(static function ($v) use ($defaultVersions) {
                                     return $v !== array_intersect($v, $defaultVersions);
                                 })
                                 ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))
@@ -337,7 +337,7 @@ final class Configuration implements ConfigurationInterface
                                 ->variableNode('request_options')
                                     ->defaultValue([])
                                     ->validate()
-                                        ->ifTrue(function ($v) { return false === \is_array($v); })
+                                        ->ifTrue(static function ($v) { return false === \is_array($v); })
                                         ->thenInvalid('The request_options parameter must be an array.')
                                     ->end()
                                     ->info('To pass options to the client charged with the request.')
@@ -435,7 +435,7 @@ final class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('exception_class')
                     ->beforeNormalization()
                         ->ifArray()
-                        ->then(function (array $exceptionToStatus) {
+                        ->then(static function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as &$httpStatusCode) {
                                 if (\is_int($httpStatusCode)) {
                                     continue;
@@ -454,7 +454,7 @@ final class Configuration implements ConfigurationInterface
                     ->prototype('integer')->end()
                     ->validate()
                         ->ifArray()
-                        ->then(function (array $exceptionToStatus) {
+                        ->then(static function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as $httpStatusCode) {
                                 if ($httpStatusCode < 100 || $httpStatusCode >= 600) {
                                     throw new InvalidConfigurationException(sprintf('The HTTP status code "%s" is not valid.', $httpStatusCode));
@@ -479,7 +479,7 @@ final class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('format')
                     ->beforeNormalization()
                         ->ifArray()
-                        ->then(function ($v) {
+                        ->then(static function ($v) {
                             foreach ($v as $format => $value) {
                                 if (isset($value['mime_types'])) {
                                     continue;
