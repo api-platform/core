@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\JsonLd\Action;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -48,6 +49,13 @@ final class ContextAction
      */
     public function __invoke(string $shortName): array
     {
+        $pathParts = pathinfo($shortName);
+
+        if (($pathParts['extension'] ?? null) && 'jsonld' !== $pathParts['extension']) {
+            throw new BadRequestHttpException();
+        }
+        $shortName = $pathParts['filename'];
+
         if ('Entrypoint' === $shortName) {
             return ['@context' => $this->contextBuilder->getEntrypointContext()];
         }
