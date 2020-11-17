@@ -38,6 +38,10 @@ final class MatchesJsonSchema extends Constraint
     {
         $this->schema = \is_string($schema) ? json_decode($schema) : $schema;
         $this->checkMode = $checkMode;
+
+        if (\is_callable('parent::__construct')) {
+            parent::__construct(); //@phpstan-ignore-line
+        }
     }
 
     /**
