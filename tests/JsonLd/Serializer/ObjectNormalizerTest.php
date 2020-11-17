@@ -48,8 +48,8 @@ class ObjectNormalizerTest extends TestCase
             '@id' => '_:1234',
         ]);
 
-        $normalizer = new ObjectNormalizer( // @phpstan-ignore-line
-            $serializerProphecy->reveal(),
+        $normalizer = new ObjectNormalizer(
+            $serializerProphecy->reveal(), // @phpstan-ignore-line
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -77,8 +77,8 @@ class ObjectNormalizerTest extends TestCase
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
         $contextBuilderProphecy->getAnonymousResourceContext($dummy, Argument::type('array'))->shouldNotBeCalled();
 
-        $normalizer = new ObjectNormalizer( // @phpstan-ignore-line
-            $serializerProphecy->reveal(),
+        $normalizer = new ObjectNormalizer(
+            $serializerProphecy->reveal(),  // @phpstan-ignore-line
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -101,8 +101,8 @@ class ObjectNormalizerTest extends TestCase
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
         $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['iri' => '/dummy/1234', 'api_resource' => $dummy])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy', '@context' => []]);
 
-        $normalizer = new ObjectNormalizer( // @phpstan-ignore-line
-            $serializerProphecy->reveal(),
+        $normalizer = new ObjectNormalizer(
+            $serializerProphecy->reveal(), // @phpstan-ignore-line
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
@@ -131,8 +131,8 @@ class ObjectNormalizerTest extends TestCase
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
         $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['iri' => '/dummy/1234', 'api_resource' => $dummy, 'has_context' => true])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy']);
 
-        $normalizer = new ObjectNormalizer( // @phpstan-ignore-line
-            $serializerProphecy->reveal(),
+        $normalizer = new ObjectNormalizer(
+            $serializerProphecy->reveal(), // @phpstan-ignore-line
             $iriConverterProphecy->reveal(),
             $contextBuilderProphecy->reveal()
         );
