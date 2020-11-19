@@ -19,7 +19,7 @@ We choose to use multiple `ApiResource` annotations to declare subresources on a
 
 * Subresource declaration is an important feature and removing it would harm the software. 
 * The `ApiSubresource` annotation is declared on a Model's properties, which was identified as the root of several issues. For example, finding what class it is defined on ([#3458][issue/3458]). Having multiple `ApiResource` would improve a lot the declaration of our internal metadata and would cause less confusion for developers. 
-* The `path` of these multiple `ApiResource` needs to be implicitly described. 
+* The `path` of these multiple `ApiResource` needs to be explicitly described. 
 * An `ApiResource` is always defined on the Resource it represents: `/companies/1/users` outputs Users and should be defined on the `User` model.
 * PropertyInfo and Doctrine metadata can be used to define how is the Resource identified according to the given path.
 
