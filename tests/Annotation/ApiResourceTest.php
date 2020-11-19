@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\Fixtures\AnnotatedClass;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
@@ -130,18 +129,6 @@ class ApiResourceTest extends TestCase
             'security_post_denormalize_message' => 'You are not bar.',
             'cache_headers' => ['max_age' => 0, 'shared_max_age' => 0, 'vary' => ['Custom-Vary-1', 'Custom-Vary-2']],
         ], $resource->attributes);
-    }
-
-    public function testConstructWithInvalidAttribute()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown property "invalidAttribute" on annotation "ApiPlatform\\Core\\Annotation\\ApiResource".');
-
-        new ApiResource([
-            'shortName' => 'shortName',
-            'routePrefix' => '/foo',
-            'invalidAttribute' => 'exception',
-        ]);
     }
 
     /**
