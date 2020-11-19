@@ -5,7 +5,7 @@
 
 ## Context and Problem Statement
 
-Subresources introduced in 2017 ([#904][pull/904]) introduced the `ApiSubresource` annotation. This definition came along with its own set of issues ([#2706][issue/2706]) and needs a refreshment. On top of that, write support on subresources is a wanted feature and it is hard to implement currently ([#2598][pull/2598]) (See [0001-subresource-write-support](./0001-subresource-write-support.md)). How can we revamp subresources to improve the developer experience and reduce the complexity?
+Subresources introduced in 2017 ([#904][pull/904]) the `ApiSubresource` annotation. This definition came along with its own set of issues ([#2706][issue/2706]) and needs a refreshment. On top of that, write support on subresources is a wanted feature and it is hard to implement currently ([#2598][pull/2598]) (See [0001-subresource-write-support](./0001-subresource-write-support.md)). How can we revamp the Subresource definition to improve the developer experience and reduce the complexity?
 
 ## Considered Options
 
@@ -28,7 +28,7 @@ Get Users belonging to the company on (`/companies/1/users`);
 
 ```php
 /**
- * @ApiResource()
+ * @ApiResource(path="/users")
  * @ApiResource(path="/companies/{companyId}/users")
  */
 class User {
@@ -40,7 +40,7 @@ With explicit identifiers:
 
 ```php
 /**
- * @ApiResource()
+ * @ApiResource(path="/users")
  * @ApiResource(path="/companies/{companyId}/users", identifiers={"companyId": {Company::class, "id"}})
  */
 class User {
@@ -52,7 +52,7 @@ Two-level subresource to get the Users belonging to the Company #1 located in Fr
 
 ```php
 /**
- * @ApiResource()
+ * @ApiResource(path="/users")
  * @ApiResource(path="/countries/{countryId}/companies/{companyId}/users")
  */
 class Users {
@@ -68,7 +68,7 @@ With explicit identifiers:
 
 ```php
 /**
- * @ApiResource()
+ * @ApiResource(path="/users")
  * @ApiResource(path="/countries/{countryId}/companies/{companyId}/users", identifiers={"companyId": {Company::class, "id"}, "countryId": {Country::class, "shortName"}})
  */
 class Users {
@@ -88,7 +88,7 @@ Get the company employees or administrators `/companies/1/administrators`:
 
 ```php
 /**
- * @ApiResource()
+ * @ApiResource(path="/users")
  * @ApiResource(path="/companies/{companyId}/administrators")
  * @ApiResource(path="/companies/{companyId}/employees")
  */
@@ -107,7 +107,7 @@ With explicit identifiers:
 
 ```php
 /**
- * @ApiResource()
+ * @ApiResource(path="/users")
  * @ApiResource(path="/companies/{companyId}/administrators", identifiers={"companyId": {Company::class, "id"}, "*": {Company::class, "administrators"}})
  * @ApiResource(path="/companies/{companyId}/employees", identifiers={"companyId": {Company::class, "id"}, "*": {Company::class, "employees"}})
  */
