@@ -20,19 +20,19 @@ We choose to use multiple `ApiResource` annotations to declare subresources on a
 * Subresource declaration is an important feature and removing it would harm the software. 
 * The `ApiSubresource` annotation is declared on a Model's properties, which was identified as the root of several issues. For example, finding what class it is defined on ([#3458][issue/3458]). Having multiple `ApiResource` would improve a lot the declaration of our internal metadata and would cause less confusion for developers. 
 * The `path` of these multiple `ApiResource` needs to be implicitly described. 
+* An `ApiResource` is always defined on the Resource it represents: `/companies/1/users` outputs Users and should be defined on the `User` model.
 
 ### Examples
 
-A Company resource with a Company Users subresource on (`/companies/1/users`);
+Get Users belonging to the company on (`/companies/1/users`);
 
 ```php
 /**
  * @ApiResource()
  * @ApiResource(path="/companies/{companyId}/users")
  */
-class Company {
-  public int $id;
-  public array $users = [];
+class User {
+  public array $companies = [];
 }
 ```
 
@@ -43,22 +43,24 @@ With explicit identifiers:
  * @ApiResource()
  * @ApiResource(path="/companies/{companyId}/users", identifiers={"companyId": {Company::class, "id"}})
  */
-class Company {
-  public int $id;
-  public array $users = [];
+class User {
+  public array $companies = [];
 }
 ```
 
-Two-level subresource to get the users belonging to the company 1 located in France `/countries/fr/companies/1/users`: 
+Two-level subresource to get the Users belonging to the Company #1 located in France `/countries/fr/companies/1/users`: 
 
 ```php
 /**
  * @ApiResource()
  * @ApiResource(path="/countries/{countryId}/companies/{companyId}/users")
  */
-class Country {
-  public int $id;
+class Users {
   public array $companies = [];
+}
+
+class Company {
+  public array $countries = [];
 }
 ```
 
@@ -69,9 +71,16 @@ With explicit identifiers:
  * @ApiResource()
  * @ApiResource(path="/countries/{countryId}/companies/{companyId}/users", identifiers={"companyId": {Company::class, "id"}, "countryId": {Country::class, "shortName"}})
  */
+class Users {
+  public array $companies = [];
+}
+
+class Company {
+  public array $countries = [];
+}
+
 class Country {
   public string $shortName;
-  public array $companies = [];
 }
 ```
 
@@ -83,6 +92,10 @@ Get the company employees or administrators `/companies/1/administrators`:
  * @ApiResource(path="/companies/{companyId}/administrators")
  * @ApiResource(path="/companies/{companyId}/employees")
  */
+class Users {
+  public array $companies;
+}
+
 class Company {
   public int $id;
   public Users $employees;
@@ -98,6 +111,10 @@ With explicit identifiers:
  * @ApiResource(path="/companies/{companyId}/administrators", identifiers={"companyId": {Company::class, "id"}, "*": {Company::class, "administrators"}})
  * @ApiResource(path="/companies/{companyId}/employees", identifiers={"companyId": {Company::class, "id"}, "*": {Company::class, "employees"}})
  */
+class Users {
+  public array $companies;
+}
+
 class Company {
   public int $id;
   public Users $employees;
