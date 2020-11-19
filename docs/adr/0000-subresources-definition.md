@@ -9,7 +9,7 @@ Subresources introduced in 2017 ([#904][pull/904]) the `ApiSubresource` annotati
 
 ## Considered Options
 
-* Fix the actual `ApiSubresource` annotation
+* Fix the current `ApiSubresource` annotation
 * Use multiple `ApiResource` to declare subresources and deprecate `ApiSubresource`
 * Deprecate subresources
 
