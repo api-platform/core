@@ -166,20 +166,24 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     {
         $type = $metadata->getTypeOfField($field);
 
+        if (MongoDbType::STRING !== $type) {
+            return MongoDbType::getType($type)->convertToDatabaseValue($value);
+        }
+
+        $quotedValue = preg_quote($value);
+
         switch ($strategy) {
-            case MongoDbType::STRING !== $type:
-                return MongoDbType::getType($type)->convertToDatabaseValue($value);
             case null:
             case self::STRATEGY_EXACT:
-                return $caseSensitive ? $value : new Regex("^$value$", 'i');
+                return $caseSensitive ? $value : new Regex("^$quotedValue$", 'i');
             case self::STRATEGY_PARTIAL:
-                return new Regex($value, $caseSensitive ? '' : 'i');
+                return new Regex($quotedValue, $caseSensitive ? '' : 'i');
             case self::STRATEGY_START:
-                return new Regex("^$value", $caseSensitive ? '' : 'i');
+                return new Regex("^$quotedValue", $caseSensitive ? '' : 'i');
             case self::STRATEGY_END:
-                return new Regex("$value$", $caseSensitive ? '' : 'i');
+                return new Regex("$quotedValue$", $caseSensitive ? '' : 'i');
             case self::STRATEGY_WORD_START:
-                return new Regex("(^$value.*|.*\s$value.*)", $caseSensitive ? '' : 'i');
+                return new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i');
             default:
                 throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
         }
