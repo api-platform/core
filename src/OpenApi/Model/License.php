@@ -20,7 +20,7 @@ final class License
     private $name;
     private $url;
 
-    public function __construct(string $name, string $url)
+    public function __construct(string $name, string $url = null)
     {
         $this->name = $name;
         $this->url = $url;
@@ -31,7 +31,7 @@ final class License
         return $this->name;
     }
 
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
@@ -44,7 +44,7 @@ final class License
         return $clone;
     }
 
-    public function withUrl(string $url): self
+    public function withUrl(?string $url): self
     {
         $clone = clone $this;
         $clone->url = $url;

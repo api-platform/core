@@ -106,6 +106,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
+        $this->registerOpenApiConfiguration($container, $config);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config['enable_docs']);
@@ -708,6 +709,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (isset($bundles['SecurityBundle'])) {
             $loader->load('security.xml');
         }
+    }
+
+    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config): void
+    {
+        $container->setParameter('api_platform.openapi.termsOfService', $config['openapi']['termsOfService']);
+        $container->setParameter('api_platform.openapi.contact.name', $config['openapi']['contact']['name']);
+        $container->setParameter('api_platform.openapi.contact.url', $config['openapi']['contact']['url']);
+        $container->setParameter('api_platform.openapi.contact.email', $config['openapi']['contact']['email']);
+        $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
+        $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
     }
 
     private function buildDeprecationArgs(string $version, string $message): array
