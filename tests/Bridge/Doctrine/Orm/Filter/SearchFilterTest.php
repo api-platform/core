@@ -384,6 +384,11 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     ['name_p1' => 'exact'],
                     $filterFactory,
                 ],
+                'exact (case insensitive, with special characters)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) = LOWER(:name_p1)', $this->alias, Dummy::class),
+                    ['name_p1' => 'exact (special)'],
+                    $filterFactory,
+                ],
                 'exact (multiple values)' => [
                     sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', $this->alias, Dummy::class),
                     [

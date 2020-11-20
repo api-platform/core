@@ -164,8 +164,8 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $aggregation = $this->buildAggregation($identifiers, $context, $executeOptions, $aggregation, --$remainingIdentifiers, $topAggregationBuilder);
 
         $results = $aggregation->execute($executeOptions)->toArray();
-        $in = array_reduce($results, function ($in, $result) use ($previousAssociationProperty) {
-            return $in + array_map(function ($result) {
+        $in = array_reduce($results, static function ($in, $result) use ($previousAssociationProperty) {
+            return $in + array_map(static function ($result) {
                 return $result['_id'];
             }, $result[$previousAssociationProperty] ?? []);
         }, []);

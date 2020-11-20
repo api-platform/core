@@ -107,7 +107,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'custom' => ['method' => 'GET', 'path' => '/foo'] + self::OPERATION_FORMATS,
                 'custom2' => ['method' => 'POST', 'path' => '/foo'] + self::OPERATION_FORMATS,
             ],
-            ['pagination_client_items_per_page' => true]
+            ['pagination_client_items_per_page' => true, 'normalization_context' => [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
@@ -544,7 +544,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'properties' => [
                             'name' => new \ArrayObject([
@@ -679,7 +679,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'properties' => [
                             'name' => new \ArrayObject([
@@ -911,7 +911,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -923,7 +923,7 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                     $ref => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -1035,7 +1035,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy-Read' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -1247,7 +1247,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -1259,7 +1259,7 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                     'Dummy-dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -1472,7 +1472,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -1484,7 +1484,7 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                     'Dummy-dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -2004,7 +2004,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -2016,7 +2016,7 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                     $ref => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -2035,7 +2035,7 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                     $relatedDummyRef => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a related dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/RelatedDummy'],
                         'properties' => [
@@ -2181,7 +2181,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'properties' => [
                             'name' => new \ArrayObject([
@@ -2354,7 +2354,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Question' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a question.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Question'],
                         'properties' => [
@@ -2367,7 +2367,7 @@ class DocumentationNormalizerV3Test extends TestCase
                     ]),
                     'Answer' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is an answer.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Answer'],
                         'properties' => [
@@ -2475,7 +2475,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -2603,7 +2603,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -2737,7 +2737,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -2875,7 +2875,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [
@@ -3113,7 +3113,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
-                        'additionalProperties' => false,
+                        'additionalProperties' => true,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [

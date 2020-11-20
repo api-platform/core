@@ -127,7 +127,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Enable code coverage
         if: matrix.coverage
-        run: echo '::set-env name=COVERAGE::1'
+        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Remove Doctrine MongoDB ODM
         if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, 'rc'))
         run: |
@@ -222,7 +222,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Enable code coverage
         if: matrix.coverage
-        run: echo '::set-env name=COVERAGE::1'
+        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Remove Doctrine MongoDB ODM
         if: startsWith(matrix.php, '7.1')
         run: |

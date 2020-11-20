@@ -200,6 +200,15 @@ trait SearchFilterTestTrait
                     'name' => 'exact',
                 ],
             ],
+            'exact (case insensitive, with special characters)' => [
+                [
+                    'id' => null,
+                    'name' => 'iexact',
+                ],
+                [
+                    'name' => 'exact (special)',
+                ],
+            ],
             'exact (multiple values)' => [
                 [
                     'id' => null,
