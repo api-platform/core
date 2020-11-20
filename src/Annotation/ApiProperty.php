@@ -77,55 +77,6 @@ final class ApiProperty
     public $identifier;
 
     /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var string
-     */
-    private $deprecationReason;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var bool
-     */
-    private $fetchable;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var bool
-     */
-    private $fetchEager;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var array
-     */
-    private $jsonldContext;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var array
-     */
-    private $openapiContext;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var bool
-     */
-    private $push;
-
-    /**
-     * @see https://github.com/Haehnchen/idea-php-annotation-plugin/issues/112
-     *
-     * @var array
-     */
-    private $swaggerContext;
-
-    /**
      * @throws InvalidArgumentException
      */
     public function __construct(array $values = [])
