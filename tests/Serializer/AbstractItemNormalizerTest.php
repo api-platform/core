@@ -113,7 +113,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
 
         $this->assertTrue($normalizer->supportsNormalization($dummy));
@@ -180,7 +180,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -256,7 +256,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -318,7 +318,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -427,7 +427,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -489,7 +489,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -547,7 +547,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -592,7 +592,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -634,7 +634,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -680,7 +680,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -755,7 +755,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -797,7 +797,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -854,7 +854,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -906,7 +906,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -969,7 +969,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1027,7 +1027,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1114,7 +1114,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [$dataTransformerProphecy->reveal(), $secondDataTransformerProphecy->reveal()],
             $resourceMetadataFactoryProphecy->reveal(),
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
