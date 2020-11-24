@@ -201,6 +201,7 @@ final class Configuration implements ConfigurationInterface
         $this->addMercureSection($rootNode);
         $this->addMessengerSection($rootNode);
         $this->addElasticsearchSection($rootNode);
+        $this->addOpenApiSection($rootNode);
 
         $this->addExceptionToStatusSection($rootNode);
 
@@ -460,6 +461,34 @@ final class Configuration implements ConfigurationInterface
                                     ->scalarNode('index')->defaultNull()->end()
                                     ->scalarNode('type')->defaultValue(DocumentMetadata::DEFAULT_TYPE)->end()
                                 ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addOpenApiSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('openapi')
+                    ->addDefaultsIfNotSet()
+                        ->children()
+                        ->arrayNode('contact')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('name')->defaultNull()->info('The identifying name of the contact person/organization.')->end()
+                                ->scalarNode('url')->defaultNull()->info('The URL pointing to the contact information. MUST be in the format of a URL.')->end()
+                                ->scalarNode('email')->defaultNull()->info('The email address of the contact person/organization. MUST be in the format of an email address.')->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('termsOfService')->defaultNull()->info('A URL to the Terms of Service for the API. MUST be in the format of a URL.')->end()
+                        ->arrayNode('license')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('name')->defaultNull()->info('The license name used for the API.')->end()
+                                ->scalarNode('url')->defaultNull()->info('URL to the license used for the API. MUST be in the format of a URL.')->end()
                             ->end()
                         ->end()
                     ->end()

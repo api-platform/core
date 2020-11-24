@@ -1142,6 +1142,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.elasticsearch.enabled' => false,
             'api_platform.asset_package' => null,
             'api_platform.defaults' => ['attributes' => ['stateless' => true]],
+            'api_platform.openapi.termsOfService' => null,
+            'api_platform.openapi.contact.name' => null,
+            'api_platform.openapi.contact.url' => null,
+            'api_platform.openapi.contact.email' => null,
+            'api_platform.openapi.license.name' => null,
+            'api_platform.openapi.license.url' => null,
         ];
 
         if ($hasSwagger) {

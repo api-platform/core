@@ -207,6 +207,18 @@ class ConfigurationTest extends TestCase
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
             'asset_package' => null,
+            'openapi' => [
+                'contact' => [
+                    'name' => null,
+                    'url' => null,
+                    'email' => null,
+                ],
+                'termsOfService' => null,
+                'license' => [
+                    'name' => null,
+                    'url' => null,
+                ],
+            ],
         ], $config);
     }
 

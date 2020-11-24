@@ -21,29 +21,29 @@ final class Contact
     private $url;
     private $email;
 
-    public function __construct(string $name = '', string $url = '', string $email = '')
+    public function __construct(string $name = null, string $url = null, string $email = null)
     {
         $this->name = $name;
         $this->url = $url;
         $this->email = $email;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
         return $this->url;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function withName(string $name): self
+    public function withName(?string $name): self
     {
         $clone = clone $this;
         $clone->name = $name;
@@ -51,7 +51,7 @@ final class Contact
         return $clone;
     }
 
-    public function withUrl(string $url): self
+    public function withUrl(?string $url): self
     {
         $clone = clone $this;
         $clone->url = $url;
@@ -59,7 +59,7 @@ final class Contact
         return $clone;
     }
 
-    public function withEmail(string $email): self
+    public function withEmail(?string $email): self
     {
         $clone = clone $this;
         $clone->email = $email;

@@ -26,8 +26,14 @@ final class Options
     private $oAuthRefreshUrl;
     private $oAuthScopes;
     private $apiKeys;
+    private $contactName;
+    private $contactUrl;
+    private $contactEmail;
+    private $termsOfService;
+    private $licenseName;
+    private $licenseUrl;
 
-    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, string $oAuthType = '', string $oAuthFlow = '', string $oAuthTokenUrl = '', string $oAuthAuthorizationUrl = '', string $oAuthRefreshUrl = '', array $oAuthScopes = [], array $apiKeys = [])
+    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, string $oAuthType = '', string $oAuthFlow = '', string $oAuthTokenUrl = '', string $oAuthAuthorizationUrl = '', string $oAuthRefreshUrl = '', array $oAuthScopes = [], array $apiKeys = [], string $contactName = null, string $contactUrl = null, string $contactEmail = null, string $termsOfService = null, string $licenseName = null, string $licenseUrl = null)
     {
         $this->title = $title;
         $this->description = $description;
@@ -40,6 +46,12 @@ final class Options
         $this->oAuthRefreshUrl = $oAuthRefreshUrl;
         $this->oAuthScopes = $oAuthScopes;
         $this->apiKeys = $apiKeys;
+        $this->contactName = $contactName;
+        $this->contactUrl = $contactUrl;
+        $this->contactEmail = $contactEmail;
+        $this->termsOfService = $termsOfService;
+        $this->licenseName = $licenseName;
+        $this->licenseUrl = $licenseUrl;
     }
 
     public function getTitle(): string
@@ -95,5 +107,35 @@ final class Options
     public function getApiKeys(): array
     {
         return $this->apiKeys;
+    }
+
+    public function getContactName(): ?string
+    {
+        return $this->contactName;
+    }
+
+    public function getContactUrl(): ?string
+    {
+        return $this->contactUrl;
+    }
+
+    public function getContactEmail(): ?string
+    {
+        return $this->contactEmail;
+    }
+
+    public function getTermsOfService(): ?string
+    {
+        return $this->termsOfService;
+    }
+
+    public function getLicenseName(): ?string
+    {
+        return $this->licenseName;
+    }
+
+    public function getLicenseUrl(): ?string
+    {
+        return $this->licenseUrl;
     }
 }

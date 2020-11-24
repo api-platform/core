@@ -23,6 +23,12 @@
             <argument>%api_platform.oauth.refreshUrl%</argument>
             <argument>%api_platform.oauth.scopes%</argument>
             <argument>%api_platform.swagger.api_keys%</argument>
+            <argument>%api_platform.openapi.contact.name%</argument>
+            <argument>%api_platform.openapi.contact.url%</argument>
+            <argument>%api_platform.openapi.contact.email%</argument>
+            <argument>%api_platform.openapi.termsOfService%</argument>
+            <argument>%api_platform.openapi.license.name%</argument>
+            <argument>%api_platform.openapi.license.url%</argument>
         </service>
         <service id="ApiPlatform\Core\OpenApi\Options" alias="api_platform.openapi.options" />
 
