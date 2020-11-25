@@ -1,4 +1,4 @@
-# Subresource definition
+# Subresource Definition
 
 * Status: proposed
 * Deciders: @dunglas, @vincentchalamon, @soyuka, @GregoireHebert, @Deuchnord
