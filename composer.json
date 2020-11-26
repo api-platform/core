@@ -72,6 +72,7 @@
         "symfony/form": "^3.4 || ^4.4 || ^5.1",
         "symfony/framework-bundle": "^4.4 || ^5.1",
         "symfony/http-client": "^4.4 || ^5.1",
+        "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.4 || ^5.1",
         "symfony/phpunit-bridge": "^5.1.7",
