@@ -11,3 +11,4 @@
 /tests/Fixtures/app/var/
 /tests/Fixtures/app/public/bundles/
 /vendor/
+/Dockerfile

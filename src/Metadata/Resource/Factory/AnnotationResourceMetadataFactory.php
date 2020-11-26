@@ -29,7 +29,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
     private $decorated;
     private $defaults;
 
-    public function __construct(Reader $reader, ResourceMetadataFactoryInterface $decorated = null, array $defaults = [])
+    public function __construct(Reader $reader = null, ResourceMetadataFactoryInterface $decorated = null, array $defaults = [])
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
@@ -54,6 +54,14 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException $reflectionException) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
+        }
+
+        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionClass->getAttributes(ApiResource::class)) {
+            return $this->createMetadata($attributes[0]->newInstance(), $parentResourceMetadata);
+        }
+
+        if (null === $this->reader) {
+            $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }
 
         $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, ApiResource::class);
