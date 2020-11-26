@@ -43,6 +43,7 @@ class DocumentationActionTest extends TestCase
     public function testDocumentationAction(): void
     {
         $requestProphecy = $this->prophesize(Request::class);
+        $requestProphecy->getRequestFormat()->willReturn('json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -63,6 +64,7 @@ class DocumentationActionTest extends TestCase
     public function testLegacyDocumentationAction(): void
     {
         $requestProphecy = $this->prophesize(Request::class);
+        $requestProphecy->getRequestFormat()->willReturn('json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -97,6 +99,7 @@ class DocumentationActionTest extends TestCase
     {
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $requestProphecy = $this->prophesize(Request::class);
+        $requestProphecy->getRequestFormat()->willReturn('json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
@@ -120,6 +123,7 @@ class DocumentationActionTest extends TestCase
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::any())->shouldBeCalled()->willReturn($openApi);
         $requestProphecy = $this->prophesize(Request::class);
+        $requestProphecy->getRequestFormat()->willReturn('json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

@@ -85,7 +85,7 @@ final class DocumentationAction
             $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes ?? []);
         }
 
-        if (null !== $this->openApiFactory && isset($context) && 3 === $context['spec_version']) {
+        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory && 3 === ($context['spec_version'] ?? null)) {
             return $this->openApiFactory->__invoke($context ?? []);
         }
 
