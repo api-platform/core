@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyNameCollectionF
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UpperCaseIdentifierDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
@@ -64,6 +65,17 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
             [$decoratedThrowsNotFound, ['name', 'alias']],
             [$decoratedReturnParent, ['name', 'alias', 'foo']],
         ];
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testCreateAttribute()
+    {
+        $factory = new AnnotationPropertyNameCollectionFactory();
+        $metadata = $factory->create(DummyPhp8::class);
+
+        $this->assertSame(['id', 'foo'], iterator_to_array($metadata));
     }
 
     /**

@@ -598,7 +598,7 @@ final class Configuration implements ConfigurationInterface
                 return $normalizedDefaults;
             });
 
-        foreach (ApiResource::CONFIGURABLE_DEFAULTS as $attribute) {
+        foreach (ApiResource::getConfigMetadata()[1] as $attribute => $_) {
             $snakeCased = $nameConverter->normalize($attribute);
             $defaultsNode->children()->variableNode($snakeCased);
         }

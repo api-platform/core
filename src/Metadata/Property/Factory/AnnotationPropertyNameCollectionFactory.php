@@ -30,7 +30,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
     private $decorated;
     private $reflection;
 
-    public function __construct(Reader $reader, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(Reader $reader = null, PropertyNameCollectionFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
@@ -66,7 +66,10 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
 
         // Properties
         foreach ($reflectionClass->getProperties() as $reflectionProperty) {
-            if (null !== $this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class)) {
+            if (
+                (\PHP_VERSION_ID >= 80000 && $reflectionProperty->getAttributes(ApiProperty::class)) ||
+                (null !== $this->reader && null !== $this->reader->getPropertyAnnotation($reflectionProperty, ApiProperty::class))
+            ) {
                 $propertyNames[$reflectionProperty->name] = $reflectionProperty->name;
             }
         }
@@ -82,7 +85,13 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
                 $propertyName = lcfirst($propertyName);
             }
 
-            if (null !== $propertyName && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class)) {
+            if (
+                null !== $propertyName &&
+                (
+                    (\PHP_VERSION_ID >= 80000 && $reflectionMethod->getAttributes(ApiProperty::class)) ||
+                    (null !== $this->reader && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class))
+                )
+            ) {
                 $propertyNames[$propertyName] = $propertyName;
             }
         }

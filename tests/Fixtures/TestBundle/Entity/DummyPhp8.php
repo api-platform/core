@@ -19,8 +19,12 @@ use ApiPlatform\Core\Annotation\ApiResource;
 #[ApiResource(description: "Hey PHP 8")]
 class DummyPhp8
 {
-    /**
-     * @ApiProperty(identifier=true)
-     */
+    #[ApiProperty(identifier: true, description: 'the identifier')]
     public $id;
+
+    #[ApiProperty(description: 'a foo')]
+    public function getFoo(): int
+    {
+        return 0;
+    }
 }

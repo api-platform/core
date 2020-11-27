@@ -57,7 +57,6 @@ class ApiResourceTest extends TestCase
             'paginationEnabled' => true,
             'paginationFetchJoinCollection' => true,
             'paginationItemsPerPage' => 42,
-            'maximumItemsPerPage' => 42, // deprecated, see paginationMaximumItemsPerPage
             'paginationMaximumItemsPerPage' => 50,
             'paginationPartial' => true,
             'routePrefix' => '/foo',
@@ -100,7 +99,6 @@ class ApiResourceTest extends TestCase
             'pagination_enabled' => true,
             'pagination_fetch_join_collection' => true,
             'pagination_items_per_page' => 42,
-            'maximum_items_per_page' => 42,
             'pagination_maximum_items_per_page' => 50,
             'pagination_partial' => true,
             'route_prefix' => '/foo',
