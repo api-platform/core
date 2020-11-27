@@ -1,35 +1,47 @@
 <?= "<?php\n" ?>
 
-namespace <?= $namespace; ?>;
+namespace <?= $namespace ?>;
 
+<?php if ($generate_collection) : ?>
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+<?php endif; ?>
+<?php if ($generate_item) : ?>
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+<?php endif; ?>
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+<?php if (null !== $resource_class): ?>
+use <?= $resource_full_class_name ?>;
+<?php endif; ?>
 
-final class <?= $class_name ?> implements ContextAwareCollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
+final class <?= $class_name ?> implements <?= ($generate_collection ? 'ContextAwareCollectionDataProviderInterface, ' : '') . ($generate_item ? 'ItemDataProviderInterface, ' : '')?>RestrictedDataProviderInterface
 {
-    /**
-    * {@inheritdoc}
-    */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        // return MyEntity::class === $resourceClass;
-        return false;
+<?php if ($resource_class !== null): ?>
+        return <?= $resource_class ?>::class === $resourceClass; // Add your custom conditions here
+<?php else : ?>
+        return false; // Add your custom conditions here
+<?php endif; ?>
     }
+<?php if ($generate_collection) : ?>
 
     /**
     * {@inheritdoc}
     */
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         // Retrieve the collection from somewhere
     }
+<?php endif; ?>
+<?php if ($generate_item) : ?>
 
     /**
     * {@inheritdoc}
     */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])<?= $resource_class ? ": ?$resource_class": (\PHP_VERSION_ID >= 70200 ? ': ?object' : '') ?>
+
     {
         // Retrieve the item from somewhere then return it or null if not found
     }
+<?php endif; ?>
 }

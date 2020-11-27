@@ -36,6 +36,8 @@ parameters:
 		- tests/ProphecyTrait.php
 		- tests/Behat/CoverageContext.php
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
+		# Templates for Maker
+		- src/Bridge/Symfony/Maker/Resources/skeleton
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail

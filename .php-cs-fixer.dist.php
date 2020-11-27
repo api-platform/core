@@ -14,6 +14,7 @@ HEADER;
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
+        'src/Bridge/Symfony/Maker/Resources/skeleton',
         'tests/Fixtures/app/var',
     ])
     ->notPath('src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php')
