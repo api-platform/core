@@ -109,7 +109,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             if (null === $parentOperation) {
                 $identifiers = (array) $rootResourceMetadata->getAttribute('identifiers');
                 $rootShortname = $rootResourceMetadata->getShortName();
-                $identifier = array_key_first($identifiers) ?: $identifiers[0];
+                $identifier = \is_string($key = array_key_first($identifiers)) ? $key : $identifiers[0];
                 $operation['identifiers'][$identifier] = [$rootResourceClass, $identifiers[$identifier][1] ?? $identifier, true];
                 $operation['operation_name'] = sprintf(
                     '%s_%s%s',
@@ -147,7 +147,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             } else {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 $identifiers = (array) $resourceMetadata->getAttribute('identifiers', null === $this->identifiersExtractor ? ['id'] : $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass));
-                $identifier = array_key_first($identifiers) ?: $identifiers[0];
+                $identifier = \is_string($key = array_key_first($identifiers)) ? $key : $identifiers[0];
                 $operation['identifiers'] = $parentOperation['identifiers'];
                 $operation['identifiers'][$parentOperation['property']] = [$resourceClass, $identifiers[$identifier][1] ?? $identifier, $isLastItem ? true : $parentOperation['collection']];
 

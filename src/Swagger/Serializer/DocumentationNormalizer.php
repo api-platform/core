@@ -598,7 +598,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $identifiers = ['id'];
         }
 
-        if (!($pathOperation['parameters'] ?? null)) {
+        if (!isset($pathOperation['parameters'])) {
             $pathOperation['parameters'] = [];
         }
 
