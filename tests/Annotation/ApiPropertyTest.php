@@ -70,4 +70,37 @@ class ApiPropertyTest extends TestCase
             'unknown' => 'unknown',
         ], $property->attributes);
     }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testConstructAttribute()
+    {
+        $property = eval(<<<'PHP'
+return new \ApiPlatform\Core\Annotation\ApiProperty(
+    deprecationReason: 'this field is deprecated',
+    fetchable: true,
+    fetchEager: false,
+    jsonldContext: ['foo' => 'bar'],
+    security: 'is_granted(\'ROLE_ADMIN\')',
+    swaggerContext: ['foo' => 'baz'],
+    openapiContext: ['foo' => 'baz'],
+    push: true,
+    attributes: ['unknown' => 'unknown', 'fetchable' => false]
+);
+PHP
+        );
+
+        $this->assertEquals([
+            'deprecation_reason' => 'this field is deprecated',
+            'fetchable' => false,
+            'fetch_eager' => false,
+            'jsonld_context' => ['foo' => 'bar'],
+            'security' => 'is_granted(\'ROLE_ADMIN\')',
+            'swagger_context' => ['foo' => 'baz'],
+            'openapi_context' => ['foo' => 'baz'],
+            'push' => true,
+            'unknown' => 'unknown',
+        ], $property->attributes);
+    }
 }

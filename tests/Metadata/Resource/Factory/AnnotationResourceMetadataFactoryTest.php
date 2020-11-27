@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceMetadataFactory
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
@@ -47,6 +48,17 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
         $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar', 'stateless' => false], $metadata->getAttributes());
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testCreateAttribute()
+    {
+        $factory = new AnnotationResourceMetadataFactory();
+        $metadata = $factory->create(DummyPhp8::class);
+
+        $this->assertSame('Hey PHP 8', $metadata->getDescription());
     }
 
     public function testCreateWithDefaults()

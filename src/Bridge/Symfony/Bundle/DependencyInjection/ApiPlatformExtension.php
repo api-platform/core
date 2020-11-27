@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface;
@@ -242,21 +243,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function normalizeDefaults(array $defaults): array
     {
-        $normalizedDefaults = ['attributes' => []];
-        $rootLevelOptions = [
-            'description',
-            'iri',
-            'item_operations',
-            'collection_operations',
-            'graphql',
-        ];
+        $normalizedDefaults = ['attributes' => $defaults['attributes'] ?? []];
+        unset($defaults['attributes']);
+
+        [$publicProperties,] = ApiResource::getConfigMetadata();
 
         foreach ($defaults as $option => $value) {
-            if (\in_array($option, $rootLevelOptions, true)) {
+            if (isset($publicProperties[$option])) {
                 $normalizedDefaults[$option] = $value;
-            } else {
-                $normalizedDefaults['attributes'][$option] = $value;
+
+                continue;
             }
+
+            $normalizedDefaults['attributes'][$option] = $value;
         }
 
         if (!\array_key_exists('stateless', $defaults)) {
