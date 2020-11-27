@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -57,7 +59,7 @@ final class ApiLoader extends Loader
     private $entrypointEnabled;
     private $docsEnabled;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -74,6 +76,12 @@ final class ApiLoader extends Loader
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
+
+        if (null === $identifiersExtractor) {
+            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.6 and will not be possible anymore in API Platform 3', IdentifierExtractorInterface::class), E_USER_DEPRECATED);
+        }
+
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -128,6 +136,8 @@ final class ApiLoader extends Loader
                         '_format' => null,
                         '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
                         '_api_resource_class' => $operation['resource_class'],
+                        '_api_identified_by' => $operation['identified_by'],
+                        '_api_has_composite_identifier' => false,
                         '_api_subresource_operation_name' => $operation['route_name'],
                         '_api_subresource_context' => [
                             'property' => $operation['property'],
@@ -222,6 +232,8 @@ final class ApiLoader extends Loader
             }
         }
 
+        $operation['identified_by'] = (array) ($operation['identified_by'] ?? $resourceMetadata->getAttribute('identified_by', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
+        $operation['has_composite_identifier'] = \count($operation['identified_by']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
@@ -232,6 +244,8 @@ final class ApiLoader extends Loader
                 '_format' => null,
                 '_stateless' => $operation['stateless'],
                 '_api_resource_class' => $resourceClass,
+                '_api_identified_by' => $operation['identified_by'],
+                '_api_has_composite_identifier' => $operation['has_composite_identifier'],
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],

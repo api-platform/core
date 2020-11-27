@@ -75,7 +75,18 @@ trait OperationDataProviderTrait
             throw new RuntimeException('Subresources not supported');
         }
 
-        return $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $identifiers, $attributes['subresource_context'] + $context, $attributes['subresource_operation_name']);
+        $subresourceIdentifiers = [];
+        foreach ($attributes['subresource_context']['identifiers'] as list($identifier, , $isItem, $identifiedBy)) {
+            if ($isItem) {
+                $subresourceIdentifiers[$identifier] = [$identifiedBy[0] => current($identifiers)];
+                next($identifiers);
+                continue;
+            }
+
+            $subresourceIdentifiers[$identifier] = [];
+        }
+
+        return $this->subresourceDataProvider->getSubresource($attributes['resource_class'], $subresourceIdentifiers, $attributes['subresource_context'] + $context, $attributes['subresource_operation_name']);
     }
 
     /**
@@ -85,38 +96,38 @@ trait OperationDataProviderTrait
      */
     private function extractIdentifiers(array $parameters, array $attributes)
     {
-        if (isset($attributes['item_operation_name'])) {
-            if (!isset($parameters['id'])) {
-                throw new InvalidIdentifierException('Parameter "id" not found');
-            }
-
-            $id = $parameters['id'];
-
-            if (null !== $this->identifierConverter) {
-                return $this->identifierConverter->convert((string) $id, $attributes['resource_class']);
-            }
-
-            return $id;
-        }
-
-        if (!isset($attributes['subresource_context'])) {
-            throw new RuntimeException('Either "item_operation_name" or "collection_operation_name" must be defined, unless the "_api_receive" request attribute is set to false.');
-        }
-
+        $identifiersKeys = $attributes['identified_by'] ?? [];
         $identifiers = [];
 
-        foreach ($attributes['subresource_context']['identifiers'] as $key => [$id, $resourceClass, $hasIdentifier]) {
-            if (false === $hasIdentifier) {
-                continue;
+        if (isset($attributes['subresource_context'])) {
+            $subresourceIdentifiersKeys = [];
+            $i = 0;
+            foreach ($attributes['subresource_context']['identifiers'] as list($identifier, , $isItem)) {
+                if ($isItem) {
+                    $subresourceIdentifiersKeys[] = $identifiersKeys[$i++] ?? $identifier;
+                }
             }
-
-            $identifiers[$id] = $parameters[$id];
-
-            if (null !== $this->identifierConverter) {
-                $identifiers[$id] = $this->identifierConverter->convert((string) $identifiers[$id], $resourceClass);
-            }
+            $identifiersKeys = $subresourceIdentifiersKeys;
         }
 
-        return $identifiers;
+        $identifiersNumber = \count($identifiersKeys);
+        foreach ($identifiersKeys as $identifier) {
+            if (!isset($parameters[$identifier])) {
+                if ($attributes['has_composite_identifier']) {
+                    $identifiers = CompositeIdentifierParser::parse($parameters['id']);
+                    if (($currentIdentifiersNumber = \count($identifiers)) !== $identifiersNumber) {
+                        throw new InvalidIdentifierException(sprintf('Expected %d identifiers, got %d', $identifiersNumber, $currentIdentifiersNumber));
+                    }
+
+                    return $identifiers;
+                }
+
+                throw new InvalidIdentifierException(sprintf('Parameter "%s" not found', $identifier));
+            }
+
+            $identifiers[$identifier] = $parameters[$identifier];
+        }
+
+        return $this->identifierConverter->convert($identifiers, $attributes['resource_class']);
     }
 }

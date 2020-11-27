@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation\Factory;
 
+use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -32,13 +33,20 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $pathSegmentNameGenerator;
+    private $identifiersExtractor;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, IdentifierExtractorInterface $identifiersExtractor = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->pathSegmentNameGenerator = $pathSegmentNameGenerator;
+
+        if (null === $identifiersExtractor) {
+            @trigger_error(sprintf('Not injecting "%s" is deprecated since API Platform 2.6 and will not be possible anymore in API Platform 3', IdentifierExtractorInterface::class), E_USER_DEPRECATED);
+        }
+
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -75,6 +83,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
+            $subresourceMetadata = $subresourceMetadata->withAttributes(($subresourceMetadata->getAttributes() ?: []) + ['identified_by' => $this->identifiersExtractor->getIdentifiersFromResourceClass($subresourceClass)]);
             $isLastItem = ($parentOperation['resource_class'] ?? null) === $resourceClass && $propertyMetadata->isIdentifier();
 
             // A subresource that is also an identifier can't be a start point
@@ -93,17 +102,20 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             }
 
             $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResourceClass);
+            $rootResourceMetadata = $rootResourceMetadata->withAttributes(($rootResourceMetadata->getAttributes() ?: []) + ['identified_by' => $this->identifiersExtractor->getIdentifiersFromResourceClass($rootResourceClass)]);
             $operationName = 'get';
             $operation = [
                 'property' => $property,
                 'collection' => $subresource->isCollection(),
+                'identified_by' => (array) $rootResourceMetadata->getAttribute('identified_by'),
                 'resource_class' => $subresourceClass,
                 'shortNames' => [$subresourceMetadata->getShortName()],
             ];
 
             if (null === $parentOperation) {
                 $rootShortname = $rootResourceMetadata->getShortName();
-                $operation['identifiers'] = [['id', $rootResourceClass, true]];
+                // TODO: mutliple identifiers for subresources?
+                $operation['identifiers'] = [[$operation['identified_by'][0], $rootResourceClass, true, $operation['identified_by']]];
                 $operation['operation_name'] = sprintf(
                     '%s_%s%s',
                     RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
@@ -126,9 +138,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 }
 
                 $operation['path'] = $subresourceOperation['path'] ?? sprintf(
-                    '/%s%s/{id}/%s%s',
+                    '/%s%s/{%s}/%s%s',
                     $prefix,
                     $this->pathSegmentNameGenerator->getSegmentName($rootShortname),
+                    $operation['identified_by'][0],
                     $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
                     self::FORMAT_SUFFIX
                 );
@@ -139,7 +152,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
             } else {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
                 $operation['identifiers'] = $parentOperation['identifiers'];
-                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $isLastItem ? true : $parentOperation['collection']];
+                $operation['identifiers'][] = [$parentOperation['property'], $resourceClass, $isLastItem ? true : $parentOperation['collection'], $operation['identified_by']];
                 $operation['operation_name'] = str_replace(
                     'get'.self::SUBRESOURCE_SUFFIX,
                     RouteNameGenerator::inflector($isLastItem ? 'item' : $property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX,

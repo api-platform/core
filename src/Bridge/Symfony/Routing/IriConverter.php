@@ -148,11 +148,14 @@ final class IriConverter implements IriConverterInterface
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
         $routeName = $this->routeNameResolver->getRouteName($resourceClass, OperationType::ITEM);
+        $metadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (\count($identifiers) > 1 && true === $metadata->getAttribute('composite_identifier', true)) {
+            $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
+        }
 
         try {
-            $identifiers = $this->generateIdentifiersUrl($identifiers, $resourceClass);
-
-            return $this->router->generate($routeName, ['id' => implode(';', $identifiers)], $this->getReferenceType($resourceClass, $referenceType));
+            return $this->router->generate($routeName, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -168,30 +171,6 @@ final class IriConverter implements IriConverterInterface
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
-    }
-
-    /**
-     * Generate the identifier url.
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return string[]
-     */
-    private function generateIdentifiersUrl(array $identifiers, string $resourceClass): array
-    {
-        if (0 === \count($identifiers)) {
-            throw new InvalidArgumentException(sprintf('No identifiers defined for resource of type "%s"', $resourceClass));
-        }
-
-        if (1 === \count($identifiers)) {
-            return [(string) reset($identifiers)];
-        }
-
-        foreach ($identifiers as $name => $value) {
-            $identifiers[$name] = sprintf('%s=%s', $name, $value);
-        }
-
-        return array_values($identifiers);
     }
 
     private function getReferenceType(string $resourceClass, ?int $referenceType): ?int

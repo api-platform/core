@@ -43,6 +43,7 @@
             <argument>%api_platform.enable_docs%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
             <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
+            <argument type="service" id="api_platform.identifiers_extractor.cached"></argument>
 
             <tag name="routing.loader" />
         </service>

@@ -28,6 +28,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("attributes", type="array"),
  *     @Attribute("cacheHeaders", type="array"),
  *     @Attribute("collectionOperations", type="array"),
+ *     @Attribute("compositeIdentifier", type="bool"),
  *     @Attribute("denormalizationContext", type="array"),
  *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("description", type="string"),
@@ -217,7 +218,8 @@ final class ApiResource
         ?string $sunset = null,
         ?array $swaggerContext = null,
         ?array $validationGroups = null,
-        ?int $urlGenerationStrategy = null
+        ?int $urlGenerationStrategy = null,
+        ?bool $compositeIdentifier = null
     ) {
         if (!\is_array($description)) { // @phpstan-ignore-line Doctrine annotations support
             [$publicProperties, $configurableAttributes] = self::getConfigMetadata();
