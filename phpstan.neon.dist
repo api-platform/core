@@ -21,6 +21,9 @@ parameters:
 		- tests/Bridge/NelmioApiDoc/*
 		- src/Bridge/FosUser/*
 		# BC layer
+		- tests/Annotation/ApiResourceTest.php
+		- tests/Annotation/ApiPropertyTest.php
+		- tests/Metadata/Resource/Factory/AnnotationResourceMetadataFactoryTest.php
 		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
 		- src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
@@ -100,6 +103,13 @@ parameters:
 		-
 			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo::\$fieldMappings \(array.*\)>\) does not accept array\(.*\)\.#'
 			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
+
+		# Expected, due to PHP 8 attributes
+		- '#ReflectionProperty::getAttributes\(\)#'
+		- '#ReflectionMethod::getAttributes\(\)#'
+		- '#ReflectionClass<mixed>::getAttributes\(\)#'
+		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiResource has an unused parameter#'
+		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiProperty has an unused parameter#'
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'

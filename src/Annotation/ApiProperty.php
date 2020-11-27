@@ -94,25 +94,24 @@ final class ApiProperty
     public $example;
 
     /**
-     * @param string $description
-     * @param bool $readable
-     * @param bool $writable
-     * @param bool $readableLink
-     * @param bool $writableLink
-     * @param bool $required
-     * @param bool $iri
-     * @param bool $identifier
-     * @param string|int|float|bool|array $default
+     * @param string                           $description
+     * @param bool                             $readable
+     * @param bool                             $writable
+     * @param bool                             $readableLink
+     * @param bool                             $writableLink
+     * @param bool                             $required
+     * @param string                           $iri
+     * @param bool                             $identifier
+     * @param string|int|float|bool|array      $default
      * @param string|int|float|bool|array|null $example
-     *
-     * @param string $deprecationReason
-     * @param bool $fetchable
-     * @param bool $fetchEager
-     * @param array $jsonldContext
-     * @param array $openapiContext
-     * @param bool $push
-     * @param string $security
-     * @param array $swaggerContext
+     * @param string                           $deprecationReason
+     * @param bool                             $fetchable
+     * @param bool                             $fetchEager
+     * @param array                            $jsonldContext
+     * @param array                            $openapiContext
+     * @param bool                             $push
+     * @param string                           $security
+     * @param array                            $swaggerContext
      *
      * @throws InvalidArgumentException
      */
@@ -121,7 +120,7 @@ final class ApiProperty
         ?bool $readable = null,
         ?bool $writable = null,
         ?bool $readableLink = null,
-        ?bool $writableLink =  null,
+        ?bool $writableLink = null,
         ?bool $required = null,
         ?string $iri = null,
         ?bool $identifier = null,
@@ -132,23 +131,23 @@ final class ApiProperty
         ?array $attributes = null,
         ?string $deprecationReason = null,
         ?bool $fetchable = null,
-        ?bool $fetchEager  = null,
+        ?bool $fetchEager = null,
         ?array $jsonldContext = null,
         ?array $openapiContext = null,
         ?bool $push = null,
         ?string $security = null,
         ?array $swaggerContext = null
     ) {
-        if (!is_array($description)) {
+        if (!\is_array($description)) { // @phpstan-ignore-line Doctrine annotations support
             [$publicProperties, $configurableAttributes] = self::getConfigMetadata();
 
             foreach ($publicProperties as $prop => $_) {
-                $this->{$prop} = $$prop;
+                $this->{$prop} = ${$prop};
             }
 
             $description = [];
             foreach ($configurableAttributes as $attribute => $_) {
-                $description[$attribute] = $$attribute;
+                $description[$attribute] = ${$attribute};
             }
         }
 

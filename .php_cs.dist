@@ -29,6 +29,7 @@ return PhpCsFixer\Config::create()
         '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
+        'single_line_comment_style' => false, // Temporary fix for compatibility with PHP 8 attributes, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/5284
         'align_multiline_comment' => [
             'comment_type' => 'phpdocs_like',
         ],
