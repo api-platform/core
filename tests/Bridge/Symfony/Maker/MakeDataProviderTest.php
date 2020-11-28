@@ -35,7 +35,10 @@ class MakeDataProviderTest extends KernelTestCase
 
         $this->assertFileExists(self::tempFile('src/DataProvider/CustomDataProvider.php'));
 
-        $this->assertSame($expected, file_get_contents(self::tempFile('src/DataProvider/CustomDataProvider.php')));
+        // Unify line endings
+        $expected = preg_replace('~\R~u', "\r\n", $expected);
+        $result = preg_replace('~\R~u', "\r\n", file_get_contents(self::tempFile('src/DataProvider/CustomDataProvider.php')));
+        $this->assertSame($expected, $result);
 
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Success!', $display);

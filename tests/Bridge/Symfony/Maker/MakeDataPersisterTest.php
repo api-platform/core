@@ -35,6 +35,11 @@ class MakeDataPersisterTest extends KernelTestCase
 
         $this->assertFileExists(self::tempFile('src/DataPersister/CustomDataPersister.php'));
 
+        // Unify line endings
+        $expected = preg_replace('~\R~u', "\r\n", $expected);
+        $result = preg_replace('~\R~u', "\r\n", file_get_contents(self::tempFile('src/DataPersister/CustomDataPersister.php')));
+        $this->assertSame($expected, $result);
+
         $display = $tester->getDisplay();
         $this->assertStringContainsString('Success!', $display);
 
@@ -48,10 +53,6 @@ class MakeDataPersisterTest extends KernelTestCase
         } else {
             $this->assertStringNotContainsString('Choose a Resource class:', $display);
         }
-
-        $this->assertSame($expected, file_get_contents(self::tempFile('src/DataPersister/CustomDataPersister.php')));
-
-        $this->assertStringContainsString('Success!', $display = $tester->getDisplay());
         $this->assertStringContainsString(<<<EOF
  Next: Open your new data persister class and start customizing it.
  Find the documentation at https://api-platform.com/docs/core/data-persisters/
