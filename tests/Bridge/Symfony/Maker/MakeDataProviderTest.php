@@ -97,7 +97,7 @@ EOF;
         yield 'Generate all without resource class' => [
             [],
             ['CustomDataProvider', ''],
-            $expected,
+            \PHP_VERSION_ID >= 70200 ? $expected : str_replace(': ?object', '', $expected),
         ];
 
         $expected = <<<'EOF'
@@ -176,7 +176,7 @@ EOF;
         yield 'Generate an item data provider without resource class' => [
             ['--item-only' => true],
             ['CustomDataProvider', ''],
-            $expected,
+            \PHP_VERSION_ID >= 70200 ? $expected : str_replace(': ?object', '', $expected),
         ];
 
         $expected = <<<'EOF'
@@ -274,6 +274,7 @@ final class CustomDataProvider implements ContextAwareCollectionDataProviderInte
 }
 
 EOF;
+
         yield 'Generate a collection data provider with a resource class' => [
             ['--collection-only' => true],
             ['CustomDataProvider', Dummy::class],
