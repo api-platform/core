@@ -24,7 +24,7 @@
         "symfony/property-info": "^3.4 || ^4.4 || ^5.1",
         "symfony/serializer": "^4.4 || ^5.1",
         "symfony/web-link": "^4.4 || ^5.1",
-        "willdurand/negotiation": "^2.0.3 || 3.0.x-dev"
+        "willdurand/negotiation": "^2.0.3 || ^3.0"
     },
     "require-dev": {
         "behat/behat": "^3.1",
