@@ -27,7 +27,7 @@ class MakeDataPersisterTest extends KernelTestCase
     /** @dataProvider dataPersisterProvider */
     public function testMakeDataPersister(array $commandInputs, array $userInputs, string $expected)
     {
-        $this->assertFileNotExists(self::tempFile('src/DataPersister/CustomDataPersister.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/DataPersister/CustomDataPersister.php'));
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:data-persister'));
         $tester->setInputs($userInputs);

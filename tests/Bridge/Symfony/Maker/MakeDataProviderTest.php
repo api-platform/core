@@ -27,7 +27,7 @@ class MakeDataProviderTest extends KernelTestCase
     /** @dataProvider dataProviderProvider */
     public function testMakeDataProvider(array $commandInputs, array $userInputs, string $expected)
     {
-        $this->assertFileNotExists(self::tempFile('src/DataProvider/CustomDataProvider.php'));
+        $this->assertFileDoesNotExist(self::tempFile('src/DataProvider/CustomDataProvider.php'));
 
         $tester = new CommandTester((new Application(self::bootKernel()))->find('make:data-provider'));
         $tester->setInputs($userInputs);
