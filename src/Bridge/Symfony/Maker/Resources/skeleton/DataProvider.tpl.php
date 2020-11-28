@@ -17,7 +17,7 @@ final class <?= $class_name ?> implements <?= ($generate_collection ? 'ContextAw
 {
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-<?php if ($resource_class !== null): ?>
+<?php if (null !== $resource_class): ?>
         return <?= $resource_class ?>::class === $resourceClass; // Add your custom conditions here
 <?php else : ?>
         return false; // Add your custom conditions here
@@ -38,7 +38,12 @@ final class <?= $class_name ?> implements <?= ($generate_collection ? 'ContextAw
     /**
     * {@inheritdoc}
     */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])<?= $resource_class ? ": ?$resource_class": (\PHP_VERSION_ID >= 70200 ? ': ?object' : '') ?>
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])<?php
+    if (null !== $resource_class) {
+        echo ": ?$resource_class";
+    } elseif (\PHP_VERSION_ID >= 70200) {
+        echo ': ?object';
+    }?>
 
     {
         // Retrieve the item from somewhere then return it or null if not found

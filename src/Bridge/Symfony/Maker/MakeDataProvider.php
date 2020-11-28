@@ -50,7 +50,7 @@ class MakeDataProvider extends AbstractMaker
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Creates an API Platform data povider')
+            ->setDescription('Creates an API Platform data provider')
             ->addArgument('name', InputArgument::OPTIONAL, 'Choose a class name for your data provider (e.g. <fg=yellow>AwesomeDataProvider</>)')
             ->addArgument('resource-class', InputArgument::OPTIONAL, 'Choose a Resource class')
             ->addOption('item-only', null, InputOption::VALUE_NONE, 'Generate only an item data provider')

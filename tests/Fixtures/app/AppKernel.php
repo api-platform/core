@@ -25,6 +25,7 @@ use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -74,6 +75,7 @@ class AppKernel extends Kernel
             new WebProfilerBundle(),
             new FriendsOfBehatSymfonyExtensionBundle(),
             new FrameworkBundle(),
+            new MakerBundle(),
         ];
 
         if (class_exists(DoctrineMongoDBBundle::class)) {

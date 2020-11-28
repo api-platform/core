@@ -1,0 +1,167 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Filesystem;
+
+class MakeDataPersisterTest extends KernelTestCase
+{
+    protected function tearDown(): void
+    {
+        (new Filesystem())->remove(self::tempDir());
+    }
+
+    /** @dataProvider dataPersisterProvider */
+    public function testMakeDataPersister(array $commandInputs, array $userInputs, string $expected)
+    {
+        $this->assertFileNotExists(self::tempFile('src/DataPersister/CustomDataPersister.php'));
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:data-persister'));
+        $tester->setInputs($userInputs);
+        $tester->execute($commandInputs);
+
+        $this->assertFileExists(self::tempFile('src/DataPersister/CustomDataPersister.php'));
+
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Success!', $display);
+
+        if (!isset($commandInputs['name'])) {
+            $this->assertStringContainsString('Choose a class name for your data persister (e.g. AwesomeDataPersister):', $display);
+        } else {
+            $this->assertStringNotContainsString('Choose a class name for your data persister (e.g. AwesomeDataPersister):', $display);
+        }
+        if (!isset($commandInputs['resource-class'])) {
+            $this->assertStringContainsString('Choose a Resource class:', $display);
+        } else {
+            $this->assertStringNotContainsString('Choose a Resource class:', $display);
+        }
+
+        $this->assertSame($expected, file_get_contents(self::tempFile('src/DataPersister/CustomDataPersister.php')));
+
+        $this->assertStringContainsString('Success!', $display = $tester->getDisplay());
+        $this->assertStringContainsString(<<<EOF
+ Next: Open your new data persister class and start customizing it.
+ Find the documentation at https://api-platform.com/docs/core/data-persisters/
+EOF
+            , $display);
+    }
+
+    public function dataPersisterProvider(): Generator
+    {
+        $expected = <<<'EOF'
+<?php
+
+namespace App\DataPersister;
+
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+
+final class CustomDataPersister implements ContextAwareDataPersisterInterface
+{
+    /**
+    * {@inheritdoc}
+    */
+    public function supports($data, array $context = []): bool
+    {
+    return false; // Add your custom conditions here
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function persist($data, array $context = []): object
+    {
+        // call your persistence layer to save $data
+
+        return $data;
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function remove($data, array $context = [])
+    {
+        // call your persistence layer to delete $data
+    }
+}
+
+EOF;
+        yield 'Generate data persister without resource class' => [
+            [],
+            ['CustomDataPersister', ''],
+            \PHP_VERSION_ID >= 70200 ? $expected : str_replace(': object', '', $expected),
+        ];
+
+        $expected = <<<'EOF'
+<?php
+
+namespace App\DataPersister;
+
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+
+final class CustomDataPersister implements ContextAwareDataPersisterInterface
+{
+    /**
+    * {@inheritdoc}
+    */
+    public function supports($data, array $context = []): bool
+    {
+    return $data instanceof Dummy::class; // Add your custom conditions here
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function persist($data, array $context = []): Dummy
+    {
+        // call your persistence layer to save $data
+
+        return $data;
+    }
+
+    /**
+    * {@inheritdoc}
+    */
+    public function remove($data, array $context = [])
+    {
+        // call your persistence layer to delete $data
+    }
+}
+
+EOF;
+        yield 'Generate data persister with resource class' => [
+            [],
+            ['CustomDataPersister', Dummy::class],
+            $expected,
+        ];
+
+        yield 'Generate data persister with resource class not interactively' => [
+            ['name' => 'CustomDataPersister', 'resource-class' => Dummy::class],
+            [],
+            $expected,
+        ];
+    }
+
+    private static function tempDir(): string
+    {
+        return __DIR__.'/../../../Fixtures/app/var/tmp';
+    }
+
+    private static function tempFile(string $path): string
+    {
+        return sprintf('%s/%s', self::tempDir(), $path);
+    }
+}
