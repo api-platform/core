@@ -154,7 +154,7 @@ class PaginatorTest extends TestCase
     public function testGetIterator()
     {
         // set local cache
-        iterator_to_array($this->paginator); // @phpstan-ignore-line
+        iterator_to_array($this->paginator);
 
         self::assertEquals(
             array_map(
