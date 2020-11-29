@@ -62,7 +62,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $constraint = new NotNull();
         $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];
         $list = new ConstraintViolationList([
-            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, null, $constraint),
+            new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'f24bdbad0becef97a6887238aa58221c', $constraint),
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
         ]);
 
@@ -75,10 +75,12 @@ class ConstraintViolationNormalizerTest extends TestCase
                 [
                     'propertyPath' => '_d',
                     'message' => 'a',
+                    'code' => 'f24bdbad0becef97a6887238aa58221c',
                 ],
                 [
                     'propertyPath' => '_4',
                     'message' => '1',
+                    'code' => null,
                 ],
             ],
         ];

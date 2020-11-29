@@ -22,7 +22,8 @@ Feature: Error handling
       "violations": [
         {
           "propertyPath": "name",
-          "message": "This value should not be blank."
+          "message": "This value should not be blank.",
+          "code": "c1051bb4-d103-4f74-8988-acbcafc7fdc3"
         }
       ]
     }
