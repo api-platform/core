@@ -48,8 +48,17 @@ class SerializerContextBuilderTest extends TestCase
             ]
         );
 
+        $resourceMetadataWithPatch = new ResourceMetadata(
+            null,
+            null,
+            null,
+            ['patch' => ['method' => 'PATCH', 'input_formats' => ['json' => ['application/merge-patch+json']]]],
+            []
+        );
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata);
+        $resourceMetadataFactoryProphecy->create('FooWithPatch')->willReturn($resourceMetadataWithPatch);
 
         $this->builder = new SerializerContextBuilder($resourceMetadataFactoryProphecy->reveal());
     }
@@ -84,6 +93,11 @@ class SerializerContextBuilderTest extends TestCase
         $request = Request::create('/bars/1/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
         $expected = ['bar' => 'baz', 'subresource_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'operation_type' => 'subresource', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false];
+        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+
+        $request = Request::create('/foowithpatch/1', 'PATCH');
+        $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_item_operation_name' => 'patch', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
+        $expected = ['item_operation_name' => 'patch', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'operation_type' => 'item', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
 

@@ -61,6 +61,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\MaxDepthDummy as MaxDept
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as NetworkPathDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PatchDummyRelation as PatchDummyRelationDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
@@ -128,6 +129,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PatchDummyRelation;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
@@ -1658,6 +1660,19 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is a PatchDummyRelation
+     */
+    public function thereIsAPatchDummyRelation()
+    {
+        $dummy = $this->buildPatchDummyRelation();
+        $related = $this->buildRelatedDummy();
+        $dummy->setRelated($related);
+        $this->manager->persist($related);
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -2090,5 +2105,13 @@ final class DoctrineContext implements Context
     private function buildInitializeInput()
     {
         return $this->isOrm() ? new InitializeInput() : new InitializeInputDocument();
+    }
+
+    /**
+     * @return PatchDummyRelation|PatchDummyRelationDocument
+     */
+    private function buildPatchDummyRelation()
+    {
+        return $this->isOrm() ? new PatchDummyRelation() : new PatchDummyRelationDocument();
     }
 }
