@@ -36,7 +36,8 @@ Feature: Using validations groups
       "violations": [
          {
              "propertyPath": "name",
-             "message": "This value should not be null."
+             "message": "This value should not be null.",
+             "code": "ad32d13f-c3d4-423b-909a-857b961eb720"
          }
       ]
     }
@@ -64,7 +65,8 @@ Feature: Using validations groups
       "violations": [
          {
              "propertyPath": "title",
-             "message": "This value should not be null."
+             "message": "This value should not be null.",
+             "code": "ad32d13f-c3d4-423b-909a-857b961eb720"
          }
       ]
     }
