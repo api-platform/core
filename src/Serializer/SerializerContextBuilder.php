@@ -63,7 +63,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         if (!$normalization) {
             if (!isset($context['api_allow_update'])) {
-                $context['api_allow_update'] = \in_array($request->getMethod(), ['PUT', 'PATCH'], true);
+                $context['api_allow_update'] = \in_array($method = $request->getMethod(), ['PUT', 'PATCH'], true);
+
+                if ($context['api_allow_update'] && 'PATCH' === $method) {
+                    $context['deep_object_to_populate'] = $context['deep_object_to_populate'] ?? true;
+                }
             }
 
             if ('csv' === $request->getContentType()) {
@@ -101,6 +105,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
+        // TODO: We should always use `skip_null_values` but changing this would be a BC break, for now use it only when `merge-patch+json` is activated on a Resource
         foreach ($resourceMetadata->getItemOperations() as $operation) {
             if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
                 $context['skip_null_values'] = true;
