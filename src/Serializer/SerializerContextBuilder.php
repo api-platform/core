@@ -66,7 +66,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 $context['api_allow_update'] = \in_array($method = $request->getMethod(), ['PUT', 'PATCH'], true);
 
                 if ($context['api_allow_update'] && 'PATCH' === $method) {
-                    $context[AbstractItemNormalizer::DEEP_OBJECT_TO_POPULATE] = $context[AbstractItemNormalizer::DEEP_OBJECT_TO_POPULATE] ?? true;
+                    $context['deep_object_to_populate'] = $context['deep_object_to_populate'] ?? true;
                 }
             }
 
@@ -108,7 +108,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         // TODO: We should always use `skip_null_values` but changing this would be a BC break, for now use it only when `merge-patch+json` is activated on a Resource
         foreach ($resourceMetadata->getItemOperations() as $operation) {
             if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
-                $context[AbstractItemNormalizer::SKIP_NULL_VALUES] = true;
+                $context['skip_null_values'] = true;
 
                 break;
             }
