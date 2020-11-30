@@ -1673,6 +1673,7 @@ final class DoctrineContext implements Context
         $related = $this->buildRelatedDummy();
         $dummy->setRelated($related);
         $this->manager->persist($related);
+        $this->manager->persist($dummy);
         $this->manager->flush();
     }
 
