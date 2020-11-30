@@ -175,12 +175,12 @@ final class ApiResource
      */
     public function __construct(
         $description = null,
-        array $collectionOperations = [],
-        array $graphql = [],
-        string $iri = '',
-        array $itemOperations = [],
-        string $shortName = '',
-        array $subresourceOperations = [],
+        ?array $collectionOperations = null,
+        ?array $graphql = null,
+        ?string $iri = null,
+        ?array $itemOperations = null,
+        ?string $shortName = null,
+        ?array $subresourceOperations = null,
 
         // attributes
         ?array $attributes = null,
