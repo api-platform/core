@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Operation\Factory;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -27,6 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\RelatedDummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -62,7 +64,10 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('anotherSubresource', false)->shouldBeCalled()->willReturn('another_subresource');
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal());
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
+        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -71,7 +76,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
@@ -83,8 +88,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subresource', RelatedDummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subresource' => [RelatedDummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource.{_format}',
@@ -96,9 +101,9 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subresource', RelatedDummyEntity::class, false],
-                    ['anotherSubresource', DummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subresource' => [RelatedDummyEntity::class, 'id', false],
+                    'anotherSubresource' => [DummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource/subcollections.{_format}',
@@ -110,7 +115,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections.{_format}',
@@ -122,8 +127,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subcollection', RelatedDummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subcollection' => [RelatedDummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections/{subcollection}/another_subresource.{_format}',
@@ -135,9 +140,9 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subcollection', RelatedDummyEntity::class, true],
-                    ['anotherSubresource', DummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subcollection' => [RelatedDummyEntity::class, 'id', true],
+                    'anotherSubresource' => [DummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subcollections/{subcollection}/another_subresource/subresource.{_format}',
@@ -180,7 +185,10 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('anotherSubresource', false)->shouldBeCalled()->willReturn('another_subresource');
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal());
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
+        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -189,7 +197,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
@@ -201,8 +209,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subresource', RelatedDummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subresource' => [RelatedDummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource.{_format}',
@@ -214,9 +222,9 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subresource', RelatedDummyEntity::class, false],
-                    ['anotherSubresource', DummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subresource' => [RelatedDummyEntity::class, 'id', false],
+                    'anotherSubresource' => [DummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_another_subresource_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/another_subresource/subcollections.{_format}',
@@ -228,7 +236,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_get_subresource',
                 'path' => '/dummy_entities/{id}/foobars',
@@ -240,8 +248,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subcollection', RelatedDummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subcollection' => [RelatedDummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar.{_format}',
@@ -253,9 +261,9 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subcollection', RelatedDummyEntity::class, true],
-                    ['anotherSubresource', DummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subcollection' => [RelatedDummyEntity::class, 'id', true],
+                    'anotherSubresource' => [DummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subcollections_another_subresource_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/foobars/{subcollection}/another_foobar/subresource.{_format}',
@@ -286,11 +294,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
                 $resourceMetadataFactoryProphecy->reveal(),
                 $propertyNameCollectionFactoryProphecy->reveal(),
                 $propertyMetadataFactoryProphecy->reveal(),
-                $pathSegmentNameGeneratorProphecy->reveal()
+                $pathSegmentNameGeneratorProphecy->reveal(),
+                $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -300,7 +312,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
@@ -346,11 +358,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('secondSubresource', false)->shouldBeCalled()->willReturn('second_subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('moreSubresource', false)->shouldBeCalled()->willReturn('mode_subresources');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $pathSegmentNameGeneratorProphecy->reveal()
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -360,7 +376,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
@@ -372,7 +388,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyValidatedEntity::class,
                 'shortNames' => ['dummyValidatedEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources.{_format}',
@@ -384,8 +400,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyValidatedEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['secondSubresource', DummyValidatedEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'secondSubresource' => [DummyValidatedEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_more_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources/mode_subresources.{_format}',
@@ -430,11 +446,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('secondSubresource', false)->shouldBeCalled()->willReturn('second_subresources');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $pathSegmentNameGeneratorProphecy->reveal()
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -444,7 +464,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
@@ -456,7 +476,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyValidatedEntity::class,
                 'shortNames' => ['dummyValidatedEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources.{_format}',
@@ -485,11 +505,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $pathSegmentNameGeneratorProphecy->reveal()
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -499,7 +523,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
@@ -537,11 +561,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('secondSubresource', false)->shouldBeCalled()->willReturn('second_subresources');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $pathSegmentNameGeneratorProphecy->reveal()
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -551,7 +579,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
@@ -563,8 +591,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subresource', DummyEntity::class, false],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subresource' => [DummyEntity::class, 'id', false],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_second_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources/second_subresources.{_format}',
@@ -576,7 +604,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_second_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/second_subresources.{_format}',
@@ -606,11 +634,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', true)->shouldBeCalled()->willReturn('subresource');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
                 $resourceMetadataFactoryProphecy->reveal(),
                 $propertyNameCollectionFactoryProphecy->reveal(),
                 $propertyMetadataFactoryProphecy->reveal(),
-                $pathSegmentNameGeneratorProphecy->reveal()
+                $pathSegmentNameGeneratorProphecy->reveal(),
+                $identifiersExtractorProphecy->reveal()
         );
 
         $result = $subresourceOperationFactory->create(DummyEntity::class);
@@ -621,7 +653,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresources_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
@@ -633,8 +665,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity', 'relatedDummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
-                    ['subresource', RelatedDummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
+                    'subresource' => [RelatedDummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresources_item_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource/{subresource}.{_format}',
@@ -664,11 +696,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
                 $resourceMetadataFactoryProphecy->reveal(),
                 $propertyNameCollectionFactoryProphecy->reveal(),
                 $propertyMetadataFactoryProphecy->reveal(),
-                $pathSegmentNameGeneratorProphecy->reveal()
+                $pathSegmentNameGeneratorProphecy->reveal(),
+                $identifiersExtractorProphecy->reveal()
         );
 
         $result = $subresourceOperationFactory->create(DummyEntity::class);
@@ -679,7 +715,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresource.{_format}',
@@ -710,11 +746,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresource');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $pathSegmentNameGeneratorProphecy->reveal()
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -724,7 +764,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/root_resource_prefix/dummy_entities/{id}/subresource.{_format}',
@@ -759,11 +799,15 @@ class SubresourceOperationFactoryTest extends TestCase
         $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('otherSubresource', false)->shouldBeCalled()->willReturn('other_subresources');
 
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
         $subresourceOperationFactory = new SubresourceOperationFactory(
             $resourceMetadataFactoryProphecy->reveal(),
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
-            $pathSegmentNameGeneratorProphecy->reveal()
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -773,7 +817,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => DummyEntity::class,
                 'shortNames' => ['dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/subresources.{_format}',
@@ -785,7 +829,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'resource_class' => RelatedDummyEntity::class,
                 'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
                 'identifiers' => [
-                    ['id', DummyEntity::class, true],
+                    'id' => [DummyEntity::class, 'id', true],
                 ],
                 'route_name' => 'api_dummy_entities_other_subresource_get_subresource',
                 'path' => '/dummy_entities/{id}/other_subresources.{_format}',

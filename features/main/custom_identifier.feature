@@ -101,3 +101,21 @@ Feature: Using custom identifier on resource
     When I send a "DELETE" request to "/custom_identifier_dummies/1"
     Then the response status code should be 204
     And the response should be empty
+
+  @createSchema
+  Scenario: Get a resource
+    Given there is a custom multiple identifier dummy
+    When I send a "GET" request to "/custom_multiple_identifier_dummies/1/2"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/CustomMultipleIdentifierDummy",
+      "@id": "/custom_multiple_identifier_dummies/1/2",
+      "@type": "CustomMultipleIdentifierDummy",
+      "firstId": 1,
+      "secondId": 2,
+      "name": "Orwell"
+    }
+    """

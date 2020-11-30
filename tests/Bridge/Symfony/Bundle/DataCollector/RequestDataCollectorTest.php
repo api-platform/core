@@ -142,6 +142,8 @@ class RequestDataCollectorTest extends TestCase
 
         $this->assertSame([
             'resource_class' => DummyEntity::class,
+            'has_composite_identifier' => false,
+            'identifiers' => ['id' => [DummyEntity::class, 'id']],
             'item_operation_name' => 'get',
             'receive' => true,
             'respond' => true,
@@ -282,7 +284,7 @@ class RequestDataCollectorTest extends TestCase
                 }
             },
         ]));
-        $itemDataProvider->getItem('', '', null, ['item_context']);
+        $itemDataProvider->getItem('', [], null, ['item_context']);
 
         return $itemDataProvider;
     }

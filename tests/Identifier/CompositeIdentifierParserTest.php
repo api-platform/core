@@ -41,4 +41,27 @@ class CompositeIdentifierParserTest extends TestCase
             'foo=test=bar;bar=' => ['foo' => 'test=bar', 'bar' => ''],
         ]]];
     }
+
+    /**
+     * @dataProvider compositeIdentifiers
+     */
+    public function testStringify(array $identifiers)
+    {
+        foreach ($identifiers as $string => $arr) {
+            $this->assertEquals(CompositeIdentifierParser::stringify($arr), $string);
+        }
+    }
+
+    public function compositeIdentifiers(): array
+    {
+        return [[[
+            'a=bd;dc=d' => ['a' => 'bd', 'dc' => 'd'],
+            'a=b;c=d foo;d23i=e' => ['a' => 'b', 'c' => 'd foo', 'd23i' => 'e'],
+            'a=1;c=2;d=10-30-24' => ['a' => '1', 'c' => '2', 'd' => '10-30-24'],
+            'a=test;b=bar;foo;c=123' => ['a' => 'test', 'b' => 'bar;foo', 'c' => '123'],
+            'foo=test=bar;;bar=bazzz' => ['foo' => 'test=bar;', 'bar' => 'bazzz'],
+            'foo=test=bar;bar=;test=foo' => ['foo' => 'test=bar', 'bar' => '', 'test' => 'foo'],
+            'foo=test=bar;bar=' => ['foo' => 'test=bar', 'bar' => ''],
+        ]]];
+    }
 }

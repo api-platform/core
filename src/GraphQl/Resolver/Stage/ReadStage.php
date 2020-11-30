@@ -172,7 +172,7 @@ final class ReadStage implements ReadStageInterface
         $resolvedIdentifiers = [];
         $rootIdentifiers = array_keys($rootResolvedFields);
         foreach ($rootIdentifiers as $rootIdentifier) {
-            $resolvedIdentifiers[] = [$rootIdentifier, $rootResolvedClass];
+            $resolvedIdentifiers[$rootIdentifier] = [$rootResolvedClass, $rootIdentifier];
         }
 
         return $this->subresourceDataProvider->getSubresource($subresourceClass, $rootResolvedFields, $normalizationContext + [

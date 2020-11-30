@@ -17,6 +17,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlDummy as Abso
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as AbsoluteUrlRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Book as BookDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
@@ -28,6 +29,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedOwner as Conver
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedRelated as ConvertedRelatedDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ConvertedString as ConvertedStringDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Customer as CustomerDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CustomMultipleIdentifierDummy as CustomMultipleIdentifierDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer as DummyAggregateOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCar as DummyCarDocument;
@@ -82,6 +84,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Book;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
@@ -93,6 +96,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedOwner;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedRelated;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConvertedString;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Customer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
@@ -1673,6 +1677,32 @@ final class DoctrineContext implements Context
         $this->manager->flush();
     }
 
+    /**
+     * @Given there is a book
+     */
+    public function thereIsABook()
+    {
+        $book = $this->buildBook();
+        $book->name = '1984';
+        $book->isbn = '9780451524935';
+        $this->manager->persist($book);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a custom multiple identifier dummy
+     */
+    public function thereIsACustomMultipleIdentifierDummy()
+    {
+        $dummy = $this->buildCustomMultipleIdentifierDummy();
+        $dummy->setName('Orwell');
+        $dummy->setFirstId(1);
+        $dummy->setSecondId(2);
+
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
     private function isOrm(): bool
     {
         return null !== $this->schemaTool;
@@ -2113,5 +2143,21 @@ final class DoctrineContext implements Context
     private function buildPatchDummyRelation()
     {
         return $this->isOrm() ? new PatchDummyRelation() : new PatchDummyRelationDocument();
+    }
+
+    /**
+     * @return BookDocument | Book
+     */
+    private function buildBook()
+    {
+        return $this->isOrm() ? new Book() : new BookDocument();
+    }
+
+    /**
+     * @return CustomMultipleIdentifierDummy | CustomMultipleIdentifierDummyDocument
+     */
+    private function buildCustomMultipleIdentifierDummy()
+    {
+        return $this->isOrm() ? new CustomMultipleIdentifierDummy() : new CustomMultipleIdentifierDummyDocument();
     }
 }

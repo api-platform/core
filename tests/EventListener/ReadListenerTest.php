@@ -188,7 +188,7 @@ class ReadListenerTest extends TestCase
     public function testRetrieveItem()
     {
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-        $identifierConverter->convert('1', 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
+        $identifierConverter->convert(['id' => '1'], 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -200,7 +200,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
+        $request = new Request([], [], ['id' => '1', '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);
@@ -241,7 +241,7 @@ class ReadListenerTest extends TestCase
     public function testRetrieveSubresource()
     {
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-        $identifierConverter->convert('1', 'Bar')->shouldBeCalled()->willReturn(['id' => '1']);
+        $identifierConverter->convert(['id' => '1'], 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -251,9 +251,9 @@ class ReadListenerTest extends TestCase
 
         $data = [new \stdClass()];
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
-        $subresourceDataProvider->getSubresource('Foo', ['id' => ['id' => '1']], ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar', IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true], 'get')->willReturn($data)->shouldBeCalled();
+        $subresourceDataProvider->getSubresource('Foo', ['id' => ['id' => '1']], ['identifiers' => [['id', 'Bar', true, ['id']]], 'property' => 'bar', IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true], 'get')->willReturn($data)->shouldBeCalled();
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request = new Request([], [], ['id' => '1', '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true, ['id']]], 'property' => 'bar']]);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);
@@ -270,19 +270,22 @@ class ReadListenerTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
 
+        $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
+        $identifierConverter->convert(['id' => '1'], 'Foo')->shouldBeCalled()->willReturn(['id' => '1']);
+
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
 
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request = new Request([], [], ['id' => '1', '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true, ['id']]], 'property' => 'bar']]);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);
         $event->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal());
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), null, null, $identifierConverter->reveal());
         $listener->onKernelRequest($event->reveal());
 
         $request->attributes->get('data');
@@ -291,7 +294,7 @@ class ReadListenerTest extends TestCase
     public function testRetrieveSubresourceNotFound()
     {
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-        $identifierConverter->convert('1', 'Bar')->willThrow(new InvalidIdentifierException())->shouldBeCalled();
+        $identifierConverter->convert(['id' => '1'], 'Foo')->willThrow(new InvalidIdentifierException())->shouldBeCalled();
         $this->expectException(NotFoundHttpException::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
@@ -300,7 +303,7 @@ class ReadListenerTest extends TestCase
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $itemDataProvider->getItem()->shouldNotBeCalled();
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request = new Request([], [], ['id' => '1', '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true, ['id']]], 'property' => 'bar']]);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);
@@ -313,7 +316,7 @@ class ReadListenerTest extends TestCase
     public function testRetrieveItemNotFound()
     {
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-        $identifierConverter->convert('22', 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
+        $identifierConverter->convert(['id' => '22'], 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
         $this->expectException(NotFoundHttpException::class);
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
@@ -323,7 +326,7 @@ class ReadListenerTest extends TestCase
 
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 
-        $request = new Request([], [], ['id' => 22, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
+        $request = new Request([], [], ['id' => '22', '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);
@@ -338,13 +341,13 @@ class ReadListenerTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
 
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-        $identifierConverter->convert('1', 'Foo')->shouldBeCalled()->willThrow(new InvalidIdentifierException());
+        $identifierConverter->convert(['id' => '1'], 'Foo')->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
+        $request = new Request([], [], ['id' => '1', '_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
         $request->setMethod(Request::METHOD_GET);
 
         $event = $this->prophesize(RequestEvent::class);
@@ -359,7 +362,7 @@ class ReadListenerTest extends TestCase
         $this->expectException(NotFoundHttpException::class);
 
         $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
-        $identifierConverter->convert(Argument::type('string'), Argument::type('string'))->shouldBeCalled()->willThrow(new InvalidIdentifierException());
+        $identifierConverter->convert(Argument::type('array'), Argument::type('string'))->shouldBeCalled()->willThrow(new InvalidIdentifierException());
 
         $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
         $collectionDataProvider->getCollection()->shouldNotBeCalled();
@@ -370,7 +373,7 @@ class ReadListenerTest extends TestCase
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
         $subresourceDataProvider->getSubresource()->shouldNotBeCalled();
 
-        $request = new Request([], [], ['id' => 1, '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true]], 'property' => 'bar']]);
+        $request = new Request([], [], ['id' => '1', '_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_subresource_context' => ['identifiers' => [['id', 'Bar', true, ['id']]], 'property' => 'bar']]);
         $request->setMethod(Request::METHOD_GET);
 
         $event = $this->prophesize(RequestEvent::class);

@@ -150,6 +150,10 @@ class SerializerFilterContextBuilderTest extends TestCase
         $attributes = [
             'resource_class' => DummyGroup::class,
             'collection_operation_name' => 'get',
+            'identifiers' => [
+                'id' => [DummyGroup::class, 'id'],
+            ],
+            'has_composite_identifier' => false,
             'receive' => true,
             'respond' => true,
             'persist' => true,

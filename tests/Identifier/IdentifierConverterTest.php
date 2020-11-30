@@ -32,6 +32,8 @@ class IdentifierConverterTest extends TestCase
 
     public function testCompositeIdentifier()
     {
+        $this->markTestSkipped('This behavior is now external to the identifier converter.');
+        /** @phpstan-ignore-next-line */
         $identifier = 'a=1;c=2;d=2015-04-05';
         $class = 'Dummy';
 
@@ -58,7 +60,7 @@ class IdentifierConverterTest extends TestCase
 
     public function testSingleDateIdentifier()
     {
-        $identifier = '2015-04-05';
+        $identifier = ['funkyid' => '2015-04-05'];
         $class = 'Dummy';
 
         $dateIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class));
@@ -77,7 +79,7 @@ class IdentifierConverterTest extends TestCase
 
     public function testIntegerIdentifier()
     {
-        $identifier = '42';
+        $identifier = ['id' => '42'];
         $class = 'Dummy';
 
         $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));

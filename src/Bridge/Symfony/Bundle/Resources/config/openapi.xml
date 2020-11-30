@@ -42,6 +42,7 @@
             <argument type="service" id="api_platform.operation_path_resolver" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.subresource_operation_factory" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />

@@ -43,12 +43,14 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class SubresourceDataProviderTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     private function assertIdentifierManagerMethodCalls($managerProphecy)
@@ -172,7 +174,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
-        $context = ['property' => 'relatedDummies', 'identifiers' => [['id', Dummy::class]], 'collection' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
+        $context = ['property' => 'relatedDummies', 'identifiers' => ['id' => [Dummy::class, 'id']], 'collection' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
         $this->assertEquals([], $dataProvider->getSubresource(RelatedDummy::class, ['id' => ['id' => 1]], $context));
     }
@@ -266,7 +268,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
-        $context = ['property' => 'thirdLevel', 'identifiers' => [['id', Dummy::class], ['relatedDummies', RelatedDummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
+        $context = ['property' => 'thirdLevel', 'identifiers' => ['id' => [Dummy::class, 'id'], 'relatedDummies' => [RelatedDummy::class, 'id']], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
         $this->assertEquals($result, $dataProvider->getSubresource(ThirdLevel::class, ['id' => ['id' => 1], 'relatedDummies' => ['id' => 1]], $context));
     }
@@ -322,7 +324,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
-        $context = ['property' => 'ownedDummy', 'identifiers' => [['id', Dummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
+        $context = ['property' => 'ownedDummy', 'identifiers' => ['id' => [Dummy::class, 'id']], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
         $this->assertEquals([], $dataProvider->getSubresource(RelatedOwningDummy::class, ['id' => ['id' => 1]], $context));
     }
@@ -382,7 +384,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
 
-        $context = ['property' => 'relatedDummies', 'identifiers' => [['id', Dummy::class]], 'collection' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
+        $context = ['property' => 'relatedDummies', 'identifiers' => ['id' => [Dummy::class, 'id']], 'collection' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
         $this->assertEquals([], $dataProvider->getSubresource(RelatedDummy::class, ['id' => ['id' => 1]], $context));
     }
@@ -426,6 +428,7 @@ class SubresourceDataProviderTest extends TestCase
      */
     public function testGetSubSubresourceItemLegacy()
     {
+        $this->expectDeprecation('Identifiers should match the convention introduced in ADR 0001-resource-identifiers, this behavior will be removed in 3.0.');
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $identifiers = ['id'];
         $funcProphecy = $this->prophesize(Func::class);
@@ -605,7 +608,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
-        $context = ['property' => 'id', 'identifiers' => [['id', Dummy::class, true], ['relatedDummies', RelatedDummy::class, true]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
+        $context = ['property' => 'id', 'identifiers' => ['id' => [Dummy::class, 'id', true], 'relatedDummies' => [RelatedDummy::class, 'id', true]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
         $this->assertEquals($result, $dataProvider->getSubresource(RelatedDummy::class, ['id' => ['id' => 1], 'relatedDummies' => ['id' => 2]], $context));
     }
