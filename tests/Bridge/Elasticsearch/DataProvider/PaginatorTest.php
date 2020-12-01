@@ -178,11 +178,11 @@ class PaginatorTest extends TestCase
 
         foreach ($documents['hits']['hits'] as $document) {
             $denormalizerProphecy
-                ->denormalize($document, Foo::class, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])
+                ->denormalize($document, Foo::class, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true, 'groups' => ['custom']])
                 ->willReturn($this->denormalizeFoo($document['_source']));
         }
 
-        return new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, $limit, $offset);
+        return new Paginator($denormalizerProphecy->reveal(), $documents, Foo::class, $limit, $offset, ['groups' => ['custom']]);
     }
 
     private function denormalizeFoo(array $fooDocument): Foo

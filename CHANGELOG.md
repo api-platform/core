@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0
+
+* Elasticsearch: The `Paginator` class constructor now receives the denormalization context to support denormalizing documents using serialization groups. This change may cause potential **BC** breaks for existing applications as denormalization was previously done without serialization groups.
+
 ## 2.6.0
 
 * Display the API Platform's version in the debug-bar
