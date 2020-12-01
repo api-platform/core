@@ -2,7 +2,7 @@
 rm -f yarn.lock
 # Keep the yarn.lock file in the repo to benefit from GitHub security alerts: https://github.blog/2019-07-02-yarn-support-for-security-alerts/
 yarn add swagger-ui-dist
-yarn add --production  es6-promise fetch react react-dom graphiql graphql-playground-react redoc
+yarn add --production  es6-promise fetch react react-dom graphiql graphql-playground-react@1.7.26 redoc
 
 dest=src/Bridge/Symfony/Bundle/Resources/public/swagger-ui/
 if [[ -d "$dest" ]]; then
