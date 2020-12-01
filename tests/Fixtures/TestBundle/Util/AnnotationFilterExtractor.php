@@ -22,7 +22,7 @@ class AnnotationFilterExtractor
 
     private $reader;
 
-    public function __construct(Reader $reader)
+    public function __construct(?Reader $reader = null)
     {
         $this->reader = $reader;
     }
