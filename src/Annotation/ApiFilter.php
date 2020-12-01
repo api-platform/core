@@ -24,6 +24,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  * @Annotation
  * @Target({"PROPERTY", "CLASS"})
  */
+#[\Attribute(\Attribute::TARGET_PROPERTY|\Attribute::TARGET_CLASS|\Attribute::IS_REPEATABLE)]
 final class ApiFilter
 {
     /**
@@ -51,25 +52,45 @@ final class ApiFilter
      */
     public $arguments = [];
 
-    public function __construct($options = [])
-    {
-        if (!\is_string($options['value'] ?? null)) {
+    /**
+     * @param string $filterClass
+     * @param string $id
+     * @param string $strategy
+     */
+    public function __construct(
+        $filterClass,
+        ?string $id = null,
+        ?string $strategy = null,
+        array $properties = [],
+        array $arguments = []
+    ) {
+        if (\is_array($filterClass)) { /** @phpstan-ignore-line Doctrine annotations */
+            $options = $filterClass;
+            $this->filterClass = $options['value'] ?? null;
+            unset($options['value']);
+
+            foreach ($options as $key => $value) {
+                if (!property_exists($this, $key)) {
+                    throw new InvalidArgumentException(sprintf('Property "%s" does not exist on the ApiFilter annotation.', $key));
+                }
+
+                $this->{$key} = $value;
+            }
+        } else {
+            // PHP attribute
+            $this->filterClass = $filterClass;
+            $this->id = $id;
+            $this->strategy = $strategy;
+            $this->properties = $properties;
+            $this->arguments = $arguments;
+        }
+
+        if (!\is_string($this->filterClass)) {
             throw new InvalidArgumentException('This annotation needs a value representing the filter class.');
         }
 
-        if (!is_a($options['value'], FilterInterface::class, true)) {
-            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $options['value'], FilterInterface::class));
-        }
-
-        $this->filterClass = $options['value'];
-        unset($options['value']);
-
-        foreach ($options as $key => $value) {
-            if (!property_exists($this, $key)) {
-                throw new InvalidArgumentException(sprintf('Property "%s" does not exist on the ApiFilter annotation.', $key));
-            }
-
-            $this->{$key} = $value;
+        if (!is_a($this->filterClass, FilterInterface::class, true)) {
+            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $this->filterClass, FilterInterface::class));
         }
     }
 }

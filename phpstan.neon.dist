@@ -21,6 +21,7 @@ parameters:
 		- tests/Bridge/NelmioApiDoc/*
 		- src/Bridge/FosUser/*
 		# BC layer
+		- tests/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
 		- tests/Annotation/ApiResourceTest.php
 		- tests/Annotation/ApiPropertyTest.php
 		- tests/Metadata/Resource/Factory/AnnotationResourceMetadataFactoryTest.php

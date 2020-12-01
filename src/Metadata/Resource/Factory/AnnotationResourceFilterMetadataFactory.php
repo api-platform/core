@@ -31,7 +31,7 @@ final class AnnotationResourceFilterMetadataFactory implements ResourceMetadataF
     private $reader;
     private $decorated;
 
-    public function __construct(Reader $reader, ResourceMetadataFactoryInterface $decorated = null)
+    public function __construct(?Reader $reader = null, ResourceMetadataFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->decorated = $decorated;

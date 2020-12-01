@@ -13,14 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ApiResource(description: "Hey PHP 8")]
 class DummyPhp8
 {
     #[ApiProperty(identifier: true, description: 'the identifier')]
     public $id;
+
+    #[ApiFilter(SearchFilter::class)]
+    public $filtered;
 
     #[ApiProperty(description: 'a foo')]
     public function getFoo(): int
