@@ -50,8 +50,12 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         }
 
         if ($reflectionClass->hasProperty($property)) {
-            $annotation = $this->reader->getPropertyAnnotation($reflectionClass->getProperty($property), ApiSubresource::class);
+            $reflectionProperty = $reflectionClass->getProperty($property);
+            if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionProperty->getAttributes(ApiSubresource::class)) {
+                return $this->updateMetadata($attributes[0]->newInstance(), $propertyMetadata, $resourceClass, $property);
+            }
 
+            $annotation = $this->reader->getPropertyAnnotation($reflectionProperty, ApiSubresource::class);
             if ($annotation instanceof ApiSubresource) {
                 return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
@@ -68,8 +72,11 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
                 continue;
             }
 
-            $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiSubresource::class);
+            if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionMethod->getAttributes(ApiSubresource::class)) {
+                return $this->updateMetadata($attributes[0]->newInstance(), $propertyMetadata, $resourceClass, $property);
+            }
 
+            $annotation = $this->reader->getMethodAnnotation($reflectionMethod, ApiSubresource::class);
             if ($annotation instanceof ApiSubresource) {
                 return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
