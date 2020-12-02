@@ -92,6 +92,10 @@ class CollectionDataProviderTest extends TestCase
 
     public function testGetCollection()
     {
+        $context = [
+            'groups' => ['custom'],
+        ];
+
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
@@ -159,7 +163,7 @@ class CollectionDataProviderTest extends TestCase
             ->shouldBeCalled();
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
-        $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, null, [])->wilLReturn([])->shouldBeCalled();
+        $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, 'get', $context)->willReturn([])->shouldBeCalled();
 
         $collectionDataProvider = new CollectionDataProvider(
             $clientProphecy->reveal(),
@@ -172,8 +176,8 @@ class CollectionDataProviderTest extends TestCase
         );
 
         self::assertEquals(
-            new Paginator($denormalizer, $documents, Foo::class, 2, 0),
-            $collectionDataProvider->getCollection(Foo::class)
+            new Paginator($denormalizer, $documents, Foo::class, 2, 0, $context),
+            $collectionDataProvider->getCollection(Foo::class, 'get', $context)
         );
     }
 }
