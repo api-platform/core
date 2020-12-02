@@ -128,12 +128,12 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
      *
      * @param string|DBALType $type
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, $value, string $nullManagement = null, $type = null)
     {
         $type = (string) $type;
         try {
             $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
