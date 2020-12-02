@@ -55,6 +55,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -248,8 +249,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         [$publicProperties,] = ApiResource::getConfigMetadata();
 
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
         foreach ($defaults as $option => $value) {
-            if (isset($publicProperties[$option])) {
+            if (isset($publicProperties[$nameConverter->denormalize($option)])) {
                 $normalizedDefaults[$option] = $value;
 
                 continue;
