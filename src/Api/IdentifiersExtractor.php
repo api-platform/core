@@ -57,6 +57,10 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
         }
 
+        if (!$identifiers) {
+            throw new RuntimeException(sprintf('No identifier defined "%s". You should add #[\ApiPlatform\Core\Annotation\ApiProperty(identifier: true)]" on the property identifying the resource."', $resourceClass));
+        }
+
         return $identifiers;
     }
 
