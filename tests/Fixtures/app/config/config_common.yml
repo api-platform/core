@@ -66,11 +66,6 @@ api_platform:
     collection:
         order_parameter_name:          'order'
         order:                         'ASC'
-        pagination:
-            client_enabled:            true
-            client_items_per_page:     true
-            client_partial:            true
-            items_per_page:            3
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
@@ -89,7 +84,6 @@ api_platform:
             shared_max_age:                   3600
             vary:                             ['Accept', 'Cookie']
             public:                           true
-        stateless: true
 
 parameters:
     container.autowiring.strict_mode: true
