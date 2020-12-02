@@ -6,23 +6,64 @@
 
 ## 2.6.0
 
-* Display the API Platform's version in the debug-bar
+* Display the API Platform's version in the debug-bar (#3235)
 * MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
 * MongoDB: Mercure support (#3290)
 * GraphQL: Subscription support with Mercure (#3321)
-* GraphQL: Allow to format GraphQL errors based on exceptions (#3063)
+* GraphQL: Allow formatting GraphQL errors based on exceptions (#3063)
 * GraphQL: Add page-based pagination (#3175, #3517)
-* GraphQL: Errors thrown from the GraphQL library can now be handled (#3632)
+* GraphQL: Errors thrown from the GraphQL library can now be handled (#3632, #3643)
 * GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
 * GraphQL: Support for field name conversion (serialized name) (#3455, #3516)
 * GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)
 * GraphQL: **BC** New syntax for the filters' arguments to preserve the order: `order: [{foo: 'asc'}, {bar: 'desc'}]` (#3468)
-* OpenAPI: Add PHP default values to the documentation (#2386)
-* Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
-* Subresources: subresource resourceClass can now be defined as a container parameter in XML and Yaml definitions
+* GraphQL: **BC** `paginationType` is now `pagination_type` (#3614)
+* OpenAPI: Add default values of PHP properties to the documentation (#2386)
+* Validator: Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
+* Subresources: Ssubresource's `resourceClass` can now be defined as a container parameter in XML and YAML definitions
 * IriConverter: Fix IRI url double encoding - may cause breaking change as some characters no longer encoded in output (#3552)
 * OpenAPI: **BC** Replace all characters other than `[a-zA-Z0-9\.\-_]` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
 * Add stateless ApiResource attribute
+* Elasticsearch: The `Paginator` class constructor now receives the denormalization context to support denormalizing documents using serialization groups. This change may cause potential **BC** breaks for existing applications as denormalization was previously done without serialization groups.
+* Improve Input/Output support (#3231)
+* JSON-LD: Improve vulcain support via an `iri_only` attribute (#3275)
+* Symfony: Display the API Platform's version in the debug-bar
+* MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* Metadata: InheritedPropertyMetadataFactory is deprecated (#3273)
+* OpenAPI: Query filters and parameters are validated (#1723)
+* Validator: Property validation through OpenAPI (#33329)
+* Validator: Autoconfiguration of validation groups generator via `ApiPlatform\Core\Validator\ValidationGroupsGeneratorInterface`
+* JSONAPI: response error codes can be specified via the `ApiPlatform\Core\Exception\ErrorCodeSerializableInterface`
+* Cache: adds a `max_header_length` configuration (#2865)
+* Cache: support `stale-while-revalidate` and `stale-if-error` cache control headers (#3439)
+* Security: ApiProperty supports a security attribute (#3503)
+* Security: ApiProperty supports a security attribute (#3503)
+* Tests: use `getCookieJar` in the ApiTestClient
+* Symfony: improved 5.x support with fewer deprecations (#3589)
+* Router: UrlGenerator strategy configuration via `url_generation_strategy` (#3198)
+* OpenAPI: Refactor of the OpenAPI code, swagger (or v2) is deprecated (#3407)
+* Symfony: Add Symfony Uid support (#3715)
+* Adds a `ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface` to prehydrate inputs (#3701)
+* Metadata: Support using annotations as PHP 8 attributes (#3869, #3868, #3851)
+* Metadata: Use `id` as default identifier if none provided (#3874)
+* Metadata: Throw an error when no identifier is defined (#3871)
+* Metadata: Improve and simplify identifiers management (#3825)
+* Metadata: Support the Symfony Serializer's `@Ignore` annotation (#3820)
+* PATCH: Support patching deep objects (#3847)
+* Validator: Add the violation code to the violation properties (#3857)
+* Validator: Allow customizing the validation error status code (#3808)
+* Doctrine: Allow searching on multiple values on every strategies (#3786)
+* Order: Support default order for a specific custom operation (#3784)
+* Lazy load all commands (#3798)
+* Mercure: Add a `normalization_context` option in `mercure` attribute (#3772)
+* Add `previous_data` to the context passed to persisters when available ()
+* Messenger: Add a new `messenger=persist` to option to call the standard data persister before publishing the message (#3617)  
+* Docs: Make `asset_package` configurable (#3764)
+* Allow to use `ItemNormalizer` without Symfony SecurityBundle (#3801)
+* Sort entries in the API entrypoint (#3091)
+* Messenger: Add a context stamp containing contextual data (#3157)
+* Config: Add an option to set global default values (#3151)
+* `ExceptionInterface` now extends `\Throwable` (#3217)
 
 ## 2.5.8
 
