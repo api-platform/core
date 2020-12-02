@@ -252,4 +252,16 @@ class IdentifiersExtractorTest extends TestCase
 
         return [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy];
     }
+
+    public function testDefaultIdentifierId(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']));
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn(new PropertyMetadata());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+
+        $this->assertSame(['id'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
+    }
 }
