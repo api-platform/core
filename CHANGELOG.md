@@ -26,29 +26,28 @@
 
 ## 2.5.8
 
-For compatibility reasons with Symfony 5.2 and PHP 8, we do not test these legacy packages nor their integration anymore:
-  - NelmioApiDoc
-  - FOSUserBundle
-
 * PHP 8 support (#3791, #3745, #3855)
 * Metadata: Fix merging null values from annotations (#3711)
-* JsonLd: missing @type from collection using output DTOs. (#3699)
-* Cache: Improve PurgeHttpCacheListener performances (#3743)
-* Cache: Fix VarnishPurger max header length (#3843)
+* JSON-LD: Add missing `@type` from collection using output DTOs (#3699)
+* Cache: Improve `PurgeHttpCacheListener` performances (#3743)
+* Cache: Fix `VarnishPurger` max header length (#3843)
 * Identifiers: Do not denormalize the same identifier twice (#3762)
-* OpenAPI: Lazy load SwaggerCommand (#3802)
+* OpenAPI: Lazy load `SwaggerCommand` (#3802)
 * OpenAPI: Use Output class name instead of the Resource short name when available (#3741)
-* Router: replace baseurl only once (#3776)
+* Router: Replace baseurl only once (#3776)
 * Mercure: Publisher bug fixes (#3790, #3739)
-* Tests: Github action with windows, now uses setup-php (#3716 #3717, #3814)
-* Tests: improve overall PHPUnit and Symfony 5.2 compatibility (#3702 #3700, #3781, #3779, #3822)
-* Tests: improve behat compatibility (#3792, #3793)
-* Tests: improve JSON Schema assertions (#3807, #3803, #3804, #3806, #3817, #3829, #3830)
-* Tests: allow extra options in ApiTestClient (#3486)
-* Tests: Use `static_lambda` code style rule (#3725)
-* Remove legacy dependencies (#3794)
 * Serializer: Catch NotNormalizableValueException to UnexpectedValueEception with inputs (#3697)
 * Doctrine: ODM escape search terms in RegexFilter
+* Tests: Improve JSON Schema assertions (#3807, #3803, #3804, #3806, #3817, #3829, #3830)
+* Tests: Allow passing extra options in ApiTestClient (#3486)
+* Docs: Upgrade Swagger UI to version 3.37.2 (#3867)
+* Docs: Upgrade ReDoc to version 2.0.0-rc.45 (#3867)
+* Docs: Upgrade GraphiQL to version 15.3.0 (#3867)
+* Docs: Upgrade GraphQL Playground to version 1.7.26 (#3867)
+
+For compatibility reasons with Symfony 5.2 and PHP 8, we do not test anymore the integration with these legacy packages:
+- FOSUserBundle
+- NelmioApiDoc 2
 
 ## 2.5.7
 
@@ -65,9 +64,9 @@ For compatibility reasons with Symfony 5.2 and PHP 8, we do not test these legac
 * GraphQL: Fix DTO relations (#3594)
 * GraphQL: Compatibility with graphql-php version 14 (#3621 and #3654)
 * Docs: Upgrade Swagger UI to version 3.32.5 (#3693)
-* Docs:Upgrade ReDoc to version 2.0.0-rc.40 (#3693)
-* Docs:Upgrade GraphiQL to version 1.0.3 (#3693)
-* Docs:Upgrade GraphQL Playground to version 1.7.23 (#3693)
+* Docs: Upgrade ReDoc to version 2.0.0-rc.40 (#3693)
+* Docs: Upgrade GraphiQL to version 1.0.3 (#3693)
+* Docs: Upgrade GraphQL Playground to version 1.7.23 (#3693)
 
 ## 2.5.6
 
