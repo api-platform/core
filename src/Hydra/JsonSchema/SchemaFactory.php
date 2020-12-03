@@ -74,6 +74,17 @@ final class SchemaFactory implements SchemaFactoryInterface
             $items = $schema['items'];
             unset($schema['items']);
 
+            switch ($schema->getVersion()) {
+                case Schema::VERSION_JSON_SCHEMA:
+                    $mappingPropDefinition = ['type' => ['string', 'null']];
+                    break;
+                case Schema::VERSION_OPENAPI:
+                    $mappingPropDefinition = ['type' => 'string', 'nullable' => true];
+                    break;
+                default:
+                    $mappingPropDefinition = ['type' => 'string'];
+            }
+
             $schema['type'] = 'object';
             $schema['properties'] = [
                 'hydra:member' => [
@@ -121,10 +132,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                                 'properties' => [
                                     '@type' => ['type' => 'string'],
                                     'variable' => ['type' => 'string'],
-                                    'property' => [
-                                        'nullable' => true,
-                                        'type' => ['string', 'null'],
-                                    ],
+                                    'property' => $mappingPropDefinition,
                                     'required' => ['type' => 'boolean'],
                                 ],
                             ],
