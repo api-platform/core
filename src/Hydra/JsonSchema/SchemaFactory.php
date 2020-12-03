@@ -121,7 +121,10 @@ final class SchemaFactory implements SchemaFactoryInterface
                                 'properties' => [
                                     '@type' => ['type' => 'string'],
                                     'variable' => ['type' => 'string'],
-                                    'property' => ['type' => 'string', 'nullable' => true],
+                                    'property' => [
+                                        'nullable' => true,
+                                        'anyOf' => [['type' => 'string'], ['type' => 'null']],
+                                    ],
                                     'required' => ['type' => 'boolean'],
                                 ],
                             ],
