@@ -74,15 +74,15 @@ final class SchemaFactory implements SchemaFactoryInterface
             $items = $schema['items'];
             unset($schema['items']);
 
+            $nullableStringDefinition = ['type' => 'string'];
+
             switch ($schema->getVersion()) {
                 case Schema::VERSION_JSON_SCHEMA:
-                    $mappingPropDefinition = ['type' => ['string', 'null']];
+                    $nullableStringDefinition = ['type' => ['string', 'null']];
                     break;
                 case Schema::VERSION_OPENAPI:
-                    $mappingPropDefinition = ['type' => 'string', 'nullable' => true];
+                    $nullableStringDefinition = ['type' => 'string', 'nullable' => true];
                     break;
-                default:
-                    $mappingPropDefinition = ['type' => 'string'];
             }
 
             $schema['type'] = 'object';
@@ -132,7 +132,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                                 'properties' => [
                                     '@type' => ['type' => 'string'],
                                     'variable' => ['type' => 'string'],
-                                    'property' => $mappingPropDefinition,
+                                    'property' => $nullableStringDefinition,
                                     'required' => ['type' => 'boolean'],
                                 ],
                             ],
