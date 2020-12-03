@@ -25,7 +25,7 @@ final class <?= $class_name ?> implements ContextAwareDataPersisterInterface
     * {@inheritdoc}
     */
     public function persist($data, array $context = [])<?php
-   if (null !==$resource_class) {
+   if (null !== $resource_class) {
        echo ": $resource_class";
    } elseif (\PHP_VERSION_ID >= 70200) {
        echo ': object';
@@ -40,7 +40,7 @@ final class <?= $class_name ?> implements ContextAwareDataPersisterInterface
     /**
     * {@inheritdoc}
     */
-    public function remove($data, array $context = [])
+    public function remove($data, array $context = []): void
     {
         // call your persistence layer to delete $data
     }

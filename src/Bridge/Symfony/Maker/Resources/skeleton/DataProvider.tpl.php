@@ -13,7 +13,15 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use <?= $resource_full_class_name ?>;
 <?php endif; ?>
 
-final class <?= $class_name ?> implements <?= ($generate_collection ? 'ContextAwareCollectionDataProviderInterface, ' : '') . ($generate_item ? 'ItemDataProviderInterface, ' : '')?>RestrictedDataProviderInterface
+final class <?= $class_name ?> implements <?php
+if ($generate_collection) {
+    echo 'ContextAwareCollectionDataProviderInterface, ';
+}
+
+if ($generate_item) {
+    echo 'ItemDataProviderInterface, ';
+}
+?>RestrictedDataProviderInterface
 {
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {

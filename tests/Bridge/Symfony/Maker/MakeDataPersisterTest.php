@@ -92,7 +92,7 @@ final class CustomDataPersister implements ContextAwareDataPersisterInterface
     /**
     * {@inheritdoc}
     */
-    public function remove($data, array $context = [])
+    public function remove($data, array $context = []): void
     {
         // call your persistence layer to delete $data
     }
@@ -136,7 +136,7 @@ final class CustomDataPersister implements ContextAwareDataPersisterInterface
     /**
     * {@inheritdoc}
     */
-    public function remove($data, array $context = [])
+    public function remove($data, array $context = []): void
     {
         // call your persistence layer to delete $data
     }

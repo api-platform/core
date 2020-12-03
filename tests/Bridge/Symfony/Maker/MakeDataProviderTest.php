@@ -14,6 +14,7 @@ declare(strict_types=1);
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -289,6 +290,15 @@ EOF;
             [],
             $expected,
         ];
+    }
+
+    public function testMakeDataProviderThrows()
+    {
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:data-provider'));
+        $this->expectException(RuntimeCommandException::class);
+        $this->expectExceptionMessage('You should at least generate an item or a collection data provider');
+
+        $tester->execute(['name' => 'CustomDataProvider', 'resource-class' => Dummy::class, '--collection-only' => true, '--item-only' => true]);
     }
 
     private static function tempDir(): string
