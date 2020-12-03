@@ -131,9 +131,15 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, $value, string $nullManagement = null, $type = null)
     {
         $type = (string) $type;
+        $value = $this->normalizeValue($value, $operator);
+
+        if (null === $value) {
+            return;
+        }
+
         try {
             $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),

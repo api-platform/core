@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 
 /**
  * Trait for filtering the collection by date intervals.
@@ -78,5 +79,21 @@ trait DateFilterTrait
                 'required' => false,
             ],
         ];
+    }
+
+    /**
+     * Normalize the value.
+     */
+    private function normalizeValue($value, string $operator): ?string
+    {
+        if (!\is_string($value)) {
+            $this->getLogger()->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected string', $operator)),
+            ]);
+
+            return null;
+        }
+
+        return $value;
     }
 }

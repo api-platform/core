@@ -110,9 +110,15 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
      */
     private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, string $nullManagement = null): void
     {
+        $value = $this->normalizeValue($value, $operator);
+
+        if (null === $value) {
+            return;
+        }
+
         try {
             $value = new \DateTime($value);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
