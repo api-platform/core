@@ -123,7 +123,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                                     'variable' => ['type' => 'string'],
                                     'property' => [
                                         'nullable' => true,
-                                        'anyOf' => [['type' => 'string'], ['type' => 'null']],
+                                        'type' => ['string', 'null'],
                                     ],
                                     'required' => ['type' => 'boolean'],
                                 ],
