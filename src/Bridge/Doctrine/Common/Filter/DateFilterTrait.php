@@ -81,12 +81,9 @@ trait DateFilterTrait
         ];
     }
 
-    /**
-     * Normalize the value.
-     */
     private function normalizeValue($value, string $operator): ?string
     {
-        if (!\is_string($value)) {
+        if (false === \is_string($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected string', $operator)),
             ]);
