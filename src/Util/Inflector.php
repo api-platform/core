@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Util;
 
+use ApiPlatform\Core\Exception\RuntimeException;
 use Doctrine\Common\Inflector\Inflector as LegacyInflector;
 use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
@@ -42,7 +43,15 @@ final class Inflector
      */
     public static function tableize(string $word): string
     {
-        return class_exists(InflectorFactory::class) ? self::getInstance()->tableize($word) : LegacyInflector::tableize($word);
+        if (class_exists(InflectorFactory::class)) {
+            return self::getInstance()->tableize($word);
+        }
+
+        if (class_exists(LegacyInflector::class)) {
+            return LegacyInflector::tableize($word);
+        }
+
+        throw new RuntimeException('Unable to find a proper Doctrine Inflector instance.');
     }
 
     /**
@@ -50,6 +59,14 @@ final class Inflector
      */
     public static function pluralize(string $word): string
     {
-        return class_exists(InflectorFactory::class) ? self::getInstance()->pluralize($word) : LegacyInflector::pluralize($word);
+        if (class_exists(InflectorFactory::class)) {
+            return self::getInstance()->pluralize($word);
+        }
+
+        if (class_exists(LegacyInflector::class)) {
+            return LegacyInflector::pluralize($word);
+        }
+
+        throw new RuntimeException('Unable to find a proper Doctrine Inflector instance.');
     }
 }
