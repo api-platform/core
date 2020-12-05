@@ -20,7 +20,9 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
+use ApiPlatform\Core\DataProvider\PaginatorFactoryInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Elasticsearch\Client;
@@ -38,20 +40,31 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     private $client;
     private $documentMetadataFactory;
     private $identifierExtractor;
-    private $denormalizer;
+    private $paginatorFactory;
     private $pagination;
     private $resourceMetadataFactory;
     private $collectionExtensions;
 
     /**
+     * @param DenormalizerInterface|PaginatorFactoryInterface $paginatorFactoryOrDenormalizer Passing a DenormalizerInterface instance is deprecated since 2.6.
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer, Pagination $pagination, ResourceMetadataFactoryInterface $resourceMetadataFactory, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, $paginatorFactoryOrDenormalizer, Pagination $pagination, ResourceMetadataFactoryInterface $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
+        // BC layer until API Platform < 3.0
+        if ($paginatorFactoryOrDenormalizer instanceof DenormalizerInterface) {
+            @trigger_error(sprintf('Injecting a %s instance as fourth argument has been deprecated since API Platform 2.6 and will be removed in API Platform 3. Inject a %s instance instead.', DenormalizerInterface::class, PaginatorFactoryInterface::class), E_USER_DEPRECATED);
+            $paginatorFactoryOrDenormalizer = new PaginatorFactory($paginatorFactoryOrDenormalizer);
+        }
+
+        if (!$paginatorFactoryOrDenormalizer instanceof PaginatorFactoryInterface) {
+            throw new InvalidArgumentException(sprintf('The fourth argument of the %s method must be a %s instance.', __METHOD__, PaginatorFactoryInterface::class));
+        }
+
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
         $this->identifierExtractor = $identifierExtractor;
-        $this->denormalizer = $denormalizer;
+        $this->paginatorFactory = $paginatorFactoryOrDenormalizer;
         $this->pagination = $pagination;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->collectionExtensions = $collectionExtensions;
@@ -111,13 +124,6 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             'body' => $body,
         ]);
 
-        return new Paginator(
-            $this->denormalizer,
-            $documents,
-            $resourceClass,
-            $limit,
-            $offset,
-            $context
-        );
+        return $this->paginatorFactory->createPaginator($documents, $limit, $offset, array_merge(['resourceClass' => $resourceClass], $context));
     }
 }
