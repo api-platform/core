@@ -109,7 +109,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             return $schema;
         }
 
-        $definition = new \ArrayObject(['type' => 'object', 'additionalProperties' => $serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] ?? true]);
+        $definition = new \ArrayObject(['type' => 'object', 'additionalProperties' => $serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] ?? false]);
         $definitions[$definitionName] = $definition;
         if (null !== $resourceMetadata && null !== $description = $resourceMetadata->getDescription()) {
             $definition['description'] = $description;
