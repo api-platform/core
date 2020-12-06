@@ -24,7 +24,6 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -37,44 +36,28 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class CollectionDataProviderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function testConstruct()
     {
+        $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal();
+
         self::assertInstanceOf(
             CollectionDataProviderInterface::class,
             new CollectionDataProvider(
                 $this->prophesize(Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
-                new PaginatorFactory($this->prophesize(DenormalizerInterface::class)->reveal()),
+                $denormalizer,
                 new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
-                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
+                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+                [],
+                new PaginatorFactory($denormalizer)
             )
-        );
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testConstructWithoutDenormalizerInterfaceOrPaginatorFactoryInterfaceInstanceIsForbidden()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The fourth argument of the ApiPlatform\\Core\\Bridge\\Elasticsearch\\DataProvider\\CollectionDataProvider::__construct method must be a ApiPlatform\\Core\\DataProvider\\PaginatorFactoryInterface instance.');
-
-        new CollectionDataProvider(
-            $this->prophesize(Client::class)->reveal(),
-            $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
-            new \stdClass(), // @phpstan-ignore-line
-            new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
-            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
         );
     }
 
@@ -95,14 +78,17 @@ class CollectionDataProviderTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(DummyCarColor::class)->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
+        $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal();
 
         $collectionDataProvider = new CollectionDataProvider(
             $this->prophesize(Client::class)->reveal(),
             $documentMetadataFactoryProphecy->reveal(),
             $identifierExtractorProphecy->reveal(),
-            new PaginatorFactory($this->prophesize(DenormalizerInterface::class)->reveal()),
+            $denormalizer,
             new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
-            $resourceMetadataFactoryProphecy->reveal()
+            $resourceMetadataFactoryProphecy->reveal(),
+            [],
+            new PaginatorFactory($denormalizer)
         );
 
         self::assertTrue($collectionDataProvider->supports(Foo::class));
@@ -187,15 +173,17 @@ class CollectionDataProviderTest extends TestCase
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, 'get', $context)->willReturn([])->shouldBeCalled();
+        $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal();
 
         $collectionDataProvider = new CollectionDataProvider(
             $clientProphecy->reveal(),
             $documentMetadataFactoryProphecy->reveal(),
             $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
-            new PaginatorFactory($denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal()),
+            $denormalizer,
             new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
             $resourceMetadataFactoryProphecy->reveal(),
-            [$requestBodySearchCollectionExtensionProphecy->reveal()]
+            [$requestBodySearchCollectionExtensionProphecy->reveal()],
+            new PaginatorFactory($denormalizer)
         );
 
         self::assertEquals(
@@ -204,10 +192,7 @@ class CollectionDataProviderTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
-    public function testGetCollectionWithDeprecatedDenormalizerDependency()
+    public function testGetCollectionWithoutPaginatorFactoryDependency()
     {
         $context = [
             'groups' => ['custom'],
@@ -282,8 +267,6 @@ class CollectionDataProviderTest extends TestCase
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, 'get', $context)->willReturn([])->shouldBeCalled();
-
-        $this->expectDeprecation('Injecting a Symfony\Component\Serializer\Normalizer\DenormalizerInterface instance as fourth argument has been deprecated since API Platform 2.6 and will be removed in API Platform 3. Inject a ApiPlatform\Core\DataProvider\PaginatorFactoryInterface instance instead.');
 
         $collectionDataProvider = new CollectionDataProvider(
             $clientProphecy->reveal(),
