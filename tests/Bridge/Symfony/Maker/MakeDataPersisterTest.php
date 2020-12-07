@@ -76,7 +76,7 @@ final class CustomDataPersister implements ContextAwareDataPersisterInterface
     */
     public function supports($data, array $context = []): bool
     {
-    return false; // Add your custom conditions here
+        return false; // Add your custom conditions here
     }
 
     /**
@@ -120,7 +120,7 @@ final class CustomDataPersister implements ContextAwareDataPersisterInterface
     */
     public function supports($data, array $context = []): bool
     {
-    return $data instanceof Dummy::class; // Add your custom conditions here
+        return $data instanceof Dummy::class; // Add your custom conditions here
     }
 
     /**

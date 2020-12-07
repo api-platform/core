@@ -15,9 +15,9 @@ final class <?= $class_name ?> implements ContextAwareDataPersisterInterface
     public function supports($data, array $context = []): bool
     {
 <?php if (null !== $resource_class): ?>
-    return $data instanceof <?= $resource_class ?>::class; // Add your custom conditions here
+        return $data instanceof <?= $resource_class ?>::class; // Add your custom conditions here
 <?php else : ?>
-    return false; // Add your custom conditions here
+        return false; // Add your custom conditions here
 <?php endif; ?>
     }
 
