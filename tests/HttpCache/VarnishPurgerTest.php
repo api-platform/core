@@ -98,6 +98,18 @@ class VarnishPurgerTest extends TestCase
 
     public function provideChunkHeaderCases()
     {
+        yield 'no iri' => [
+            50,
+            [],
+            [],
+        ];
+
+        yield 'one iri' => [
+            50,
+            ['/foo'],
+            ['(^|\,)/foo($|\,)'],
+        ];
+
         yield 'few iris' => [
             50,
             ['/foo', '/bar'],

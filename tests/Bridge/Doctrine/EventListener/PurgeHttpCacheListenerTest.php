@@ -56,7 +56,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $toDeleteNoPurge->setId(5);
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge(['/dummies' => '/dummies', '/dummies/1' => '/dummies/1', '/dummies/2' => '/dummies/2', '/dummies/3' => '/dummies/3', '/dummies/4' => '/dummies/4'])->shouldBeCalled();
+        $purgerProphecy->purge(['/dummies', '/dummies/1', '/dummies/2', '/dummies/3', '/dummies/4'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
@@ -99,7 +99,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $dummy->setId(1);
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge(['/dummies' => '/dummies', '/dummies/1' => '/dummies/1', '/related_dummies/old' => '/related_dummies/old', '/related_dummies/new' => '/related_dummies/new'])->shouldBeCalled();
+        $purgerProphecy->purge(['/dummies', '/dummies/1', '/related_dummies/old', '/related_dummies/new'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();

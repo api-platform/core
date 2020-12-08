@@ -103,7 +103,7 @@ final class PurgeHttpCacheListener
             return;
         }
 
-        $this->purger->purge($this->tags);
+        $this->purger->purge(array_values($this->tags));
         $this->tags = [];
     }
 
