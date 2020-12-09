@@ -109,6 +109,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             return $schema;
         }
 
+        /** @var \ArrayObject<string, mixed> $definition */
         $definition = new \ArrayObject(['type' => 'object']);
         $definitions[$definitionName] = $definition;
         if (null !== $resourceMetadata && null !== $description = $resourceMetadata->getDescription()) {
