@@ -118,7 +118,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         // additionalProperties are allowed by default, so it does not need to be set explicitly, unless allow_extra_attributes is false
         // See https://json-schema.org/understanding-json-schema/reference/object.html#properties
-        if (isset($serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES]) && false === $serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES]) {
+        if (false === ($serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] ?? true)) {
             $definition['additionalProperties'] = false;
         }
 
