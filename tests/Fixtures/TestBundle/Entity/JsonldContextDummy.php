@@ -42,7 +42,7 @@ class JsonldContextDummy
      *     attributes={
      *         "jsonld_context"={
      *             "@id"="http://example.com/id",
-     *             "@var"="@id",
+     *             "@type"="@id",
      *             "foo"="bar"
      *         }
      *     },
