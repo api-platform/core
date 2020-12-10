@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     attributes={
  *         "normalization_context"={"groups"={"barcelona"}},
  *         "denormalization_context"={"groups"={"chicago"}},
- *         "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
+ *         "hydra_context"={"@var"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
  *     },
  *     itemOperations={
  *         "get",

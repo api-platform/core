@@ -80,7 +80,7 @@ final class JsonApiContext implements Context
         $this->validator->validate($json, (object) ['$ref' => "file://{$this->jsonApiSchemaFile}"]);
 
         if (!$this->validator->isValid()) {
-            throw new ExpectationFailedException(sprintf('The JSON is not valid according to the JSON API schema.'));
+            throw new ExpectationFailedException('The JSON is not valid according to the JSON API schema.');
         }
     }
 

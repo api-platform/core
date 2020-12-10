@@ -31,8 +31,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class OrderExtension implements AggregationCollectionExtensionInterface
 {
-    use PropertyHelperTrait;
     use MongoDbOdmPropertyHelperTrait;
+    use PropertyHelperTrait;
 
     private $order;
     private $resourceMetadataFactory;

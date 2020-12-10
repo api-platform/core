@@ -145,7 +145,7 @@ final class Response implements ResponseInterface
         }
 
         try {
-            $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? \JSON_THROW_ON_ERROR : 0));
+            $content = json_decode($content, true, 512, JSON_BIGINT_AS_STRING | (\PHP_VERSION_ID >= 70300 ? JSON_THROW_ON_ERROR : 0));
         } catch (\JsonException $e) {
             throw new JsonException($e->getMessage(), $e->getCode());
         }

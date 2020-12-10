@@ -79,7 +79,7 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
             [],
         ];
 
-        yield  'Empty ChainSubresourceDataProvider' => [
+        yield 'Empty ChainSubresourceDataProvider' => [
             new ChainSubresourceDataProvider([]),
             ['some_context'],
             [],
