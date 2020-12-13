@@ -79,7 +79,7 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
             [],
         ];
 
-        yield  'Empty ChainCollectionDataProvider' => [
+        yield 'Empty ChainCollectionDataProvider' => [
             new ChainCollectionDataProvider([]),
             ['some_context'],
             [],

@@ -238,7 +238,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Method copy-pasted from symfony/serializer.
-     * Remove it after symfony/serializer version update @link https://github.com/symfony/symfony/pull/28263.
+     * Remove it after symfony/serializer version update @see https://github.com/symfony/symfony/pull/28263.
      *
      * {@inheritdoc}
      *

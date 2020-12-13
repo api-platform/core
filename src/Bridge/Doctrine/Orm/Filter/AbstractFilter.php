@@ -35,8 +35,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractFilter implements FilterInterface
 {
-    use PropertyHelperTrait;
     use OrmPropertyHelperTrait;
+    use PropertyHelperTrait;
 
     protected $managerRegistry;
     protected $requestStack;

@@ -17,7 +17,7 @@ date_default_timezone_set('UTC');
 
 // PHPUnit's autoloader
 if (!file_exists($phpUnitAutoloaderPath = __DIR__.'/../../../vendor/bin/.phpunit/phpunit/vendor/autoload.php')) {
-    die('PHPUnit is not installed. Please run ./vendor/bin/simple-phpunit to install it');
+    exit('PHPUnit is not installed. Please run ./vendor/bin/simple-phpunit to install it');
 }
 
 $phpunitLoader = require $phpUnitAutoloaderPath;
