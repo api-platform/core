@@ -355,8 +355,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $options = $this->getFactoryOptions($context);
         $propertyNames = $this->propertyNameCollectionFactory->create($context['resource_class'], $options);
 
-        dump($propertyNames);
-
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
