@@ -11,8 +11,15 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 
 class SerializerIgnoredPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    private PropertyNameCollectionFactoryInterface $decorated;
-    private ClassMetadataFactoryInterface $serializerClassMetadataFactory;
+    /**
+     * @var PropertyNameCollectionFactoryInterface
+     */
+    private $decorated;
+    
+    /**
+     * @var PropertyNameCollectionFactoryInterface
+     */
+    private $serializerClassMetadataFactory;
 
     public function __construct(ClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyNameCollectionFactoryInterface $decorated)
     {
