@@ -44,9 +44,6 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Mapping\AttributeMetadata;
-use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -1204,69 +1201,5 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $actualDummy);
 
         $propertyAccessorProphecy->setValue($actualDummy, 'name', 'Dummy')->shouldHaveBeenCalled();
-    }
-
-    public function testNormalizationWithIgnoreMetadata()
-    {
-        if (!method_exists(AttributeMetadata::class, 'setIgnore')) {
-            $this->markTestSkipped();
-        }
-
-        $dummy = new Dummy();
-
-        $dummyAttributeMetadata = new AttributeMetadata('dummy');
-        $dummyAttributeMetadata->setIgnore(true);
-
-        $classMetadataProphecy = $this->prophesize(ClassMetadataInterface::class);
-        $classMetadataProphecy->getAttributesMetadata()->willReturn(['dummy' => $dummyAttributeMetadata]);
-
-        $classMetadataFactoryProphecy = $this->prophesize(ClassMetadataFactoryInterface::class);
-        $classMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($classMetadataProphecy->reveal());
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name', 'dummy']));
-
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummy', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true));
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
-
-        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo');
-        $propertyAccessorProphecy->getValue($dummy, 'dummy')->willReturn('bar');
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
-
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo');
-        $serializerProphecy->normalize('bar', null, Argument::type('array'))->willReturn('bar');
-
-        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
-            null,
-            $classMetadataFactoryProphecy->reveal(),
-            null,
-            false,
-            [],
-            [],
-            null,
-            null,
-        ]);
-        $normalizer->setSerializer($serializerProphecy->reveal());
-
-        $expected = [
-            'name' => 'foo',
-        ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
-            'resources' => [],
-        ]));
     }
 }
