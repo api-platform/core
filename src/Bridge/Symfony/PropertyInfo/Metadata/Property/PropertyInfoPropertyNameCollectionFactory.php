@@ -38,7 +38,7 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $properties = $this->propertyInfo->getProperties($resourceClass, $options);
+        $properties = $this->propertyInfo->getProperties($resourceClass, $options + ['serializer_groups' => null]);
 
         return new PropertyNameCollection($properties ?? []);
     }
