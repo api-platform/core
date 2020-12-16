@@ -15,7 +15,7 @@ class SerializerIgnoredPropertyNameCollectionFactory implements PropertyNameColl
      * @var PropertyNameCollectionFactoryInterface
      */
     private $decorated;
-    
+
     /**
      * @var PropertyNameCollectionFactoryInterface
      */
@@ -31,9 +31,13 @@ class SerializerIgnoredPropertyNameCollectionFactory implements PropertyNameColl
         $propertyNameCollection = $this->decorated->create($resourceClass, $options);
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($resourceClass);
         $propertyNames = [];
+        if($serializerClassMetadata == null){
+            return $propertyNameCollection;
+        }
         foreach($propertyNameCollection->getIterator() as $propertyName){
             if(
                 !isset($serializerClassMetadata->getAttributesMetadata()[$propertyName]) ||
+                !method_exists($serializerClassMetadata->getAttributesMetadata()[$propertyName], 'isIgnored') ||
                 !$serializerClassMetadata->getAttributesMetadata()[$propertyName]->isIgnored()
             ){
                 $propertyNames[$propertyName] = $propertyName;
