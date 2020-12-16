@@ -49,6 +49,11 @@
             <argument type="service" id="api_platform.property_info" />
         </service>
 
+        <service id="api_platform.metadata.property.name_collection_factory.serializer_ignored" class="ApiPlatform\Core\Bridge\Symfony\Serializer\Metadata\Property\SerializerIgnoredPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="10" public="false">
+            <argument type="service" id="serializer.mapping.class_metadata_factory" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory.serializer_ignored.inner" />
+        </service>
+
         <service id="api_platform.metadata.property.name_collection_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.cached.inner" />
