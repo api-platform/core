@@ -19,7 +19,7 @@ Feature: Search filter on collections
     Given there is a DummyCar entity with related colors
     When I send a "GET" request to "/dummy_cars?colors.prop=red"
     Then the response status code should be 200
-    And the JSON should be deep equal to:
+    And the JSON should be equal to:
     """
     {
       "@context": "/contexts/DummyCar",
@@ -81,19 +81,7 @@ Feature: Search filter on collections
         "hydra:mapping": [
           {
             "@type": "IriTemplateMapping",
-            "variable": "availableAt[after]",
-            "property": "availableAt",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
             "variable": "availableAt[before]",
-            "property": "availableAt",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "availableAt[strictly_after]",
             "property": "availableAt",
             "required": false
           },
@@ -105,26 +93,20 @@ Feature: Search filter on collections
           },
           {
             "@type": "IriTemplateMapping",
+            "variable": "availableAt[after]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "availableAt[strictly_after]",
+            "property": "availableAt",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
             "variable": "canSell",
             "property": "canSell",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "colors",
-            "property": "colors",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "colors.prop",
-            "property": "colors.prop",
-            "required": false
-          },
-          {
-            "@type": "IriTemplateMapping",
-            "variable": "colors[]",
-            "property": "colors",
             "required": false
           },
           {
@@ -147,8 +129,20 @@ Feature: Search filter on collections
           },
           {
             "@type": "IriTemplateMapping",
-            "variable": "name",
-            "property": "name",
+            "variable": "colors.prop",
+            "property": "colors.prop",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "colors",
+            "property": "colors",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "colors[]",
+            "property": "colors",
             "required": false
           },
           {
@@ -185,6 +179,12 @@ Feature: Search filter on collections
             "@type": "IriTemplateMapping",
             "variable": "uuid[]",
             "property": "uuid",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "name",
+            "property": "name",
             "required": false
           }
         ]
@@ -278,7 +278,6 @@ Feature: Search filter on collections
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And print last JSON response
     And the JSON should be valid according to this schema:
     """
     {

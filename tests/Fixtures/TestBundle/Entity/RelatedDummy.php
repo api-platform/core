@@ -33,7 +33,6 @@ class RelatedDummy extends ParentDummy
 {
     /**
      * @ApiProperty(writable=false)
-     * @ApiSubresource
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Behat;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase;
 use Behat\Gherkin\Node\PyStringNode;
+use Behat\Mink\Exception\ExpectationException;
 use Behatch\Context\JsonContext as BaseJsonContext;
 use Behatch\HttpCall\HttpCallResultPool;
 use Behatch\Json\Json;
@@ -28,24 +29,73 @@ final class JsonContext extends BaseJsonContext
     }
 
     /**
-     * @Then /^the JSON should be deep equal to:$/
+     * @Then the JSON node :node should contain:
      */
-    public function theJsonShouldBeDeepEqualTo(PyStringNode $content)
+    public function theJsonNodeShouldContainContent(string $node, PyStringNode $content): void
     {
         $actual = $this->getJson();
+
         try {
             $expected = new Json($content);
         } catch (\Exception $e) {
-            throw new \Exception('The expected JSON is not a valid');
+            throw new ExpectationException('The expected JSON is not valid.', $this->getSession()->getDriver(), $e);
         }
 
-        $actual = new Json(json_encode($this->sortArrays($actual->getContent())));
-        $expected = new Json(json_encode($this->sortArrays($expected->getContent())));
+        $actualContent = $this->inspector->evaluate($actual, $node);
 
-        $this->assertSame(
-            (string) $expected,
-            (string) $actual,
-            "The json is equal to:\n".$actual->encode()
+        if (!is_iterable($actualContent)) {
+            throw new ExpectationException(sprintf("The JSON is equal to:\n%s", json_encode($actualContent, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)), $this->getSession()->getDriver());
+        }
+
+        foreach ($actualContent as $itemContent) {
+            try {
+                $this->assertEquals($expected->getContent(), $itemContent, ' ');
+            } catch (ExpectationException $e) {
+                continue;
+            }
+
+            return;
+        }
+
+        throw new ExpectationException("The JSON node \"{$node}\" does not contain the expected content.", $this->getSession()->getDriver());
+    }
+
+    /**
+     * @Then the JSON node :node should be equal to:
+     */
+    public function theJsonNodeShouldBeEqualToContent(string $node, PyStringNode $content): void
+    {
+        $actual = $this->getJson();
+
+        try {
+            $expected = new Json($content);
+        } catch (\Exception $e) {
+            throw new ExpectationException('The expected JSON is not valid.', $this->getSession()->getDriver(), $e);
+        }
+
+        $actualContent = $this->inspector->evaluate($actual, $node);
+
+        $this->assertEquals(
+            $expected->getContent(),
+            $actualContent,
+            sprintf("The JSON node \"%s\" is equal to:\n%s", $node, json_encode($actualContent, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT))
+        );
+    }
+
+    public function theJsonShouldBeEqualTo(PyStringNode $content): void
+    {
+        $actual = $this->getJson();
+
+        try {
+            $expected = new Json($content);
+        } catch (\Exception $e) {
+            throw new ExpectationException('The expected JSON is not valid.', $this->getSession()->getDriver());
+        }
+
+        $this->assertEquals(
+            $expected->getContent(),
+            $actual->getContent(),
+            "The JSON is equal to:\n{$actual->encode()}"
         );
     }
 
@@ -58,26 +108,5 @@ final class JsonContext extends BaseJsonContext
         $subset = json_decode($content->getRaw(), true);
 
         method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array); // @phpstan-ignore-line Compatibility with PHPUnit 7
-    }
-
-    private function sortArrays($obj)
-    {
-        $isObject = \is_object($obj);
-
-        foreach ($obj as $key => $value) {
-            if (null === $value || is_scalar($value)) {
-                continue;
-            }
-
-            if (\is_array($value)) {
-                sort($value);
-            }
-
-            $value = $this->sortArrays($value);
-
-            $isObject ? $obj->{$key} = $value : $obj[$key] = $value;
-        }
-
-        return $obj;
     }
 }
