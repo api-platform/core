@@ -34,7 +34,7 @@ final class OpenApi implements DocumentationInterface
     private $tags;
     private $externalDocs;
 
-    public function __construct(Info $info, array $servers = [], Paths $paths, Components $components = null, array $security = [], array $tags = [], $externalDocs = null)
+    public function __construct(Info $info, array $servers, Paths $paths, Components $components = null, array $security = [], array $tags = [], $externalDocs = null)
     {
         $this->openapi = self::VERSION;
         $this->info = $info;
