@@ -46,12 +46,6 @@ parameters:
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
 				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php
-		-
-			message: '#Variable \$iri might not be defined\.#'
-			path: src/JsonApi/Serializer/ItemNormalizer.php
-		-
-			message: '#Variable \$positionPm might not be defined\.#'
-			path: src/Util/ClassInfoTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'

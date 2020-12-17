@@ -66,8 +66,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  */
 class DocumentationNormalizerV2Test extends TestCase
 {
-    use ProphecyTrait;
     use ExpectDeprecationTrait;
+    use ProphecyTrait;
 
     private const OPERATION_FORMATS = [
         'input_formats' => ['jsonld' => ['application/ld+json']],
