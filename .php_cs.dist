@@ -98,6 +98,7 @@ return PhpCsFixer\Config::create()
         'phpdoc_add_missing_param_annotation' => [
             'only_untyped' => true,
         ],
+        'phpdoc_no_alias_tag' => false, // Set the rule to true when https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues/5357 is fixed
         'phpdoc_order' => true,
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'phpdoc_var_annotation_correct_order' => true,

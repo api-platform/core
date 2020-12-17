@@ -100,7 +100,7 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4'
-          - 'rc'
+          - '8.0'
         include:
           - php: '7.4'
             coverage: true
@@ -129,13 +129,13 @@ jobs:
         if: matrix.coverage
         run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Remove Doctrine MongoDB ODM
-        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, 'rc'))
+        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '8.0'))
         run: |
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, 'rc'))
+        if: (startsWith(matrix.php, '8.0'))
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
@@ -146,10 +146,10 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        if: (!startsWith(matrix.php, 'rc'))
+        if: (!startsWith(matrix.php, '8.0'))
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Clear test app cache (php rc)
-        if: (startsWith(matrix.php, 'rc'))
+      - name: Clear test app cache (php 8.0)
+        if: (startsWith(matrix.php, '8.0'))
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run PHPUnit tests
         run: |
@@ -195,7 +195,7 @@ jobs:
           - '7.2'
           - '7.3'
           - '7.4'
-          - 'rc'
+          - '8.0'
         include:
           - php: '7.4'
             coverage: true
@@ -211,6 +211,10 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
+      - name: Set Composer platform config
+        if: (startsWith(matrix.php, '8.0'))
+        run: |
+          composer config platform.php 7.4.99
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
@@ -237,10 +241,10 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        if: (!startsWith(matrix.php, 'rc'))
+        if: (!startsWith(matrix.php, '8.0'))
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Clear test app cache (php rc)
-        if: (startsWith(matrix.php, 'rc'))
+      - name: Clear test app cache (php 8.0)
+        if: (startsWith(matrix.php, '8.0'))
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
         run: |

@@ -5,6 +5,7 @@
 /build/
 /composer.lock
 /composer.phar
+/phpstan.neon
 /phpunit.xml
 /swagger.json
 /swagger.yaml
