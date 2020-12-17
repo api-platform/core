@@ -72,7 +72,11 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
     {
         $found = false;
         foreach ($this->persisters as $persister) {
-            if (($this->persistersResponse[\get_class($persister)] = $found ? false : $persister->supports($data)) && !($persister instanceof ResumableDataPersisterInterface && $persister->resumable()) && !$found) {
+            if (
+                ($this->persistersResponse[\get_class($persister)] = $found ? false : $persister->supports($data))
+                &&
+                !($persister instanceof ResumableDataPersisterInterface && $persister->resumable()) && !$found
+            ) {
                 $found = true;
             }
         }
