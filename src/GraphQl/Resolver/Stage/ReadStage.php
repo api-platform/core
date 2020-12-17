@@ -35,9 +35,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class ReadStage implements ReadStageInterface
 {
+    use ArrayTrait;
     use ClassInfoTrait;
     use IdentifierTrait;
-    use ArrayTrait;
 
     private $resourceMetadataFactory;
     private $iriConverter;

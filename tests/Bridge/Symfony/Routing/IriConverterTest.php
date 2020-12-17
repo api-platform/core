@@ -43,8 +43,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class IriConverterTest extends TestCase
 {
-    use ProphecyTrait;
     use ExpectDeprecationTrait;
+    use ProphecyTrait;
 
     public function testGetItemFromIriNoRouteException()
     {

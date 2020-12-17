@@ -35,8 +35,8 @@ use Psr\Container\ContainerInterface;
  */
 final class ItemResolverFactory implements ResolverFactoryInterface
 {
-    use CloneTrait;
     use ClassInfoTrait;
+    use CloneTrait;
 
     private $readStage;
     private $securityStage;

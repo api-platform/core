@@ -28,6 +28,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(AbstractPaginator::class);
+
 /**
  * Applies pagination on the Doctrine query for resource collection when enabled.
  *

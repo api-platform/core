@@ -67,7 +67,7 @@ final class JsonHalContext implements Context
         $this->validator->validate($json, (object) ['$ref' => "file://{$this->schemaFile}"]);
 
         if (!$this->validator->isValid()) {
-            throw new ExpectationFailedException(sprintf('The JSON is not valid according to the HAL+JSON schema.'));
+            throw new ExpectationFailedException('The JSON is not valid according to the HAL+JSON schema.');
         }
     }
 

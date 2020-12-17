@@ -32,7 +32,7 @@ class PropertySchemaFormat implements PropertySchemaRestrictionMetadataInterface
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
     {
         if ($constraint instanceof Email) {
-            return  ['format' => 'email'];
+            return ['format' => 'email'];
         }
 
         if ($constraint instanceof Uuid) {

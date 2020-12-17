@@ -110,11 +110,19 @@ final class SchemaFactory implements SchemaFactoryInterface
             return $schema;
         }
 
-        $definition = new \ArrayObject(['type' => 'object', 'additionalProperties' => $serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] ?? true]);
+        /** @var \ArrayObject<string, mixed> $definition */
+        $definition = new \ArrayObject(['type' => 'object']);
         $definitions[$definitionName] = $definition;
         if (null !== $resourceMetadata && null !== $description = $resourceMetadata->getDescription()) {
             $definition['description'] = $description;
         }
+
+        // additionalProperties are allowed by default, so it does not need to be set explicitly, unless allow_extra_attributes is false
+        // See https://json-schema.org/understanding-json-schema/reference/object.html#properties
+        if (false === ($serializerContext[AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES] ?? true)) {
+            $definition['additionalProperties'] = false;
+        }
+
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
         if (
             Schema::VERSION_SWAGGER !== $version &&

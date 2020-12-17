@@ -207,6 +207,7 @@ PHP
             'hydra_context' => ['hydra' => 'foo'],
             'pagination_via_cursor' => ['foo'],
             'stateless' => true,
+            'composite_identifier' => null,
         ], $resource->attributes);
     }
 
