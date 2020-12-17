@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.5.9
+
+* Fix a warning when preloading the `AbstractPaginator` class (#3827)
+* OpenAPI: prevent `additionalProp1` from showing in example values (#3888)
+* Varnish: fix a bug when passing an empty list of tags to the purger (#3827)
+* JSON Schema: mark `hydra:mapping` properties as nullable (#3877)
+
 ## 2.5.8
 
 * PHP 8 support (#3791, #3745, #3855)
