@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DataPersister;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersister;
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -111,7 +112,60 @@ class TraceableChainDataPersisterTest extends TestCase
                     }
                 },
             ]),
-            [false, true, null],
+            [false, true, false],
+        ];
+
+        yield [
+            new ChainDataPersister([
+                new class() implements DataPersisterInterface, ResumableDataPersisterInterface {
+                    public function supports($data): bool
+                    {
+                        return true;
+                    }
+
+                    public function resumable(array $context = []): bool
+                    {
+                        return true;
+                    }
+
+                    public function persist($data)
+                    {
+                    }
+
+                    public function remove($data)
+                    {
+                    }
+                },
+                new class() implements DataPersisterInterface {
+                    public function supports($data): bool
+                    {
+                        return false;
+                    }
+
+                    public function persist($data)
+                    {
+                    }
+
+                    public function remove($data)
+                    {
+                    }
+                },
+                new class() implements DataPersisterInterface {
+                    public function supports($data): bool
+                    {
+                        return true;
+                    }
+
+                    public function persist($data)
+                    {
+                    }
+
+                    public function remove($data)
+                    {
+                    }
+                },
+            ]),
+            [true, false, true],
         ];
     }
 }

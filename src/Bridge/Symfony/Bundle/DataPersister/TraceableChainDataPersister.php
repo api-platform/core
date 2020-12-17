@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister;
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
@@ -52,9 +53,9 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
      */
     public function persist($data, array $context = [])
     {
-        if ($match = $this->tracePersisters($data, $context)) {
-            return $match->persist($data, $context) ?? $data;
-        }
+        $this->tracePersisters($data, $context);
+
+        return $this->decorated->persist($data, $context);
     }
 
     /**
@@ -62,22 +63,18 @@ final class TraceableChainDataPersister implements ContextAwareDataPersisterInte
      */
     public function remove($data, array $context = [])
     {
-        if ($match = $this->tracePersisters($data, $context)) {
-            return $match->remove($data, $context);
-        }
+        $this->tracePersisters($data, $context);
+
+        return $this->decorated->remove($data, $context);
     }
 
     private function tracePersisters($data, array $context = [])
     {
-        $match = null;
+        $found = false;
         foreach ($this->persisters as $persister) {
-            $this->persistersResponse[\get_class($persister)] = $match ? null : false;
-            if (!$match && $persister->supports($data, $context)) {
-                $match = $persister;
-                $this->persistersResponse[\get_class($persister)] = true;
+            if (($this->persistersResponse[\get_class($persister)] = $found ? false : $persister->supports($data)) && !($persister instanceof ResumableDataPersisterInterface && $persister->resumable()) && !$found) {
+                $found = true;
             }
         }
-
-        return $match;
     }
 }
