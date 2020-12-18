@@ -149,7 +149,10 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $identifiers = (array) $resourceMetadata->getAttribute('identifiers', null === $this->identifiersExtractor ? ['id'] : $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass));
                 $identifier = \is_string($key = array_key_first($identifiers)) ? $key : $identifiers[0];
                 $operation['identifiers'] = $parentOperation['identifiers'];
-                $operation['identifiers'][$parentOperation['property']] = [$resourceClass, $identifiers[$identifier][1] ?? $identifier, $isLastItem ? true : $parentOperation['collection']];
+
+                if (!isset($operation['identifiers'][$parentOperation['property']])) {
+                    $operation['identifiers'][$parentOperation['property']] = [$resourceClass, $identifiers[$identifier][1] ?? $identifier, $isLastItem ? true : $parentOperation['collection']];
+                }
 
                 $operation['operation_name'] = str_replace(
                     'get'.self::SUBRESOURCE_SUFFIX,
