@@ -1,6 +1,6 @@
 # Subresource Definition
 
-* Status: proposed
+* Status: superseded by [0002-resource-definition](0002-resource-definition.md)]
 * Deciders: @dunglas, @vincentchalamon, @soyuka, @GregoireHebert, @Deuchnord
 
 ## Context and Problem Statement
