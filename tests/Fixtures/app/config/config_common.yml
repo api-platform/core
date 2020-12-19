@@ -262,12 +262,6 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
-    app.data_transformer.messenger_with_array_dto:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\MessengerWithArrayDtoDataTransformer'
-        public: false
-        tags:
-            -  { name: 'api_platform.data_transformer' }
-
     app.data_transformer.custom_output_dto_fallback_same_class:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
         public: false
