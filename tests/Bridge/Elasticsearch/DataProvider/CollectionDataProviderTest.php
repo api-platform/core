@@ -102,7 +102,7 @@ class CollectionDataProviderTest extends TestCase
     {
         $context = [
             'groups' => ['custom'],
-            'resourceClass' => Foo::class,
+            'resource_class' => Foo::class,
         ];
 
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
@@ -196,7 +196,7 @@ class CollectionDataProviderTest extends TestCase
     {
         $context = [
             'groups' => ['custom'],
-            'resourceClass' => Foo::class,
+            'resource_class' => Foo::class,
         ];
 
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);

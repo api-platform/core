@@ -32,10 +32,10 @@ final class PaginatorFactory implements PaginatorFactoryInterface
      */
     public function createPaginator($subject, int $limit, int $offset, array $context = []): PaginatorInterface
     {
-        $resourceClass = $context['resourceClass'] ?? null;
+        $resourceClass = $context['resource_class'] ?? null;
 
         if (null === $resourceClass) {
-            throw new RuntimeException('The given context array is missing the "resourceClass" key.');
+            throw new RuntimeException('The given context array is missing the "resource_class" key.');
         }
 
         return new Paginator(

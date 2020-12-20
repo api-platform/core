@@ -116,6 +116,6 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             'body' => $body,
         ]);
 
-        return $this->paginatorFactory->createPaginator($documents, $limit, $offset, array_merge(['resourceClass' => $resourceClass], $context));
+        return $this->paginatorFactory->createPaginator($documents, $limit, $offset, $context + ['resource_class' => $resourceClass]);
     }
 }

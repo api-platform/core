@@ -38,7 +38,7 @@ final class PaginatorFactoryTest extends TestCase
 
     public function testCreatePaginator()
     {
-        $paginator = $this->paginatorFactory->createPaginator([], 10, 0, ['resourceClass' => Foo::class]);
+        $paginator = $this->paginatorFactory->createPaginator([], 10, 0, ['resource_class' => Foo::class]);
 
         $this->assertInstanceOf(Paginator::class, $paginator);
     }
@@ -46,9 +46,9 @@ final class PaginatorFactoryTest extends TestCase
     public function testCreatePaginatorFailsWhenResourceClassAttributeIsMissing()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The given context array is missing the "resourceClass" key.');
+        $this->expectExceptionMessage('The given context array is missing the "resource_class" key.');
 
-        $this->paginatorFactory->createPaginator([], 10, 0, ['resourceClass' => null]);
+        $this->paginatorFactory->createPaginator([], 10, 0, ['resource_class' => null]);
     }
 
     protected function setUp(): void
