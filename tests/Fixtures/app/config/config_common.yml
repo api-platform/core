@@ -10,6 +10,11 @@ framework:
     profiler:
         enabled:                        true
         collect:                        false
+    messenger:
+        default_bus: messenger.bus.default
+        buses:
+            messenger.bus.default:
+                default_middleware: allow_no_handlers
     router:
         utf8:                           true
 
@@ -61,11 +66,6 @@ api_platform:
     collection:
         order_parameter_name:          'order'
         order:                         'ASC'
-        pagination:
-            client_enabled:            true
-            client_items_per_page:     true
-            client_partial:            true
-            items_per_page:            3
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
@@ -73,10 +73,17 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
-        max_age:        60
-        shared_max_age: 3600
-        vary:           ['Accept', 'Cookie']
-        public:         true
+    defaults:
+        pagination_client_enabled:            true
+        pagination_client_items_per_page:     true
+        pagination_client_partial:            true
+        pagination_items_per_page:            3
+        order:                                'ASC'
+        cache_headers:
+            max_age:                          60
+            shared_max_age:                   3600
+            vary:                             ['Accept', 'Cookie']
+            public:                           true
 
 parameters:
     container.autowiring.strict_mode: true
@@ -138,11 +145,39 @@ services:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\LengthFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\PatternFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
         resource: '../../TestBundle/Controller'
         autowire: true
         autoconfigure: true
         tags: ['controller.service_arguments']
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\EnumFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
 
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
@@ -206,6 +241,8 @@ services:
 
     mercure.hub.default.publisher:
         class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
+        public: true
+        tags: ['messenger.message_handler']
 
     app.serializer.normalizer.override_documentation:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
@@ -257,6 +294,12 @@ services:
 
     app.data_transformer.recover_password_output:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordOutputDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
+    app.data_transformer.initialize_input:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\InitializeInputDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }

@@ -132,3 +132,4 @@ elasticsearch-coverage:
         - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
+

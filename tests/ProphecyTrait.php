@@ -110,9 +110,7 @@ trait ProphecyTrait
         $this->prophecyAssertionsCounted = true;
 
         foreach ($this->prophet->getProphecies() as $objectProphecy) {
-            /**
-             * @var MethodProphecy[] $methodProphecies
-             */
+            /** @var MethodProphecy[] $methodProphecies */
             foreach ($objectProphecy->getMethodProphecies() as $methodProphecies) {
                 foreach ($methodProphecies as $methodProphecy) {
                     \assert($methodProphecy instanceof MethodProphecy);

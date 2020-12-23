@@ -116,6 +116,26 @@ final class JsonApiContext implements Context
     }
 
     /**
+     * @Then the JSON node :node should be sorted
+     * @Then the JSON should be sorted
+     */
+    public function theJsonNodeShouldBeSorted($node = '')
+    {
+        $actual = (array) $this->getValueOfNode($node);
+
+        if (!\is_array($actual)) {
+            throw new \Exception(sprintf('The "%s" node value is not an array', $node));
+        }
+
+        $expected = $actual;
+        ksort($expected);
+
+        if ($actual !== $expected) {
+            throw new ExpectationFailedException(sprintf('The json node "%s" is not sorted by keys', $node));
+        }
+    }
+
+    /**
      * @Given there is a RelatedDummy
      */
     public function thereIsARelatedDummy()

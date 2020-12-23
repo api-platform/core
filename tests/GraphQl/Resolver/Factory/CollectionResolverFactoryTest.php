@@ -77,7 +77,7 @@ class CollectionResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $request = new Request();
         $attributesParameterBagProphecy = $this->prophesize(ParameterBag::class);
@@ -141,7 +141,7 @@ class CollectionResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
@@ -160,7 +160,7 @@ class CollectionResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = [new \stdClass()];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);

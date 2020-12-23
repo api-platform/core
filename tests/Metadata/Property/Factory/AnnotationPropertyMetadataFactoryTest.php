@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
@@ -48,6 +49,21 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $this->assertTrue($metadata->isRequired());
         $this->assertEquals('foo', $metadata->getIri());
         $this->assertEquals(['foo' => 'bar'], $metadata->getAttributes());
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testCreateAttribute()
+    {
+        $factory = new AnnotationPropertyMetadataFactory();
+
+        $metadata = $factory->create(DummyPhp8::class, 'id');
+        $this->assertTrue($metadata->isIdentifier());
+        $this->assertSame('the identifier', $metadata->getDescription());
+
+        $metadata = $factory->create(DummyPhp8::class, 'foo');
+        $this->assertSame('a foo', $metadata->getDescription());
     }
 
     public function dependenciesProvider(): array

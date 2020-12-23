@@ -48,8 +48,17 @@ class SerializerContextBuilderTest extends TestCase
             ]
         );
 
+        $resourceMetadataWithPatch = new ResourceMetadata(
+            null,
+            null,
+            null,
+            ['patch' => ['method' => 'PATCH', 'input_formats' => ['json' => ['application/merge-patch+json']]]],
+            []
+        );
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata);
+        $resourceMetadataFactoryProphecy->create('FooWithPatch')->willReturn($resourceMetadataWithPatch);
 
         $this->builder = new SerializerContextBuilder($resourceMetadataFactoryProphecy->reveal());
     }
@@ -58,32 +67,42 @@ class SerializerContextBuilderTest extends TestCase
     {
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null];
+        $expected = ['foo' => 'bar', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
         $request = Request::create('/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'pot', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['foo' => 'bar', 'collection_operation_name' => 'pot',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'operation_type' => 'collection', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null];
+        $expected = ['foo' => 'bar', 'collection_operation_name' => 'pot',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'operation_type' => 'collection', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, true));
 
         $request = Request::create('/foos/1');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null];
+        $expected = ['bar' => 'baz', 'item_operation_name' => 'get',  'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'POST');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'collection_operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'operation_type' => 'collection', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null];
+        $expected = ['bar' => 'baz', 'collection_operation_name' => 'post',  'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => false, 'operation_type' => 'collection', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/foos', 'PUT');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'put', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'collection_operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'operation_type' => 'collection', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null];
+        $expected = ['bar' => 'baz', 'collection_operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'operation_type' => 'collection', 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/bars/1/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'subresource_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'operation_type' => 'subresource', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null];
+        $expected = ['bar' => 'baz', 'subresource_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'operation_type' => 'subresource', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false];
+        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+
+        $request = Request::create('/foowithpatch/1', 'PATCH');
+        $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_item_operation_name' => 'patch', '_api_format' => 'json', '_api_mime_type' => 'application/json']);
+        $expected = ['item_operation_name' => 'patch', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'operation_type' => 'item', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false];
+        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+
+        $request = Request::create('/bars/1/foos');
+        $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_subresource_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml', '_api_subresource_context' => ['identifiers' => ['id' => ['Foo', 'id']]], 'id' => '1']);
+        $expected = ['bar' => 'baz', 'subresource_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'operation_type' => 'subresource', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'subresource_identifiers' => ['id' => '1'], 'subresource_resources' => ['Foo' => ['id' => '1']]];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
 
@@ -96,7 +115,7 @@ class SerializerContextBuilderTest extends TestCase
 
     public function testReuseExistingAttributes()
     {
-        $expected = ['bar' => 'baz', 'item_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null];
+        $expected = ['bar' => 'baz', 'item_operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/foos/1', 'api_allow_update' => false, 'operation_type' => 'item', 'uri' => 'http://localhost/foos/1', 'output' => null, 'input' => null, 'iri_only' => false];
         $this->assertEquals($expected, $this->builder->createFromRequest(Request::create('/foos/1'), false, ['resource_class' => 'Foo', 'item_operation_name' => 'get']));
     }
 }

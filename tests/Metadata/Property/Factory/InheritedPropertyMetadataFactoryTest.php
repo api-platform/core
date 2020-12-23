@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class InheritedPropertyMetadataFactoryTest extends TestCase
 {

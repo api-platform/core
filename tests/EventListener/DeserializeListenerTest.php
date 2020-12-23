@@ -200,13 +200,7 @@ class DeserializeListenerTest extends TestCase
     public function testLegacyDeserializeResourceClassSupportedFormat(string $method, bool $populateObject): void
     {
         $formatsProviderProphecy = $this->prophesize(FormatsProviderInterface::class);
-        $formatsProviderProphecy->getFormatsFromAttributes([
-            'resource_class' => 'Foo',
-            'collection_operation_name' => 'post',
-            'receive' => true,
-            'respond' => true,
-            'persist' => true,
-        ])->willReturn(self::FORMATS)->shouldBeCalled();
+        $formatsProviderProphecy->getFormatsFromAttributes(Argument::type('array'))->willReturn(self::FORMATS)->shouldBeCalled();
 
         $this->doTestDeserializeResourceClassSupportedFormat($method, $populateObject, $formatsProviderProphecy->reveal());
     }

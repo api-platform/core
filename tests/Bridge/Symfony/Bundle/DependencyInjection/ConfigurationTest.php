@@ -144,6 +144,7 @@ class ConfigurationTest extends TestCase
                 'flow' => 'application',
                 'tokenUrl' => '/oauth/v2/token',
                 'authorizationUrl' => '/oauth/v2/auth',
+                'refreshUrl' => '/oauth/v2/refresh',
                 'scopes' => [],
             ],
             'swagger' => [
@@ -182,6 +183,7 @@ class ConfigurationTest extends TestCase
                     'enabled' => false,
                     'varnish_urls' => [],
                     'request_options' => [],
+                    'max_header_length' => 7500,
                 ],
                 'etag' => true,
                 'max_age' => null,
@@ -204,6 +206,19 @@ class ConfigurationTest extends TestCase
             ],
             'allow_plain_identifiers' => false,
             'resource_class_directories' => [],
+            'asset_package' => null,
+            'openapi' => [
+                'contact' => [
+                    'name' => null,
+                    'url' => null,
+                    'email' => null,
+                ],
+                'termsOfService' => null,
+                'license' => [
+                    'name' => null,
+                    'url' => null,
+                ],
+            ],
         ], $config);
     }
 

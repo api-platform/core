@@ -30,6 +30,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use PackageVersions\Versions;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -141,6 +142,8 @@ class RequestDataCollectorTest extends TestCase
 
         $this->assertSame([
             'resource_class' => DummyEntity::class,
+            'has_composite_identifier' => false,
+            'identifiers' => ['id' => [DummyEntity::class, 'id']],
             'item_operation_name' => 'get',
             'receive' => true,
             'respond' => true,
@@ -213,6 +216,27 @@ class RequestDataCollectorTest extends TestCase
         }
     }
 
+    public function testVersionCollection()
+    {
+        $this->apiResourceClassWillReturn(DummyEntity::class);
+
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            $this->getUsedCollectionDataProvider(),
+            $this->getUsedItemDataProvider(),
+            $this->getUsedSubresourceDataProvider(),
+            $this->getUsedPersister()
+        );
+
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
+
+        $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
+    }
+
     private function apiResourceClassWillReturn($data, $context = [])
     {
         $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
@@ -260,7 +284,7 @@ class RequestDataCollectorTest extends TestCase
                 }
             },
         ]));
-        $itemDataProvider->getItem('', '', null, ['item_context']);
+        $itemDataProvider->getItem('', [], null, ['item_context']);
 
         return $itemDataProvider;
     }

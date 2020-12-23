@@ -76,23 +76,11 @@ class ResourceAccessCheckerTest extends TestCase
     public function testExpressionLanguageNotInstalled()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "security".');
+        $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "security" attribute.');
 
         $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
         $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
         $tokenStorageProphecy->getToken()->willReturn($this->prophesize(TokenInterface::class)->willImplement(Serializable::class)->reveal());
-
-        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
-        $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
-    }
-
-    public function testNotBehindAFirewall()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
-
-        $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
-        $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
 
         $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');

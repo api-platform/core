@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Messenger;
 
+use ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\DataPersister;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -59,7 +60,9 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch($dummy)->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
+            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
+        }))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
@@ -70,6 +73,7 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
+
         $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
             return $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class);
         }))->willReturn(new Envelope($dummy))->shouldBeCalled();
@@ -83,7 +87,9 @@ class DataPersisterTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch($dummy)->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
+            return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
+        }))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));

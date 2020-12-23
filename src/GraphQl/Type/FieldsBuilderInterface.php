@@ -45,9 +45,14 @@ interface FieldsBuilderInterface
     public function getMutationFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $mutationName): array;
 
     /**
+     * Gets the subscription fields of the schema.
+     */
+    public function getSubscriptionFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $subscriptionName): array;
+
+    /**
      * Gets the fields of the type of the given resource.
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, int $depth, ?array $ioMetadata): array;
+    public function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth, ?array $ioMetadata): array;
 
     /**
      * Resolve the args of a resource by resolving its types.

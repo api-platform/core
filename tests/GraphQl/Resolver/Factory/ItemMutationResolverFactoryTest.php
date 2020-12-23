@@ -25,7 +25,6 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -85,7 +84,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
@@ -153,7 +152,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
         $readStageItem = [];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
@@ -172,7 +171,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
@@ -213,7 +212,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
@@ -253,7 +252,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
@@ -305,7 +304,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $readStageItem->field = 'read';
@@ -324,7 +323,7 @@ class ItemMutationResolverFactoryTest extends TestCase
             return $customItem;
         });
 
-        $this->expectException(Error::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Custom mutation resolver "query_resolver_id" has to return an item of class shortName but returned an item of class Dummy.');
 
         ($this->itemMutationResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);

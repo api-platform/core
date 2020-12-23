@@ -58,7 +58,9 @@ final class AnnotationFilterPass implements CompilerPassInterface
      */
     private function createFilterDefinitions(\ReflectionClass $resourceReflectionClass, ContainerBuilder $container): void
     {
-        $this->reader ?? $this->reader = $container->get('annotation_reader');
+        if (null === $this->reader) {
+            $this->reader = $container->has('annotation_reader') ? $container->get('annotation_reader') : null;
+        }
 
         foreach ($this->readFilterAnnotations($resourceReflectionClass, $this->reader) as $id => [$arguments, $filterClass]) {
             if ($container->has($id)) {

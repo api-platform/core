@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -34,6 +35,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * The configuration of the bundle.
@@ -90,6 +92,7 @@ final class Configuration implements ConfigurationInterface
                     ->info('Specify the default operation path resolver to use for generating resources operations path.')
                 ->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
+                ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
                 ->booleanNode('allow_plain_identifiers')->defaultFalse()->info('Allow plain identifiers, for example "id" instead of "@id" when denormalizing a relation.')->end()
                 ->arrayNode('validator')
@@ -133,13 +136,41 @@ final class Configuration implements ConfigurationInterface
                             ->canBeDisabled()
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->booleanNode('enabled')->defaultTrue()->info('To enable or disable pagination for all resource collections by default.')->end()
-                                ->booleanNode('partial')->defaultFalse()->info('To enable or disable partial pagination for all resource collections by default when pagination is enabled.')->end()
-                                ->booleanNode('client_enabled')->defaultFalse()->info('To allow the client to enable or disable the pagination.')->end()
-                                ->booleanNode('client_items_per_page')->defaultFalse()->info('To allow the client to set the number of items per page.')->end()
-                                ->booleanNode('client_partial')->defaultFalse()->info('To allow the client to enable or disable partial pagination.')->end()
-                                ->integerNode('items_per_page')->defaultValue(30)->info('The default number of items per page.')->end()
-                                ->integerNode('maximum_items_per_page')->defaultNull()->info('The maximum number of items per page.')->end()
+                                ->booleanNode('enabled')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_enabled` instead.'))
+                                    ->defaultTrue()
+                                    ->info('To enable or disable pagination for all resource collections by default.')
+                                ->end()
+                                ->booleanNode('partial')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_partial` instead.'))
+                                    ->defaultFalse()
+                                    ->info('To enable or disable partial pagination for all resource collections by default when pagination is enabled.')
+                                ->end()
+                                ->booleanNode('client_enabled')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.client_enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_enabled` instead.'))
+                                    ->defaultFalse()
+                                    ->info('To allow the client to enable or disable the pagination.')
+                                ->end()
+                                ->booleanNode('client_items_per_page')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.client_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_items_per_page` instead.'))
+                                    ->defaultFalse()
+                                    ->info('To allow the client to set the number of items per page.')
+                                ->end()
+                                ->booleanNode('client_partial')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.client_partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_partial` instead.'))
+                                    ->defaultFalse()
+                                    ->info('To allow the client to enable or disable partial pagination.')
+                                ->end()
+                                ->integerNode('items_per_page')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_items_per_page` instead.'))
+                                    ->defaultValue(30)
+                                    ->info('The default number of items per page.')
+                                ->end()
+                                ->integerNode('maximum_items_per_page')
+                                    ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `collection.pagination.maximum_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_maximum_items_per_page` instead.'))
+                                    ->defaultNull()
+                                    ->info('The maximum number of items per page.')
+                                ->end()
                                 ->scalarNode('page_parameter_name')->defaultValue('page')->cannotBeEmpty()->info('The default name of the parameter handling the page number.')->end()
                                 ->scalarNode('enabled_parameter_name')->defaultValue('pagination')->cannotBeEmpty()->info('The name of the query parameter to enable or disable pagination.')->end()
                                 ->scalarNode('items_per_page_parameter_name')->defaultValue('itemsPerPage')->cannotBeEmpty()->info('The name of the query parameter to set the number of items per page.')->end()
@@ -170,6 +201,7 @@ final class Configuration implements ConfigurationInterface
         $this->addMercureSection($rootNode);
         $this->addMessengerSection($rootNode);
         $this->addElasticsearchSection($rootNode);
+        $this->addOpenApiSection($rootNode);
 
         $this->addExceptionToStatusSection($rootNode);
 
@@ -183,6 +215,8 @@ final class Configuration implements ConfigurationInterface
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
+
+        $this->addDefaultsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -221,6 +255,7 @@ final class Configuration implements ConfigurationInterface
                         ->scalarNode('flow')->defaultValue('application')->info('The oauth flow grant type.')->end()
                         ->scalarNode('tokenUrl')->defaultValue('/oauth/v2/token')->info('The oauth token url.')->end()
                         ->scalarNode('authorizationUrl')->defaultValue('/oauth/v2/auth')->info('The oauth authentication url.')->end()
+                        ->scalarNode('refreshUrl')->defaultValue('/oauth/v2/refresh')->info('The oauth refresh url.')->end()
                         ->arrayNode('scopes')
                             ->prototype('scalar')->end()
                         ->end()
@@ -268,7 +303,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('versions')
-                            ->info('The active versions of OpenAPI to be exported or used in the swagger_ui. The first value is the default.')
+                            ->info('The active versions of Open API to be exported or used in the swagger_ui. The first value is the default.')
                             ->defaultValue($defaultVersions)
                             ->beforeNormalization()
                                 ->always(static function ($v) {
@@ -316,10 +351,23 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('http_cache')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->booleanNode('etag')->defaultTrue()->info('Automatically generate etags for API responses.')->end()
-                        ->integerNode('max_age')->defaultNull()->info('Default value for the response max age.')->end()
-                        ->integerNode('shared_max_age')->defaultNull()->info('Default value for the response shared (proxy) max age.')->end()
+                        ->booleanNode('etag')
+                            ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `http_cache.etag` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.cache_headers.etag` instead.'))
+                            ->defaultTrue()
+                            ->info('Automatically generate etags for API responses.')
+                        ->end()
+                        ->integerNode('max_age')
+                            ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `http_cache.max_age` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.cache_headers.max_age` instead.'))
+                            ->defaultNull()
+                            ->info('Default value for the response max age.')
+                        ->end()
+                        ->integerNode('shared_max_age')
+                            ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `http_cache.shared_max_age` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.cache_headers.shared_max_age` instead.'))
+                            ->defaultNull()
+                            ->info('Default value for the response shared (proxy) max age.')
+                        ->end()
                         ->arrayNode('vary')
+                            ->setDeprecated(...$this->buildDeprecationArgs('2.6', 'The use of the `http_cache.vary` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.cache_headers.vary` instead.'))
                             ->defaultValue(['Accept'])
                             ->prototype('scalar')->end()
                             ->info('Default values of the "Vary" HTTP header.')
@@ -333,6 +381,10 @@ final class Configuration implements ConfigurationInterface
                                     ->defaultValue([])
                                     ->prototype('scalar')->end()
                                     ->info('URLs of the Varnish servers to purge using cache tags when a resource is updated.')
+                                ->end()
+                                ->integerNode('max_header_length')
+                                    ->defaultValue(7500)
+                                    ->info('Max header length supported by the server')
                                 ->end()
                                 ->variableNode('request_options')
                                     ->defaultValue([])
@@ -409,6 +461,34 @@ final class Configuration implements ConfigurationInterface
                                     ->scalarNode('index')->defaultNull()->end()
                                     ->scalarNode('type')->defaultValue(DocumentMetadata::DEFAULT_TYPE)->end()
                                 ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addOpenApiSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('openapi')
+                    ->addDefaultsIfNotSet()
+                        ->children()
+                        ->arrayNode('contact')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('name')->defaultNull()->info('The identifying name of the contact person/organization.')->end()
+                                ->scalarNode('url')->defaultNull()->info('The URL pointing to the contact information. MUST be in the format of a URL.')->end()
+                                ->scalarNode('email')->defaultNull()->info('The email address of the contact person/organization. MUST be in the format of an email address.')->end()
+                            ->end()
+                        ->end()
+                        ->scalarNode('termsOfService')->defaultNull()->info('A URL to the Terms of Service for the API. MUST be in the format of a URL.')->end()
+                        ->arrayNode('license')
+                        ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('name')->defaultNull()->info('The license name used for the API.')->end()
+                                ->scalarNode('url')->defaultNull()->info('URL to the license used for the API. MUST be in the format of a URL.')->end()
                             ->end()
                         ->end()
                     ->end()
@@ -498,6 +578,31 @@ final class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+    }
+
+    private function addDefaultsSection(ArrayNodeDefinition $rootNode): void
+    {
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
+        $defaultsNode = $rootNode->children()->arrayNode('defaults');
+
+        $defaultsNode
+            ->ignoreExtraKeys()
+            ->beforeNormalization()
+            ->always(static function (array $defaults) use ($nameConverter) {
+                $normalizedDefaults = [];
+                foreach ($defaults as $option => $value) {
+                    $option = $nameConverter->normalize($option);
+                    $normalizedDefaults[$option] = $value;
+                }
+
+                return $normalizedDefaults;
+            });
+
+        [$publicProperties, $configurableAttributes] = ApiResource::getConfigMetadata();
+        foreach (array_merge($publicProperties, $configurableAttributes) as $attribute => $_) {
+            $snakeCased = $nameConverter->normalize($attribute);
+            $defaultsNode->children()->variableNode($snakeCased);
+        }
     }
 
     private function buildDeprecationArgs(string $version, string $message): array

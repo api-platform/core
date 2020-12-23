@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
@@ -25,6 +26,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -33,6 +35,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyForAdditionalFieldsIn
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
@@ -41,7 +44,11 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Mapping\AttributeMetadata;
+use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -113,7 +120,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
 
         $this->assertTrue($normalizer->supportsNormalization($dummy));
@@ -180,7 +187,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -196,6 +203,65 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
             'ignored_attributes' => ['alias'],
+        ]));
+    }
+
+    public function testNormalizeWithSecuredProperty()
+    {
+        $dummy = new SecuredDummy();
+        $dummy->setTitle('myPublicTitle');
+        $dummy->setAdminOnlyProperty('secret');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true));
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, null, null, null, null, null, null, null, ['security' => 'is_granted(\'ROLE_ADMIN\')']));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/secured_dummies/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'title')->willReturn('myPublicTitle');
+        $propertyAccessorProphecy->getValue($dummy, 'adminOnlyProperty')->willReturn('secret');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(SecuredDummy::class);
+
+        $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->isGranted('adminOnlyProperty', 'is_granted(\'ROLE_ADMIN\')')->willReturn(false);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('myPublicTitle', null, Argument::type('array'))->willReturn('myPublicTitle');
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            null,
+            false,
+            [],
+            [],
+            null,
+            $resourceAccessChecker->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setIgnoredAttributes')) {
+            $normalizer->setIgnoredAttributes(['alias']);
+        }
+
+        $expected = [
+            'title' => 'myPublicTitle',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
+            'resources' => [],
         ]));
     }
 
@@ -256,7 +322,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -318,7 +384,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -343,13 +409,19 @@ class AbstractItemNormalizerTest extends TestCase
             'output' => ['class' => DummyForAdditionalFields::class],
         ];
         $augmentedContext = $context + ['api_denormalize' => true];
+
+        $preHydratedDummy = new DummyForAdditionalFieldsInput('Name Dummy');
         $cleanedContext = array_diff_key($augmentedContext, [
             'input' => null,
             'resource_class' => null,
         ]);
+        $cleanedContextWithObjectToPopulate = array_merge($cleanedContext, [
+            AbstractObjectNormalizer::OBJECT_TO_POPULATE => $preHydratedDummy,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+        ]);
 
         $dummyInputDto = new DummyForAdditionalFieldsInput('Dummy Name');
-        $dummy = new DummyForAdditionalFields('Dummy Name', 'dummy-name');
+        $dummy = new DummyForAdditionalFields('Dummy Name', 'name-dummy');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
@@ -360,15 +432,17 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, DummyForAdditionalFields::class)->willReturn(DummyForAdditionalFields::class);
 
-        $inputDataTransformerProphecy = $this->prophesize(DataTransformerInterface::class);
+        $inputDataTransformerProphecy = $this->prophesize(DataTransformerInitializerInterface::class);
+        $inputDataTransformerProphecy->willImplement(DataTransformerInitializerInterface::class);
+        $inputDataTransformerProphecy->initialize(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
         $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $augmentedContext)->willReturn(true);
         $inputDataTransformerProphecy->transform($dummyInputDto, DummyForAdditionalFields::class, $augmentedContext)->willReturn($dummy);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
-        $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContext)->willReturn($dummyInputDto);
+        $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContextWithObjectToPopulate)->willReturn($dummyInputDto);
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, false, [], [$inputDataTransformerProphecy->reveal()], null) extends AbstractItemNormalizer {
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, null, false, [], [$inputDataTransformerProphecy->reveal()], null, null) extends AbstractItemNormalizer {
         };
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -427,7 +501,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -489,7 +563,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -547,7 +621,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -592,7 +666,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -634,7 +708,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -680,7 +754,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -755,7 +829,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -797,7 +871,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -808,7 +882,10 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'name', null)->shouldHaveBeenCalled();
     }
 
-    public function testChildInheritedProperty()
+    /**
+     * @group legacy
+     */
+    public function testChildInheritedProperty(): void
     {
         $dummy = new DummyTableInheritance();
         $dummy->setName('foo');
@@ -854,7 +931,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -906,7 +983,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -969,7 +1046,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            true,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1027,7 +1104,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [],
             null,
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1114,7 +1191,7 @@ class AbstractItemNormalizerTest extends TestCase
             [],
             [$dataTransformerProphecy->reveal(), $secondDataTransformerProphecy->reveal()],
             $resourceMetadataFactoryProphecy->reveal(),
-            false,
+            null,
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
@@ -1127,5 +1204,69 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $actualDummy);
 
         $propertyAccessorProphecy->setValue($actualDummy, 'name', 'Dummy')->shouldHaveBeenCalled();
+    }
+
+    public function testNormalizationWithIgnoreMetadata()
+    {
+        if (!method_exists(AttributeMetadata::class, 'setIgnore')) {
+            $this->markTestSkipped();
+        }
+
+        $dummy = new Dummy();
+
+        $dummyAttributeMetadata = new AttributeMetadata('dummy');
+        $dummyAttributeMetadata->setIgnore(true);
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $classMetadataProphecy->getAttributesMetadata()->willReturn(['dummy' => $dummyAttributeMetadata]);
+
+        $classMetadataFactoryProphecy = $this->prophesize(ClassMetadataFactoryInterface::class);
+        $classMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($classMetadataProphecy->reveal());
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name', 'dummy']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummy', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo');
+        $propertyAccessorProphecy->getValue($dummy, 'dummy')->willReturn('bar');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo');
+        $serializerProphecy->normalize('bar', null, Argument::type('array'))->willReturn('bar');
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            $classMetadataFactoryProphecy->reveal(),
+            null,
+            false,
+            [],
+            [],
+            null,
+            null,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'name' => 'foo',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy, null, [
+            'resources' => [],
+        ]));
     }
 }

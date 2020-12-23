@@ -60,6 +60,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
                     '@type' => 'hydra:Operation',
                     '@hydra:title' => 'File config Dummy',
                 ],
+                'stateless' => true,
             ],
         ];
 

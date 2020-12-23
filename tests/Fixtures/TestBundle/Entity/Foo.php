@@ -30,6 +30,11 @@ use Doctrine\ORM\Mapping as ORM;
  *         "collection_query"={"pagination_enabled"=false},
  *         "create",
  *         "delete"
+ *     },
+ *     collectionOperations={
+ *         "get",
+ *         "get_desc_custom"={"method"="GET", "path"="custom_collection_desc_foos", "order"={"name"="DESC"}},
+ *         "get_asc_custom"={"method"="GET", "path"="custom_collection_asc_foos", "order"={ "name"="ASC"}},
  *     }
  * )
  * @ORM\Entity

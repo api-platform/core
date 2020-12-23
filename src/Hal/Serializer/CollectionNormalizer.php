@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hal\Serializer;
 
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Core\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -27,32 +29,40 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     public const FORMAT = 'jsonhal';
 
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, string $pageParameterName, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    {
+        parent::__construct($resourceClassResolver, $pageParameterName, $resourceMetadataFactory);
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function getPaginationData($object, array $context = []): array
     {
         [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
-        $parsed = IriHelper::parseIri($context['request_uri'] ?? '/', $this->pageParameterName);
+        $parsed = IriHelper::parseIri($context['uri'] ?? '/', $this->pageParameterName);
+
+        $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
+        $urlGenerationStrategy = $metadata->getAttribute('url_generation_strategy');
 
         $data = [
             '_links' => [
-                'self' => ['href' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null)],
+                'self' => ['href' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $urlGenerationStrategy)],
             ],
         ];
 
         if ($paginated) {
             if (null !== $lastPage) {
-                $data['_links']['first']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-                $data['_links']['last']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+                $data['_links']['first']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
+                $data['_links']['last']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
             }
 
             if (1. !== $currentPage) {
-                $data['_links']['prev']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
+                $data['_links']['prev']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
             }
 
             if ((null !== $lastPage && $currentPage !== $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
-                $data['_links']['next']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
+                $data['_links']['next']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
             }
         }
 

@@ -202,6 +202,20 @@ class IdentifiersExtractorTest extends TestCase
         $this->assertSame(['foo' => 'woot'], $identifiersExtractor->getIdentifiersFromItem($item));
     }
 
+    public function testNoIdentifiers(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('No identifier defined "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy". You should add #[\ApiPlatform\Core\Annotation\ApiProperty(identifier: true)]" on the property identifying the resource.');
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['foo']));
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo')->willReturn(new PropertyMetadata());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+
+        $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class);
+    }
+
     /**
      * @group legacy
      * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the IdentifiersExtractor might introduce cache issues with object identifiers.
@@ -237,5 +251,17 @@ class IdentifiersExtractorTest extends TestCase
         }
 
         return [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy];
+    }
+
+    public function testDefaultIdentifierId(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']));
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn(new PropertyMetadata());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+
+        $this->assertSame(['id'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
     }
 }

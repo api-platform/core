@@ -24,13 +24,28 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class InheritedPropertyNameCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreate()
+    public function testCreateOnParent()
+    {
+        $resourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class, DummyTableInheritanceChild::class]))->shouldBeCalled();
+
+        $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->create(DummyTableInheritance::class, [])->willReturn(new PropertyNameCollection(['name']))->shouldBeCalled();
+        $propertyNameCollectionFactory->create(DummyTableInheritanceChild::class, [])->shouldNotBeCalled();
+
+        $factory = new InheritedPropertyNameCollectionFactory($resourceNameCollectionFactory->reveal(), $propertyNameCollectionFactory->reveal());
+        $metadata = $factory->create(DummyTableInheritance::class);
+
+        $this->assertSame((array) new PropertyNameCollection(['name']), (array) $metadata);
+    }
+
+    public function testCreateOnChild()
     {
         $resourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class, DummyTableInheritanceChild::class]))->shouldBeCalled();
@@ -40,8 +55,8 @@ class InheritedPropertyNameCollectionFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(DummyTableInheritanceChild::class, [])->willReturn(new PropertyNameCollection(['nickname', '169']))->shouldBeCalled();
 
         $factory = new InheritedPropertyNameCollectionFactory($resourceNameCollectionFactory->reveal(), $propertyNameCollectionFactory->reveal());
-        $metadata = $factory->create(DummyTableInheritance::class);
+        $metadata = $factory->create(DummyTableInheritanceChild::class);
 
-        $this->assertSame((array) $metadata, (array) new PropertyNameCollection(['name', 'nickname', '169']));
+        $this->assertSame((array) new PropertyNameCollection(['nickname', '169', 'name']), (array) $metadata);
     }
 }

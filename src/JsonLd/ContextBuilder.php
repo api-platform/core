@@ -90,9 +90,16 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
-        $metadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (null === $shortName = $metadata->getShortName()) {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        if (null === $shortName = $resourceMetadata->getShortName()) {
             return [];
+        }
+
+        if ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) {
+            $context = $this->getBaseContext($referenceType);
+            $context['hydra:member']['@type'] = '@id';
+
+            return $context;
         }
 
         return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName);
@@ -101,9 +108,12 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContextUri(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getResourceContextUri(string $resourceClass, int $referenceType = null): string
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        if (null === $referenceType) {
+            $referenceType = $resourceMetadata->getAttribute('url_generation_strategy');
+        }
 
         return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $resourceMetadata->getShortName()], $referenceType);
     }

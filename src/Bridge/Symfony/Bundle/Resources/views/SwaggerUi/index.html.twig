@@ -6,11 +6,11 @@
 
     {% block stylesheet %}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css') }}">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css', assetPackage) }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css', assetPackage) }}">
     {% endblock %}
 
-    {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html')) })} %}
+    {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html', assetPackage)) })} %}
     {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
     <script id="swagger-data" type="application/json">{{ swagger_data|merge(oauth_data)|json_encode(65)|raw }}</script>
 </head>
@@ -50,12 +50,12 @@
     </defs>
 </svg>
 <header>
-    <a id="logo" href="https://api-platform.com"><img src="{{ asset('bundles/apiplatform/logo-header.svg') }}" alt="API Platform"></a>
+    <a id="logo" href="https://api-platform.com"><img src="{{ asset('bundles/apiplatform/logo-header.svg', assetPackage) }}" alt="API Platform"></a>
 </header>
 
 {% if showWebby %}
-    <div class="web"><img src="{{ asset('bundles/apiplatform/web.png') }}"></div>
-    <div class="webby"><img src="{{ asset('bundles/apiplatform/webby.png') }}"></div>
+    <div class="web"><img src="{{ asset('bundles/apiplatform/web.png', assetPackage) }}"></div>
+    <div class="webby"><img src="{{ asset('bundles/apiplatform/webby.png', assetPackage) }}"></div>
 {% endif %}
 
 <div id="swagger-ui" class="api-platform"></div>
@@ -72,6 +72,7 @@
             {% set active_ui = app.request.get('ui', 'swagger_ui') %}
             {% if swaggerUiEnabled and active_ui != 'swagger_ui' %}<a href="{{ path('api_doc') }}">Swagger UI</a>{% endif %}
             {% if reDocEnabled and active_ui != 're_doc' %}<a href="{{ path('api_doc', {'ui': 're_doc'}) }}">ReDoc</a>{% endif %}
+            {# FIXME: Typo in graphql => graphQl in SwaggerUiAction #}
             {% if not graphqlEnabled %}<a href="javascript:alert('GraphQL support is not enabled, see https://api-platform.com/docs/core/graphql/')">GraphiQL</a>{% endif %}
             {% if graphiQlEnabled %}<a href="{{ path('api_graphql_graphiql') }}">GraphiQL</a>{% endif %}
             {% if graphQlPlaygroundEnabled %}<a href="{{ path('api_graphql_graphql_playground') }}">GraphQL Playground</a>{% endif %}
@@ -81,12 +82,12 @@
 
 {% block javascript %}
     {% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
-        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js') }}"></script>
-        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js', assetPackage) }}"></script>
     {% else %}
-        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js') }}"></script>
-        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js') }}"></script>
-        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js') }}"></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-bundle.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js', assetPackage) }}"></script>
+        <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js', assetPackage) }}"></script>
     {% endif %}
 {% endblock %}
 

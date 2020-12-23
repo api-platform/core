@@ -18,6 +18,7 @@
         <service id="api_platform.metadata.resource.metadata_factory.yaml" decorates="api_platform.metadata.resource.metadata_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.metadata.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.yaml.inner" />
+            <argument>%api_platform.defaults%</argument>
         </service>
 
         <service id="api_platform.metadata.property.name_collection_factory.yaml" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">

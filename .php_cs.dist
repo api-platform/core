@@ -16,6 +16,8 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude([
         'tests/Fixtures/app/var',
     ])
+    ->notPath('src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php')
+    ->notPath('tests/Fixtures/TestBundle/Entity/DummyPhp8.php') // temporary
     ->append([
         'tests/Fixtures/app/console',
     ]);
@@ -29,6 +31,8 @@ return PhpCsFixer\Config::create()
         '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
+        'single_line_comment_style' => false, // Temporary fix for compatibility with PHP 8 attributes, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/5284
+        'comment_to_phpdoc' => true, // Temporary fix for compatibility with PHP 8 attributes, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/5284
         'align_multiline_comment' => [
             'comment_type' => 'phpdocs_like',
         ],
@@ -36,7 +40,6 @@ return PhpCsFixer\Config::create()
         'array_syntax' => [
             'syntax' => 'short',
         ],
-        'comment_to_phpdoc' => true,
         'compact_nullable_typehint' => true,
         'doctrine_annotation_array_assignment' => [
             'operator' => '=',

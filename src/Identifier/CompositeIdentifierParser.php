@@ -20,6 +20,8 @@ namespace ApiPlatform\Core\Identifier;
  */
 final class CompositeIdentifierParser
 {
+    public const COMPOSITE_IDENTIFIER_REGEXP = '/(\w+)=(?<=\w=)(.*?)(?=;\w+=)|(\w+)=([^;]*);?$/';
+
     private function __construct()
     {
     }
@@ -33,7 +35,7 @@ final class CompositeIdentifierParser
     {
         $matches = [];
         $identifiers = [];
-        $num = preg_match_all('/(\w+)=(?<=\w=)(.*?)(?=;\w+=)|(\w+)=([^;]*);?$/', $identifier, $matches, PREG_SET_ORDER);
+        $num = preg_match_all(self::COMPOSITE_IDENTIFIER_REGEXP, $identifier, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $i => $match) {
             if ($i === $num - 1) {
@@ -44,5 +46,18 @@ final class CompositeIdentifierParser
         }
 
         return $identifiers;
+    }
+
+    /**
+     * Renders composite identifiers to string using: key=value;key2=value2.
+     */
+    public static function stringify(array $identifiers): string
+    {
+        $composite = [];
+        foreach ($identifiers as $name => $value) {
+            $composite[] = sprintf('%s=%s', $name, $value);
+        }
+
+        return implode(';', $composite);
     }
 }

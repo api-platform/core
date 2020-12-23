@@ -22,6 +22,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -38,14 +39,16 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
     use IdentifierManagerTrait;
 
     private $managerRegistry;
+    private $resourceMetadataFactory;
     private $itemExtensions;
 
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->itemExtensions = $itemExtensions;
@@ -95,6 +98,10 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
             }
         }
 
-        return $aggregationBuilder->hydrate($resourceClass)->execute()->current() ?: null;
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $attribute = $resourceMetadata->getItemOperationAttribute($operationName, 'doctrine_mongodb', [], true);
+        $executeOptions = $attribute['execute_options'] ?? [];
+
+        return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions)->current() ?: null;
     }
 }

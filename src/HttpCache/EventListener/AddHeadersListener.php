@@ -32,8 +32,10 @@ final class AddHeadersListener
     private $vary;
     private $public;
     private $resourceMetadataFactory;
+    private $staleWhileRevalidate;
+    private $staleIfError;
 
-    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
     {
         $this->etag = $etag;
         $this->maxAge = $maxAge;
@@ -41,6 +43,8 @@ final class AddHeadersListener
         $this->vary = $vary;
         $this->public = $public;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->staleWhileRevalidate = $staleWhileRevalidate;
+        $this->staleIfError = $staleIfError;
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -85,6 +89,14 @@ final class AddHeadersListener
         // Cache-Control "s-maxage" is only relevant is resource is not marked as "private"
         if (false !== $public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
             $response->setSharedMaxAge($sharedMaxAge);
+        }
+
+        if (null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate')) {
+            $response->headers->addCacheControlDirective('stale-while-revalidate', $staleWhileRevalidate);
+        }
+
+        if (null !== ($staleIfError = $resourceCacheHeaders['stale_if_error'] ?? $this->staleIfError) && !$response->headers->hasCacheControlDirective('stale-if-error')) {
+            $response->headers->addCacheControlDirective('stale-if-error', $staleIfError);
         }
     }
 }

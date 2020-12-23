@@ -17,6 +17,8 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Hal\Serializer\CollectionNormalizer;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -31,7 +33,8 @@ class CollectionNormalizerTest extends TestCase
     public function testSupportsNormalize()
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
 
         $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT));
         $this->assertTrue($normalizer->supportsNormalization(new \ArrayObject(), CollectionNormalizer::FORMAT));
@@ -44,11 +47,12 @@ class CollectionNormalizerTest extends TestCase
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass()->shouldNotBeCalled();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('bar', null, ['api_sub_level' => true])->willReturn(22);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         $this->assertEquals(['foo' => 22], $normalizer->normalize(['foo' => 'bar'], null, ['api_sub_level' => true]));
@@ -137,13 +141,16 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($paginatorProphecy, 'Foo')->willReturn('Foo');
 
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
             'api_sub_level' => true,
             'resource_class' => 'Foo',
         ])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page');
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
         $normalizer->setNormalizer($itemNormalizer->reveal());
 
         return $normalizer->normalize($paginatorProphecy->reveal(), CollectionNormalizer::FORMAT, [

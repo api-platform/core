@@ -20,6 +20,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomCo
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
+use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -39,23 +41,31 @@ class SerializerContextBuilderTest extends TestCase
     {
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
-        $this->serializerContextBuilder = new SerializerContextBuilder(
-            $this->resourceMetadataFactoryProphecy->reveal(),
-            new CustomConverter()
-        );
+        $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
+    }
+
+    private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
+    {
+        return new SerializerContextBuilder($this->resourceMetadataFactoryProphecy->reveal(), $advancedNameConverter ?? new CustomConverter());
     }
 
     /**
      * @dataProvider createNormalizationContextProvider
      */
-    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, array $expectedContext, bool $isMutation, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?AdvancedNameConverterInterface $advancedNameConverter = null, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
-        $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
         $resolverContext = [
-            'info' => $resolveInfoProphecy->reveal(),
             'is_mutation' => $isMutation,
+            'is_subscription' => $isSubscription,
         ];
+
+        if ($noInfo) {
+            $resolverContext['fields'] = $fields;
+        } else {
+            $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
+            $resolveInfoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
+            $resolverContext['info'] = $resolveInfoProphecy->reveal();
+        }
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
             (new ResourceMetadata('shortName'))
@@ -73,51 +83,86 @@ class SerializerContextBuilderTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $context = $this->serializerContextBuilder->create($resourceClass, $operationName, $resolverContext, true);
+        $serializerContextBuilder = $this->serializerContextBuilder;
+        if ($advancedNameConverter) {
+            $serializerContextBuilder = $this->buildSerializerContextBuilder($advancedNameConverter);
+        }
+
+        $context = $serializerContextBuilder->create($resourceClass, $operationName, $resolverContext, true);
 
         $this->assertSame($expectedContext, $context);
     }
 
     public function createNormalizationContextProvider(): array
     {
+        $advancedNameConverter = $this->prophesize(AdvancedNameConverterInterface::class);
+        $advancedNameConverter->denormalize('field', 'myResource', null, Argument::type('array'))->willReturn('denormalizedField');
+
         return [
             'nominal' => [
                 $resourceClass = 'myResource',
                 $operationName = 'item_query',
                 ['_id' => 3, 'field' => 'foo'],
+                false,
+                false,
+                false,
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'id' => 3,
                         'field' => 'foo',
                     ],
+                ],
+            ],
+            'nominal with advanced name converter' => [
+                $resourceClass = 'myResource',
+                $operationName = 'item_query',
+                ['_id' => 3, 'field' => 'foo'],
+                false,
+                false,
+                false,
+                [
+                    'groups' => ['normalization_group'],
+                    'resource_class' => $resourceClass,
+                    'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
+                    'attributes' => [
+                        'id' => 3,
+                        'denormalizedField' => 'foo',
+                    ],
                 ],
-                false,
+                $advancedNameConverter->reveal(),
             ],
             'nominal collection' => [
                 $resourceClass = 'myResource',
                 $operationName = 'collection_query',
                 ['edges' => ['node' => ['nodeField' => 'baz']]],
+                false,
+                false,
+                false,
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'nodeField' => 'baz',
                     ],
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
                 ],
-                false,
             ],
             'no resource class' => [
                 $resourceClass = null,
                 $operationName = 'item_query',
                 ['related' => ['_id' => 9]],
+                false,
+                false,
+                false,
                 [
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
@@ -125,33 +170,57 @@ class SerializerContextBuilderTest extends TestCase
                         'related' => ['id' => 9],
                     ],
                 ],
-                false,
             ],
             'mutation' => [
                 $resourceClass = 'myResource',
                 $operationName = 'create',
                 ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
+                true,
+                false,
+                false,
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
                     'graphql_operation_name' => $operationName,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
                     'attributes' => [
                         'id' => 7,
                         'related' => ['field' => 'bar'],
                     ],
-                    'input' => ['class' => 'inputClass'],
-                    'output' => ['class' => 'outputClass'],
                 ],
-                true,
             ],
             'mutation without resource class' => [
                 $resourceClass = null,
                 $operationName = 'create',
                 ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
-                [],
                 true,
+                false,
+                false,
+                [],
+                null,
                 \LogicException::class,
-                'ResourceMetadata should always exist for a mutation.',
+                'ResourceMetadata should always exist for a mutation or a subscription.',
+            ],
+            'subscription (using fields in context)' => [
+                $resourceClass = 'myResource',
+                $operationName = 'update',
+                ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
+                false,
+                true,
+                true,
+                [
+                    'groups' => ['normalization_group'],
+                    'resource_class' => $resourceClass,
+                    'graphql_operation_name' => $operationName,
+                    'no_resolver_data' => true,
+                    'input' => ['class' => 'inputClass'],
+                    'output' => ['class' => 'outputClass'],
+                    'attributes' => [
+                        'id' => 7,
+                        'related' => ['field' => 'bar'],
+                    ],
+                ],
             ],
         ];
     }

@@ -65,7 +65,8 @@ Feature: Search filter on collections
               "prop": "blue"
             }
           ],
-          "uuid": []
+          "uuid": [],
+          "carBrand": "DummyBrand"
         }
       ],
       "hydra:totalItems": 1,
@@ -271,6 +272,47 @@ Feature: Search filter on collections
     }
     """
 
+  Scenario: Search collection by name (partial multiple values)
+    Given there are 30 dummy objects
+    When I send a "GET" request to "/dummies?name[]=2&name[]=3"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And print last JSON response
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"},
+                  {"pattern": "^/dummies/12$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?name%5B%5D=2&name%5B%5D=3"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   Scenario: Search collection by name (partial case insensitive)
     When I send a "GET" request to "/dummies?dummy=somedummytest1"
     Then the response status code should be 200
@@ -338,6 +380,45 @@ Feature: Search filter on collections
     }
     """
 
+  Scenario: Search collection by alias (start multiple values)
+    When I send a "GET" request to "/dummies?description[]=Sma&description[]=Not"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?description%5B%5D=Sma&description%5B%5D=Not"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
   @sqlite
   Scenario: Search collection by description (word_start)
     When I send a "GET" request to "/dummies?description=smart"
@@ -371,6 +452,46 @@ Feature: Search filter on collections
           "type": "object",
           "properties": {
             "@id": {"pattern": "^/dummies\\?description=smart"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  @sqlite
+  Scenario: Search collection by description (word_start multiple values)
+    When I send a "GET" request to "/dummies?description[]=smart&description[]=so"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/Dummy$"},
+        "@id": {"pattern": "^/dummies$"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/dummies/1$"},
+                  {"pattern": "^/dummies/2$"},
+                  {"pattern": "^/dummies/3$"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/dummies\\?description%5B%5D=smart&description%5B%5D=so"},
             "@type": {"pattern": "^hydra:PartialCollectionView$"}
           }
         }
@@ -804,7 +925,6 @@ Feature: Search filter on collections
     When I send a "GET" request to "/converted_owners?name_converted.name_converted=Converted 3"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    Then print last JSON response
     And the JSON should be valid according to this schema:
     """
     {

@@ -93,6 +93,7 @@
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
         "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
+        "ocramius/package-versions": "To display the API Platform's version in the debug bar.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "ramsey/uuid": "To support Ramsey's UUID identifiers.",
@@ -101,6 +102,7 @@
         "symfony/expression-language": "To use authorization features.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
+        "symfony/uid": "To support Symfony UUID/ULID identifiers.",
         "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
@@ -122,7 +124,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.5.x-dev"
+            "dev-master": "2.6.x-dev"
         },
         "symfony": {
             "require": "^3.4 || ^4.4 || ^5.1"

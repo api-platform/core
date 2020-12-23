@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  *     itemOperations={"get"={"swagger_context"={"tags"={}}, "openapi_context"={"tags"={}}}, "put", "delete"},
  *     attributes={
  *         "sunset"="2050-01-01",
- *         "normalization_context"={"groups"="colors"}
+ *         "normalization_context"={"groups"={"colors"}}
  *     }
  * )
  * @ODM\Document
@@ -109,6 +109,16 @@ class DummyCar
      * @ODM\Field(type="date")
      */
     private $availableAt;
+
+    /**
+     * @var string
+     *
+     * @Serializer\Groups({"colors"})
+     * @Serializer\SerializedName("carBrand")
+     *
+     * @ODM\Field
+     */
+    private $brand = 'DummyBrand';
 
     public function __construct()
     {
@@ -190,5 +200,15 @@ class DummyCar
     public function setAvailableAt(\DateTime $availableAt)
     {
         $this->availableAt = $availableAt;
+    }
+
+    public function getBrand(): string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(string $brand): void
+    {
+        $this->brand = $brand;
     }
 }

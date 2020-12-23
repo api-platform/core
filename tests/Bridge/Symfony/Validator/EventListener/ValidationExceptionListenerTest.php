@@ -57,7 +57,7 @@ class ValidationExceptionListenerTest extends TestCase
         $response = $event->getResponse();
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame($exceptionJson, $response->getContent());
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
         $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
         $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
         $this->assertSame('deny', $response->headers->get('X-Frame-Options'));

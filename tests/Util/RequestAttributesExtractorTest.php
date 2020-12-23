@@ -33,6 +33,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -49,6 +51,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -65,6 +69,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => false,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -78,6 +84,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -91,6 +99,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -107,6 +117,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => false,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -120,6 +132,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -133,6 +147,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -149,6 +165,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => false,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -162,6 +180,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -175,6 +195,8 @@ class RequestAttributesExtractorTest extends TestCase
                 'receive' => true,
                 'respond' => true,
                 'persist' => true,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
             ],
             RequestAttributesExtractor::extractAttributes($request)
         );
@@ -188,5 +210,43 @@ class RequestAttributesExtractorTest extends TestCase
     public function testOperationNotSet()
     {
         $this->assertEmpty(RequestAttributesExtractor::extractAttributes(new Request([], [], ['_api_resource_class' => 'Foo'])));
+    }
+
+    public function testExtractPreviousDataAttributes()
+    {
+        $object = new \stdClass();
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', 'previous_data' => $object]);
+
+        $this->assertEquals(
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'receive' => true,
+                'respond' => true,
+                'persist' => true,
+                'previous_data' => $object,
+                'identifiers' => ['id' => ['Foo', 'id']],
+                'has_composite_identifier' => false,
+            ],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
+    }
+
+    public function testExtractIdentifiers()
+    {
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get', '_api_identifiers' => ['test'], '_api_has_composite_identifier' => true]);
+
+        $this->assertEquals(
+            [
+                'resource_class' => 'Foo',
+                'item_operation_name' => 'get',
+                'receive' => true,
+                'respond' => true,
+                'persist' => true,
+                'identifiers' => ['test' => ['Foo', 'test']],
+                'has_composite_identifier' => true,
+            ],
+            RequestAttributesExtractor::extractAttributes($request)
+        );
     }
 }

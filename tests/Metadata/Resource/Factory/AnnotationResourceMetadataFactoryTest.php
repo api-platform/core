@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceMetadataFactory
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
@@ -45,8 +46,55 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => true]], $metadata->getItemOperations());
         $this->assertEquals(['baz' => ['tab' => false]], $metadata->getCollectionOperations());
         $this->assertEquals(['sub' => ['bus' => false]], $metadata->getSubresourceOperations());
-        $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar'], $metadata->getAttributes());
+        $this->assertEquals(['a' => 1, 'route_prefix' => '/foobar', 'stateless' => false], $metadata->getAttributes());
         $this->assertEquals(['foo' => 'bar'], $metadata->getGraphql());
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testCreateAttribute()
+    {
+        $factory = new AnnotationResourceMetadataFactory();
+        $metadata = $factory->create(DummyPhp8::class);
+
+        $this->assertSame('Hey PHP 8', $metadata->getDescription());
+    }
+
+    public function testCreateWithDefaults()
+    {
+        $defaults = [
+            'shortName' => 'Default shortname should not be ignored',
+            'description' => 'CHANGEME!',
+            'collection_operations' => ['get'],
+            'item_operations' => ['get', 'put'],
+            'attributes' => [
+                'pagination_items_per_page' => 4,
+                'pagination_maximum_items_per_page' => 6,
+                'stateless' => true,
+            ],
+        ];
+
+        $annotation = new ApiResource([
+            'itemOperations' => ['get', 'delete'],
+            'attributes' => [
+                'pagination_client_enabled' => true,
+                'pagination_maximum_items_per_page' => 10,
+            ],
+        ]);
+        $reader = $this->prophesize(Reader::class);
+        $reader->getClassAnnotation(Argument::type(\ReflectionClass::class), ApiResource::class)->willReturn($annotation)->shouldBeCalled();
+        $factory = new AnnotationResourceMetadataFactory($reader->reveal(), null, $defaults);
+        $metadata = $factory->create(Dummy::class);
+
+        $this->assertNull($metadata->getShortName());
+        $this->assertEquals('CHANGEME!', $metadata->getDescription());
+        $this->assertEquals(['get'], $metadata->getCollectionOperations());
+        $this->assertEquals(['get', 'delete'], $metadata->getItemOperations());
+        $this->assertTrue($metadata->getAttribute('pagination_client_enabled'));
+        $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
+        $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
+        $this->assertTrue($metadata->getAttribute('stateless'));
     }
 
     public function testCreateWithoutAttributes()
@@ -71,6 +119,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
             'subresourceOperations' => ['sub' => ['bus' => false]],
             'attributes' => ['a' => 1, 'route_prefix' => '/foobar'],
             'graphql' => ['foo' => 'bar'],
+            'stateless' => false,
         ];
         $annotationFull = new ApiResource($resourceData);
 

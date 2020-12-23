@@ -49,7 +49,7 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
@@ -62,7 +62,7 @@ final class TypeConverter implements TypeConverterInterface
                 return GraphQLType::string();
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if ($resourceType = $this->getResourceType($type, $input, $queryName, $mutationName, $depth)) {
+                if ($resourceType = $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $depth)) {
                     return $resourceType;
                 }
 
@@ -76,7 +76,7 @@ final class TypeConverter implements TypeConverterInterface
                     return GraphQLType::string();
                 }
 
-                return $this->getResourceType($type, $input, $queryName, $mutationName, $depth);
+                return $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $depth);
             default:
                 return null;
         }
@@ -100,7 +100,7 @@ final class TypeConverter implements TypeConverterInterface
         throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
     }
 
-    private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, int $depth): ?GraphQLType
+    private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth): ?GraphQLType
     {
         $resourceClass = $this->typeBuilder->isCollection($type) && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
         if (null === $resourceClass) {
@@ -120,7 +120,7 @@ final class TypeConverter implements TypeConverterInterface
             return null;
         }
 
-        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, false, $depth);
+        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, false, $depth);
     }
 
     private function resolveAstTypeNode(TypeNode $astTypeNode, string $fromType): ?GraphQLType

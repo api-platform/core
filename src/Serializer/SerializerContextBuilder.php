@@ -63,7 +63,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         if (!$normalization) {
             if (!isset($context['api_allow_update'])) {
-                $context['api_allow_update'] = \in_array($request->getMethod(), ['PUT', 'PATCH'], true);
+                $context['api_allow_update'] = \in_array($method = $request->getMethod(), ['PUT', 'PATCH'], true);
+
+                if ($context['api_allow_update'] && 'PATCH' === $method) {
+                    $context['deep_object_to_populate'] = $context['deep_object_to_populate'] ?? true;
+                }
             }
 
             if ('csv' === $request->getContentType()) {
@@ -72,6 +76,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['resource_class'] = $attributes['resource_class'];
+        $context['iri_only'] = $resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false;
         $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true);
         $context['output'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true);
         $context['request_uri'] = $request->getRequestUri();
@@ -80,12 +85,12 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if (isset($attributes['subresource_context'])) {
             $context['subresource_identifiers'] = [];
 
-            foreach ($attributes['subresource_context']['identifiers'] as $key => [$id, $resourceClass]) {
+            foreach ($attributes['subresource_context']['identifiers'] as $parameterName => [$resourceClass]) {
                 if (!isset($context['subresource_resources'][$resourceClass])) {
                     $context['subresource_resources'][$resourceClass] = [];
                 }
 
-                $context['subresource_identifiers'][$id] = $context['subresource_resources'][$resourceClass][$id] = $request->attributes->get($id);
+                $context['subresource_identifiers'][$parameterName] = $context['subresource_resources'][$resourceClass][$parameterName] = $request->attributes->get($parameterName);
             }
         }
 
@@ -100,6 +105,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
+        // TODO: We should always use `skip_null_values` but changing this would be a BC break, for now use it only when `merge-patch+json` is activated on a Resource
         foreach ($resourceMetadata->getItemOperations() as $operation) {
             if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
                 $context['skip_null_values'] = true;

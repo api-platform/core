@@ -38,4 +38,16 @@ class AnnotationResourceNameCollectionFactoryTest extends TestCase
 
         $this->assertEquals(new ResourceNameCollection(['foo', 'bar']), $metadata->create());
     }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testCreateAttribute()
+    {
+        $decorated = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $decorated->create()->willReturn(new ResourceNameCollection(['foo', 'bar']))->shouldBeCalled();
+
+        $metadata = new AnnotationResourceNameCollectionFactory(null, [], $decorated->reveal());
+        $this->assertEquals(new ResourceNameCollection(['foo', 'bar']), $metadata->create());
+    }
 }

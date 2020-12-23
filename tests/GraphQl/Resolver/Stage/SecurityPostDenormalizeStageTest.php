@@ -18,10 +18,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -110,7 +110,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
         $info = $this->prophesize(ResolveInfo::class)->reveal();
 
-        $this->expectException(Error::class);
+        $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Access Denied.');
 
         ($this->securityPostDenormalizeStage)($resourceClass, 'item_query', [

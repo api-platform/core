@@ -390,7 +390,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN (:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', $this->alias, Dummy::class),
                     [
                         'name_p1' => [
                             'CaSE',
@@ -400,7 +400,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN (:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(:name_p1)', $this->alias, Dummy::class),
                     [
                         'name_p1' => [
                             'case',
@@ -420,43 +420,107 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'partial' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1, \'%%\')', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\')', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'partial (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1, \'%%\'))', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
+                    $filterFactory,
+                ],
+                'partial (multiple values)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1, \'%%\')', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'CaSE',
+                        'name_p1_1' => 'SENSitive',
+                    ],
+                    $filterFactory,
+                ],
+                'partial (multiple values; case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1, \'%%\'))', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'case',
+                        'name_p1_1' => 'insensitive',
+                    ],
                     $filterFactory,
                 ],
                 'start' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\')', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\')', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'start (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\'))', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
+                    $filterFactory,
+                ],
+                'start (multiple values)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(:name_p1_1, \'%%\')', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'CaSE',
+                        'name_p1_1' => 'SENSitive',
+                    ],
+                    $filterFactory,
+                ],
+                'start (multiple values; case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_1, \'%%\'))', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'case',
+                        'name_p1_1' => 'insensitive',
+                    ],
                     $filterFactory,
                 ],
                 'end' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1)', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0)', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'end (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1))', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0))', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
+                    $filterFactory,
+                ],
+                'end (multiple values)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0) OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1)', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'CaSE',
+                        'name_p1_1' => 'SENSitive',
+                    ],
+                    $filterFactory,
+                ],
+                'end (multiple values; case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0)) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_1))', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'case',
+                        'name_p1_1' => 'insensitive',
+                    ],
                     $filterFactory,
                 ],
                 'word_start' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1, \'%%\')', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_0, \'%%\')', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
                 'word_start (case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1, \'%%\'))', $this->alias, Dummy::class),
-                    ['name_p1' => 'partial'],
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_0, \'%%\'))', $this->alias, Dummy::class),
+                    ['name_p1_0' => 'partial'],
+                    $filterFactory,
+                ],
+                'word_start (multiple values)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE (%1$s.name LIKE CONCAT(:name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_0, \'%%\')) OR (%1$s.name LIKE CONCAT(:name_p1_1, \'%%\') OR %1$s.name LIKE CONCAT(\'%% \', :name_p1_1, \'%%\'))', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'CaSE',
+                        'name_p1_1' => 'SENSitive',
+                    ],
+                    $filterFactory,
+                ],
+                'word_start (multiple values; case insensitive)' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_0, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_0, \'%%\'))) OR (LOWER(%1$s.name) LIKE LOWER(CONCAT(:name_p1_1, \'%%\')) OR LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%% \', :name_p1_1, \'%%\')))', $this->alias, Dummy::class),
+                    [
+                        'name_p1_0' => 'case',
+                        'name_p1_1' => 'insensitive',
+                    ],
                     $filterFactory,
                 ],
                 'invalid value for relation' => [
@@ -483,7 +547,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'mixed IRI and entity ID values for relations' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN(:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', $this->alias, Dummy::class),
                     [
                         'relatedDummy_p1' => [1, 2],
                         'relatedDummies_p2' => 1,

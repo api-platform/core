@@ -47,8 +47,8 @@ final class CoverageContext implements Context
             return;
         }
 
-        $filter->addDirectoryToWhitelist(__DIR__.'/../../src'); // @phpstan-ignore-line
-        self::$coverage = new CodeCoverage(null, $filter); // @phpstan-ignore-line
+        $filter->addDirectoryToWhitelist(__DIR__.'/../../src');
+        self::$coverage = new CodeCoverage(null, $filter);
     }
 
     /**

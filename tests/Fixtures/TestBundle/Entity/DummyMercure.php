@@ -26,7 +26,23 @@ class DummyMercure
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
+
+    /**
+     * @ORM\Column
+     */
+    public $name;
+
+    /**
+     * @ORM\Column
+     */
+    public $description;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     */
+    public $relatedDummy;
 }

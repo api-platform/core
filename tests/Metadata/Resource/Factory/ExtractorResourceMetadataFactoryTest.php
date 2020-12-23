@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory;
@@ -23,6 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ShortNameResourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 
@@ -288,5 +290,56 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
         $resourceMetadata = $shortNameResourceMetadataFactory->create(DummyResourceInterface::class);
         $this->assertSame('DummyResourceInterface', $resourceMetadata->getShortName());
+    }
+
+    public function testItFallbacksToDefaultConfiguration()
+    {
+        $defaults = [
+            'shortName' => 'Default shortname should not be ignored',
+            'description' => 'CHANGEME!',
+            'collection_operations' => ['get'],
+            'item_operations' => ['get', 'put'],
+            'attributes' => [
+                'pagination_items_per_page' => 4,
+                'pagination_maximum_items_per_page' => 6,
+                'stateless' => true,
+            ],
+        ];
+        $resourceConfiguration = [
+            Dummy::class => [
+                'shortName' => null,
+                'description' => null,
+                'subresourceOperations' => null,
+                'itemOperations' => ['get', 'delete'],
+                'attributes' => [
+                    'pagination_maximum_items_per_page' => 10,
+                    'stateless' => false,
+                ],
+            ],
+        ];
+
+        $extractor = new class($resourceConfiguration) implements ExtractorInterface {
+            private $resources;
+
+            public function __construct(array $resources)
+            {
+                $this->resources = $resources;
+            }
+
+            public function getResources(): array
+            {
+                return $this->resources;
+            }
+        };
+        $factory = new ExtractorResourceMetadataFactory($extractor, null, $defaults);
+        $metadata = $factory->create(Dummy::class);
+
+        $this->assertNull($metadata->getShortName());
+        $this->assertEquals('CHANGEME!', $metadata->getDescription());
+        $this->assertEquals(['get'], $metadata->getCollectionOperations());
+        $this->assertEquals(['get', 'delete'], $metadata->getItemOperations());
+        $this->assertEquals(4, $metadata->getAttribute('pagination_items_per_page'));
+        $this->assertEquals(10, $metadata->getAttribute('pagination_maximum_items_per_page'));
+        $this->assertFalse($metadata->getAttribute('stateless'));
     }
 }

@@ -23,7 +23,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * Custom Identifier Dummy With Subresource.
  *
- * @ApiResource
+ * @ApiResource(attributes={"identifiers"="slug"})
  * @ODM\Document
  */
 class SlugParentDummy

@@ -23,5 +23,5 @@ interface ContextAwareIdentifierConverterInterface extends IdentifierConverterIn
     /**
      * {@inheritdoc}
      */
-    public function convert(string $data, string $class, array $context = []): array;
+    public function convert($data, string $class, array $context = []): array;
 }

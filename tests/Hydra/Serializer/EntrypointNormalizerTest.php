@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -50,14 +51,16 @@ class EntrypointNormalizerTest extends TestCase
 
     public function testNormalize()
     {
-        $collection = new ResourceNameCollection([Dummy::class]);
+        $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
 
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
+        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadata('FooDummy', null, null, null, ['get']))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(FooDummy::class)->willReturn('/api/foo_dummies')->shouldBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/api')->shouldBeCalled();
@@ -70,6 +73,7 @@ class EntrypointNormalizerTest extends TestCase
             '@id' => '/api',
             '@type' => 'Entrypoint',
             'dummy' => '/api/dummies',
+            'fooDummy' => '/api/foo_dummies',
         ];
         $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
     }

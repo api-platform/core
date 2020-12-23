@@ -334,4 +334,109 @@ class CollectionNormalizerTest extends TestCase
             'resource_class' => 'Foo',
         ]);
     }
+
+    public function testNormalizeIriOnlyResourceCollection(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $fooThree = new Foo();
+        $fooThree->id = 3;
+        $fooThree->bar = 'bzz';
+
+        $data = [$fooOne, $fooThree];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
+        $iriConverterProphecy->getIriFromItem($fooOne)->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromItem($fooThree)->willReturn('/foos/3');
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+
+        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'collection_operation_name' => 'get',
+            'iri_only' => true,
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertSame([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'hydra:Collection',
+            'hydra:member' => [
+                '/foos/1',
+                '/foos/3',
+            ],
+            'hydra:totalItems' => 2,
+        ], $actual);
+    }
+
+    public function testNormalizeIriOnlyEmbedContextResourceCollection(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $fooThree = new Foo();
+        $fooThree->id = 3;
+        $fooThree->bar = 'bzz';
+
+        $data = [$fooOne, $fooThree];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContext(Foo::class)->willReturn([
+            '@vocab' => 'http://localhost:8080/docs.jsonld#',
+            'hydra' => 'http://www.w3.org/ns/hydra/core#',
+            'hydra:member' => [
+                '@type' => '@id',
+            ],
+        ]);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
+        $iriConverterProphecy->getIriFromItem($fooOne)->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromItem($fooThree)->willReturn('/foos/3');
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+
+        $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'collection_operation_name' => 'get',
+            'iri_only' => true,
+            'jsonld_embed_context' => true,
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertSame([
+            '@context' => [
+                '@vocab' => 'http://localhost:8080/docs.jsonld#',
+                'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                'hydra:member' => [
+                    '@type' => '@id',
+                ],
+            ],
+            '@id' => '/foos',
+            '@type' => 'hydra:Collection',
+            'hydra:member' => [
+                '/foos/1',
+                '/foos/3',
+            ],
+            'hydra:totalItems' => 2,
+        ], $actual);
+    }
 }

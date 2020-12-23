@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\DataPersister;
 
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -88,5 +89,34 @@ class ChainDataPersisterTest extends TestCase
         $foobarPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         (new ChainDataPersister([$fooPersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->remove($dummy);
+    }
+
+    public function testResumable()
+    {
+        $dummy = new Dummy();
+        $fooPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $fooPersisterProphecy->willImplement(ResumableDataPersisterInterface::class);
+        $fooPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $fooPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
+        $fooPersisterProphecy->remove($dummy, Argument::type('array'))->shouldBeCalled();
+        $fooPersisterProphecy->resumable(Argument::type('array'))->willReturn(true)->shouldBeCalled();
+
+        $foo2PersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $foo2PersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $foo2PersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $foo2PersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
+
+        $barPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $barPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
+        $barPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
+        $barPersisterProphecy->remove($dummy, Argument::type('array'))->shouldBeCalled();
+
+        $foobarPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
+        $foobarPersisterProphecy->supports($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $foobarPersisterProphecy->persist($dummy, Argument::type('array'))->shouldNotBeCalled();
+        $foobarPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
+
+        (new ChainDataPersister([$fooPersisterProphecy->reveal(), $foo2PersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->persist($dummy);
+        (new ChainDataPersister([$fooPersisterProphecy->reveal(), $foo2PersisterProphecy->reveal(), $barPersisterProphecy->reveal(), $foobarPersisterProphecy->reveal()]))->remove($dummy);
     }
 }

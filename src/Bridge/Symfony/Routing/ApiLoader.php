@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
@@ -56,8 +57,9 @@ final class ApiLoader extends Loader
     private $graphQlPlaygroundEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
+    private $identifiersExtractor;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -74,6 +76,7 @@ final class ApiLoader extends Loader
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
+        $this->identifiersExtractor = $identifiersExtractor;
     }
 
     /**
@@ -126,7 +129,10 @@ final class ApiLoader extends Loader
                     [
                         '_controller' => $controller,
                         '_format' => null,
+                        '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
                         '_api_resource_class' => $operation['resource_class'],
+                        '_api_identifiers' => $operation['identifiers'],
+                        '_api_has_composite_identifier' => false,
                         '_api_subresource_operation_name' => $operation['route_name'],
                         '_api_subresource_context' => [
                             'property' => $operation['property'],
@@ -221,6 +227,8 @@ final class ApiLoader extends Loader
             }
         }
 
+        $operation['identifiers'] = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
+        $operation['has_composite_identifier'] = \count($operation['identifiers']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
@@ -229,7 +237,10 @@ final class ApiLoader extends Loader
             [
                 '_controller' => $controller,
                 '_format' => null,
+                '_stateless' => $operation['stateless'],
                 '_api_resource_class' => $resourceClass,
+                '_api_identifiers' => $operation['identifiers'],
+                '_api_has_composite_identifier' => $operation['has_composite_identifier'],
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],

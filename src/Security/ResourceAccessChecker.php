@@ -48,14 +48,20 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
         if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
             throw new \LogicException('The "symfony/security" library must be installed to use the "security" attribute.');
         }
-        if (null === $token = $this->tokenStorage->getToken()) {
-            throw new \LogicException('The current token must be set to use the "security" attribute (is the URL behind a firewall?).');
-        }
         if (null === $this->expressionLanguage) {
-            throw new \LogicException('The "symfony/expression-language" library must be installed to use the "security".');
+            throw new \LogicException('The "symfony/expression-language" library must be installed to use the "security" attribute.');
         }
 
-        return (bool) $this->expressionLanguage->evaluate($expression, array_merge($extraVariables, $this->getVariables($token)));
+        $variables = array_merge($extraVariables, [
+            'trust_resolver' => $this->authenticationTrustResolver,
+            'auth_checker' => $this->authorizationChecker, // needed for the is_granted expression function
+        ]);
+
+        if ($token = $this->tokenStorage->getToken()) {
+            $variables = array_merge($variables, $this->getVariables($token));
+        }
+
+        return (bool) $this->expressionLanguage->evaluate($expression, $variables);
     }
 
     /**
@@ -69,9 +75,6 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
             'token' => $token,
             'user' => $token->getUser(),
             'roles' => $this->getEffectiveRoles($token),
-            'trust_resolver' => $this->authenticationTrustResolver,
-            // needed for the is_granted expression function
-            'auth_checker' => $this->authorizationChecker,
         ];
     }
 

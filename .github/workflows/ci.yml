@@ -28,7 +28,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring 
           ini-values: memory_limit=-1
-          tools: flex, pecl, composer, flex, php-cs-fixer
+          tools: pecl, composer, php-cs-fixer
           coverage: none
       - name: Run PHP-CS-Fixer fix
         run: php-cs-fixer fix --dry-run --diff --ansi
@@ -51,7 +51,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex, phpstan
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -87,7 +87,7 @@ jobs:
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.4'
-        run: phpstan analyse --no-interaction --no-progress --no-interaction --ansi
+        run: ./vendor/bin/phpstan analyse --no-interaction --no-progress --no-interaction --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -112,7 +112,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: pcov
           ini-values: memory_limit=-1
@@ -207,7 +207,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
@@ -322,7 +322,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
           ini-values: memory_limit=-1
@@ -362,7 +362,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: none
           ini-values: memory_limit=-1
@@ -412,7 +412,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
           coverage: none
           ini-values: memory_limit=-1
@@ -460,7 +460,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
           coverage: none
           ini-values: memory_limit=-1
@@ -506,7 +506,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
           ini-values: memory_limit=-1
@@ -562,7 +562,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
@@ -600,7 +600,7 @@ jobs:
           - '7.4'
       fail-fast: false
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=7
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=8
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -608,7 +608,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
           ini-values: memory_limit=-1
@@ -650,7 +650,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
           ini-values: memory_limit=-1
@@ -710,7 +710,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
           ini-values: memory_limit=-1
@@ -774,7 +774,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: none
           ini-values: memory_limit=-1
@@ -817,7 +817,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: flex, pecl, composer, flex
+          tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: none
           ini-values: memory_limit=-1
@@ -840,3 +840,4 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+

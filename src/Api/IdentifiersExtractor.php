@@ -51,10 +51,18 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     public function getIdentifiersFromResourceClass(string $resourceClass): array
     {
         $identifiers = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+        foreach ($properties = $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
                 $identifiers[] = $property;
             }
+        }
+
+        if (!$identifiers) {
+            if (\in_array('id', iterator_to_array($properties), true)) {
+                return ['id'];
+            }
+
+            throw new RuntimeException(sprintf('No identifier defined "%s". You should add #[\ApiPlatform\Core\Annotation\ApiProperty(identifier: true)]" on the property identifying the resource."', $resourceClass));
         }
 
         return $identifiers;
@@ -67,14 +75,14 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     {
         $identifiers = [];
         $resourceClass = $this->getResourceClass($item, true);
+        $identifierProperties = $this->getIdentifiersFromResourceClass($resourceClass);
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            $identifier = $propertyMetadata->isIdentifier();
-            if (null === $identifier || false === $identifier) {
+            if (!\in_array($propertyName, $identifierProperties, true)) {
                 continue;
             }
 
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
             $identifier = $identifiers[$propertyName] = $this->propertyAccessor->getValue($item, $propertyName);
 
             if (!\is_object($identifier)) {

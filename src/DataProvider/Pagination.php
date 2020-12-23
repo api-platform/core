@@ -202,6 +202,22 @@ final class Pagination
         return $this->getEnabled($context, $resourceClass, $operationName, true);
     }
 
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function getGraphQlPaginationType(string $resourceClass, string $operationName): string
+    {
+        try {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        } catch (ResourceClassNotFoundException $e) {
+            return 'cursor';
+        }
+
+        return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_type', 'cursor', true);
+    }
+
     /**
      * Is the classic or partial pagination enabled?
      */

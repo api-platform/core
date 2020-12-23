@@ -37,7 +37,7 @@ class AnnotationResourceFilterMetadataFactoryTest extends TestCase
         $decorated->create(Dummy::class)->willReturn(new ResourceMetadata('hello', 'blabla'))->shouldBeCalled();
 
         $reader = $this->prophesize(Reader::class);
-        $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->shouldBeCalled()->willReturn([
+        $reader->getClassAnnotations(Argument::type(\ReflectionClass::class))->shouldBeCalled()->willReturn([ // @phpstan-ignore-next-line
             new ApiFilter(['value' => DummyFilter::class]),
         ]);
 

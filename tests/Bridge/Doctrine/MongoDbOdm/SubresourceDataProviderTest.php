@@ -22,6 +22,8 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy;
@@ -47,6 +49,18 @@ use Prophecy\Argument;
 class SubresourceDataProviderTest extends TestCase
 {
     use ProphecyTrait;
+
+    private $resourceMetadataFactoryProphecy;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+    }
 
     private function getMetadataProphecies(array $resourceClassesIdentifiers)
     {
@@ -97,7 +111,7 @@ class SubresourceDataProviderTest extends TestCase
         $aggregationBuilder = $this->prophesize(Builder::class)->reveal();
         $managerRegistry = $this->getManagerRegistryProphecy($aggregationBuilder, $identifiers, Dummy::class);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistry, $propertyNameCollectionFactory, $propertyMetadataFactory, []);
+        $dataProvider = new SubresourceDataProvider($managerRegistry, $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, []);
 
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
@@ -129,7 +143,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dummyIterator = $this->prophesize(Iterator::class);
         $dummyIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
-        $dummyAggregationBuilder->execute()->shouldBeCalled()->willReturn($dummyIterator->reveal());
+        $dummyAggregationBuilder->execute([])->shouldBeCalled()->willReturn($dummyIterator->reveal());
 
         $managerProphecy->createAggregationBuilder(Dummy::class)->shouldBeCalled()->willReturn($dummyAggregationBuilder->reveal());
 
@@ -140,16 +154,18 @@ class SubresourceDataProviderTest extends TestCase
 
         $iterator = $this->prophesize(Iterator::class);
         $iterator->toArray()->shouldBeCalled()->willReturn([]);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
+        $aggregationBuilder->execute([])->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(RelatedDummy::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => ['id']]);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $context = ['property' => 'relatedDummies', 'identifiers' => [['id', Dummy::class]], 'collection' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
@@ -174,7 +190,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $dummyIterator = $this->prophesize(Iterator::class);
         $dummyIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
-        $dummyAggregationBuilder->execute()->shouldBeCalled()->willReturn($dummyIterator->reveal());
+        $dummyAggregationBuilder->execute([])->shouldBeCalled()->willReturn($dummyIterator->reveal());
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
@@ -201,7 +217,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $rIterator = $this->prophesize(Iterator::class);
         $rIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'thirdLevel' => [['_id' => 3]]]]);
-        $rAggregationBuilder->execute()->shouldBeCalled()->willReturn($rIterator->reveal());
+        $rAggregationBuilder->execute([])->shouldBeCalled()->willReturn($rIterator->reveal());
 
         $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $rClassMetadataProphecy->hasAssociation('thirdLevel')->shouldBeCalled()->willReturn(true);
@@ -223,7 +239,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $iterator = $this->prophesize(Iterator::class);
         $iterator->current()->shouldBeCalled()->willReturn($result);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
+        $aggregationBuilder->execute([])->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(ThirdLevel::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
@@ -234,13 +250,112 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata());
+
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $context = ['property' => 'thirdLevel', 'identifiers' => [['id', Dummy::class], ['relatedDummies', RelatedDummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
         $this->assertEquals($result, $dataProvider->getSubresource(ThirdLevel::class, ['id' => ['id' => 1], 'relatedDummies' => ['id' => 1]], $context));
+    }
+
+    public function testGetSubSubresourceItemWithExecuteOptions()
+    {
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $identifiers = ['id'];
+
+        // First manager (Dummy)
+        $dummyAggregationBuilder = $this->prophesize(Builder::class);
+        $dummyLookup = $this->prophesize(Lookup::class);
+        $dummyLookup->alias('relatedDummies')->shouldBeCalled();
+        $dummyAggregationBuilder->lookup('relatedDummies')->shouldBeCalled()->willReturn($dummyLookup->reveal());
+
+        $dummyMatch = $this->prophesize(AggregationMatch::class);
+        $dummyMatch->equals(1)->shouldBeCalled();
+        $dummyMatch->field('id')->shouldBeCalled()->willReturn($dummyMatch);
+        $dummyAggregationBuilder->match()->shouldBeCalled()->willReturn($dummyMatch->reveal());
+
+        $dummyIterator = $this->prophesize(Iterator::class);
+        $dummyIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 2]]]]);
+        $dummyAggregationBuilder->execute(['allowDiskUse' => true])->shouldBeCalled()->willReturn($dummyIterator->reveal());
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
+
+        $dummyManagerProphecy = $this->prophesize(DocumentManager::class);
+        $dummyManagerProphecy->createAggregationBuilder(Dummy::class)->shouldBeCalled()->willReturn($dummyAggregationBuilder->reveal());
+        $dummyManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($dummyManagerProphecy->reveal());
+
+        // Second manager (RelatedDummy)
+        $rAggregationBuilder = $this->prophesize(Builder::class);
+        $rLookup = $this->prophesize(Lookup::class);
+        $rLookup->alias('thirdLevel')->shouldBeCalled();
+        $rAggregationBuilder->lookup('thirdLevel')->shouldBeCalled()->willReturn($rLookup->reveal());
+
+        $rMatch = $this->prophesize(AggregationMatch::class);
+        $rMatch->equals(1)->shouldBeCalled();
+        $rMatch->field('id')->shouldBeCalled()->willReturn($rMatch);
+        $previousRMatch = $this->prophesize(AggregationMatch::class);
+        $previousRMatch->in([2])->shouldBeCalled();
+        $previousRMatch->field('_id')->shouldBeCalled()->willReturn($previousRMatch);
+        $rAggregationBuilder->match()->shouldBeCalled()->willReturn($rMatch->reveal(), $previousRMatch->reveal());
+
+        $rIterator = $this->prophesize(Iterator::class);
+        $rIterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'thirdLevel' => [['_id' => 3]]]]);
+        $rAggregationBuilder->execute(['allowDiskUse' => true])->shouldBeCalled()->willReturn($rIterator->reveal());
+
+        $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $rClassMetadataProphecy->hasAssociation('thirdLevel')->shouldBeCalled()->willReturn(true);
+
+        $rDummyManagerProphecy = $this->prophesize(DocumentManager::class);
+        $rDummyManagerProphecy->createAggregationBuilder(RelatedDummy::class)->shouldBeCalled()->willReturn($rAggregationBuilder->reveal());
+        $rDummyManagerProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($rClassMetadataProphecy->reveal());
+
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($rDummyManagerProphecy->reveal());
+
+        $result = new \stdClass();
+        // Origin manager (ThirdLevel)
+        $aggregationBuilder = $this->prophesize(Builder::class);
+
+        $match = $this->prophesize(AggregationMatch::class);
+        $match->in([3])->shouldBeCalled();
+        $match->field('_id')->shouldBeCalled()->willReturn($match);
+        $aggregationBuilder->match()->shouldBeCalled()->willReturn($match);
+
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->current()->shouldBeCalled()->willReturn($result);
+        $aggregationBuilder->execute(['allowDiskUse' => true])->shouldBeCalled()->willReturn($iterator->reveal());
+        $aggregationBuilder->hydrate(ThirdLevel::class)->shouldBeCalled()->willReturn($aggregationBuilder);
+
+        $repositoryProphecy = $this->prophesize(DocumentRepository::class);
+        $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn($aggregationBuilder->reveal());
+
+        $managerProphecy = $this->prophesize(DocumentManager::class);
+        $managerProphecy->getRepository(ThirdLevel::class)->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
+
+        $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
+
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata(
+            'ThirdLevel',
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['third_level_operation_name' => ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]]]
+        ));
+
+        [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
+
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+
+        $context = ['property' => 'thirdLevel', 'identifiers' => [['id', Dummy::class], ['relatedDummies', RelatedDummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
+
+        $this->assertEquals($result, $dataProvider->getSubresource(ThirdLevel::class, ['id' => ['id' => 1], 'relatedDummies' => ['id' => 1]], $context, 'third_level_operation_name'));
     }
 
     public function testGetSubresourceOneToOneOwningRelation()
@@ -277,16 +392,18 @@ class SubresourceDataProviderTest extends TestCase
         $iterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'ownedDummy' => [['_id' => 3]]]]);
         $result = new \stdClass();
         $iterator->current()->shouldBeCalled()->willReturn($result);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
+        $aggregationBuilder->execute([])->shouldBeCalled()->willReturn($iterator->reveal());
         $aggregationBuilder->hydrate(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($aggregationBuilder);
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
+        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadata());
+
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $context = ['property' => 'ownedDummy', 'identifiers' => [['id', Dummy::class]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
@@ -324,11 +441,13 @@ class SubresourceDataProviderTest extends TestCase
 
         $iterator = $this->prophesize(Iterator::class);
         $iterator->toArray()->shouldBeCalled()->willReturn([['_id' => 1, 'relatedDummies' => [['_id' => 3]]]]);
-        $aggregationBuilder->execute()->shouldBeCalled()->willReturn($iterator->reveal());
+        $aggregationBuilder->execute([])->shouldBeCalled()->willReturn($iterator->reveal());
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
+
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -337,7 +456,7 @@ class SubresourceDataProviderTest extends TestCase
         $extensionProphecy->supportsResult(RelatedDummy::class, null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $extensionProphecy->getResult($aggregationBuilder, RelatedDummy::class, null, Argument::type('array'))->willReturn([])->shouldBeCalled();
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory, [$extensionProphecy->reveal()]);
 
         $context = ['property' => 'relatedDummies', 'identifiers' => [['id', Dummy::class]], 'collection' => true, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 
@@ -360,7 +479,7 @@ class SubresourceDataProviderTest extends TestCase
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
 
@@ -374,7 +493,7 @@ class SubresourceDataProviderTest extends TestCase
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
         $dataProvider->getSubresource(Dummy::class, ['id' => 1], []);
     }
 
@@ -404,7 +523,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $rIterator = $this->prophesize(Iterator::class);
         $rIterator->current()->shouldBeCalled()->willReturn($result);
-        $rAggregationBuilder->execute()->shouldBeCalled()->willReturn($rIterator->reveal());
+        $rAggregationBuilder->execute([])->shouldBeCalled()->willReturn($rIterator->reveal());
         $rAggregationBuilder->hydrate(RelatedDummy::class)->shouldBeCalled()->willReturn($rAggregationBuilder);
 
         $aggregationBuilder = $this->prophesize(Builder::class);
@@ -414,9 +533,11 @@ class SubresourceDataProviderTest extends TestCase
 
         $rDummyManagerProphecy->getRepository(RelatedDummy::class)->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
 
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
-        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new SubresourceDataProvider($managerRegistryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
 
         $context = ['property' => 'id', 'identifiers' => [['id', Dummy::class, true], ['relatedDummies', RelatedDummy::class, true]], 'collection' => false, IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true];
 

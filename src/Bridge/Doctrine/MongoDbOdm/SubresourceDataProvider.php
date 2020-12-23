@@ -24,6 +24,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -43,6 +44,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     use IdentifierManagerTrait;
 
     private $managerRegistry;
+    private $resourceMetadataFactory;
     private $collectionExtensions;
     private $itemExtensions;
 
@@ -50,9 +52,10 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
      * @param AggregationCollectionExtensionInterface[] $collectionExtensions
      * @param AggregationItemExtensionInterface[]       $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
+    public function __construct(ManagerRegistry $managerRegistry, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->collectionExtensions = $collectionExtensions;
@@ -80,7 +83,11 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
 
-        $aggregationBuilder = $this->buildAggregation($identifiers, $context, $repository->createAggregationBuilder(), \count($context['identifiers']));
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $attribute = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'doctrine_mongodb', [], true);
+        $executeOptions = $attribute['execute_options'] ?? [];
+
+        $aggregationBuilder = $this->buildAggregation($identifiers, $context, $executeOptions, $repository->createAggregationBuilder(), \count($context['identifiers']));
 
         if (true === $context['collection']) {
             foreach ($this->collectionExtensions as $extension) {
@@ -98,7 +105,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             }
         }
 
-        $iterator = $aggregationBuilder->hydrate($resourceClass)->execute();
+        $iterator = $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);
 
         return $context['collection'] ? $iterator->toArray() : ($iterator->current() ?: null);
     }
@@ -106,7 +113,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     /**
      * @throws RuntimeException
      */
-    private function buildAggregation(array $identifiers, array $context, Builder $previousAggregationBuilder, int $remainingIdentifiers, Builder $topAggregationBuilder = null): Builder
+    private function buildAggregation(array $identifiers, array $context, array $executeOptions, Builder $previousAggregationBuilder, int $remainingIdentifiers, Builder $topAggregationBuilder = null): Builder
     {
         if ($remainingIdentifiers <= 0) {
             return $previousAggregationBuilder;
@@ -114,8 +121,16 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $topAggregationBuilder = $topAggregationBuilder ?? $previousAggregationBuilder;
 
-        [$identifier, $identifierResourceClass] = $context['identifiers'][$remainingIdentifiers - 1];
-        $previousAssociationProperty = $context['identifiers'][$remainingIdentifiers][0] ?? $context['property'];
+        if (\is_string(key($context['identifiers']))) {
+            $contextIdentifiers = array_keys($context['identifiers']);
+            $identifier = $contextIdentifiers[$remainingIdentifiers - 1];
+            $identifierResourceClass = $context['identifiers'][$identifier][0];
+            $previousAssociationProperty = $contextIdentifiers[$remainingIdentifiers] ?? $context['property'];
+        } else {
+            @trigger_error('Identifiers should match the convention introduced in ADR 0001-resource-identifiers, this behavior will be removed in 3.0.', E_USER_DEPRECATED);
+            [$identifier, $identifierResourceClass] = $context['identifiers'][$remainingIdentifiers - 1];
+            $previousAssociationProperty = $context['identifiers'][$remainingIdentifiers][0] ?? $context['property'];
+        }
 
         $manager = $this->managerRegistry->getManagerForClass($identifierResourceClass);
         if (!$manager instanceof DocumentManager) {
@@ -154,9 +169,9 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         }
 
         // Recurse aggregations
-        $aggregation = $this->buildAggregation($identifiers, $context, $aggregation, --$remainingIdentifiers, $topAggregationBuilder);
+        $aggregation = $this->buildAggregation($identifiers, $context, $executeOptions, $aggregation, --$remainingIdentifiers, $topAggregationBuilder);
 
-        $results = $aggregation->execute()->toArray();
+        $results = $aggregation->execute($executeOptions)->toArray();
         $in = array_reduce($results, static function ($in, $result) use ($previousAssociationProperty) {
             return $in + array_map(static function ($result) {
                 return $result['_id'];
