@@ -327,7 +327,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 if (\array_key_exists($key, $parsed) && \is_array($parsed[$key])) {
                     $parsed = [$key => ''];
                 }
-                array_walk_recursive($parsed, function (&$value) use ($graphqlFilterType) {
+                array_walk_recursive($parsed, static function (&$value) use ($graphqlFilterType) {
                     $value = $graphqlFilterType;
                 });
                 $args = $this->mergeFilterArgs($args, $parsed, $resourceMetadata, $key);

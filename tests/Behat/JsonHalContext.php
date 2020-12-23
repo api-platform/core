@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -45,9 +47,15 @@ final class JsonHalContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**
@@ -59,7 +67,7 @@ final class JsonHalContext implements Context
         $this->validator->validate($json, (object) ['$ref' => "file://{$this->schemaFile}"]);
 
         if (!$this->validator->isValid()) {
-            throw new ExpectationFailedException(sprintf('The JSON is not valid according to the HAL+JSON schema.'));
+            throw new ExpectationFailedException('The JSON is not valid according to the HAL+JSON schema.');
         }
     }
 

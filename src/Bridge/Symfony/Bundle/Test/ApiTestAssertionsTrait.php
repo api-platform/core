@@ -20,6 +20,7 @@ use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -111,16 +112,16 @@ trait ApiTestAssertionsTrait
 
     public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName);
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
 
-        static::assertMatchesJsonSchema($schema);
+        static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName);
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
 
-        static::assertMatchesJsonSchema($schema);
+        static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     private static function getHttpClient(Client $newClient = null): ?Client

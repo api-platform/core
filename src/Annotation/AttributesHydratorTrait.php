@@ -54,11 +54,7 @@ trait AttributesHydratorTrait
 
         foreach ($values as $key => $value) {
             $key = (string) $key;
-            if (!property_exists($this, $key)) {
-                throw new InvalidArgumentException(sprintf('Unknown property "%s" on annotation "%s".', $key, self::class));
-            }
-
-            if ((new \ReflectionProperty($this, $key))->isPublic()) {
+            if (property_exists($this, $key) && (new \ReflectionProperty($this, $key))->isPublic()) {
                 $this->{$key} = $value;
                 continue;
             }

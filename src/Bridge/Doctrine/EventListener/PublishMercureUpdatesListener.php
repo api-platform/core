@@ -73,7 +73,7 @@ final class PublishMercureUpdatesListener
         $this->formats = $formats;
         $this->messageBus = $messageBus;
         $this->publisher = $publisher;
-        $this->expressionLanguage = $expressionLanguage ?? class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null;
+        $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->reset();
     }
 
@@ -136,9 +136,6 @@ final class PublishMercureUpdatesListener
         }
 
         $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
-        if (false === $options) {
-            return;
-        }
 
         if (\is_string($options)) {
             if (null === $this->expressionLanguage) {
@@ -146,6 +143,10 @@ final class PublishMercureUpdatesListener
             }
 
             $options = $this->expressionLanguage->evaluate($options, ['object' => $entity]);
+        }
+
+        if (false === $options) {
+            return;
         }
 
         if (true === $options) {

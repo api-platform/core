@@ -32,7 +32,7 @@ class TypeFactoryTest extends TestCase
     public function testGetType(array $schema, Type $type): void
     {
         $typeFactory = new TypeFactory();
-        $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema()));
+        $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_OPENAPI)));
     }
 
     public function typeProvider(): iterable
@@ -146,14 +146,129 @@ class TypeFactoryTest extends TestCase
         ];
     }
 
-    /** @dataProvider openAPIV2typeProvider */
+    /**
+     * @dataProvider jsonSchemaTypeProvider
+     */
+    public function testGetTypeWithJsonSchemaSyntax(array $schema, Type $type): void
+    {
+        $typeFactory = new TypeFactory();
+        $this->assertEquals($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_JSON_SCHEMA)));
+    }
+
+    public function jsonSchemaTypeProvider(): iterable
+    {
+        yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
+        yield [['type' => ['integer', 'null']], new Type(Type::BUILTIN_TYPE_INT, true)];
+        yield [['type' => 'number'], new Type(Type::BUILTIN_TYPE_FLOAT)];
+        yield [['type' => ['number', 'null']], new Type(Type::BUILTIN_TYPE_FLOAT, true)];
+        yield [['type' => 'boolean'], new Type(Type::BUILTIN_TYPE_BOOL)];
+        yield [['type' => ['boolean', 'null']], new Type(Type::BUILTIN_TYPE_BOOL, true)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_STRING)];
+        yield [['type' => ['string', 'null']], new Type(Type::BUILTIN_TYPE_STRING, true)];
+        yield [['type' => 'string'], new Type(Type::BUILTIN_TYPE_OBJECT)];
+        yield [['type' => ['string', 'null']], new Type(Type::BUILTIN_TYPE_OBJECT, true)];
+        yield [['type' => 'string', 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)];
+        yield [['type' => ['string', 'null'], 'format' => 'date-time'], new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTimeImmutable::class)];
+        yield [['type' => 'string', 'format' => 'duration'], new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class)];
+        yield [['type' => 'string', 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)];
+        yield [['type' => ['string', 'null'], 'format' => 'iri-reference'], new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class)];
+        yield [['type' => 'array', 'items' => ['type' => 'string']], new Type(Type::BUILTIN_TYPE_STRING, false, null, true)];
+        yield 'array can be itself nullable' => [
+            ['type' => ['array', 'null'], 'items' => ['type' => 'string']],
+            new Type(Type::BUILTIN_TYPE_STRING, true, null, true),
+        ];
+
+        yield 'array can contain nullable values' => [
+            [
+                'type' => 'array',
+                'items' => [
+                    'type' => ['string', 'null'],
+                ],
+            ],
+            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, null, new Type(Type::BUILTIN_TYPE_STRING, true, null, false)),
+        ];
+
+        yield 'map with string keys becomes an object' => [
+            ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
+            new Type(
+                Type::BUILTIN_TYPE_STRING,
+                false,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+            ),
+        ];
+
+        yield 'nullable map with string keys becomes a nullable object' => [
+            [
+                'type' => ['object', 'null'],
+                'additionalProperties' => ['type' => 'string'],
+            ],
+            new Type(
+                Type::BUILTIN_TYPE_STRING,
+                true,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
+            ),
+        ];
+
+        yield 'map value type will be considered' => [
+            ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
+            new Type(
+                Type::BUILTIN_TYPE_ARRAY,
+                false,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
+            ),
+        ];
+
+        yield 'map value type nullability will be considered' => [
+            [
+                'type' => 'object',
+                'additionalProperties' => [
+                    'type' => ['integer', 'null'],
+                ],
+            ],
+            new Type(
+                Type::BUILTIN_TYPE_ARRAY,
+                false,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+            ),
+        ];
+
+        yield 'nullable map can contain nullable values' => [
+            [
+                'type' => ['object', 'null'],
+                'additionalProperties' => [
+                    'type' => ['integer', 'null'],
+                ],
+            ],
+            new Type(
+                Type::BUILTIN_TYPE_ARRAY,
+                true,
+                null,
+                true,
+                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
+                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
+            ),
+        ];
+    }
+
+    /** @dataProvider openAPIV2TypeProvider */
     public function testGetTypeWithOpenAPIV2Syntax(array $schema, Type $type): void
     {
         $typeFactory = new TypeFactory();
         $this->assertSame($schema, $typeFactory->getType($type, 'json', null, null, new Schema(Schema::VERSION_SWAGGER)));
     }
 
-    public function openAPIV2typeProvider(): iterable
+    public function openAPIV2TypeProvider(): iterable
     {
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT)];
         yield [['type' => 'integer'], new Type(Type::BUILTIN_TYPE_INT, true)];

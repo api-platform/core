@@ -107,7 +107,11 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('force_eager')->defaultTrue()->info('Force join on every relation. If disabled, it will only join relations having the EAGER fetch mode.')->end()
                     ->end()
                 ->end()
-                ->booleanNode('enable_fos_user')->defaultValue(class_exists(FOSUserBundle::class))->info('Enable the FOSUserBundle integration.')->end()
+                ->booleanNode('enable_fos_user')
+                    ->defaultValue(class_exists(FOSUserBundle::class))
+                    ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'FOSUserBundle is not actively maintained anymore. Enabling the FOSUserBundle integration has been deprecated in 2.5 and will be removed in 3.0.'))
+                    ->info('Enable the FOSUserBundle integration.')
+                ->end()
                 ->booleanNode('enable_nelmio_api_doc')
                     ->defaultFalse()
                     ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'Enabling the NelmioApiDocBundle integration has been deprecated in 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'))
@@ -280,7 +284,7 @@ final class Configuration implements ConfigurationInterface
                                 })
                             ->end()
                             ->validate()
-                                ->ifTrue(function ($v) use ($defaultVersions) {
+                                ->ifTrue(static function ($v) use ($defaultVersions) {
                                     return $v !== array_intersect($v, $defaultVersions);
                                 })
                                 ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $defaultVersions), '%s'))
@@ -333,7 +337,7 @@ final class Configuration implements ConfigurationInterface
                                 ->variableNode('request_options')
                                     ->defaultValue([])
                                     ->validate()
-                                        ->ifTrue(function ($v) { return false === \is_array($v); })
+                                        ->ifTrue(static function ($v) { return false === \is_array($v); })
                                         ->thenInvalid('The request_options parameter must be an array.')
                                     ->end()
                                     ->info('To pass options to the client charged with the request.')
@@ -431,7 +435,7 @@ final class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('exception_class')
                     ->beforeNormalization()
                         ->ifArray()
-                        ->then(function (array $exceptionToStatus) {
+                        ->then(static function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as &$httpStatusCode) {
                                 if (\is_int($httpStatusCode)) {
                                     continue;
@@ -450,7 +454,7 @@ final class Configuration implements ConfigurationInterface
                     ->prototype('integer')->end()
                     ->validate()
                         ->ifArray()
-                        ->then(function (array $exceptionToStatus) {
+                        ->then(static function (array $exceptionToStatus) {
                             foreach ($exceptionToStatus as $httpStatusCode) {
                                 if ($httpStatusCode < 100 || $httpStatusCode >= 600) {
                                     throw new InvalidConfigurationException(sprintf('The HTTP status code "%s" is not valid.', $httpStatusCode));
@@ -475,7 +479,7 @@ final class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('format')
                     ->beforeNormalization()
                         ->ifArray()
-                        ->then(function ($v) {
+                        ->then(static function ($v) {
                             foreach ($v as $format => $value) {
                                 if (isset($value['mime_types'])) {
                                     continue;

@@ -31,6 +31,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -190,9 +191,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (!$this->serializer instanceof DenormalizerInterface) {
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
-            $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
+            try {
+                $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
+            } catch (NotNormalizableValueException $e) {
+                throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
+            }
+
             if (!\is_object($denormalizedInput)) {
-                throw new \UnexpectedValueException('Expected denormalized input to be an object.');
+                throw new UnexpectedValueException('Expected denormalized input to be an object.');
             }
 
             return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
@@ -232,7 +238,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Method copy-pasted from symfony/serializer.
-     * Remove it after symfony/serializer version update @link https://github.com/symfony/symfony/pull/28263.
+     * Remove it after symfony/serializer version update @see https://github.com/symfony/symfony/pull/28263.
      *
      * {@inheritdoc}
      *
@@ -607,6 +613,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
+            // @phpstan-ignore-next-line throwing an explicit exception helps debugging
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
             }

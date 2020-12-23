@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\CircularReference as CircularReferenceDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
@@ -23,8 +25,8 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use JsonSchema\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -58,9 +60,15 @@ final class JsonApiContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**
@@ -72,7 +80,7 @@ final class JsonApiContext implements Context
         $this->validator->validate($json, (object) ['$ref' => "file://{$this->jsonApiSchemaFile}"]);
 
         if (!$this->validator->isValid()) {
-            throw new ExpectationFailedException(sprintf('The JSON is not valid according to the JSON API schema.'));
+            throw new ExpectationFailedException('The JSON is not valid according to the JSON API schema.');
         }
     }
 

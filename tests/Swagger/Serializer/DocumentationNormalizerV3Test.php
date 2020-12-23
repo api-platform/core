@@ -107,7 +107,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'custom' => ['method' => 'GET', 'path' => '/foo'] + self::OPERATION_FORMATS,
                 'custom2' => ['method' => 'POST', 'path' => '/foo'] + self::OPERATION_FORMATS,
             ],
-            ['pagination_client_items_per_page' => true]
+            ['pagination_client_items_per_page' => true, 'normalization_context' => [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
@@ -370,6 +370,7 @@ class DocumentationNormalizerV3Test extends TestCase
                 'schemas' => new \ArrayObject([
                     'Dummy' => new \ArrayObject([
                         'type' => 'object',
+                        'additionalProperties' => false,
                         'description' => 'This is a dummy.',
                         'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
                         'properties' => [

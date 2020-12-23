@@ -5,9 +5,11 @@
 /build/
 /composer.lock
 /composer.phar
+/phpstan.neon
 /phpunit.xml
 /swagger.json
 /swagger.yaml
 /tests/Fixtures/app/var/
 /tests/Fixtures/app/public/bundles/
 /vendor/
+/Dockerfile

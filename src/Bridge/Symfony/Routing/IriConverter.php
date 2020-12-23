@@ -43,8 +43,8 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class IriConverter implements IriConverterInterface
 {
-    use ResourceClassInfoTrait;
     use OperationDataProviderTrait;
+    use ResourceClassInfoTrait;
 
     private $routeNameResolver;
     private $router;

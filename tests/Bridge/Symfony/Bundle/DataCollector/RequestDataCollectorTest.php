@@ -180,7 +180,8 @@ class RequestDataCollectorTest extends TestCase
 
         $dataProvider = $dataCollector->getCollectionDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
-            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertStringContainsString('@anonymous', $class);
+
             $this->assertTrue($response);
         }
         $context = $dataProvider['context'];
@@ -189,7 +190,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataProvider = $dataCollector->getItemDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
-            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertStringContainsString('@anonymous', $class);
             $this->assertTrue($response);
         }
         $context = $dataProvider['context'];
@@ -198,7 +199,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataProvider = $dataCollector->getSubresourceDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
-            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertStringContainsString('@anonymous', $class);
             $this->assertTrue($response);
         }
         $context = $dataProvider['context'];
@@ -207,7 +208,7 @@ class RequestDataCollectorTest extends TestCase
 
         $dataPersister = $dataCollector->getDataPersisters();
         foreach ($dataPersister['responses'] as $class => $response) {
-            $this->assertStringStartsWith('class@anonymous', $class);
+            $this->assertStringContainsString('@anonymous', $class);
             $this->assertTrue($response);
         }
     }

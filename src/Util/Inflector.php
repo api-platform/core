@@ -27,7 +27,7 @@ use Doctrine\Inflector\InflectorFactory;
 final class Inflector
 {
     /**
-     * @var InflectorObject
+     * @var InflectorObject|null
      */
     private static $instance;
 
@@ -38,18 +38,18 @@ final class Inflector
     }
 
     /**
-     * @see LegacyInflector::tableize()
+     * @see InflectorObject::tableize()
      */
     public static function tableize(string $word): string
     {
-        return class_exists(InflectorFactory::class) ? self::getInstance()->tableize($word) : LegacyInflector::tableize($word);
+        return class_exists(LegacyInflector::class) ? LegacyInflector::tableize($word) : self::getInstance()->tableize($word);
     }
 
     /**
-     * @see LegacyInflector::pluralize()
+     * @see InflectorObject::pluralize()
      */
     public static function pluralize(string $word): string
     {
-        return class_exists(InflectorFactory::class) ? self::getInstance()->pluralize($word) : LegacyInflector::pluralize($word);
+        return class_exists(LegacyInflector::class) ? LegacyInflector::pluralize($word) : self::getInstance()->pluralize($word);
     }
 }

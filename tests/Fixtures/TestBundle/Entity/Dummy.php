@@ -98,7 +98,7 @@ class Dummy
      * @var \DateTime A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
+     * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;
 

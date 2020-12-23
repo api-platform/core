@@ -60,7 +60,7 @@ final class SerializeListener
         if (
             $controllerResult instanceof Response
             || !(($attributes = RequestAttributesExtractor::extractAttributes($request))['respond'] ?? $request->attributes->getBoolean('_api_respond', false))
-            || $attributes && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
+            || ($attributes && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
         ) {
             return;
         }

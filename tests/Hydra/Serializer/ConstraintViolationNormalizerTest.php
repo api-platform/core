@@ -70,8 +70,7 @@ class ConstraintViolationNormalizerTest extends TestCase
             '@context' => '/context/foo',
             '@type' => 'ConstraintViolationList',
             'hydra:title' => 'An error occurred',
-            'hydra:description' => '_d: a
-_4: 1',
+            'hydra:description' => "_d: a\n_4: 1",
             'violations' => [
                 [
                     'propertyPath' => '_d',

@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -18,7 +20,7 @@ use Behatch\Context\RestContext;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
 
-final class SwaggerContext implements Context
+final class OpenApiContext implements Context
 {
     /**
      * @var RestContext
@@ -32,9 +34,15 @@ final class SwaggerContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**
@@ -129,7 +137,7 @@ final class SwaggerContext implements Context
      */
     public function assertPropertyIsRequiredForSwagger(string $propertyName, string $className)
     {
-        if (!in_array($propertyName, $this->getClassInfo($className)->required, true)) {
+        if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
@@ -139,7 +147,7 @@ final class SwaggerContext implements Context
      */
     public function assertPropertyIsRequiredForOpenAPi(string $propertyName, string $className)
     {
-        if (!in_array($propertyName, $this->getClassInfo($className, 3)->required, true)) {
+        if (!\in_array($propertyName, $this->getClassInfo($className, 3)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
@@ -149,9 +157,13 @@ final class SwaggerContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): stdClass
+    private function getPropertyInfo(string $propertyName, string $className, int $specVersion = 2): \stdClass
     {
-        foreach ($this->getProperties($className, $specVersion) as $classPropertyName => $property) {
+        /**
+         * @var iterable $properties
+         */
+        $properties = $this->getProperties($className, $specVersion);
+        foreach ($properties as $classPropertyName => $property) {
             if ($classPropertyName === $propertyName) {
                 return $property;
             }
@@ -163,7 +175,7 @@ final class SwaggerContext implements Context
     /**
      * Gets all operations of a given class.
      */
-    private function getProperties(string $className, int $specVersion = 2): stdClass
+    private function getProperties(string $className, int $specVersion = 2): \stdClass
     {
         return $this->getClassInfo($className, $specVersion)->{'properties'} ?? new \stdClass();
     }
@@ -173,7 +185,7 @@ final class SwaggerContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getClassInfo(string $className, int $specVersion = 2): stdClass
+    private function getClassInfo(string $className, int $specVersion = 2): \stdClass
     {
         $nodes = 2 === $specVersion ? $this->getLastJsonResponse()->{'definitions'} : $this->getLastJsonResponse()->{'components'}->{'schemas'};
         foreach ($nodes as $classTitle => $classData) {
@@ -190,7 +202,7 @@ final class SwaggerContext implements Context
      *
      * @throws \RuntimeException
      */
-    private function getLastJsonResponse(): stdClass
+    private function getLastJsonResponse(): \stdClass
     {
         if (null === ($decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent()))) {
             throw new \RuntimeException('JSON response seems to be invalid');

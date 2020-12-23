@@ -11,13 +11,15 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behatch\Context\RestContext;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\ExpectationFailedException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class HydraContext implements Context
 {
@@ -27,9 +29,9 @@ final class HydraContext implements Context
     private $restContext;
     private $propertyAccessor;
 
-    public function __construct()
+    public function __construct(PropertyAccessorInterface $propertyAccessor)
     {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -39,9 +41,15 @@ final class HydraContext implements Context
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
-        /** @var InitializedContextEnvironment $environment */
+        /**
+         * @var InitializedContextEnvironment $environment
+         */
         $environment = $scope->getEnvironment();
-        $this->restContext = $environment->getContext(RestContext::class);
+        /**
+         * @var RestContext $restContext
+         */
+        $restContext = $environment->getContext(RestContext::class);
+        $this->restContext = $restContext;
     }
 
     /**
@@ -142,7 +150,7 @@ final class HydraContext implements Context
      */
     public function assertNbOperationsExist(int $nb, string $className)
     {
-        Assert::assertEquals($nb, count($this->getOperations($className)));
+        Assert::assertEquals($nb, \count($this->getOperations($className)));
     }
 
     /**
@@ -150,7 +158,7 @@ final class HydraContext implements Context
      */
     public function assertNbPropertiesExist(int $nb, string $className)
     {
-        Assert::assertEquals($nb, count($this->getProperties($className)));
+        Assert::assertEquals($nb, \count($this->getProperties($className)));
     }
 
     /**
@@ -222,7 +230,7 @@ final class HydraContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getPropertyInfo(string $propertyName, string $className): stdClass
+    private function getPropertyInfo(string $propertyName, string $className): \stdClass
     {
         foreach ($this->getProperties($className) as $property) {
             if ($property->{'hydra:title'} === $propertyName) {
@@ -238,7 +246,7 @@ final class HydraContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getOperation(string $method, string $className): stdClass
+    private function getOperation(string $method, string $className): \stdClass
     {
         foreach ($this->getOperations($className) as $operation) {
             if ($operation->{'hydra:method'} === $method) {
@@ -270,7 +278,7 @@ final class HydraContext implements Context
      *
      * @throws \InvalidArgumentException
      */
-    private function getClassInfo(string $className): stdClass
+    private function getClassInfo(string $className): \stdClass
     {
         $json = $this->getLastJsonResponse();
 
@@ -290,7 +298,7 @@ final class HydraContext implements Context
      *
      * @throws \RuntimeException
      */
-    private function getLastJsonResponse(): stdClass
+    private function getLastJsonResponse(): \stdClass
     {
         if (null === $decoded = json_decode($this->restContext->getMink()->getSession()->getDriver()->getContent())) {
             throw new \RuntimeException('JSON response seems to be invalid');

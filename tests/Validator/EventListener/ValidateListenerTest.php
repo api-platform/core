@@ -23,7 +23,6 @@ use ApiPlatform\Core\Validator\ValidatorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -47,12 +46,10 @@ class ValidateListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn([]);
-        $eventProphecy->getRequest()->willReturn($request);
-
         $listener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
-        $listener->onKernelView($eventProphecy->reveal());
+
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, []);
+        $listener->onKernelView($event);
     }
 
     public function testValidatorIsCalled()
@@ -82,14 +79,15 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $response = new Response();
-
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn($response);
-        $eventProphecy->getRequest()->willReturn($request);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
-        $validationViewListener->onKernelView($eventProphecy->reveal());
+        $validationViewListener->onKernelView($event);
     }
 
     public function testDoNotValidateWhenReceiveFlagIsFalse()
@@ -104,12 +102,15 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn($dummy);
-        $eventProphecy->getRequest()->willReturn($request);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
-        $validationViewListener->onKernelView($eventProphecy->reveal());
+        $validationViewListener->onKernelView($event);
     }
 
     public function testDoNotValidateWhenDisabledInOperationAttribute()
@@ -131,12 +132,15 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $eventProphecy = $this->prophesize(ViewEvent::class);
-        $eventProphecy->getControllerResult()->willReturn($dummy);
-        $eventProphecy->getRequest()->willReturn($request);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
-        $validationViewListener->onKernelView($eventProphecy->reveal());
+        $validationViewListener->onKernelView($event);
     }
 
     public function testThrowsValidationExceptionWithViolationsFound()

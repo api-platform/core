@@ -44,7 +44,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
     public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         if (null !== $properties) {
-            $properties = array_map(function ($propertyOptions) {
+            $properties = array_map(static function ($propertyOptions) {
                 // shorthand for default direction
                 if (\is_string($propertyOptions)) {
                     $propertyOptions = [

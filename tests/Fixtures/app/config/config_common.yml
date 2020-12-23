@@ -7,10 +7,11 @@ framework:
     test:                              ~
     session:
         storage_id:                    'session.storage.mock_file'
-    form:                              ~ # For FOSUser
     profiler:
         enabled:                        true
         collect:                        false
+    router:
+        utf8:                           true
 
 web_profiler:
     toolbar: true
@@ -57,7 +58,6 @@ api_platform:
         enabled: true
         nesting_separator: __
     name_converter:                    'app.name_converter'
-    enable_fos_user:                   true
     collection:
         order_parameter_name:          'order'
         order:                         'ASC'
@@ -123,9 +123,6 @@ services:
         tags:
             -  { name: 'serializer.normalizer' }
 
-    fos_user.mailer.default:
-        class: 'ApiPlatform\Core\Tests\Mock\FosUser\MailerMock'
-
     app.name_converter:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
@@ -143,6 +140,8 @@ services:
 
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
         resource: '../../TestBundle/Controller'
+        autowire: true
+        autoconfigure: true
         tags: ['controller.service_arguments']
 
     app.config_dummy_resource.action:

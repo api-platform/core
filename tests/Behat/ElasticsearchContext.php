@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+namespace ApiPlatform\Core\Tests\Behat;
+
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
 use Behat\Behat\Context\Context;
 use Elasticsearch\Client;
@@ -126,7 +128,7 @@ final class ElasticsearchContext implements Context
 
                 $bulk[] = $document;
 
-                if (0 === (count($bulk) % 50)) {
+                if (0 === (\count($bulk) % 50)) {
                     $this->client->bulk(['body' => $bulk]);
                     $bulk = [];
                 }

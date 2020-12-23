@@ -43,6 +43,13 @@ class ApiPlatformParserTest extends TestCase
 {
     use ProphecyTrait;
 
+    protected function setUp(): void
+    {
+        if (!class_exists(NelmioApiDocBundle::class)) {
+            $this->markTestSkipped('NelmioApiDocBundle is not installed.');
+        }
+    }
+
     /**
      * @expectedDeprecation The ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser class is deprecated since version 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.
      */

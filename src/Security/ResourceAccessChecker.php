@@ -81,15 +81,15 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
     private function getEffectiveRoles(TokenInterface $token): array
     {
         if (null === $this->roleHierarchy) {
-            return method_exists($token, 'getRoleNames') ? $token->getRoleNames() : array_map('strval', $token->getRoles());
+            return method_exists($token, 'getRoleNames') ? $token->getRoleNames() : array_map('strval', $token->getRoles()); // @phpstan-ignore-line
         }
 
         if (method_exists($this->roleHierarchy, 'getReachableRoleNames')) {
             return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
         }
 
-        return array_map(function (Role $role): string {
-            return $role->getRole();
-        }, $this->roleHierarchy->getReachableRoles($token->getRoles()));
+        return array_map(static function (Role $role): string { // @phpstan-ignore-line
+            return $role->getRole(); // @phpstan-ignore-line
+        }, $this->roleHierarchy->getReachableRoles($token->getRoles())); // @phpstan-ignore-line
     }
 }
