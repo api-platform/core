@@ -26,6 +26,7 @@ use ApiPlatform\Core\Tests\Fixtures\NotAResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyMercure;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
@@ -139,6 +140,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $toUpdate->setId(2);
         $toUpdateNoMercureAttribute = new DummyCar();
         $toUpdateMercureOptions = new DummyOffer();
+        $toUpdateMercureTopicOptions = new DummyMercure();
 
         $toDelete = new Dummy();
         $toDelete->setId(3);
@@ -150,11 +152,13 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyCar::class))->willReturn(DummyCar::class);
         $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyFriend::class))->willReturn(DummyFriend::class);
         $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyOffer::class))->willReturn(DummyOffer::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyMercure::class))->willReturn(DummyMercure::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
         $resourceClassResolverProphecy->isResourceClass(DummyCar::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(DummyFriend::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(DummyOffer::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(DummyMercure::class)->willReturn(true);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($toInsert, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
@@ -169,11 +173,13 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['private' => true, 'retry' => 10]]));
         $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => 'http://example.com/custom_topics/1', 'normalization_context' => ['groups' => ['baz']]]]));
+        $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['/dummies/1', '/users/3'], 'normalization_context' => ['groups' => ['baz']]]]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
         $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
         $serializerProphecy->serialize($toUpdateMercureOptions, 'jsonld', ['groups' => ['baz']])->willReturn('mercure_options');
+        $serializerProphecy->serialize($toUpdateMercureTopicOptions, 'jsonld', ['groups' => ['baz']])->willReturn('mercure_options');
 
         $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
 
@@ -200,7 +206,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
-        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate, $toUpdateNoMercureAttribute, $toUpdateMercureOptions])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate, $toUpdateNoMercureAttribute, $toUpdateMercureOptions, $toUpdateMercureTopicOptions])->shouldBeCalled();
         $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete, $toDeleteExpressionLanguage])->shouldBeCalled();
 
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
@@ -210,9 +216,9 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4'], $topics);
-        $this->assertSame([false, false, false, false, true], $private);
-        $this->assertSame([null, null, null, null, 10], $retry);
+        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4'], $topics);
+        $this->assertSame([false, false, false, false, false, true], $private);
+        $this->assertSame([null, null, null, null, null, 10], $retry);
     }
 
     public function testPublishGraphQlUpdates(): void
