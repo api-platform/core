@@ -255,6 +255,9 @@ final class PublishMercureUpdatesListener
         return $updates;
     }
 
+    /**
+     * @var string|string[] $iri
+     */
     private function buildUpdate($iri, string $data, array $options): Update
     {
         if (method_exists(Update::class, 'isPrivate')) {
