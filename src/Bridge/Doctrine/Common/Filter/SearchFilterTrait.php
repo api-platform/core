@@ -167,4 +167,15 @@ trait SearchFilterTrait
 
         return true;
     }
+
+    /**
+     * This can be overwritten by a user extending a search filter to map computed properties and extend values that will be matched.
+     *
+     * @param string $property
+     * @param mixed $value
+     */
+    protected function mapCustomPropertyAndValue(string $property, $value): array
+    {
+        return [$property, $value];
+    }
 }

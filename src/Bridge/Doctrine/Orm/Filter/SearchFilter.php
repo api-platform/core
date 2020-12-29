@@ -66,8 +66,10 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, bool $useOrWhere = false)
     {
+        [$property, $value] = $this->mapCustomPropertyAndValue($property, $value);
+
         if (
             null === $value ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
@@ -113,7 +115,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
                 $caseSensitive = false;
             }
 
-            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive);
+            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive, $useOrWhere);
 
             return;
         }
@@ -165,8 +167,9 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive)
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive, bool $useOrWhere = false)
     {
+        $whereFn = $useOrWhere ? 'orWhere' : 'andWhere';
         if (!\is_array($values)) {
             $values = [$values];
         }
@@ -178,14 +181,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         if (null == $strategy || self::STRATEGY_EXACT == $strategy) {
             if (1 == \count($values)) {
                 $queryBuilder
-                    ->andWhere($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
+                    ->$whereFn($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
                     ->setParameter($valueParameter, $values[0]);
 
                 return;
             }
 
             $queryBuilder
-                ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
+                ->$whereFn($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
                 ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
 
             return;
@@ -227,7 +230,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
             }
         }
 
-        $queryBuilder->andWhere($queryBuilder->expr()->orX(...$ors));
+        $queryBuilder->$whereFn($queryBuilder->expr()->orX(...$ors));
         array_walk($parameters, [$queryBuilder, 'setParameter']);
     }
 
