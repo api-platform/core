@@ -31,7 +31,7 @@ class VoDummyCar extends VoDummyVehicle
     /**
      * @var int
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      * @Groups({"car_read", "car_write"})
      */
     private $mileage;

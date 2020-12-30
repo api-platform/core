@@ -25,7 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class CompositePrimitiveItem
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -35,7 +35,7 @@ class CompositePrimitiveItem
     private $name;
 
     /**
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      */
     private $year;
 

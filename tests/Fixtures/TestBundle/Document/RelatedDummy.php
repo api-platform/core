@@ -35,7 +35,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @ApiProperty(writable=false)
      * @ApiSubresource
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"chicago", "friends"})
      */
     private $id;
@@ -80,7 +80,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var bool A dummy bool
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      * @Groups({"friends"})
      */
     public $dummyBoolean;

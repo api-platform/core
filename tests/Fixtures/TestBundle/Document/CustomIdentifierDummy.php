@@ -27,7 +27,7 @@ class CustomIdentifierDummy
     /**
      * @var int The custom identifier
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $customId;
 

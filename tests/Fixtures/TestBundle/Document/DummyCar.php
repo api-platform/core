@@ -44,7 +44,7 @@ class DummyCar
     /**
      * @var int The entity Id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -99,7 +99,7 @@ class DummyCar
     /**
      * @var bool
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      */
     private $canSell;
 

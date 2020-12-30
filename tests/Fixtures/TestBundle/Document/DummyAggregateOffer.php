@@ -32,7 +32,7 @@ class DummyAggregateOffer
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -54,7 +54,7 @@ class DummyAggregateOffer
     /**
      * @var int The dummy aggregate offer value
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      */
     private $value;
 

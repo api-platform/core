@@ -38,7 +38,7 @@ class EmbeddableDummy
     /**
      * @var bool A dummy boolean
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      */
     public $dummyBoolean;
 

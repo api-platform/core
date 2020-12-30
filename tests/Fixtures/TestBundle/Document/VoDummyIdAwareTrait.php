@@ -20,7 +20,7 @@ trait VoDummyIdAwareTrait
     /**
      * @var int
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     protected $id;
 

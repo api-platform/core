@@ -32,14 +32,14 @@ class ThirdLevel
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
      * @var int
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 3;
@@ -47,7 +47,7 @@ class ThirdLevel
     /**
      * @var bool
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      */
     private $test = true;
 

@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CompositeRelation
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 

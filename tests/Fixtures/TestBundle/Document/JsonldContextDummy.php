@@ -29,7 +29,7 @@ class JsonldContextDummy
      * @var int The id
      *
      * @ApiProperty(identifier=true)
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 

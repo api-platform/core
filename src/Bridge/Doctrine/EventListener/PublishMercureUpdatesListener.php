@@ -256,7 +256,7 @@ final class PublishMercureUpdatesListener
     }
 
     /**
-     * @var string|string[] $iri
+     * @param string|string[] $iri
      */
     private function buildUpdate($iri, string $data, array $options): Update
     {

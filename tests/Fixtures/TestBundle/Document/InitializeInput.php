@@ -24,7 +24,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class InitializeInput
 {
     /**
-     * @ODM\Id(strategy="NONE", type="integer")
+     * @ODM\Id(strategy="NONE", type="int")
      */
     public $id;
 
