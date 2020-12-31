@@ -58,7 +58,7 @@ final class SecurityScheme
         return $this->in;
     }
 
-    public function getScheme(): string
+    public function getScheme(): ?string
     {
         return $this->scheme;
     }

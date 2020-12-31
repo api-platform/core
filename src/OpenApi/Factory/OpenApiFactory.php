@@ -446,7 +446,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         foreach ($this->openApiOptions->getApiKeys() as $key => $apiKey) {
             $description = sprintf('Value for the %s %s parameter.', $apiKey['name'], $apiKey['type']);
-            $securitySchemes[$key] = new Model\SecurityScheme('apiKey', $description, $apiKey['name'], $apiKey['type'], 'bearer');
+            $securitySchemes[$key] = new Model\SecurityScheme('apiKey', $description, $apiKey['name'], $apiKey['type']);
         }
 
         return $securitySchemes;
