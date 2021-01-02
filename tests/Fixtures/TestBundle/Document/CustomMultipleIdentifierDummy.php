@@ -28,7 +28,7 @@ class CustomMultipleIdentifierDummy
     /**
      * @var int The custom identifier
      *
-     * @ODM\Id(strategy="NONE", type="integer")
+     * @ODM\Id(strategy="NONE", type="int")
      */
     private $firstId;
 
@@ -36,7 +36,7 @@ class CustomMultipleIdentifierDummy
      * @var int The custom identifier
      *
      * @ApiProperty(identifier=true)
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      */
     private $secondId;
 

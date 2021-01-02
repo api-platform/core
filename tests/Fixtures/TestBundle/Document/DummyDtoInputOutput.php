@@ -37,7 +37,7 @@ class DummyDtoInputOutput
 
     /**
      * @var int The id
-     * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
+     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     public $id;
 

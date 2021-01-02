@@ -63,7 +63,7 @@ class User implements UserInterface
     /**
      * @var int
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     protected $id;
 

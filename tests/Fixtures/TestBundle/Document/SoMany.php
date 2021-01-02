@@ -34,7 +34,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class SoMany
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     public $id;
 

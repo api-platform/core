@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 class Answer
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      * @Serializer\Groups({"foobar"})
      */
     private $id;

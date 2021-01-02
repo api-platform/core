@@ -29,7 +29,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class RelatedOwningDummy
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 

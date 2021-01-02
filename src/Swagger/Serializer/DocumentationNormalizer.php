@@ -697,13 +697,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $security[] = [$key => []];
         }
 
-        if ($v3) {
-            if ($securityDefinitions && $security) {
-                $docs['security'] = $security;
-            }
-        } elseif ($securityDefinitions && $security) {
-            $docs['securityDefinitions'] = $securityDefinitions;
+        if ($securityDefinitions && $security) { // @phpstan-ignore-line
             $docs['security'] = $security;
+            if (!$v3) {
+                $docs['securityDefinitions'] = $securityDefinitions;
+            }
         }
 
         if ($v3) {

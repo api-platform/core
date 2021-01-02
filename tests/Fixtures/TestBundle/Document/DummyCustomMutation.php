@@ -60,14 +60,14 @@ class DummyCustomMutation
     /**
      * @var int
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
      * @var int
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      */
     private $operandA;
 
@@ -75,7 +75,7 @@ class DummyCustomMutation
      * @var int
      *
      * @Groups({"sum"})
-     * @ODM\Field(type="integer", nullable=true)
+     * @ODM\Field(type="int", nullable=true)
      */
     private $operandB;
 
@@ -83,7 +83,7 @@ class DummyCustomMutation
      * @var int
      *
      * @Groups({"result"})
-     * @ODM\Field(type="integer", nullable=true)
+     * @ODM\Field(type="int", nullable=true)
      */
     private $result;
 

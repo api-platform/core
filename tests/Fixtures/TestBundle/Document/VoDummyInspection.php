@@ -35,7 +35,7 @@ class VoDummyInspection
     /**
      * @var bool
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
     private $accepted;

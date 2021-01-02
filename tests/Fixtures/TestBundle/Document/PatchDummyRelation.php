@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class PatchDummyRelation
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     public $id;
 

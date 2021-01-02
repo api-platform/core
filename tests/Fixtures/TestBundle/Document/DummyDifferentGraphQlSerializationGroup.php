@@ -35,7 +35,7 @@ class DummyDifferentGraphQlSerializationGroup
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
+     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      * @Groups({"item_query", "collection_query"})
      */
     private $id;

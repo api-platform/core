@@ -39,8 +39,10 @@ trait ClassInfoTrait
     {
         // __CG__: Doctrine Common Marker for Proxy (ODM < 2.0 and ORM < 3.0)
         // __PM__: Ocramius Proxy Manager (ODM >= 2.0)
-        if ((false === $positionCg = strrpos($className, '\\__CG__\\')) &&
-            (false === $positionPm = strrpos($className, '\\__PM__\\'))) {
+        $positionCg = strrpos($className, '\\__CG__\\');
+        $positionPm = strrpos($className, '\\__PM__\\');
+
+        if (false === $positionCg && false === $positionPm) {
             return $className;
         }
 

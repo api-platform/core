@@ -52,7 +52,7 @@ class DummyGroup
     /**
      * @var int
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      *
      * @Groups({"dummy", "dummy_read", "dummy_id"})
      */

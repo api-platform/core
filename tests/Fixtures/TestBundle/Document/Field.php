@@ -23,7 +23,7 @@ class Field implements \JsonSerializable
     /**
      * @var int|null
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 

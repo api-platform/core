@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 class MaxDepthDummy
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"default"})
      */
     private $id;

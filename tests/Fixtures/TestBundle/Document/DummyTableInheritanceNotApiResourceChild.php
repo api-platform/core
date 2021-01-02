@@ -23,7 +23,7 @@ class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
     /**
      * @var bool The dummy swagg
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      */
     private $swaggerThanParent;
 

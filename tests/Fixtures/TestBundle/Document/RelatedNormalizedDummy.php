@@ -36,7 +36,7 @@ class RelatedNormalizedDummy
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"related_output", "related_input"})
      */
     private $id;
