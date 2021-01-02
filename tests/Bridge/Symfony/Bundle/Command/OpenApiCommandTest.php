@@ -78,12 +78,16 @@ YAML;
         $expected = <<<YAML
 info:
   title: 'My Dummy API'
-  description: |
+YAML;
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
+
+        $expected = <<<YAML
     This is a test API.
     Made with love
   version: 0.0.0
 YAML;
-        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
+
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result);
     }
 
     public function testWriteToFile()
