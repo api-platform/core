@@ -9,6 +9,7 @@
             <argument type="tagged" tag="api_platform.data_persister" />
         </service>
         <service id="ApiPlatform\Core\DataPersister\DataPersisterInterface" alias="api_platform.data_persister" />
+        <service id="ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface" alias="api_platform.data_persister" />
     </services>
 
 </container>
