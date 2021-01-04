@@ -106,7 +106,7 @@ trait OperationDataProviderTrait
                         throw new InvalidIdentifierException(sprintf('Expected %d identifiers, got %d', $identifiersNumber, $currentIdentifiersNumber));
                     }
 
-                    return $identifiers;
+                    return $this->identifierConverter->convert($identifiers, $attributes['resource_class']);
                 }
 
                 // TODO: Subresources tuple may have a third item representing if it is a "collection", this behavior will be removed in 3.0

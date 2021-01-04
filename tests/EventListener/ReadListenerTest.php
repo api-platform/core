@@ -382,4 +382,27 @@ class ReadListenerTest extends TestCase
         $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
         $listener->onKernelRequest($event->reveal());
     }
+
+    public function testRetrieveItemWithCompositeIdentifiersCallsIdentifierConverter()
+    {
+        $identifierConverter = $this->prophesize(IdentifierConverterInterface::class);
+        $identifierConverter->convert(['foo' => '22', 'bar' => 'test'], 'DummyWithCompositeIdentifier')->shouldBeCalled()->willReturn(['foo' => 22, 'bar' => 'test']);
+        $this->expectException(NotFoundHttpException::class);
+
+        $collectionDataProvider = $this->prophesize(CollectionDataProviderInterface::class);
+
+        $itemDataProvider = $this->prophesize(ItemDataProviderInterface::class);
+        $itemDataProvider->getItem('DummyWithCompositeIdentifier', ['foo' => 22, 'bar' => 'test'], 'get', [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true])->willReturn(null)->shouldBeCalled();
+
+        $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
+
+        $request = new Request([], [], ['id' => 'foo=22;bar=test', '_api_resource_class' => 'DummyWithCompositeIdentifier', '_api_item_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_identifiers' => ['foo', 'bar'], '_api_has_composite_identifier' => true]);
+        $request->setMethod('GET');
+
+        $event = $this->prophesize(RequestEvent::class);
+        $event->getRequest()->willReturn($request)->shouldBeCalled();
+
+        $listener = new ReadListener($collectionDataProvider->reveal(), $itemDataProvider->reveal(), $subresourceDataProvider->reveal(), null, $identifierConverter->reveal());
+        $listener->onKernelRequest($event->reveal());
+    }
 }
