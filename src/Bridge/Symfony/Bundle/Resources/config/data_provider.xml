@@ -44,6 +44,8 @@
         </service>
         <service id="ApiPlatform\Core\DataProvider\PaginationOptions" alias="api_platform.pagination_options" />
 
+        <service id="ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface" alias="api_platform.item_data_provider" />
+        <service id="ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface" alias="api_platform.collection_data_provider" />
     </services>
 
 </container>
