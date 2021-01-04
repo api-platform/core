@@ -105,10 +105,24 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $securityRequirements = [];
 
         foreach (array_keys($securitySchemes) as $key) {
-            $securityRequirements[$key] = [];
+            $securityRequirements[] = [$key => []];
         }
 
-        return new OpenApi($info, $servers, $paths, new Model\Components(new \ArrayObject($schemas), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject($securitySchemes)), $securityRequirements);
+        return new OpenApi(
+            $info,
+            $servers,
+            $paths,
+            new Model\Components(
+                new \ArrayObject($schemas),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject($securitySchemes)
+            ),
+            $securityRequirements
+        );
     }
 
     /**

@@ -232,6 +232,12 @@ class OpenApiFactoryTest extends TestCase
             'query' => new Model\SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
         ]));
 
+        $this->assertSame([
+            ['oauth' => []],
+            ['header' => []],
+            ['query' => []],
+        ], $openApi->getSecurity());
+
         $paths = $openApi->getPaths();
         $dummiesPath = $paths->getPath('/dummies');
         $this->assertNotNull($dummiesPath);
