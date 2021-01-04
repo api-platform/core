@@ -17,7 +17,7 @@ trait ExtensionTrait
 {
     private $extensionProperties = [];
 
-    public function withExtensionProperty(string $key, string $value)
+    public function withExtensionProperty(string $key, $value)
     {
         if (0 !== strpos($key, 'x-')) {
             $key = 'x-'.$key;
