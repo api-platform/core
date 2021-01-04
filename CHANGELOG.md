@@ -50,12 +50,13 @@
 * Symfony: Allow using `ItemNormalizer` without Symfony SecurityBundle (#3801)
 * Symfony: Lazy load all commands (#3798)
 * Tests: adds a method to retrieve the CookieJar in the test Client `getCookieJar`
+* Tests: Fix the registration of the `test.api_platform.client` service when the `FrameworkBundle` bundle is registered after the `ApiPlatformBundle` bundle (#3928)
 * Validator: Add the violation code to the violation properties (#3857)
 * Validator: Allow customizing the validation error status code (#3808)
 * Validator: Autoconfiguration of validation groups generator via `ApiPlatform\Core\Validator\ValidationGroupsGeneratorInterface`
 * Validator: Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
 * Validator: Property validation through OpenAPI (#33329)
-* Validator:Query filters and parameters are validated (#1723)
+* Validator: Query filters and parameters are validated (#1723)
 * `ExceptionInterface` now extends `\Throwable` (#3217)
 
 ## 2.5.9

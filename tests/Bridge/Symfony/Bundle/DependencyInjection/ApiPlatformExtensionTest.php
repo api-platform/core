@@ -1159,7 +1159,6 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
         }
-        $containerBuilderProphecy->hasParameter('test.client.parameters')->wilLReturn(true);
 
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
@@ -1270,7 +1269,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.listener.ui',
             'api_platform.validator',
             'api_platform.validator.query_parameter_validator',
-            'test.api_platform.client',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
