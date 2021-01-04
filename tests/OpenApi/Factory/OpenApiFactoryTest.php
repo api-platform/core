@@ -256,7 +256,7 @@ class OpenApiFactoryTest extends TestCase
                     ]))),
                 ])),
             ],
-            '',
+            'Retrieves the collection of Dummy resources.',
             'Retrieves the collection of Dummy resources.',
             null,
             [
@@ -289,7 +289,7 @@ class OpenApiFactoryTest extends TestCase
                 ),
                 '400' => new Model\Response('Invalid input'),
             ],
-            '',
+            'Creates a Dummy resource.',
             'Creates a Dummy resource.',
             null,
             [],
@@ -320,7 +320,7 @@ class OpenApiFactoryTest extends TestCase
                 ),
                 '404' => new Model\Response('Resource not found'),
             ],
-            '',
+            'Retrieves a Dummy resource.',
             'Retrieves a Dummy resource.',
             null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
@@ -341,7 +341,7 @@ class OpenApiFactoryTest extends TestCase
                 '400' => new Model\Response('Invalid input'),
                 '404' => new Model\Response('Resource not found'),
             ],
-            '',
+            'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
@@ -361,7 +361,7 @@ class OpenApiFactoryTest extends TestCase
                 '204' => new Model\Response('Dummy resource deleted'),
                 '404' => new Model\Response('Resource not found'),
             ],
-            '',
+            'Removes the Dummy resource.',
             'Removes the Dummy resource.',
             null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
@@ -374,7 +374,7 @@ class OpenApiFactoryTest extends TestCase
             [
                 '404' => new Model\Response('Resource not found'),
             ],
-            '',
+            'Dummy',
             'Custom description',
             null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
@@ -397,7 +397,7 @@ class OpenApiFactoryTest extends TestCase
                 '400' => new Model\Response('Invalid input'),
                 '404' => new Model\Response('Resource not found'),
             ],
-            '',
+            'Replaces the Dummy resource.',
             'Replaces the Dummy resource.',
             null,
             [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
@@ -423,7 +423,7 @@ class OpenApiFactoryTest extends TestCase
                     ])),
                 ])),
             ],
-            '',
+            'Retrieves the collection of Dummy resources.',
             'Retrieves the collection of Dummy resources.',
             null,
             [
@@ -467,7 +467,7 @@ class OpenApiFactoryTest extends TestCase
                     ])),
                 ])),
             ],
-            '',
+            'Retrieves the collection of Dummy resources.',
             'Retrieves the collection of Dummy resources.',
             null,
             [
@@ -683,7 +683,7 @@ class OpenApiFactoryTest extends TestCase
                     ])
                 ),
             ],
-            '',
+            'Retrieves a Question resource.',
             'Retrieves a Question resource.',
             null,
             [new Model\Parameter('id', 'path', 'Question identifier', true, false, false, ['type' => 'string'])]
