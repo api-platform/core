@@ -89,13 +89,15 @@ Coverage will be available in `coverage/index.html`.
 
 The command to launch Behat tests is:
 
-    php -d memory_limit=-1 ./vendor/bin/behat --suite=default --stop-on-failure --format=progress
+    php -d memory_limit=-1 ./vendor/bin/behat --profile=default --stop-on-failure --format=progress
 
 If you want to launch Behat tests for MongoDB, the command is:
 
-    APP_ENV=mongodb php -d memory_limit=-1 ./vendor/bin/behat --suite=mongodb --stop-on-failure --format=progress
+    MONGODB_URL=mongodb://localhost:27017 APP_ENV=mongodb php -d memory_limit=-1 ./vendor/bin/behat --profile=mongodb --stop-on-failure --format=progress
 
-To get more details about an error, replace `--format=progress` by `-vvv`.
+To get more details about an error, replace `--format=progress` by `-vvv`. You may run a mongo instance using docker:
+
+	docker run -p 27017:27017 mongo:latest
 
 # License and Copyright Attribution
 
