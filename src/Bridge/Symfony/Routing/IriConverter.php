@@ -154,6 +154,7 @@ final class IriConverter implements IriConverterInterface
         try {
             return $this->router->generate($routeName, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
         } catch (RoutingExceptionInterface $e) {
+            dump($e->getMessage());
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
     }

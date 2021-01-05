@@ -27,7 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *     itemOperations={
  *         "get"={
  *             "method"="GET",
- *             "requirements"={"id"=".+"}
+ *             "requirements"={"id"=".*"}
  *         }
  *     }
  * )
@@ -37,7 +37,7 @@ class UrlEncodedId
     /**
      * @ODM\Id(strategy="none")
      */
-    private $id = '%encode:001';
+    private $id = '%./encode:001';
 
     public function getId()
     {

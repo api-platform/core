@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -36,14 +36,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "post"
  *     }
  * )
- * @ORM\Entity
+ * @ODM\Document
+ *
+ * @author Daniel West <daniel@silverback.is>
  */
 class RelatedToUrlEncodedId
 {
     /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="UrlEncodedId")
-     * @ORM\JoinColumn(name="urlencodedid_id", referencedColumnName="id", nullable=false)
+     * @ODM\Id(strategy="none")
+     * @ODM\ManyToOne(targetEntity="UrlEncodedId")
+     * @ODM\JoinColumn(name="urlencodedid_id", referencedColumnName="id", nullable=false)
      * @Assert\NotNull
      */
     private $urlEncodedIdResource;
