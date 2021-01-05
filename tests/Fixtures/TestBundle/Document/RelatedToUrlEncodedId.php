@@ -44,8 +44,7 @@ class RelatedToUrlEncodedId
 {
     /**
      * @ODM\Id(strategy="none")
-     * @ODM\ManyToOne(targetEntity="UrlEncodedId")
-     * @ODM\JoinColumn(name="urlencodedid_id", referencedColumnName="id", nullable=false)
+     * @ODM\ReferenceOne(targetEntity="UrlEncodedId")
      * @Assert\NotNull
      */
     private $urlEncodedIdResource;
