@@ -13,14 +13,30 @@ Feature: Allowing resource identifiers with characters that should be URL encode
     """
     {
         "@context": "/contexts/UrlEncodedId",
-        "@id": "/url_encoded_ids/%25encode:id",
+        "@id": "/url_encoded_ids/%25encode:001",
         "@type": "UrlEncodedId",
-        "id": "%encode:id"
+        "id": "%encode:001"
     }
     """
     Examples:
-      | url                              |
-      | /url_encoded_ids/%encode:id      |
-      | /url_encoded_ids/%25encode%3Aid  |
-      | /url_encoded_ids/%25encode:id    |
-      | /url_encoded_ids/%encode%3Aid    |
+      | url                               |
+      | /url_encoded_ids/%encode:001      |
+      | /url_encoded_ids/%25encode%3A001  |
+      | /url_encoded_ids/%encode%3A001    |
+
+  @createSchema
+  Scenario Outline: Add a resource relation which contains special URL characters
+    Given there is a UrlEncodedId resource
+    And I add "Content-Type" header equal to "application/ld+json"
+    When I send a "POST" request to "/related_to_url_encoded_ids" with body:
+    """
+    {
+      "urlEncodedIdResource": "/url_encoded_ids/<id>"
+    }
+    """
+    Then the response status code should be 201
+    Examples:
+      | id                   |
+      | %25encode%3A001      |
+      | %encode:001          |
+      | %encode%3A001         |

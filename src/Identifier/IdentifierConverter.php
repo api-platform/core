@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Identifier converter that chains identifier denormalizers.
@@ -28,27 +29,31 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class IdentifierConverter implements ContextAwareIdentifierConverterInterface
 {
     private $propertyMetadataFactory;
-    private $identifiersExtractor;
+    /* @var DenormalizerInterface[] */
     private $identifierDenormalizers;
+    private $identifiersExtractor;
     private $resourceMetadataFactory;
 
     /**
      * TODO: rename identifierDenormalizers to identifierTransformers in 3.0 and change their interfaces to a IdentifierTransformerInterface.
+     * TODO: rename convert method in 3.0
+     * TODO: remove unused variables $identifiersExtractor and $resourceMetadataFactory in 3.0
      *
      * @param iterable<DenormalizerInterface> $identifierDenormalizers
      */
     public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $identifierDenormalizers, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->identifiersExtractor = $identifiersExtractor;
         $this->identifierDenormalizers = $identifierDenormalizers;
+
+        $this->identifiersExtractor = $identifiersExtractor;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convert($data, string $class, array $context = []): array
+    public function convert($data, string $class, array $context = [], bool $normalize = false): array
     {
         if (!\is_array($data)) {
             @trigger_error(sprintf('Not using an array as the first argument of "%s->convert" is deprecated since API Platform 2.6 and will not be possible anymore in API Platform 3', self::class), E_USER_DEPRECATED);
@@ -61,16 +66,27 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
                 continue;
             }
 
-            /* @var DenormalizerInterface[] */
-            foreach ($this->identifierDenormalizers as $identifierTransformer) {
-                if (!$identifierTransformer->supportsDenormalization($value, $type)) {
-                    continue;
+            if ($normalize) {
+                foreach ($this->identifierDenormalizers as $identifierTransformer) {
+                    if (!$identifierTransformer instanceof NormalizerInterface || !$identifierTransformer->supportsNormalization($value, $type)) {
+                        continue;
+                    }
+                    try {
+                        $identifiers[$identifier] = $identifierTransformer->normalize($value);
+                    } catch (InvalidIdentifierException $e) {
+                        throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be normalized.', $identifier), $e->getCode(), $e);
+                    }
                 }
-
-                try {
-                    $identifiers[$identifier] = $identifierTransformer->denormalize($value, $type);
-                } catch (InvalidIdentifierException $e) {
-                    throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be denormalized.', $identifier), $e->getCode(), $e);
+            } else {
+                foreach ($this->identifierDenormalizers as $identifierTransformer) {
+                    if (!$identifierTransformer instanceof DenormalizerInterface || !$identifierTransformer->supportsDenormalization($value, $type)) {
+                        continue;
+                    }
+                    try {
+                        $identifiers[$identifier] = $identifierTransformer->denormalize($value, $type);
+                    } catch (InvalidIdentifierException $e) {
+                        throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be denormalized.', $identifier), $e->getCode(), $e);
+                    }
                 }
             }
         }
