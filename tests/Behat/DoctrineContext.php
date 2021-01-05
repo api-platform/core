@@ -45,7 +45,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackTo
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyImmutableDate as DummyDateImmutableDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyImmutableDate as DummyImmutableDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyMercure as DummyMercureDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
@@ -1803,11 +1803,11 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return DummyImmutableDate|DummyDateImmutableDocument
+     * @return DummyImmutableDate|DummyImmutableDateDocument
      */
     private function buildDummyImmutableDate()
     {
-        return $this->isOrm() ? new DummyImmutableDate() : new DummyDateImmutableDocument();
+        return $this->isOrm() ? new DummyImmutableDate() : new DummyImmutableDateDocument();
     }
 
     /**
