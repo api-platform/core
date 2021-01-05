@@ -232,7 +232,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operationId,
                 $operation['openapi_context']['tags'] ?? (OperationType::SUBRESOURCE === $operationType ? $operation['shortNames'] : [$resourceShortName]),
                 $responses,
-                $operation['openapi_context']['summary'] ?? '',
+                $operation['openapi_context']['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operationType),
                 $operation['openapi_context']['description'] ?? $this->getPathDescription($resourceShortName, $method, $operationType),
                 isset($operation['openapi_context']['externalDocs']) ? new ExternalDocumentation($operation['openapi_context']['externalDocs']['description'] ?? null, $operation['openapi_context']['externalDocs']['url']) : null,
                 $parameters,
