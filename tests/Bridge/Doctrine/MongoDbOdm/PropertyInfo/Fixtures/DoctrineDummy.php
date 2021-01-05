@@ -92,6 +92,11 @@ class DoctrineDummy
     private $date;
 
     /**
+     * @Field(type="date_immutable")
+     */
+    private $dateImmutable;
+
+    /**
      * @Field(type="float")
      */
     private $float;

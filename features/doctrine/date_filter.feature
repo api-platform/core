@@ -506,7 +506,6 @@ Feature: Date filter on collections
     And the JSON node "hydra:member[0].dateIncludeNullBeforeAndAfter" should be equal to "2015-04-02T00:00:00+00:00"
     And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
 
-  @!mongodb
   @createSchema
   Scenario: Get collection filtered by date that is an immutable date variant
     Given there are 30 dummyimmutabledate objects with dummyDate

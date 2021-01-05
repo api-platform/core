@@ -34,6 +34,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
 
     public const DOCTRINE_DATE_TYPES = [
         MongoDbType::DATE => true,
+        MongoDbType::DATE_IMMUTABLE => true,
     ];
 
     /**
