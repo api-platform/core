@@ -44,7 +44,7 @@ class RelatedToUrlEncodedId
 {
     /**
      * @ODM\Id(strategy="none")
-     * @ODM\ReferenceOne(targetEntity="UrlEncodedId")
+     * @ODM\ReferenceOne(targetDocument="UrlEncodedId")
      * @Assert\NotNull
      */
     private $urlEncodedIdResource;
