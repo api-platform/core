@@ -41,12 +41,28 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedToUrlEncodedId
 {
     /**
+     * @ORM\Column(type="integer")
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
      * @ORM\ManyToOne(targetEntity="UrlEncodedId")
      * @ORM\JoinColumn(name="urlencodedid_id", referencedColumnName="id", nullable=false)
      * @Assert\NotNull
      */
     private $urlEncodedIdResource;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
     /**
      * @return UrlEncodedId

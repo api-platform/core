@@ -43,11 +43,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedToUrlEncodedId
 {
     /**
-     * @ODM\Id(strategy="none")
+     * @ODM\Id(strategy="INCREMENT", type="int")
+     */
+    private $id;
+
+    /**
      * @ODM\ReferenceOne(targetDocument="UrlEncodedId")
      * @Assert\NotNull
      */
     private $urlEncodedIdResource;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
     /**
      * @return UrlEncodedId
