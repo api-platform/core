@@ -33,7 +33,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("swaggerContext", type="array")
  * )
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY|\Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_PROPERTY|\Attribute::TARGET_METHOD|\Attribute::TARGET_PARAMETER)]
 final class ApiProperty
 {
     use AttributesHydratorTrait;
