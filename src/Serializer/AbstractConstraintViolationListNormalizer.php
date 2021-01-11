@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Serializer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -58,6 +59,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     {
         $violations = $messages = [];
 
+        /** @var ConstraintViolation $violation */
         foreach ($constraintViolationList as $violation) {
             $class = \is_object($root = $violation->getRoot()) ? \get_class($root) : null;
             $violationData = [
