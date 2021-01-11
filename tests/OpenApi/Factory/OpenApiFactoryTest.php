@@ -451,6 +451,7 @@ class OpenApiFactoryTest extends TestCase
                 ], 'deepObject', true),
                 new Model\Parameter('order[name]', 'query', '', false, false, true, [
                     'type' => 'string',
+                    'enum' => ['asc', 'desc'],
                 ]),
             ]
         ));

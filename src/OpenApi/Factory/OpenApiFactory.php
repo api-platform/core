@@ -363,7 +363,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
-                $schema = $data['schema'] ?? \in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string'];
+                $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string']);
 
                 $parameters[] = new Model\Parameter(
                     $name,
