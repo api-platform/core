@@ -671,7 +671,7 @@ class OpenApiFactoryTest extends TestCase
         $openApi = $factory(['base_url', '/app_dev.php/']);
 
         $paths = $openApi->getPaths();
-        $pathItem = $paths->getPath('/questions/{id}/answer');
+        $pathItem = $paths->getPath('/api/questions/{id}/answer');
 
         $this->assertEquals($pathItem->getGet(), new Model\Operation(
             'api_questions_answer_get_subresourceQuestionSubresource',
