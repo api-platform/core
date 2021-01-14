@@ -2339,7 +2339,6 @@ class DocumentationNormalizerV2Test extends TestCase
                         ]),
                         'relatedDummy' => new \ArrayObject([
                             'description' => 'This is a related dummy \o/.',
-                            '$ref' => '#/definitions/'.$relatedDummyRef,
                         ]),
                     ],
                 ]),
