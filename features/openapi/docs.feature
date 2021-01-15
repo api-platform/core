@@ -87,7 +87,11 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].required" should be false
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].schema.type" should be equal to "string"
 
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 5 elements
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].name" should be equal to "description"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].in" should be equal to "query"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].required" should be false
+
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
 
     # Subcollection - check schema
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany"
