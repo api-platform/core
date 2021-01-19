@@ -176,7 +176,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 if ($operation['collection']) {
-                    $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
+                    $subresourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                    $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($subresourceMetadata, $operationName, $resourceClass));
                 }
             }
 
