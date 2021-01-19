@@ -226,7 +226,11 @@ final class SchemaFactory implements SchemaFactoryInterface
             $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
         }
 
-        $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
+        if (\count($propertySchema) > 0 && \array_key_exists('$ref', $valueSchema)) {
+            $propertySchema = new \ArrayObject($propertySchema);
+        } else {
+            $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
+        }
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
