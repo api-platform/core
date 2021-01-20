@@ -82,7 +82,7 @@ trait IdentifierManagerTrait
                     $exceptionMessage .= sprintf(' for resource "%s"', $resourceMetadata->getShortName());
                 }
 
-                throw new PropertyNotFoundException($exceptionMessage . ".");
+                throw new PropertyNotFoundException($exceptionMessage.'.');
             }
 
             $doctrineTypeName = $doctrineClassMetadata->getTypeOfField($propertyName);
@@ -101,7 +101,7 @@ trait IdentifierManagerTrait
                     $exceptionMessage .= sprintf(' for resource "%s"', $resourceMetadata->getShortName());
                 }
 
-                throw new InvalidIdentifierException($exceptionMessage . ".", $e->getCode(), $e);
+                throw new InvalidIdentifierException($exceptionMessage.'.', $e->getCode(), $e);
             }
 
             $identifiers[$propertyName] = $identifier;
