@@ -18,6 +18,7 @@ use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
 /**
@@ -66,24 +67,26 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     }
 
     /**
-     * Sets readable/writable based on matching normalization/denormalization groups.
+     * Sets readable/writable based on matching normalization/denormalization groups and property's ignorance.
      *
      * A false value is never reset as it could be unreadable/unwritable for other reasons.
-     * If normalization/denormalization groups are not specified, the property is implicitly readable/writable.
+     * If normalization/denormalization groups are not specified and the property is not ignored, the property is implicitly readable/writable.
      *
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
     private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
     {
-        $groups = $this->getPropertySerializerGroups($resourceClass, $propertyName);
+        $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
+        $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
+        $ignored = $serializerAttributeMetadata && method_exists($serializerAttributeMetadata, 'isIgnored') ? $serializerAttributeMetadata->isIgnored() : false;
 
         if (false !== $propertyMetadata->isReadable()) {
-            $propertyMetadata = $propertyMetadata->withReadable(null === $normalizationGroups || !empty(array_intersect($normalizationGroups, $groups)));
+            $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)));
         }
 
         if (false !== $propertyMetadata->isWritable()) {
-            $propertyMetadata = $propertyMetadata->withWritable(null === $denormalizationGroups || !empty(array_intersect($denormalizationGroups, $groups)));
+            $propertyMetadata = $propertyMetadata->withWritable(!$ignored && (null === $denormalizationGroups || array_intersect($denormalizationGroups, $groups)));
         }
 
         return $propertyMetadata;
@@ -178,22 +181,17 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         ];
     }
 
-    /**
-     * Gets the serializer groups defined on a property.
-     *
-     * @return string[]
-     */
-    private function getPropertySerializerGroups(string $class, string $property): array
+    private function getSerializerAttributeMetadata(string $class, string $attribute): ?AttributeMetadataInterface
     {
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if ($property === $serializerAttributeMetadata->getName()) {
-                return $serializerAttributeMetadata->getGroups();
+            if ($attribute === $serializerAttributeMetadata->getName()) {
+                return $serializerAttributeMetadata;
             }
         }
 
-        return [];
+        return null;
     }
 
     /**
