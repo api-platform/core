@@ -757,12 +757,12 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['orm'], $config);
-        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
         $this->extension->load($config, $containerBuilder);
@@ -775,13 +775,14 @@ class ApiPlatformExtensionTest extends TestCase
         $config['api_platform']['enable_swagger_ui'] = false;
 
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy(['orm'], $config);
-        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldNotBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.action.ui', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.swagger.listener.ui', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', true)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldNotBeCalled();
-        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_swagger_ui', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', true)->shouldBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.enable_re_doc', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.swagger.api_keys', true)->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
         $this->extension->load($config, $containerBuilder);
     }
@@ -1147,11 +1148,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.openapi.contact.email' => null,
             'api_platform.openapi.license.name' => null,
             'api_platform.openapi.license.url' => null,
+            'api_platform.swagger.api_keys' => [],
         ];
 
         if ($hasSwagger) {
             $parameters['api_platform.swagger.versions'] = [2, 3];
-            $parameters['api_platform.swagger.api_keys'] = [];
         } else {
             $parameters['api_platform.swagger.versions'] = [];
         }
@@ -1240,6 +1241,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.purger.varnish',
+            'api_platform.json_schema.json_schema_generate_command',
+            'api_platform.json_schema.schema_factory',
+            'api_platform.json_schema.type_factory',
             'api_platform.listener.view.validate',
             'api_platform.listener.view.validate_query_parameters',
             'api_platform.mercure.listener.response.add_link_header',
@@ -1262,11 +1266,21 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.yaml',
             'api_platform.metadata.subresource.metadata_factory.annotation',
+            'api_platform.openapi.command',
+            'api_platform.openapi.factory',
+            'api_platform.openapi.normalizer',
+            'api_platform.openapi.normalizer.api_gateway',
+            'api_platform.openapi.options',
             'api_platform.problem.encoder',
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
             'api_platform.swagger.action.ui',
+            'api_platform.swagger.command.swagger_command',
             'api_platform.swagger.listener.ui',
+            'api_platform.swagger.normalizer.api_gateway',
+            'api_platform.swagger.normalizer.documentation',
+            'api_platform.swagger_ui.context',
+            'api_platform.swagger_ui.action',
             'api_platform.validator',
             'api_platform.validator.query_parameter_validator',
         ];
@@ -1300,22 +1314,6 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.doctrine.metadata_factory';
         }
 
-        // Only when swagger is enabled
-        if ($hasSwagger) {
-            $definitions[] = 'api_platform.swagger.command.swagger_command';
-            $definitions[] = 'api_platform.swagger.normalizer.api_gateway';
-            $definitions[] = 'api_platform.swagger.normalizer.documentation';
-            $definitions[] = 'api_platform.json_schema.type_factory';
-            $definitions[] = 'api_platform.json_schema.schema_factory';
-            $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
-            $definitions[] = 'api_platform.openapi.options';
-            $definitions[] = 'api_platform.openapi.normalizer';
-            $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
-            $definitions[] = 'api_platform.openapi.factory';
-            $definitions[] = 'api_platform.openapi.command';
-            $definitions[] = 'api_platform.swagger_ui.context';
-            $definitions[] = 'api_platform.swagger_ui.action';
-        }
 
         // has jsonld
         if ($hasHydra) {
@@ -1349,11 +1347,15 @@ class ApiPlatformExtensionTest extends TestCase
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
             'api_platform.message_bus' => 'messenger.default_bus',
+            'api_platform.swagger_ui.listener' => 'api_platform.swagger.listener.ui',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',
             PaginationExtension::class => 'api_platform.doctrine.orm.query_extension.pagination',
             OrderExtension::class => 'api_platform.doctrine.orm.query_extension.order',
+            SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
+            OpenApiFactoryInterface::class => 'api_platform.openapi.factory',
+            TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
             ValidatorInterface::class => 'api_platform.validator',
             SearchFilter::class => 'api_platform.doctrine.orm.search_filter',
             OrderFilter::class => 'api_platform.doctrine.orm.order_filter',
@@ -1363,6 +1365,8 @@ class ApiPlatformExtensionTest extends TestCase
             NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
             ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
             GraphQlSerializerContextBuilderInterface::class => 'api_platform.graphql.serializer.context_builder',
+            OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
+            Options::class => 'api_platform.openapi.options',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
@@ -1377,18 +1381,6 @@ class ApiPlatformExtensionTest extends TestCase
                 MongoDbOdmFilterExtension::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter',
                 MongoDbOdmOrderExtension::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.order',
                 MongoDbOdmPaginationExtension::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination',
-            ];
-        }
-
-        // Only when swagger is enabled
-        if ($hasSwagger) {
-            $aliases += [
-                TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
-                SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
-                Options::class => 'api_platform.openapi.options',
-                OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
-                OpenApiFactoryInterface::class => 'api_platform.openapi.factory',
-                'api_platform.swagger_ui.listener' => 'api_platform.swagger.listener.ui',
             ];
         }
 
