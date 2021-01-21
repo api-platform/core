@@ -375,10 +375,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
 
-        if (empty($config['swagger']['versions'])) {
-            return;
-        }
-
         $loader->load('json_schema.xml');
         $loader->load('swagger.xml');
         $loader->load('openapi.xml');
