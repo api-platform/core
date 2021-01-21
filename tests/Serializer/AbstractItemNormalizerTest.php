@@ -230,7 +230,11 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(SecuredDummy::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted('adminOnlyProperty', 'is_granted(\'ROLE_ADMIN\')')->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            ['object' => $dummy]
+        )->willReturn(false);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
