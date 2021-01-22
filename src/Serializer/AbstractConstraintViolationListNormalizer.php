@@ -59,7 +59,6 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     {
         $violations = $messages = [];
 
-        /** @var ConstraintViolation $violation */
         foreach ($constraintViolationList as $violation) {
             $class = \is_object($root = $violation->getRoot()) ? \get_class($root) : null;
             $violationData = [

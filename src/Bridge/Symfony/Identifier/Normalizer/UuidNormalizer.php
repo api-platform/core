@@ -29,7 +29,7 @@ final class UuidNormalizer implements DenormalizerInterface
     {
         try {
             return Uuid::fromString($data);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException | \ValueError $e) { // catching ValueError will not be necessary anymore when https://github.com/symfony/symfony/pull/39636 will be released
             throw new InvalidIdentifierException($e->getMessage(), $e->getCode(), $e);
         }
     }
