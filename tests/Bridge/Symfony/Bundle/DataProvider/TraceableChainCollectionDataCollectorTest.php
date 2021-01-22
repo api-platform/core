@@ -39,7 +39,7 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
             }
 
             return 0 !== strpos($key, 'class@anonymous');
-        }, ARRAY_FILTER_USE_KEY));
+        }, \ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
         $this->assertSame($context, $dataProvider->getContext());
     }
@@ -61,7 +61,7 @@ class TraceableChainCollectionDataCollectorTest extends TestCase
             }
 
             return 0 !== strpos($key, 'class@anonymous');
-        }, ARRAY_FILTER_USE_KEY));
+        }, \ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
         $this->assertSame($context, $dataProvider->getContext());
     }

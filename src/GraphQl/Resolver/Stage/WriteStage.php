@@ -59,7 +59,7 @@ final class WriteStage implements WriteStageInterface
         $persistResult = $this->dataPersister->persist($data, $denormalizationContext);
 
         if (!\is_object($persistResult)) {
-            @trigger_error(sprintf('Not returning an object from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.', DataPersisterInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not returning an object from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.', DataPersisterInterface::class), \E_USER_DEPRECATED);
             $persistResult = null;
         }
 

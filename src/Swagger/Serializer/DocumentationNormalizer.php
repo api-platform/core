@@ -108,7 +108,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3])
     {
         if ($jsonSchemaTypeFactory instanceof OperationMethodResolverInterface) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
 
             $this->operationMethodResolver = $jsonSchemaTypeFactory;
             $this->jsonSchemaTypeFactory = new TypeFactory();
@@ -117,7 +117,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if ($jsonSchemaFactory instanceof ResourceClassResolverInterface) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', ResourceClassResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', ResourceClassResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
         }
 
         if (null === $jsonSchemaFactory || $jsonSchemaFactory instanceof ResourceClassResolverInterface) {
@@ -127,15 +127,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->jsonSchemaFactory = $jsonSchemaFactory;
 
         if ($nameConverter) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', NameConverterInterface::class, __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', NameConverterInterface::class, __METHOD__), \E_USER_DEPRECATED);
         }
 
         if ($urlGenerator) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.1 and will be removed in 3.0.', UrlGeneratorInterface::class, __METHOD__), \E_USER_DEPRECATED);
         }
 
         if ($formats instanceof FormatsProviderInterface) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0, pass an array instead.', FormatsProviderInterface::class, __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0, pass an array instead.', FormatsProviderInterface::class, __METHOD__), \E_USER_DEPRECATED);
 
             $this->formatsProvider = $formats;
         } else {
@@ -384,7 +384,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
                     $maxItemsPerPage = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'maximum_items_per_page', null, true);
                     if (null !== $maxItemsPerPage) {
-                        @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', E_USER_DEPRECATED);
+                        @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', \E_USER_DEPRECATED);
                     }
                     $maxItemsPerPage = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage, true);
 
@@ -453,7 +453,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         // Avoid duplicates parameters when there is a filter on a subresource identifier
         $parametersMemory = [];
         $pathOperation['parameters'] = [];
-        foreach ($subresourceOperation['identifiers'] as list($identifier, , $hasIdentifier)) {
+        foreach ($subresourceOperation['identifiers'] as [$identifier, , $hasIdentifier]) {
             if (true === $hasIdentifier) {
                 $parameter = ['name' => $identifier, 'in' => 'path', 'required' => true];
                 $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
@@ -675,10 +675,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if ($v3) {
-            if ($securityDefinitions && $security) {
+            if ($securityDefinitions && $security) { // @phpstan-ignore-line false positive
                 $docs['security'] = $security;
             }
-        } elseif ($securityDefinitions && $security) {
+        } elseif ($securityDefinitions && $security) { // @phpstan-ignore-line false positive
             $docs['securityDefinitions'] = $securityDefinitions;
             $docs['security'] = $security;
         }

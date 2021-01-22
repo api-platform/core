@@ -26,7 +26,7 @@ final class DashOperationPathResolver implements OperationPathResolverInterface
 {
     public function __construct()
     {
-        @trigger_error(sprintf('The use of %s is deprecated since 2.1. Please use %s instead.', __CLASS__, DashPathSegmentNameGenerator::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The use of %s is deprecated since 2.1. Please use %s instead.', __CLASS__, DashPathSegmentNameGenerator::class), \E_USER_DEPRECATED);
     }
 
     /**

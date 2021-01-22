@@ -65,7 +65,7 @@ final class XmlExtractor extends AbstractExtractor
         if (!$graphql && $legacyOperations = $this->getAttributes($resource, $operationType)) {
             @trigger_error(
                 sprintf('Configuring "%1$s" tags without using a parent "%1$ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', $operationType),
-                E_USER_DEPRECATED
+                \E_USER_DEPRECATED
             );
 
             return $legacyOperations;

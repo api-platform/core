@@ -30,7 +30,7 @@ final class FormatsProvider implements FormatsProviderInterface, OperationAwareF
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $configuredFormats)
     {
-        @trigger_error(sprintf('The "%s" class is deprecated since API Platform 2.5, use the "formats" attribute instead.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The "%s" class is deprecated since API Platform 2.5, use the "formats" attribute instead.', __CLASS__), \E_USER_DEPRECATED);
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->configuredFormats = $configuredFormats;

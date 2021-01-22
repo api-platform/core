@@ -193,7 +193,7 @@ class RespondListenerTest extends TestCase
         $response = $event->getResponse();
         /** @var string $value */
         $value = $response->headers->get('Sunset');
-        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(DATE_RFC1123, $value));
+        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(\DATE_RFC1123, $value));
     }
 
     public function testSetCustomStatus()

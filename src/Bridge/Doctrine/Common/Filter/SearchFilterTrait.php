@@ -160,7 +160,7 @@ trait SearchFilterTrait
     protected function hasValidValues(array $values, $type = null): bool
     {
         foreach ($values as $key => $value) {
-            if (self::DOCTRINE_INTEGER_TYPE === $type && null !== $value && false === filter_var($value, FILTER_VALIDATE_INT)) {
+            if (self::DOCTRINE_INTEGER_TYPE === $type && null !== $value && false === filter_var($value, \FILTER_VALIDATE_INT)) {
                 return false;
             }
         }

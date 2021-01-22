@@ -67,7 +67,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     {
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        $fields = $info->getFieldSelection(PHP_INT_MAX);
+        $fields = $info->getFieldSelection(\PHP_INT_MAX);
 
         $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields);
 

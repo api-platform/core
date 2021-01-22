@@ -34,7 +34,7 @@ if (\PHP_VERSION_ID >= 70200) {
          *
          * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
          */
-        public function parseLiteral(/*Node */$valueNode, ?array $variables = null)
+        public function parseLiteral(/*Node */ $valueNode, ?array $variables = null)
         {
             if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
                 return $this->parseIterableLiteral($valueNode);
