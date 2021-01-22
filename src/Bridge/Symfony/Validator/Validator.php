@@ -51,7 +51,7 @@ class Validator implements ValidatorInterface
                 \is_callable($service)
             ) {
                 if (!$service instanceof ValidationGroupsGeneratorInterface) {
-                    @trigger_error(sprintf('Using a public validation groups generator service not implementing "%s" is deprecated since 2.6 and will be removed in 3.0.', ValidationGroupsGeneratorInterface::class), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Using a public validation groups generator service not implementing "%s" is deprecated since 2.6 and will be removed in 3.0.', ValidationGroupsGeneratorInterface::class), \E_USER_DEPRECATED);
                 }
 
                 $validationGroups = $service($data);

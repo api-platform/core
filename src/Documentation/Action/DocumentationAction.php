@@ -51,14 +51,14 @@ final class DocumentationAction
         $this->openApiFactory = $openApiFactory;
 
         if (null === $openApiFactory) {
-            @trigger_error(sprintf('Not passing an instance of "%s" as 7th parameter of the constructor of "%s" is deprecated since API Platform 2.6', OpenApiFactoryInterface::class, __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not passing an instance of "%s" as 7th parameter of the constructor of "%s" is deprecated since API Platform 2.6', OpenApiFactoryInterface::class, __CLASS__), \E_USER_DEPRECATED);
         }
 
         if (null === $formatsProvider) {
             return;
         }
 
-        @trigger_error(sprintf('Passing an array or an instance of "%s" as 5th parameter of the constructor of "%s" is deprecated since API Platform 2.5', FormatsProviderInterface::class, __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Passing an array or an instance of "%s" as 5th parameter of the constructor of "%s" is deprecated since API Platform 2.5', FormatsProviderInterface::class, __CLASS__), \E_USER_DEPRECATED);
         if (\is_array($formatsProvider)) {
             $this->formats = $formatsProvider;
 

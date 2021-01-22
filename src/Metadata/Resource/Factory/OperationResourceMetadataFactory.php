@@ -122,7 +122,7 @@ final class OperationResourceMetadataFactory implements ResourceMetadataFactoryI
                 if ($supported) {
                     $operation['method'] = $upperOperationName;
                 } else {
-                    @trigger_error(sprintf('The "route_name" attribute will not be set automatically again in API Platform 3.0, set it for the %s operation "%s" of the class "%s".', $collection ? 'collection' : 'item', $operationName, $resourceClass), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('The "route_name" attribute will not be set automatically again in API Platform 3.0, set it for the %s operation "%s" of the class "%s".', $collection ? 'collection' : 'item', $operationName, $resourceClass), \E_USER_DEPRECATED);
                     $operation['route_name'] = $operationName;
                 }
             }

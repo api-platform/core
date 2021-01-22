@@ -209,7 +209,7 @@ final class ApiLoader extends Loader
 
         if (isset($operation['route_name'])) {
             if (!isset($operation['method'])) {
-                @trigger_error(sprintf('Not setting the "method" attribute is deprecated and will not be supported anymore in API Platform 3.0, set it for the %s operation "%s" of the class "%s".', OperationType::COLLECTION === $operationType ? 'collection' : 'item', $operationName, $resourceClass), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Not setting the "method" attribute is deprecated and will not be supported anymore in API Platform 3.0, set it for the %s operation "%s" of the class "%s".', OperationType::COLLECTION === $operationType ? 'collection' : 'item', $operationName, $resourceClass), \E_USER_DEPRECATED);
             }
 
             return;

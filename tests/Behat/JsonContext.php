@@ -44,7 +44,7 @@ final class JsonContext extends BaseJsonContext
         $actualContent = $this->inspector->evaluate($actual, $node);
 
         if (!is_iterable($actualContent)) {
-            throw new ExpectationException(sprintf("The JSON is equal to:\n%s", json_encode($actualContent, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)), $this->getSession()->getDriver());
+            throw new ExpectationException(sprintf("The JSON is equal to:\n%s", json_encode($actualContent, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRETTY_PRINT)), $this->getSession()->getDriver());
         }
 
         foreach ($actualContent as $itemContent) {
@@ -78,7 +78,7 @@ final class JsonContext extends BaseJsonContext
         $this->assertEquals(
             $expected->getContent(),
             $actualContent,
-            sprintf("The JSON node \"%s\" is equal to:\n%s", $node, json_encode($actualContent, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT))
+            sprintf("The JSON node \"%s\" is equal to:\n%s", $node, json_encode($actualContent, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRETTY_PRINT))
         );
     }
 

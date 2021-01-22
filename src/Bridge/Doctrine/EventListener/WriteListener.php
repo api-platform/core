@@ -31,7 +31,7 @@ final class WriteListener
 
     public function __construct(ManagerRegistry $managerRegistry)
     {
-        @trigger_error(sprintf('The %s class is deprecated since version 2.2 and will be removed in 3.0. Use the %s class instead.', __CLASS__, BaseWriteListener::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The %s class is deprecated since version 2.2 and will be removed in 3.0. Use the %s class instead.', __CLASS__, BaseWriteListener::class), \E_USER_DEPRECATED);
 
         $this->managerRegistry = $managerRegistry;
     }

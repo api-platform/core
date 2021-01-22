@@ -55,10 +55,10 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         if (null !== $this->requestStack) {
-            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', RequestStack::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', RequestStack::class), \E_USER_DEPRECATED);
         }
         if (null !== $this->serializerContextBuilder) {
-            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', SerializerContextBuilderInterface::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', SerializerContextBuilderInterface::class), \E_USER_DEPRECATED);
         }
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -178,7 +178,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
                 (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
             ) {
-                @trigger_error('The "fetchEager" attribute is deprecated since 2.3. Please use "fetch_eager" instead.', E_USER_DEPRECATED);
+                @trigger_error('The "fetchEager" attribute is deprecated since 2.3. Please use "fetch_eager" instead.', \E_USER_DEPRECATED);
             }
 
             if (false === $fetchEager) {

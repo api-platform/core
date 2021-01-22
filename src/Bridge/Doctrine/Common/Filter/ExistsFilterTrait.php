@@ -75,7 +75,7 @@ trait ExistsFilterTrait
         if (\is_array($value) && isset($value[self::QUERY_PARAMETER_KEY])) {
             @trigger_error(
                 sprintf('The ExistsFilter syntax "%s[exists]=true/false" is deprecated since 2.5. Use the syntax "%s[%s]=true/false" instead.', $property, $this->existsParameterName, $property),
-                E_USER_DEPRECATED
+                \E_USER_DEPRECATED
             );
             $value = $value[self::QUERY_PARAMETER_KEY];
         }

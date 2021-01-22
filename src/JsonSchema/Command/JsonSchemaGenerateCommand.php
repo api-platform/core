@@ -110,7 +110,7 @@ final class JsonSchemaGenerateCommand extends Command
             return 1;
         }
 
-        $io->text((string) json_encode($schema, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $io->text((string) json_encode($schema, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return 0;
     }

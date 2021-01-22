@@ -40,7 +40,7 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
         }
 
         // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
-        $jsonEncodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE;
+        $jsonEncodeOptions = \JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT | \JSON_UNESCAPED_UNICODE;
         if (interface_exists(AdvancedNameConverterInterface::class)) {
             $jsonEncode = new JsonEncode(['json_encode_options' => $jsonEncodeOptions]);
             $jsonDecode = new JsonDecode(['json_decode_associative' => true]);

@@ -176,7 +176,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
             if (
                 null !== $value
                 && Type::BUILTIN_TYPE_INT === $type->getBuiltinType()
-                && false === filter_var($value, FILTER_VALIDATE_INT)
+                && false === filter_var($value, \FILTER_VALIDATE_INT)
             ) {
                 return false;
             }

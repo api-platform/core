@@ -77,7 +77,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
             if (__CLASS__ !== static::class) {
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a seventh `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.5.', __FUNCTION__), E_USER_DEPRECATED);
+                    @trigger_error(sprintf('Method %s() will have a seventh `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.5.', __FUNCTION__), \E_USER_DEPRECATED);
                 }
             }
             $context = [];
@@ -202,7 +202,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
             return parent::extractProperties($request, $resourceClass);
         }
 
-        @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), \E_USER_DEPRECATED);
 
         $properties = $request->query->all()[$this->existsParameterName];
 

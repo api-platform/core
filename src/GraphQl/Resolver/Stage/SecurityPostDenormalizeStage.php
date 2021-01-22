@@ -48,7 +48,7 @@ final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStage
             // Backward compatibility
             $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'access_control', null, true);
             if (null !== $isGranted) {
-                @trigger_error('Attribute "access_control" is deprecated since API Platform 2.5, prefer using "security" attribute instead', E_USER_DEPRECATED);
+                @trigger_error('Attribute "access_control" is deprecated since API Platform 2.5, prefer using "security" attribute instead', \E_USER_DEPRECATED);
             }
         }
 

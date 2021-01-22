@@ -36,7 +36,7 @@ final class ValidateListener
 
     public function __construct(ValidatorInterface $validator, ResourceMetadataFactoryInterface $resourceMetadataFactory, ContainerInterface $container = null)
     {
-        @trigger_error(sprintf('Using "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Use "%s" instead.', __CLASS__, MainValidateListener::class), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Using "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Use "%s" instead.', __CLASS__, MainValidateListener::class), \E_USER_DEPRECATED);
 
         $this->validator = $validator;
         $this->resourceMetadataFactory = $resourceMetadataFactory;

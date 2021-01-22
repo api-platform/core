@@ -26,7 +26,7 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, PropertyNameCollectionFactoryInterface $decorated = null)
     {
-        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), \E_USER_DEPRECATED);
 
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->decorated = $decorated;
@@ -37,7 +37,7 @@ final class InheritedPropertyNameCollectionFactory implements PropertyNameCollec
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), \E_USER_DEPRECATED);
 
         $propertyNames = [];
 

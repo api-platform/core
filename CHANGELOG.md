@@ -59,6 +59,10 @@
 * Validator: Query filters and parameters are validated (#1723)
 * `ExceptionInterface` now extends `\Throwable` (#3217)
 
+## 2.5.10
+
+* Hydra: only display `hydra:next` when the item total is strictly greater than the number of items per page (#3967)
+
 ## 2.5.9
 
 * Fix a warning when preloading the `AbstractPaginator` class (#3827)

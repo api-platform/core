@@ -24,7 +24,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  * @Annotation
  * @Target({"PROPERTY", "CLASS"})
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY|\Attribute::TARGET_CLASS|\Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ApiFilter
 {
     /**

@@ -52,7 +52,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
     {
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        $fields = $info->getFieldSelection(PHP_INT_MAX);
+        $fields = $info->getFieldSelection(\PHP_INT_MAX);
         $this->arrayRecursiveSort($fields, 'ksort');
         $iri = $this->getIdentifierFromContext($context);
         if (null === $iri) {

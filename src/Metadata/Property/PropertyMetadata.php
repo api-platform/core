@@ -60,7 +60,7 @@ final class PropertyMetadata
         $this->identifier = $identifier;
         $this->iri = $iri;
         if (null !== $childInherited) {
-            @trigger_error(sprintf('Providing a non-null value for the 10th argument ($childInherited) of the "%s" constructor is deprecated since 2.6 and will not be supported in 3.0.', __CLASS__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Providing a non-null value for the 10th argument ($childInherited) of the "%s" constructor is deprecated since 2.6 and will not be supported in 3.0.', __CLASS__), \E_USER_DEPRECATED);
         }
         $this->childInherited = $childInherited;
         $this->attributes = $attributes;
@@ -296,7 +296,7 @@ final class PropertyMetadata
      */
     public function isChildInherited(): ?string
     {
-        @trigger_error(sprintf('"%s::%s" is deprecated since 2.4 and will be removed in 3.0.', __CLASS__, __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s::%s" is deprecated since 2.4 and will be removed in 3.0.', __CLASS__, __METHOD__), \E_USER_DEPRECATED);
 
         return $this->getChildInherited();
     }
@@ -306,7 +306,7 @@ final class PropertyMetadata
      */
     public function withChildInherited(string $childInherited): self
     {
-        @trigger_error(sprintf('"%s::%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__, __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s::%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__, __METHOD__), \E_USER_DEPRECATED);
 
         $metadata = clone $this;
         $metadata->childInherited = $childInherited;

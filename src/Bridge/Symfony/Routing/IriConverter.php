@@ -57,7 +57,6 @@ final class IriConverter implements IriConverterInterface
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
         $this->router = $router;
-        $this->identifiersExtractor = $identifiersExtractor;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->identifierConverter = $identifierConverter;
         $this->resourceClassResolver = $resourceClassResolver;

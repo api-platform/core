@@ -26,7 +26,7 @@ final class InheritedPropertyMetadataFactory implements PropertyMetadataFactoryI
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, PropertyMetadataFactoryInterface $decorated = null)
     {
-        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), \E_USER_DEPRECATED);
 
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->decorated = $decorated;
@@ -37,7 +37,7 @@ final class InheritedPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), \E_USER_DEPRECATED);
 
         $propertyMetadata = $this->decorated ? $this->decorated->create($resourceClass, $property, $options) : new PropertyMetadata();
 

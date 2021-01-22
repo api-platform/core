@@ -39,7 +39,7 @@ final class Documentation implements DocumentationInterface
             return;
         }
 
-        @trigger_error(sprintf('Passing a 5th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('Passing a 5th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), \E_USER_DEPRECATED);
 
         foreach ($formats as $mimeTypes) {
             foreach ($mimeTypes as $mimeType) {
@@ -50,7 +50,7 @@ final class Documentation implements DocumentationInterface
 
     public function getMimeTypes(): array
     {
-        @trigger_error(sprintf('The method "%s" is deprecated since API Platform 2.5, use the "formats" attribute instead', __METHOD__), E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method "%s" is deprecated since API Platform 2.5, use the "formats" attribute instead', __METHOD__), \E_USER_DEPRECATED);
 
         return $this->mimeTypes;
     }

@@ -21,7 +21,7 @@ namespace ApiPlatform\Core\Annotation;
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY|\Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD)]
 final class ApiSubresource
 {
     /**

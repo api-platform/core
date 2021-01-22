@@ -148,7 +148,7 @@ final class ReadStage implements ReadStageInterface
                             $filterArgsNew[] = sprintf('{%s: "%s"}', $filterArgName, $filterArgValue);
                         }
                         $deprecationMessage .= sprintf('%s}" is deprecated since API Platform 2.6, use the following syntax instead: "%s: [%s]".', implode(', ', $filterArgsOld), $name, implode(', ', $filterArgsNew));
-                        @trigger_error($deprecationMessage, E_USER_DEPRECATED);
+                        @trigger_error($deprecationMessage, \E_USER_DEPRECATED);
                     }
                     $value = array_merge(...$value);
                 }

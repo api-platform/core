@@ -79,7 +79,6 @@ class PartialCollectionViewNormalizerTest extends TestCase
                     '@id' => '/?_page=3',
                     '@type' => 'hydra:PartialCollectionView',
                     'hydra:previous' => '/?_page=2',
-                    'hydra:next' => '/?_page=4',
                 ],
             ],
             $this->normalizePaginator(true)
