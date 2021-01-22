@@ -61,14 +61,14 @@ class AppKernel extends Kernel
     public function registerBundles(): array
     {
         $bundles = [
-            new FrameworkBundle(),
+            new ApiPlatformBundle(),
             new TwigBundle(),
             new DoctrineBundle(),
             new MercureBundle(),
-            new ApiPlatformBundle(),
             new SecurityBundle(),
             new WebProfilerBundle(),
             new FriendsOfBehatSymfonyExtensionBundle(),
+            new FrameworkBundle(),
         ];
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
