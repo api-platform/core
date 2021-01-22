@@ -37,7 +37,7 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
         if (\func_num_args() >= 4) {
             $operationName = func_get_arg(3);
         } else {
-            @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), \E_USER_DEPRECATED);
 
             $operationName = null;
         }

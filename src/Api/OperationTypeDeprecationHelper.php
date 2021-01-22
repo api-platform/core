@@ -34,7 +34,7 @@ final class OperationTypeDeprecationHelper
     public static function getOperationType($operationType): string
     {
         if (\is_bool($operationType)) {
-            @trigger_error('Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', E_USER_DEPRECATED);
+            @trigger_error('Using a boolean for the Operation Type is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3', \E_USER_DEPRECATED);
 
             $operationType = $operationType ? OperationType::COLLECTION : OperationType::ITEM;
         }

@@ -65,7 +65,7 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
                 $identifier = $id;
                 if (!$dataProvider instanceof DenormalizedIdentifiersAwareItemDataProviderInterface && $identifier && \is_array($identifier)) {
                     if (\count($identifier) > 1) {
-                        @trigger_error(sprintf('Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "%s".', DenormalizedIdentifiersAwareItemDataProviderInterface::class), E_USER_DEPRECATED);
+                        @trigger_error(sprintf('Receiving "$id" as non-array in an item data provider is deprecated in 2.3 in favor of implementing "%s".', DenormalizedIdentifiersAwareItemDataProviderInterface::class), \E_USER_DEPRECATED);
                         $identifier = http_build_query($identifier, '', ';');
                     } else {
                         $identifier = current($identifier);
@@ -75,7 +75,7 @@ final class TraceableChainItemDataProvider implements ItemDataProviderInterface
                 $result = $dataProvider->getItem($resourceClass, $identifier, $operationName, $context);
                 $this->providersResponse[\get_class($dataProvider)] = $match = true;
             } catch (ResourceClassNotSupportedException $e) {
-                @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', \get_class($e), RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Throwing a "%s" is deprecated in favor of implementing "%s"', \get_class($e), RestrictedDataProviderInterface::class), \E_USER_DEPRECATED);
                 continue;
             }
         }

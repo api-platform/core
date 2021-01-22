@@ -45,7 +45,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
 
         if (null === $identifiersExtractor) {
-            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.', E_USER_DEPRECATED);
+            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.', \E_USER_DEPRECATED);
         }
 
         $this->iriConverter = $iriConverter;

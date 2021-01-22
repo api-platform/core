@@ -51,7 +51,7 @@ final class ChainCollectionDataProvider implements ContextAwareCollectionDataPro
 
                 return $dataProvider->getCollection($resourceClass, $operationName, $context);
             } catch (ResourceClassNotSupportedException $e) {
-                @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), E_USER_DEPRECATED);
+                @trigger_error(sprintf('Throwing a "%s" in a data provider is deprecated in favor of implementing "%s"', ResourceClassNotSupportedException::class, RestrictedDataProviderInterface::class), \E_USER_DEPRECATED);
                 continue;
             }
         }

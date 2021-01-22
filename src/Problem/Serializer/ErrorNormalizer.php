@@ -27,11 +27,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    use ErrorNormalizerTrait;
     public const FORMAT = 'jsonproblem';
     public const TYPE = 'type';
     public const TITLE = 'title';
-
-    use ErrorNormalizerTrait;
 
     private $debug;
     private $defaultContext = [

@@ -51,7 +51,7 @@ class SerializerContextBuilderTest extends TestCase
     public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, array $expectedContext, bool $isMutation, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-        $resolveInfoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
+        $resolveInfoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
         $resolverContext = [
             'info' => $resolveInfoProphecy->reveal(),
             'is_mutation' => $isMutation,

@@ -36,6 +36,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PublishMercureUpdatesListener
 {
+    use DispatchTrait;
+    use ResourceClassInfoTrait;
     private const ALLOWED_KEYS = [
         'topics' => true,
         'data' => true,
@@ -44,9 +46,6 @@ final class PublishMercureUpdatesListener
         'type' => true,
         'retry' => true,
     ];
-
-    use DispatchTrait;
-    use ResourceClassInfoTrait;
 
     private $iriConverter;
     private $serializer;
@@ -163,7 +162,7 @@ final class PublishMercureUpdatesListener
                     throw new \InvalidArgumentException('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead or downgrade the Mercure Component to version 0.3');
                 }
 
-                @trigger_error('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead.', E_USER_DEPRECATED);
+                @trigger_error('Targets do not exist anymore since Mercure 0.10. Mark the update as private instead.', \E_USER_DEPRECATED);
                 break;
             }
 
