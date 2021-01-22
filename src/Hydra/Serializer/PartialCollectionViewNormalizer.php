@@ -113,7 +113,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
                 $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
             }
 
-            if (null !== $lastPage && $currentPage < $lastPage || null === $lastPage && $pageTotalItems >= $itemsPerPage) {
+            if (null !== $lastPage && $currentPage < $lastPage || null === $lastPage && $pageTotalItems > $itemsPerPage) {
                 $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
             }
         }
