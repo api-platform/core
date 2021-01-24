@@ -80,6 +80,7 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
             'attributes' => [
                 'pagination_client_enabled' => true,
                 'pagination_maximum_items_per_page' => 10,
+                'stateless' => null,
             ],
         ]);
         $reader = $this->prophesize(Reader::class);

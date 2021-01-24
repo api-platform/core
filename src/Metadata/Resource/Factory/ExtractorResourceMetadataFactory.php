@@ -59,7 +59,15 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
         $resource['itemOperations'] = $resource['itemOperations'] ?? $this->defaults['item_operations'] ?? null;
         $resource['collectionOperations'] = $resource['collectionOperations'] ?? $this->defaults['collection_operations'] ?? null;
         $resource['graphql'] = $resource['graphql'] ?? $this->defaults['graphql'] ?? null;
-        $resource['attributes'] = (null === $resource['attributes'] && [] === $this->defaults['attributes']) ? null : (array) $resource['attributes'] + $this->defaults['attributes'];
+
+        if (null !== $resource['attributes'] || [] !== $this->defaults['attributes']) {
+            $resource['attributes'] = (array) $resource['attributes'];
+            foreach ($this->defaults['attributes'] as $key => $value) {
+                if (!isset($resource['attributes'][$key])) {
+                    $resource['attributes'][$key] = $value;
+                }
+            }
+        }
 
         return $this->update($parentResourceMetadata ?: new ResourceMetadata(), $resource);
     }
