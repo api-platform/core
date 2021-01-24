@@ -312,6 +312,7 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
                 'subresourceOperations' => null,
                 'itemOperations' => ['get', 'delete'],
                 'attributes' => [
+                    'pagination_items_per_page' => null,
                     'pagination_maximum_items_per_page' => 10,
                     'stateless' => false,
                 ],
