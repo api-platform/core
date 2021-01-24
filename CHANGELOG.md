@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1
+
+* Fix defaults when using attributes (#3978)
+
 ## 2.6.0
 
 * Cache: adds a `max_header_length` configuration (#2865)
