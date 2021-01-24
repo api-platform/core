@@ -88,7 +88,15 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
 
     private function createMetadata(ApiResource $annotation, ResourceMetadata $parentResourceMetadata = null): ResourceMetadata
     {
-        $attributes = (null === $annotation->attributes && [] === $this->defaults['attributes']) ? null : (array) $annotation->attributes + $this->defaults['attributes'];
+        $attributes = null;
+        if (null !== $annotation->attributes || [] !== $this->defaults['attributes']) {
+            $attributes = (array) $annotation->attributes;
+            foreach ($this->defaults['attributes'] as $key => $value) {
+                if (!isset($attributes[$key])) {
+                    $attributes[$key] = $value;
+                }
+            }
+        }
 
         if (!$parentResourceMetadata) {
             return new ResourceMetadata(
