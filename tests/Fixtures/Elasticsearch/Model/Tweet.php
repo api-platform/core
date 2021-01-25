@@ -73,12 +73,12 @@ class Tweet
         $this->author = $author;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): void
+    public function setDate(\DateTimeImmutable $date): void
     {
         $this->date = $date;
     }

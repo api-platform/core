@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
+use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
@@ -101,7 +101,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
             return null;
         }
 
-        $item = $this->denormalizer->denormalize($document, $resourceClass, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
+        $item = $this->denormalizer->denormalize($document, $resourceClass, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]);
         if (!\is_object($item) && null !== $item) {
             throw new \UnexpectedValueException('Expected item to be an object or null.');
         }
