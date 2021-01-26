@@ -31,7 +31,7 @@ class ApiSubresourceTest extends TestCase
 
     public function testConstruct()
     {
-        $property = new ApiSubresource([
+        $property = new ApiSubresource([ // @phpstan-ignore-line
             'maxDepth' => 1,
         ]);
         $this->assertEquals(1, $property->maxDepth);
