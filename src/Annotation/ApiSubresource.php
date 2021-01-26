@@ -46,8 +46,10 @@ final class ApiSubresource
     {
         if (!\is_array($maxDepth)) { // @phpstan-ignore-line
             $this->maxDepth = $maxDepth;
+
+            $maxDepth = [];
         }
 
-        $this->hydrateAttributes($maxDepth);
+        $this->hydrateAttributes($maxDepth ?? []);
     }
 }
