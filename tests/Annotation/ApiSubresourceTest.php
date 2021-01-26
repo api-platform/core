@@ -17,7 +17,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Cody Banman <crbanman@gmail.com>
  */
 class ApiSubresourceTest extends TestCase
 {
@@ -25,22 +25,16 @@ class ApiSubresourceTest extends TestCase
     {
         $property = new ApiSubresource();
         $property->maxDepth = 1;
-        $property->attributes = ['foo' => 'bar'];
 
         $this->assertEquals(1, $property->maxDepth);
-        $this->assertEquals(['foo' => 'bar'], $property->attributes);
     }
 
     public function testConstruct()
     {
         $property = new ApiSubresource([
-            'maxDepth' => null,
-            'attributes' => ['unknown' => 'unknown', 'max_depth' => 1],
+            'maxDepth' => 1,
         ]);
-        $this->assertEquals([
-            'max_depth' => 1,
-            'unknown' => 'unknown',
-        ], $property->attributes);
+        $this->assertEquals(1, $property->maxDepth);
     }
 
     /**
@@ -50,15 +44,10 @@ class ApiSubresourceTest extends TestCase
     {
         $property = eval(<<<'PHP'
 return new \ApiPlatform\Core\Annotation\ApiSubresource(
-    maxDepth: null,
-    attributes: ['unknown' => 'unknown', 'max_depth' => 1]
+    maxDepth: 1
 );
 PHP
         );
-
-        $this->assertEquals([
-            'max_depth' => 1,
-            'unknown' => 'unknown',
-        ], $property->attributes);
+        $this->assertEquals(1, $property->maxDepth);
     }
 }

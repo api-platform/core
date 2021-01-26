@@ -27,39 +27,21 @@ namespace ApiPlatform\Core\Annotation;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD)]
 final class ApiSubresource
 {
-    use AttributesHydratorTrait;
-
-    /**
-     * @var array<string, array>
-     */
-    private static $deprecatedAttributes = [];
-
     /**
      * @var int
      */
     public $maxDepth;
 
     /**
-     * @param int $maxDepth
+     * @param int|array $maxDepth
      */
-    public function __construct(
-        $maxDepth = null,
-        // attributes
-        ?array $attributes = null
-    ) {
-        if (!\is_array($maxDepth)) { // @phpstan-ignore-line
-            [$publicProperties, $configurableAttributes] = self::getConfigMetadata();
+    public function __construct($maxDepth = null)
+    {
+        if (!\is_array($maxDepth)) {
+            $this->maxDepth = $maxDepth;
 
-            foreach ($publicProperties as $prop => $_) {
-                $this->{$prop} = ${$prop};
-            }
-
-            $maxDepth = [];
-            foreach ($configurableAttributes as $attribute => $_) {
-                $maxDepth[$attribute] = ${$attribute};
-            }
+            return;
         }
-
-        $this->hydrateAttributes($maxDepth ?? []);
+        $this->maxDepth = $maxDepth['maxDepth'];
     }
 }
