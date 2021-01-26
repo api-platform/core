@@ -6,7 +6,7 @@
 
     <services>
         <service id="api_platform.identifier.uuid_normalizer" class="ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer" public="false">
-            <tag name="api_platform.identifier.denormalizer" />
+            <tag name="api_platform.identifier.denormalizer" priority="-100" />
         </service>
 
         <service id="api_platform.serializer.uuid_denormalizer" class="ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer" public="false">
