@@ -60,7 +60,8 @@ class TraceableChainDataPersisterTest extends TestCase
         $this->assertSame($expected, array_values($result));
     }
 
-    public function testSupports() {
+    public function testSupports()
+    {
         $context = ['ok' => true];
         $persister = $this->prophesize(DataPersisterInterface::class);
         $persister->supports('', $context)->willReturn(true)->shouldBeCalled();
@@ -173,7 +174,7 @@ class TraceableChainDataPersisterTest extends TestCase
                     public function remove($data)
                     {
                     }
-                }
+                },
             ]),
             [true, false, true],
         ];
