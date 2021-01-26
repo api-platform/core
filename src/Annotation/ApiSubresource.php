@@ -42,6 +42,6 @@ final class ApiSubresource
 
             return;
         }
-        $this->maxDepth = $maxDepth['maxDepth'];
+        $this->maxDepth = $maxDepth['maxDepth'] ?? null;
     }
 }
