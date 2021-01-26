@@ -67,7 +67,7 @@ class TraceableChainDataPersisterTest extends TestCase
         $chain = new ChainDataPersister([$persister->reveal()]);
         $persister->persist('', $context)->shouldBeCalled();
         $dataPersister = new TraceableChainDataPersister($chain);
-        $dataPersister->persist('',$context);
+        $dataPersister->persist('', $context);
     }
 
     public function dataPersisterProvider(): iterable
