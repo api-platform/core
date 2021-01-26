@@ -60,6 +60,16 @@ class TraceableChainDataPersisterTest extends TestCase
         $this->assertSame($expected, array_values($result));
     }
 
+    public function testSupports() {
+        $context = ['ok' => true];
+        $persister = $this->prophesize(DataPersisterInterface::class);
+        $persister->supports('', $context)->willReturn(true)->shouldBeCalled();
+        $chain = new ChainDataPersister([$persister->reveal()]);
+        $persister->persist('', $context)->shouldBeCalled();
+        $dataPersister = new TraceableChainDataPersister($chain);
+        $dataPersister->persist('', $context);
+    }
+
     public function dataPersisterProvider(): iterable
     {
         yield [
@@ -163,7 +173,7 @@ class TraceableChainDataPersisterTest extends TestCase
                     public function remove($data)
                     {
                     }
-                },
+                }
             ]),
             [true, false, true],
         ];
