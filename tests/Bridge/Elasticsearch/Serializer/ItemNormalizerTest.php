@@ -15,9 +15,9 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Serializer;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -44,20 +44,12 @@ final class ItemNormalizerTest extends TestCase
         );
     }
 
-    /** @dataProvider decoratedNormalizerProvider */
-    public function testConstruct(NormalizerInterface $normalizer, ?string $exception): void
+    public function testConstruct(): void
     {
-        if (null !== $exception) {
-            $this->expectException(InvalidArgumentException::class);
-            $this->expectExceptionMessage($exception);
-        }
-
-        $itemNormalizer = new ItemNormalizer($normalizer);
-
-        self::assertInstanceOf(NormalizerInterface::class, $itemNormalizer);
-        self::assertInstanceOf(DenormalizerInterface::class, $itemNormalizer);
-        self::assertInstanceOf(SerializerAwareInterface::class, $itemNormalizer);
-        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $itemNormalizer);
+        self::assertInstanceOf(NormalizerInterface::class, $this->itemNormalizer);
+        self::assertInstanceOf(DenormalizerInterface::class, $this->itemNormalizer);
+        self::assertInstanceOf(SerializerAwareInterface::class, $this->itemNormalizer);
+        self::assertInstanceOf(CacheableSupportsMethodInterface::class, $this->itemNormalizer);
     }
 
     public function testHasCacheableSupportsMethod(): void
@@ -106,38 +98,35 @@ final class ItemNormalizerTest extends TestCase
         $this->itemNormalizer->setSerializer($serializer);
     }
 
-    public function decoratedNormalizerProvider(): iterable
+    public function testHasCacheableSupportsMethodWithDecoratedNormalizerNotAnInstanceOfCacheableSupportsMethodInterface(): void
     {
-        yield [
-            $this->prophesize(NormalizerInterface::class)->reveal(),
-            sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class),
-        ];
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
 
-        yield [
-            $this
-                ->prophesize(NormalizerInterface::class)
-                ->willImplement(DenormalizerInterface::class)
-                ->reveal(),
-            sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class),
-        ];
+        (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->hasCacheableSupportsMethod();
+    }
 
-        yield [
-            $this
-                ->prophesize(NormalizerInterface::class)
-                ->willImplement(DenormalizerInterface::class)
-                ->willImplement(SerializerAwareInterface::class)
-                ->reveal(),
-            sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class),
-        ];
+    public function testDenormalizeWithDecoratedNormalizerNotAnInstanceOfDenormalizerInterface(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
 
-        yield [
-            $this
-                ->prophesize(NormalizerInterface::class)
-                ->willImplement(DenormalizerInterface::class)
-                ->willImplement(SerializerAwareInterface::class)
-                ->willImplement(CacheableSupportsMethodInterface::class)
-                ->reveal(),
-            null,
-        ];
+        (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->denormalize('foo', 'string');
+    }
+
+    public function testSupportsDenormalizationWithDecoratedNormalizerNotAnInstanceOfDenormalizerInterface(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
+
+        (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->supportsDenormalization('foo', 'string');
+    }
+
+    public function testSetSerializerWithDecoratedNormalizerNotAnInstanceOfSerializerAwareInterface(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
+
+        (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
     }
 }

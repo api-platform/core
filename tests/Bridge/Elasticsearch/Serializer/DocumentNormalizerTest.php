@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class DocumentNormalizerTest extends TestCase
+final class DocumentNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 

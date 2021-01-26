@@ -1,38 +1,44 @@
 {
   "mappings": {
-    "properties": {
-      "id": {
-        "type": "keyword"
-      },
-      "gender": {
-        "type": "keyword"
-      },
-      "age": {
-        "type": "integer"
-      },
-      "firstName": {
-        "type": "text"
-      },
-      "lastName": {
-        "type": "text"
-      },
-      "tweets": {
-        "type": "nested",
-        "properties": {
-          "id": {
-            "type": "keyword"
-          },
-          "date": {
-            "type": "date",
-            "format": "yyyy-MM-dd HH:mm:ss"
-          },
-          "message": {
-            "type": "text"
-          }
+    "_doc": {
+      "properties": {
+        "id": {
+          "type": "keyword"
         },
-        "dynamic": "strict"
-      }
-    },
-    "dynamic": "strict"
+        "gender": {
+          "type": "keyword"
+        },
+        "age": {
+          "type": "integer"
+        },
+        "firstName": {
+          "type": "text"
+        },
+        "lastName": {
+          "type": "text"
+        },
+        "registeredAt": {
+          "type": "date",
+          "format": "yyyy-MM-dd"
+        },
+        "tweets": {
+          "type": "nested",
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "date": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss"
+            },
+            "message": {
+              "type": "text"
+            }
+          },
+          "dynamic": "strict"
+        }
+      },
+      "dynamic": "strict"
+    }
   }
 }

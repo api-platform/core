@@ -5,6 +5,7 @@
     "age": 31,
     "firstName": "Kilian",
     "lastName": "Jornet",
+    "registeredAt": "2009-09-01",
     "tweets": [
       {
         "id": "f36a0026-0635-4865-86a6-5adb21d94d64",
@@ -29,6 +30,7 @@
     "age": 32,
     "firstName": "Francois",
     "lastName": "D'Haene",
+    "registeredAt": "2014-08-01",
     "tweets": [
       {
         "id": "5bc245d7-df50-4e2d-b26b-823e73372183",
@@ -48,6 +50,7 @@
     "age": 30,
     "firstName": "Xavier",
     "lastName": "Thevenard",
+    "registeredAt": "2013-09-02",
     "tweets": [
       {
         "id": "86c41446-31d6-48a4-96e7-73e84ea283d3",
@@ -62,6 +65,7 @@
     "age": 35,
     "firstName": "Anton",
     "lastName": "Krupicka",
+    "registeredAt": "2014-07-01",
     "tweets": [
       {
         "id": "ce73f15a-8c96-46fe-8999-392460feb61b",
@@ -81,6 +85,7 @@
     "age": 28,
     "firstName": "Jim",
     "lastName": "Walmsley",
+    "registeredAt": "2011-07-01",
     "tweets": [
       {
         "id": "0cfe3d33-6116-416b-8c50-3b8319331998",
@@ -95,6 +100,7 @@
     "age": 30,
     "firstName": "Zach",
     "lastName": "Miller",
+    "registeredAt": "2017-03-01",
     "tweets": [
       {
         "id": "1c9e0545-1b37-4a9a-83e0-30400d0b354e",
@@ -119,6 +125,7 @@
     "age": 42,
     "firstName": "Caroline",
     "lastName": "Chaverot",
+    "registeredAt": "2013-11-01",
     "tweets": [
       {
         "id": "6d82a76c-8ba2-4e78-9ab3-6a456e4470c3",
@@ -138,6 +145,7 @@
     "age": 42,
     "firstName": "Nuria",
     "lastName": "Picas",
+    "registeredAt": "2012-12-01",
     "tweets": [
       {
         "id": "dcaef1db-225d-442b-960e-5de6984a44be",
@@ -157,6 +165,7 @@
     "age": 32,
     "firstName": "Emelie",
     "lastName": "Forsberg",
+    "registeredAt": "2012-07-01",
     "tweets": [
       {
         "id": "6947ce52-c85d-4786-a587-3966a936842b",
@@ -176,6 +185,7 @@
     "age": 37,
     "firstName": "Anna",
     "lastName": "Frost",
+    "registeredAt": "2010-07-01",
     "tweets": [
       {
         "id": "9de3308c-6f82-4a57-a33c-4e3cd5d5a3f6",
@@ -195,6 +205,7 @@
     "age": 34,
     "firstName": "Rory",
     "lastName": "Bosio",
+    "registeredAt": "2013-09-05",
     "tweets": []
   },
   {
@@ -203,6 +214,7 @@
     "age": 29,
     "firstName": "Ruth",
     "lastName": "Croft",
+    "registeredAt": "2015-02-01",
     "tweets": [
       {
         "id": "3a1d02fa-2347-41ff-80ef-ed9b9c0efea9",
