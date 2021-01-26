@@ -20,10 +20,20 @@ namespace ApiPlatform\Core\Annotation;
  *
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
+ * @Attributes (
+ *     @Attribute("maxDepth", type="int"),
+ * )
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD)]
 final class ApiSubresource
 {
+    use AttributesHydratorTrait;
+
+    /**
+     * @var array<string, array>
+     */
+    private static $deprecatedAttributes = [];
+
     /**
      * @var int
      */
@@ -37,5 +47,7 @@ final class ApiSubresource
         if (!\is_array($maxDepth)) { // @phpstan-ignore-line
             $this->maxDepth = $maxDepth;
         }
+
+        $this->hydrateAttributes($maxDepth);
     }
 }
