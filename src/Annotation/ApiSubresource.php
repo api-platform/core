@@ -20,7 +20,7 @@ namespace ApiPlatform\Core\Annotation;
  *
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
- * @Attributes (
+ * @Attributes(
  *     @Attribute("maxDepth", type="int"),
  * )
  */
@@ -42,12 +42,22 @@ final class ApiSubresource
     /**
      * @param int $maxDepth
      */
-    public function __construct($maxDepth = null)
-    {
+    public function __construct(
+        $maxDepth = null,
+        // attributes
+        ?array $attributes = null
+    ) {
         if (!\is_array($maxDepth)) { // @phpstan-ignore-line
-            $this->maxDepth = $maxDepth;
+            [$publicProperties, $configurableAttributes] = self::getConfigMetadata();
+
+            foreach ($publicProperties as $prop => $_) {
+                $this->{$prop} = ${$prop};
+            }
 
             $maxDepth = [];
+            foreach ($configurableAttributes as $attribute => $_) {
+                $maxDepth[$attribute] = ${$attribute};
+            }
         }
 
         $this->hydrateAttributes($maxDepth ?? []);
