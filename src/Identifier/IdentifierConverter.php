@@ -69,6 +69,7 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
 
                 try {
                     $identifiers[$identifier] = $identifierTransformer->denormalize($value, $type);
+                    break;
                 } catch (InvalidIdentifierException $e) {
                     throw new InvalidIdentifierException(sprintf('Identifier "%s" could not be denormalized.', $identifier), $e->getCode(), $e);
                 }
