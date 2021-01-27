@@ -1316,7 +1316,7 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.swagger_ui.context';
             $definitions[] = 'api_platform.swagger_ui.action';
         }
-        
+
         // has jsonld
         if ($hasHydra) {
             $containerBuilderProphecy->has('api_platform.json_schema.schema_factory')->shouldBeCalled()->willReturn($hasSwagger);
