@@ -156,4 +156,54 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['description']);
         $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['description']['type']);
     }
+
+    public function testBuildSchemaWithContext(): void
+    {
+        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
+        ), Argument::cetera())->willReturn([
+            'type' => 'string',
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)->willReturn(new ResourceMetadata((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName(), null, null, [
+            'put' => [
+                'normalization_context' => [
+                    'groups' => 'overridden_operation_dummy_put',
+                    AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+                ],
+                'validation_groups' => ['validation_groups_dummy_put'],
+            ],
+        ], [], [
+            'normalization_context' => [
+                'groups' => 'overridden_operation_dummy_read',
+            ],
+        ]));
+
+        $serializerGroup = 'overridden_operation_dummy_put';
+        $validationGroups = 'validation_groups_dummy_put';
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['alias', 'description']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::type('array'))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::type('array'))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
+
+        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+
+        // This context will override the resource one
+        $context = [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true];
+        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, OperationType::ITEM, 'put', null, $context);
+
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $definitions = $resultSchema->getDefinitions();
+        $this->assertArrayHasKey($rootDefinitionKey, $definitions);
+        $this->assertArrayNotHasKey('addionalProperties', $definitions[$rootDefinitionKey]);
+    }
 }

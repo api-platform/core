@@ -292,7 +292,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         return [
             $resourceMetadata,
-            array_merge($serializerContext ?? [], $this->getSerializerContext($resourceMetadata, $type, $operationType, $operationName)),
+            array_merge($this->getSerializerContext($resourceMetadata, $type, $operationType, $operationName), $serializerContext ?? []),
             $this->getValidationGroups($resourceMetadata, $operationType, $operationName),
             $inputOrOutput['class'],
         ];
