@@ -38,6 +38,8 @@ final class Components
         $this->securitySchemes = $securitySchemes;
         $this->links = $links;
         $this->callbacks = $callbacks;
+
+        $this->schemas->ksort();
     }
 
     public function getSchemas(): ?\ArrayObject

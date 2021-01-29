@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\OpenApi\Model;
 
 final class Paths
 {
-    private $paths;
+    private $paths = [];
 
     public function addPath(string $path, PathItem $pathItem)
     {
@@ -29,6 +29,8 @@ final class Paths
 
     public function getPaths(): array
     {
-        return $this->paths ?? [];
+        ksort($this->paths);
+
+        return $this->paths;
     }
 }
