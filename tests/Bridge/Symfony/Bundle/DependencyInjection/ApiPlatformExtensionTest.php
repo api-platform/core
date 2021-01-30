@@ -1240,6 +1240,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.purger.varnish',
+            'api_platform.json_schema.json_schema_generate_command',
+            'api_platform.json_schema.type_factory',
+            'api_platform.json_schema.schema_factory',
             'api_platform.listener.view.validate',
             'api_platform.listener.view.validate_query_parameters',
             'api_platform.mercure.listener.response.add_link_header',
@@ -1305,9 +1308,6 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.swagger.command.swagger_command';
             $definitions[] = 'api_platform.swagger.normalizer.api_gateway';
             $definitions[] = 'api_platform.swagger.normalizer.documentation';
-            $definitions[] = 'api_platform.json_schema.type_factory';
-            $definitions[] = 'api_platform.json_schema.schema_factory';
-            $definitions[] = 'api_platform.json_schema.json_schema_generate_command';
             $definitions[] = 'api_platform.openapi.options';
             $definitions[] = 'api_platform.openapi.normalizer';
             $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
@@ -1363,6 +1363,8 @@ class ApiPlatformExtensionTest extends TestCase
             NumericFilter::class => 'api_platform.doctrine.orm.numeric_filter',
             ExistsFilter::class => 'api_platform.doctrine.orm.exists_filter',
             GraphQlSerializerContextBuilderInterface::class => 'api_platform.graphql.serializer.context_builder',
+            TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
+            SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
@@ -1383,8 +1385,6 @@ class ApiPlatformExtensionTest extends TestCase
         // Only when swagger is enabled
         if ($hasSwagger) {
             $aliases += [
-                TypeFactoryInterface::class => 'api_platform.json_schema.type_factory',
-                SchemaFactoryInterface::class => 'api_platform.json_schema.schema_factory',
                 Options::class => 'api_platform.openapi.options',
                 OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
                 OpenApiFactoryInterface::class => 'api_platform.openapi.factory',

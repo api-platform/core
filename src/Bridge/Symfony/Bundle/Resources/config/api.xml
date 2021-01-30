@@ -242,7 +242,7 @@
             <argument>%api_platform.version%</argument>
             <argument>null</argument>
             <argument on-invalid="null">%api_platform.swagger.versions%</argument>
-            <argument type="service" id="api_platform.openapi.factory"></argument>
+            <argument type="service" id="api_platform.openapi.factory" on-invalid="null"></argument>
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">
