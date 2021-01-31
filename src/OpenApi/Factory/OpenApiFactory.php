@@ -162,6 +162,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $parameters = [];
             $responses = [];
 
+            if ($operation['openapi_context']['parameters'] ?? false) {
+                foreach ($operation['openapi_context']['parameters'] as $parameter) {
+                    $parameters[] = new Model\Parameter($parameter['name'], $parameter['in'], $parameter['description'] ?? '', $parameter['required'] ?? false, $parameter['deprecated'] ?? false, $parameter['allowEmptyValue'] ?? false, $parameter['schema'] ?? []);
+                }
+            }
+
             // Set up parameters
             if (OperationType::ITEM === $operationType) {
                 foreach ($identifiers as $parameterName => $identifier) {
@@ -218,7 +224,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $requestBody = null;
-            if ('PUT' === $method || 'POST' === $method || 'PATCH' === $method) {
+            if ($contextRequestBody = $operation['openapi_context']['requestBody'] ?? false) {
+                $requestBody = new Model\RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
+            } elseif ('PUT' === $method || 'POST' === $method || 'PATCH' === $method) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
                     $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operationType, $operationName, new Schema('openapi'), null, $forceSchemaCollection);

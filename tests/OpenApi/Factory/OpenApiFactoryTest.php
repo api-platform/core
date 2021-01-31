@@ -67,7 +67,29 @@ class OpenApiFactoryTest extends TestCase
                 'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
                 'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
                 'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
-                'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => ['description' => 'Custom description']] + self::OPERATION_FORMATS,
+                'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => [
+                    'description' => 'Custom description',
+                    'parameters' => [
+                        ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'type' => 'string', 'required' => true, 'default' => 'BOTH'],
+                    ],
+                    'requestBody' => [
+                        'required' => true,
+                        'description' => 'Custom request body',
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'file' => [
+                                            'type' => 'string',
+                                            'format' => 'binary',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]] + self::OPERATION_FORMATS,
                 'formats' => ['method' => 'PUT', 'path' => '/formatted/{id}', 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]],
             ],
             [
@@ -377,7 +399,20 @@ class OpenApiFactoryTest extends TestCase
             'Dummy',
             'Custom description',
             null,
-            [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
+            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
+            new Model\RequestBody('Custom request body', new \ArrayObject([
+                'multipart/form-data' => [
+                    'schema' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'file' => [
+                                'type' => 'string',
+                                'format' => 'binary',
+                            ],
+                        ],
+                    ],
+                ],
+            ]), true)
         ));
 
         $formattedPath = $paths->getPath('/formatted/{id}');
