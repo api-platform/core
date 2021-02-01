@@ -847,8 +847,8 @@ class SubresourceOperationFactoryTest extends TestCase
                 'openapi_context' => [
                     'summary' => 'Get related dummy entities',
                     'tags' => ['Dummy'],
-                ]
-            ]
+                ],
+            ],
         ]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -890,7 +890,7 @@ class SubresourceOperationFactoryTest extends TestCase
                 'openapi_context' => [
                     'summary' => 'Get related dummy entities',
                     'tags' => ['Dummy'],
-                ]
+                ],
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
