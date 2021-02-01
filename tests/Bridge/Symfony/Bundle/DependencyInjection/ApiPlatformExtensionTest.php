@@ -786,6 +786,22 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testPaginationEnabledViaDefaults()
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults'] = [
+            'attributes' => [
+                'pagination' => true
+            ],
+        ];
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => ['pagination' => true]])->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => []])->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy($configuration = null)
     {
         $parameterBag = new EnvPlaceholderParameterBag();
