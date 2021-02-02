@@ -3215,7 +3215,7 @@ class DocumentationNormalizerV3Test extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory
+     * @expectedDeprecation Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.
      */
     public function testNormalizeOpenApi()
     {
