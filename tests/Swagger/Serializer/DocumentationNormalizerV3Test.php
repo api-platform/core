@@ -3213,10 +3213,6 @@ class DocumentationNormalizerV3Test extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Decorating the DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory
-     */
     public function testNormalizeOpenApi()
     {
         $openapi = new OpenApi(new Model\Info('api', 'v1'), [], new Model\Paths());
