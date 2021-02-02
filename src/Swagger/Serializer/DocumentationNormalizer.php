@@ -184,7 +184,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         if ($object instanceof OpenApi) {
             // To be removed in 3.0, we force the non-deprecation in the OpenApiCommand
-            if (false === $context['openapi_backward_compatibility_layer'] ?? false) {
+            if (false === ($context['openapi_backward_compatibility_layer'] ?? false)) {
                 @trigger_error('Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory', \E_USER_DEPRECATED);
             }
 
