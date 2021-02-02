@@ -103,8 +103,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     private $identifiersExtractor;
 
-    private bool $openApiBackwardCompatibility;
-    private ?NormalizerInterface $openApiNormalizer;
+    private $openApiBackwardCompatibility;
+    private $openApiNormalizer;
 
     /**
      * @param SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
