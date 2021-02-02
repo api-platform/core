@@ -1147,7 +1147,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.openapi.contact.email' => null,
             'api_platform.openapi.license.name' => null,
             'api_platform.openapi.license.url' => null,
-            'api_platform.openapi.backward_compatibility' => true,
         ];
 
         if ($hasSwagger) {
