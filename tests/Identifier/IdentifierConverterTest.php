@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -94,6 +95,28 @@ class IdentifierConverterTest extends TestCase
         $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['id']);
 
         $identifierDenormalizers = [new IntegerDenormalizer()];
+        $identifierDenormalizer = new IdentifierConverter($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
+
+        $this->assertSame(['id' => 42], $identifierDenormalizer->convert($identifier, $class));
+    }
+
+    public function testShouldBreakAfterTransforming()
+    {
+        $identifier = ['id' => '42'];
+        $class = 'Dummy';
+
+        $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create($class, 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);
+
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractor->getIdentifiersFromResourceClass($class)->willReturn(['id']);
+
+        $shouldNotBeCalled = $this->prophesize(DenormalizerInterface::class);
+        $shouldNotBeCalled->supportsDenormalization()->shouldNotBeCalled();
+
+        $identifierDenormalizers = [new IntegerDenormalizer(), $shouldNotBeCalled->reveal()];
         $identifierDenormalizer = new IdentifierConverter($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
 
         $this->assertSame(['id' => 42], $identifierDenormalizer->convert($identifier, $class));
