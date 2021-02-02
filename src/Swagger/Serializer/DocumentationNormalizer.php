@@ -33,6 +33,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Psr\Container\ContainerInterface;
@@ -102,6 +103,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     private $identifiersExtractor;
 
+    private bool $openApiBackwardCompatibility;
+    private NormalizerInterface $openApiNormalizer;
+
     /**
      * @param SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
      * @param ContainerInterface|FilterCollection|null                   $filterLocator
@@ -109,7 +113,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * @param mixed|null                                                 $jsonSchemaTypeFactory
      * @param int[]                                                      $swaggerVersions
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, bool $openApiBackwardCompatibility = true, NormalizerInterface $openApiNormalizer = null)
     {
         if ($jsonSchemaTypeFactory instanceof OperationMethodResolverInterface) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
@@ -171,6 +175,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
         $this->identifiersExtractor = $identifiersExtractor;
+
+        $this->openApiBackwardCompatibility = $openApiBackwardCompatibility;
+        $this->openApiNormalizer = $openApiNormalizer;
     }
 
     /**
@@ -178,6 +185,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     public function normalize($object, $format = null, array $context = [])
     {
+        if ($object instanceof OpenApi) {
+            @trigger_error('Decorating the DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory', \E_USER_DEPRECATED);
+
+            return $this->openApiNormalizer->normalize($object, $format, $context);
+        }
+
         $v3 = 3 === ($context['spec_version'] ?? $this->defaultContext['spec_version']) && !($context['api_gateway'] ?? $this->defaultContext['api_gateway']);
 
         $definitions = new \ArrayObject();
@@ -779,7 +792,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     public function supportsNormalization($data, $format = null): bool
     {
-        return self::FORMAT === $format && $data instanceof Documentation;
+        return self::FORMAT === $format && ($data instanceof Documentation || $this->openApiBackwardCompatibility && $data instanceof OpenApi);
     }
 
     /**

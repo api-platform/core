@@ -373,6 +373,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     private function registerSwaggerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
+        $container->setParameter('api_platform.openapi.backward_compatibility', $config['openapi']['backward_compatibility']);
         $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
 
         if (empty($config['swagger']['versions'])) {
