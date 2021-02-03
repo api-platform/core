@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -43,7 +43,7 @@ final class ValidationExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = method_exists($event, 'getThrowable') ? $event->getThrowable() : $event->getException(); // @phpstan-ignore-line
-        if (!$exception instanceof ValidationException) {
+        if (!$exception instanceof ConstraintViolationListAwareExceptionInterface) {
             return;
         }
         $exceptionClass = \get_class($exception);

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ValidationException extends BaseValidationException
+final class ValidationException extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface
 {
     private $constraintViolationList;
 
@@ -32,9 +32,6 @@ final class ValidationException extends BaseValidationException
         parent::__construct($message ?: $this->__toString(), $code, $previous);
     }
 
-    /**
-     * Gets constraint violations related to this exception.
-     */
     public function getConstraintViolationList(): ConstraintViolationListInterface
     {
         return $this->constraintViolationList;
