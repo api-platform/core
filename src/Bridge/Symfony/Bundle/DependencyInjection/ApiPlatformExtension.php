@@ -375,13 +375,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $container->setParameter('api_platform.swagger.versions', $config['swagger']['versions']);
 
-        if (empty($config['swagger']['versions'])) {
-            return;
+        if (!$config['enable_swagger'] && $config['enable_swagger_ui']) {
+            throw new RuntimeException('You can not enable the Swagger UI without enabling Swagger, fix this by enabling swagger via the configuration "enable_swagger: true".');
         }
 
         $loader->load('json_schema.xml');
-        $loader->load('swagger.xml');
+
+        if (!$config['enable_swagger']) {
+            return;
+        }
+
         $loader->load('openapi.xml');
+        $loader->load('swagger.xml');
         $loader->load('swagger-ui.xml');
 
         if (!$config['enable_swagger_ui'] && !$config['enable_re_doc']) {
