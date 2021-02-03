@@ -55,13 +55,17 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
             }
 
             if ('schemas' === $key) {
-                ksort($value);
+                if ($value) {
+                    ksort($value);
+                }
             }
 
             // Side effect of using getPaths(): Paths which itself contains the array
             if ('paths' === $key) {
                 $value = $data['paths'] = $data['paths']['paths'];
-                ksort($value);
+                if ($value) {
+                    ksort($value);
+                }
                 unset($data['paths']['paths']);
             }
 

@@ -7,7 +7,8 @@
     <services>
         <service id="api_platform.openapi.normalizer" class="ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer" public="false">
             <argument type="service" id="serializer.normalizer.object" />
-            <tag name="serializer.normalizer" priority="-785" />
+            <!-- Just after the DocumentationNormalizer see swagger.xml -->
+            <tag name="serializer.normalizer" priority="-795" />
         </service>
         <service id="ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer" alias="api_platform.openapi.normalizer" />
 

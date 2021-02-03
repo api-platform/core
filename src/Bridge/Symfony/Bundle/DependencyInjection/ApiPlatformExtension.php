@@ -392,6 +392,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
         $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
+
+        if (true === $config['openapi']['backward_compatibility_layer']) {
+            $container->getDefinition('api_platform.swagger.normalizer.documentation')->addArgument($container->getDefinition('api_platform.openapi.normalizer'));
+        }
     }
 
     private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader): void
