@@ -185,5 +185,7 @@ class OpenApiNormalizerTest extends TestCase
 
         // Make sure things are sorted
         $this->assertEquals(array_keys($openApiAsArray['paths']), ['/dummies', '/dummies/{id}', '/zorros', '/zorros/{id}']);
+        // Test name converter doesn't rename this property
+        $this->assertArrayHasKey('requestBody', $openApiAsArray['paths']['/dummies']['post']);
     }
 }
