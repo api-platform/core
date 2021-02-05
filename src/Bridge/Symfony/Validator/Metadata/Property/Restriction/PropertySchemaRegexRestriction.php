@@ -29,7 +29,11 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
     {
-        return $constraint->getHtmlPattern() ? ['pattern' => $constraint->getHtmlPattern()] : [];
+        if ($constraint instanceof Regex && $constraint->getHtmlPattern()) {
+            return ['pattern' => $constraint->getHtmlPattern()];
+        }
+
+        return [];
     }
 
     /**

@@ -50,9 +50,6 @@ parameters:
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
 			path: src/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
-		-
-			message: '#Call to an undefined method Symfony\\Component\\Validator\\Constraint::getHtmlPattern\(\)\.#'
-			path: src/Bridge/Symfony/Validator/Metadata/Property/Restriction/PropertySchemaRegexRestriction.php
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
