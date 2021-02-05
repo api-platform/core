@@ -237,6 +237,36 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
     }
 
+    public function testWithPreviousData()
+    {
+        $data = new \stdClass();
+        $data->a = $data;
+
+        $this->apiResourceClassWillReturn(DummyEntity::class, ['_api_item_operation_name' => 'get', '_api_receive' => true, 'previous_data' => $data]);
+        $this->request->attributes = $this->attributes->reveal();
+
+        $this->filterLocator->has('foo')->willReturn(false);
+        $this->filterLocator->has('a_filter')->willReturn(true);
+        $this->filterLocator->get('a_filter')->willReturn(new \stdClass());
+
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            new ChainCollectionDataProvider([]),
+            new ChainItemDataProvider([]),
+            new ChainSubresourceDataProvider([]),
+            new ChainDataPersister([])
+        );
+
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
+
+        $this->assertArrayHasKey('previous_data', $requestAttributes = $dataCollector->getRequestAttributes());
+        $this->assertNotSame($requestAttributes['previous_data']->data, $requestAttributes['previous_data']);
+    }
+
     private function apiResourceClassWillReturn($data, $context = [])
     {
         $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
