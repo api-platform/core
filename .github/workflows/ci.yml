@@ -763,6 +763,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - '8.0'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -787,10 +788,14 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Set Composer platform config
+        if: (startsWith(matrix.php, '8.0'))
+        run: |
+            composer config platform.php 7.4.99
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi --ignore-platform-reqs
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -806,6 +811,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - '8.0'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -830,10 +836,14 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Set Composer platform config
+        if: (startsWith(matrix.php, '8.0'))
+        run: |
+            composer config platform.php 7.4.99
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi --ignore-platform-reqs
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
