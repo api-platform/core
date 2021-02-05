@@ -1329,6 +1329,8 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.swagger.normalizer.api_gateway';
             $definitions[] = 'api_platform.swagger.normalizer.documentation';
             $definitions[] = 'api_platform.openapi.options';
+            $definitions[] = 'api_platform.openapi.object_normalizer';
+            $definitions[] = 'api_platform.openapi.serializer';
             $definitions[] = 'api_platform.openapi.normalizer';
             $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
             $definitions[] = 'api_platform.openapi.factory';
