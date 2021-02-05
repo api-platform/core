@@ -72,15 +72,20 @@ final class RequestDataCollector extends DataCollector
             ++$counters['ignored_filters'];
         }
 
+        $requestAttributes = RequestAttributesExtractor::extractAttributes($request);
+        if (isset($requestAttributes['previous_data'])) {
+            $requestAttributes['previous_data'] = $this->cloneVar($requestAttributes['previous_data']);
+        }
+
         $this->data = [
             'resource_class' => $resourceClass,
             'resource_metadata' => $resourceMetadata ? $this->cloneVar($resourceMetadata) : null,
             'acceptable_content_types' => $request->getAcceptableContentTypes(),
-            'request_attributes' => RequestAttributesExtractor::extractAttributes($request),
             'filters' => $filters,
             'counters' => $counters,
             'dataProviders' => [],
             'dataPersisters' => ['responses' => []],
+            'request_attributes' => $requestAttributes,
         ];
 
         if ($this->collectionDataProvider instanceof TraceableChainCollectionDataProvider) {
