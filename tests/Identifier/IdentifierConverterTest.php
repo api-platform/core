@@ -121,4 +121,27 @@ class IdentifierConverterTest extends TestCase
 
         $this->assertSame(['id' => 42], $identifierDenormalizer->convert($identifier, $class));
     }
+
+    public function testWithContextAndMultipleIdentifiers()
+    {
+        $identifier = ['id' => '42', 'book' => '21'];
+
+        $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create('Author', 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);
+        $propertyMetadataFactory->create('Book', 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);
+
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractor->getIdentifiersFromResourceClass('Book')->willReturn(['id']);
+        $identifiersExtractor->getIdentifiersFromResourceClass('Author')->willReturn(['id']);
+
+        $shouldNotBeCalled = $this->prophesize(DenormalizerInterface::class);
+        $shouldNotBeCalled->supportsDenormalization()->shouldNotBeCalled();
+
+        $identifierDenormalizers = [new IntegerDenormalizer(), $shouldNotBeCalled->reveal()];
+        $identifierDenormalizer = new IdentifierConverter($identifiersExtractor->reveal(), $propertyMetadataFactory->reveal(), $identifierDenormalizers);
+
+        $this->assertSame(['id' => 42, 'book' => 21], $identifierDenormalizer->convert($identifier, 'Book', ['identifiers' => ['id' => ['Author', 'id'], 'book' => ['Book', 'id']]]));
+    }
 }

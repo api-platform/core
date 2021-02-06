@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\DataProvider;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
+use ApiPlatform\Core\Identifier\ContextAwareIdentifierConverterInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 
 /**
@@ -106,7 +107,7 @@ trait OperationDataProviderTrait
                         throw new InvalidIdentifierException(sprintf('Expected %d identifiers, got %d', $identifiersNumber, $currentIdentifiersNumber));
                     }
 
-                    return $this->identifierConverter->convert($identifiers, $attributes['resource_class']);
+                    return $this->identifierConverter->convert($identifiers, $identifiedBy[0]);
                 }
 
                 // TODO: Subresources tuple may have a third item representing if it is a "collection", this behavior will be removed in 3.0
@@ -118,6 +119,10 @@ trait OperationDataProviderTrait
             }
 
             $identifiers[$parameterName] = $parameters[$parameterName];
+        }
+
+        if ($this->identifierConverter instanceof ContextAwareIdentifierConverterInterface) {
+            return $this->identifierConverter->convert($identifiers, $attributes['resource_class'], ['identifiers' => $identifiersKeys]);
         }
 
         return $this->identifierConverter->convert($identifiers, $attributes['resource_class']);
