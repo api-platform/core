@@ -1362,6 +1362,13 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.jsonld.normalizer.object';
         }
 
+        // Ignore inlined services
+        $containerBuilderProphecy->setDefinition(Argument::that(static function (string $arg) {
+            return 0 === strpos($arg, '.');
+        }), Argument::type(Definition::class))->should(function () {
+            return true;
+        });
+
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();
         }
