@@ -56,12 +56,12 @@ final class Parameter
         }
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getIn(): ?string
+    public function getIn(): string
     {
         return $this->in;
     }
@@ -91,7 +91,7 @@ final class Parameter
         return $this->schema;
     }
 
-    public function getStyle(): string
+    public function getStyle(): ?string
     {
         return $this->style;
     }
