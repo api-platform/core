@@ -76,8 +76,16 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         if (!$classMetadata->isIdentifierComposite) {
             $replacementAlias = $queryNameGenerator->generateJoinAlias($originAlias);
             $in = $this->getQueryBuilderWithNewAliases($queryBuilder, $queryNameGenerator, $originAlias, $replacementAlias);
-            $in->select($replacementAlias);
-            $queryBuilderClone->andWhere($queryBuilderClone->expr()->in($originAlias, $in->getDQL()));
+
+            if ($classMetadata->containsForeignIdentifier) {
+                $identifier = current($classMetadata->getIdentifier());
+                $in->select("IDENTITY($replacementAlias.$identifier)");
+                $queryBuilderClone->andWhere($queryBuilderClone->expr()->in("$originAlias.$identifier", $in->getDQL()));
+            } else {
+                $in->select($replacementAlias);
+                $queryBuilderClone->andWhere($queryBuilderClone->expr()->in($originAlias, $in->getDQL()));
+            }
+
             $changedWhereClause = true;
         } else {
             // Because Doctrine doesn't support WHERE ( foo, bar ) IN () (https://github.com/doctrine/doctrine2/issues/5238), we are building as many subqueries as they are identifiers
