@@ -91,7 +91,7 @@ final class Parameter
         return $this->schema;
     }
 
-    public function getStyle(): string
+    public function getStyle(): ?string
     {
         return $this->style;
     }
