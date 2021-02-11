@@ -371,3 +371,10 @@ services:
         decorates: 'api_platform.graphql.type_converter'
         arguments: ['@app.graphql.type_converter.inner']
         public: false
+
+    app.data_transformer.rpc_output:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RPCOutputDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+
