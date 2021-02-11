@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
@@ -187,5 +188,36 @@ class OpenApiNormalizerTest extends TestCase
         $this->assertEquals(array_keys($openApiAsArray['paths']), ['/dummies', '/dummies/{id}', '/zorros', '/zorros/{id}']);
         // Test name converter doesn't rename this property
         $this->assertArrayHasKey('requestBody', $openApiAsArray['paths']['/dummies']['post']);
+    }
+
+    public function testNormalizeWithSchemas()
+    {
+        $openApi = new OpenApi(new Model\Info('My API', '1.0.0', 'An amazing API'), [new Model\Server('https://example.com')], new Model\Paths(), new Model\Components(new \ArrayObject(['z' => [], 'b' => []])));
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+
+        $array = $normalizer->normalize($openApi);
+
+        $this->assertEquals(array_keys($array['components']['schemas']), ['b', 'z']);
+    }
+
+    public function testNormalizeWithEmptySchemas()
+    {
+        $openApi = new OpenApi(new Model\Info('My API', '1.0.0', 'An amazing API'), [new Model\Server('https://example.com')], new Model\Paths(), new Model\Components(new \ArrayObject()));
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+
+        $array = $normalizer->normalize($openApi);
+        $this->assertCount(0, $array['components']['schemas']);
     }
 }
