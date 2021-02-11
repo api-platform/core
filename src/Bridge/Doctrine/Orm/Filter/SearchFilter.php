@@ -198,7 +198,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         if (\func_num_args() > 7 && ($metadata = func_get_arg(7)) instanceof ClassMetadata) {
             $type = $metadata->getTypeOfField($field);
         } else {
-            @trigger_error(sprintf('Method %s() will have a 8th argument `$metadata` in version API Platform 3.0.', __FUNCTION__), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Method %s() will have a 8th argument `$metadata` in version API Platform 3.0.', __FUNCTION__), \E_USER_DEPRECATED);
             $type = null; // default setParameter() value
         }
 
