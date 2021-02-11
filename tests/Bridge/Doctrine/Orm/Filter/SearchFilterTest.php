@@ -390,22 +390,18 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'exact (multiple values)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN(:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name IN (:name_p1, :name_p2)', $this->alias, Dummy::class),
                     [
-                        'name_p1' => [
-                            'CaSE',
-                            'SENSitive',
-                        ],
+                        'name_p1' => 'CaSE',
+                        'name_p2' => 'SENSitive',
                     ],
                     $filterFactory,
                 ],
                 'exact (multiple values; case insensitive)' => [
-                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN(:name_p1)', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) IN (:name_p1, :name_p2)', $this->alias, Dummy::class),
                     [
-                        'name_p1' => [
-                            'case',
-                            'insensitive',
-                        ],
+                        'name_p1' => 'case',
+                        'name_p2' => 'insensitive',
                     ],
                     $filterFactory,
                 ],
@@ -547,10 +543,11 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'mixed IRI and entity ID values for relations' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN(:relatedDummy_p1) AND relatedDummies_a1.id = :relatedDummies_p2', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1, :relatedDummy_p2) AND relatedDummies_a1.id = :relatedDummies_p4', $this->alias, Dummy::class),
                     [
-                        'relatedDummy_p1' => [1, 2],
-                        'relatedDummies_p2' => 1,
+                        'relatedDummy_p1' => 1,
+                        'relatedDummy_p2' => 2,
+                        'relatedDummies_p4' => 1,
                     ],
                     $filterFactory,
                 ],
