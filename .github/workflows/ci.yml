@@ -522,7 +522,6 @@ jobs:
       - name: Update project dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
-          composer why doctrine/reflection
       # - name: Require Symfony Uid
       #   run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit

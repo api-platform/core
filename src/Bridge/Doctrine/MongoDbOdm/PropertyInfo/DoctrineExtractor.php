@@ -92,6 +92,8 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             switch ($typeOfField) {
                 case MongoDbType::DATE:
                     return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTime')];
+                case MongoDbType::DATE_IMMUTABLE:
+                    return [new Type(Type::BUILTIN_TYPE_OBJECT, $nullable, 'DateTimeImmutable')];
                 case MongoDbType::HASH:
                     return [new Type(Type::BUILTIN_TYPE_ARRAY, $nullable, null, true)];
                 case MongoDbType::COLLECTION:

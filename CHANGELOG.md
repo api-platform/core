@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0
+
+* MongoDB: `date_immutable` support (#3940)
+
 ## 2.6.1
 
 * Fix defaults when using attributes (#3978)
