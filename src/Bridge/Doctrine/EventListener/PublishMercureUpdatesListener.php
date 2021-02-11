@@ -191,6 +191,8 @@ final class PublishMercureUpdatesListener
         }
 
         if ('deletedObjects' === $property) {
+            // if it's a deletion, ignore 'data' provided
+            unset($options['data']);
             $this->deletedObjects[(object) [
                 'id' => $this->iriConverter->getIriFromItem($object),
                 'iri' => $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL),
