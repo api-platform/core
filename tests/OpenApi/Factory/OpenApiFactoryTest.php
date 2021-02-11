@@ -32,6 +32,7 @@ use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
+use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
@@ -48,7 +49,10 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class OpenApiFactoryTest extends TestCase
 {
@@ -724,5 +728,15 @@ class OpenApiFactoryTest extends TestCase
             null,
             [new Model\Parameter('id', 'path', 'Question identifier', true, false, false, ['type' => 'string'])]
         ));
+
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        // Call the normalizer to see if everything is smooth
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+        $normalizer->normalize($openApi);
     }
 }
