@@ -75,7 +75,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             }
         }
 
-        $context['identifiers'] = $attributes['identifiers'] ?? [];
         $context['resource_class'] = $attributes['resource_class'];
         $context['iri_only'] = $resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false;
         $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true);
