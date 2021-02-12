@@ -92,7 +92,7 @@ parameters:
 		# Expected, due to PHP 8 attributes
 		- '#ReflectionProperty::getAttributes\(\)#'
 		- '#ReflectionMethod::getAttributes\(\)#'
-		- '#ReflectionClass<mixed>::getAttributes\(\)#'
+		- '#ReflectionClass<object>::getAttributes\(\)#'
 		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiResource has an unused parameter#'
 		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiProperty has an unused parameter#'
 
@@ -118,9 +118,3 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
-		# Waiting to be fixed by https://github.com/Roave/BetterReflection/issues/663
-		-
-			message: '#Call to private method getNestedFieldPath\(\) of class ApiPlatform\\Core\\Bridge\\Elasticsearch\\DataProvider\\Filter\\AbstractFilter\.#'
-			paths:
-				- src/Bridge/Elasticsearch/DataProvider/Filter/OrderFilter.php
-				- src/Bridge/Elasticsearch/DataProvider/Filter/AbstractSearchFilter.php

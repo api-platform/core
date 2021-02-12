@@ -837,4 +837,61 @@ class SubresourceOperationFactoryTest extends TestCase
             ] + SubresourceOperationFactory::ROUTE_OPTIONS,
         ], $subresourceOperationFactory->create(DummyEntity::class));
     }
+
+    public function testCreateWithOpenapiContext()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new ResourceMetadata('relatedDummyEntity'));
+        $resourceMetadataFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn((new ResourceMetadata('dummyEntity'))->withSubresourceOperations([
+            'subresource_get_subresource' => [
+                'openapi_context' => [
+                    'summary' => 'Get related dummy entities',
+                    'tags' => ['Dummy'],
+                ],
+            ],
+        ]));
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection(['subresource']));
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummyEntity::class)->shouldBeCalled()->willReturn(new PropertyNameCollection([]));
+
+        $subresourceMetadata = (new PropertyMetadata())->withSubresource(new SubresourceMetadata(RelatedDummyEntity::class, false));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->shouldBeCalled()->willReturn($subresourceMetadata);
+
+        $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
+        $pathSegmentNameGeneratorProphecy->getSegmentName('dummyEntity')->shouldBeCalled()->willReturn('dummy_entities');
+        $pathSegmentNameGeneratorProphecy->getSegmentName('subresource', false)->shouldBeCalled()->willReturn('subresources');
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
+
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
+
+        $this->assertEquals([
+            'api_dummy_entities_subresource_get_subresource' => [
+                'property' => 'subresource',
+                'collection' => false,
+                'resource_class' => RelatedDummyEntity::class,
+                'shortNames' => ['relatedDummyEntity', 'dummyEntity'],
+                'identifiers' => [
+                    'id' => [DummyEntity::class, 'id', true],
+                ],
+                'route_name' => 'api_dummy_entities_subresource_get_subresource',
+                'path' => '/dummy_entities/{id}/subresources.{_format}',
+                'operation_name' => 'subresource_get_subresource',
+                'openapi_context' => [
+                    'summary' => 'Get related dummy entities',
+                    'tags' => ['Dummy'],
+                ],
+            ] + SubresourceOperationFactory::ROUTE_OPTIONS,
+        ], $subresourceOperationFactory->create(DummyEntity::class));
+    }
 }

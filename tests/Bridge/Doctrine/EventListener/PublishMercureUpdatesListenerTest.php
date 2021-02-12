@@ -146,6 +146,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $toDelete->setId(3);
         $toDeleteExpressionLanguage = new DummyFriend();
         $toDeleteExpressionLanguage->setId(4);
+        $toDeleteMercureOptions = new DummyOffer();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
@@ -167,12 +168,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDeleteMercureOptions)->willReturn('/dummy_offers/5')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDeleteMercureOptions, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_offers/5')->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
         $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['private' => true, 'retry' => 10]]));
-        $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => 'http://example.com/custom_topics/1', 'normalization_context' => ['groups' => ['baz']]]]));
+        $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => 'http://example.com/custom_topics/1', 'data' => 'mercure_custom_data', 'normalization_context' => ['groups' => ['baz']]]]));
         $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['/dummies/1', '/users/3'], 'normalization_context' => ['groups' => ['baz']]]]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -186,10 +189,12 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $topics = [];
         $private = [];
         $retry = [];
-        $publisher = function (Update $update) use (&$topics, &$private, &$retry): string {
+        $data = [];
+        $publisher = function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
             $topics = array_merge($topics, $update->getTopics());
             $private[] = $update->isPrivate();
             $retry[] = $update->getRetry();
+            $data[] = $update->getData();
 
             return 'id';
         };
@@ -207,7 +212,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
         $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate, $toUpdateNoMercureAttribute, $toUpdateMercureOptions, $toUpdateMercureTopicOptions])->shouldBeCalled();
-        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete, $toDeleteExpressionLanguage])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete, $toDeleteExpressionLanguage, $toDeleteMercureOptions])->shouldBeCalled();
 
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
         $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
@@ -216,9 +221,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
 
-        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4'], $topics);
-        $this->assertSame([false, false, false, false, false, true], $private);
-        $this->assertSame([null, null, null, null, null, 10], $retry);
+        $this->assertSame(['1', '2', 'mercure_custom_data', 'mercure_options', '{"@id":"\/dummies\/3"}', '{"@id":"\/dummy_friends\/4"}', '{"@id":"\/dummy_offers\/5"}'], $data);
+        $this->assertSame(['http://example.com/dummies/1', 'http://example.com/dummies/2', 'http://example.com/custom_topics/1', '/dummies/1', '/users/3', 'http://example.com/dummies/3', 'http://example.com/dummy_friends/4', 'http://example.com/custom_topics/1'], $topics);
+        $this->assertSame([false, false, false, false, false, true, false], $private);
+        $this->assertSame([null, null, null, null, null, 10, null], $retry);
     }
 
     public function testPublishGraphQlUpdates(): void

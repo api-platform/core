@@ -213,7 +213,7 @@ final class PublishMercureUpdatesListener
             // and I'm not a fond of this approach.
             $iri = $options['topics'] ?? $object->iri;
             /** @var string $data */
-            $data = $options['data'] ?? json_encode(['@id' => $object->id]);
+            $data = json_encode(['@id' => $object->id]);
         } else {
             $resourceClass = $this->getObjectClass($object);
             $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);

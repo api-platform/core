@@ -786,6 +786,26 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testDisabledPaginationViaDefaults()
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults'] = [
+            'pagination_enabled' => false,
+        ];
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.collection.pagination', [
+            'enabled' => false, 'partial' => false, 'client_enabled' => false, 'client_items_per_page' => false, 'client_partial' => false, 'items_per_page' => 30, 'maximum_items_per_page' => null, 'page_parameter_name' => 'page', 'enabled_parameter_name' => 'pagination', 'items_per_page_parameter_name' => 'itemsPerPage', 'partial_parameter_name' => 'partial', ])->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.collection.pagination', [
+            'enabled' => true, 'partial' => false, 'client_enabled' => false, 'client_items_per_page' => false, 'client_partial' => false, 'items_per_page' => 30, 'maximum_items_per_page' => null, 'page_parameter_name' => 'page', 'enabled_parameter_name' => 'pagination', 'items_per_page_parameter_name' => 'itemsPerPage', 'partial_parameter_name' => 'partial', ])->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.collection.pagination.enabled', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.collection.pagination.enabled', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => ['pagination_enabled' => false]])->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.defaults', ['attributes' => []])->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+        $this->extension->load($config, $containerBuilder);
+    }
+
     private function getPartialContainerBuilderProphecy($configuration = null)
     {
         $parameterBag = new EnvPlaceholderParameterBag();
@@ -1341,6 +1361,13 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.jsonld.normalizer.item';
             $definitions[] = 'api_platform.jsonld.normalizer.object';
         }
+
+        // Ignore inlined services
+        $containerBuilderProphecy->setDefinition(Argument::that(static function (string $arg) {
+            return 0 === strpos($arg, '.');
+        }), Argument::type(Definition::class))->should(function () {
+            return true;
+        });
 
         foreach ($definitions as $definition) {
             $containerBuilderProphecy->setDefinition($definition, Argument::type(Definition::class))->shouldBeCalled();

@@ -32,6 +32,7 @@ use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
+use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
@@ -48,7 +49,10 @@ use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class OpenApiFactoryTest extends TestCase
 {
@@ -67,7 +71,29 @@ class OpenApiFactoryTest extends TestCase
                 'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
                 'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
                 'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
-                'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => ['description' => 'Custom description']] + self::OPERATION_FORMATS,
+                'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => [
+                    'description' => 'Custom description',
+                    'parameters' => [
+                        ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'type' => 'string', 'required' => true, 'default' => 'BOTH'],
+                    ],
+                    'requestBody' => [
+                        'required' => true,
+                        'description' => 'Custom request body',
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'file' => [
+                                            'type' => 'string',
+                                            'format' => 'binary',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]] + self::OPERATION_FORMATS,
                 'formats' => ['method' => 'PUT', 'path' => '/formatted/{id}', 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]],
             ],
             [
@@ -377,7 +403,20 @@ class OpenApiFactoryTest extends TestCase
             'Dummy',
             'Custom description',
             null,
-            [new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])]
+            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
+            new Model\RequestBody('Custom request body', new \ArrayObject([
+                'multipart/form-data' => [
+                    'schema' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'file' => [
+                                'type' => 'string',
+                                'format' => 'binary',
+                            ],
+                        ],
+                    ],
+                ],
+            ]), true)
         ));
 
         $formattedPath = $paths->getPath('/formatted/{id}');
@@ -689,5 +728,15 @@ class OpenApiFactoryTest extends TestCase
             null,
             [new Model\Parameter('id', 'path', 'Question identifier', true, false, false, ['type' => 'string'])]
         ));
+
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        // Call the normalizer to see if everything is smooth
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+        $normalizer->normalize($openApi);
     }
 }

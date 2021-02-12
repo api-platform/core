@@ -20,6 +20,9 @@ namespace ApiPlatform\Core\Annotation;
  *
  * @Annotation
  * @Target({"METHOD", "PROPERTY"})
+ * @Attributes(
+ *     @Attribute("maxDepth", type="int"),
+ * )
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD)]
 final class ApiSubresource
@@ -36,6 +39,8 @@ final class ApiSubresource
     {
         if (!\is_array($maxDepth)) { // @phpstan-ignore-line
             $this->maxDepth = $maxDepth;
+        } else {
+            $this->maxDepth = $maxDepth['maxDepth'] ?? null;
         }
     }
 }

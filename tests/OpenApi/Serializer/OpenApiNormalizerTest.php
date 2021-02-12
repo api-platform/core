@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
@@ -53,10 +54,11 @@ class OpenApiNormalizerTest extends TestCase
     public function testNormalize()
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class, 'Zorro']));
         $defaultContext = ['base_url' => '/app_dev.php/'];
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
+        $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
 
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
@@ -74,17 +76,33 @@ class OpenApiNormalizerTest extends TestCase
             []
         );
 
+        $zorroMetadata = new ResourceMetadata(
+            'Zorro',
+            'This is zorro.',
+            'http://schema.example.com/Zorro',
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+            ],
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+            ],
+            []
+        );
+
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
         $subresourceOperationFactoryProphecy->create(Argument::any(), Argument::any(), Argument::any())->willReturn([]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $resourceMetadataFactoryProphecy->create('Zorro')->shouldBeCalled()->willReturn($zorroMetadata);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true, null, null, null, null, null, null, null, ['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$']));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, [], null, null, null, null));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is an initializable but not writable property.', true, false, true, true, false, false, null, null, [], null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class), 'This is a \DateTimeInterface object.', true, true, true, true, false, false, null, null, []));
+
+        $propertyMetadataFactoryProphecy->create('Zorro', 'id', Argument::any())->shouldBeCalled()->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), 'This is an id.', true, false, null, null, null, true));
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -165,5 +183,41 @@ class OpenApiNormalizerTest extends TestCase
         // Security can be disabled per-operation using an empty array
         $this->assertEquals([], $openApiAsArray['paths']['/dummies']['post']['security']);
         $this->assertEquals(['url' => '/test'], $openApiAsArray['paths']['/dummies']['post']['servers']);
+
+        // Make sure things are sorted
+        $this->assertEquals(array_keys($openApiAsArray['paths']), ['/dummies', '/dummies/{id}', '/zorros', '/zorros/{id}']);
+        // Test name converter doesn't rename this property
+        $this->assertArrayHasKey('requestBody', $openApiAsArray['paths']['/dummies']['post']);
+    }
+
+    public function testNormalizeWithSchemas()
+    {
+        $openApi = new OpenApi(new Model\Info('My API', '1.0.0', 'An amazing API'), [new Model\Server('https://example.com')], new Model\Paths(), new Model\Components(new \ArrayObject(['z' => [], 'b' => []])));
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+
+        $array = $normalizer->normalize($openApi);
+
+        $this->assertEquals(array_keys($array['components']['schemas']), ['b', 'z']);
+    }
+
+    public function testNormalizeWithEmptySchemas()
+    {
+        $openApi = new OpenApi(new Model\Info('My API', '1.0.0', 'An amazing API'), [new Model\Server('https://example.com')], new Model\Paths(), new Model\Components(new \ArrayObject()));
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+
+        $array = $normalizer->normalize($openApi);
+        $this->assertCount(0, $array['components']['schemas']);
     }
 }

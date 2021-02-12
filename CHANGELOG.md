@@ -4,6 +4,21 @@
 
 * MongoDB: `date_immutable` support (#3940)
 
+## 2.6.3
+
+* Mercure: Do not use data in options when deleting (#4056)
+
+## 2.6.2
+
+* Validation: properties regex pattern is now compliant with ECMA 262 (#4027)
+* OpenApi: normalizer is now backward compatible (#4016), fix the name converter issue changing OpenApi properties (#4019)
+* Identifiers: Break after transforming the identifier (#3985), use the identifiers context to transform with multiple classes (#4029)
+* JsonSchema: Revert `ALLOW_EXTRA_ATTRIBUTE=false` as it is a BC break and will be done in 3.0 instead see #3881 (#4007)
+* Subresource: fix ApiSubresource maxDepth option (#3986), recursive issue in the profiler (#4023)
+* OpenApi: Allow `requestBody` and `parameters` via the `openapi_context` (#4001), make `openapi_context` work on subresources (#4004), sort paths (#4013)
+* Config: Allow disabling OpenAPI and Swagger UI without loosing the schema (#3968 and #4018), fix pagination defaults (#4011)
+* DataPersister: context propagation fix (#3983)
+
 ## 2.6.1
 
 * Fix defaults when using attributes (#3978)

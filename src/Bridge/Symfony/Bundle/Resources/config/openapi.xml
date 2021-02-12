@@ -6,8 +6,26 @@
 
     <services>
         <service id="api_platform.openapi.normalizer" class="ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer" public="false">
-            <argument type="service" id="serializer.normalizer.object" />
-            <tag name="serializer.normalizer" priority="-785" />
+            <argument type="service">
+                <service class="Symfony\Component\Serializer\Serializer">
+                    <argument type="collection">
+                        <argument type="service">
+                            <service class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
+                                <argument>null</argument>
+                                <argument>null</argument>
+                                <argument type="service" id="api_platform.property_accessor"/>
+                                <argument type="service" id="api_platform.property_info"/>
+                            </service>
+                        </argument>
+                    </argument>
+                    <argument type="collection">
+                        <argument type="service" id="serializer.encoder.json" />
+                    </argument>
+                </service>
+            </argument>
+
+            <!-- Just after the DocumentationNormalizer see swagger.xml -->
+            <tag name="serializer.normalizer" priority="-795" />
         </service>
         <service id="ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer" alias="api_platform.openapi.normalizer" />
 

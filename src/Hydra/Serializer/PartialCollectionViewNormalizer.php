@@ -62,7 +62,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         $currentPage = $lastPage = $itemsPerPage = $pageTotalItems = null;
-        if ($paginated = $object instanceof PartialPaginatorInterface) {
+        if ($paginated = ($object instanceof PartialPaginatorInterface)) {
             if ($object instanceof PaginatorInterface) {
                 $paginated = 1. !== $lastPage = $object->getLastPage();
             } else {
@@ -81,41 +81,20 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
+        $cursorPaginationAttribute = null;
         $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
         $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'] ?? $context['subresource_operation_name'], 'pagination_via_cursor', null, true);
 
-        $data['hydra:view'] = [
-            '@id' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated && !$isPaginatedWithCursor ? $currentPage : null),
-            '@type' => 'hydra:PartialCollectionView',
-        ];
+        $data['hydra:view'] = ['@id' => null, '@type' => 'hydra:PartialCollectionView'];
 
         if ($isPaginatedWithCursor) {
-            $objects = iterator_to_array($object);
-            $firstObject = current($objects);
-            $lastObject = end($objects);
+            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute);
+        }
 
-            $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null);
 
-            if (false !== $lastObject && isset($cursorPaginationAttribute)) {
-                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
-            }
-
-            if (false !== $firstObject && isset($cursorPaginationAttribute)) {
-                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
-            }
-        } elseif ($paginated) {
-            if (null !== $lastPage) {
-                $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
-                $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
-            }
-
-            if (1. !== $currentPage) {
-                $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
-            }
-
-            if (null !== $lastPage && $currentPage < $lastPage || null === $lastPage && $pageTotalItems > $itemsPerPage) {
-                $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
-            }
+        if ($paginated) {
+            return $this->populateDataWithPagination($data, $parsed, $currentPage, $lastPage, $itemsPerPage, $pageTotalItems);
         }
 
         return $data;
@@ -163,5 +142,42 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         return $paginationFilters;
+    }
+
+    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, $cursorPaginationAttribute): array
+    {
+        $objects = iterator_to_array($object);
+        $firstObject = current($objects);
+        $lastObject = end($objects);
+
+        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
+
+        if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
+        }
+
+        if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
+        }
+
+        return $data;
+    }
+
+    private function populateDataWithPagination(array $data, array $parsed, ?float $currentPage, ?float $lastPage, ?float $itemsPerPage, ?float $pageTotalItems): array
+    {
+        if (null !== $lastPage) {
+            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1.);
+            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage);
+        }
+
+        if (1. !== $currentPage) {
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1.);
+        }
+
+        if ((null !== $lastPage && $currentPage < $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1.);
+        }
+
+        return $data;
     }
 }
