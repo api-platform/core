@@ -148,7 +148,7 @@ final class ApiResource
      * @param bool|array   $mercure                        https://api-platform.com/docs/core/mercure
      * @param bool         $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
      * @param array        $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param array        $openapiContext                 https://api-platform.com/docs/core/swagger/#using-the-openapi-and-swagger-contexts
+     * @param array        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param array        $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
      * @param string|false $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
      * @param bool         $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
@@ -167,7 +167,7 @@ final class ApiResource
      * @param string       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param bool         $stateless
      * @param string       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param array        $swaggerContext                 https://api-platform.com/docs/core/swagger/#using-the-openapi-and-swagger-contexts
+     * @param array        $swaggerContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param array        $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
      * @param int          $urlGenerationStrategy
      *

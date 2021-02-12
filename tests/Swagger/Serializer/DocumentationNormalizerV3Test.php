@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouterOperationPathResolver;
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
@@ -33,6 +34,8 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
@@ -54,6 +57,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -3207,5 +3211,56 @@ class DocumentationNormalizerV3Test extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['base_url' => '/']));
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.
+     */
+    public function testNormalizeOpenApi()
+    {
+        $openapi = new OpenApi(new Model\Info('api', 'v1'), [], new Model\Paths());
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $operationPathResolver = new OperationPathResolver(new UnderscorePathSegmentNameGenerator());
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+
+        $openApiNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $openApiNormalizerProphecy->normalize($openapi, null, [])->willReturn([])->shouldBeCalled();
+
+        $normalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            null,
+            null,
+            $operationPathResolver,
+            null,
+            null,
+            null, false,
+            '',
+            '',
+            '',
+            '',
+            [],
+            [],
+            null,
+            false,
+            'page',
+            false,
+            'itemsPerPage',
+            $formatsProvider ?? [],
+            false,
+            'pagination',
+            ['spec_version' => 3],
+            [2, 3],
+            $identifiersExtractorProphecy->reveal(),
+            $openApiNormalizerProphecy->reveal()
+        );
+
+        $this->assertTrue($normalizer->supportsNormalization($openapi, 'json'));
+        $this->assertEquals([], $normalizer->normalize($openapi));
     }
 }

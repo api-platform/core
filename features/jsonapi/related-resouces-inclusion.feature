@@ -602,7 +602,7 @@ Feature: JSON API Inclusion of Related Resources
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON should be valid according to the JSON API schema
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
         "links": {
