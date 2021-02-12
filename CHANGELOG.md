@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.3
+
+* Mercure: Do not use data in options when deleting (#4056)
+
 ## 2.6.2
 
 * Validation: properties regex pattern is now compliant with ECMA 262 (#4027)
