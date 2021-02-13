@@ -197,7 +197,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             if ($this->identifiersExtractor) {
-                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identifiers' => !$resourceMetadata->getItemOperations() ? [] : $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)]);
+                $identifiers = [];
+                if ($resourceMetadata->getItemOperations()) {
+                    $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);
+                }
+
+                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identifiers' => $identifiers]);
             }
             $resourceShortName = $resourceMetadata->getShortName();
 
