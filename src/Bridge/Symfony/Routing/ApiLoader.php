@@ -230,7 +230,7 @@ final class ApiLoader extends Loader
         if ($resourceMetadata->getItemOperations()) {
             $operation['identifiers'] = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
         } else {
-            $operation['identifiers'] = [];
+            $operation['identifiers'] = $operation['identifiers'] ?? [];
         }
 
         $operation['has_composite_identifier'] = \count($operation['identifiers']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
