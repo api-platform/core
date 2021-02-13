@@ -143,7 +143,7 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     Then the response status code should be 202
 
   @createSchema
-  Scenario: Use a POST operation to do a Remote Procedure Call without identifiers
+  Scenario: Use a POST operation to do a Remote Procedure Call without identifiers and with an output DTO
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/rpc_output"
     """
