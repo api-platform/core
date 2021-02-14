@@ -151,7 +151,7 @@ class RespondListenerTest extends TestCase
         $this->assertTrue($response->headers->has('Location'));
     }
 
-    public function testCreate204Response()
+    public function testCreate200ResponseFromDeleteWithBody()
     {
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
@@ -169,6 +169,31 @@ class RespondListenerTest extends TestCase
 
         $response = $event->getResponse();
         $this->assertEquals('foo', $response->getContent());
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertEquals('Accept', $response->headers->get('Vary'));
+        $this->assertEquals('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertEquals('deny', $response->headers->get('X-Frame-Options'));
+    }
+
+    public function testCreate204ResponseFromDeleteWithoutBody()
+    {
+        $request = new Request([], [], ['_api_respond' => true]);
+        $request->setRequestFormat('xml');
+        $request->setMethod('DELETE');
+
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            ''
+        );
+
+        $listener = new RespondListener();
+        $listener->onKernelView($event);
+
+        $response = $event->getResponse();
+        $this->assertEquals('', $response->getContent());
         $this->assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
         $this->assertEquals('text/xml; charset=utf-8', $response->headers->get('Content-Type'));
         $this->assertEquals('Accept', $response->headers->get('Vary'));

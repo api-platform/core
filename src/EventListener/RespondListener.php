@@ -77,6 +77,10 @@ final class RespondListener
 
         $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;
 
+        if (Response::HTTP_NO_CONTENT === $status && $controllerResult) {
+            $status = Response::HTTP_OK;
+        }
+
         if ($request->attributes->has('_api_write_item_iri')) {
             $headers['Content-Location'] = $request->attributes->get('_api_write_item_iri');
 
