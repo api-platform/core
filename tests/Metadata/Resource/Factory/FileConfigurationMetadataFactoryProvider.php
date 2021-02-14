@@ -36,7 +36,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
                 'my_other_op_name' => ['method' => 'POST'],
             ],
             'collectionOperations' => [
-                'my_collection_op' => ['method' => 'POST', 'path' => 'the/collection/path'],
+                'my_collection_op' => ['method' => 'POST', 'path' => 'the/collection/path', 'status' => '201'],
             ],
             'subresourceOperations' => [
                 'my_collection_subresource' => ['path' => 'the/subresource/path'],
