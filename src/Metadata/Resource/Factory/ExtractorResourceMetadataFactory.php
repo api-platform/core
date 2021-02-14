@@ -87,23 +87,23 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
     }
 
     /**
-     * Update resource metadata if new config is given
+     * Update resource metadata if new config is given.
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
-            $propertyData = $metadata[$property];
-            $parentPropertyData = $resourceMetadata->{'get'.ucfirst($property)}();
+            $propertyMetadata = $metadata[$property];
+            $parentPropertyMetadata = $resourceMetadata->{'get'.ucfirst($property)}();
 
-            if (null === $propertyData) {
+            if (null === $propertyMetadata) {
                 continue;
             }
 
-            if (is_array($parentPropertyData) && is_array($propertyData)) {
-                $propertyData = array_merge($parentPropertyData, $propertyData);
+            if (\is_array($parentPropertyMetadata) && \is_array($propertyMetadata)) {
+                $propertyMetadata = array_merge($parentPropertyMetadata, $propertyMetadata);
             }
 
-            $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($propertyData);
+            $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($propertyMetadata);
         }
 
         return $resourceMetadata;
