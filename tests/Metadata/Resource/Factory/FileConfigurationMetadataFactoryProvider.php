@@ -110,4 +110,22 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 
         return [[$resourceMetadata]];
     }
+
+    public function overrideOperationsResourceMetadataProvider()
+    {
+        $resourceMetadata = $this->resourceMetadataProvider()[0][0];
+
+        $resourceMetadata = $resourceMetadata->withDescription('New description');
+
+        $resourceMetadata = $resourceMetadata->withItemOperations([
+            'my_op_name' => ['method' => 'GET', 'path' => 'the/path'],
+            'my_other_op_name' => ['method' => 'POST'],
+        ]);
+
+        $resourceMetadata = $resourceMetadata->withCollectionOperations([
+            'my_collection_op' => ['method' => 'POST', 'status' => '200'],
+        ]);
+
+        return [[$resourceMetadata]];
+    }
 }
