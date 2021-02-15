@@ -39,7 +39,7 @@ class DummyCarColor
      * @var DummyCar
      *
      * @ORM\ManyToOne(targetEntity="DummyCar", inversedBy="colors")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", referencedColumnName="id_id")
      * @Assert\NotBlank
      */
     private $car;

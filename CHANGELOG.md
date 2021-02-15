@@ -3,6 +3,7 @@
 ## 2.6.3
 
 * Mercure: Do not use data in options when deleting (#4056)
+* Doctrine: Support for foreign identifiers
 
 ## 2.6.2
 

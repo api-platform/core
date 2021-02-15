@@ -559,6 +559,48 @@ SQL;
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
     }
 
+    public function testCompositeIdentifiersWithForeignIdentifiers()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
+
+        $classMetadata = new ClassMetadataInfo(DummyCar::class);
+        $classMetadata->setIdentifier(['id']);
+        $classMetadata->containsForeignIdentifier = true;
+
+        $em = $this->prophesize(EntityManager::class);
+        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
+        $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn($classMetadata);
+
+        $qb = new QueryBuilder($em->reveal());
+
+        $qb->select('o')
+            ->from(DummyCar::class, 'o')
+            ->leftJoin('o.colors', 'colors')
+            ->where('o.colors = :foo')
+            ->setParameter('foo', 1);
+
+        $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
+        $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
+        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
+
+        $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), true);
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, 'get');
+
+        $expected = <<<SQL
+SELECT o
+FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o
+LEFT JOIN o.colors colors
+WHERE o.id IN(
+  SELECT IDENTITY(o_2.id) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
+  LEFT JOIN o_2.colors colors_2
+  WHERE o_2.colors = :foo
+)
+SQL;
+
+        $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
+    }
+
     private function toDQLString(string $dql): string
     {
         return preg_replace(['/\s+/', '/\(\s/', '/\s\)/'], [' ', '(', ')'], $dql);
