@@ -130,3 +130,27 @@ Feature: Create-Retrieve-Update-Delete with a Overridden Operation context
     When I send a "DELETE" request to "/overridden_operation_dummies/1"
     Then the response status code should be 204
     And the response should be empty
+
+  @createSchema
+  Scenario: Use a POST operation to do a Remote Procedure Call without identifiers
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/rpc"
+    """
+    {
+      "value": "Hello world"
+    }
+    """
+    Then the response status code should be 202
+
+  @createSchema
+  Scenario: Use a POST operation to do a Remote Procedure Call without identifiers and with an output DTO
+    When I add "Content-Type" header equal to "application/json"
+    And I send a "POST" request to "/rpc_output"
+    """
+    {
+      "value": "Hello world"
+    }
+    """
+    Then the response status code should be 200
+    And the JSON node "success" should be equal to "YES"
+    And the JSON node "@type" should be equal to "RPC"
