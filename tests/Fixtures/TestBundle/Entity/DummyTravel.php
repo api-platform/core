@@ -31,7 +31,7 @@ class DummyTravel
 
     /**
      * @ORM\ManyToOne(targetEntity="DummyCar")
-     * @ORM\JoinColumn(name="car_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="car_id", referencedColumnName="id_id")
      */
     public $car;
 
