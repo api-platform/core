@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RPC as RPCDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RPCOutput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RPC;
 
@@ -32,6 +33,6 @@ final class RPCOutputDataTransformer implements DataTransformerInterface
      */
     public function supportsTransformation($object, string $to, array $context = []): bool
     {
-        return $object instanceof RPC && RPCOutput::class === $to;
+        return ($object instanceof RPC || $object instanceof RPCDocument) && RPCOutput::class === $to;
     }
 }
