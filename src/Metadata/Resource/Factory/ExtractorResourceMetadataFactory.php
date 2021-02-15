@@ -74,6 +74,8 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
      */
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
+        $attributes = isset($metadata['attributes']) ? $metadata['attributes'] : [];
+
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
             $propertyMetadata = $metadata[$property];
             $parentPropertyMetadata = $resourceMetadata->{'get'.ucfirst($property)}();
@@ -82,8 +84,16 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
                 continue;
             }
 
-            if (\is_array($parentPropertyMetadata) && \is_array($propertyMetadata)) {
-                $propertyMetadata = array_merge($parentPropertyMetadata, $propertyMetadata);
+            // If metadata already defined before, consider merge new and old configs.
+            if (null !== $parentPropertyMetadata) {
+                // "merge" attribute must set to true to allow merging.
+                if (!isset($attributes['merge']) || $attributes['merge'] === false) {
+                    continue;
+                }
+
+                if (\is_array($parentPropertyMetadata) && \is_array($propertyMetadata)) {
+                    $propertyMetadata = array_merge($parentPropertyMetadata, $propertyMetadata);
+                }
             }
 
             $resourceMetadata = $resourceMetadata->{'with'.ucfirst($property)}($propertyMetadata);
