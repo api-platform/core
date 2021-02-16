@@ -3,6 +3,7 @@
 ## 2.7.0
 
 * Doctrine: Better exception to find which resource is linked to an exception (#3965)
+* Doctrine: Allow mixed type value for date filter (notice if invalid) (#3870)
 * MongoDB: `date_immutable` support (#3940)
 
 ## 2.6.3
