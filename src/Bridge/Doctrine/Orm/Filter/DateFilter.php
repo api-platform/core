@@ -128,9 +128,15 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
      *
      * @param string|DBALType $type
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value, string $nullManagement = null, $type = null)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, $value, string $nullManagement = null, $type = null)
     {
         $type = (string) $type;
+        $value = $this->normalizeValue($value, $operator);
+
+        if (null === $value) {
+            return;
+        }
+
         try {
             $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
         } catch (\Exception $e) {

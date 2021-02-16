@@ -220,6 +220,7 @@ trait DateFilterTestTrait
                 [
                     'dummyDate' => [
                         'after' => '1932iur123ufqe',
+                        'before' => [],
                     ],
                 ],
             ],
