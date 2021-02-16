@@ -21,13 +21,13 @@ final class PaginationOptions
     private $itemsPerPageParameterName;
     private $paginationClientEnabled;
     private $paginationClientEnabledParameterName;
-    private int $itemsPerPage;
-    private ?int $maximumItemsPerPage;
-    private bool $partialPaginationEnabled;
-    private bool $clientPartialPaginationEnabled;
-    private string $partialPaginationParameterName;
+    private $itemsPerPage;
+    private $maximumItemsPerPage;
+    private $partialPaginationEnabled;
+    private $clientPartialPaginationEnabled;
+    private $partialPaginationParameterName;
 
-    public function __construct(bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', int $itemsPerPage = 30, ?int $maximumItemsPerPage = null, bool $partialPaginationEnabled = false, bool $clientPartialPaginationEnabled = false, string $partialPaginationParameterName = 'partial')
+    public function __construct(bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', int $itemsPerPage = 30, int $maximumItemsPerPage = null, bool $partialPaginationEnabled = false, bool $clientPartialPaginationEnabled = false, string $partialPaginationParameterName = 'partial')
     {
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
@@ -82,7 +82,7 @@ final class PaginationOptions
         return $this->itemsPerPage;
     }
 
-    public function getMaximumItemsPerPage(): ?int
+    public function getMaximumItemsPerPage(): int
     {
         return $this->maximumItemsPerPage;
     }
