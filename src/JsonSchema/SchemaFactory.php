@@ -325,10 +325,10 @@ final class SchemaFactory implements SchemaFactoryInterface
      */
     private function getFactoryOptions(array $serializerContext, array $validationGroups, ?string $operationType, ?string $operationName): array
     {
-        $options = [];
-
-        /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
-        $options['enable_getter_setter_extraction'] = true;
+        $options = [
+            /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
+            'enable_getter_setter_extraction' => true,
+        ];
 
         if (isset($serializerContext[AbstractNormalizer::GROUPS])) {
             /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
