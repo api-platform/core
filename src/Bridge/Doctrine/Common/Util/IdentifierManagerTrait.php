@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Util;
 
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -29,6 +30,7 @@ trait IdentifierManagerTrait
 {
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
+    private $resourceMetadataFactory;
 
     /**
      * Transform and check the identifier, composite or not.
@@ -74,7 +76,13 @@ trait IdentifierManagerTrait
 
             $identifier = null === $identifiersMap ? $identifierValues[$i] ?? null : $identifiersMap[$propertyName] ?? null;
             if (null === $identifier) {
-                throw new PropertyNotFoundException(sprintf('Invalid identifier "%s", "%s" was not found.', $id, $propertyName));
+                $exceptionMessage = sprintf('Invalid identifier "%s", "%s" was not found', $id, $propertyName);
+                if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+                    $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                    $exceptionMessage .= sprintf(' for resource "%s"', $resourceMetadata->getShortName());
+                }
+
+                throw new PropertyNotFoundException($exceptionMessage.'.');
             }
 
             $doctrineTypeName = $doctrineClassMetadata->getTypeOfField($propertyName);
@@ -87,7 +95,13 @@ trait IdentifierManagerTrait
                     $identifier = MongoDbType::getType($doctrineTypeName)->convertToPHPValue($identifier);
                 }
             } catch (ConversionException $e) {
-                throw new InvalidIdentifierException(sprintf('Invalid value "%s" provided for an identifier.', $propertyName), $e->getCode(), $e);
+                $exceptionMessage = sprintf('Invalid value "%s" provided for an identifier', $propertyName);
+                if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+                    $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+                    $exceptionMessage .= sprintf(' for resource "%s"', $resourceMetadata->getShortName());
+                }
+
+                throw new InvalidIdentifierException($exceptionMessage.'.', $e->getCode(), $e);
             }
 
             $identifiers[$propertyName] = $identifier;

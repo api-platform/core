@@ -25,6 +25,7 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
         <service id="api_platform.doctrine.orm.subresource_data_provider" public="false" abstract="true">
@@ -33,6 +34,7 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
         </service>
 
         <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider">

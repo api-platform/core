@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* Doctrine: Better exception to find which resource is linked to an exception (#3965)
 * MongoDB: `date_immutable` support (#3940)
 
 ## 2.6.3
