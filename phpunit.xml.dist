@@ -6,7 +6,6 @@
          backupGlobals="false"
          bootstrap="tests/Fixtures/app/bootstrap.php"
          colors="true"
-         stopOnFailure="true"
 >
     <php>
         <ini name="error_reporting" value="-1" />
