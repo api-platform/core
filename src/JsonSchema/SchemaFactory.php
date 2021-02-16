@@ -327,6 +327,9 @@ final class SchemaFactory implements SchemaFactoryInterface
     {
         $options = [];
 
+        /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
+        $options['enable_getter_setter_extraction'] = true;
+
         if (isset($serializerContext[AbstractNormalizer::GROUPS])) {
             /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
             $options['serializer_groups'] = (array) $serializerContext[AbstractNormalizer::GROUPS];
