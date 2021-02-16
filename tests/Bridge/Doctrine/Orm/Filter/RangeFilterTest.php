@@ -332,6 +332,31 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'isDummyBoolean[between]' => [
+                'property' => 'isDummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'isDummyBoolean[gt]' => [
+                'property' => 'isDummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'isDummyBoolean[gte]' => [
+                'property' => 'isDummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'isDummyBoolean[lt]' => [
+                'property' => 'isDummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'isDummyBoolean[lte]' => [
+                'property' => 'isDummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 

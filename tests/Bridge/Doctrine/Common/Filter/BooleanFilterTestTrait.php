@@ -46,6 +46,11 @@ trait BooleanFilterTestTrait
                 'type' => 'bool',
                 'required' => false,
             ],
+            'isDummyBoolean' => [
+                'property' => 'isDummyBoolean',
+                'type' => 'bool',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
