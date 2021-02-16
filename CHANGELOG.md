@@ -4,6 +4,7 @@
 
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers
+* SchemaFactory: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`)
 
 ## 2.6.2
 

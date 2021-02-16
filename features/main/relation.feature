@@ -155,6 +155,7 @@ Feature: Relations support
       "description": null,
       "dummy": null,
       "dummyBoolean": null,
+      "isDummyBoolean": null,
       "dummyDate": null,
       "dummyFloat": null,
       "dummyPrice": null,
