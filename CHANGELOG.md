@@ -2,6 +2,7 @@
 
 ## 2.6.3
 
+* Security: Use a `NullToken` when using the new authenticator manager in the resource access checker (#4067)
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers
 * SchemaFactory: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`)
