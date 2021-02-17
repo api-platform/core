@@ -13,18 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
-use Traversable;
-
-class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
+final class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
 {
-    private $taverable;
+    private $traversable;
     private $currentPage;
     private $itemsPerPage;
     private $totalItems;
 
-    public function __construct(Traversable $iterator, float $currentPage, float $itemsPerPage, float $totalItems)
+    public function __construct(\Traversable $iterator, float $currentPage, float $itemsPerPage, float $totalItems)
     {
-        $this->taverable = $iterator;
+        $this->traversable = $iterator;
         $this->currentPage = $currentPage;
         $this->itemsPerPage = $itemsPerPage;
         $this->totalItems = $totalItems;
@@ -43,11 +41,11 @@ class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
      */
     public function getLastPage(): float
     {
-        if (0. === $this->itemsPerPage) {
-            return 1;
+        if (0. >= $this->itemsPerPage) {
+            return 1.;
         }
 
-        return max(ceil($this->totalItems / $this->itemsPerPage), 1);
+        return max(ceil($this->totalItems / $this->itemsPerPage) ?: 1., 1.);
     }
 
     /**
@@ -75,7 +73,7 @@ class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
             return (int) ceil($this->itemsPerPage);
         }
 
-        if (0. === $this->itemsPerPage) {
+        if (0. >= $this->itemsPerPage) {
             return (int) ceil($this->totalItems);
         }
 
@@ -85,8 +83,8 @@ class TraversablePaginator implements \IteratorAggregate, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
-        return $this->taverable;
+        return $this->traversable;
     }
 }
