@@ -25,7 +25,6 @@ Feature: Handle properly invalid data submitted to the API
       "description": null,
       "dummy": null,
       "dummyBoolean": null,
-      "isDummyBoolean": null,
       "dummyDate": null,
       "dummyFloat": null,
       "dummyPrice": null,

@@ -214,20 +214,6 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                 'strategy' => 'exact',
                 'is_collection' => true,
             ],
-            'isDummyBoolean' => [
-                'property' => 'isDummyBoolean',
-                'type' => 'bool',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-            ],
-            'isDummyBoolean[]' => [
-                'property' => 'isDummyBoolean',
-                'type' => 'bool',
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-            ],
         ], $filter->getDescription($this->resourceClass));
     }
 

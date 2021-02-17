@@ -27,6 +27,7 @@ Feature: Documentation support
     And the OpenAPI class "CustomNormalizedDummy-output" exists
     And the OpenAPI class "CustomWritableIdentifierDummy" exists
     And the OpenAPI class "Dummy" exists
+    And the OpenAPI class "DummyBoolean" exists
     And the OpenAPI class "RelatedDummy" exists
     And the OpenAPI class "DummyTableInheritance" exists
     And the OpenAPI class "DummyTableInheritanceChild" exists
@@ -53,8 +54,11 @@ Feature: Documentation support
     And the JSON node "paths./api/custom-call/{id}.get" should exist
     And the JSON node "paths./api/custom-call/{id}.put" should exist
     # Properties
-    And "id" property exists for the OpenAPI class "Dummy"
-    And "name" property is required for OpenAPI class "Dummy"
+    And the "id" property exists for the OpenAPI class "Dummy"
+    And the "name" property is required for the OpenAPI class "Dummy"
+    # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
+    #And the "isDummyBoolean" property exists for the OpenAPI class "DummyBoolean"
+    #And the "isDummyBoolean" property is not read only for the OpenAPI class "DummyBoolean"
     # Filters
     And the JSON node "paths./dummies.get.parameters[3].name" should be equal to "dummyBoolean"
     And the JSON node "paths./dummies.get.parameters[3].in" should be equal to "query"
@@ -129,6 +133,7 @@ Feature: Documentation support
     And the Swagger class "CustomNormalizedDummy-output" exists
     And the Swagger class "CustomWritableIdentifierDummy" exists
     And the Swagger class "Dummy" exists
+    And the Swagger class "DummyBoolean" exists
     And the Swagger class "RelatedDummy" exists
     And the Swagger class "DummyTableInheritance" exists
     And the Swagger class "DummyTableInheritanceChild" exists
@@ -155,8 +160,11 @@ Feature: Documentation support
     And the JSON node "paths./api/custom-call/{id}.get" should exist
     And the JSON node "paths./api/custom-call/{id}.put" should exist
     # Properties
-    And "id" property exists for the Swagger class "Dummy"
-    And "name" property is required for Swagger class "Dummy"
+    And the "id" property exists for the Swagger class "Dummy"
+    And the "name" property is required for the Swagger class "Dummy"
+    # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
+    #And the "isDummyBoolean" property exists for the Swagger class "DummyBoolean"
+    #And the "isDummyBoolean" property is not read only for the Swagger class "DummyBoolean"
     # Filters
     And the JSON node "paths./dummies.get.parameters[0].name" should be equal to "dummyBoolean"
     And the JSON node "paths./dummies.get.parameters[0].in" should be equal to "query"

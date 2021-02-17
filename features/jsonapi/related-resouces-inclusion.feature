@@ -338,7 +338,6 @@ Feature: JSON API Inclusion of Related Resources
                     "description": null,
                     "dummy": null,
                     "dummyBoolean": null,
-                    "isDummyBoolean": null,
                     "dummyDate": null,
                     "dummyFloat": null,
                     "dummyPrice": null,

@@ -95,13 +95,6 @@ class Dummy
     public $dummyBoolean;
 
     /**
-     * @var bool A dummy boolean
-     *
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    public $isDummyBoolean;
-
-    /**
      * @var \DateTime A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
@@ -323,7 +316,7 @@ class Dummy
     /**
      * @return bool
      */
-    public function getDummyBoolean()
+    public function isDummyBoolean()
     {
         return $this->dummyBoolean;
     }
@@ -334,22 +327,6 @@ class Dummy
     public function setDummyBoolean($dummyBoolean)
     {
         $this->dummyBoolean = $dummyBoolean;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDummyBoolean()
-    {
-        return $this->isDummyBoolean;
-    }
-
-    /**
-     * @param bool $isDummyBoolean
-     */
-    public function setIsDummyBoolean($isDummyBoolean)
-    {
-        $this->isDummyBoolean = $isDummyBoolean;
     }
 
     public function setDummy($dummy = null)
