@@ -460,7 +460,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 throw new \LogicException('OAuth flow must be one of: implicit, password, clientCredentials, authorizationCode');
         }
 
-        return new Model\SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, 'oauth2', null, new Model\OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode), null);
+        return new Model\SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, null, null, new Model\OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode), null);
     }
 
     private function getSecuritySchemes(): array
