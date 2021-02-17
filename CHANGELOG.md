@@ -232,7 +232,7 @@ For compatibility reasons with Symfony 5.2 and PHP 8, we do not test anymore the
 
 * Add an HTTP client dedicated to functional API testing (#2608)
 * Add PATCH support (#2895)  
-  Note: with PATCH, responses will skip null values. As this may break on some endpoints, you need to manually [add the `merge-patch+json` format](https://api-platform.com/docs/core/content-negotiation/#configuring-patch-formats) to enable PATCH support. This will be the default behavior in API Platform 3.
+  Note: with JSON Merge Patch, responses will skip null values. As this may break on some endpoints, you need to manually [add the `merge-patch+json` format](https://api-platform.com/docs/core/content-negotiation/#configuring-patch-formats) to enable PATCH support. This will be the default behavior in API Platform 3.
 * Add a command to generate json schemas `api:json-schema:generate` (#2996)
 * Add infrastructure to generate a JSON Schema from a Resource `ApiPlatform\Core\JsonSchema\SchemaFactoryInterface` (#2983)
 * Replaces `access_control` by `security` and adds a `security_post_denormalize` attribute (#2992)
