@@ -7,6 +7,7 @@
 * Doctrine: Support for foreign identifiers
 * SchemaFactory: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`)
 * OpenApiFactory: Do not set scheme to oauth2 when generating securitySchemes
+* OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
 
 ## 2.6.2
 
