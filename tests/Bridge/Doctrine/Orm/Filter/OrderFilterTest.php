@@ -180,18 +180,6 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     ],
                 ],
             ],
-            'order[isDummyBoolean]' => [
-                'property' => 'isDummyBoolean',
-                'type' => 'string',
-                'required' => false,
-                'schema' => [
-                    'type' => 'string',
-                    'enum' => [
-                        'asc',
-                        'desc',
-                    ],
-                ],
-            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
