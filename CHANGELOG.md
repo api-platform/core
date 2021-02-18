@@ -2,10 +2,13 @@
 
 ## 2.6.3
 
+* Identifiers: Re-allow `POST` operations even if no identifier is defined (#4052)
+* Hydra: Fix partial pagination which no longer returns the `hydra:next` property (#4015)
 * Security: Use a `NullToken` when using the new authenticator manager in the resource access checker (#4067)
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers
-* SchemaFactory: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`)
+* JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`)
+* OpenAPI: Fix error when schema is empty (#4051)
 * OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
 
