@@ -89,6 +89,9 @@ parameters:
 			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo::\$fieldMappings \(array.*\)>\) does not accept array\(.*\)\.#'
 			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
 
+		# Expected, Symfony 5.3
+		- '#getCollectionValueTypes#'
+
 		# Expected, due to PHP 8 attributes
 		- '#ReflectionProperty::getAttributes\(\)#'
 		- '#ReflectionMethod::getAttributes\(\)#'
