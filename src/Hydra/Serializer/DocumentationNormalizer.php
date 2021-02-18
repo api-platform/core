@@ -347,7 +347,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             return null;
         }
 
-        if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueType()) {
+        if ($type->isCollection() && null !== $collectionType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
             $type = $collectionType;
         }
 

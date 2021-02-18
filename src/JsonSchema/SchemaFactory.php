@@ -214,8 +214,13 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $valueSchema = [];
         if (null !== $type = $propertyMetadata->getType()) {
-            $isCollection = $type->isCollection();
-            if (null === $valueType = $isCollection ? $type->getCollectionValueType() : $type) {
+            if ($isCollection = $type->isCollection()) {
+                $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
+            } else {
+                $valueType = $type;
+            }
+
+            if (null === $valueType) {
                 $builtinType = 'string';
                 $className = null;
             } else {

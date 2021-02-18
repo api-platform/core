@@ -80,7 +80,7 @@ trait FieldDatatypeTrait
         }
 
         if (
-            null !== ($type = $type->getCollectionValueType())
+            null !== ($type = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType())
             && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && null !== ($className = $type->getClassName())
             && $this->resourceClassResolver->isResourceClass($className)
