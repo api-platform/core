@@ -6,6 +6,7 @@
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers
 * SchemaFactory: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`)
+* OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
 
 ## 2.6.2
