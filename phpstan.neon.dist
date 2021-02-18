@@ -90,7 +90,7 @@ parameters:
 			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
 
 		# Expected, Symfony 5.3
-		- '#getCollectionValueTypes#'
+		- '#getCollectionValueT#'
 
 		# Expected, due to PHP 8 attributes
 		- '#ReflectionProperty::getAttributes\(\)#'
