@@ -29,6 +29,7 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
@@ -108,6 +109,25 @@ class AppKernel extends Kernel
         $c->setParameter('kernel.project_dir', __DIR__);
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
+
+        $c->prependExtensionConfig('framework',  [
+            'secret' => 'dunglas.fr',
+            'validation' => ['enable_annotations' => true],
+            'serializer' => ['enable_annotations' => true],
+            'test' => null,
+            'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+            'profiler' => [
+                'enabled' => true,
+                'collect' => false,
+            ],
+            'messenger' => [
+                'default_bus' => 'messenger.bus.default',
+                'buses' => [
+                    'messenger.bus.default' => ['default_middleware' => 'allow_no_handlers'],
+                ],
+            ],
+            'router' => ['utf8' => true],
+        ]);
 
         $alg = class_exists(NativePasswordEncoder::class) ? 'auto' : 'bcrypt';
         $securityConfig = [

@@ -33,8 +33,8 @@ use Twig\Environment as TwigEnvironment;
  */
 class SwaggerUiActionTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
+    use ExpectDeprecationTrait;
 
     public const SPEC = [
         'paths' => [
