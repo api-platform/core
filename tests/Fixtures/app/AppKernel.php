@@ -110,7 +110,7 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
-        $c->prependExtensionConfig('framework',  [
+        $c->prependExtensionConfig('framework', [
             'secret' => 'dunglas.fr',
             'validation' => ['enable_annotations' => true],
             'serializer' => ['enable_annotations' => true],
