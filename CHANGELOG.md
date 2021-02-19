@@ -1,5 +1,9 @@
 # Changelog
 
+# 2.6.4
+
+* OpenApi: Fix missing 422 responses in the documentation (#4086)
+
 ## 2.6.3
 
 * Identifiers: Re-allow `POST` operations even if no identifier is defined (#4052)
