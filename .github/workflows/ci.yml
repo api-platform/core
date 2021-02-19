@@ -600,7 +600,7 @@ jobs:
           - '7.4'
       fail-fast: false
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=8
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -643,6 +643,8 @@ jobs:
         symfony:
           - '5.3'
       fail-fast: false
+    env:
+      SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
