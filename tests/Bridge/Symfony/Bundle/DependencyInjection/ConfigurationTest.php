@@ -150,6 +150,10 @@ class ConfigurationTest extends TestCase
             'swagger' => [
                 'versions' => [2, 3],
                 'api_keys' => [],
+                'ui' => [
+                    'doc_expansion' => 'list',
+                    'filter' => false,
+                ],
             ],
             'eager_loading' => [
                 'enabled' => true,

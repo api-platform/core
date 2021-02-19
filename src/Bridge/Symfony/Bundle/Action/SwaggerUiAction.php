@@ -62,12 +62,14 @@ final class SwaggerUiAction
     private $swaggerVersions;
     private $swaggerUiAction;
     private $assetPackage;
+    private $swaggerUiDocExpansion;
+    private $swaggerUiFilter;
 
     /**
      * @param int[]      $swaggerVersions
      * @param mixed|null $assetPackage
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null, string $swaggerUiDocExpansion = 'list', bool $swaggerUiFilter = false)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -98,6 +100,11 @@ final class SwaggerUiAction
         if (null === $this->swaggerUiAction) {
             @trigger_error(sprintf('The use of "%s" is deprecated since API Platform 2.6, use "%s" instead.', __CLASS__, OpenApiSwaggerUiAction::class), \E_USER_DEPRECATED);
         }
+
+        if (\in_array($swaggerUiDocExpansion, ['list', 'full', 'none'], true)) {
+            $this->swaggerUiDocExpansion = $swaggerUiDocExpansion;
+        }
+        $this->swaggerUiFilter = $swaggerUiFilter;
 
         if (\is_array($formats)) {
             $this->formats = $formats;
@@ -156,6 +163,8 @@ final class SwaggerUiAction
 
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
+            'docExpansion' => $this->swaggerUiDocExpansion,
+            'filter' => $this->swaggerUiFilter,
             'spec' => $this->normalizer->normalize($documentation, 'json', $swaggerContext),
         ];
 

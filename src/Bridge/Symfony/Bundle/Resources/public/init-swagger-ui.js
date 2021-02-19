@@ -42,6 +42,8 @@ window.onload = function() {
 
     const data = JSON.parse(document.getElementById('swagger-data').innerText);
     const ui = SwaggerUIBundle({
+        docExpansion: data.docExpansion,
+        filter: data.filter,
         spec: data.spec,
         dom_id: '#swagger-ui',
         validatorUrl: null,

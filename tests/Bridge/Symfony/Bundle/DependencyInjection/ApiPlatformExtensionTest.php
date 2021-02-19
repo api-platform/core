@@ -244,6 +244,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->hasParameter('kernel.debug')->willReturn(true);
         $containerBuilderProphecy->getParameter('kernel.debug')->willReturn(false);
         $containerBuilderProphecy->setAlias('api_platform.name_converter', $nameConverterId)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.swagger_ui.doc_expansion', 'list')->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.swagger_ui.filter', false)->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -1172,6 +1174,8 @@ class ApiPlatformExtensionTest extends TestCase
         if ($hasSwagger) {
             $parameters['api_platform.swagger.versions'] = [2, 3];
             $parameters['api_platform.swagger.api_keys'] = [];
+            $parameters['api_platform.swagger_ui.doc_expansion'] = 'list';
+            $parameters['api_platform.swagger_ui.filter'] = false;
         } else {
             $parameters['api_platform.swagger.versions'] = [];
         }

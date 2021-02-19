@@ -22,8 +22,10 @@ final class SwaggerUiContext
     private $graphiQlEnabled;
     private $graphQlPlaygroundEnabled;
     private $assetPackage;
+    private $docExpansion;
+    private $filter;
 
-    public function __construct(bool $swaggerUiEnabled = false, bool $showWebby = true, bool $reDocEnabled = false, bool $graphQlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, $assetPackage = null)
+    public function __construct(bool $swaggerUiEnabled = false, bool $showWebby = true, bool $reDocEnabled = false, bool $graphQlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, $assetPackage = null, string $docExpansion = 'list', bool $filter = false)
     {
         $this->swaggerUiEnabled = $swaggerUiEnabled;
         $this->showWebby = $showWebby;
@@ -32,6 +34,11 @@ final class SwaggerUiContext
         $this->graphiQlEnabled = $graphiQlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->assetPackage = $assetPackage;
+
+        if (\in_array($docExpansion, ['list', 'full', 'none'], true)) {
+            $this->docExpansion = $docExpansion;
+        }
+        $this->filter = $filter;
     }
 
     public function isSwaggerUiEnabled(): bool
@@ -67,5 +74,15 @@ final class SwaggerUiContext
     public function getAssetPackage(): ?string
     {
         return $this->assetPackage;
+    }
+
+    public function getDocExpansion(): string
+    {
+        return $this->docExpansion;
+    }
+
+    public function hasFilter(): bool
+    {
+        return $this->filter;
     }
 }
