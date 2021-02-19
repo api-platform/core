@@ -539,6 +539,7 @@ Feature: Search filter on collections
     }
     """
 
+  @!postgres
   @!mongodb
   @!lowest
   Scenario: Search collection by binary UUID (Ramsey)
@@ -550,6 +551,7 @@ Feature: Search filter on collections
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to "1"
 
+  @!postgres
   @!mongodb
   @!lowest
   Scenario: Search collection by binary UUID (Ramsey) (multiple values)
@@ -560,6 +562,7 @@ Feature: Search filter on collections
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to "2"
 
+  @!postgres
   @!mongodb
   @!lowest
   Scenario: Search collection by related binary UUID (Ramsey)
@@ -571,6 +574,7 @@ Feature: Search filter on collections
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON node "hydra:totalItems" should be equal to "1"
 
+  @!postgres
   @!mongodb
   @!lowest
   Scenario: Search collection by related binary UUID (Ramsey) (multiple values)
