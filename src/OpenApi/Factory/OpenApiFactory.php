@@ -204,6 +204,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '201');
                     $responses[$successStatus] = new Model\Response(sprintf('%s resource created', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
+                    $responses['422'] = new Model\Response('Unprocessable entity');
                     break;
                 case 'PATCH':
                 case 'PUT':
@@ -212,6 +213,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
                     $responses[$successStatus] = new Model\Response(sprintf('%s resource updated', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
+                    $responses['422'] = new Model\Response('Unprocessable entity');
                     break;
                 case 'DELETE':
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '204');

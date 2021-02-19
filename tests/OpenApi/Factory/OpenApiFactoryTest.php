@@ -317,6 +317,7 @@ class OpenApiFactoryTest extends TestCase
                     new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
+                '422' => new Model\Response('Unprocessable entity'),
             ],
             'Creates a Dummy resource.',
             'Creates a Dummy resource.',
@@ -368,6 +369,7 @@ class OpenApiFactoryTest extends TestCase
                     new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
+                '422' => new Model\Response('Unprocessable entity'),
                 '404' => new Model\Response('Resource not found'),
             ],
             'Replaces the Dummy resource.',
@@ -437,6 +439,7 @@ class OpenApiFactoryTest extends TestCase
                     new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
+                '422' => new Model\Response('Unprocessable entity'),
                 '404' => new Model\Response('Resource not found'),
             ],
             'Replaces the Dummy resource.',
