@@ -139,6 +139,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Product;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidBinaryDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
@@ -1302,6 +1303,35 @@ final class DoctrineContext implements Context
         $dummy = new RamseyUuidDummy();
         $dummy->setId($uuid);
 
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a ramsey identified resource with binary uuid :uuid
+     */
+    public function thereIsARamseyIdentifiedResourceWithBinaryUuid(string $uuid)
+    {
+        $dummy = new RamseyUuidBinaryDummy();
+        $dummy->setId($uuid);
+
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a ramsey identified resource with binary uuid :uuid having a related resource with binary uuid :uuid_related
+     */
+    public function thereIsARamseyIdentifiedResourceWithBinaryUuidHavingARelatedResourceWithBinaryUuid(string $uuid, string $uuidRelated)
+    {
+        $related = new RamseyUuidBinaryDummy();
+        $related->setId($uuidRelated);
+
+        $dummy = new RamseyUuidBinaryDummy();
+        $dummy->setId($uuid);
+        $dummy->addRelated($related);
+
+        $this->manager->persist($related);
         $this->manager->persist($dummy);
         $this->manager->flush();
     }

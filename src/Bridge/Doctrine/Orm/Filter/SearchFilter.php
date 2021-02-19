@@ -151,40 +151,28 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
             $associationField = $associationFieldIdentifier;
         }
 
-        /*
-         * If field type is string/float, Doctrine does not call convertToDatabaseValueSQL() because it
-         * does not know it needs conversion.
-         * This would lead to incorrect values for Ramsey\Uuid\Doctrine\UuidBinaryType for example.
-         * The only fix is to provide field type to doctrine ...
-         * It's easy if setParameter() sets only one value BUT impossible if multiple values are provided.
-         * The only way to do this is to rewrite the IN() statement to multiple values
-         * and map a global setParameters()
-         */
         $type = $metadata->getTypeOfField($associationField);
-        $nbValues = \count($values);
 
-        if (1 === $nbValues) {
+        if (1 === \count($values)) {
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->eq($associationAlias.'.'.$associationField, ':'.$valueParameter))
                 ->setParameter($valueParameter, $values[0], $type);
-        } else {
-            // get current parameters, because QueryBuilder->setParameters() erase previous parameters set
-            $parameters = $queryBuilder->getParameters();
-            $inQuery = [];
 
-            // convertToDatabaseValue() can only convert one value at a time ... We can no longer pass an array of values, we should use multiple values
-
-            for ($i = 0; $i < $nbValues; ++$i) {
-                $inQuery[] = ':'.$valueParameter;
-                $parameters->add(new Parameter($valueParameter, $values[$i], $type));
-                $valueParameter = $queryNameGenerator->generateParameterName($associationField);
-            }
-
-            // we cannot use expr->in() here because it considers $inQuery parameters as strings.
-            $queryBuilder
-                ->andWhere($associationAlias.'.'.$associationField.' IN ('.implode(', ', $inQuery).')')
-                ->setParameters($parameters);
+            return;
         }
+
+        $parameters = $queryBuilder->getParameters();
+        $inQuery = [];
+
+        foreach ($values as $val) {
+            $inQuery[] = ':'.$valueParameter;
+            $parameters->add(new Parameter($valueParameter, $val, $type));
+            $valueParameter = $queryNameGenerator->generateParameterName($associationField);
+        }
+
+        $queryBuilder
+            ->andWhere($associationAlias.'.'.$associationField.' IN ('.implode(', ', $inQuery).')')
+            ->setParameters($parameters);
     }
 
     /**
@@ -192,27 +180,25 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive/*, ClassMetadata $metadata = null*/)
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive/*, ClassMetadata $metadata*/)
     {
-        // check if we have metadata
         if (\func_num_args() > 7 && ($metadata = func_get_arg(7)) instanceof ClassMetadata) {
             $type = $metadata->getTypeOfField($field);
         } else {
             @trigger_error(sprintf('Method %s() will have a 8th argument `$metadata` in version API Platform 3.0.', __FUNCTION__), \E_USER_DEPRECATED);
-            $type = null; // default setParameter() value
+            $type = null;
         }
 
         if (!\is_array($values)) {
             $values = [$values];
         }
 
-        $nbValues = \count($values);
         $wrapCase = $this->createWrapCase($caseSensitive);
         $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
         $aliasedField = sprintf('%s.%s', $alias, $field);
 
-        if (null == $strategy || self::STRATEGY_EXACT == $strategy) {
-            if (1 == $nbValues) {
+        if (self::STRATEGY_EXACT === $strategy) {
+            if (1 === \count($values)) {
                 $queryBuilder
                     ->andWhere($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
                     ->setParameter($valueParameter, $values[0], $type);
@@ -220,16 +206,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
                 return;
             }
 
-            // get current parameters, because QueryBuilder->setParameters() erase previous parameters set
             $parameters = $queryBuilder->getParameters();
             $inQuery = [];
-            for ($i = 0; $i < $nbValues; ++$i) {
+            foreach ($values as $value) {
                 $inQuery[] = $valueParameter;
-                $parameters->add(new Parameter($valueParameter, $caseSensitive ? $values[$i] : strtolower($values[$i]), $type));
+                $parameters->add(new Parameter($valueParameter, $caseSensitive ? $value : strtolower($value), $type));
                 $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
             }
 
-            // we cannot use expr->in() here because it considers $inQuery parameters as strings.
             $queryBuilder
                 ->andWhere($wrapCase($aliasedField).' IN ('.implode(', ', $inQuery).')')
                 ->setParameters($parameters);

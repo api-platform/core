@@ -8,7 +8,8 @@ doctrine:
         path:                         '%kernel.cache_dir%/db.sqlite'
         charset:                      'UTF8'
         types:
-            uuid:  Ramsey\Uuid\Doctrine\UuidType
+            uuid: Ramsey\Uuid\Doctrine\UuidType
+            uuid_binary: Ramsey\Uuid\Doctrine\UuidBinaryType
 
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'
