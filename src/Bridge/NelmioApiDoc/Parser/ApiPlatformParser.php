@@ -213,7 +213,7 @@ final class ApiPlatformParser implements ParserInterface
         if ($type->isCollection()) {
             $data['actualType'] = DataTypes::COLLECTION;
 
-            if ($collectionType = $type->getCollectionValueType()) {
+            if ($collectionType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
                 $subProperty = $this->parseProperty($resourceMetadata, $propertyMetadata, $io, $collectionType, $visited);
                 if (self::TYPE_IRI === $subProperty['dataType']) {
                     $data['dataType'] = 'array of IRIs';

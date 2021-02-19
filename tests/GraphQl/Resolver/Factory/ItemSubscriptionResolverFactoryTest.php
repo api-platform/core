@@ -21,6 +21,7 @@ use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterfa
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -30,6 +31,8 @@ use Prophecy\Argument;
  */
 class ItemSubscriptionResolverFactoryTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $itemSubscriptionResolverFactory;
     private $readStageProphecy;
     private $securityStageProphecy;

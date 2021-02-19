@@ -433,7 +433,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw new InvalidArgumentException(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)));
         }
 
-        $collectionKeyType = $type->getCollectionKeyType();
+        $collectionKeyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
         $collectionKeyBuiltinType = null === $collectionKeyType ? null : $collectionKeyType->getBuiltinType();
 
         $values = [];
@@ -578,7 +578,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (
             $type &&
             $type->isCollection() &&
-            ($collectionValueType = $type->getCollectionValueType()) &&
+            ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
             ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
@@ -727,7 +727,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (
             $type->isCollection() &&
-            null !== ($collectionValueType = $type->getCollectionValueType()) &&
+            null !== ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
             null !== ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
@@ -750,7 +750,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (
             $type->isCollection() &&
-            null !== ($collectionValueType = $type->getCollectionValueType()) &&
+            null !== ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
             null !== ($className = $collectionValueType->getClassName())
         ) {
             if (!$this->serializer instanceof DenormalizerInterface) {

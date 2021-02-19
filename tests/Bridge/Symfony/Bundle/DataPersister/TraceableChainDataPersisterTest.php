@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersi
 use ApiPlatform\Core\DataPersister\ChainDataPersister;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,6 +25,8 @@ use PHPUnit\Framework\TestCase;
  */
 class TraceableChainDataPersisterTest extends TestCase
 {
+    use ProphecyTrait;
+
     /** @dataProvider dataPersisterProvider */
     public function testPersist($persister, $expected)
     {
