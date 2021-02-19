@@ -31,9 +31,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -129,7 +129,7 @@ class AppKernel extends Kernel
             'router' => ['utf8' => true],
         ]);
 
-        $alg = class_exists(NativePasswordEncoder::class) ? 'auto' : 'bcrypt';
+        $alg = class_exists(NativePasswordHasher::class) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
                 User::class => $alg,
