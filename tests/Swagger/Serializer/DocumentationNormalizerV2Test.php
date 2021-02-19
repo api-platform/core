@@ -3266,7 +3266,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'description' => 'Resource not found',
                             ],
                             422 => [
-                                'description' => 'Unprocessable entity'
+                                'description' => 'Unprocessable entity',
                             ],
                         ],
                         'parameters' => [
@@ -3343,7 +3343,7 @@ class DocumentationNormalizerV2Test extends TestCase
                                 'description' => 'Resource not found',
                             ],
                             422 => [
-                                'description' => 'Unprocessable entity'
+                                'description' => 'Unprocessable entity',
                             ],
                         ],
                     ]),
