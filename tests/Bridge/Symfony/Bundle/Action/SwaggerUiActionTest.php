@@ -88,9 +88,8 @@ class SwaggerUiActionTest extends TestCase
             'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
-                'docExpansion' => 'list',
-                'filter' => false,
                 'spec' => self::SPEC,
+                'extraConfiguration' => [],
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',
@@ -124,9 +123,8 @@ class SwaggerUiActionTest extends TestCase
             'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
-                'docExpansion' => 'list',
-                'filter' => false,
                 'spec' => self::SPEC,
+                'extraConfiguration' => [],
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',
@@ -183,9 +181,8 @@ class SwaggerUiActionTest extends TestCase
             'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
-                'docExpansion' => 'list',
-                'filter' => false,
                 'spec' => self::SPEC,
+                'extraConfiguration' => [],
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',

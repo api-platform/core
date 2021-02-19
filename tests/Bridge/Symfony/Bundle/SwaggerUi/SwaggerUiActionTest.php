@@ -88,8 +88,6 @@ class SwaggerUiActionTest extends TestCase
             'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
-                'docExpansion' => 'list',
-                'filter' => false,
                 'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
@@ -101,6 +99,7 @@ class SwaggerUiActionTest extends TestCase
                     'authorizationUrl' => '',
                     'scopes' => [],
                 ],
+                'extraConfiguration' => [],
                 'shortName' => 'F',
                 'operationId' => 'getFCollection',
                 'id' => null,
@@ -124,8 +123,6 @@ class SwaggerUiActionTest extends TestCase
             'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
-                'docExpansion' => 'list',
-                'filter' => false,
                 'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
@@ -137,6 +134,7 @@ class SwaggerUiActionTest extends TestCase
                     'authorizationUrl' => '',
                     'scopes' => [],
                 ],
+                'extraConfiguration' => [],
                 'shortName' => 'F',
                 'operationId' => 'getFItem',
                 'id' => null,
@@ -178,8 +176,6 @@ class SwaggerUiActionTest extends TestCase
             'assetPackage' => null,
             'swagger_data' => [
                 'url' => '/url',
-                'docExpansion' => 'list',
-                'filter' => false,
                 'spec' => self::SPEC,
                 'oauth' => [
                     'enabled' => false,
@@ -191,6 +187,7 @@ class SwaggerUiActionTest extends TestCase
                     'authorizationUrl' => '',
                     'scopes' => [],
                 ],
+                'extraConfiguration' => [],
             ],
         ])->shouldBeCalled()->willReturn('');
 

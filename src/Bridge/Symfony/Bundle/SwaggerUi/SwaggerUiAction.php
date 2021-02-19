@@ -75,8 +75,6 @@ final class SwaggerUiAction
 
         $swaggerData = [
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
-            'docExpansion' => $this->swaggerUiContext->getDocExpansion(),
-            'filter' => $this->swaggerUiContext->hasFilter(),
             'spec' => $this->normalizer->normalize($openApi, 'json', []),
             'oauth' => [
                 'enabled' => $this->openApiOptions->getOAuthEnabled(),
@@ -88,6 +86,7 @@ final class SwaggerUiAction
                 'clientId' => $this->oauthClientId,
                 'clientSecret' => $this->oauthClientSecret,
             ],
+            'extraConfiguration' => $this->swaggerUiContext->getExtraConfiguration(),
         ];
 
         if ($request->isMethodSafe() && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {
