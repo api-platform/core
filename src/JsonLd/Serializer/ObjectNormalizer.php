@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -84,7 +85,11 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         }
 
         if (isset($originalResource)) {
-            $context['output']['iri'] = $this->iriConverter->getIriFromItem($originalResource);
+            try {
+                $context['output']['iri'] = $this->iriConverter->getIriFromItem($originalResource);
+            } catch (InvalidArgumentException $e) {
+                // The original resource has no identifiers
+            }
             $context['api_resource'] = $originalResource;
         }
 

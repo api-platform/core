@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -27,6 +28,8 @@ use Psr\Container\ContainerInterface;
  */
 class QueryParameterValidatorTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $testedInstance;
     private $filterLocatorProphecy;
 

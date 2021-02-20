@@ -205,7 +205,7 @@ class IdentifiersExtractorTest extends TestCase
     public function testNoIdentifiers(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('No identifier defined "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy". You should add #[\ApiPlatform\Core\Annotation\ApiProperty(identifier: true)]" on the property identifying the resource.');
+        $this->expectExceptionMessage('No identifier defined in "ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy". You should add #[\ApiPlatform\Core\Annotation\ApiProperty(identifier: true)]" on the property identifying the resource.');
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['foo']));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);

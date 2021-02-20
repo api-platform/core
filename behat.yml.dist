@@ -50,7 +50,7 @@ postgres:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@!postgres'
 
 mongodb:
   suites:

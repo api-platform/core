@@ -52,8 +52,8 @@ final class TypeFactory implements TypeFactoryInterface
     public function getType(Type $type, string $format = 'json', ?bool $readableLink = null, ?array $serializerContext = null, Schema $schema = null): array
     {
         if ($type->isCollection()) {
-            $keyType = $type->getCollectionKeyType();
-            $subType = $type->getCollectionValueType() ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+            $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
+            $subType = (method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
 
             if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
                 return $this->addNullabilityToTypeDefinition([

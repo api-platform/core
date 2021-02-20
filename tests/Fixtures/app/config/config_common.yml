@@ -1,23 +1,3 @@
-framework:
-    secret:                           'dunglas.fr'
-    validation:
-        enable_annotations:            true
-    serializer:
-        enable_annotations:            true
-    test:                              ~
-    session:
-        storage_id:                    'session.storage.mock_file'
-    profiler:
-        enabled:                        true
-        collect:                        false
-    messenger:
-        default_bus: messenger.bus.default
-        buses:
-            messenger.bus.default:
-                default_middleware: allow_no_handlers
-    router:
-        utf8:                           true
-
 web_profiler:
     toolbar: true
     intercept_redirects: false
@@ -28,7 +8,8 @@ doctrine:
         path:                         '%kernel.cache_dir%/db.sqlite'
         charset:                      'UTF8'
         types:
-            uuid:  Ramsey\Uuid\Doctrine\UuidType
+            uuid: Ramsey\Uuid\Doctrine\UuidType
+            uuid_binary: Ramsey\Uuid\Doctrine\UuidBinaryType
 
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'
@@ -371,3 +352,10 @@ services:
         decorates: 'api_platform.graphql.type_converter'
         arguments: ['@app.graphql.type_converter.inner']
         public: false
+
+    app.data_transformer.rpc_output:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RPCOutputDataTransformer'
+        public: false
+        tags:
+            -  { name: 'api_platform.data_transformer' }
+

@@ -17,37 +17,37 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * Dummy Date Immutable.
- *
- * @ApiResource(attributes={
- *     "filters"={"my_dummy_immutable_date.mongodb.date"}
- * })
- *
+ * @ApiResource
  * @ODM\Document
  */
-class DummyImmutableDate
+class DummyBoolean
 {
     /**
-     * @var int The id
+     * @var int
      *
-     * @ODM\Id(strategy="INCREMENT", type="int")
+     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     private $id;
 
     /**
-     * @var \DateTimeImmutable The dummy date
+     * @var bool
      *
-     * @ODM\Field(type="date_immutable")
+     * @ODM\Field(type="bool", nullable=true)
      */
-    public $dummyDate;
+    private $isDummyBoolean;
 
-    /**
-     * Get id.
-     *
-     * @return int
-     */
+    public function __construct(bool $isDummyBoolean)
+    {
+        $this->isDummyBoolean = $isDummyBoolean;
+    }
+
     public function getId()
     {
         return $this->id;
+    }
+
+    public function isDummyBoolean(): bool
+    {
+        return $this->isDummyBoolean;
     }
 }

@@ -13,3 +13,4 @@ doctrine:
         server_version: '%env(POSTGRES_VERSION)%'
         types:
             uuid: Ramsey\Uuid\Doctrine\UuidType
+            uuid_binary: Ramsey\Uuid\Doctrine\UuidBinaryType

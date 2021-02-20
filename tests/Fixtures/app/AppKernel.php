@@ -29,10 +29,11 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
+use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
-use Symfony\Component\Security\Core\Encoder\NativePasswordEncoder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -109,7 +110,26 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
-        $alg = class_exists(NativePasswordEncoder::class) ? 'auto' : 'bcrypt';
+        $c->prependExtensionConfig('framework', [
+            'secret' => 'dunglas.fr',
+            'validation' => ['enable_annotations' => true],
+            'serializer' => ['enable_annotations' => true],
+            'test' => null,
+            'session' => class_exists(SessionFactory::class) ? ['storage_factory_id' => 'session.storage.factory.mock_file'] : ['storage_id' => 'session.storage.mock_file'],
+            'profiler' => [
+                'enabled' => true,
+                'collect' => false,
+            ],
+            'messenger' => [
+                'default_bus' => 'messenger.bus.default',
+                'buses' => [
+                    'messenger.bus.default' => ['default_middleware' => 'allow_no_handlers'],
+                ],
+            ],
+            'router' => ['utf8' => true],
+        ]);
+
+        $alg = class_exists(NativePasswordHasher::class) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
         $securityConfig = [
             'encoders' => [
                 User::class => $alg,

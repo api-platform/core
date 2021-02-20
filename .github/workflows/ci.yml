@@ -384,7 +384,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!lowest'
 
   postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -599,7 +599,7 @@ jobs:
           - '7.4'
       fail-fast: false
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[total]=8
+      SYMFONY_DEPRECATIONS_HELPER: max[total]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -638,17 +638,19 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.0'
         symfony:
-          - '5.2'
+          - '5.3'
       fail-fast: false
+    env:
+      SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.0'
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
@@ -698,9 +700,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8.0'
         symfony:
-          - '5.2'
+          - '5.3'
       fail-fast: false
     steps:
       - name: Checkout
@@ -708,7 +710,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.0'
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
@@ -719,8 +721,7 @@ jobs:
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: Allow unstable project dependencies
-        run: |
-          jq '. + {"minimum-stability": "dev"}' composer.json | sponge composer.json
+        run: composer config minimum-stability dev
       - name: Cache dependencies
         uses: actions/cache@v2
         with:

@@ -10,3 +10,4 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
         types:
             uuid: Ramsey\Uuid\Doctrine\UuidType
+            uuid_binary: Ramsey\Uuid\Doctrine\UuidBinaryType

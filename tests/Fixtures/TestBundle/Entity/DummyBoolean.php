@@ -20,33 +20,36 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource
  * @ORM\Entity
  */
-class DummyTravel
+class DummyBoolean
 {
     /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="DummyCar")
-     * @ORM\JoinColumn(name="car_id", referencedColumnName="id_id")
+     * @var bool
+     *
+     * @ORM\Column(type="boolean", nullable=true)
      */
-    public $car;
+    private $isDummyBoolean;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    public $confirmed;
-    /**
-     * @ORM\ManyToOne(targetEntity="DummyPassenger")
-     * @ORM\JoinColumn(name="passenger_id", referencedColumnName="id")
-     */
-    public $passenger;
+    public function __construct(bool $isDummyBoolean)
+    {
+        $this->isDummyBoolean = $isDummyBoolean;
+    }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    public function isDummyBoolean(): bool
+    {
+        return $this->isDummyBoolean;
     }
 }

@@ -115,7 +115,7 @@ abstract class AbstractFilter implements FilterInterface
                 return $noop;
             }
 
-            if ($type->isCollection() && null === $type = $type->getCollectionValueType()) {
+            if ($type->isCollection() && null === $type = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) {
                 return $noop;
             }
 

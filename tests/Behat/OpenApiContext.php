@@ -109,33 +109,33 @@ final class OpenApiContext implements Context
     }
 
     /**
-     * @Then :prop property exists for the Swagger class :class
+     * @Then the :prop property exists for the Swagger class :class
      */
-    public function assertPropertyExistForTheSwaggerClass(string $propertyName, string $className)
+    public function assertThePropertyExistForTheSwaggerClass(string $propertyName, string $className)
     {
         try {
             $this->getPropertyInfo($propertyName, $className);
         } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className), null, $e);
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" doesn\'t exist.', $propertyName, $className), null, $e);
         }
     }
 
     /**
-     * @Then :prop property exists for the OpenAPI class :class
+     * @Then the :prop property exists for the OpenAPI class :class
      */
-    public function assertPropertyExistForTheOpenApiClass(string $propertyName, string $className)
+    public function assertThePropertyExistForTheOpenApiClass(string $propertyName, string $className)
     {
         try {
             $this->getPropertyInfo($propertyName, $className, 3);
         } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className), null, $e);
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" doesn\'t exist.', $propertyName, $className), null, $e);
         }
     }
 
     /**
-     * @Then :prop property is required for Swagger class :class
+     * @Then the :prop property is required for the Swagger class :class
      */
-    public function assertPropertyIsRequiredForSwagger(string $propertyName, string $className)
+    public function assertThePropertyIsRequiredForTheSwaggerClass(string $propertyName, string $className)
     {
         if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
@@ -143,12 +143,34 @@ final class OpenApiContext implements Context
     }
 
     /**
-     * @Then :prop property is required for OpenAPi class :class
+     * @Then the :prop property is required for the OpenAPI class :class
      */
-    public function assertPropertyIsRequiredForOpenAPi(string $propertyName, string $className)
+    public function assertThePropertyIsRequiredForTheOpenAPIClass(string $propertyName, string $className)
     {
         if (!\in_array($propertyName, $this->getClassInfo($className, 3)->required, true)) {
             throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then the :prop property is not read only for the Swagger class :class
+     */
+    public function assertThePropertyIsNotReadOnlyForTheSwaggerClass(string $propertyName, string $className)
+    {
+        $propertyInfo = $this->getPropertyInfo($propertyName, $className);
+        if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should not be read only', $propertyName, $className));
+        }
+    }
+
+    /**
+     * @Then the :prop property is not read only for the OpenAPI class :class
+     */
+    public function assertThePropertyIsNotReadOnlyForTheOpenAPIClass(string $propertyName, string $className)
+    {
+        $propertyInfo = $this->getPropertyInfo($propertyName, $className, 3);
+        if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {
+            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should not be read only', $propertyName, $className));
         }
     }
 

@@ -263,7 +263,14 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth = 0): ?array
     {
         try {
-            $resourceClass = $this->typeBuilder->isCollection($type) && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
+            if (
+                $this->typeBuilder->isCollection($type) &&
+                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            ) {
+                $resourceClass = $collectionValueType->getClassName();
+            } else {
+                $resourceClass = $type->getClassName();
+            }
 
             if (null === $graphqlType = $this->convertType($type, $input, $queryName, $mutationName, $subscriptionName, $resourceClass ?? '', $rootResource, $property, $depth)) {
                 return null;
