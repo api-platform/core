@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
@@ -53,5 +54,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new DeprecateMercurePublisherPass());
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
         $container->addCompilerPass(new TestClientPass());
+        $container->addCompilerPass(new AuthenticatorManagerPass());
     }
 }

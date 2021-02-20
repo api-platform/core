@@ -35,6 +35,7 @@ use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
@@ -46,6 +47,8 @@ use Symfony\Component\Serializer\Serializer;
 
 class OpenApiNormalizerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private const OPERATION_FORMATS = [
         'input_formats' => ['jsonld' => ['application/ld+json']],
         'output_formats' => ['jsonld' => ['application/ld+json']],

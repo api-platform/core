@@ -26,6 +26,7 @@ use ApiPlatform\Core\Serializer\CacheKeyTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
@@ -275,7 +276,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             if (null !== $type) {
                 if ($type->isCollection()) {
-                    $isMany = ($type->getCollectionValueType() && $className = $type->getCollectionValueType()->getClassName()) ? $this->resourceClassResolver->isResourceClass($className) : false;
+                    $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
+                    $isMany = ($collectionValueType && $className = $collectionValueType->getClassName()) ? $this->resourceClassResolver->isResourceClass($className) : false;
                 } else {
                     $isOne = ($className = $type->getClassName()) ? $this->resourceClassResolver->isResourceClass($className) : false;
                 }

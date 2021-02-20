@@ -18,6 +18,7 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManager;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -28,6 +29,8 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class SubscriptionManagerTest extends TestCase
 {
+    use ProphecyTrait;
+
     private $subscriptionsCacheProphecy;
     private $subscriptionIdentifierGeneratorProphecy;
     private $serializeStageProphecy;

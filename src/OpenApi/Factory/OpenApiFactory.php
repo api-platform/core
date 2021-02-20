@@ -138,7 +138,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         $rootResourceClass = $resourceClass;
         foreach ($operations as $operationName => $operation) {
-            $identifiers = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', null === $this->identifiersExtractor ? ['id'] : $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)));
+            if (OperationType::COLLECTION === $operationType && !$resourceMetadata->getItemOperations()) {
+                $identifiers = [];
+            } else {
+                $identifiers = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', null === $this->identifiersExtractor ? ['id'] : $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)));
+            }
             if (\count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false) {
                 $identifiers = ['id'];
             }
@@ -200,6 +204,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '201');
                     $responses[$successStatus] = new Model\Response(sprintf('%s resource created', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
+                    $responses['422'] = new Model\Response('Unprocessable entity');
                     break;
                 case 'PATCH':
                 case 'PUT':
@@ -208,6 +213,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
                     $responses[$successStatus] = new Model\Response(sprintf('%s resource updated', $resourceShortName), $responseContent, null, $responseLinks);
                     $responses['400'] = new Model\Response('Invalid input');
+                    $responses['422'] = new Model\Response('Unprocessable entity');
                     break;
                 case 'DELETE':
                     $successStatus = (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '204');
@@ -456,7 +462,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 throw new \LogicException('OAuth flow must be one of: implicit, password, clientCredentials, authorizationCode');
         }
 
-        return new Model\SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, 'oauth2', null, new Model\OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode), null);
+        return new Model\SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, null, null, new Model\OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode), null);
     }
 
     private function getSecuritySchemes(): array

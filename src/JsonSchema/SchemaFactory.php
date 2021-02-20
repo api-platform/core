@@ -214,8 +214,13 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $valueSchema = [];
         if (null !== $type = $propertyMetadata->getType()) {
-            $isCollection = $type->isCollection();
-            if (null === $valueType = $isCollection ? $type->getCollectionValueType() : $type) {
+            if ($isCollection = $type->isCollection()) {
+                $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
+            } else {
+                $valueType = $type;
+            }
+
+            if (null === $valueType) {
                 $builtinType = 'string';
                 $className = null;
             } else {
@@ -226,7 +231,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
         }
 
-        if (\count($propertySchema) > 0 && \array_key_exists('$ref', $valueSchema)) {
+        if (\array_key_exists('type', $propertySchema) && \array_key_exists('$ref', $valueSchema)) {
             $propertySchema = new \ArrayObject($propertySchema);
         } else {
             $propertySchema = new \ArrayObject($propertySchema + $valueSchema);
@@ -325,7 +330,10 @@ final class SchemaFactory implements SchemaFactoryInterface
      */
     private function getFactoryOptions(array $serializerContext, array $validationGroups, ?string $operationType, ?string $operationName): array
     {
-        $options = [];
+        $options = [
+            /* @see https://github.com/symfony/symfony/blob/v5.1.0/src/Symfony/Component/PropertyInfo/Extractor/ReflectionExtractor.php */
+            'enable_getter_setter_extraction' => true,
+        ];
 
         if (isset($serializerContext[AbstractNormalizer::GROUPS])) {
             /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */

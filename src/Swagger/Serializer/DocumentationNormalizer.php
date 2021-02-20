@@ -197,7 +197,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             if ($this->identifiersExtractor) {
-                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identifiers' => $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass)]);
+                $identifiers = [];
+                if ($resourceMetadata->getItemOperations()) {
+                    $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);
+                }
+
+                $resourceMetadata = $resourceMetadata->withAttributes(($resourceMetadata->getAttributes() ?: []) + ['identifiers' => $identifiers]);
             }
             $resourceShortName = $resourceMetadata->getShortName();
 
@@ -521,6 +526,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '201') => $successResponse,
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
+            '422' => ['description' => 'Unprocessable entity'],
         ];
 
         return $this->addRequestBody($v3, $pathOperation, $definitions, $resourceClass, $resourceShortName, $operationType, $operationName, $requestMimeTypes);
@@ -544,6 +550,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             (string) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'status', '200') => $successResponse,
             '400' => ['description' => 'Invalid input'],
             '404' => ['description' => 'Resource not found'],
+            '422' => ['description' => 'Unprocessable entity'],
         ];
 
         return $this->addRequestBody($v3, $pathOperation, $definitions, $resourceClass, $resourceShortName, $operationType, $operationName, $requestMimeTypes, true);

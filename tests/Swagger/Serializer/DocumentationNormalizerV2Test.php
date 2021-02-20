@@ -241,6 +241,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -293,6 +294,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -349,6 +351,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -791,6 +794,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -841,6 +845,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1013,6 +1018,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1063,6 +1069,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1333,6 +1340,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1383,6 +1391,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1543,6 +1552,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1593,6 +1603,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1752,6 +1763,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -1804,6 +1816,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -2133,7 +2146,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::allOf(
             Argument::type('array'),
             Argument::withEntry('serializer_groups', $groups)
-        ))->willReturn(new PropertyNameCollection(['name', 'relatedDummy']));
+        ))->willReturn(new PropertyNameCollection(['name', 'relatedDummy', 'relatedDummyWithCustomOpenApiContextType']));
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name']));
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class, Argument::allOf(
             Argument::type('array'),
@@ -2170,6 +2183,7 @@ class DocumentationNormalizerV2Test extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class), 'This is a related dummy \o/.', true, true, true, true, false, false, null, null, []));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummyWithCustomOpenApiContextType', Argument::type('array'))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class), 'This is a related dummy with type string \o/.', true, true, true, true, false, false, null, null, ['swagger_context' => ['type' => 'string']]));
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', Argument::type('array'))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), 'This is a name.', true, true, true, true, false, false, null, null, []));
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
@@ -2262,6 +2276,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -2312,6 +2327,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -2339,6 +2355,11 @@ class DocumentationNormalizerV2Test extends TestCase
                         ]),
                         'relatedDummy' => new \ArrayObject([
                             'description' => 'This is a related dummy \o/.',
+                            '$ref' => '#/definitions/'.$relatedDummyRef,
+                        ]),
+                        'relatedDummyWithCustomOpenApiContextType' => new \ArrayObject([
+                            'description' => 'This is a related dummy with type string \o/.',
+                            'type' => 'string',
                         ]),
                     ],
                 ]),
@@ -3032,6 +3053,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -3084,6 +3106,7 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             400 => ['description' => 'Invalid input'],
                             404 => ['description' => 'Resource not found'],
+                            422 => ['description' => 'Unprocessable entity'],
                         ],
                     ]),
                 ],
@@ -3242,6 +3265,9 @@ class DocumentationNormalizerV2Test extends TestCase
                             404 => [
                                 'description' => 'Resource not found',
                             ],
+                            422 => [
+                                'description' => 'Unprocessable entity',
+                            ],
                         ],
                         'parameters' => [
                             [
@@ -3315,6 +3341,9 @@ class DocumentationNormalizerV2Test extends TestCase
                             ],
                             404 => [
                                 'description' => 'Resource not found',
+                            ],
+                            422 => [
+                                'description' => 'Unprocessable entity',
                             ],
                         ],
                     ]),

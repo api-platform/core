@@ -227,7 +227,12 @@ final class ApiLoader extends Loader
             }
         }
 
-        $operation['identifiers'] = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
+        if ($resourceMetadata->getItemOperations()) {
+            $operation['identifiers'] = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
+        } else {
+            $operation['identifiers'] = $operation['identifiers'] ?? [];
+        }
+
         $operation['has_composite_identifier'] = \count($operation['identifiers']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
