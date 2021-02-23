@@ -22,8 +22,9 @@ final class SwaggerUiContext
     private $graphiQlEnabled;
     private $graphQlPlaygroundEnabled;
     private $assetPackage;
+    private $extraConfiguration;
 
-    public function __construct(bool $swaggerUiEnabled = false, bool $showWebby = true, bool $reDocEnabled = false, bool $graphQlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, $assetPackage = null)
+    public function __construct(bool $swaggerUiEnabled = false, bool $showWebby = true, bool $reDocEnabled = false, bool $graphQlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, $assetPackage = null, array $extraConfiguration = [])
     {
         $this->swaggerUiEnabled = $swaggerUiEnabled;
         $this->showWebby = $showWebby;
@@ -32,6 +33,7 @@ final class SwaggerUiContext
         $this->graphiQlEnabled = $graphiQlEnabled;
         $this->graphQlPlaygroundEnabled = $graphQlPlaygroundEnabled;
         $this->assetPackage = $assetPackage;
+        $this->extraConfiguration = $extraConfiguration;
     }
 
     public function isSwaggerUiEnabled(): bool
@@ -67,5 +69,10 @@ final class SwaggerUiContext
     public function getAssetPackage(): ?string
     {
         return $this->assetPackage;
+    }
+
+    public function getExtraConfiguration(): array
+    {
+        return $this->extraConfiguration;
     }
 }

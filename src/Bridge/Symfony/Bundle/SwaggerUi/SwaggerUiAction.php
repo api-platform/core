@@ -86,6 +86,7 @@ final class SwaggerUiAction
                 'clientId' => $this->oauthClientId,
                 'clientSecret' => $this->oauthClientSecret,
             ],
+            'extraConfiguration' => $this->swaggerUiContext->getExtraConfiguration(),
         ];
 
         if ($request->isMethodSafe() && null !== $resourceClass = $request->attributes->get('_api_resource_class')) {

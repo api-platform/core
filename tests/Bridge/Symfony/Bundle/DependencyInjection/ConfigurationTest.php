@@ -150,6 +150,7 @@ class ConfigurationTest extends TestCase
             'swagger' => [
                 'versions' => [2, 3],
                 'api_keys' => [],
+                'swagger_ui_extra_configuration' => [],
             ],
             'eager_loading' => [
                 'enabled' => true,
@@ -219,6 +220,7 @@ class ConfigurationTest extends TestCase
                     'url' => null,
                 ],
                 'backward_compatibility_layer' => true,
+                'swagger_ui_extra_configuration' => [],
             ],
         ], $config);
     }
