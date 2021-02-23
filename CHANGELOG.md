@@ -13,6 +13,7 @@
 * OpenAPI: Fix error when schema is empty (#4051)
 * OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
+* GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
 
 ## 2.6.2
 

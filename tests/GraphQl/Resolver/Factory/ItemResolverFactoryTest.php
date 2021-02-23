@@ -118,6 +118,15 @@ class ItemResolverFactoryTest extends TestCase
         $this->assertSame(['already_serialized'], ($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
     }
 
+    public function testResolveNestedNullValue(): void
+    {
+        $source = ['nestedNullValue' => null];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'nestedNullValue';
+
+        $this->assertNull(($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
+    }
+
     public function testResolveBadReadStageItem(): void
     {
         $resourceClass = 'stdClass';
