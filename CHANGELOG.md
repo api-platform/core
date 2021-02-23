@@ -5,7 +5,8 @@
 * Doctrine: Better exception to find which resource is linked to an exception (#3965)
 * Doctrine: Allow mixed type value for date filter (notice if invalid) (#3870)
 * MongoDB: `date_immutable` support (#3940)
-* Add `TraversablePaginator` (#3783)
+* DataProvider: Add `TraversablePaginator` (#3783)
+* Swagger UI: Add `ui_extra_configuration` to Swagger configuration (#3731)
 
 ## 2.6.3
 
