@@ -61,7 +61,7 @@ final class OpenApi implements DocumentationInterface
         return $this->servers;
     }
 
-    public function getPaths()
+    public function getPaths(): Paths
     {
         return $this->paths;
     }
