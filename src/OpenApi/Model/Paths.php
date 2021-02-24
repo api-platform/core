@@ -31,4 +31,9 @@ final class Paths
     {
         return $this->paths ?? [];
     }
+    
+    public function removePath(string $path)
+    {
+        unset($this->paths[$path]);
+    }
 }
