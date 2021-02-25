@@ -138,7 +138,7 @@ final class PathItem
         return $clone;
     }
 
-    public function withGet(Operation $get): self
+    public function withGet(?Operation $get): self
     {
         $clone = clone $this;
         $clone->get = $get;
@@ -146,7 +146,7 @@ final class PathItem
         return $clone;
     }
 
-    public function withPut(Operation $put): self
+    public function withPut(?Operation $put): self
     {
         $clone = clone $this;
         $clone->put = $put;
@@ -154,7 +154,7 @@ final class PathItem
         return $clone;
     }
 
-    public function withPost(Operation $post): self
+    public function withPost(?Operation $post): self
     {
         $clone = clone $this;
         $clone->post = $post;
@@ -162,7 +162,7 @@ final class PathItem
         return $clone;
     }
 
-    public function withDelete(Operation $delete): self
+    public function withDelete(?Operation $delete): self
     {
         $clone = clone $this;
         $clone->delete = $delete;
@@ -186,7 +186,7 @@ final class PathItem
         return $clone;
     }
 
-    public function withPatch(Operation $patch): self
+    public function withPatch(?Operation $patch): self
     {
         $clone = clone $this;
         $clone->patch = $patch;
