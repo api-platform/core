@@ -232,6 +232,62 @@ trait OrderFilterTestTrait
                     ],
                 ],
             ],
+            'nulls_always_first (asc)' => [
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_always_first',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'asc',
+                        'name' => 'desc',
+                    ],
+                ],
+            ],
+            'nulls_always_first (desc)' => [
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_always_first',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'desc',
+                        'name' => 'desc',
+                    ],
+                ],
+            ],
+            'nulls_always_last (asc)' => [
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_always_last',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'asc',
+                        'name' => 'desc',
+                    ],
+                ],
+            ],
+            'nulls_always_last (desc)' => [
+                [
+                    'dummyDate' => [
+                        'nulls_comparison' => 'nulls_always_last',
+                    ],
+                    'name' => null,
+                ],
+                [
+                    'order' => [
+                        'dummyDate' => 'desc',
+                        'name' => 'desc',
+                    ],
+                ],
+            ],
             'not having order should not throw a deprecation (select unchanged)' => [
                 [
                     'id' => null,

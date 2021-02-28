@@ -24,6 +24,8 @@ interface OrderFilterInterface
 {
     public const DIRECTION_ASC = 'ASC';
     public const DIRECTION_DESC = 'DESC';
+    public const NULLS_ALWAYS_FIRST = 'nulls_always_first';
+    public const NULLS_ALWAYS_LAST = 'nulls_always_last';
     public const NULLS_SMALLEST = 'nulls_smallest';
     public const NULLS_LARGEST = 'nulls_largest';
     public const NULLS_DIRECTION_MAP = [
