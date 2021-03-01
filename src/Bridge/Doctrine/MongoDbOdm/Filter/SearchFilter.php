@@ -77,6 +77,11 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $matchField = $field = $property;
 
+        $values = $this->normalizeValues((array) $value, $property);
+        if (null === $values) {
+            return;
+        }
+
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$matchField, $field, $associations] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
@@ -86,11 +91,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
          * @var MongoDBClassMetadata
          */
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
-
-        $values = $this->normalizeValues((array) $value, $property);
-        if (null === $values) {
-            return;
-        }
 
         $caseSensitive = true;
 

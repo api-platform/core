@@ -466,6 +466,14 @@ trait SearchFilterTestTrait
                     'relatedDummy.symfony' => 'exact',
                 ],
             ],
+            'empty nested property' => [
+                [
+                    'relatedDummy.symfony' => null,
+                ],
+                [
+                    'relatedDummy.symfony' => [],
+                ],
+            ],
         ];
     }
 }
