@@ -8,6 +8,7 @@
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers (#4042)
 * Doctrine: Support for binary UUID in search filter (#3774)
+* Doctrine: Do not add join or lookup for search filter with empty value (#3703)
 * JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`) (#4064)
 * OpenAPI: Fix missing 422 responses in the documentation (#4086)
 * OpenAPI: Fix error when schema is empty (#4051)
