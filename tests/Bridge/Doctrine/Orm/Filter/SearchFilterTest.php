@@ -559,6 +559,11 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     ],
                     $filterFactory,
                 ],
+                'empty nested property' => [
+                    sprintf('SELECT %s FROM %s %1$s', $this->alias, Dummy::class),
+                    [],
+                    $filterFactory,
+                ],
             ]
         );
     }
