@@ -485,7 +485,7 @@ jobs:
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
   mongodb:
-    name: Behat (PHP ${{ matrix.php }}) (MongoDB)
+    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MongoDB)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -528,8 +528,8 @@ jobs:
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run PHPUnit
-        run: vendor/bin/simple-phpunit
+      - name: Run PHPUnit tests
+        run: vendor/bin/simple-phpunit --group mongodb
       - name: Run Behat tests
         run: vendor/bin/behat -vv --out=std --format=progress --profile=mongodb --no-interaction
 
@@ -584,8 +584,6 @@ jobs:
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
 

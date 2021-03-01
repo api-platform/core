@@ -16,7 +16,7 @@
         <server name="SYMFONY_PHPUNIT_REMOVE" value="symfony/yaml" />
         <server name="KERNEL_DIR" value="tests/Fixtures/app/" />
         <server name="KERNEL_CLASS" value="AppKernel" />
-        <server name="APP_ENV" value="test" />
+        <env name="APP_ENV" value="test" />
     </php>
 
     <testsuites>
