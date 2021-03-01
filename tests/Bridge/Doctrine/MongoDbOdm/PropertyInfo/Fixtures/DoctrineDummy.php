@@ -102,11 +102,6 @@ class DoctrineDummy
     private $bool;
 
     /**
-     * @Field(type="boolean")
-     */
-    private $boolean;
-
-    /**
      * @Field(type="custom_foo")
      */
     private $customFoo;
@@ -115,11 +110,6 @@ class DoctrineDummy
      * @Field(type="int")
      */
     private $int;
-
-    /**
-     * @Field(type="integer")
-     */
-    private $integer;
 
     /**
      * @Field(type="string")

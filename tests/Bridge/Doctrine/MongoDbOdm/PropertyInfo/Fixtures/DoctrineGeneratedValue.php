@@ -26,7 +26,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 class DoctrineGeneratedValue
 {
     /**
-     * @Id(strategy="INCREMENT", type="integer")
+     * @Id(strategy="INCREMENT", type="int")
      */
     public $id;
 
