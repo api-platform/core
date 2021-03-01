@@ -103,11 +103,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         }
 
         if (null !== $nullsComparison = $this->properties[$property]['nulls_comparison'] ?? null) {
-            if (\in_array($nullsComparison, [self::NULLS_ALWAYS_FIRST, self::NULLS_ALWAYS_LAST], true)) {
-                $nullsDirection = self::NULLS_ALWAYS_FIRST === $nullsComparison ? 'ASC' : 'DESC';
-            } else {
-                $nullsDirection = self::NULLS_DIRECTION_MAP[$nullsComparison][$direction];
-            }
+            $nullsDirection = self::NULLS_DIRECTION_MAP[$nullsComparison][$direction];
 
             $nullRankHiddenField = sprintf('_%s_%s_null_rank', $alias, $field);
 

@@ -37,5 +37,13 @@ interface OrderFilterInterface
             'ASC' => 'DESC',
             'DESC' => 'ASC',
         ],
+        self::NULLS_ALWAYS_FIRST => [
+            'ASC' => 'ASC',
+            'DESC' => 'ASC',
+        ],
+        self::NULLS_ALWAYS_LAST => [
+            'ASC' => 'DESC',
+            'DESC' => 'DESC',
+        ],
     ];
 }
