@@ -8,7 +8,6 @@
 /features export-ignore
 /phpstan.neon.dist export-ignore
 /phpunit.xml.dist export-ignore
-/phpunit_mongodb.xml export-ignore
 /tests export-ignore
 /update-js.sh export-ignore
 /yarn.lock export-ignore
