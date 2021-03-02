@@ -168,6 +168,7 @@ class AppKernel extends Kernel
                     'http_basic' => null,
                     'anonymous' => null,
                     'stateless' => true,
+                    'entry_point' => 'app.security.authentication_entrypoint',
                 ],
             ],
             'access_control' => [

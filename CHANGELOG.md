@@ -2,12 +2,13 @@
 
 ## 2.7.0
 
+* **BC**: Change `api_platform.listener.request.add_format` priority from 7 to 28 to execute it before firewall (priority 8) (#3599)
 * Doctrine: Better exception to find which resource is linked to an exception (#3965)
 * Doctrine: Allow mixed type value for date filter (notice if invalid) (#3870)
+* Doctrine: Add `nulls_always_first` and `nulls_always_last` to `nulls_comparison` in order filter (#4103)
 * MongoDB: `date_immutable` support (#3940)
 * DataProvider: Add `TraversablePaginator` (#3783)
 * Swagger UI: Add `swagger_ui_extra_configuration` to Swagger / OpenAPI configuration (#3731)
-* OrderFilter: Add `nulls_always_first` and `nulls_always_last` to `nulls_comparison` (#4103)
 
 ## 2.6.3
 

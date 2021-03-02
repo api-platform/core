@@ -1,5 +1,8 @@
 Feature: Validate filters based upon filter description
 
+  Background:
+    Given I add "Accept" header equal to "application/json"
+
   @createSchema
   Scenario: Required filter should not throw an error if set
     When I am on "/filter_validators?required=foo&required-allow-empty=&arrayRequired[foo]="
@@ -13,7 +16,7 @@ Feature: Validate filters based upon filter description
   Scenario: Required filter should throw an error if not set
     When I am on "/filter_validators"
     Then the response status code should be 400
-    Then the JSON node "detail" should match '/^Query parameter "required" is required\nQuery parameter "required-allow-empty" is required$/'
+    And the JSON node "detail" should match '/^Query parameter "required" is required\nQuery parameter "required-allow-empty" is required$/'
 
   Scenario: Required filter should not throw an error if set
     When I am on "/array_filter_validators?arrayRequired[]=foo&indexedArrayRequired[foo]=foo"

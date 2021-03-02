@@ -359,3 +359,7 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
+    app.security.authentication_entrypoint:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Security\AuthenticationEntryPoint'
+        arguments:
+            $router: '@router'
