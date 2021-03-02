@@ -7,6 +7,7 @@
 * MongoDB: `date_immutable` support (#3940)
 * DataProvider: Add `TraversablePaginator` (#3783)
 * Swagger UI: Add `swagger_ui_extra_configuration` to Swagger / OpenAPI configuration (#3731)
+* OrderFilter: Add `nulls_always_first` and `nulls_always_last` to `nulls_comparison` (#4103)
 
 ## 2.6.3
 

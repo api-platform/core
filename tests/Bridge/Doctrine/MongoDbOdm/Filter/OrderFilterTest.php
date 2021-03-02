@@ -436,6 +436,70 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $orderFilterFactory,
                 ],
+                'nulls_always_first (asc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
+                'nulls_always_first (desc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
+                'nulls_always_last (asc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
+                'nulls_always_last (desc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
                 'not having order should not throw a deprecation (select unchanged)' => [
                     [],
                     $orderFilterFactory,

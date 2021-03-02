@@ -265,6 +265,26 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     null,
                     $orderFilterFactory,
                 ],
+                'nulls_always_first (asc)' => [
+                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate ASC, o.name DESC', Dummy::class),
+                    null,
+                    $orderFilterFactory,
+                ],
+                'nulls_always_first (desc)' => [
+                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                    null,
+                    $orderFilterFactory,
+                ],
+                'nulls_always_last (asc)' => [
+                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate ASC, o.name DESC', Dummy::class),
+                    null,
+                    $orderFilterFactory,
+                ],
+                'nulls_always_last (desc)' => [
+                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                    null,
+                    $orderFilterFactory,
+                ],
                 'not having order should not throw a deprecation (select unchanged)' => [
                     sprintf('SELECT o FROM %s o', Dummy::class),
                     null,
