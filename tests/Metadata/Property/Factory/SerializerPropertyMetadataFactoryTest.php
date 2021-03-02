@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyIgnoreProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -56,7 +57,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     /**
      * @dataProvider groupsProvider
      */
-    public function testCreate($readGroups, $writeGroups)
+    public function testCreate($readGroups, $writeGroups, ?string $relatedOutputClass = null)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $dummyResourceMetadata = (new ResourceMetadata())
@@ -69,6 +70,13 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
                 ],
             ]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata);
+        $relatedDummyResourceMetadata = new ResourceMetadata();
+        if ($relatedOutputClass) {
+            $relatedDummyResourceMetadata = $relatedDummyResourceMetadata->withAttributes([
+                'output' => ['class' => $relatedOutputClass],
+            ]);
+        }
+        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedDummyResourceMetadata);
 
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
@@ -88,6 +96,12 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $nameSerializerAttributeMetadata->addGroup('dummy_read');
         $relatedDummySerializerClassMetadata->addAttributeMetadata($nameSerializerAttributeMetadata);
         $serializerClassMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedDummySerializerClassMetadata);
+        $dummyCarSerializerClassMetadata = new SerializerClassMetadata(DummyCar::class);
+        $nameSerializerAttributeMetadata = new SerializerAttributeMetadata('name');
+        $nameSerializerAttributeMetadata->addGroup('dummy_car_read');
+        $nameSerializerAttributeMetadata->addGroup('dummy_write');
+        $dummyCarSerializerClassMetadata->addAttributeMetadata($nameSerializerAttributeMetadata);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(DummyCar::class)->willReturn($dummyCarSerializerClassMetadata);
 
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $fooPropertyMetadata = (new PropertyMetadata())
@@ -120,8 +134,13 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $this->assertInstanceOf(PropertyMetadata::class, $actual[1]);
         $this->assertTrue($actual[1]->isReadable());
         $this->assertTrue($actual[1]->isWritable());
-        $this->assertTrue($actual[1]->isReadableLink());
-        $this->assertFalse($actual[1]->isWritableLink());
+        if ($relatedOutputClass) {
+            $this->assertFalse($actual[1]->isReadableLink());
+            $this->assertTrue($actual[1]->isWritableLink());
+        } else {
+            $this->assertTrue($actual[1]->isReadableLink());
+            $this->assertFalse($actual[1]->isWritableLink());
+        }
 
         $this->assertInstanceOf(PropertyMetadata::class, $actual[2]);
         $this->assertFalse($actual[2]->isReadable());
@@ -133,6 +152,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         return [
             [['dummy_read'], ['dummy_write']],
             ['dummy_read', 'dummy_write'],
+            ['dummy_read', 'dummy_write', DummyCar::class],
         ];
     }
 
