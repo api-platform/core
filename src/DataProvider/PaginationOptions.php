@@ -21,8 +21,13 @@ final class PaginationOptions
     private $itemsPerPageParameterName;
     private $paginationClientEnabled;
     private $paginationClientEnabledParameterName;
+    private $itemsPerPage;
+    private $maximumItemsPerPage;
+    private $partialPaginationEnabled;
+    private $clientPartialPaginationEnabled;
+    private $partialPaginationParameterName;
 
-    public function __construct(bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination')
+    public function __construct(bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', int $itemsPerPage = 30, int $maximumItemsPerPage = null, bool $partialPaginationEnabled = false, bool $clientPartialPaginationEnabled = false, string $partialPaginationParameterName = 'partial')
     {
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationPageParameterName = $paginationPageParameterName;
@@ -30,6 +35,11 @@ final class PaginationOptions
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
         $this->paginationClientEnabled = $paginationClientEnabled;
         $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
+        $this->itemsPerPage = $itemsPerPage;
+        $this->maximumItemsPerPage = $maximumItemsPerPage;
+        $this->partialPaginationEnabled = $partialPaginationEnabled;
+        $this->clientPartialPaginationEnabled = $clientPartialPaginationEnabled;
+        $this->partialPaginationParameterName = $partialPaginationParameterName;
     }
 
     public function isPaginationEnabled(): bool
@@ -57,8 +67,38 @@ final class PaginationOptions
         return $this->paginationClientEnabled;
     }
 
+    public function isPaginationClientEnabled(): bool
+    {
+        return $this->paginationClientEnabled;
+    }
+
     public function getPaginationClientEnabledParameterName(): string
     {
         return $this->paginationClientEnabledParameterName;
+    }
+
+    public function getItemsPerPage(): int
+    {
+        return $this->itemsPerPage;
+    }
+
+    public function getMaximumItemsPerPage(): int
+    {
+        return $this->maximumItemsPerPage;
+    }
+
+    public function isPartialPaginationEnabled(): bool
+    {
+        return $this->partialPaginationEnabled;
+    }
+
+    public function isClientPartialPaginationEnabled(): bool
+    {
+        return $this->clientPartialPaginationEnabled;
+    }
+
+    public function getPartialPaginationParameterName(): string
+    {
+        return $this->partialPaginationParameterName;
     }
 }
