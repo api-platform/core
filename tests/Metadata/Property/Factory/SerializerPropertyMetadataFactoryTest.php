@@ -57,23 +57,23 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     /**
      * @dataProvider groupsProvider
      */
-    public function testCreate($readGroups, $writeGroups, $relatedOutputClass = null)
+    public function testCreate($readGroups, $writeGroups, ?string $relatedOutputClass = null)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $dummyResourceMetadata = (new ResourceMetadata())
             ->withAttributes([
                 'normalization_context' => [
-                    AbstractNormalizer::GROUPS => $readGroups[Dummy::class],
+                    AbstractNormalizer::GROUPS => $readGroups,
                 ],
                 'denormalization_context' => [
-                    AbstractNormalizer::GROUPS => $writeGroups[Dummy::class],
+                    AbstractNormalizer::GROUPS => $writeGroups,
                 ],
             ]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyResourceMetadata);
         $relatedDummyResourceMetadata = new ResourceMetadata();
         if ($relatedOutputClass) {
             $relatedDummyResourceMetadata = $relatedDummyResourceMetadata->withAttributes([
-               'output' => ['class' => $relatedOutputClass],
+                'output' => ['class' => $relatedOutputClass],
             ]);
         }
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedDummyResourceMetadata);
@@ -150,9 +150,9 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     public function groupsProvider(): array
     {
         return [
-            [[Dummy::class => ['dummy_read']], [Dummy::class => ['dummy_write']]],
-            [[Dummy::class => 'dummy_read'], [Dummy::class => 'dummy_write']],
-            [[Dummy::class => 'dummy_read'], [Dummy::class => 'dummy_write'], DummyCar::class],
+            [['dummy_read'], ['dummy_write']],
+            ['dummy_read', 'dummy_write'],
+            ['dummy_read', 'dummy_write', DummyCar::class],
         ];
     }
 
