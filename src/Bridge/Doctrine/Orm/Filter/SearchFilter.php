@@ -91,6 +91,15 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
             [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
         }
 
+        $caseSensitive = true;
+        $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
+
+        // prefixing the strategy with i makes it case insensitive
+        if (0 === strpos($strategy, 'i')) {
+            $strategy = substr($strategy, 1);
+            $caseSensitive = false;
+        }
+
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
         if ($metadata->hasField($field)) {
@@ -104,15 +113,6 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
                 ]);
 
                 return;
-            }
-
-            $caseSensitive = true;
-            $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
-
-            // prefixing the strategy with i makes it case insensitive
-            if (0 === strpos($strategy, 'i')) {
-                $strategy = substr($strategy, 1);
-                $caseSensitive = false;
             }
 
             $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive, $metadata);
@@ -145,34 +145,12 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         $associationAlias = $alias;
         $associationField = $field;
-        $valueParameter = $queryNameGenerator->generateParameterName($associationField);
         if ($metadata->isCollectionValuedAssociation($associationField)) {
             $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
             $associationField = $associationFieldIdentifier;
         }
 
-        $type = $metadata->getTypeOfField($associationField);
-
-        if (1 === \count($values)) {
-            $queryBuilder
-                ->andWhere($queryBuilder->expr()->eq($associationAlias.'.'.$associationField, ':'.$valueParameter))
-                ->setParameter($valueParameter, $values[0], $type);
-
-            return;
-        }
-
-        $parameters = $queryBuilder->getParameters();
-        $inQuery = [];
-
-        foreach ($values as $val) {
-            $inQuery[] = ':'.$valueParameter;
-            $parameters->add(new Parameter($valueParameter, $val, $type));
-            $valueParameter = $queryNameGenerator->generateParameterName($associationField);
-        }
-
-        $queryBuilder
-            ->andWhere($associationAlias.'.'.$associationField.' IN ('.implode(', ', $inQuery).')')
-            ->setParameters($parameters);
+        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive, $metadata);
     }
 
     /**

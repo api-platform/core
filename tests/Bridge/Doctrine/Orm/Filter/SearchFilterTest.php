@@ -543,11 +543,11 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                 ],
                 'mixed IRI and entity ID values for relations' => [
-                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1, :relatedDummy_p2) AND relatedDummies_a1.id = :relatedDummies_p4', $this->alias, Dummy::class),
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedDummies relatedDummies_a1 WHERE %1$s.relatedDummy IN (:relatedDummy_p1, :relatedDummy_p2) AND relatedDummies_a1.id = :id_p4', $this->alias, Dummy::class),
                     [
                         'relatedDummy_p1' => 1,
                         'relatedDummy_p2' => 2,
-                        'relatedDummies_p4' => 1,
+                        'id_p4' => 1,
                     ],
                     $filterFactory,
                 ],
