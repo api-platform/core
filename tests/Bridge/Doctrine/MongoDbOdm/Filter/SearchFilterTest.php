@@ -686,6 +686,10 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $filterFactory,
                 ],
+                'empty nested property' => [
+                    [],
+                    $filterFactory,
+                ],
             ]
         );
     }

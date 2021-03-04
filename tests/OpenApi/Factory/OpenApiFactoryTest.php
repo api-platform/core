@@ -30,6 +30,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
+use ApiPlatform\Core\OpenApi\Model\PathItem;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
@@ -744,5 +745,21 @@ class OpenApiFactoryTest extends TestCase
         // Call the normalizer to see if everything is smooth
         $normalizer = new OpenApiNormalizer($normalizers[0]);
         $normalizer->normalize($openApi);
+    }
+
+    public function testResetPathItem()
+    {
+        $pathItem = new PathItem();
+        $pathItem->withGet(null);
+        $pathItem->withDelete(null);
+        $pathItem->withPost(null);
+        $pathItem->withPut(null);
+        $pathItem->withPatch(null);
+
+        $this->assertNull($pathItem->getGet());
+        $this->assertNull($pathItem->getDelete());
+        $this->assertNull($pathItem->getPost());
+        $this->assertNull($pathItem->getPut());
+        $this->assertNull($pathItem->getPatch());
     }
 }
