@@ -25,6 +25,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ *
+ * @final
  */
 class DateFilter extends AbstractContextAwareFilter implements DateFilterInterface
 {

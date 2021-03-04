@@ -28,6 +28,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @final
  */
 class NumericFilter extends AbstractContextAwareFilter
 {
