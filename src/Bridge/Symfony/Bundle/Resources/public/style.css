@@ -220,7 +220,7 @@ header #logo img {
 
 #formats {
   text-align: right;
-  font-family: sans-serif;
+  font-family: Open Sans, sans-serif;
   width: 100%;
   max-width: 1460px;
   padding: 0 60px;
@@ -306,6 +306,33 @@ header #logo img {
 #swagger-ui.api-platform textarea:focus,
 #swagger-ui.api-platform button:focus {
   outline: none;
+}
+
+/** USE OPEN SANS FONT **/
+
+.swagger-ui .opblock-tag,
+.swagger-ui .opblock .opblock-section-header label,
+.swagger-ui .opblock .opblock-section-header h4,
+.swagger-ui .opblock .opblock-summary-method,
+.swagger-ui .tab li,
+.swagger-ui .scheme-container .schemes>label,
+.swagger-ui .loading-container .loading:after,
+.swagger-ui .btn,
+.swagger-ui .btn.cancel,
+.swagger-ui select,
+.swagger-ui label,
+.swagger-ui .dialog-ux .modal-ux-content h4,
+.swagger-ui .dialog-ux .modal-ux-header h3,
+.swagger-ui section.models h4,
+.swagger-ui section.models h5,
+.swagger-ui .model-title,
+.swagger-ui .parameter__name,
+.swagger-ui .topbar a,
+.swagger-ui .topbar .download-url-wrapper .download-url-button,
+.swagger-ui .info .title small pre,
+.swagger-ui .scopes h2,
+.swagger-ui .errors-wrapper hgroup h4 {
+  font-family: Open Sans, sans-serif !important;
 }
 
 /** ANIMATIONS **/
