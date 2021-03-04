@@ -209,6 +209,11 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      */
     private function getClassSerializerGroups(string $class): array
     {
+        $resourceMetadata = $this->resourceMetadataFactory->create($class);
+        if ($outputClass = $resourceMetadata->getAttribute('output')['class'] ?? null) {
+            $class = $outputClass;
+        }
+
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($class);
 
         $groups = [];
