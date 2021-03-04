@@ -17,6 +17,7 @@
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
 * GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
 * Metadata: Check the output class when calculating serializer groups (#3696)
+* Swagger UI: Remove Google fonts (#4112)
 
 ## 2.6.2
 
