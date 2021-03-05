@@ -162,11 +162,10 @@ class CachedRouteNameResolverTest extends TestCase
 
     public function testGetRouteNameWithCacheItemThrowsCacheException()
     {
-        $cacheException = $this->prophesize(\Exception::class);
-        $cacheException->willImplement(CacheException::class);
+        $cacheException = new class() extends \Exception implements CacheException {};
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem(Argument::type('string'))->shouldBeCalledTimes(1)->willThrow($cacheException->reveal());
+        $cacheItemPool->getItem(Argument::type('string'))->shouldBeCalledTimes(1)->willThrow($cacheException);
 
         $decoratedProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $decoratedProphecy->getRouteName('AppBundle\Entity\User', OperationType::ITEM, [])->willReturn('some_item_route')->shouldBeCalledTimes(1);
