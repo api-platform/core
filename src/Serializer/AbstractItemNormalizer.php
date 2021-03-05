@@ -228,20 +228,25 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
                 }
             } catch (InvalidArgumentException $e) {
-                if (!$supportsPlainIdentifiers) {
+                if (!$supportsPlainIdentifiers && !($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false)) {
                     throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
                 }
             }
         }
 
         if (!\is_array($data)) {
-            if (!$supportsPlainIdentifiers) {
+            if (!$supportsPlainIdentifiers && !($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false)) {
                 throw new UnexpectedValueException(sprintf('Expected IRI or document for resource "%s", "%s" given.', $resourceClass, \gettype($data)));
             }
 
             $item = $this->itemDataProvider->getItem($resourceClass, $data, null, $context + ['fetch_data' => true]);
+
             if (null === $item) {
-                throw new ItemNotFoundException(sprintf('Item not found for resource "%s" with id "%s".', $resourceClass, $data));
+                if (!($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false)) {
+                    throw new ItemNotFoundException(sprintf('Item not found for resource "%s" with id "%s".', $resourceClass, $data));
+                }
+
+                return $data;
             }
 
             return $item;
