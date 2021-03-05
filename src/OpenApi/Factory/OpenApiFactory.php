@@ -360,7 +360,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return new Model\Link(
             $operationId,
             new \ArrayObject($parameters),
-            [],
+            null,
             1 === \count($parameters) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', key($parameters), $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path)
         );
     }

@@ -314,7 +314,7 @@ class OpenApiFactoryTest extends TestCase
                         'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -366,7 +366,7 @@ class OpenApiFactoryTest extends TestCase
                         'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -436,7 +436,7 @@ class OpenApiFactoryTest extends TestCase
                         'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
