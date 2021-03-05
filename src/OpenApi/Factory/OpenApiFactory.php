@@ -229,6 +229,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $responses['default'] = new Model\Response('Unexpected error');
             }
 
+            if ($contextResponses = $operation['openapi_context']['responses'] ?? false) {
+                foreach ($contextResponses as $statusCode => $contextResponse) {
+                    $responses[$statusCode] = new Model\Response($contextResponse['description'] ?? '', new \ArrayObject($contextResponse['content']), isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null);
+                }
+            }
+
             $requestBody = null;
             if ($contextRequestBody = $operation['openapi_context']['requestBody'] ?? false) {
                 $requestBody = new Model\RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
