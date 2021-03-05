@@ -70,6 +70,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("swaggerContext", type="array"),
  *     @Attribute("urlGenerationStrategy", type="int"),
  *     @Attribute("validationGroups", type="mixed"),
+ *     @Attribute("exceptionToStatus", type="array"),
  * )
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -170,6 +171,7 @@ final class ApiResource
      * @param array        $swaggerContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param array        $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
      * @param int          $urlGenerationStrategy
+     * @param array        $exceptionToStatus              https://api-platform.com/docs/core/errors/#fine-grained-configuration
      *
      * @throws InvalidArgumentException
      */
@@ -219,7 +221,8 @@ final class ApiResource
         ?array $swaggerContext = null,
         ?array $validationGroups = null,
         ?int $urlGenerationStrategy = null,
-        ?bool $compositeIdentifier = null
+        ?bool $compositeIdentifier = null,
+        ?array $exceptionToStatus = null
     ) {
         if (!\is_array($description)) { // @phpstan-ignore-line Doctrine annotations support
             [$publicProperties, $configurableAttributes] = self::getConfigMetadata();

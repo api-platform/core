@@ -159,6 +159,9 @@ return new \ApiPlatform\Core\Annotation\ApiResource(
     hydraContext: ['hydra' => 'foo'],
     paginationViaCursor: ['foo'],
     stateless: true,
+    exceptionToStatus: [
+        \DomainException::class => 400,
+    ],
 );
 PHP
         );
@@ -208,6 +211,9 @@ PHP
             'pagination_via_cursor' => ['foo'],
             'stateless' => true,
             'composite_identifier' => null,
+            'exception_to_status' => [
+                \DomainException::class => 400,
+            ],
         ], $resource->attributes);
     }
 
