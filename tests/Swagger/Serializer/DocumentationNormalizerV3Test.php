@@ -583,7 +583,7 @@ class DocumentationNormalizerV3Test extends TestCase
                             'authorizationCode' => [
                                 'tokenUrl' => '/oauth/v2/token',
                                 'authorizationUrl' => '/oauth/v2/auth',
-                                'scopes' => ['scope param'],
+                                'scopes' => new \ArrayObject(['scope param']),
                             ],
                         ],
                     ],
