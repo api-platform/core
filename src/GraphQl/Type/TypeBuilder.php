@@ -188,26 +188,27 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType
     {
-        $shortName = $resourceType->name;
+        $shortName = $resourceType instanceof NonNull ? $resourceType->getOfType()->name : "Nullable{$resourceType->name}";
+        $connectionName = "{$shortName}Connection";
 
-        if ($this->typesContainer->has("{$shortName}Connection")) {
-            return $this->typesContainer->get("{$shortName}Connection");
+        if ($this->typesContainer->has($connectionName)) {
+            return $this->typesContainer->get($connectionName);
         }
 
         $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $operationName);
 
         $fields = 'cursor' === $paginationType ?
-            $this->getCursorBasedPaginationFields($resourceType) :
-            $this->getPageBasedPaginationFields($resourceType);
+            $this->getCursorBasedPaginationFields($resourceType, $shortName) :
+            $this->getPageBasedPaginationFields($resourceType, $shortName);
 
         $configuration = [
-            'name' => "{$shortName}Connection",
+            'name' => $connectionName,
             'description' => "Connection for $shortName.",
             'fields' => $fields,
         ];
 
         $resourcePaginatedCollectionType = new ObjectType($configuration);
-        $this->typesContainer->set("{$shortName}Connection", $resourcePaginatedCollectionType);
+        $this->typesContainer->set($connectionName, $resourcePaginatedCollectionType);
 
         return $resourcePaginatedCollectionType;
     }
@@ -220,10 +221,8 @@ final class TypeBuilder implements TypeBuilderInterface
         return $type->isCollection() && ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();
     }
 
-    private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
+    private function getCursorBasedPaginationFields(GraphQLType $resourceType, string $shortName): array
     {
-        $shortName = $resourceType->name;
-
         $edgeObjectTypeConfiguration = [
             'name' => "{$shortName}Edge",
             'description' => "Edge of $shortName.",
@@ -255,10 +254,8 @@ final class TypeBuilder implements TypeBuilderInterface
         ];
     }
 
-    private function getPageBasedPaginationFields(GraphQLType $resourceType): array
+    private function getPageBasedPaginationFields(GraphQLType $resourceType, string $shortName): array
     {
-        $shortName = $resourceType->name;
-
         $paginationInfoObjectTypeConfiguration = [
             'name' => "{$shortName}PaginationInfo",
             'description' => 'Information about the pagination.',

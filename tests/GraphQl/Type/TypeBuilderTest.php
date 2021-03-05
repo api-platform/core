@@ -426,14 +426,17 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::string(), $resolvedType);
     }
 
-    public function testCursorBasedGetResourcePaginatedCollectionType(): void
+    /**
+     * @dataProvider getResourcePaginatedCollectionTypeProvider
+     */
+    public function testCursorBasedGetResourcePaginatedCollectionType(GraphQLType $graphqlType, string $shortName): void
     {
-        $this->typesContainerProphecy->has('StringConnection')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
-        $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
-        $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has("{$shortName}Connection")->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set("{$shortName}Connection", Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set("{$shortName}Edge", Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set("{$shortName}PageInfo", Argument::type(ObjectType::class))->shouldBeCalled();
 
-        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
+        $this->resourceMetadataFactoryProphecy->create("{$shortName}ResourceClass")->shouldBeCalled()->willReturn(new ResourceMetadata(
             null,
             null,
             null,
@@ -443,9 +446,9 @@ class TypeBuilderTest extends TestCase
         ));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
-        $this->assertSame('StringConnection', $resourcePaginatedCollectionType->name);
-        $this->assertSame('Connection for String.', $resourcePaginatedCollectionType->description);
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, "{$shortName}ResourceClass", 'operationName');
+        $this->assertSame("{$shortName}Connection", $resourcePaginatedCollectionType->name);
+        $this->assertSame("Connection for {$shortName}.", $resourcePaginatedCollectionType->description);
 
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('edges', $resourcePaginatedCollectionTypeFields);
@@ -456,12 +459,12 @@ class TypeBuilderTest extends TestCase
         $edgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
         /** @var ObjectType $wrappedType */
         $wrappedType = $edgesType->getWrappedType();
-        $this->assertSame('StringEdge', $wrappedType->name);
-        $this->assertSame('Edge of String.', $wrappedType->description);
+        $this->assertSame("{$shortName}Edge", $wrappedType->name);
+        $this->assertSame("Edge of {$shortName}.", $wrappedType->description);
         $edgeObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('node', $edgeObjectTypeFields);
         $this->assertArrayHasKey('cursor', $edgeObjectTypeFields);
-        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['node']->getType());
+        $this->assertSame($graphqlType, $edgeObjectTypeFields['node']->getType());
         $this->assertInstanceOf(NonNull::class, $edgeObjectTypeFields['cursor']->getType());
         $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['cursor']->getType()->getWrappedType());
 
@@ -469,7 +472,7 @@ class TypeBuilderTest extends TestCase
         $pageInfoType = $resourcePaginatedCollectionTypeFields['pageInfo']->getType();
         /** @var ObjectType $wrappedType */
         $wrappedType = $pageInfoType->getWrappedType();
-        $this->assertSame('StringPageInfo', $wrappedType->name);
+        $this->assertSame("{$shortName}PageInfo", $wrappedType->name);
         $this->assertSame('Information about the current page.', $wrappedType->description);
         $pageInfoObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('endCursor', $pageInfoObjectTypeFields);
@@ -489,13 +492,16 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::int(), $totalCountType->getWrappedType());
     }
 
-    public function testPageBasedGetResourcePaginatedCollectionType(): void
+    /**
+     * @dataProvider getResourcePaginatedCollectionTypeProvider
+     */
+    public function testPageBasedGetResourcePaginatedCollectionType(GraphQLType $graphqlType, string $shortName): void
     {
-        $this->typesContainerProphecy->has('StringConnection')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
-        $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has("${shortName}Connection")->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set("${shortName}Connection", Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set("${shortName}PaginationInfo", Argument::type(ObjectType::class))->shouldBeCalled();
 
-        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
+        $this->resourceMetadataFactoryProphecy->create("${shortName}ResourceClass")->shouldBeCalled()->willReturn(new ResourceMetadata(
             null,
             null,
             null,
@@ -505,9 +511,9 @@ class TypeBuilderTest extends TestCase
         ));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
-        $this->assertSame('StringConnection', $resourcePaginatedCollectionType->name);
-        $this->assertSame('Connection for String.', $resourcePaginatedCollectionType->description);
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, "${shortName}ResourceClass", 'operationName');
+        $this->assertSame("${shortName}Connection", $resourcePaginatedCollectionType->name);
+        $this->assertSame("Connection for ${shortName}.", $resourcePaginatedCollectionType->description);
 
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
@@ -517,7 +523,7 @@ class TypeBuilderTest extends TestCase
         $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
         /** @var ObjectType $wrappedType */
         $wrappedType = $paginationInfoType->getWrappedType();
-        $this->assertSame('StringPaginationInfo', $wrappedType->name);
+        $this->assertSame("${shortName}PaginationInfo", $wrappedType->name);
         $this->assertSame('Information about the pagination.', $wrappedType->description);
         $paginationInfoObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('itemsPerPage', $paginationInfoObjectTypeFields);
@@ -529,6 +535,14 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['totalCount']->getType());
         $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
+    }
+
+    public function getResourcePaginatedCollectionTypeProvider(): array
+    {
+        return [
+            'nullable' => [GraphQLType::string(), 'NullableString'],
+            'non-null' => [GraphQLType::nonNull(GraphQLType::string()), 'String'],
+        ];
     }
 
     /**

@@ -246,7 +246,7 @@ class FieldsBuilderTest extends TestCase
     {
         return [
             'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal collection case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'nominal collection case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], $graphqlType = GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new ObjectType(['name' => 'collection'])))), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -275,7 +275,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with filters' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with filters' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new ObjectType(['name' => 'collection'])))), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -309,7 +309,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection empty overridden args and add fields' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new ObjectType(['name' => 'collection'])))), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -323,7 +323,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection override args with custom ones' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new ObjectType(['name' => 'collection'])))), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -339,7 +339,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['pagination_type' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['pagination_type' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(new ObjectType(['name' => 'collection'])))), $resolver = function () {
             },
                 [
                     'actionShortNames' => [

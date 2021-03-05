@@ -69,6 +69,7 @@ Feature: GraphQL introspection support
     """
     Then the response status code should be 200
     And the response should be in JSON
+    And print last JSON response
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.type1.description" should be equal to "Dummy Product."
     And the JSON node "data.type1.fields" should contain:
@@ -101,9 +102,12 @@ Feature: GraphQL introspection support
     {
       "name":"node",
       "type":{
-        "name":"DummyAggregateOffer",
-        "kind":"OBJECT",
-        "ofType":null
+        "name": null,
+        "kind": "NON_NULL",
+        "ofType": {
+          "name": "DummyAggregateOffer",
+          "kind": "OBJECT"
+        }
       }
     }
     """
