@@ -20,6 +20,8 @@
 * OpenAPI: Fix error when schema is empty (#4051)
 * OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
+* OpenAPI: Fix `response` support via the `openapi_context` (#4116)
+* OpenAPI: Fix `Link->requestBody` default value (#4116)
 * GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
 * Metadata: Check the output class when calculating serializer groups (#3696)
 
