@@ -113,10 +113,12 @@
 * Identifiers: Do not denormalize the same identifier twice (#3762)
 * OpenAPI: Lazy load `SwaggerCommand` (#3802)
 * OpenAPI: Use Output class name instead of the Resource short name when available (#3741)
+* OpenAPI: Allow unset PathItem method (#4107)
 * Router: Replace baseurl only once (#3776)
 * Mercure: Publisher bug fixes (#3790, #3739)
 * Serializer: Catch NotNormalizableValueException to UnexpectedValueEception with inputs (#3697)
-* Doctrine: ODM escape search terms in RegexFilter
+* Doctrine: Do not add JOINs for filters without a value (#3703)
+* MongoDB: Escape search terms in `RegexFilter` (#3755)
 * Tests: Improve JSON Schema assertions (#3807, #3803, #3804, #3806, #3817, #3829, #3830)
 * Tests: Allow passing extra options in ApiTestClient (#3486)
 * Docs: Upgrade Swagger UI to version 3.37.2 (#3867)
