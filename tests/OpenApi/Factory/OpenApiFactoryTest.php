@@ -30,7 +30,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
-use ApiPlatform\Core\OpenApi\Model\PathItem;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
@@ -749,17 +748,21 @@ class OpenApiFactoryTest extends TestCase
 
     public function testResetPathItem()
     {
-        $pathItem = new PathItem();
-        $pathItem->withGet(null);
-        $pathItem->withDelete(null);
-        $pathItem->withPost(null);
-        $pathItem->withPut(null);
-        $pathItem->withPatch(null);
+        $pathItem = new Model\PathItem(
+            null,
+            '',
+            '',
+            new Model\Operation(),
+            new Model\Operation(),
+            new Model\Operation(),
+            new Model\Operation(),
+            new Model\Operation()
+        );
 
-        $this->assertNull($pathItem->getGet());
-        $this->assertNull($pathItem->getDelete());
-        $this->assertNull($pathItem->getPost());
-        $this->assertNull($pathItem->getPut());
-        $this->assertNull($pathItem->getPatch());
+        $this->assertNull($pathItem->withGet(null)->getGet());
+        $this->assertNull($pathItem->withDelete(null)->getDelete());
+        $this->assertNull($pathItem->withPost(null)->getPost());
+        $this->assertNull($pathItem->withPut(null)->getPut());
+        $this->assertNull($pathItem->withPatch(null)->getPatch());
     }
 }
