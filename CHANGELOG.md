@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.4
+
+* Swagger UI: Remove Google fonts (#4112)
+
 ## 2.6.3
 
 * Identifiers: Re-allow `POST` operations even if no identifier is defined (#4052)
