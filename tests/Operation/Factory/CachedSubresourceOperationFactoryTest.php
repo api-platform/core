@@ -70,11 +70,10 @@ class CachedSubresourceOperationFactoryTest extends TestCase
 
     public function testCreateWithGetCacheItemThrowsCacheException()
     {
-        $cacheException = $this->prophesize(\Exception::class);
-        $cacheException->willImplement(CacheException::class);
+        $cacheException = new class() extends \Exception implements CacheException {};
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
-        $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException->reveal())->shouldBeCalledTimes(1);
+        $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException)->shouldBeCalledTimes(1);
 
         $decoratedSubresourceOperationFactory = $this->prophesize(SubresourceOperationFactoryInterface::class);
         $decoratedSubresourceOperationFactory->create(Dummy::class)->shouldBeCalledTimes(1)->willReturn(['foo' => 'bar']);
