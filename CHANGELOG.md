@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.4
+
+* Swagger UI: Remove Google fonts (#4112)
+
 ## 2.6.3
 
 * Identifiers: Re-allow `POST` operations even if no identifier is defined (#4052)
@@ -17,7 +21,6 @@
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
 * GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
 * Metadata: Check the output class when calculating serializer groups (#3696)
-* Swagger UI: Remove Google fonts (#4112)
 
 ## 2.6.2
 
