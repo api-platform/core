@@ -125,7 +125,9 @@ final class PurgeHttpCacheListener
     {
         $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
         foreach (array_keys($associationMappings) as $property) {
-            $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
+            if ($this->propertyAccessor->isReadable($entity, $property)) {
+                $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
+            }
         }
     }
 
