@@ -37,6 +37,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Interpretation: filter products which have a brand
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
+ *
+ * @final
  */
 class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInterface
 {
@@ -74,7 +76,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         if (\func_num_args() > 6) {
             $context = func_get_arg(6);
         } else {
-            if (__CLASS__ !== static::class) {
+            if (__CLASS__ !== static::class) { /** @phpstan-ignore-line The class was not final before */
                 $r = new \ReflectionMethod($this, __FUNCTION__);
                 if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
                     @trigger_error(sprintf('Method %s() will have a seventh `$context` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.5.', __FUNCTION__), \E_USER_DEPRECATED);

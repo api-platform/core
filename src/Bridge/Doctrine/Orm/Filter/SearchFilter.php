@@ -35,6 +35,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @final
  */
 class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {

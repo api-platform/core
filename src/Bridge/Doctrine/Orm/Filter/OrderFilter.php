@@ -36,6 +36,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ *
+ * @final
  */
 class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInterface
 {

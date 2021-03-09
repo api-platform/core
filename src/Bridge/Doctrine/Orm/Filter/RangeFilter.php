@@ -22,6 +22,8 @@ use Doctrine\ORM\QueryBuilder;
  * Filters the collection by range.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
+ *
+ * @final
  */
 class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInterface
 {
