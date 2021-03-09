@@ -4,6 +4,7 @@
 
 * **BC**: Change `api_platform.listener.request.add_format` priority from 7 to 28 to execute it before firewall (priority 8) (#3599)
 * **BC**: Use `@final` annotation in ORM filters (#4109)
+* Allow defining `exception_to_status` per operation (#3519)
 * Doctrine: Better exception to find which resource is linked to an exception (#3965)
 * Doctrine: Allow mixed type value for date filter (notice if invalid) (#3870)
 * Doctrine: Add `nulls_always_first` and `nulls_always_last` to `nulls_comparison` in order filter (#4103)
