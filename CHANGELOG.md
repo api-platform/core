@@ -2,6 +2,7 @@
 
 ## 2.6.4
 
+* Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
 * Swagger UI: Remove Google fonts (#4112)
 
 ## 2.6.3
