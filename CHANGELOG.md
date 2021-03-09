@@ -3,6 +3,7 @@
 ## 2.6.4
 
 * Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
+* GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
 * Swagger UI: Remove Google fonts (#4112)
 
 ## 2.6.3
