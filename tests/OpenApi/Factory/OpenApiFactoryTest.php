@@ -79,6 +79,23 @@ class OpenApiFactoryTest extends TestCase
                     'parameters' => [
                         ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'type' => 'string', 'required' => true, 'default' => 'BOTH'],
                     ],
+                    'tags' => ['Dummy', 'Profile'],
+                    'responses' => [
+                        '202' => [
+                            'description' => 'Success',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                ],
+                            ],
+                            'headers' => [
+                                'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                            ],
+                            'links' => [
+                                'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                            ],
+                        ],
+                    ],
                     'requestBody' => [
                         'required' => true,
                         'description' => 'Custom request body',
@@ -314,7 +331,7 @@ class OpenApiFactoryTest extends TestCase
                         'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -366,7 +383,7 @@ class OpenApiFactoryTest extends TestCase
                         'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -401,8 +418,17 @@ class OpenApiFactoryTest extends TestCase
         $customPath = $paths->getPath('/foo/{id}');
         $this->assertEquals($customPath->getHead(), new Model\Operation(
             'customDummyItem',
-            ['Dummy'],
+            ['Dummy', 'Profile'],
             [
+                '202' => new Model\Response('Success', new \ArrayObject([
+                    'application/json' => [
+                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                    ],
+                ]), new \ArrayObject([
+                    'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                ]), new \ArrayObject([
+                    'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                ])),
                 '404' => new Model\Response('Resource not found'),
             ],
             'Dummy',
@@ -436,7 +462,7 @@ class OpenApiFactoryTest extends TestCase
                         'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),

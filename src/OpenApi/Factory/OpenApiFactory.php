@@ -229,6 +229,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $responses['default'] = new Model\Response('Unexpected error');
             }
 
+            if ($contextResponses = $operation['openapi_context']['responses'] ?? false) {
+                foreach ($contextResponses as $statusCode => $contextResponse) {
+                    $responses[$statusCode] = new Model\Response($contextResponse['description'] ?? '', new \ArrayObject($contextResponse['content']), isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null);
+                }
+            }
+
             $requestBody = null;
             if ($contextRequestBody = $operation['openapi_context']['requestBody'] ?? false) {
                 $requestBody = new Model\RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
@@ -360,7 +366,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return new Model\Link(
             $operationId,
             new \ArrayObject($parameters),
-            [],
+            null,
             1 === \count($parameters) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', key($parameters), $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path)
         );
     }
