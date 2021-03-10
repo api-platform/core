@@ -1,3 +1,4 @@
+@!lowest
 Feature: Serialization of boolean properties
   In order to use an hypermedia API
   As a client software developer
