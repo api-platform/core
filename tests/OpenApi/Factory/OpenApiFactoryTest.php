@@ -762,4 +762,17 @@ class OpenApiFactoryTest extends TestCase
         $this->assertNull($pathItem->getPut());
         $this->assertNull($pathItem->getPatch());
     }
+
+    public function testRemovePath()
+    {
+        $paths = new Model\Paths();
+
+        $paths->addPath('/', new PathItem());
+
+        $this->assertEquals(1, count($paths->getPaths()));
+
+        $paths->removePath('/');
+
+        $this->assertEquals(0, count($paths->getPaths()));
+    }
 }
