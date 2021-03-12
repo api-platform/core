@@ -82,7 +82,7 @@
 * OpenAPI: **BC** Replace all characters other than `[a-zA-Z0-9\.\-_]` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
 * OpenAPI: Refactor OpenAPI v3 support, OpenAPI v2 (aka Swagger) is deprecated (#3407)
 * Order: Support default order for a specific custom operation (#3784)
-* PATCH: Support patching deep objects (#3847)
+* PATCH: **BC** Support patching deep objects, previously new objects were created instead of updating current objects (#3847)
 * Router: UrlGenerator strategy configuration via `url_generation_strategy` (#3198)
 * Routing: Add stateless `ApiResource` attribute (#3436)
 * Security: Add support for access control rule on attributes (#3503)
