@@ -13,7 +13,6 @@
 * Security: Use a `NullToken` when using the new authenticator manager in the resource access checker (#4067)
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers (#4042)
-* Doctrine: Support for binary UUID in search filter (#3774)
 * Doctrine: Do not add join or lookup for search filter with empty value (#3703)
 * Doctrine: Reduce code duplication in search filter (#3541)
 * JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`) (#4064)
