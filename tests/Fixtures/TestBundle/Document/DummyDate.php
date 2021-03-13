@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -27,6 +28,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.mongodb.date"}
  * })
+ * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
  * @ApiFilter(DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,

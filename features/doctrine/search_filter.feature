@@ -993,3 +993,11 @@ Feature: Search filter on collections
       }
     }
     """
+
+  @createSchema
+  Scenario: Search by date (#4128)
+    Given there are 3 dummydate objects with dummyDate
+    When I send a "GET" request to "/dummy_dates?dummyDate=2015-04-01"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "hydra:totalItems" should be equal to 1
