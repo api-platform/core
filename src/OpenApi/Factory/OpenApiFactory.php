@@ -175,19 +175,42 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             // Set up parameters
             if (OperationType::ITEM === $operationType) {
                 foreach ($identifiers as $parameterName => $identifier) {
-                    $parameters[] = new Model\Parameter(\is_string($parameterName) ? $parameterName : $identifier, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                    $parameterName = \is_string($parameterName) ? $parameterName : $identifier;
+                    $parameter = new Model\Parameter($parameterName, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                    if ($this->hasParameter($parameter, $parameters)) {
+                        continue;
+                    }
+
+                    $parameters[] = $parameter;
                 }
                 $links[$operationId] = $this->getLink($resourceClass, $operationId, $path);
             } elseif (OperationType::COLLECTION === $operationType && 'GET' === $method) {
-                $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
+                foreach (array_merge($this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass)) as $parameter) {
+                    if ($this->hasParameter($parameter, $parameters)) {
+                        continue;
+                    }
+
+                    $parameters[] = $parameter;
+                }
             } elseif (OperationType::SUBRESOURCE === $operationType) {
                 foreach ($operation['identifiers'] as $parameterName => [$class, $property]) {
-                    $parameters[] = new Model\Parameter($parameterName, 'path', $this->resourceMetadataFactory->create($class)->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                    $parameter = new Model\Parameter($parameterName, 'path', $this->resourceMetadataFactory->create($class)->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                    if ($this->hasParameter($parameter, $parameters)) {
+                        continue;
+                    }
+
+                    $parameters[] = $parameter;
                 }
 
                 if ($operation['collection']) {
                     $subresourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-                    $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($subresourceMetadata, $operationName, $resourceClass));
+                    foreach (array_merge($this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($subresourceMetadata, $operationName, $resourceClass)) as $parameter) {
+                        if ($this->hasParameter($parameter, $parameters)) {
+                            continue;
+                        }
+
+                        $parameters[] = $parameter;
+                    }
                 }
             }
 
@@ -485,5 +508,19 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $securitySchemes;
+    }
+
+    /**
+     * @var Model\Parameter[]
+     */
+    private function hasParameter(Model\Parameter $parameter, array $parameters): bool
+    {
+        foreach ($parameters as $existingParameter) {
+            if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

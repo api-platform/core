@@ -77,7 +77,8 @@ class OpenApiFactoryTest extends TestCase
                 'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => [
                     'description' => 'Custom description',
                     'parameters' => [
-                        ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'type' => 'string', 'required' => true, 'default' => 'BOTH'],
+                        ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'required' => true],
+                        ['description' => 'Replace parameter', 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'format' => 'uuid']],
                     ],
                     'tags' => ['Dummy', 'Profile'],
                     'responses' => [
@@ -117,7 +118,11 @@ class OpenApiFactoryTest extends TestCase
                 'formats' => ['method' => 'PUT', 'path' => '/formatted/{id}', 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]],
             ],
             [
-                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'get' => ['method' => 'GET', 'openapi_context' => [
+                    'parameters' => [
+                        ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
+                    ],
+                ]] + self::OPERATION_FORMATS,
                 'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
                 'filtered' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4', 'f5'], 'path' => '/filtered'] + self::OPERATION_FORMATS,
                 'paginated' => ['method' => 'GET', 'pagination_client_enabled' => true, 'pagination_client_items_per_page' => true, 'pagination_items_per_page' => 20, 'pagination_maximum_items_per_page' => 80, 'path' => '/paginated'] + self::OPERATION_FORMATS,
@@ -306,7 +311,7 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Model\Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
@@ -434,7 +439,7 @@ class OpenApiFactoryTest extends TestCase
             'Dummy',
             'Custom description',
             null,
-            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
+            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Replace parameter', true, false, false, ['type' => 'string', 'format' => 'uuid'])],
             new Model\RequestBody('Custom request body', new \ArrayObject([
                 'multipart/form-data' => [
                     'schema' => [
