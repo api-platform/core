@@ -5,6 +5,7 @@
 * Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
 * GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
 * Swagger UI: Remove Google fonts (#4112)
+* Doctrine: Revert #3774 support for binary UUID in search filter (#4134) 
 
 ## 2.6.3
 
@@ -14,7 +15,6 @@
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers (#4042)
 * Doctrine: Do not add join or lookup for search filter with empty value (#3703)
-* Doctrine: Reduce code duplication in search filter (#3541)
 * JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`) (#4064)
 * OpenAPI: Fix missing 422 responses in the documentation (#4086)
 * OpenAPI: Fix error when schema is empty (#4051)
