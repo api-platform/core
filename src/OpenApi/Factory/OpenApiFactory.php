@@ -419,7 +419,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $schema,
                     'array' === $schema['type'] && \in_array($data['type'],
                     [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
-                    'array' === $schema['type'],
+                    $data['openapi']['explode'] ?? ('array' === $schema['type']),
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
                     isset($data['openapi']['examples']

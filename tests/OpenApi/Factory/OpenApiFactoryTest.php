@@ -158,7 +158,7 @@ class OpenApiFactoryTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'openapi' => ['example' => 'bar', 'deprecated' => true, 'allowEmptyValue' => true, 'allowReserved' => true],
+                'openapi' => ['example' => 'bar', 'deprecated' => true, 'allowEmptyValue' => true, 'allowReserved' => true, 'explode' => true],
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -517,7 +517,7 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 new Model\Parameter('name', 'query', '', true, true, true, [
                     'type' => 'string',
-                ], 'form', false, true, 'bar'),
+                ], 'form', true, true, 'bar'),
                 new Model\Parameter('ha', 'query', '', false, false, true, [
                     'type' => 'integer',
                 ]),
