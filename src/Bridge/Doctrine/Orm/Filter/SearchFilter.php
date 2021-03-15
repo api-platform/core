@@ -175,8 +175,8 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
         $aliasedField = sprintf('%s.%s', $alias, $field);
 
-        if (null == $strategy || self::STRATEGY_EXACT == $strategy) {
-            if (1 == \count($values)) {
+        if (!$strategy || self::STRATEGY_EXACT === $strategy) {
+            if (1 === \count($values)) {
                 $queryBuilder
                     ->andWhere($queryBuilder->expr()->eq($wrapCase($aliasedField), $wrapCase($valueParameter)))
                     ->setParameter($valueParameter, $values[0]);
