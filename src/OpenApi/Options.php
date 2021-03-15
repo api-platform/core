@@ -33,7 +33,7 @@ final class Options
     private $licenseName;
     private $licenseUrl;
 
-    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, string $oAuthType = '', string $oAuthFlow = '', string $oAuthTokenUrl = '', string $oAuthAuthorizationUrl = '', string $oAuthRefreshUrl = '', array $oAuthScopes = [], array $apiKeys = [], string $contactName = null, string $contactUrl = null, string $contactEmail = null, string $termsOfService = null, string $licenseName = null, string $licenseUrl = null)
+    public function __construct(string $title, string $description = '', string $version = '', bool $oAuthEnabled = false, ?string $oAuthType = null, ?string $oAuthFlow = null, ?string $oAuthTokenUrl = null, ?string $oAuthAuthorizationUrl = null, ?string $oAuthRefreshUrl = null, array $oAuthScopes = [], array $apiKeys = [], string $contactName = null, string $contactUrl = null, string $contactEmail = null, string $termsOfService = null, string $licenseName = null, string $licenseUrl = null)
     {
         $this->title = $title;
         $this->description = $description;
@@ -41,9 +41,9 @@ final class Options
         $this->oAuthEnabled = $oAuthEnabled;
         $this->oAuthType = $oAuthType;
         $this->oAuthFlow = $oAuthFlow;
-        $this->oAuthTokenUrl = $oAuthTokenUrl;
-        $this->oAuthAuthorizationUrl = $oAuthAuthorizationUrl;
-        $this->oAuthRefreshUrl = $oAuthRefreshUrl;
+        $this->oAuthTokenUrl = $oAuthTokenUrl ?: null;
+        $this->oAuthAuthorizationUrl = $oAuthAuthorizationUrl ?: null;
+        $this->oAuthRefreshUrl = $oAuthRefreshUrl ?: null;
         $this->oAuthScopes = $oAuthScopes;
         $this->apiKeys = $apiKeys;
         $this->contactName = $contactName;
@@ -74,27 +74,27 @@ final class Options
         return $this->oAuthEnabled;
     }
 
-    public function getOAuthType(): string
+    public function getOAuthType(): ?string
     {
         return $this->oAuthType;
     }
 
-    public function getOAuthFlow(): string
+    public function getOAuthFlow(): ?string
     {
         return $this->oAuthFlow;
     }
 
-    public function getOAuthTokenUrl(): string
+    public function getOAuthTokenUrl(): ?string
     {
         return $this->oAuthTokenUrl;
     }
 
-    public function getOAuthAuthorizationUrl(): string
+    public function getOAuthAuthorizationUrl(): ?string
     {
         return $this->oAuthAuthorizationUrl;
     }
 
-    public function getOAuthRefreshUrl(): string
+    public function getOAuthRefreshUrl(): ?string
     {
         return $this->oAuthRefreshUrl;
     }

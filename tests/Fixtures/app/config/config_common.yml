@@ -47,6 +47,13 @@ api_platform:
     collection:
         order_parameter_name:          'order'
         order:                         'ASC'
+    oauth:
+        enabled: true
+        clientId: my_client
+        type: 'oauth2'
+        flow: 'implicit'
+        authorizationUrl: 'http://my-custom-server/openid-connect/auth'
+        scopes: []
     exception_to_status:
         Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST

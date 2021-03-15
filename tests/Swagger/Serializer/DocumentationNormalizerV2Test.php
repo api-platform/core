@@ -529,7 +529,7 @@ class DocumentationNormalizerV2Test extends TestCase
                     'flow' => 'application',
                     'tokenUrl' => '/oauth/v2/token',
                     'authorizationUrl' => '/oauth/v2/auth',
-                    'scopes' => ['scope param'],
+                    'scopes' => new \ArrayObject(['scope param']),
                 ],
             ],
             'security' => [['oauth' => []]],
