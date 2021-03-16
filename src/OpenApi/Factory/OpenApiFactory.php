@@ -86,7 +86,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $servers = '/' === $baseUrl || '' === $baseUrl ? [new Model\Server('/')] : [new Model\Server($baseUrl)];
         $paths = new Model\Paths();
         $links = [];
-        $schemas = [];
+        $schemas = new \ArrayObject();
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
@@ -94,11 +94,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
             [$itemOperationLinks, $itemOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
-            $schemas += $itemOperationSchemas;
+            $this->appendSchemaDefinitions($schemas, $itemOperationSchemas);
             [$collectionOperationLinks, $collectionOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
 
             [$subresourceOperationLinks, $subresourceOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::SUBRESOURCE, $context, $paths, $links, $schemas);
-            $schemas += $collectionOperationSchemas;
+            $this->appendSchemaDefinitions($schemas, $collectionOperationSchemas);
         }
 
         $securitySchemes = $this->getSecuritySchemes();
@@ -113,7 +113,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $servers,
             $paths,
             new Model\Components(
-                new \ArrayObject($schemas),
+                $schemas,
                 new \ArrayObject(),
                 new \ArrayObject(),
                 new \ArrayObject(),
@@ -128,7 +128,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @return array | array
      */
-    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, array $schemas = []): array
+    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, \ArrayObject $schemas): array
     {
         $resourceShortName = $resourceMetadata->getShortName();
         $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : (OperationType::ITEM === $operationType ? $resourceMetadata->getItemOperations() : $this->subresourceOperationFactory->create($resourceClass));
@@ -155,12 +155,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $linkedOperationId = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM);
             $pathItem = $paths->getPath($path) ?: new Model\PathItem();
             $forceSchemaCollection = OperationType::SUBRESOURCE === $operationType ? ($operation['collection'] ?? false) : false;
+            $schema = new Schema('openapi');
+            $schema->setDefinitions($schemas);
 
             $operationOutputSchemas = [];
             foreach ($responseMimeTypes as $operationFormat) {
-                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operationType, $operationName, new Schema('openapi'), null, $forceSchemaCollection);
-                $schemas += $operationOutputSchema->getDefinitions()->getArrayCopy();
+                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operationType, $operationName, $schema, null, $forceSchemaCollection);
                 $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
+                $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
             }
 
             $parameters = [];
@@ -175,19 +177,42 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             // Set up parameters
             if (OperationType::ITEM === $operationType) {
                 foreach ($identifiers as $parameterName => $identifier) {
-                    $parameters[] = new Model\Parameter(\is_string($parameterName) ? $parameterName : $identifier, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                    $parameterName = \is_string($parameterName) ? $parameterName : $identifier;
+                    $parameter = new Model\Parameter($parameterName, 'path', 'Resource identifier', true, false, false, ['type' => 'string']);
+                    if ($this->hasParameter($parameter, $parameters)) {
+                        continue;
+                    }
+
+                    $parameters[] = $parameter;
                 }
                 $links[$operationId] = $this->getLink($resourceClass, $operationId, $path);
             } elseif (OperationType::COLLECTION === $operationType && 'GET' === $method) {
-                $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass));
+                foreach (array_merge($this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($resourceMetadata, $operationName, $resourceClass)) as $parameter) {
+                    if ($this->hasParameter($parameter, $parameters)) {
+                        continue;
+                    }
+
+                    $parameters[] = $parameter;
+                }
             } elseif (OperationType::SUBRESOURCE === $operationType) {
                 foreach ($operation['identifiers'] as $parameterName => [$class, $property]) {
-                    $parameters[] = new Model\Parameter($parameterName, 'path', $this->resourceMetadataFactory->create($class)->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                    $parameter = new Model\Parameter($parameterName, 'path', $this->resourceMetadataFactory->create($class)->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                    if ($this->hasParameter($parameter, $parameters)) {
+                        continue;
+                    }
+
+                    $parameters[] = $parameter;
                 }
 
                 if ($operation['collection']) {
                     $subresourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-                    $parameters = array_merge($parameters, $this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($subresourceMetadata, $operationName, $resourceClass));
+                    foreach (array_merge($this->getPaginationParameters($resourceMetadata, $operationName), $this->getFiltersParameters($subresourceMetadata, $operationName, $resourceClass)) as $parameter) {
+                        if ($this->hasParameter($parameter, $parameters)) {
+                            continue;
+                        }
+
+                        $parameters[] = $parameter;
+                    }
                 }
             }
 
@@ -241,9 +266,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             } elseif ('PUT' === $method || 'POST' === $method || 'PATCH' === $method) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
-                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operationType, $operationName, new Schema('openapi'), null, $forceSchemaCollection);
-                    $schemas += $operationInputSchema->getDefinitions()->getArrayCopy();
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operationType, $operationName, $schema, null, $forceSchemaCollection);
                     $operationInputSchemas[$operationFormat] = $operationInputSchema;
+                    $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
 
                 $requestBody = new Model\RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
@@ -396,7 +421,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $schema,
                     'array' === $schema['type'] && \in_array($data['type'],
                     [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
-                    'array' === $schema['type'],
+                    $data['openapi']['explode'] ?? ('array' === $schema['type']),
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
                     isset($data['openapi']['examples']
@@ -485,5 +510,26 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $securitySchemes;
+    }
+
+    private function appendSchemaDefinitions(\ArrayObject $schemas, \ArrayObject $definitions): void
+    {
+        foreach ($definitions as $key => $value) {
+            $schemas[$key] = $value;
+        }
+    }
+
+    /**
+     * @param Model\Parameter[] $parameters
+     */
+    private function hasParameter(Model\Parameter $parameter, array $parameters): bool
+    {
+        foreach ($parameters as $existingParameter) {
+            if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

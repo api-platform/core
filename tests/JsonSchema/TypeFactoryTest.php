@@ -372,7 +372,7 @@ class TypeFactoryTest extends TestCase
     {
         $schemaFactoryProphecy = $this->prophesize(SchemaFactoryInterface::class);
 
-        $schemaFactoryProphecy->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, Argument::type(Schema::class), ['foo' => 'bar'])->will(function (array $args) {
+        $schemaFactoryProphecy->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, Argument::type(Schema::class), ['foo' => 'bar'], false)->will(function (array $args) {
             $args[5]['$ref'] = 'ref';
 
             return $args[5];
