@@ -520,7 +520,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     }
 
     /**
-     * @var Model\Parameter[]
+     * @param Model\Parameter[] $parameters
      */
     private function hasParameter(Model\Parameter $parameter, array $parameters): bool
     {
