@@ -512,7 +512,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $securitySchemes;
     }
 
-    private function appendSchemaDefinitions(\ArrayObject &$schemas, \ArrayObject $definitions): void
+    private function appendSchemaDefinitions(\ArrayObject $schemas, \ArrayObject $definitions): void
     {
         foreach ($definitions as $key => $value) {
             $schemas[$key] = $value;
