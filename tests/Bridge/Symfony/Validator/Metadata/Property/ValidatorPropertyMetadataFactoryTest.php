@@ -20,11 +20,13 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropert
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
@@ -334,5 +336,36 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             $this->assertArrayHasKey('format', $schema);
             $this->assertEquals($format, $schema['format']);
         }
+    }
+
+    public function testCreateWithSequentiallyConstraint(): void
+    {
+        if (!class_exists(Sequentially::class)) {
+            $this->markTestSkipped();
+        }
+
+        $validatorClassMetadata = new ClassMetadata(DummySequentiallyValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummySequentiallyValidatedEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummySequentiallyValidatedEntity::class, 'dummy', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING))
+        )->shouldBeCalled();
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            [new PropertySchemaLengthRestriction(), new PropertySchemaRegexRestriction()]
+        );
+        $schema = $validationPropertyMetadataFactory->create(DummySequentiallyValidatedEntity::class, 'dummy')->getSchema();
+
+        $this->assertNotNull($schema);
+        $this->assertArrayHasKey('minLength', $schema);
+        $this->assertArrayHasKey('maxLength', $schema);
+        $this->assertArrayHasKey('pattern', $schema);
     }
 }
