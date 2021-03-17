@@ -95,17 +95,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $populatedRelationContext = $context;
         $relationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $allRelationshipsData);
 
-        if (!isset($context['api_included_resources'])) {
-            // initialize tracking of already included resources
-            $context['api_included_resources'] = [];
-        }
-
-        // do not include primary resources
-        $context['api_included_resources'] = [
-            $resourceMetadata->getShortName() => [
-                $context['iri'],
-            ],
-        ];
+        // Do not include primary resources
+        $context['api_included_resources'] = [$context['iri']];
 
         $includedResourcesData = $this->getRelatedResources($object, $format, $context, $allRelationshipsData);
 
@@ -389,35 +380,25 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 continue;
             }
 
-            $relationshipName = $relationshipDataArray['name'];
             $relationContext = $context;
-            if ($this->isIntermediateResource($relationshipName, $context)) {
-                $relationContext['api_included'] = $this->getNestedResources($relationshipName, $context);
-            } else {
-                $relationContext['api_included'] = [];
-            }
+            $relationContext['api_included'] = $this->getIncludedNestedResources($relationshipName, $context);
+
             $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $relationContext);
 
             if (!$attributeValue) {
                 continue;
             }
 
+            // Many to many relationship
+            $attributeValues = $attributeValue;
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
-                $this->addIncluded($attributeValue['data'], $included, $context);
-                if (isset($attributeValue['included']) && \is_array($attributeValue['included'])) {
-                    foreach ($attributeValue['included'] as $include) {
-                        $this->addIncluded($include, $included, $context);
-                    }
-                }
-
-                continue;
+                $attributeValues = [$attributeValue];
             }
-            // Many to many relationship
-            foreach ($attributeValue as $attributeValueElement) {
+
+            foreach ($attributeValues as $attributeValueElement) {
                 if (isset($attributeValueElement['data'])) {
                     $this->addIncluded($attributeValueElement['data'], $included, $context);
-
                     if (isset($attributeValueElement['included']) && \is_array($attributeValueElement['included'])) {
                         foreach ($attributeValueElement['included'] as $include) {
                             $this->addIncluded($include, $included, $context);
@@ -431,58 +412,39 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * add data to included array if it's not already.
-     *
-     * @param array $data
-     * @param array $included
-     * @param array $context
+     * Add data to included array if it's not already included.
      */
-    private function addIncluded($data, &$included, &$context)
+    private function addIncluded(array $data, array &$included, array &$context): void
     {
-        if (isset($data['id']) && $data['type']) {
-            if (!isset($context['api_included_resources'][$data['type']])) {
-                $context['api_included_resources'][$data['type']] = [];
-            }
-            if (!\in_array($data['id'], $context['api_included_resources'][$data['type']], true)) {
-                $included[] = $data;
-                // track already included resources
-                $context['api_included_resources'][$data['type']][] = $data['id'];
-            }
+        if (isset($data['id']) && !\in_array($data['id'], $context['api_included_resources'], true)) {
+            $included[] = $data;
+            // Track already included resources
+            $context['api_included_resources'][] = $data['id'];
         }
     }
 
     /**
-     * figure out if the relationship is in the api_included hash, at least as an intermediate resource.
+     * Figures out if the relationship is in the api_included hash or has included nested resources (path).
      */
     private function shouldIncludeRelation(string $relationshipName, array $context): bool
     {
         $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
 
-        return \in_array($normalizedName, $context['api_included'], true) || $this->isIntermediateResource($relationshipName, $context);
+        return \in_array($normalizedName, $context['api_included'], true) || \count($this->getIncludedNestedResources($relationshipName, $context)) > 0;
     }
 
     /**
-     * returns true if the relationship is an intermediate resource.
+     * Returns the names of the nested resources from a path relationship.
      */
-    private function isIntermediateResource(string $relationshipName, array $context): bool
-    {
-        $nested = $this->getNestedResources($relationshipName, $context);
-
-        return \count($nested) > 0;
-    }
-
-    /**
-     * returns the names of the nested resources from an relationship.
-     */
-    private function getNestedResources(string $relationshipName, array $context): array
+    private function getIncludedNestedResources(string $relationshipName, array $context): array
     {
         $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
 
-        $filtered = array_filter($context['api_included'], function (string $included) use ($normalizedName) {
+        $filtered = array_filter($context['api_included'] ?? [], static function (string $included) use ($normalizedName) {
             return 0 === strpos($included, $normalizedName.'.');
         });
 
-        return array_map(function (string $nested) {
+        return array_map(static function (string $nested) {
             return substr($nested, strpos($nested, '.') + 1);
         }, $filtered);
     }
