@@ -94,6 +94,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $allRelationshipsData = $this->getComponents($object, $format, $context)['relationships'];
         $populatedRelationContext = $context;
         $relationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $allRelationshipsData);
+
+        // Do not include primary resources
+        $context['api_included_resources'] = [$context['iri']];
+
         $includedResourcesData = $this->getRelatedResources($object, $format, $context, $allRelationshipsData);
 
         $resourceData = [
@@ -370,32 +374,78 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $included = [];
         foreach ($relationships as $relationshipDataArray) {
-            if (!\in_array($relationshipDataArray['name'], $context['api_included'], true)) {
+            $relationshipName = $relationshipDataArray['name'];
+
+            if (!$this->shouldIncludeRelation($relationshipName, $context)) {
                 continue;
             }
 
-            $relationshipName = $relationshipDataArray['name'];
             $relationContext = $context;
+            $relationContext['api_included'] = $this->getIncludedNestedResources($relationshipName, $context);
+
             $attributeValue = $this->getAttributeValue($object, $relationshipName, $format, $relationContext);
 
             if (!$attributeValue) {
                 continue;
             }
 
+            // Many to many relationship
+            $attributeValues = $attributeValue;
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
-                $included[] = $attributeValue['data'];
-
-                continue;
+                $attributeValues = [$attributeValue];
             }
-            // Many to many relationship
-            foreach ($attributeValue as $attributeValueElement) {
+
+            foreach ($attributeValues as $attributeValueElement) {
                 if (isset($attributeValueElement['data'])) {
-                    $included[] = $attributeValueElement['data'];
+                    $this->addIncluded($attributeValueElement['data'], $included, $context);
+                    if (isset($attributeValueElement['included']) && \is_array($attributeValueElement['included'])) {
+                        foreach ($attributeValueElement['included'] as $include) {
+                            $this->addIncluded($include, $included, $context);
+                        }
+                    }
                 }
             }
         }
 
         return $included;
+    }
+
+    /**
+     * Add data to included array if it's not already included.
+     */
+    private function addIncluded(array $data, array &$included, array &$context): void
+    {
+        if (isset($data['id']) && !\in_array($data['id'], $context['api_included_resources'], true)) {
+            $included[] = $data;
+            // Track already included resources
+            $context['api_included_resources'][] = $data['id'];
+        }
+    }
+
+    /**
+     * Figures out if the relationship is in the api_included hash or has included nested resources (path).
+     */
+    private function shouldIncludeRelation(string $relationshipName, array $context): bool
+    {
+        $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
+
+        return \in_array($normalizedName, $context['api_included'], true) || \count($this->getIncludedNestedResources($relationshipName, $context)) > 0;
+    }
+
+    /**
+     * Returns the names of the nested resources from a path relationship.
+     */
+    private function getIncludedNestedResources(string $relationshipName, array $context): array
+    {
+        $normalizedName = $this->nameConverter ? $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context) : $relationshipName;
+
+        $filtered = array_filter($context['api_included'] ?? [], static function (string $included) use ($normalizedName) {
+            return 0 === strpos($included, $normalizedName.'.');
+        });
+
+        return array_map(static function (string $nested) {
+            return substr($nested, strpos($nested, '.') + 1);
+        }, $filtered);
     }
 }
