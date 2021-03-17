@@ -52,6 +52,20 @@ But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](ht
 And then, add the fixed file to your commit before pushing.
 Be sure to add only **your modified files**. If any other file is fixed by cs tools, just revert it before committing.
 
+### Backward Compatibility Promise
+
+API Platform is following the [Symfony Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
+
+When you are making a change, make sure no BC break is added.
+
+### Deprecating Code
+
+Adding a deprecation is sometimes necessary in order to follow the backward compatibility promise and to improve an existing implementation.
+
+They can only be introduced in minor or major versions (`main` branch) and exceptionally in patch versions if they are critical.
+
+See also the [related documentation for Symfony](https://symfony.com/doc/current/contributing/code/conventions.html#deprecating-code).
+
 ### Sending a Pull Request
 
 When you send a PR, just make sure that:
