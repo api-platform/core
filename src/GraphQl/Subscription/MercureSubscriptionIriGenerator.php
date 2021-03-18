@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Subscription;
 
+use Symfony\Bundle\MercureBundle\Mercure;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -25,12 +26,19 @@ use Symfony\Component\Routing\RequestContext;
 final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGeneratorInterface
 {
     private $requestContext;
-    private $hub;
+    private $mercure;
 
-    public function __construct(RequestContext $requestContext, string $hub)
+    /**
+     * @param Mercure|string $mercure
+     */
+    public function __construct(RequestContext $requestContext, $mercure)
     {
+        if (is_string($mercure)) {
+            @trigger_error(sprintf('Passing a string as the seconds argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
+        }
+
         $this->requestContext = $requestContext;
-        $this->hub = $hub;
+        $this->mercure = $mercure;
     }
 
     public function generateTopicIri(string $subscriptionId): string
@@ -45,8 +53,12 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
         return "$scheme://$host/subscriptions/$subscriptionId";
     }
 
-    public function generateMercureUrl(string $subscriptionId): string
+    public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
-        return $this->hub.'?topic='.$this->generateTopicIri($subscriptionId);
+        if (is_string($this->mercure)) {
+            return $this->mercure.'?topic='.$this->generateTopicIri($subscriptionId);
+        }
+
+        return $this->mercure->getHub($hub)->getUrl().'?topic=' . $this->generateTopicIri($subscriptionId);
     }
 }

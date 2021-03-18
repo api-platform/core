@@ -18,6 +18,7 @@ use ApiPlatform\Core\Util\CorsTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Bundle\MercureBundle\Discovery;
 
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
@@ -29,12 +30,19 @@ final class AddLinkHeaderListener
     use CorsTrait;
 
     private $resourceMetadataFactory;
-    private $hub;
+    private $discovery;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, string $hub)
+    /**
+     * @param Discovery|string
+     */
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $discovery)
     {
+        if (is_string($discovery)) {
+            @trigger_error(sprintf('Passing a string as the seconds argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Discovery::class), \E_USER_DEPRECATED);
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->hub = $hub;
+        $this->discovery = $discovery;
     }
 
     /**
@@ -43,26 +51,32 @@ final class AddLinkHeaderListener
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
-        // Prevent issues with NelmioCorsBundle
         if ($this->isPreflightRequest($request)) {
             return;
         }
 
-        $link = new Link('mercure', $this->hub);
-
         if (
             null === ($resourceClass = $request->attributes->get('_api_resource_class')) ||
-            false === $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false)
+            false === ($mercure = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false))
         ) {
             return;
         }
 
-        if (null === $linkProvider = $request->attributes->get('_links')) {
-            $request->attributes->set('_links', new GenericLinkProvider([$link]));
+        if (is_string($this->discovery)) {
+            $link = new Link('mercure', $this->hub);
+            if (null === $linkProvider = $request->attributes->get('_links')) {
+                $request->attributes->set('_links', new GenericLinkProvider([$link]));
+
+                return;
+            }
+
+            $request->attributes->set('_links', $linkProvider->withLink($link));
 
             return;
         }
 
-        $request->attributes->set('_links', $linkProvider->withLink($link));
+        $hub = is_array($mercure) ? ($mercure['hub'] ?? null) : null;
+
+        $this->discovery->addLink($request, $hub);
     }
 }

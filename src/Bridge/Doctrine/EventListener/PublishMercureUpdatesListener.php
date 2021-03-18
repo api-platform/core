@@ -26,6 +26,7 @@ use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
+use Symfony\Bundle\MercureBundle\Mercure;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\Update;
@@ -51,11 +52,12 @@ final class PublishMercureUpdatesListener
         'type' => true,
         'retry' => true,
         'normalization_context' => true,
+        'hub' => true,
     ];
 
     private $iriConverter;
     private $serializer;
-    private $publisher;
+    private $mercure;
     private $expressionLanguage;
     private $createdObjects;
     private $updatedObjects;
@@ -66,11 +68,16 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param array<string, string[]|string> $formats
+     * @param Mercure|callable $publisher
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $mercure = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
-        if (null === $messageBus && null === $publisher) {
-            throw new InvalidArgumentException('A message bus or a publisher must be provided.');
+        if (null === $messageBus && null === $mercure) {
+            throw new InvalidArgumentException('A message bus or a mercure instance must be provided.');
+        }
+
+        if ($mercure && !$mercure instanceof Mercure) {
+            @trigger_error(sprintf('Passing a callable as the seventh argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
         }
 
         $this->resourceClassResolver = $resourceClassResolver;
@@ -79,7 +86,7 @@ final class PublishMercureUpdatesListener
         $this->serializer = $serializer;
         $this->formats = $formats;
         $this->messageBus = $messageBus;
-        $this->publisher = $publisher;
+        $this->mercure = $mercure;
         $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
         $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
@@ -188,6 +195,10 @@ final class PublishMercureUpdatesListener
             if (!isset(self::ALLOWED_KEYS[$key])) {
                 throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
             }
+
+            if ('hub' === $key && !$this->mercure instanceof Mercure) {
+                throw new InvalidArgumentException(sprintf('The option "hub" set in the "mercure" attribute of the "%s" resource is not supported. Please install mercure-bundle:^0.3 to enable it.', $resourceClass));
+            }
         }
 
         if ('deletedObjects' === $property) {
@@ -225,7 +236,11 @@ final class PublishMercureUpdatesListener
         $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
 
         foreach ($updates as $update) {
-            $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
+            if ($this->mercure instanceof Mercure) {
+                $this->mercure->getPublisher($options['hub'] ?? null)->publish($update);
+            } else {
+                $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
+            }
         }
     }
 
