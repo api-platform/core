@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints\Isbn;
 use Symfony\Component\Validator\Constraints\Issn;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Time;
 use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\Uuid;
@@ -170,11 +171,15 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
 
             foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $propertyConstraint) {
-                $constraints[] = $propertyConstraint;
+                if ($propertyConstraint instanceof Sequentially) {
+                    $constraints[] = $propertyConstraint->getNestedContraints();
+                } else {
+                    $constraints[] = [$propertyConstraint];
+                }
             }
         }
 
-        return $constraints;
+        return array_merge([], ...$constraints);
     }
 
     /**
