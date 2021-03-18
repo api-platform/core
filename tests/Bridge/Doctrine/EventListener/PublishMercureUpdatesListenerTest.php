@@ -305,7 +305,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
     public function testNoPublisher(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A message bus or a publisher must be provided.');
+        $this->expectExceptionMessage('A message bus or a mercure instance must be provided.');
 
         new PublishMercureUpdatesListener(
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),

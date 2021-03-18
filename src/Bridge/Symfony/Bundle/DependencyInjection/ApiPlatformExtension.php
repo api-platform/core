@@ -648,26 +648,26 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('mercure.xml');
-        if (!$container->hasDefinition(Discovery::class)) {
+        if (!class_exists(Discovery::class)) {
             $container->getDefinition('api_platform.mercure.listener.response.add_link_header')->setArgument(1, $config['mercure']['hub_url'] ?? '%mercure.default_hub%');
         }
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
-            if ($container->hasDefinition(Mercure::class)) {
-                $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument(6, new Reference(Mercure::class));
+            if (class_exists(Mercure::class)) {
+                $container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->setArgument(6, new Reference(Mercure::class));
             }
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             $loader->load('doctrine_mongodb_odm_mercure_publisher.xml');
-            if ($container->hasDefinition(Mercure::class)) {
+            if (class_exists(Mercure::class)) {
                 $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument(6, new Reference(Mercure::class));
             }
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql_mercure.xml');
-            if ($container->hasDefinition(Mercure::class)) {
+            if (class_exists(Mercure::class)) {
                 $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument(new Reference(Mercure::class));
             } else {
                 $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');

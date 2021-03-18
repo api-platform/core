@@ -33,7 +33,7 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
      */
     public function __construct(RequestContext $requestContext, $mercure)
     {
-        if (is_string($mercure)) {
+        if (\is_string($mercure)) {
             @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
         }
 
@@ -55,10 +55,10 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
 
     public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
-        if (is_string($this->mercure)) {
+        if (\is_string($this->mercure)) {
             return $this->mercure.'?topic='.$this->generateTopicIri($subscriptionId);
         }
 
-        return $this->mercure->getHub($hub)->getUrl().'?topic=' . $this->generateTopicIri($subscriptionId);
+        return $this->mercure->getHub($hub)->getUrl().'?topic='.$this->generateTopicIri($subscriptionId);
     }
 }

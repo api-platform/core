@@ -82,7 +82,7 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
                     throw new \LogicException('Cannot use Mercure for subscriptions when MercureBundle is not installed. Try running "composer require mercure".');
                 }
 
-                $hub = is_array($mercure) ? ($mercure['hub'] ?? null) : null;
+                $hub = \is_array($mercure) ? ($mercure['hub'] ?? null) : null;
                 $result['mercureUrl'] = $this->mercureSubscriptionIriGenerator->generateMercureUrl($subscriptionId, $hub);
             }
 

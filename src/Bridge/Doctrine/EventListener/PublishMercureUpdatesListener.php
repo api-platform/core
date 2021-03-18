@@ -68,7 +68,7 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param array<string, string[]|string> $formats
-     * @param Mercure|callable $mercure
+     * @param Mercure|callable               $mercure
      */
     public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $mercure = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
@@ -239,7 +239,7 @@ final class PublishMercureUpdatesListener
             if ($this->mercure instanceof Mercure) {
                 $this->mercure->getPublisher($options['hub'] ?? null)->publish($update);
             } else {
-                $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
+                $this->messageBus ? $this->dispatch($update) : ($this->mercure)($update);
             }
         }
     }
