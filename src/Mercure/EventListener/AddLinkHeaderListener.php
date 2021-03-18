@@ -38,7 +38,7 @@ final class AddLinkHeaderListener
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $discovery)
     {
         if (is_string($discovery)) {
-            @trigger_error(sprintf('Passing a string as the seconds argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Discovery::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Discovery::class), \E_USER_DEPRECATED);
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;

@@ -34,7 +34,7 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
     public function __construct(RequestContext $requestContext, $mercure)
     {
         if (is_string($mercure)) {
-            @trigger_error(sprintf('Passing a string as the seconds argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
         }
 
         $this->requestContext = $requestContext;
