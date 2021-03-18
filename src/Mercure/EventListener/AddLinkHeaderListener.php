@@ -63,7 +63,7 @@ final class AddLinkHeaderListener
         }
 
         if (is_string($this->discovery)) {
-            $link = new Link('mercure', $this->hub);
+            $link = new Link('mercure', $this->discovery);
             if (null === $linkProvider = $request->attributes->get('_links')) {
                 $request->attributes->set('_links', new GenericLinkProvider([$link]));
 
