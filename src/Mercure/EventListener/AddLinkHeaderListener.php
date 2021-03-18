@@ -33,7 +33,7 @@ final class AddLinkHeaderListener
     private $discovery;
 
     /**
-     * @param Discovery|string
+     * @param Discovery|string $discovery
      */
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $discovery)
     {
