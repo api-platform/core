@@ -12,6 +12,7 @@
 * DataProvider: Add `TraversablePaginator` (#3783)
 * JSON:API: Support inclusion of resources from path (#3288)
 * Swagger UI: Add `swagger_ui_extra_configuration` to Swagger / OpenAPI configuration (#3731)
+* Mercure: Add `owners_topic` to Mercure (#4150)
 
 ## 2.6.3
 

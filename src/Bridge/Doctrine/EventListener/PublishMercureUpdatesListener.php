@@ -45,6 +45,7 @@ final class PublishMercureUpdatesListener
     use ResourceClassInfoTrait;
     private const ALLOWED_KEYS = [
         'topics' => true,
+        'owners_topic' => true,
         'data' => true,
         'private' => true,
         'id' => true,
@@ -222,7 +223,35 @@ final class PublishMercureUpdatesListener
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
         }
 
-        $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
+        if ($options['owners_topic'] ?? false) {
+            if (null === $this->expressionLanguage) {
+                throw new RuntimeException('The Expression Language component is not installed. Try running "composer require symfony/expression-language".');
+            }
+
+            $topics = (array) $iri;
+
+            $owners = $this->expressionLanguage->evaluate($options['owners_topic'], ['object' => $object]);
+            $owners = empty($owners) || \is_array($owners) ? $owners : [$owners];
+
+            if (!empty($owners)) {
+                foreach ($owners as $owner) {
+                    $query_topics = '?';
+
+                    foreach ((array) $iri as $topic) {
+                        $query_topics .= \strlen($query_topics) > 1 ? '&' : '';
+                        $query_topics .= sprintf('topic=%s', urlencode($topic));
+                    }
+
+                    $topics[] = sprintf(
+                        '%s/%s',
+                        $this->iriConverter->getIriFromItem($owner, UrlGeneratorInterface::ABS_URL),
+                        $query_topics
+                    );
+                }
+            }
+        }
+
+        $updates = array_merge([$this->buildUpdate($topics ?? $iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
 
         foreach ($updates as $update) {
             $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
