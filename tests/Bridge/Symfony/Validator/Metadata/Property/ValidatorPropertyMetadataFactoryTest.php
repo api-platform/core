@@ -15,10 +15,12 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Tests\Fixtures\DummyAtLeastOneOfValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
@@ -26,6 +28,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
@@ -367,5 +370,40 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertArrayHasKey('minLength', $schema);
         $this->assertArrayHasKey('maxLength', $schema);
         $this->assertArrayHasKey('pattern', $schema);
+    }
+
+    public function testCreateWithAtLeastOneOfConstraint(): void
+    {
+        if (!class_exists(AtLeastOneOf::class)) {
+            $this->markTestSkipped();
+        }
+
+        $validatorClassMetadata = new ClassMetadata(DummyAtLeastOneOfValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyAtLeastOneOfValidatedEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyAtLeastOneOfValidatedEntity::class, 'dummy', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING))
+        )->shouldBeCalled();
+        $restrictionsMetadata = [new PropertySchemaLengthRestriction(), new PropertySchemaRegexRestriction()];
+        $restrictionsMetadata = [new PropertySchemaOneOfRestriction($restrictionsMetadata), new PropertySchemaLengthRestriction(), new PropertySchemaRegexRestriction()];
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            $restrictionsMetadata
+        );
+        $schema = $validationPropertyMetadataFactory->create(DummyAtLeastOneOfValidatedEntity::class, 'dummy')->getSchema();
+
+        $this->assertNotNull($schema);
+        $this->assertArrayHasKey('oneOf', $schema);
+        $this->assertSame([
+            ['pattern' => '.*#.*'],
+            ['minLength' => 10],
+        ], $schema['oneOf']);
     }
 }
