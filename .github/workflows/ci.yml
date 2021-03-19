@@ -446,16 +446,20 @@ jobs:
         php:
           - '7.4'
       fail-fast: false
+    services:
+      mysql:
+        image: mariadb:10.5.9
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: api_platform_test
+        ports:
+          - 3306:3306
     env:
       APP_ENV: mysql
       DATABASE_URL: mysql://root:root@127.0.0.1/api_platform_test
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup mysql
-        run: |
-          sudo systemctl start mysql.service
-          sudo mysql -u root -proot -e "CREATE DATABASE api_platform_test"
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
