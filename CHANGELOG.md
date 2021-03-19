@@ -3,6 +3,7 @@
 ## 2.6.4
 
 * Serializer: Fix denormalization of basic property-types in XML and CSV (#3191)
+* JSON Schema: Manage Sequentially and AtLeastOneOf constraints when generating property metadata (#4139 and #4147)
 * Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
 * Doctrine: Revert #3774 support for binary UUID in search filter (#4134)
 * GraphQL: Partial pagination support (#3223)
