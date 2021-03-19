@@ -162,7 +162,7 @@ class AddHeadersListenerTest extends TestCase
         $listener->onKernelResponse($event);
 
         $this->assertSame('max-age=123, public, s-maxage=456, stale-if-error=70, stale-while-revalidate=928', $response->headers->get('Cache-Control'));
-        $this->assertSame(['Vary-1', 'Vary-2'], $response->getVary());
+        $this->assertSame(['Accept', 'Cookie', 'Vary-1', 'Vary-2'], $response->getVary());
     }
 
     public function testSetHeadersFromResourceMetadataMarkedAsPrivate()
