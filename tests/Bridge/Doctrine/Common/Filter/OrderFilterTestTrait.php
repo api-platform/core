@@ -249,6 +249,26 @@ trait OrderFilterTestTrait
                     'order' => ['relatedDummy.name' => 'ASC'],
                 ],
             ],
+            'embeddable' => [
+                [
+                    'embeddedDummy.dummyName' => 'ASC',
+                ],
+                [
+                    'order' => ['embeddedDummy.dummyName' => 'ASC'],
+                ],
+            ],
+            'embeddable_nulls_comparison' => [
+                [
+                    'embeddedDummy.dummyName' => [
+                        'nulls_comparison' => 'nulls_largest',
+                    ],
+                ],
+                [
+                    'order' => [
+                        'embeddedDummy.dummyName' => 'asc',
+                    ],
+                ],
+            ],
         ];
     }
 }

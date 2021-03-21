@@ -105,7 +105,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         if (null !== $nullsComparison = $this->properties[$property]['nulls_comparison'] ?? null) {
             $nullsDirection = self::NULLS_DIRECTION_MAP[$nullsComparison][$direction];
 
-            $nullRankHiddenField = sprintf('_%s_%s_null_rank', $alias, $field);
+            $nullRankHiddenField = sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
 
             $queryBuilder->addSelect(sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
             $queryBuilder->addOrderBy($nullRankHiddenField, $nullsDirection);
