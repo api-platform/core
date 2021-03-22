@@ -30,7 +30,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Core\OpenApi\Model;
-use ApiPlatform\Core\OpenApi\Model\PathItem;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
@@ -78,7 +77,25 @@ class OpenApiFactoryTest extends TestCase
                 'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => [
                     'description' => 'Custom description',
                     'parameters' => [
-                        ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'type' => 'string', 'required' => true, 'default' => 'BOTH'],
+                        ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'required' => true],
+                        ['description' => 'Replace parameter', 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => ['type' => 'string', 'format' => 'uuid']],
+                    ],
+                    'tags' => ['Dummy', 'Profile'],
+                    'responses' => [
+                        '202' => [
+                            'description' => 'Success',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                ],
+                            ],
+                            'headers' => [
+                                'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                            ],
+                            'links' => [
+                                'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                            ],
+                        ],
                     ],
                     'requestBody' => [
                         'required' => true,
@@ -101,7 +118,11 @@ class OpenApiFactoryTest extends TestCase
                 'formats' => ['method' => 'PUT', 'path' => '/formatted/{id}', 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]],
             ],
             [
-                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'get' => ['method' => 'GET', 'openapi_context' => [
+                    'parameters' => [
+                        ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
+                    ],
+                ]] + self::OPERATION_FORMATS,
                 'post' => ['method' => 'POST'] + self::OPERATION_FORMATS,
                 'filtered' => ['method' => 'GET', 'filters' => ['f1', 'f2', 'f3', 'f4', 'f5'], 'path' => '/filtered'] + self::OPERATION_FORMATS,
                 'paginated' => ['method' => 'GET', 'pagination_client_enabled' => true, 'pagination_client_items_per_page' => true, 'pagination_items_per_page' => 20, 'pagination_maximum_items_per_page' => 80, 'path' => '/paginated'] + self::OPERATION_FORMATS,
@@ -137,7 +158,7 @@ class OpenApiFactoryTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'openapi' => ['example' => 'bar', 'deprecated' => true, 'allowEmptyValue' => true, 'allowReserved' => true],
+                'openapi' => ['example' => 'bar', 'deprecated' => true, 'allowEmptyValue' => true, 'allowReserved' => true, 'explode' => true],
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -290,7 +311,7 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Model\Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
@@ -315,7 +336,7 @@ class OpenApiFactoryTest extends TestCase
                         'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -367,7 +388,7 @@ class OpenApiFactoryTest extends TestCase
                         'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -402,14 +423,23 @@ class OpenApiFactoryTest extends TestCase
         $customPath = $paths->getPath('/foo/{id}');
         $this->assertEquals($customPath->getHead(), new Model\Operation(
             'customDummyItem',
-            ['Dummy'],
+            ['Dummy', 'Profile'],
             [
+                '202' => new Model\Response('Success', new \ArrayObject([
+                    'application/json' => [
+                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                    ],
+                ]), new \ArrayObject([
+                    'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                ]), new \ArrayObject([
+                    'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                ])),
                 '404' => new Model\Response('Resource not found'),
             ],
             'Dummy',
             'Custom description',
             null,
-            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Resource identifier', true, false, false, ['type' => 'string'])],
+            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Replace parameter', true, false, false, ['type' => 'string', 'format' => 'uuid'])],
             new Model\RequestBody('Custom request body', new \ArrayObject([
                 'multipart/form-data' => [
                     'schema' => [
@@ -437,7 +467,7 @@ class OpenApiFactoryTest extends TestCase
                         'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
                     ]),
                     null,
-                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), [], 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
+                    new \ArrayObject(['GetDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'The `id` value returned in the response can be used as the `id` parameter in `GET /dummies/{id}`.')])
                 ),
                 '400' => new Model\Response('Invalid input'),
                 '422' => new Model\Response('Unprocessable entity'),
@@ -487,7 +517,7 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 new Model\Parameter('name', 'query', '', true, true, true, [
                     'type' => 'string',
-                ], 'form', false, true, 'bar'),
+                ], 'form', true, true, 'bar'),
                 new Model\Parameter('ha', 'query', '', false, false, true, [
                     'type' => 'integer',
                 ]),
@@ -749,17 +779,21 @@ class OpenApiFactoryTest extends TestCase
 
     public function testResetPathItem()
     {
-        $pathItem = new PathItem();
-        $pathItem->withGet(null);
-        $pathItem->withDelete(null);
-        $pathItem->withPost(null);
-        $pathItem->withPut(null);
-        $pathItem->withPatch(null);
+        $pathItem = new Model\PathItem(
+            null,
+            '',
+            '',
+            new Model\Operation(),
+            new Model\Operation(),
+            new Model\Operation(),
+            new Model\Operation(),
+            new Model\Operation()
+        );
 
-        $this->assertNull($pathItem->getGet());
-        $this->assertNull($pathItem->getDelete());
-        $this->assertNull($pathItem->getPost());
-        $this->assertNull($pathItem->getPut());
-        $this->assertNull($pathItem->getPatch());
+        $this->assertNull($pathItem->withGet(null)->getGet());
+        $this->assertNull($pathItem->withDelete(null)->getDelete());
+        $this->assertNull($pathItem->withPost(null)->getPost());
+        $this->assertNull($pathItem->withPut(null)->getPut());
+        $this->assertNull($pathItem->withPatch(null)->getPatch());
     }
 }

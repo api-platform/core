@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\OrderFilterTestTrait;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -524,6 +525,28 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                     ],
                     $orderFilterFactory,
+                ],
+                'embedded' => [
+                    [
+                        [
+                            '$sort' => [
+                                'embeddedDummy.dummyName' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                    EmbeddedDummy::class,
+                ],
+                'embedded with nulls_comparison' => [
+                    [
+                        [
+                            '$sort' => [
+                                'embeddedDummy.dummyName' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                    EmbeddedDummy::class,
                 ],
             ]
         );

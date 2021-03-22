@@ -29,6 +29,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -78,11 +79,22 @@ class PurgeHttpCacheListenerTest extends TestCase
 
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
         $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
-        $emProphecy->getClassMetadata(Dummy::class)->willReturn(new ClassMetadata(Dummy::class))->shouldBeCalled();
+        $dummyClassMetadata = new ClassMetadata(Dummy::class);
+        $dummyClassMetadata->associationMappings = [
+            'relatedDummy' => [],
+            'relatedOwningDummy' => [],
+        ];
+        $emProphecy->getClassMetadata(Dummy::class)->willReturn($dummyClassMetadata)->shouldBeCalled();
         $emProphecy->getClassMetadata(DummyNoGetOperation::class)->willReturn(new ClassMetadata(DummyNoGetOperation::class))->shouldBeCalled();
         $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedDummy')->willReturn(true);
+        $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedOwningDummy')->willReturn(false);
+        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummy')->shouldBeCalled();
+        $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedOwningDummy')->shouldNotBeCalled();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }

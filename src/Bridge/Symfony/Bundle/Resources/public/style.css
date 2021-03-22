@@ -308,7 +308,7 @@ header #logo img {
   outline: none;
 }
 
-/** REMOVE TITILIUM FONT **/
+/** USE OPEN SANS FONT **/
 
 .swagger-ui .opblock-tag,
 .swagger-ui .opblock .opblock-section-header label,

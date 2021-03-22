@@ -80,7 +80,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         $version = $schema->getVersion();
-        $definitionName = $this->buildDefinitionName($className, $format, $type, $operationType, $operationName, $serializerContext);
+        $definitionName = $this->buildDefinitionName($className, $format, $inputOrOutputClass, $resourceMetadata, $serializerContext);
 
         if (null === $operationType || null === $operationName) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
@@ -239,10 +239,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = $propertySchema;
     }
 
-    private function buildDefinitionName(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?array $serializerContext = null): string
+    private function buildDefinitionName(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?ResourceMetadata $resourceMetadata = null, ?array $serializerContext = null): string
     {
-        [$resourceMetadata, $serializerContext,, $inputOrOutputClass] = $this->getMetadata($className, $type, $operationType, $operationName, $serializerContext);
-
         $prefix = $resourceMetadata ? $resourceMetadata->getShortName() : (new \ReflectionClass($className))->getShortName();
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
             $parts = explode('\\', $inputOrOutputClass);

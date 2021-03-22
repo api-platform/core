@@ -13,6 +13,18 @@
 * JSON:API: Support inclusion of resources from path (#3288)
 * Swagger UI: Add `swagger_ui_extra_configuration` to Swagger / OpenAPI configuration (#3731)
 
+## 2.6.4
+
+* Serializer: Fix denormalization of basic property-types in XML and CSV (#3191)
+* Serializer: Fix denormalization of collection with one element in XML (#4154)
+* JSON Schema: Manage Sequentially and AtLeastOneOf constraints when generating property metadata (#4139 and #4147)
+* Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
+* Doctrine: Revert #3774 support for binary UUID in search filter (#4134)
+* Doctrine: Fix order filter when using embedded and nulls comparison (#4151)
+* GraphQL: Partial pagination support (#3223)
+* GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
+* Swagger UI: Remove Google fonts (#4112)
+
 ## 2.6.3
 
 * Identifiers: Re-allow `POST` operations even if no identifier is defined (#4052)
@@ -20,16 +32,17 @@
 * Security: Use a `NullToken` when using the new authenticator manager in the resource access checker (#4067)
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers (#4042)
-* Doctrine: Support for binary UUID in search filter (#3774)
 * Doctrine: Do not add join or lookup for search filter with empty value (#3703)
-* Doctrine: Reduce code duplication in search filter (#3541)
 * JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`) (#4064)
 * OpenAPI: Fix missing 422 responses in the documentation (#4086)
 * OpenAPI: Fix error when schema is empty (#4051)
 * OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
+* OpenAPI: Fix `response` support via the `openapi_context` (#4116)
+* OpenAPI: Fix `Link->requestBody` default value (#4116)
 * GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
 * Metadata: Check the output class when calculating serializer groups (#3696)
+* OpenAPI: Using an implicit flow is now valid, changes oauth configuration default values (#4115)
 
 ## 2.6.2
 
@@ -87,7 +100,7 @@
 * OpenAPI: **BC** Replace all characters other than `[a-zA-Z0-9\.\-_]` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
 * OpenAPI: Refactor OpenAPI v3 support, OpenAPI v2 (aka Swagger) is deprecated (#3407)
 * Order: Support default order for a specific custom operation (#3784)
-* PATCH: Support patching deep objects (#3847)
+* PATCH: **BC** Support patching deep objects, previously new objects were created instead of updating current objects (#3847)
 * Router: UrlGenerator strategy configuration via `url_generation_strategy` (#3198)
 * Routing: Add stateless `ApiResource` attribute (#3436)
 * Security: Add support for access control rule on attributes (#3503)
@@ -126,10 +139,12 @@
 * Identifiers: Do not denormalize the same identifier twice (#3762)
 * OpenAPI: Lazy load `SwaggerCommand` (#3802)
 * OpenAPI: Use Output class name instead of the Resource short name when available (#3741)
+* OpenAPI: Allow unset PathItem method (#4107)
 * Router: Replace baseurl only once (#3776)
 * Mercure: Publisher bug fixes (#3790, #3739)
 * Serializer: Catch NotNormalizableValueException to UnexpectedValueEception with inputs (#3697)
-* Doctrine: ODM escape search terms in RegexFilter
+* Doctrine: Do not add JOINs for filters without a value (#3703)
+* MongoDB: Escape search terms in `RegexFilter` (#3755)
 * Tests: Improve JSON Schema assertions (#3807, #3803, #3804, #3806, #3817, #3829, #3830)
 * Tests: Allow passing extra options in ApiTestClient (#3486)
 * Docs: Upgrade Swagger UI to version 3.37.2 (#3867)

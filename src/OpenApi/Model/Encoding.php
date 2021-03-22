@@ -52,7 +52,17 @@ final class Encoding
         return $this->explode;
     }
 
+    public function getExplode(): bool
+    {
+        return $this->explode;
+    }
+
     public function canAllowReserved(): bool
+    {
+        return $this->allowReserved;
+    }
+
+    public function getAllowReserved(): bool
     {
         return $this->allowReserved;
     }
