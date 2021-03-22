@@ -68,6 +68,7 @@
             <argument>%api_platform.collection.order_parameter_name%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument key="$orderNullsComparison">%api_platform.collection.order_nulls_comparison%</argument>
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter" alias="api_platform.doctrine.orm.order_filter" />
 

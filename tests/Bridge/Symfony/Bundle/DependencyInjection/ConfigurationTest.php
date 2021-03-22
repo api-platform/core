@@ -162,6 +162,7 @@ class ConfigurationTest extends TestCase
                 'exists_parameter_name' => 'exists',
                 'order' => 'ASC',
                 'order_parameter_name' => 'order',
+                'order_nulls_comparison' => null,
                 'pagination' => [
                     'enabled' => true,
                     'partial' => false,
