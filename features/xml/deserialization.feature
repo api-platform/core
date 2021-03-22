@@ -74,3 +74,19 @@ Feature: XML Deserialization
     | NaN   |
     | INF   |
     | -INF  |
+
+  Scenario: Posting an XML resource with a collection with only one element
+    When I send a "POST" request to "/dummy_properties" with body:
+    """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <DummyProperty>
+      <groups>
+        <DummyGroup>
+          <foo>bar</foo>
+        </DummyGroup>
+      </groups>
+    </DummyProperty>
+    """
+    Then the response status code should be 201
+    And the response should be in XML
+    And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
