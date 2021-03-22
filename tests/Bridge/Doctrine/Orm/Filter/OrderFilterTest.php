@@ -20,7 +20,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
-use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -388,13 +387,13 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     null,
                     $orderFilterFactory,
                 ],
-                'embeddable' => [
+                'embedded' => [
                     sprintf('SELECT o FROM %s o ORDER BY o.embeddedDummy.dummyName ASC', EmbeddedDummy::class),
                     null,
                     $orderFilterFactory,
                     EmbeddedDummy::class,
                 ],
-                'embeddable_nulls_comparison' => [
+                'embedded with nulls_comparison' => [
                     sprintf('SELECT o, CASE WHEN o.embeddedDummy.dummyName IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_embeddedDummy_dummyName_null_rank FROM %s o ORDER BY _o_embeddedDummy_dummyName_null_rank DESC, o.embeddedDummy.dummyName ASC', EmbeddedDummy::class),
                     null,
                     $orderFilterFactory,

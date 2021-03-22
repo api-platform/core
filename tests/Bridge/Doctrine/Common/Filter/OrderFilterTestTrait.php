@@ -249,7 +249,7 @@ trait OrderFilterTestTrait
                     'order' => ['relatedDummy.name' => 'ASC'],
                 ],
             ],
-            'embeddable' => [
+            'embedded' => [
                 [
                     'embeddedDummy.dummyName' => 'ASC',
                 ],
@@ -257,7 +257,7 @@ trait OrderFilterTestTrait
                     'order' => ['embeddedDummy.dummyName' => 'ASC'],
                 ],
             ],
-            'embeddable_nulls_comparison' => [
+            'embedded with nulls_comparison' => [
                 [
                     'embeddedDummy.dummyName' => [
                         'nulls_comparison' => 'nulls_largest',
@@ -265,7 +265,7 @@ trait OrderFilterTestTrait
                 ],
                 [
                     'order' => [
-                        'embeddedDummy.dummyName' => 'asc',
+                        'embeddedDummy.dummyName' => 'ASC',
                     ],
                 ],
             ],
