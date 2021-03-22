@@ -6,6 +6,7 @@
 * JSON Schema: Manage Sequentially and AtLeastOneOf constraints when generating property metadata (#4139 and #4147)
 * Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
 * Doctrine: Revert #3774 support for binary UUID in search filter (#4134)
+* Doctrine: Fix order filter when using embedded and nulls comparison (#4151)
 * GraphQL: Partial pagination support (#3223)
 * GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
 * Swagger UI: Remove Google fonts (#4112)
