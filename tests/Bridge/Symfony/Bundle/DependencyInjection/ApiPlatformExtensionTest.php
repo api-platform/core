@@ -807,6 +807,58 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testItLoadsMetadataConfigFileInAlphabeticalOrder()
+    {
+        $yamlExtractorDefinition = $this->prophesize(Definition::class);
+        $yamlExtractorDefinition->replaceArgument(0, Argument::that(static function ($paths): bool {
+            self::assertIsArray($paths);
+            self::assertContainsOnly('string', $paths);
+
+            $normalizePaths = static function (array $paths): array {
+                return array_map(
+                    static function (string $path): string {
+                        return str_replace(\DIRECTORY_SEPARATOR, '/', $path);
+                    },
+                    $paths
+                );
+            };
+
+            $testsDirectory = \dirname(__DIR__, 4);
+
+            self::assertSame(
+                $normalizePaths([
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/B.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/Bb.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a/a.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/b/a.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c/a.yaml",
+                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
+                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
+                ]),
+                $normalizePaths($paths)
+            );
+
+            return true;
+        }))->shouldBeCalled();
+
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecyWithoutDefaultMetadataLoading();
+        $containerBuilderProphecy
+            ->getDefinition('api_platform.metadata.extractor.xml')
+            ->willReturn($this->prophesize(Definition::class))
+            ->shouldBeCalled();
+        $containerBuilderProphecy
+            ->getDefinition('api_platform.metadata.extractor.yaml')
+            ->willReturn($yamlExtractorDefinition)
+            ->shouldBeCalled();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['mapping']['paths'] = [__DIR__.'/Fixtures/resources'];
+
+        $this->extension->load($config, $containerBuilderProphecy->reveal());
+    }
+
     private function getPartialContainerBuilderProphecy($configuration = null)
     {
         $parameterBag = new EnvPlaceholderParameterBag();
@@ -1043,7 +1095,22 @@ class ApiPlatformExtensionTest extends TestCase
         return $containerBuilderProphecy;
     }
 
-    private function getBaseContainerBuilderProphecy(array $doctrineIntegrationsToLoad = ['orm'], $configuration = null)
+    private function getBaseContainerBuilderProphecy(
+        array $doctrineIntegrationsToLoad = ['orm'],
+        $configuration = null
+    ) {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecyWithoutDefaultMetadataLoading($doctrineIntegrationsToLoad, $configuration);
+
+        foreach (['yaml', 'xml'] as $format) {
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->replaceArgument(0, Argument::type('array'))->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+        }
+
+        return $containerBuilderProphecy;
+    }
+
+    private function getBaseContainerBuilderProphecyWithoutDefaultMetadataLoading(array $doctrineIntegrationsToLoad = ['orm'], $configuration = null)
     {
         $hasSwagger = null === $configuration || true === $configuration['api_platform']['enable_swagger'] ?? false;
         $hasHydra = null === $configuration || isset($configuration['api_platform']['formats']['jsonld']);
@@ -1145,9 +1212,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.oauth.clientSecret' => '',
             'api_platform.oauth.type' => 'oauth2',
             'api_platform.oauth.flow' => 'application',
-            'api_platform.oauth.tokenUrl' => '/oauth/v2/token',
-            'api_platform.oauth.authorizationUrl' => '/oauth/v2/auth',
-            'api_platform.oauth.refreshUrl' => '/oauth/v2/refresh',
+            'api_platform.oauth.tokenUrl' => '',
+            'api_platform.oauth.authorizationUrl' => '',
+            'api_platform.oauth.refreshUrl' => '',
             'api_platform.oauth.scopes' => [],
             'api_platform.enable_swagger_ui' => true,
             'api_platform.enable_re_doc' => true,
@@ -1180,12 +1247,6 @@ class ApiPlatformExtensionTest extends TestCase
 
         foreach ($parameters as $key => $value) {
             $containerBuilderProphecy->setParameter($key, $value)->shouldBeCalled();
-        }
-
-        foreach (['yaml', 'xml'] as $format) {
-            $definitionProphecy = $this->prophesize(Definition::class);
-            $definitionProphecy->replaceArgument(0, Argument::type('array'))->shouldBeCalled();
-            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
 
         $definitions = [
@@ -1274,6 +1335,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.validator',
             'api_platform.metadata.property_schema.length_restriction',
+            'api_platform.metadata.property_schema.one_of_restriction',
             'api_platform.metadata.property_schema.regex_restriction',
             'api_platform.metadata.property_schema.format_restriction',
             'api_platform.metadata.property.metadata_factory.yaml',

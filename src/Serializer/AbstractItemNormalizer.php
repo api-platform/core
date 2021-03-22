@@ -31,6 +31,8 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -725,9 +727,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $value;
         }
 
+        $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
+
+        /* From @see AbstractObjectNormalizer::validateAndDenormalize() */
+        // Fix a collection that contains the only one element
+        // This is special to xml format only
+        if ('xml' === $format && null !== $collectionValueType && (!\is_array($value) || !\is_int(key($value)))) {
+            $value = [$value];
+        }
+
         if (
             $type->isCollection() &&
-            null !== ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
+            null !== $collectionValueType &&
             null !== ($className = $collectionValueType->getClassName()) &&
             $this->resourceClassResolver->isResourceClass($className)
         ) {
@@ -750,7 +761,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (
             $type->isCollection() &&
-            null !== ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) &&
+            null !== $collectionValueType &&
             null !== ($className = $collectionValueType->getClassName())
         ) {
             if (!$this->serializer instanceof DenormalizerInterface) {
@@ -770,6 +781,51 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             unset($context['resource_class']);
 
             return $this->serializer->denormalize($value, $className, $format, $context);
+        }
+
+        /* From @see AbstractObjectNormalizer::validateAndDenormalize() */
+        // In XML and CSV all basic datatypes are represented as strings, it is e.g. not possible to determine,
+        // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
+        // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
+        if (\is_string($value) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
+            if ('' === $value && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
+                return null;
+            }
+
+            switch ($type->getBuiltinType()) {
+                case Type::BUILTIN_TYPE_BOOL:
+                    // according to https://www.w3.org/TR/xmlschema-2/#boolean, valid representations are "false", "true", "0" and "1"
+                    if ('false' === $value || '0' === $value) {
+                        $value = false;
+                    } elseif ('true' === $value || '1' === $value) {
+                        $value = true;
+                    } else {
+                        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $className, $value));
+                    }
+                    break;
+                case Type::BUILTIN_TYPE_INT:
+                    if (ctype_digit($value) || ('-' === $value[0] && ctype_digit(substr($value, 1)))) {
+                        $value = (int) $value;
+                    } else {
+                        throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $className, $value));
+                    }
+                    break;
+                case Type::BUILTIN_TYPE_FLOAT:
+                    if (is_numeric($value)) {
+                        return (float) $value;
+                    }
+
+                    switch ($value) {
+                        case 'NaN':
+                            return \NAN;
+                        case 'INF':
+                            return \INF;
+                        case '-INF':
+                            return -\INF;
+                        default:
+                            throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $className, $value));
+                    }
+            }
         }
 
         if ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false) {

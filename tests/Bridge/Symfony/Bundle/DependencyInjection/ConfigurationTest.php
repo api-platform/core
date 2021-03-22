@@ -142,9 +142,9 @@ class ConfigurationTest extends TestCase
                 'clientSecret' => '',
                 'type' => 'oauth2',
                 'flow' => 'application',
-                'tokenUrl' => '/oauth/v2/token',
-                'authorizationUrl' => '/oauth/v2/auth',
-                'refreshUrl' => '/oauth/v2/refresh',
+                'tokenUrl' => '',
+                'authorizationUrl' => '',
+                'refreshUrl' => '',
                 'scopes' => [],
             ],
             'swagger' => [

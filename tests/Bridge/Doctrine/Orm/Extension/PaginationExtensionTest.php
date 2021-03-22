@@ -1043,7 +1043,10 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    public function testGetResultWithFetchJoinCollectionDisabled()
+    /**
+     * @dataProvider fetchJoinCollectionProvider
+     */
+    public function testGetResultWithFetchJoinCollection(array $attributes, array $context, bool $expected)
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);
 
@@ -1064,7 +1067,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_fetch_join_collection' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, $attributes));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1072,7 +1075,7 @@ class PaginationExtensionTest extends TestCase
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
 
-        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, 'get');
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, 'get', $context);
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
@@ -1081,7 +1084,17 @@ class PaginationExtensionTest extends TestCase
         $doctrinePaginatorReflectionProperty->setAccessible(true);
 
         $doctrinePaginator = $doctrinePaginatorReflectionProperty->getValue($result);
-        $this->assertFalse($doctrinePaginator->getFetchJoinCollection());
+        $this->assertSame($expected, $doctrinePaginator->getFetchJoinCollection());
+    }
+
+    public function fetchJoinCollectionProvider(): array
+    {
+        return [
+            'collection disabled' => [['pagination_fetch_join_collection' => false], ['collection_operation_name' => 'get'], false],
+            'collection enabled' => [['pagination_fetch_join_collection' => true], ['collection_operation_name' => 'get'], true],
+            'graphql disabled' => [['pagination_fetch_join_collection' => false], ['graphql_operation_name' => 'query'], false],
+            'graphql enabled' => [['pagination_fetch_join_collection' => true], ['graphql_operation_name' => 'query'], true],
+        ];
     }
 
     /**
@@ -1133,7 +1146,10 @@ class PaginationExtensionTest extends TestCase
         $this->assertFalse($doctrinePaginator->getFetchJoinCollection());
     }
 
-    public function testGetResultWithUseOutputWalkersDisabled()
+    /**
+     * @dataProvider fetchUseOutputWalkersProvider
+     */
+    public function testGetResultWithUseOutputWalkers(array $attributes, array $context, bool $expected)
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);
 
@@ -1154,7 +1170,7 @@ class PaginationExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, ['pagination_use_output_walkers' => false]));
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, null, $attributes));
 
         $paginationExtension = new PaginationExtension(
             $managerRegistryProphecy->reveal(),
@@ -1162,7 +1178,7 @@ class PaginationExtensionTest extends TestCase
             new Pagination($resourceMetadataFactoryProphecy->reveal())
         );
 
-        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, 'get');
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, 'get', $context);
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
@@ -1171,7 +1187,17 @@ class PaginationExtensionTest extends TestCase
         $doctrinePaginatorReflectionProperty->setAccessible(true);
 
         $doctrinePaginator = $doctrinePaginatorReflectionProperty->getValue($result);
-        $this->assertFalse($doctrinePaginator->getUseOutputWalkers());
+        $this->assertSame($expected, $doctrinePaginator->getUseOutputWalkers());
+    }
+
+    public function fetchUseOutputWalkersProvider(): array
+    {
+        return [
+            'collection disabled' => [['pagination_use_output_walkers' => false], ['collection_operation_name' => 'get'], false],
+            'collection enabled' => [['pagination_use_output_walkers' => true], ['collection_operation_name' => 'get'], true],
+            'graphql disabled' => [['pagination_use_output_walkers' => false], ['graphql_operation_name' => 'query'], false],
+            'graphql enabled' => [['pagination_use_output_walkers' => true], ['graphql_operation_name' => 'query'], true],
+        ];
     }
 
     /**

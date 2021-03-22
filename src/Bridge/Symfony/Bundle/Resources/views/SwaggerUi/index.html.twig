@@ -5,7 +5,8 @@
     <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
 
     {% block stylesheet %}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/400.css') }}">
+        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/700.css') }}">
         <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css', assetPackage) }}">
         <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css', assetPackage) }}">
     {% endblock %}

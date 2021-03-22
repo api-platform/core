@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -26,6 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.date"}
  * })
+ * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
  * @ApiFilter(DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,

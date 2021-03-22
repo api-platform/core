@@ -323,7 +323,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
-                foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.(xml|ya?ml)$/') as $file) {
+                foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.(xml|ya?ml)$/')->sortByName() as $file) {
                     $resources['yaml' === ($extension = $file->getExtension()) ? 'yml' : $extension][] = $file->getRealPath();
                 }
 
