@@ -126,6 +126,10 @@ services:
         parent:    'api_platform.serializer.property_filter'
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
 
+    app.dummy_travel_resource.property_filter:
+        parent: 'api_platform.serializer.property_filter'
+        tags: [ { name: 'api_platform.filter', id: 'dummy_travel.property' } ]
+
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']

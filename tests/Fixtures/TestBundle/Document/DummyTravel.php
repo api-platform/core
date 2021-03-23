@@ -11,37 +11,34 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ApiResource(filters={"dummy_travel.property"})
- * @ORM\Entity
+ * @ODM\Document
  */
 class DummyTravel
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="DummyCar")
-     * @ORM\JoinColumn(name="car_id", referencedColumnName="id_id")
+     * @ODM\ReferenceOne(targetDocument=DummyCar::class)
      */
     public $car;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ODM\Field(type="bool")
      */
     public $confirmed;
+
     /**
-     * @ORM\ManyToOne(targetEntity="DummyPassenger")
-     * @ORM\JoinColumn(name="passenger_id", referencedColumnName="id")
+     * @ODM\ReferenceOne(targetDocument=DummyPassenger::class)
      */
     public $passenger;
 

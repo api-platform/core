@@ -8,7 +8,7 @@ Feature: Eager Loading
   Scenario: Eager loading for a relation
     Given there is a RelatedDummy with 2 friends
     When I send a "GET" request to "/related_dummies/1"
-    And the response status code should be 200
+    Then the response status code should be 200
     And the DQL should be equal to:
     """
     SELECT o, thirdLevel_a1, relatedToDummyFriend_a2, dummyFriend_a3
@@ -42,7 +42,7 @@ Feature: Eager Loading
   Scenario: Eager loading for a relation and a search filter
     Given there is a RelatedDummy with 2 friends
     When I send a "GET" request to "/related_dummies?relatedToDummyFriend.dummyFriend=2"
-    And the response status code should be 200
+    Then the response status code should be 200
     And the DQL should be equal to:
     """
     SELECT o, thirdLevel_a4, relatedToDummyFriend_a1, dummyFriend_a5
@@ -57,6 +57,22 @@ Feature: Eager Loading
             WHERE relatedToDummyFriend_a3.dummyFriend = :dummyFriend_p1
         )
     ORDER BY o.id ASC
+    """
+
+  Scenario: Eager loading for a relation and a property filter with multiple relations
+    Given there is a dummy travel
+    When I send a "GET" request to "/dummy_travels/1?properties[]=confirmed&properties[car][]=brand&properties[passenger][]=nickname"
+    Then the response status code should be 200
+    And the JSON node "confirmed" should be equal to "true"
+    And the JSON node "car.carBrand" should be equal to "DummyBrand"
+    And the JSON node "passenger.nickname" should be equal to "Tom"
+    And the DQL should be equal to:
+    """
+    SELECT o, car_a1, passenger_a2
+    FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTravel o
+        LEFT JOIN o.car car_a1
+        LEFT JOIN o.passenger passenger_a2
+    WHERE o.id = :id_id
     """
 
   Scenario: Eager loading for a relation with complex sub-query filter
