@@ -26,9 +26,9 @@ use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
-use Symfony\Bundle\MercureBundle\Mercure;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -57,7 +57,7 @@ final class PublishMercureUpdatesListener
 
     private $iriConverter;
     private $serializer;
-    private $mercure;
+    private $registry;
     private $expressionLanguage;
     private $createdObjects;
     private $updatedObjects;
@@ -68,15 +68,15 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param array<string, string[]|string> $formats
-     * @param Mercure|callable               $mercure
+     * @param HubRegistry|callable           $registry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $mercure = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $registry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
-        if (null === $messageBus && null === $mercure) {
-            throw new InvalidArgumentException('A message bus or a mercure instance must be provided.');
+        if (null === $messageBus && null === $registry) {
+            throw new InvalidArgumentException('A message bus or a HubRegistry instance must be provided.');
         }
 
-        if ($mercure && !$mercure instanceof Mercure) {
+        if ($registry && !$registry instanceof HubRegistry) {
             @trigger_error(sprintf('Passing a callable as the seventh argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
         }
 
@@ -86,7 +86,7 @@ final class PublishMercureUpdatesListener
         $this->serializer = $serializer;
         $this->formats = $formats;
         $this->messageBus = $messageBus;
-        $this->mercure = $mercure;
+        $this->registry = $registry;
         $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
         $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
@@ -196,8 +196,8 @@ final class PublishMercureUpdatesListener
                 throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
             }
 
-            if ('hub' === $key && !$this->mercure instanceof Mercure) {
-                throw new InvalidArgumentException(sprintf('The option "hub" set in the "mercure" attribute of the "%s" resource is not supported. Please install mercure-bundle:^0.3 to enable it.', $resourceClass));
+            if ('hub' === $key && !$this->registry instanceof HubRegistry) {
+                throw new InvalidArgumentException(sprintf('The option "hub" set in the "mercure" attribute of the "%s" resource is not supported. Please install symfony/mercure:^0.5 to enable it.', $resourceClass));
             }
         }
 
@@ -236,10 +236,10 @@ final class PublishMercureUpdatesListener
         $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
 
         foreach ($updates as $update) {
-            if ($this->mercure instanceof Mercure) {
-                $this->mercure->getPublisher($options['hub'] ?? null)->publish($update);
+            if ($this->registry instanceof HubRegistry) {
+                $this->registry->getHub($options['hub'] ?? null)->publish($update);
             } else {
-                $this->messageBus ? $this->dispatch($update) : ($this->mercure)($update);
+                $this->messageBus ? $this->dispatch($update) : ($this->registry)($update);
             }
         }
     }

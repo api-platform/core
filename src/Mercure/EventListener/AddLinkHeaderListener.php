@@ -17,8 +17,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\CorsTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
-use Symfony\Bundle\MercureBundle\Discovery;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\Mercure\Discovery;
 
 /**
  * Adds the HTTP Link header pointing to the Mercure hub for resources having their updates dispatched.
@@ -37,7 +37,7 @@ final class AddLinkHeaderListener
      */
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $discovery)
     {
-        if (\is_string($discovery)) {
+        if (!$discovery instanceof Discovery) {
             @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Discovery::class), \E_USER_DEPRECATED);
         }
 
@@ -62,7 +62,7 @@ final class AddLinkHeaderListener
             return;
         }
 
-        if (\is_string($this->discovery)) {
+        if (!$this->discovery instanceof Discovery) {
             $link = new Link('mercure', $this->discovery);
             if (null === $linkProvider = $request->attributes->get('_links')) {
                 $request->attributes->set('_links', new GenericLinkProvider([$link]));

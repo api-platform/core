@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Subscription;
 
-use Symfony\Bundle\MercureBundle\Mercure;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -26,19 +26,19 @@ use Symfony\Component\Routing\RequestContext;
 final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGeneratorInterface
 {
     private $requestContext;
-    private $mercure;
+    private $registry;
 
     /**
-     * @param Mercure|string $mercure
+     * @param HubRegistry|string $mercure
      */
-    public function __construct(RequestContext $requestContext, $mercure)
+    public function __construct(RequestContext $requestContext, $registry)
     {
-        if (\is_string($mercure)) {
-            @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
+        if (!$registry instanceof HubRegistry) {
+            @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, HubRegistry::class), \E_USER_DEPRECATED);
         }
 
         $this->requestContext = $requestContext;
-        $this->mercure = $mercure;
+        $this->registry = $registry;
     }
 
     public function generateTopicIri(string $subscriptionId): string
@@ -55,10 +55,10 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
 
     public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
-        if (\is_string($this->mercure)) {
-            return $this->mercure.'?topic='.$this->generateTopicIri($subscriptionId);
+        if (!$this->registry instanceof HubRegistry) {
+            return $this->mercure . '?topic=' . $this->generateTopicIri($subscriptionId);
         }
 
-        return $this->mercure->getHub($hub)->getUrl().'?topic='.$this->generateTopicIri($subscriptionId);
+        return $this->registry->getHub($hub)->getUrl() . '?topic=' . $this->generateTopicIri($subscriptionId);
     }
 }

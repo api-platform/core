@@ -21,16 +21,15 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\MercureBundle\Discovery;
-use Symfony\Bundle\MercureBundle\Mercure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Mercure\Discovery;
 use Symfony\Component\Mercure\Hub;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -39,9 +38,6 @@ class AddLinkHeaderListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $hubs;
-    private $publishers;
-    private $factories;
     private $defaultHub;
     private $managedHub;
     private $mercure;
@@ -49,14 +45,10 @@ class AddLinkHeaderListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->hubs = $this->prophesize(ServiceProviderInterface::class);
-        $this->publishers = $this->prophesize(ServiceProviderInterface::class);
-        $this->factories = $this->prophesize(ServiceProviderInterface::class);
+        $this->defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://external/.well-known/mercure');
+        $this->managedHub = new Hub('https://managed.mercure.rocks/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://managed.mercure.rocks/.well-known/mercure');
 
-        $this->defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), 'https://external/.well-known/mercure');
-        $this->managedHub = new Hub('https://managed.mercure.rocks/.well-known/mercure', new StaticTokenProvider('xxx'), 'https://managed.mercure.rocks/.well-known/mercure');
-
-        $this->mercure = new Mercure('default', $this->hubs->reveal(), $this->publishers->reveal(), $this->factories->reveal());
+        $this->mercure = new HubRegistry($this->defaultHub, ['default' => $this->defaultHub, 'managed' => $this->managedHub]);
         $this->discovery = new Discovery($this->mercure);
     }
 
@@ -67,9 +59,6 @@ class AddLinkHeaderListenerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['hub' => 'managed']]));
-
-        $this->hubs->has('managed')->shouldBeCalled()->willReturn(true);
-        $this->hubs->get('managed')->shouldBeCalled()->willReturn($this->managedHub);
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),

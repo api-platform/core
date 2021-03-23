@@ -41,8 +41,6 @@ use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterfa
 use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
-use Symfony\Bundle\MercureBundle\Discovery;
-use Symfony\Bundle\MercureBundle\Mercure;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -55,6 +53,8 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Mercure\Discovery;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -91,7 +91,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -265,7 +265,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
-                $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
+                $config['resource_class_directories'],
+                $container->getParameter('api_platform.resource_class_directories')
             ));
         }
 
@@ -589,8 +590,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $definitions[] = $definition;
         }
 
-        $container->getDefinition('api_platform.http_cache.purger.varnish')->setArguments([$definitions,
-            $config['http_cache']['invalidation']['max_header_length'], ]);
+        $container->getDefinition('api_platform.http_cache.purger.varnish')->setArguments([
+            $definitions,
+            $config['http_cache']['invalidation']['max_header_length'],
+        ]);
         $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish');
     }
 
@@ -654,21 +657,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_mercure_publisher.xml');
-            if (class_exists(Mercure::class)) {
-                $container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->setArgument(6, new Reference(Mercure::class));
+            if (class_exists(HubRegistry::class)) {
+                $container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->setArgument(6, new Reference(HubRegistry::class));
             }
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             $loader->load('doctrine_mongodb_odm_mercure_publisher.xml');
-            if (class_exists(Mercure::class)) {
-                $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument(6, new Reference(Mercure::class));
+            if (class_exists(HubRegistry::class)) {
+                $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument(6, new Reference(HubRegistry::class));
             }
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
             $loader->load('graphql_mercure.xml');
-            if (class_exists(Mercure::class)) {
-                $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument(new Reference(Mercure::class));
+            if (class_exists(HubRegistry::class)) {
+                $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument(new Reference(HubRegistry::class));
             } else {
                 $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
             }

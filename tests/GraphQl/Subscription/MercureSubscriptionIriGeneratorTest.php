@@ -15,11 +15,10 @@ namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
 
 use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGenerator;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\MercureBundle\Mercure;
 use Symfony\Component\Mercure\Hub;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -27,12 +26,9 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 class MercureSubscriptionIriGeneratorTest extends TestCase
 {
     private $requestContext;
-    private $hubs;
-    private $publishers;
-    private $factories;
     private $defaultHub;
     private $managedHub;
-    private $mercure;
+    private $registry;
     private $mercureSubscriptionIriGenerator;
 
     /**
@@ -40,17 +36,13 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->hubs = $this->prophesize(ServiceProviderInterface::class);
-        $this->publishers = $this->prophesize(ServiceProviderInterface::class);
-        $this->factories = $this->prophesize(ServiceProviderInterface::class);
-
         $this->defaultHub = new Hub('https://demo.mercure.rocks/hub', new StaticTokenProvider('xx'));
         $this->managedHub = new Hub('https://demo.mercure.rocks/managed', new StaticTokenProvider('xx'));
 
-        $this->mercure = new Mercure('default', $this->hubs->reveal(), $this->publishers->reveal(), $this->factories->reveal());
+        $this->registry = new HubRegistry($this->defaultHub, ['default' => $this->defaultHub, 'managed' => $this->managedHub]);
 
         $this->requestContext = new RequestContext('', 'GET', 'example.com');
-        $this->mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator($this->requestContext, $this->mercure);
+        $this->mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator($this->requestContext, $this->registry);
     }
 
     public function testGenerateTopicIri(): void
@@ -60,32 +52,23 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
 
     public function testGenerateDefaultTopicIri(): void
     {
-        $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', '', ''), $this->mercure);
+        $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', '', ''), $this->registry);
 
         $this->assertSame('https://api-platform.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
     public function testGenerateMercureUrl(): void
     {
-        $this->hubs->has('default')->shouldBeCalled()->willReturn(true);
-        $this->hubs->get('default')->shouldBeCalled()->willReturn($this->defaultHub);
-
         $this->assertSame("{$this->defaultHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id'));
     }
 
     public function testGenerateExplicitDefaultMercureUrl(): void
     {
-        $this->hubs->has('default')->shouldBeCalled()->willReturn(true);
-        $this->hubs->get('default')->shouldBeCalled()->willReturn($this->defaultHub);
-
         $this->assertSame("{$this->defaultHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id', 'default'));
     }
 
     public function testGenerateNonDefaultMercureUrl(): void
     {
-        $this->hubs->has('managed')->shouldBeCalled()->willReturn(true);
-        $this->hubs->get('managed')->shouldBeCalled()->willReturn($this->managedHub);
-
         $this->assertSame("{$this->managedHub->getUrl()}?topic=http://example.com/subscriptions/subscription-id", $this->mercureSubscriptionIriGenerator->generateMercureUrl('subscription-id', 'managed'));
     }
 }

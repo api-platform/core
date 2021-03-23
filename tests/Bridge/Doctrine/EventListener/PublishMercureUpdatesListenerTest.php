@@ -34,13 +34,12 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Bundle\MercureBundle\Mercure;
-use Symfony\Component\Mercure\Hub;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Jwt\StaticTokenProvider;
-use Symfony\Component\Mercure\PublisherInterface;
+use Symfony\Component\Mercure\MockHub;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -48,25 +47,6 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 class PublishMercureUpdatesListenerTest extends TestCase
 {
     use ProphecyTrait;
-
-    private $hubs;
-    private $publishers;
-    private $factories;
-    private $defaultHub;
-    private $managedHub;
-    private $mercure;
-
-    protected function setUp(): void
-    {
-        $this->hubs = $this->prophesize(ServiceProviderInterface::class);
-        $this->publishers = $this->prophesize(ServiceProviderInterface::class);
-        $this->factories = $this->prophesize(ServiceProviderInterface::class);
-
-        $this->defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), 'https://external/.well-known/mercure');
-        $this->managedHub = new Hub('https://managed.mercure.rocks/.well-known/mercure', new StaticTokenProvider('xxx'), 'https://managed.mercure.rocks/.well-known/mercure');
-
-        $this->mercure = new Mercure('default', $this->hubs->reveal(), $this->publishers->reveal(), $this->factories->reveal());
-    }
 
     /**
      * @group legacy
@@ -259,7 +239,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
     public function testPublishUpdate(): void
     {
-        if (!method_exists(Update::class, 'isPrivate')) {
+        if (!class_exists(HubRegistry::class)) {
             $this->markTestSkipped();
         }
 
@@ -322,17 +302,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $retry = [];
         $data = [];
 
-        $this->publishers->has('managed')->shouldBeCalled()->willReturn(true);
-        $this->publishers->get('managed')->shouldBeCalled()->willReturn(
-            $this->createMockPublisher(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
-                $topics = array_merge($topics, $update->getTopics());
-                $private[] = $update->isPrivate();
-                $retry[] = $update->getRetry();
-                $data[] = $update->getData();
+        $managedHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
 
-                return 'id';
-            })
-        );
+            return 'id';
+        });
 
         $listener = new PublishMercureUpdatesListener(
             $resourceClassResolverProphecy->reveal(),
@@ -341,7 +318,9 @@ class PublishMercureUpdatesListenerTest extends TestCase
             $serializerProphecy->reveal(),
             $formats,
             null,
-            $this->mercure
+            new HubRegistry($this->createMock(HubInterface::class), [
+                'managed' => $managedHub,
+            ]),
         );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
@@ -364,7 +343,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
     public function testPublishGraphQlUpdates(): void
     {
-        if (!method_exists(Update::class, 'isPrivate')) {
+        if (!class_exists(HubRegistry::class)) {
             $this->markTestSkipped();
         }
 
@@ -391,17 +370,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $retry = [];
         $data = [];
 
-        $this->publishers->has('default')->shouldBeCalled()->willReturn(true);
-        $this->publishers->get('default')->shouldBeCalled()->willReturn(
-            $this->createMockPublisher(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
-                $topics = array_merge($topics, $update->getTopics());
-                $private[] = $update->isPrivate();
-                $retry[] = $update->getRetry();
-                $data[] = $update->getData();
+        $defaultHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
 
-                return 'id';
-            })
-        );
+            return 'id';
+        });
 
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
@@ -418,7 +394,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             $serializerProphecy->reveal(),
             $formats,
             null,
-            $this->mercure,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
             $graphQlSubscriptionManagerProphecy->reveal(),
             $graphQlMercureSubscriptionIriGenerator->reveal()
         );
@@ -444,7 +420,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
     public function testNoPublisher(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A message bus or a mercure instance must be provided.');
+        $this->expectExceptionMessage('A message bus or a HubRegistry instance must be provided.');
 
         new PublishMercureUpdatesListener(
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
@@ -482,7 +458,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             $serializerProphecy->reveal(),
             ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
             null,
-            $this->mercure
+            new HubRegistry($this->createMock(HubInterface::class), [])
         );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
@@ -540,28 +516,8 @@ class PublishMercureUpdatesListenerTest extends TestCase
         //$listener->postFlush();
     }
 
-    /**
-     * @TODO(azjezz): replace by MockPublisher once https://github.com/symfony/mercure/pull/40 is merged.
-     */
-    private function createMockPublisher(callable $callable): PublisherInterface
+    private function createMockHub(callable $callable): HubInterface
     {
-        return new class($callable) implements PublisherInterface {
-            private $callable;
-
-            public function __construct(callable $callable)
-            {
-                $this->callable = $callable;
-            }
-
-            public function publish(Update $update): string
-            {
-                return ($this->callable)($update);
-            }
-
-            public function __invoke(Update $update): string
-            {
-                return ($this->callable)($update);
-            }
-        };
+        return new MockHub('default', 'https://mercure.demo/.well-known/mercure', new StaticTokenProvider('x'), $callable);
     }
 }
