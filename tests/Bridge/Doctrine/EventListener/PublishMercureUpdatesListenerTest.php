@@ -435,6 +435,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
     public function testInvalidMercureAttribute(): void
     {
+        if (!class_exists(HubInterface::class)) {
+            $this->markTestSkipped();
+        }
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The value of the "mercure" attribute of the "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" resource class must be a boolean, an array of options or an expression returning this array, "integer" given.');
 

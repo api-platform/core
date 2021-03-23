@@ -77,7 +77,7 @@ final class PublishMercureUpdatesListener
         }
 
         if ($registry && !$registry instanceof HubRegistry) {
-            @trigger_error(sprintf('Passing a callable as the seventh argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, Mercure::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a callable as the seventh argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, HubRegistry::class), \E_USER_DEPRECATED);
         }
 
         $this->resourceClassResolver = $resourceClassResolver;
