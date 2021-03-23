@@ -91,7 +91,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);

@@ -29,7 +29,7 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
     private $registry;
 
     /**
-     * @param HubRegistry|string $mercure
+     * @param HubRegistry $registry
      */
     public function __construct(RequestContext $requestContext, $registry)
     {

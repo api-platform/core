@@ -320,7 +320,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
             null,
             new HubRegistry($this->createMock(HubInterface::class), [
                 'managed' => $managedHub,
-            ]),
+            ])
         );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
