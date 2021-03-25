@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property;
 
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
@@ -27,6 +28,7 @@ use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyRangeValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyUniqueValidatedEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -472,5 +474,44 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'min float' => ['type' => new Type(Type::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMin', 'expectedSchema' => ['minimum' => 1.5]];
         yield 'max float' => ['type' => new Type(Type::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMax', 'expectedSchema' => ['maximum' => 10.5]];
         yield 'min/max float' => ['type' => new Type(Type::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMinMax', 'expectedSchema' => ['minimum' => 1.5, 'maximum' => 10.5]];
+    }
+
+    /**
+     * @dataProvider provideChoiceConstraintCases
+     */
+    public function testCreateWithPropertyChoiceRestriction(PropertyMetadata $propertyMetadata, string $property, array $expectedSchema): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyValidatedChoiceEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyValidatedChoiceEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyValidatedChoiceEntity::class, $property, [])->willReturn(
+            $propertyMetadata
+        )->shouldBeCalled();
+
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(),
+            [new PropertySchemaChoiceRestriction()]
+        );
+
+        $schema = $validationPropertyMetadataFactory->create(DummyValidatedChoiceEntity::class, $property)->getSchema();
+
+        $this->assertSame($expectedSchema, $schema);
+    }
+
+    public function provideChoiceConstraintCases(): \Generator
+    {
+        yield 'single choice' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummySingleChoice', 'expectedSchema' => ['enum' => ['a', 'b']]];
+        yield 'single choice callback' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummySingleChoiceCallback', 'expectedSchema' => ['enum' => ['a', 'b', 'c', 'd']]];
+        yield 'multi choice' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoice', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]];
+        yield 'multi choice callback' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceCallback', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
+        yield 'multi choice min' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceMin', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2]];
+        yield 'multi choice max' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]];
+        yield 'multi choice min/max' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceMinMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
     }
 }
