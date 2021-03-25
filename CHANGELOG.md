@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* JSON Schema: Add support for generating property schema with Unique restriction (#4159)
 * **BC**: Change `api_platform.listener.request.add_format` priority from 7 to 28 to execute it before firewall (priority 8) (#3599)
 * **BC**: Use `@final` annotation in ORM filters (#4109)
 * Allow defining `exception_to_status` per operation (#3519)
