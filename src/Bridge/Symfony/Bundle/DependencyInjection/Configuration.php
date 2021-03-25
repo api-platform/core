@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use WouterJ\EloquentBundle\WouterJEloquentBundle;
 
 /**
  * The configuration of the bundle.
@@ -201,6 +202,7 @@ final class Configuration implements ConfigurationInterface
 
         $this->addDoctrineOrmSection($rootNode);
         $this->addDoctrineMongoDbOdmSection($rootNode);
+        $this->addEloquentSection($rootNode);
         $this->addOAuthSection($rootNode);
         $this->addGraphQlSection($rootNode);
         $this->addSwaggerSection($rootNode);
@@ -244,6 +246,16 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('doctrine_mongodb_odm')
                     ->{class_exists(DoctrineMongoDBBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+            ->end();
+    }
+
+    private function addEloquentSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('eloquent')
+                    ->{class_exists(WouterJEloquentBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end();
     }

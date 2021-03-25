@@ -1,0 +1,67 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.eloquent.builder_factory"
+                 class="ApiPlatform\Core\Bridge\Eloquent\BuilderFactory">
+        </service>
+
+        <service id="api_platform.eloquent.data_persister" class="ApiPlatform\Core\Bridge\Eloquent\DataPersister" public="false">
+            <argument type="service" id="wouterj_eloquent.database_manager" />
+            <tag name="api_platform.data_persister" priority="-1000" />
+        </service>
+
+        <service id="api_platform.eloquent.item_data_provider" public="false" abstract="true">
+            <argument type="service" id="api_platform.eloquent.builder_factory" />
+        </service>
+
+        <service id="api_platform.eloquent.collection_data_provider" public="false" abstract="true">
+            <argument type="service" id="api_platform.eloquent.builder_factory" />
+        </service>
+
+        <service id="api_platform.eloquent.default.collection_data_provider"
+                 parent="api_platform.eloquent.collection_data_provider"
+                 class="ApiPlatform\Core\Bridge\Eloquent\CollectionDataProvider">
+            <tag name="api_platform.collection_data_provider"/>
+        </service>
+
+        <service id="api_platform.eloquent.default.item_data_provider"
+                 parent="api_platform.eloquent.item_data_provider"
+                 class="ApiPlatform\Core\Bridge\Eloquent\ItemDataProvider">
+            <tag name="api_platform.item_data_provider"/>
+        </service>
+
+        <service id="api_platform.eloquent.property_accessor"
+                 class="ApiPlatform\Core\Bridge\Eloquent\PropertyAccess\EloquentPropertyAccessor"
+                 decorates="api_platform.property_accessor"
+        >
+            <argument type="service" id="api_platform.eloquent.property_accessor.inner" />
+        </service>
+
+        <service id="api_platform.eloquent.property_info_extractor" class="ApiPlatform\Core\Bridge\Eloquent\PropertyInfo\EloquentExtractor">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <tag name="property_info.type_extractor" priority="-999" />
+            <tag name="property_info.access_extractor" priority="-999" />
+        </service>
+
+        <!-- Metadata loader -->
+
+        <service id="api_platform.eloquent.metadata.property.name_collection_factory"
+                 class="ApiPlatform\Core\Bridge\Eloquent\Metadata\Property\Factory\EloquentPropertyNameCollectionFactory"
+                 decorates="api_platform.metadata.property.name_collection_factory"
+                 decoration-priority="-7"
+                 public="false">
+            <argument type="service" id="api_platform.eloquent.metadata.property.name_collection_factory.inner" />
+        </service>
+
+        <service id="api_platform.eloquent.metadata.property.metadata_factory"
+                 class="ApiPlatform\Core\Bridge\Eloquent\Metadata\Property\EloquentPropertyMetadataFactory"
+                 decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="service" id="api_platform.eloquent.metadata.property.metadata_factory.inner" />
+        </service>
+    </services>
+
+</container>

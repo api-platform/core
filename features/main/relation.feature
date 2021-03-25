@@ -1,3 +1,4 @@
+@eloquent
 Feature: Relations support
   In order to use a hypermedia API
   As a client software developer
@@ -79,6 +80,7 @@ Feature: Relations support
     """
 
   @!mongodb
+  @!eloquent
   Scenario: Create a friend relationship
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/related_to_dummy_friends" with body:
@@ -109,6 +111,7 @@ Feature: Relations support
     """
 
   @!mongodb
+  @!eloquent
   Scenario: Get the relationship
     When I send a "GET" request to "/related_to_dummy_friends/dummyFriend=1;relatedDummy=1"
     And the response status code should be 200
@@ -396,6 +399,7 @@ Feature: Relations support
     }
     """
 
+  @!eloquent
   Scenario: Issue #1222
     Given there are people having pets
     When I add "Content-Type" header equal to "application/ld+json"
@@ -429,6 +433,7 @@ Feature: Relations support
     }
     """
 
+  @!eloquent
   Scenario: Eager load relations should not be duplicated
     Given there is an order with same customer and recipient
     When I add "Content-Type" header equal to "application/ld+json"
@@ -534,7 +539,7 @@ Feature: Relations support
           "pattern": "^An error occurred$"
         },
         "hydra:description": {
-          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\", \"integer\" given.$"
+          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity|Models)\\\\RelatedDummy\", \"integer\" given.$"
         }
       },
       "required": [

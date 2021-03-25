@@ -27,6 +27,8 @@ use Behatch\Json\Json;
 use Behatch\Json\JsonInspector;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Illuminate\Database\Capsule\Manager;
 use JsonSchema\Validator;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -41,7 +43,10 @@ final class JsonApiContext implements Context
     private $jsonApiSchemaFile;
     private $manager;
 
-    public function __construct(ManagerRegistry $doctrine, string $jsonApiSchemaFile)
+    /**
+     * @param ManagerRegistry|Manager $registry
+     */
+    public function __construct($registry, string $jsonApiSchemaFile)
     {
         if (!is_file($jsonApiSchemaFile)) {
             throw new \InvalidArgumentException('The JSON API schema doesn\'t exist.');
@@ -50,7 +55,9 @@ final class JsonApiContext implements Context
         $this->validator = new Validator();
         $this->inspector = new JsonInspector('javascript');
         $this->jsonApiSchemaFile = $jsonApiSchemaFile;
-        $this->manager = $doctrine->getManager();
+        if ($registry instanceof ManagerRegistry) {
+            $this->manager = $registry->getManager();
+        }
     }
 
     /**
@@ -143,8 +150,10 @@ final class JsonApiContext implements Context
         $relatedDummy = $this->buildRelatedDummy();
         $relatedDummy->setName('RelatedDummy with no friends');
 
-        $this->manager->persist($relatedDummy);
-        $this->manager->flush();
+        if ($this->isDoctrine()) {
+            $this->manager->persist($relatedDummy);
+            $this->manager->flush();
+        }
     }
 
     /**
@@ -196,6 +205,11 @@ final class JsonApiContext implements Context
     private function isOrm(): bool
     {
         return $this->manager instanceof EntityManagerInterface;
+    }
+
+    private function isDoctrine(): bool
+    {
+        return $this->manager instanceof ObjectManager;
     }
 
     /**

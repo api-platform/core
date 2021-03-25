@@ -1,0 +1,12 @@
+imports:
+    - { resource: config_common.yml }
+    - { resource: config_behat_eloquent.yml }
+
+api_platform:
+    doctrine: false
+    doctrine_mongodb_odm: false
+    eloquent: true
+    mapping:
+        paths:
+            - '%kernel.project_dir%/../TestBundle/Model'
+            - '%kernel.project_dir%/../TestBundle/Models'

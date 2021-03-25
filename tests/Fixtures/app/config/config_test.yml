@@ -4,6 +4,7 @@ imports:
 
 api_platform:
     doctrine_mongodb_odm: false
+    eloquent: false
     mapping:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'

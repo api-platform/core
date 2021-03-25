@@ -39,6 +39,7 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use WouterJ\EloquentBundle\WouterJEloquentBundle;
 
 /**
  * AppKernel for tests.
@@ -78,6 +79,10 @@ class AppKernel extends Kernel
 
         if (class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();
+        }
+
+        if (class_exists(WouterJEloquentBundle::class)) {
+            $bundles[] = new WouterJEloquentBundle();
         }
 
         if (class_exists(NelmioApiDocBundle::class)) {
@@ -227,6 +232,14 @@ class AppKernel extends Kernel
                 ],
             ]);
             $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
+        }
+
+        if (class_exists(WouterJEloquentBundle::class)) {
+            $c->prependExtensionConfig('wouterj_eloquent', [
+                'driver' => 'sqlite',
+                'database' => '%kernel.project_dir%/var/db.sqlite',
+                'eloquent' => true,
+            ]);
         }
     }
 }

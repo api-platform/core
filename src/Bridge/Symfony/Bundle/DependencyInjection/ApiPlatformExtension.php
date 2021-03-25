@@ -119,6 +119,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
         $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
+        $this->registerEloquentConfiguration($container, $config, $loader);
         $this->registerHttpCacheConfiguration($container, $config, $loader);
         $this->registerValidatorConfiguration($container, $config, $loader);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
@@ -301,6 +302,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
             if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
                 $paths[] = "$dirname/Document";
+            }
+            if ($this->isConfigEnabled($container, $config['eloquent'])) {
+                $paths[] = "$dirname/Model";
             }
 
             foreach ($paths as $path) {
@@ -569,6 +573,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
         $loader->load('doctrine_mongodb_odm.xml');
+    }
+
+    private function registerEloquentConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    {
+        $enabled = $this->isConfigEnabled($container, $config['eloquent']);
+
+        $container->setParameter('api_platform.eloquent.enabled', $enabled);
+
+        if (!$enabled) {
+            return;
+        }
+
+        $loader->load('eloquent.xml');
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

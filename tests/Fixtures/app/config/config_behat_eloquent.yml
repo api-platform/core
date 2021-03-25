@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    ApiPlatform\Core\Tests\Behat\CommandContext: ~
+    ApiPlatform\Core\Tests\Behat\DoctrineContext:
+        $registry: '@wouterj_eloquent'
+    ApiPlatform\Core\Tests\Behat\HttpCacheContext: ~
+    ApiPlatform\Core\Tests\Behat\HydraContext: ~
+    ApiPlatform\Core\Tests\Behat\JsonApiContext:
+        $registry: '@wouterj_eloquent'
+        $jsonApiSchemaFile: '%kernel.project_dir%/../JsonSchema/jsonapi.json'
+    ApiPlatform\Core\Tests\Behat\JsonHalContext:
+        $schemaFile: '%kernel.project_dir%/../JsonHal/jsonhal.json'
+    ApiPlatform\Core\Tests\Behat\MercureContext:
+        $driverContainer: '@behat.driver.service_container'

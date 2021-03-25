@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Cache;
 
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Contracts\Cache\CallbackInterface;
 
 /**
  * @internal
@@ -25,27 +27,35 @@ trait CachedTrait
     private $cacheItemPool;
     private $localCache = [];
 
-    private function getCached(string $cacheKey, callable $getValue)
+    /**
+     * @param callable|CallbackInterface $getValue
+     */
+    private function getCached(string $cacheKey, $getValue)
     {
         if (\array_key_exists($cacheKey, $this->localCache)) {
             return $this->localCache[$cacheKey];
         }
 
+        $save = true;
         try {
             $cacheItem = $this->cacheItemPool->getItem($cacheKey);
         } catch (CacheException $e) {
-            return $this->localCache[$cacheKey] = $getValue();
+            return $this->localCache[$cacheKey] = $getValue(new CacheItem(), $save);
         }
 
         if ($cacheItem->isHit()) {
             return $this->localCache[$cacheKey] = $cacheItem->get();
         }
 
-        $value = $getValue();
+        $value = $getValue($cacheItem, $save);
 
         $cacheItem->set($value);
-        $this->cacheItemPool->save($cacheItem);
+        // @phpstan-ignore-next-line
+        if ($save) {
+            $this->cacheItemPool->save($cacheItem);
+            $this->localCache[$cacheKey] = $value;
+        }
 
-        return $this->localCache[$cacheKey] = $value;
+        return $value;
     }
 }

@@ -20,6 +20,8 @@ parameters:
 		- src/Bridge/NelmioApiDoc/*
 		- tests/Bridge/NelmioApiDoc/*
 		- src/Bridge/FosUser/*
+		# Laravel migrations
+		- tests/Fixtures/app/migrations
 		# BC layer
 		- tests/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
 		- tests/Annotation/ApiResourceTest.php
@@ -114,3 +116,8 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+
+		# Expected, Eloquent dynamic properties
+		-
+			message: '#Access to an undefined property ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Models\\[a-zA-Z0-9_]+::\$[a-zA-Z0-9_]+.#'
+			path: tests/Behat/DoctrineContext.php

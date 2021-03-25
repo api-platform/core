@@ -25,6 +25,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use WouterJ\EloquentBundle\WouterJEloquentBundle;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -199,6 +200,9 @@ class ConfigurationTest extends TestCase
             ],
             'doctrine_mongodb_odm' => [
                 'enabled' => \in_array('odm', $doctrineIntegrationsToLoad, true),
+            ],
+            'eloquent' => [
+                'enabled' => class_exists(WouterJEloquentBundle::class),
             ],
             'messenger' => [
                 'enabled' => true,
