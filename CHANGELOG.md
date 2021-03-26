@@ -11,6 +11,8 @@
 * GraphQL: Partial pagination support (#3223)
 * GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
 * Swagger UI: Remove Google fonts (#4112)
+* Doctrine: Revert #3774 support for binary UUID in search filter (#4134) 
+* Do not override Vary headers already set in the Response 
 
 ## 2.6.3
 
