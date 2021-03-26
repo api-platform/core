@@ -497,13 +497,13 @@ Feature: Relations support
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
-      "related": "certainly not an iri and not a plain identifier"
+      "related": "certainly not an IRI"
     }
     """
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an iri and not a plain identifier".'
+    And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an IRI".'
 
   Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"

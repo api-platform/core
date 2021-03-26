@@ -88,7 +88,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->itemDataProvider = $itemDataProvider;
+
+        if (true === $allowPlainIdentifiers) {
+            @trigger_error(sprintf('Allowing plain identifiers as argument of "%s" is deprecated since API Platform 2.7 and will not be possible anymore in API Platform 3.', self::class), \E_USER_DEPRECATED);
+        }
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
+
         $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
@@ -851,6 +856,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
     }
 
+    /**
+     * TODO: to remove in 3.0.
+     *
+     * @deprecated since 2.7
+     */
     private function supportsPlainIdentifiers(): bool
     {
         return $this->allowPlainIdentifiers && null !== $this->itemDataProvider;

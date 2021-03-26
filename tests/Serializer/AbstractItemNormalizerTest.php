@@ -942,6 +942,11 @@ class AbstractItemNormalizerTest extends TestCase
         ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class, 'resources' => []]));
     }
 
+    /**
+     * TODO: to remove in 3.0.
+     *
+     * @group legacy
+     */
     public function testDenormalizeRelationWithPlainId()
     {
         $data = [
@@ -995,6 +1000,11 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'relatedDummy', $relatedDummy)->shouldHaveBeenCalled();
     }
 
+    /**
+     * TODO: to remove in 3.0.
+     *
+     * @group legacy
+     */
     public function testDenormalizeRelationWithPlainIdNotFound()
     {
         $this->expectException(ItemNotFoundException::class);
@@ -1054,6 +1064,9 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->denormalize($data, Dummy::class, 'jsonld');
     }
 
+    /**
+     * TODO: to remove in 3.0.
+     */
     public function testDoNotDenormalizeRelationWithPlainIdWhenPlainIdentifiersAreNotAllowed()
     {
         $this->expectException(UnexpectedValueException::class);
