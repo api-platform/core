@@ -100,6 +100,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
+                        ->booleanNode('query_parameter_validation')->defaultValue(true)->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')

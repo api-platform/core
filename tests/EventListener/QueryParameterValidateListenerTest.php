@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
@@ -29,7 +30,7 @@ class QueryParameterValidateListenerTest extends TestCase
     use ProphecyTrait;
 
     private $testedInstance;
-    private $queryParameterValidor;
+    private $queryParameterValidator;
 
     /**
      * unsafe method should not use filter validations.
@@ -49,6 +50,59 @@ class QueryParameterValidateListenerTest extends TestCase
         );
     }
 
+    public function testDoNotValidateWhenDisabledGlobally(): void
+    {
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [], [
+            'get' => [],
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+
+        $queryParameterValidator = $this->prophesize(QueryParameterValidator::class);
+        $queryParameterValidator->validateFilters(Argument::cetera())->shouldNotBeCalled();
+
+        $listener = new QueryParameterValidateListener(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $queryParameterValidator->reveal(),
+            false
+        );
+
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
+    public function testDoNotValidateWhenDisabledInOperationAttribute(): void
+    {
+        $resourceMetadata = new ResourceMetadata('Dummy', null, null, [], [
+            'get' => [
+                'query_parameter_validate' => false,
+            ],
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request);
+
+        $queryParameterValidator = $this->prophesize(QueryParameterValidator::class);
+        $queryParameterValidator->validateFilters(Argument::cetera())->shouldNotBeCalled();
+
+        $listener = new QueryParameterValidateListener(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $queryParameterValidator->reveal()
+        );
+
+        $listener->onKernelRequest($eventProphecy->reveal());
+    }
+
     /**
      * If the tested filter is non-existent, then nothing should append.
      */
@@ -62,7 +116,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->queryParameterValidor->validateFilters(Dummy::class, ['some_inexistent_filter'], [])->shouldBeCalled();
+        $this->queryParameterValidator->validateFilters(Dummy::class, ['some_inexistent_filter'], [])->shouldBeCalled();
 
         $this->assertNull(
             $this->testedInstance->onKernelRequest($eventProphecy->reveal())
@@ -82,7 +136,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->queryParameterValidor
+        $this->queryParameterValidator
             ->validateFilters(Dummy::class, ['some_filter'], [])
             ->shouldBeCalled()
             ->willThrow(new FilterValidationException(['Query parameter "required" is required']));
@@ -111,7 +165,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $eventProphecy = $this->prophesize(RequestEvent::class);
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
 
-        $this->queryParameterValidor
+        $this->queryParameterValidator
             ->validateFilters(Dummy::class, ['some_filter'], ['required' => 'foo'])
             ->shouldBeCalled();
 
@@ -132,11 +186,11 @@ class QueryParameterValidateListenerTest extends TestCase
                 ])
             );
 
-        $this->queryParameterValidor = $this->prophesize(QueryParameterValidator::class);
+        $this->queryParameterValidator = $this->prophesize(QueryParameterValidator::class);
 
         $this->testedInstance = new QueryParameterValidateListener(
             $resourceMetadataFactoryProphecy->reveal(),
-            $this->queryParameterValidor->reveal()
+            $this->queryParameterValidator->reveal()
         );
     }
 }
