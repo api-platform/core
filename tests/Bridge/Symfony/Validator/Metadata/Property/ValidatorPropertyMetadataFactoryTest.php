@@ -17,12 +17,14 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\Prop
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyAtLeastOneOfValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyUniqueValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
@@ -405,5 +407,31 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             ['pattern' => '.*#.*'],
             ['minLength' => 10],
         ], $schema['oneOf']);
+    }
+
+    public function testCreateWithPropertyUniqueRestriction(): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyUniqueValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyUniqueValidatedEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyUniqueValidatedEntity::class, 'dummyItems', [])->willReturn(
+            new PropertyMetadata()
+        )->shouldBeCalled();
+
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            [new PropertySchemaUniqueRestriction()]
+        );
+
+        $schema = $validationPropertyMetadataFactory->create(DummyUniqueValidatedEntity::class, 'dummyItems')->getSchema();
+
+        $this->assertSame(['uniqueItems' => true], $schema);
     }
 }

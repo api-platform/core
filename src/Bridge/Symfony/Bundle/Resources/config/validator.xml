@@ -34,6 +34,10 @@
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 
+        <service id="api_platform.metadata.property_schema.unique_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
         <service id="api_platform.listener.view.validate" class="ApiPlatform\Core\Validator\EventListener\ValidateListener">
             <argument type="service" id="api_platform.validator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
