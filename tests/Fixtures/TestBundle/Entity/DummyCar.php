@@ -45,7 +45,7 @@ class DummyCar
      * @var DummyCarIdentifier The entity Id
      *
      * @ORM\Id
-     * @ORM\OneToOne(targetEntity="DummyCarIdentifier", cascade="persist")
+     * @ORM\OneToOne(targetEntity="DummyCarIdentifier", cascade={"persist"})
      */
     private $id;
 
