@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -39,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "put"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
  *     },
  *     graphql={
- *         "item_query"={"security"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "item_query"={"security"="is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.getOwner() == user)"},
  *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
  *         "delete"={},
  *         "update"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
@@ -90,6 +91,27 @@ class SecuredDummy
      */
     private $owner;
 
+    /**
+     * @var ArrayCollection Several dummies
+     *
+     * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
+     */
+    public $relatedDummies;
+
+    /**
+     * @var RelatedDummy
+     *
+     * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
+     */
+    protected $relatedDummy;
+
+    public function __construct()
+    {
+        $this->relatedDummies = new ArrayCollection();
+    }
+
     public function getId(): int
     {
         return $this->id;
@@ -133,5 +155,25 @@ class SecuredDummy
     public function setOwner(string $owner)
     {
         $this->owner = $owner;
+    }
+
+    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummies->add($relatedDummy);
+    }
+
+    public function getRelatedDummies()
+    {
+        return $this->relatedDummies;
+    }
+
+    public function getRelatedDummy()
+    {
+        return $this->relatedDummy;
+    }
+
+    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummy = $relatedDummy;
     }
 }

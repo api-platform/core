@@ -1036,6 +1036,30 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there are :nb SecuredDummy objects owned by :ownedby with related dummies
+     */
+    public function thereAreSecuredDummyObjectsOwnedByWithRelatedDummies(int $nb, string $ownedby)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $securedDummy = $this->buildSecuredDummy();
+            $securedDummy->setTitle("#$i");
+            $securedDummy->setDescription("Hello #$i");
+            $securedDummy->setOwner($ownedby);
+
+            $relatedDummy = $this->buildRelatedDummy();
+            $relatedDummy->setName('RelatedDummy');
+            $this->manager->persist($relatedDummy);
+
+            $securedDummy->addRelatedDummy($relatedDummy);
+            $securedDummy->setRelatedDummy($relatedDummy);
+
+            $this->manager->persist($securedDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a RelationEmbedder object
      */
     public function thereIsARelationEmbedderObject()

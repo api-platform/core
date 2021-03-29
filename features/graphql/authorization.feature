@@ -107,6 +107,86 @@ Feature: Authorization checking
     And the JSON node "errors[0].message" should be equal to "Only admins can create a secured dummy."
 
   @createSchema
+  Scenario: An admin can access a secured collection relation
+    Given there are 1 SecuredDummy objects owned by admin with related dummies
+    When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        relatedDummies {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedDummies" should have 1 elements
+
+  Scenario: An admin can access a secured relation
+    When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        relatedDummy {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedDummy" should not be null
+
+  @createSchema
+  Scenario: A user can't access a secured collection relation
+    Given there are 1 SecuredDummy objects owned by dunglas with related dummies
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        relatedDummies {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedDummies" should be null
+
+  Scenario: A user can't access a secured relation
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        relatedDummy {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedDummy" should be null
+
+  @createSchema
   Scenario: An admin can create a secured resource
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
     And I send the following GraphQL request:
@@ -178,6 +258,40 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.owner" should be equal to the string "dunglas"
+
+  Scenario: An admin can see a secured admin-only property on an object they don't own
+    When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/2") {
+        owner
+        title
+        adminOnlyProperty
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.adminOnlyProperty" should not be null
+
+  Scenario: A user can't see a secured admin-only property on an object they own
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/2") {
+        owner
+        title
+        adminOnlyProperty
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.adminOnlyProperty" should be null
 
   Scenario: A user can't assign to themself an item they doesn't own
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
