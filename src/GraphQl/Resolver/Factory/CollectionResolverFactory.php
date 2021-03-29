@@ -87,17 +87,20 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $queryResolver($collection, $resolverContext);
             }
 
-            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
-                'extra_variables' => [
-                    'object' => $collection,
-                ],
-            ]);
-            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
-                'extra_variables' => [
-                    'object' => $collection,
-                    'previous_object' => $this->clone($collection),
-                ],
-            ]);
+            // Only perform security stage on the top-level query
+            if (null === $source) {
+                ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $collection,
+                    ],
+                ]);
+                ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $collection,
+                        'previous_object' => $this->clone($collection),
+                    ],
+                ]);
+            }
 
             return ($this->serializeStage)($collection, $resourceClass, $operationName, $resolverContext);
         };
