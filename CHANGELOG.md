@@ -13,6 +13,7 @@
 * Swagger UI: Remove Google fonts (#4112)
 * Doctrine: Revert #3774 support for binary UUID in search filter (#4134) 
 * Do not override Vary headers already set in the Response 
+* GraphQL: Make sure the order of order filters is preserved if nested resources are used
 
 ## 2.6.3
 
