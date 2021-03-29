@@ -59,7 +59,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
-            if (null === $resourceClass || null === $rootClass) {
+            if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;
             }
 
