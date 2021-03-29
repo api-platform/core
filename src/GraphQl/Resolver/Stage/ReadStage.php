@@ -161,7 +161,7 @@ final class ReadStage implements ReadStageInterface
                 $filters =
                     \array_slice($filters, 0, $index + 1) +
                     [str_replace($this->nestingSeparator, '.', $name) => $value] +
-                    \array_slice($filters, $index);
+                    \array_slice($filters, $index + 1);
             }
         }
 

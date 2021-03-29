@@ -222,11 +222,7 @@ class ReadStageTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    /**
-     * Test a regression where the order in which order fitlers were applied
-     * was wrong when the data had been ordered by a nested field.
-     */
-    public function testPreserveOrderOfOrderFitlersIfNested()
+    public function testPreserveOrderOfOrderFitlersIfNested(): void
     {
         $operationName = 'collection_query';
         $resourceClass = 'myResource';
