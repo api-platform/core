@@ -222,7 +222,7 @@ class ReadStageTest extends TestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function testPreserveOrderOfOrderFitlersIfNested(): void
+    public function testPreserveOrderOfOrderFiltersIfNested(): void
     {
         $operationName = 'collection_query';
         $resourceClass = 'myResource';
