@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -94,7 +95,7 @@ class SecuredDummy
     /**
      * A collection of dummies that only admins can access.
      *
-     * @var ArrayCollection Several dummies
+     * @var Collection<RelatedDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      * @ORM\JoinTable(name="secured_dummy_related_dummy")
@@ -116,7 +117,7 @@ class SecuredDummy
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
-     * @var ArrayCollection Several dummies
+     * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
      * @ORM\JoinTable(name="secured_dummy_related_secured_dummy")
@@ -138,7 +139,7 @@ class SecuredDummy
     /**
      * Collection of dummies that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
-     * @var ArrayCollection Several dummies
+     * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
      * @ORM\JoinTable(name="secured_dummy_public_related_secured_dummy")

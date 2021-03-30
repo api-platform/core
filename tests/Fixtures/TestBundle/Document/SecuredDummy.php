@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -91,7 +92,7 @@ class SecuredDummy
     private $owner;
 
     /**
-     * @var ArrayCollection Several dummies
+     * @var Collection<RelatedDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
@@ -109,7 +110,7 @@ class SecuredDummy
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
-     * @var ArrayCollection Several dummies
+     * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      * @ApiProperty(security="is_granted('ROLE_USER')")
@@ -129,7 +130,7 @@ class SecuredDummy
     /**
      * Collection of dummies that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
-     * @var ArrayCollection Several dummies
+     * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
