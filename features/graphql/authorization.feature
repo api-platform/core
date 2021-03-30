@@ -21,6 +21,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].extensions.status" should be equal to 403
     And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.securedDummy" should be null
 
   Scenario: An anonymous user tries to retrieve a secured collection
     Given there are 1 SecuredDummy objects
@@ -43,6 +44,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].extensions.status" should be equal to 403
     And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.securedDummies" should be null
 
   Scenario: An admin can retrieve a secured collection
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
@@ -86,6 +88,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].extensions.status" should be equal to 403
     And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.securedDummies" should be null
 
   Scenario: An anonymous user tries to create a resource they are not allowed to
     When I send the following GraphQL request:
@@ -105,6 +108,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].extensions.status" should be equal to 403
     And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Only admins can create a secured dummy."
+    And the JSON node "data.createSecuredDummy" should be null
 
   @createSchema
   Scenario: An admin can access a secured collection relation
@@ -358,6 +362,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].extensions.status" should be equal to 403
     And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.securedDummy" should be null
 
   Scenario: A user can retrieve an item they owns
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
@@ -429,6 +434,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].extensions.status" should be equal to 403
     And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.updateSecuredDummy" should be null
 
   Scenario: A user can update an item they owns and transfer it
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
