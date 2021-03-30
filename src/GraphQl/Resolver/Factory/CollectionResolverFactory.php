@@ -59,6 +59,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+            // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
             if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;
             }
