@@ -105,6 +105,7 @@ class ConfigurationTest extends TestCase
             'path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
             'validator' => [
                 'serialize_payload_fields' => [],
+                'query_parameter_validation' => true,
             ],
             'name_converter' => null,
             'enable_fos_user' => false,

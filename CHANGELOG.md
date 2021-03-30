@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* Validator: Add an option to disable query parameter validation (#4165)
 * JSON Schema: Add support for generating property schema with Choice restriction (#4162)
 * JSON Schema: Add support for generating property schema with Range restriction (#4158)
 * JSON Schema: Add support for generating property schema with Unique restriction (#4159)

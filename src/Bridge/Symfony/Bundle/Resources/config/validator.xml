@@ -60,6 +60,7 @@
         <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Core\EventListener\QueryParameterValidateListener" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.validator.query_parameter_validator" />
+            <argument>%api_platform.validator.query_parameter_validation%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="16" />
         </service>

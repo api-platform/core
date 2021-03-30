@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -26,14 +27,21 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class QueryParameterValidateListener
 {
+    use ToggleableOperationAttributeTrait;
+
+    public const OPERATION_ATTRIBUTE_KEY = 'query_parameter_validate';
+
     private $resourceMetadataFactory;
 
     private $queryParameterValidator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, QueryParameterValidator $queryParameterValidator)
+    private $enabled;
+
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, QueryParameterValidator $queryParameterValidator, bool $enabled = true)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->queryParameterValidator = $queryParameterValidator;
+        $this->enabled = $enabled;
     }
 
     public function onKernelRequest(RequestEvent $event)
@@ -45,6 +53,7 @@ final class QueryParameterValidateListener
             || !isset($attributes['collection_operation_name'])
             || !($operationName = $attributes['collection_operation_name'])
             || 'GET' !== $request->getMethod()
+            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled)
         ) {
             return;
         }
