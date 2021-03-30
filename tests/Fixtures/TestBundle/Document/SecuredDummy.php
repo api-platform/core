@@ -106,9 +106,49 @@ class SecuredDummy
      */
     protected $relatedDummy;
 
+    /**
+     * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var ArrayCollection Several dummies
+     *
+     * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
+     * @ApiProperty(security="is_granted('ROLE_USER')")
+     */
+    public $relatedSecuredDummies;
+
+    /**
+     * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var RelatedSecuredDummy
+     *
+     * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
+     * @ApiProperty(security="is_granted('ROLE_USER')")
+     */
+    protected $relatedSecuredDummy;
+
+    /**
+     * Collection of dummies that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var ArrayCollection Several dummies
+     *
+     * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
+     */
+    public $publicRelatedSecuredDummies;
+
+    /**
+     * A dummy that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var RelatedSecuredDummy
+     *
+     * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
+     */
+    protected $publicRelatedSecuredDummy;
+
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->relatedSecuredDummies = new ArrayCollection();
+        $this->publicRelatedSecuredDummies = new ArrayCollection();
     }
 
     public function getId(): int
@@ -174,5 +214,46 @@ class SecuredDummy
     public function setRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummy = $relatedDummy;
+    }
+
+
+    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    {
+        $this->relatedSecuredDummies->add($relatedSecuredDummy);
+    }
+
+    public function getRelatedSecuredDummies()
+    {
+        return $this->relatedSecuredDummies;
+    }
+
+    public function getRelatedSecuredDummy()
+    {
+        return $this->relatedSecuredDummy;
+    }
+
+    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    {
+        $this->relatedSecuredDummy = $relatedSecuredDummy;
+    }
+
+    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    {
+        $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
+    }
+
+    public function getPublicRelatedSecuredDummies()
+    {
+        return $this->publicRelatedSecuredDummies;
+    }
+
+    public function getPublicRelatedSecuredDummy()
+    {
+        return $this->publicRelatedSecuredDummy;
+    }
+
+    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    {
+        $this->publicRelatedSecuredDummy = $publicRelatedSecuredDummy;
     }
 }

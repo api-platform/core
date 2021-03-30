@@ -127,7 +127,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.securedDummy.relatedDummies" should have 1 elements
+    And the JSON node "data.securedDummy.relatedDummies" should have 1 element
 
   Scenario: An admin can access a secured relation
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
@@ -185,6 +185,122 @@ Feature: Authorization checking
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.relatedDummy" should be null
+
+  Scenario: A user can't access a secured relation resource directly
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      relatedSecuredDummy(id: "/related_secured_dummies/1") {
+        id
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to 403
+    And the JSON node "errors[0].extensions.category" should be equal to user
+    And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.relatedSecuredDummy" should be null
+
+  Scenario: A user can't access a secured relation resource collection directly
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      relatedSecuredDummies {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to 403
+    And the JSON node "errors[0].extensions.category" should be equal to user
+    And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.relatedSecuredDummies" should be null
+
+  Scenario: A user can access a secured collection relation
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        relatedSecuredDummies {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedSecuredDummies" should have 1 element
+
+  Scenario: A user can access a secured relation
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        relatedSecuredDummy {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedSecuredDummy" should not be null
+
+  Scenario: A user can access a non-secured collection relation
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        publicRelatedSecuredDummies {
+          edges {
+            node {
+              id
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.publicRelatedSecuredDummies" should have 1 element
+
+  Scenario: A user can access a non-secured relation
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    When I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/1") {
+        publicRelatedSecuredDummy {
+          id
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.publicRelatedSecuredDummy" should not be null
 
   @createSchema
   Scenario: An admin can create a secured resource

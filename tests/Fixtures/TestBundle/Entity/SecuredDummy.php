@@ -92,24 +92,74 @@ class SecuredDummy
     private $owner;
 
     /**
+     * A collection of dummies that only admins can access.
+     *
      * @var ArrayCollection Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     * @ORM\JoinTable(name="secured_dummy_related_dummy")
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     public $relatedDummies;
 
     /**
+     * A dummy that only admins can access.
+     *
      * @var RelatedDummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     * @ORM\JoinColumn(name="related_dummy_id")
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     protected $relatedDummy;
 
+    /**
+     * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var ArrayCollection Several dummies
+     *
+     * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinTable(name="secured_dummy_related_secured_dummy")
+     * @ApiProperty(security="is_granted('ROLE_USER')")
+     */
+    public $relatedSecuredDummies;
+
+    /**
+     * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var RelatedSecuredDummy
+     *
+     * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinColumn(name="related_secured_dummy_id")
+     * @ApiProperty(security="is_granted('ROLE_USER')")
+     */
+    protected $relatedSecuredDummy;
+
+    /**
+     * Collection of dummies that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var ArrayCollection Several dummies
+     *
+     * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinTable(name="secured_dummy_public_related_secured_dummy")
+     */
+    public $publicRelatedSecuredDummies;
+
+    /**
+     * A dummy that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var RelatedSecuredDummy
+     *
+     * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinColumn(name="public_related_secured_dummy_id")
+     */
+    protected $publicRelatedSecuredDummy;
+
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->relatedSecuredDummies = new ArrayCollection();
+        $this->publicRelatedSecuredDummies = new ArrayCollection();
     }
 
     public function getId(): int
@@ -175,5 +225,45 @@ class SecuredDummy
     public function setRelatedDummy(RelatedDummy $relatedDummy)
     {
         $this->relatedDummy = $relatedDummy;
+    }
+
+    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    {
+        $this->relatedSecuredDummies->add($relatedSecuredDummy);
+    }
+
+    public function getRelatedSecuredDummies()
+    {
+        return $this->relatedSecuredDummies;
+    }
+
+    public function getRelatedSecuredDummy()
+    {
+        return $this->relatedSecuredDummy;
+    }
+
+    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    {
+        $this->relatedSecuredDummy = $relatedSecuredDummy;
+    }
+
+    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    {
+        $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
+    }
+
+    public function getPublicRelatedSecuredDummies()
+    {
+        return $this->publicRelatedSecuredDummies;
+    }
+
+    public function getPublicRelatedSecuredDummy()
+    {
+        return $this->publicRelatedSecuredDummy;
+    }
+
+    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    {
+        $this->publicRelatedSecuredDummy = $publicRelatedSecuredDummy;
     }
 }
