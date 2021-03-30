@@ -114,7 +114,7 @@ Feature: Authorization checking
   Scenario: An admin can access a secured collection relation
     Given there are 1 SecuredDummy objects owned by admin with related dummies
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
@@ -135,7 +135,7 @@ Feature: Authorization checking
 
   Scenario: An admin can access a secured relation
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
@@ -154,7 +154,7 @@ Feature: Authorization checking
   Scenario: A user can't access a secured collection relation
     Given there are 1 SecuredDummy objects owned by dunglas with related dummies
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
@@ -175,7 +175,7 @@ Feature: Authorization checking
 
   Scenario: A user can't access a secured relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
@@ -192,7 +192,7 @@ Feature: Authorization checking
 
   Scenario: A user can't access a secured relation resource directly
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       relatedSecuredDummy(id: "/related_secured_dummies/1") {
@@ -210,7 +210,7 @@ Feature: Authorization checking
 
   Scenario: A user can't access a secured relation resource collection directly
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       relatedSecuredDummies {
@@ -232,7 +232,7 @@ Feature: Authorization checking
 
   Scenario: A user can access a secured collection relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
@@ -253,7 +253,7 @@ Feature: Authorization checking
 
   Scenario: A user can access a secured relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
@@ -270,7 +270,7 @@ Feature: Authorization checking
 
   Scenario: A user can access a non-secured collection relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    When I send the following GraphQL request:
+    And I send the following GraphQL request:
     """
     {
       securedDummy(id: "/secured_dummies/1") {
