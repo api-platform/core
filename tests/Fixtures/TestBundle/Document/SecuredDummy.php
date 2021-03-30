@@ -217,7 +217,6 @@ class SecuredDummy
         $this->relatedDummy = $relatedDummy;
     }
 
-
     public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
     {
         $this->relatedSecuredDummies->add($relatedSecuredDummy);
