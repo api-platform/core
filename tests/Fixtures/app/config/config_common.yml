@@ -126,6 +126,10 @@ services:
         parent:    'api_platform.serializer.property_filter'
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.property' } ]
 
+    app.dummy_travel_resource.property_filter:
+        parent: 'api_platform.serializer.property_filter'
+        tags: [ { name: 'api_platform.filter', id: 'dummy_travel.property' } ]
+
     ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
@@ -228,10 +232,11 @@ services:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
 
-    mercure.hub.default.publisher:
-        class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
+    mercure.hub.default.message_handler:
+        class: ApiPlatform\Core\Tests\Fixtures\DummyMercureUpdateHandler
         public: true
         tags: ['messenger.message_handler']
+    mercure.hub.default.publisher: '@mercure.hub.default.message_handler'
 
     app.serializer.normalizer.override_documentation:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer

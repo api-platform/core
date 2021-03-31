@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher;
+namespace ApiPlatform\Core\Tests\Behat;
+
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
-use Symfony\Component\Mercure\Update;
+use Psr\Container\ContainerInterface;
 
 /**
  * Context for Mercure.
@@ -23,11 +24,11 @@ use Symfony\Component\Mercure\Update;
  */
 final class MercureContext implements Context
 {
-    private $publisher;
+    private $driverContainer;
 
-    public function __construct(DummyMercurePublisher $publisher)
+    public function __construct(ContainerInterface $driverContainer)
     {
-        $this->publisher = $publisher;
+        $this->driverContainer = $driverContainer;
     }
 
     /**
@@ -38,9 +39,10 @@ final class MercureContext implements Context
         $topics = explode(',', $topics);
         $update = json_decode($update->getRaw(), true);
 
-        /** @var Update $sentUpdate */
-        foreach ($this->publisher->getUpdates() as $sentUpdate) {
-            $toMatchTopics = count($topics);
+        $updateHandler = $this->driverContainer->get('mercure.hub.default.message_handler');
+
+        foreach ($updateHandler->getUpdates() as $sentUpdate) {
+            $toMatchTopics = \count($topics);
             foreach ($sentUpdate->getTopics() as $sentTopic) {
                 foreach ($topics as $topic) {
                     if (preg_match("@$topic@", $sentTopic)) {

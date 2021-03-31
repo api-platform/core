@@ -25,6 +25,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -219,6 +220,41 @@ class ReadStageTest extends TestCase
         $result = ($this->readStage)($resourceClass, $rootClass, $operationName, $context);
 
         $this->assertSame($expectedResult, $result);
+    }
+
+    public function testPreserveOrderOfOrderFiltersIfNested(): void
+    {
+        $operationName = 'collection_query';
+        $resourceClass = 'myResource';
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $fieldName = 'subresource';
+        $info->fieldName = $fieldName;
+        $context = [
+            'is_collection' => true,
+            'is_mutation' => false,
+            'is_subscription' => false,
+            'args' => [
+                'order' => [
+                    'some_field' => 'ASC',
+                    'localField' => 'ASC',
+                ],
+            ],
+            'info' => $info,
+            'source' => null,
+        ];
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+
+        $normalizationContext = ['normalization' => true];
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+
+        ($this->readStage)($resourceClass, $resourceClass, $operationName, $context);
+
+        $this->collectionDataProviderProphecy->getCollection($resourceClass, $operationName, Argument::that(function ($args) {
+            // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
+            return
+            array_search('some.field', array_keys($args['filters']['order']), true) <
+            array_search('localField', array_keys($args['filters']['order']), true);
+        }))->shouldHaveBeenCalled();
     }
 
     public function collectionProvider(): array

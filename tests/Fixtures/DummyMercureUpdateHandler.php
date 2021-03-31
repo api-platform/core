@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures;
 
 use Symfony\Component\Mercure\Update;
 
-class DummyMercurePublisher
+class DummyMercureUpdateHandler
 {
     private $updates = [];
 

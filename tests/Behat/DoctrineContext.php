@@ -49,9 +49,11 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroup
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyImmutableDate as DummyImmutableDateDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyMercure as DummyMercureDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyOffer as DummyOfferDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyPassenger as DummyPassengerDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceNotApiResourceChild as DummyTableInheritanceNotApiResourceChildDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyTravel as DummyTravelDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\FileConfigDummy as FileConfigDummyDocument;
@@ -118,9 +120,11 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyMercure;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyOffer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPassenger;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTravel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ExternalUser;
@@ -1142,6 +1146,30 @@ final class DoctrineContext implements Context
     }
 
     /**
+     * @Given there is a dummy travel
+     */
+    public function thereIsADummyTravel()
+    {
+        $car = $this->buildDummyCar();
+        $car->setName('model x');
+        $car->setCanSell(true);
+        $car->setAvailableAt(new \DateTime());
+        $this->manager->persist($car);
+
+        $passenger = $this->buildDummyPassenger();
+        $passenger->nickname = 'Tom';
+        $this->manager->persist($passenger);
+
+        $travel = $this->buildDummyTravel();
+        $travel->car = $car;
+        $travel->passenger = $passenger;
+        $travel->confirmed = true;
+        $this->manager->persist($travel);
+
+        $this->manager->flush();
+    }
+
+    /**
      * @Given there is a RelatedDummy with :nb friends
      */
     public function thereIsARelatedDummyWithFriends(int $nb)
@@ -1876,6 +1904,22 @@ final class DoctrineContext implements Context
     private function buildDummyCarColor()
     {
         return $this->isOrm() ? new DummyCarColor() : new DummyCarColorDocument();
+    }
+
+    /**
+     * @return DummyPassenger|DummyPassengerDocument
+     */
+    private function buildDummyPassenger()
+    {
+        return $this->isOrm() ? new DummyPassenger() : new DummyPassengerDocument();
+    }
+
+    /**
+     * @return DummyTravel|DummyTravelDocument
+     */
+    private function buildDummyTravel()
+    {
+        return $this->isOrm() ? new DummyTravel() : new DummyTravelDocument();
     }
 
     /**

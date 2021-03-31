@@ -74,10 +74,9 @@ final class AddHeadersListener
             $response->setMaxAge($maxAge);
         }
 
-        if (isset($resourceCacheHeaders['vary'])) {
-            $response->setVary($resourceCacheHeaders['vary']);
-        } elseif (null !== $this->vary) {
-            $response->setVary(array_diff($this->vary, $response->getVary()), false);
+        $vary = $resourceCacheHeaders['vary'] ?? $this->vary;
+        if (null !== $vary) {
+            $response->setVary(array_diff($vary, $response->getVary()), false);
         }
 
         // if the public-property is defined and not yet set; apply it to the response
