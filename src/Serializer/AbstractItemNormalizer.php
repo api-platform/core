@@ -249,11 +249,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $item;
         }
 
-        // Filter out input attributes that aren't allowed
-        $data = array_filter($data, function (string $attribute) use ($context) {
-            return $this->canAccessAttribute($context[self::OBJECT_TO_POPULATE] ?? null, $attribute, $context);
-        }, \ARRAY_FILTER_USE_KEY);
-
         return parent::denormalize($data, $resourceClass, $format, $context);
     }
 
@@ -390,22 +385,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        return \is_object($classOrObject) ? $this->canAccessAttribute($classOrObject, $attribute, $context) : true;
-    }
-
-    /**
-     * Check if access to the attribute is granted.
-     *
-     * @param object|null $object
-     */
-    protected function canAccessAttribute($object, string $attribute, array $context = []): bool
-    {
         $options = $this->getFactoryOptions($context);
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
         $security = $propertyMetadata->getAttribute('security');
         if ($this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
-                'object' => $object,
+                'object' => $classOrObject,
             ]);
         }
 

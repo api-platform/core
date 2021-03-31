@@ -78,22 +78,6 @@ Feature: Authorization checking
     And I send a "GET" request to "/secured_dummies/2"
     Then the response status code should be 200
 
-  Scenario: A user can see a secured owner-only property on an object they own
-    When I add "Accept" header equal to "application/ld+json"
-    And I add "Content-Type" header equal to "application/ld+json"
-    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
-    And I send a "GET" request to "/secured_dummies/2"
-    Then the response status code should be 200
-    And the JSON node "ownerOnlyProperty" should exist
-    And the JSON node "ownerOnlyProperty" should not be null
-
-  Scenario: An admin can't see a secured owner-only property on objects they don't own
-    When I add "Accept" header equal to "application/ld+json"
-    And I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
-    And I send a "GET" request to "/secured_dummies"
-    Then the response status code should be 200
-    And the response should not contain "ownerOnlyProperty"
-
   Scenario: A user can't assign to themself an item they doesn't own
     When I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
