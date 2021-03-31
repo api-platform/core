@@ -232,10 +232,11 @@ services:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
 
-    mercure.hub.default.publisher:
-        class: ApiPlatform\Core\Tests\Fixtures\DummyMercurePublisher
+    mercure.hub.default.message_handler:
+        class: ApiPlatform\Core\Tests\Fixtures\DummyMercureUpdateHandler
         public: true
         tags: ['messenger.message_handler']
+    mercure.hub.default.publisher: '@mercure.hub.default.message_handler'
 
     app.serializer.normalizer.override_documentation:
         class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
