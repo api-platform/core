@@ -32,8 +32,8 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
     {
         $choices = [];
 
-        if (\is_callable($choices = $constraint->callback)) {
-            $choices = $choices();
+        if (\is_callable($constraint->callback)) {
+            $choices = ($constraint->callback)();
         } elseif (\is_array($constraint->choices)) {
             $choices = $constraint->choices;
         }
