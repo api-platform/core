@@ -28,7 +28,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring 
           ini-values: memory_limit=-1
-          tools: pecl, composer, php-cs-fixer:2.18.4
+          tools: pecl, composer, php-cs-fixer
           coverage: none
       - name: Run PHP-CS-Fixer fix
         run: php-cs-fixer fix --dry-run --diff --ansi
