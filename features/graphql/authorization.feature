@@ -419,6 +419,37 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.adminOnlyProperty" should be null
 
+  Scenario: A user can see a secured owner-only property on an object they own
+    When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/2") {
+        ownerOnlyProperty
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.ownerOnlyProperty" should exist
+    And the JSON node "data.securedDummy.ownerOnlyProperty" should not be null
+
+  Scenario: An admin can't see a secured owner-only property on an object they don't own
+    When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
+    And I send the following GraphQL request:
+    """
+    {
+      securedDummy(id: "/secured_dummies/2") {
+        ownerOnlyProperty
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.ownerOnlyProperty" should be null
+
   Scenario: A user can't assign to themself an item they doesn't own
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
     And I send the following GraphQL request:
