@@ -64,6 +64,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummies" should exist
     And the JSON node "data.securedDummies" should not be null
 
   Scenario: An anonymous user cannot retrieve a secured collection
@@ -148,6 +149,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedDummy" should exist
     And the JSON node "data.securedDummy.relatedDummy" should not be null
 
   @createSchema
@@ -266,6 +268,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.relatedSecuredDummy" should exist
     And the JSON node "data.securedDummy.relatedSecuredDummy" should not be null
 
   Scenario: A user can access a non-secured collection relation
@@ -304,6 +307,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.publicRelatedSecuredDummy" should exist
     And the JSON node "data.securedDummy.publicRelatedSecuredDummy" should not be null
 
   @createSchema
@@ -395,6 +399,7 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.securedDummy.adminOnlyProperty" should exist
     And the JSON node "data.securedDummy.adminOnlyProperty" should not be null
 
   Scenario: A user can't see a secured admin-only property on an object they own
