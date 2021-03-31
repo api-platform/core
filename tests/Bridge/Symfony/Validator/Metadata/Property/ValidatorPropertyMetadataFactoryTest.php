@@ -264,22 +264,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('minLength', $schema);
         $this->assertArrayHasKey('maxLength', $schema);
-
-        $numberTypes = [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT];
-
-        foreach ($numberTypes as $type) {
-            $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, $property, [])->willReturn(
-                    new PropertyMetadata(new Type($type))
-                )->shouldBeCalled();
-            $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
-                $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(), [$lengthRestrictions]
-            );
-
-            $schema = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, $property)->getSchema();
-            $this->assertNotNull($schema);
-            $this->assertArrayHasKey('minimum', $schema);
-            $this->assertArrayHasKey('maximum', $schema);
-        }
     }
 
     public function testCreateWithPropertyRegexRestriction(): void
