@@ -157,7 +157,11 @@ final class ReadStage implements ReadStageInterface
 
             if (\is_string($name) && strpos($name, $this->nestingSeparator)) {
                 // Gives a chance to relations/nested fields.
-                $filters[str_replace($this->nestingSeparator, '.', $name)] = $value;
+                $index = array_search($name, array_keys($filters), true);
+                $filters =
+                    \array_slice($filters, 0, $index + 1) +
+                    [str_replace($this->nestingSeparator, '.', $name) => $value] +
+                    \array_slice($filters, $index + 1);
             }
         }
 

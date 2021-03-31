@@ -71,7 +71,7 @@ final class SwaggerCommand extends Command
         $this
             ->setDescription('Dump the Swagger v2 documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
-            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, sprintf('OpenAPI version to use (%s)', implode(' or ', $this->swaggerVersions)), $this->swaggerVersions[0] ?? 2)
+            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, sprintf('OpenAPI version to use (%s)', implode(' or ', $this->swaggerVersions)), (string) ($this->swaggerVersions[0] ?? 2))
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
             ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'API Gateway compatibility');
     }

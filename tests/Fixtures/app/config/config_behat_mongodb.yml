@@ -13,3 +13,5 @@ services:
         $jsonApiSchemaFile: '%kernel.project_dir%/../JsonSchema/jsonapi.json'
     ApiPlatform\Core\Tests\Behat\JsonHalContext:
         $schemaFile: '%kernel.project_dir%/../JsonHal/jsonhal.json'
+    ApiPlatform\Core\Tests\Behat\MercureContext:
+        $driverContainer: '@behat.driver.service_container'

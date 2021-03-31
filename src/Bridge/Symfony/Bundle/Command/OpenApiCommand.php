@@ -50,7 +50,7 @@ final class OpenApiCommand extends Command
             ->setDescription('Dump the Open API documentation')
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
-            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'Open API version to use (2 or 3) (2 is deprecated)', 3)
+            ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'Open API version to use (2 or 3) (2 is deprecated)', '3')
             ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'Enable the Amazon API Gateway compatibility mode');
     }
 

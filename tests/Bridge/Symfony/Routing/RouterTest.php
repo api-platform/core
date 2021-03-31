@@ -96,7 +96,7 @@ class RouterTest extends TestCase
         $this->assertEquals(['bar'], $router->match('/app_dev.php/foo'));
     }
 
-    public function testWithinvalidContext()
+    public function testMatchWithInvalidContext()
     {
         $this->expectException(RoutingExceptionInterface::class);
         $this->expectExceptionMessage('Invalid request context.');
@@ -107,5 +107,33 @@ class RouterTest extends TestCase
 
         $router = new Router($mockedRouter->reveal());
         $router->match('28-01-2018 10:10');
+    }
+
+    public function testMatchDuplicatedBaseUrl()
+    {
+        $context = new RequestContext('/app', 'GET', 'localhost', 'https');
+
+        $mockedRouter = $this->prophesize(RouterInterface::class);
+        $mockedRouter->getContext()->willReturn($context);
+        $mockedRouter->setContext(Argument::type(RequestContext::class))->willReturn();
+        $mockedRouter->match('/api/app_crm/resource')->willReturn(['bar']);
+
+        $router = new Router($mockedRouter->reveal());
+
+        $this->assertEquals(['bar'], $router->match('/app/api/app_crm/resource'));
+    }
+
+    public function testMatchEmptyBaseUrl()
+    {
+        $context = new RequestContext('', 'GET', 'localhost', 'https');
+
+        $mockedRouter = $this->prophesize(RouterInterface::class);
+        $mockedRouter->getContext()->willReturn($context);
+        $mockedRouter->setContext(Argument::type(RequestContext::class))->willReturn();
+        $mockedRouter->match('/foo')->willReturn(['bar']);
+
+        $router = new Router($mockedRouter->reveal());
+
+        $this->assertEquals(['bar'], $router->match('/foo'));
     }
 }
