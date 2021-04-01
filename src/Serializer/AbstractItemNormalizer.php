@@ -254,7 +254,34 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $item;
         }
 
-        return parent::denormalize($data, $resourceClass, $format, $context);
+        $objectToPopulate = $context[self::OBJECT_TO_POPULATE] ?? null;
+        $isUpdate = null !== $objectToPopulate;
+
+        // Filter out input attributes that aren't allowed for updates
+        if ($isUpdate) {
+            $data = array_filter($data, function (string $attribute) use ($context, $objectToPopulate) {
+                return $this->canAccessAttribute($objectToPopulate, $attribute, $context);
+            }, \ARRAY_FILTER_USE_KEY);
+        }
+
+        $previousObject = $isUpdate ? clone $objectToPopulate : null;
+        $object = parent::denormalize($data, $resourceClass, $format, $context);
+
+        // Revert attributes that aren't allowed to be changed after a post-denormalize check
+        foreach (array_keys($data) as $attribute) {
+            if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
+                if ($isUpdate) {
+                    $object[$attribute] = $previousObject[$attribute];
+                } else {
+                    $reflection = (new \ReflectionClass($object));
+                    $property = $reflection->getProperty($attribute);
+                    $property->setAccessible(true);
+                    $property->setValue($object, $reflection->getDefaultProperties()[$attribute] ?? null);
+                }
+            }
+        }
+
+        return $object;
     }
 
     /**
@@ -390,12 +417,43 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
+        return $this->canAccessAttribute(\is_object($classOrObject) ? $classOrObject : null, $attribute, $context);
+    }
+
+    /**
+     * Check if access to the attribute is granted.
+     *
+     * @param object $object
+     */
+    protected function canAccessAttribute($object, string $attribute, array $context = []): bool
+    {
         $options = $this->getFactoryOptions($context);
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
         $security = $propertyMetadata->getAttribute('security');
         if ($this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
-                'object' => $classOrObject,
+                'object' => $object,
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if access to the attribute is granted.
+     *
+     * @param object      $object
+     * @param object|null $previousObject
+     */
+    protected function canAccessAttributePostDenormalize($object, $previousObject, string $attribute, array $context = []): bool
+    {
+        $options = $this->getFactoryOptions($context);
+        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
+        $security = $propertyMetadata->getAttribute('security_post_denormalize');
+        if ($this->resourceAccessChecker && $security) {
+            return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
+                'object' => $object,
+                'previous_object' => $previousObject,
             ]);
         }
 

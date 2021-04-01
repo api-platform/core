@@ -30,6 +30,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("jsonldContext", type="array"),
  *     @Attribute("push", type="bool"),
  *     @Attribute("security", type="string"),
+ *     @Attribute("securityPostDenormalize", type="string"),
  *     @Attribute("swaggerContext", type="array")
  * )
  */
@@ -111,6 +112,7 @@ final class ApiProperty
      * @param array                            $openapiContext
      * @param bool                             $push
      * @param string                           $security
+     * @param string                           $securityPostDenormalize
      * @param array                            $swaggerContext
      *
      * @throws InvalidArgumentException
@@ -136,6 +138,7 @@ final class ApiProperty
         ?array $openapiContext = null,
         ?bool $push = null,
         ?string $security = null,
+        ?string $securityPostDenormalize = null,
         ?array $swaggerContext = null
     ) {
         if (!\is_array($description)) { // @phpstan-ignore-line Doctrine annotations support

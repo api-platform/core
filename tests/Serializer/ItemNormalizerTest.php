@@ -164,6 +164,7 @@ class ItemNormalizerTest extends TestCase
 
         $propertyMetadata = new PropertyMetadata(null, null, true, true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn($propertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

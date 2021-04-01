@@ -266,6 +266,63 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
+    public function testDenormalizeWithSecuredProperty()
+    {
+        $data = [
+            'title' => 'foo',
+            'adminOnlyProperty' => 'secret',
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title']));
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true));
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true, null, null, null, null, null, null, null, ['security' => 'is_granted(\'ROLE_ADMIN\')']));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            ['object' => null]
+        )->willReturn(false);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            null,
+            false,
+            [],
+            [],
+            null,
+            $resourceAccessChecker->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $actual = $normalizer->denormalize($data, SecuredDummy::class);
+
+        $this->assertInstanceOf(SecuredDummy::class, $actual);
+
+        $propertyAccessorProphecy->setValue($actual, 'title', 'foo')->shouldHaveBeenCalled();
+        $propertyAccessorProphecy->setValue($actual, 'adminOnlyProperty', 'secret')->shouldNotHaveBeenCalled();
+    }
+
     public function testNormalizeReadableLinks()
     {
         $relatedDummy = new RelatedDummy();
@@ -787,6 +844,8 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummies']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', false, true, false, false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
             new PropertyMetadata(
                 new Type(
