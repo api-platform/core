@@ -226,7 +226,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                     continue;
                 }
 
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', null), $propertyType, $resourceClass, $input, $queryName, $mutationName, $subscriptionName, $depth)) {
+                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', null), $propertyType, $resourceClass, $input, $queryName, $mutationName, $subscriptionName, $depth, null !== $propertyMetadata->getAttribute('security'))) {
                     $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
                 }
             }
@@ -260,7 +260,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
      */
-    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth = 0): ?array
+    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth = 0, bool $forceNullable = false): ?array
     {
         try {
             if (
@@ -272,7 +272,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 $resourceClass = $type->getClassName();
             }
 
-            if (null === $graphqlType = $this->convertType($type, $input, $queryName, $mutationName, $subscriptionName, $resourceClass ?? '', $rootResource, $property, $depth)) {
+            if (null === $graphqlType = $this->convertType($type, $input, $queryName, $mutationName, $subscriptionName, $resourceClass ?? '', $rootResource, $property, $depth, $forceNullable)) {
                 return null;
             }
 
@@ -476,7 +476,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
      *
      * @throws InvalidTypeException
      */
-    private function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    private function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false)
     {
         $graphqlType = $this->typeConverter->convertType($type, $input, $queryName, $mutationName, $subscriptionName, $resourceClass, $rootResource, $property, $depth);
 
@@ -498,7 +498,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             return $this->pagination->isGraphQlEnabled($resourceClass, $operationName) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $operationName) : GraphQLType::listOf($graphqlType);
         }
 
-        return !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
+        return $forceNullable || !$graphqlType instanceof NullableType || $type->isNullable() || (null !== $mutationName && 'update' === $mutationName)
             ? $graphqlType
             : GraphQLType::nonNull($graphqlType);
     }

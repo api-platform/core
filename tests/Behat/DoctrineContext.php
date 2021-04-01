@@ -76,6 +76,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Question as QuestionDocu
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy as RelatedOwningDummyDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedSecuredDummy as RelatedSecuredDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as RelatedToDummyFriendDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
@@ -150,6 +151,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedSecuredDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToDummyFriend;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
@@ -1028,6 +1030,40 @@ final class DoctrineContext implements Context
             $securedDummy->setTitle("#$i");
             $securedDummy->setDescription("Hello #$i");
             $securedDummy->setOwner('notexist');
+
+            $this->manager->persist($securedDummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb SecuredDummy objects owned by :ownedby with related dummies
+     */
+    public function thereAreSecuredDummyObjectsOwnedByWithRelatedDummies(int $nb, string $ownedby)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $securedDummy = $this->buildSecuredDummy();
+            $securedDummy->setTitle("#$i");
+            $securedDummy->setDescription("Hello #$i");
+            $securedDummy->setOwner($ownedby);
+
+            $relatedDummy = $this->buildRelatedDummy();
+            $relatedDummy->setName('RelatedDummy');
+            $this->manager->persist($relatedDummy);
+
+            $relatedSecuredDummy = $this->buildRelatedSecureDummy();
+            $this->manager->persist($relatedSecuredDummy);
+
+            $publicRelatedSecuredDummy = $this->buildRelatedSecureDummy();
+            $this->manager->persist($publicRelatedSecuredDummy);
+
+            $securedDummy->addRelatedDummy($relatedDummy);
+            $securedDummy->setRelatedDummy($relatedDummy);
+            $securedDummy->addRelatedSecuredDummy($relatedSecuredDummy);
+            $securedDummy->setRelatedSecuredDummy($relatedSecuredDummy);
+            $securedDummy->addPublicRelatedSecuredDummy($publicRelatedSecuredDummy);
+            $securedDummy->setPublicRelatedSecuredDummy($publicRelatedSecuredDummy);
 
             $this->manager->persist($securedDummy);
         }
@@ -2168,6 +2204,14 @@ final class DoctrineContext implements Context
     private function buildSecuredDummy()
     {
         return $this->isOrm() ? new SecuredDummy() : new SecuredDummyDocument();
+    }
+
+    /**
+     * @return RelatedSecuredDummy|RelatedSecuredDummyDocument
+     */
+    private function buildRelatedSecureDummy()
+    {
+        return $this->isOrm() ? new RelatedSecuredDummy() : new RelatedSecuredDummyDocument();
     }
 
     /**

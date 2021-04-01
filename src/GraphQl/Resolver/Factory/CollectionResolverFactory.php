@@ -59,7 +59,8 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
-            if (null === $resourceClass || null === $rootClass) {
+            // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
+            if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;
             }
 
@@ -87,17 +88,20 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 $collection = $queryResolver($collection, $resolverContext);
             }
 
-            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
-                'extra_variables' => [
-                    'object' => $collection,
-                ],
-            ]);
-            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
-                'extra_variables' => [
-                    'object' => $collection,
-                    'previous_object' => $this->clone($collection),
-                ],
-            ]);
+            // Only perform security stage on the top-level query
+            if (null === $source) {
+                ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $collection,
+                    ],
+                ]);
+                ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $collection,
+                        'previous_object' => $this->clone($collection),
+                    ],
+                ]);
+            }
 
             return ($this->serializeStage)($collection, $resourceClass, $operationName, $resolverContext);
         };

@@ -74,7 +74,78 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
+        $source = ['testField' => 0];
+        $args = ['args'];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'testField';
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
+
+        $request = new Request();
+        $attributesParameterBagProphecy = $this->prophesize(ParameterBag::class);
+        $attributesParameterBagProphecy->get('_graphql_collections_args', [])->willReturn(['collection_args']);
+        $attributesParameterBagProphecy->set('_graphql_collections_args', [$resourceClass => $args, 'collection_args'])->shouldBeCalled();
+        $request->attributes = $attributesParameterBagProphecy->reveal();
+        $this->requestStackProphecy->getCurrentRequest()->willReturn($request);
+
+        $readStageCollection = [new \stdClass()];
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
+
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+                'previous_object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+
+        $serializeStageData = ['serialized'];
+        $this->serializeStageProphecy->__invoke($readStageCollection, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+
+        $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
+    }
+
+    public function testResolveFieldNotInSource(): void
+    {
+        $resourceClass = 'stdClass';
+        $rootClass = 'rootClass';
+        $operationName = 'collection_query';
         $source = ['source'];
+        $args = ['args'];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'testField';
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
+
+        $readStageCollection = [new \stdClass()];
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldNotBeCalled();
+
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+                'previous_object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+
+        // Null should be returned if the field isn't in the source - as its lack of presence will be due to @ApiProperty security stripping unauthorized fields
+        $this->assertNull(($this->collectionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
+    }
+
+    public function testResolveNullSource(): void
+    {
+        $resourceClass = 'stdClass';
+        $rootClass = 'rootClass';
+        $operationName = 'collection_query';
+        $source = null;
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
@@ -138,7 +209,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
-        $source = ['source'];
+        $source = null;
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
@@ -157,7 +228,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
-        $source = ['source'];
+        $source = null;
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
