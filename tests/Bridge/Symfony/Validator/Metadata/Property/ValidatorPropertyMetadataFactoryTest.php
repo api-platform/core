@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
@@ -25,6 +26,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropert
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyAtLeastOneOfValidatedEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyCollectionValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyCompoundValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyCountValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
@@ -580,5 +582,68 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'min' => ['property' => 'dummyMin', 'expectedSchema' => ['minItems' => 1]];
         yield 'max' => ['property' => 'dummyMax', 'expectedSchema' => ['maxItems' => 10]];
         yield 'min/max' => ['property' => 'dummyMinMax', 'expectedSchema' => ['minItems' => 1, 'maxItems' => 10]];
+    }
+
+    public function testCreateWithPropertyCollectionRestriction(): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyCollectionValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyCollectionValidatedEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyCollectionValidatedEntity::class, 'dummyData', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_ARRAY))
+        )->shouldBeCalled();
+
+        $lengthRestriction = new PropertySchemaLengthRestriction();
+        $regexRestriction = new PropertySchemaRegexRestriction();
+        $formatRestriction = new PropertySchemaFormat();
+        $restrictionsMetadata = [
+            $lengthRestriction,
+            $regexRestriction,
+            $formatRestriction,
+            new PropertySchemaCollectionRestriction([
+                $lengthRestriction,
+                $regexRestriction,
+                $formatRestriction,
+                new PropertySchemaCollectionRestriction([
+                    $lengthRestriction,
+                    $regexRestriction,
+                    $formatRestriction,
+                ]),
+            ]),
+        ];
+
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            $restrictionsMetadata
+        );
+
+        $schema = $validationPropertyMetadataFactory->create(DummyCollectionValidatedEntity::class, 'dummyData')->getSchema();
+
+        $this->assertSame([
+            'type' => 'object',
+            'properties' => [
+                'name' => ['type' => 'string'],
+                'email' => ['type' => 'string', 'format' => 'email'],
+                'phone' => ['type' => 'string', 'pattern' => '[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*'],
+                'age' => ['type' => 'integer'],
+                'social' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'githubUsername' => ['type' => 'string'],
+                    ],
+                    'additionalProperties' => false,
+                    'required' => ['githubUsername'],
+                ],
+            ],
+            'additionalProperties' => true,
+            'required' => ['name', 'email', 'social'],
+        ], $schema);
     }
 }
