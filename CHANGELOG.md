@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* JSON Schema: Manage Compound constraint when generating property metadata (#4180)
 * Validator: Add an option to disable query parameter validation (#4165)
 * JSON Schema: Add support for generating property schema with Choice restriction (#4162)
 * JSON Schema: Add support for generating property schema with Range restriction (#4158)
