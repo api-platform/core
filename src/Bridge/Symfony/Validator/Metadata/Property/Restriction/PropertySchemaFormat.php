@@ -16,8 +16,10 @@ namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restrictio
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Constraints\Ip;
 use Symfony\Component\Validator\Constraints\Ulid;
+use Symfony\Component\Validator\Constraints\Url;
 use Symfony\Component\Validator\Constraints\Uuid;
 
 /**
@@ -34,6 +36,14 @@ class PropertySchemaFormat implements PropertySchemaRestrictionMetadataInterface
     {
         if ($constraint instanceof Email) {
             return ['format' => 'email'];
+        }
+
+        if ($constraint instanceof Url) {
+            return ['format' => 'uri'];
+        }
+
+        if ($constraint instanceof Hostname) {
+            return ['format' => 'hostname'];
         }
 
         if ($constraint instanceof Uuid) {
@@ -62,6 +72,6 @@ class PropertySchemaFormat implements PropertySchemaRestrictionMetadataInterface
     {
         $schema = $propertyMetadata->getSchema();
 
-        return empty($schema['format']) && ($constraint instanceof Email || $constraint instanceof Uuid || $constraint instanceof Ulid || $constraint instanceof Ip);
+        return empty($schema['format']) && ($constraint instanceof Email || $constraint instanceof Url || $constraint instanceof Hostname || $constraint instanceof Uuid || $constraint instanceof Ulid || $constraint instanceof Ip);
     }
 }
