@@ -53,7 +53,7 @@ class ApiPropertyTest extends TestCase
             'fetchEager' => false,
             'jsonldContext' => ['foo' => 'bar'],
             'security' => 'is_granted(\'ROLE_ADMIN\')',
-            'security_post_denormalize' => 'is_granted(\'VIEW\', object)',
+            'securityPostDenormalize' => 'is_granted(\'VIEW\', object)',
             'swaggerContext' => ['foo' => 'baz'],
             'openapiContext' => ['foo' => 'baz'],
             'push' => true,
