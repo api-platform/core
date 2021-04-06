@@ -2,7 +2,7 @@
 
 ## 2.7.0
 
-* Security: **BC** Fix `ApiProperty` `security` attribute expression passed a class string for `object` variable for updates/creates - null is now passed instead if the object is not available (#4184)
+* Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)
 * Security: `ApiProperty` now supports a `security_post_denormalize` attribute, which provides access to the `object` variable for the object being updated/created and `previous_object` for the object before it was updated (#4184)
 * JSON Schema: Add support for generating property schema with numeric constraint restrictions (#4225)
 * JSON Schema: Add support for generating property schema with Collection restriction (#4182)
