@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
@@ -25,6 +26,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\Fixtures\DummyAtLeastOneOfValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyCompoundValidatedEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyCountValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyRangeValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
@@ -546,5 +548,40 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'multi choice min' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceMin', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2]];
         yield 'multi choice max' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]];
         yield 'multi choice min/max' => ['propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), 'property' => 'dummyMultiChoiceMinMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
+    }
+
+    /**
+     * @dataProvider provideCountConstraintCases
+     */
+    public function testCreateWithPropertyCountRestriction(string $property, array $expectedSchema): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyCountValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyCountValidatedEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyCountValidatedEntity::class, $property, [])->willReturn(
+            new PropertyMetadata()
+        )->shouldBeCalled();
+
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(),
+            [new PropertySchemaCountRestriction()]
+        );
+
+        $schema = $validationPropertyMetadataFactory->create(DummyCountValidatedEntity::class, $property)->getSchema();
+
+        $this->assertSame($expectedSchema, $schema);
+    }
+
+    public function provideCountConstraintCases(): \Generator
+    {
+        yield 'min' => ['property' => 'dummyMin', 'expectedSchema' => ['minItems' => 1]];
+        yield 'max' => ['property' => 'dummyMax', 'expectedSchema' => ['maxItems' => 10]];
+        yield 'min/max' => ['property' => 'dummyMinMax', 'expectedSchema' => ['minItems' => 1, 'maxItems' => 10]];
     }
 }

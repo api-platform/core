@@ -21,6 +21,10 @@
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 
+        <service id="api_platform.metadata.property_schema.count_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
         <service id="api_platform.metadata.property_schema.length_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction" public="false">
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
