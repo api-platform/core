@@ -254,29 +254,24 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $item;
         }
 
-        $objectToPopulate = $context[self::OBJECT_TO_POPULATE] ?? null;
-        $isUpdate = null !== $objectToPopulate;
-
         // Filter out input attributes that aren't allowed for updates
-        if ($isUpdate) {
+        if (null !== $objectToPopulate) {
             $data = array_filter($data, function (string $attribute) use ($context, $objectToPopulate) {
                 return $this->canAccessAttribute($objectToPopulate, $attribute, $context);
             }, \ARRAY_FILTER_USE_KEY);
         }
 
-        $previousObject = $isUpdate ? clone $objectToPopulate : null;
+        $previousObject = null !== $objectToPopulate ? clone $objectToPopulate : null;
         $object = parent::denormalize($data, $resourceClass, $format, $context);
 
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
-                if ($isUpdate) {
-                    $object[$attribute] = $previousObject[$attribute];
+                if (null !== $previousObject) {
+                    $this->setValue($object, $attribute, $this->propertyAccessor->getValue($previousObject, $attribute));
                 } else {
-                    $reflection = (new \ReflectionClass($object));
-                    $property = $reflection->getProperty($attribute);
-                    $property->setAccessible(true);
-                    $property->setValue($object, $reflection->getDefaultProperties()[$attribute] ?? null);
+                    $propertyMetaData = $this->propertyMetadataFactory->create($resourceClass, $attribute, $this->getFactoryOptions($context));
+                    $this->setValue($object, $attribute, $propertyMetaData->getDefault());
                 }
             }
         }
