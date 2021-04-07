@@ -29,6 +29,7 @@ class ClientTest extends ApiTestCase
          * @var EntityManagerInterface
          */
         $manager = self::$container->get('doctrine')->getManager();
+        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);
 

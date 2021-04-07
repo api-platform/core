@@ -39,8 +39,6 @@ parameters:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
 	ignoreErrors:
-		# Real problems, hard to fix
-		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
 		# False positives
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
