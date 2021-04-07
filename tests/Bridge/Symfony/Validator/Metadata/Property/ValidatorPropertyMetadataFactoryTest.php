@@ -33,13 +33,17 @@ use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyUniqueValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyValidatedHostnameEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyValidatedUlidEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\Compound;
+use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AnnotationLoader;
@@ -318,36 +322,45 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals('dummy', $schema['pattern']);
     }
 
-    public function testCreateWithPropertyFormatRestriction(): void
+    /**
+     * @dataProvider providePropertySchemaFormatCases
+     */
+    public function testCreateWithPropertyFormatRestriction(string $property, string $class, array $expectedSchema): void
     {
-        $validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
+        $validatorClassMetadata = new ClassMetadata($class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 
         $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
-        $validatorMetadataFactory->getMetadataFor(DummyValidatedEntity::class)
+        $validatorMetadataFactory->getMetadataFor($class)
                                  ->willReturn($validatorClassMetadata)
                                  ->shouldBeCalled();
-        $formats = [
-            'dummyEmail' => 'email',
-            'dummyUuid' => 'uuid',
-            'dummyIpv4' => 'ipv4',
-            'dummyIpv6' => 'ipv6',
-        ];
 
-        foreach ($formats as $property => $format) {
-            $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-            $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, $property, [])->willReturn(
-                new PropertyMetadata()
-            )->shouldBeCalled();
-            $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
-                $validatorMetadataFactory->reveal(),
-                $decoratedPropertyMetadataFactory->reveal(),
-                [new PropertySchemaFormat()]
-            );
-            $schema = $validationPropertyMetadataFactory->create(DummyValidatedEntity::class, $property)->getSchema();
-            $this->assertNotNull($schema);
-            $this->assertArrayHasKey('format', $schema);
-            $this->assertEquals($format, $schema['format']);
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create($class, $property, [])->willReturn(
+            new PropertyMetadata()
+        )->shouldBeCalled();
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            [new PropertySchemaFormat()]
+        );
+        $schema = $validationPropertyMetadataFactory->create($class, $property)->getSchema();
+
+        $this->assertSame($expectedSchema, $schema);
+    }
+
+    public function providePropertySchemaFormatCases(): \Generator
+    {
+        yield ['dummyEmail', DummyValidatedEntity::class, ['format' => 'email']];
+        yield ['dummyUuid', DummyValidatedEntity::class, ['format' => 'uuid']];
+        yield ['dummyIpv4', DummyValidatedEntity::class, ['format' => 'ipv4']];
+        yield ['dummyIpv6', DummyValidatedEntity::class, ['format' => 'ipv6']];
+        yield ['dummyUrl', DummyValidatedEntity::class, ['format' => 'uri']];
+        if (class_exists(Ulid::class)) {
+            yield ['dummyUlid', DummyValidatedUlidEntity::class, ['format' => 'ulid']];
+        }
+        if (class_exists(Hostname::class)) {
+            yield ['dummyHostname', DummyValidatedHostnameEntity::class, ['format' => 'hostname']];
         }
     }
 

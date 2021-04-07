@@ -77,4 +77,11 @@ class DummyValidatedEntity
      * @Assert\NotNull(groups={"dummy"})
      */
     public $dummyGroup;
+
+    /**
+     * @var string A dummy url
+     *
+     * @Assert\Url
+     */
+    public $dummyUrl;
 }
