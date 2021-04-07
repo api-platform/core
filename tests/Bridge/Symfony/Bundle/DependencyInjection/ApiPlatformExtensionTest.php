@@ -859,6 +859,19 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilderProphecy->reveal());
     }
 
+    public function testExtraConfigurationMegrging()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.swagger_ui.extra_configuration', [])->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.swagger_ui.extra_configuration', ['someParameter' => 'someValue'])->shouldBeCalled();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['openapi']['swagger_ui_extra_configuration'] = [];
+        $config['api_platform']['swagger']['swagger_ui_extra_configuration'] = ['someParameter' => 'someValue'];
+
+        $this->extension->load($config, $containerBuilderProphecy->reveal());
+    }
+
     private function getPartialContainerBuilderProphecy($configuration = null)
     {
         $parameterBag = new EnvPlaceholderParameterBag();
