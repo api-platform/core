@@ -864,12 +864,20 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.swagger_ui.extra_configuration', [])->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.swagger_ui.extra_configuration', ['someParameter' => 'someValue'])->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
 
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['openapi']['swagger_ui_extra_configuration'] = [];
         $config['api_platform']['swagger']['swagger_ui_extra_configuration'] = ['someParameter' => 'someValue'];
 
-        $this->extension->load($config, $containerBuilderProphecy->reveal());
+        $this->extension->load($config, $containerBuilder);
+
+        $config['api_platform']['openapi']['swagger_ui_extra_configuration'] = ['someParameter' => 'someValue'];
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You can not set "swagger_ui_extra_configuration" twice - in "openapi" and "swagger" section.');
+
+        $this->extension->load($config, $containerBuilder);
     }
 
     private function getPartialContainerBuilderProphecy($configuration = null)
