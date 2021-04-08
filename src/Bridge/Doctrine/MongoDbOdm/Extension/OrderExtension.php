@@ -58,7 +58,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
             if (empty($defaultOrder)) {
                 $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
             }
-            if (\is_array($defaultOrder)) {
+            if (null !== $defaultOrder) {
                 foreach ($defaultOrder as $field => $order) {
                     if (\is_int($field)) {
                         // Default direction

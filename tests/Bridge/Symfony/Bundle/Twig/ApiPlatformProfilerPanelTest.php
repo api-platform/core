@@ -50,6 +50,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $manager = $doctrine->getManager();
         $this->manager = $manager;
         $this->schemaTool = new SchemaTool($this->manager);
+        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
         $classes = $this->manager->getMetadataFactory()->getAllMetadata();
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
