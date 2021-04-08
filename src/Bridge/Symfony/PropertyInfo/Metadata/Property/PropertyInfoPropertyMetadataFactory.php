@@ -37,39 +37,39 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $name, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         if (null === $this->decorated) {
             $propertyMetadata = new PropertyMetadata();
         } else {
             try {
-                $propertyMetadata = $this->decorated->create($resourceClass, $name, $options);
+                $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
                 $propertyMetadata = new PropertyMetadata();
             }
         }
 
         if (null === $propertyMetadata->getType()) {
-            $types = $this->propertyInfo->getTypes($resourceClass, $name, $options);
+            $types = $this->propertyInfo->getTypes($resourceClass, $property, $options);
             if (isset($types[0])) {
                 $propertyMetadata = $propertyMetadata->withType($types[0]);
             }
         }
 
-        if (null === $propertyMetadata->getDescription() && null !== $description = $this->propertyInfo->getShortDescription($resourceClass, $name, $options)) {
+        if (null === $propertyMetadata->getDescription() && null !== $description = $this->propertyInfo->getShortDescription($resourceClass, $property, $options)) {
             $propertyMetadata = $propertyMetadata->withDescription($description);
         }
 
-        if (null === $propertyMetadata->isReadable() && null !== $readable = $this->propertyInfo->isReadable($resourceClass, $name, $options)) {
+        if (null === $propertyMetadata->isReadable() && null !== $readable = $this->propertyInfo->isReadable($resourceClass, $property, $options)) {
             $propertyMetadata = $propertyMetadata->withReadable($readable);
         }
 
-        if (null === $propertyMetadata->isWritable() && null !== $writable = $this->propertyInfo->isWritable($resourceClass, $name, $options)) {
+        if (null === $propertyMetadata->isWritable() && null !== $writable = $this->propertyInfo->isWritable($resourceClass, $property, $options)) {
             $propertyMetadata = $propertyMetadata->withWritable($writable);
         }
 
         if (method_exists($this->propertyInfo, 'isInitializable')) {
-            if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $name, $options)) {
+            if (null === $propertyMetadata->isInitializable() && null !== $initializable = $this->propertyInfo->isInitializable($resourceClass, $property, $options)) {
                 $propertyMetadata = $propertyMetadata->withInitializable($initializable);
             }
         } else {
@@ -77,7 +77,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
             $ref = new \ReflectionClass($resourceClass);
             if ($ref->isInstantiable() && $constructor = $ref->getConstructor()) {
                 foreach ($constructor->getParameters() as $constructorParameter) {
-                    if ($constructorParameter->name === $name && null === $propertyMetadata->isInitializable()) {
+                    if ($constructorParameter->name === $property && null === $propertyMetadata->isInitializable()) {
                         $propertyMetadata = $propertyMetadata->withInitializable(true);
                     }
                 }

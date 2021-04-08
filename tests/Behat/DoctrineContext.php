@@ -185,7 +185,6 @@ final class DoctrineContext implements Context
     private $passwordEncoder;
     private $schemaTool;
     private $schemaManager;
-    private $classes;
 
     /**
      * Initializes context.
@@ -201,7 +200,6 @@ final class DoctrineContext implements Context
         $this->manager = $doctrine->getManager();
         $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
         $this->schemaManager = $this->manager instanceof DocumentManager ? $this->manager->getSchemaManager() : null;
-        $this->classes = $this->manager->getMetadataFactory()->getAllMetadata();
     }
 
     /**
@@ -209,9 +207,12 @@ final class DoctrineContext implements Context
      */
     public function createDatabase()
     {
+        /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
+        $classes = $this->manager->getMetadataFactory()->getAllMetadata();
+
         if ($this->isOrm()) {
-            $this->schemaTool->dropSchema($this->classes);
-            $this->schemaTool->createSchema($this->classes);
+            $this->schemaTool->dropSchema($classes);
+            $this->schemaTool->createSchema($classes);
         }
 
         if ($this->isOdm()) {

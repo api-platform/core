@@ -67,7 +67,6 @@ api_platform:
         pagination_client_items_per_page:     true
         pagination_client_partial:            true
         pagination_items_per_page:            3
-        order:                                'ASC'
         cache_headers:
             max_age:                          60
             shared_max_age:                   3600

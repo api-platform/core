@@ -88,9 +88,9 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $name, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        $propertyMetadata = $this->decorated->create($resourceClass, $name, $options);
+        $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
         $required = $propertyMetadata->isRequired();
         $iri = $propertyMetadata->getIri();
@@ -109,7 +109,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         $validationGroups = $this->getValidationGroups($validatorClassMetadata, $options);
         $restrictions = [];
 
-        foreach ($validatorClassMetadata->getPropertyMetadata($name) as $validatorPropertyMetadata) {
+        foreach ($validatorClassMetadata->getPropertyMetadata($property) as $validatorPropertyMetadata) {
             foreach ($this->getPropertyConstraints($validatorPropertyMetadata, $validationGroups) as $constraint) {
                 if (null === $required && $this->isRequired($constraint)) {
                     $required = true;

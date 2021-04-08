@@ -32,29 +32,12 @@ class PropertySchemaLengthRestriction implements PropertySchemaRestrictionMetada
     {
         $restriction = [];
 
-        switch ($propertyMetadata->getType()->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_STRING:
+        if (isset($constraint->min)) {
+            $restriction['minLength'] = (int) $constraint->min;
+        }
 
-                if (isset($constraint->min)) {
-                    $restriction['minLength'] = (int) $constraint->min;
-                }
-
-                if (isset($constraint->max)) {
-                    $restriction['maxLength'] = (int) $constraint->max;
-                }
-
-                break;
-            case Type::BUILTIN_TYPE_INT:
-            case Type::BUILTIN_TYPE_FLOAT:
-                if (isset($constraint->min)) {
-                    $restriction['minimum'] = (int) $constraint->min;
-                }
-
-                if (isset($constraint->max)) {
-                    $restriction['maximum'] = (int) $constraint->max;
-                }
-
-                break;
+        if (isset($constraint->max)) {
+            $restriction['maxLength'] = (int) $constraint->max;
         }
 
         return $restriction;
@@ -65,6 +48,6 @@ class PropertySchemaLengthRestriction implements PropertySchemaRestrictionMetada
      */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
-        return $constraint instanceof Length && null !== $propertyMetadata->getType();
+        return $constraint instanceof Length && null !== ($type = $propertyMetadata->getType()) && Type::BUILTIN_TYPE_STRING === $type->getBuiltinType();
     }
 }
