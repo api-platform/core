@@ -859,7 +859,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilderProphecy->reveal());
     }
 
-    public function testExtraConfigurationMegrging()
+    public function testExtraConfigurationMerging()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->setParameter('api_platform.swagger_ui.extra_configuration', [])->shouldNotBeCalled();
