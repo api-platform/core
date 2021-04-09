@@ -93,12 +93,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $resourceShortName = $resourceMetadata->getShortName();
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
-            [$itemOperationLinks, $itemOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
-            $this->appendSchemaDefinitions($schemas, $itemOperationSchemas);
-            [$collectionOperationLinks, $collectionOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
+            $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
+            $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
 
-            [$subresourceOperationLinks, $subresourceOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::SUBRESOURCE, $context, $paths, $links, $schemas);
-            $this->appendSchemaDefinitions($schemas, $collectionOperationSchemas);
+            $this->collectPaths($resourceMetadata, $resourceClass, OperationType::SUBRESOURCE, $context, $paths, $links, $schemas);
         }
 
         $securitySchemes = $this->getSecuritySchemes();
@@ -125,10 +123,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         );
     }
 
-    /**
-     * @return array | array
-     */
-    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, \ArrayObject $schemas): array
+    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, \ArrayObject $schemas): void
     {
         $resourceShortName = $resourceMetadata->getShortName();
         $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : (OperationType::ITEM === $operationType ? $resourceMetadata->getItemOperations() : $this->subresourceOperationFactory->create($resourceClass));
