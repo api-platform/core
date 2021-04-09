@@ -165,6 +165,7 @@ final class TypeFactory implements TypeFactoryInterface
         if (\array_key_exists('$ref', $jsonSchema)) {
             return [
                 'nullable' => true,
+                'type' => array_merge(isset($jsonSchema['type']) ? [$jsonSchema['type']] : ['object'], ['null']),
                 'anyOf' => [$jsonSchema],
             ];
         }

@@ -404,6 +404,7 @@ class TypeFactoryTest extends TestCase
 
         self::assertSame([
             'nullable' => true,
+            'type' => ['object', 'null'],
             'anyOf' => [
                 ['$ref' => 'the-ref-name'],
             ],
