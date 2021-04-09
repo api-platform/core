@@ -128,7 +128,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $resourceShortName = $resourceMetadata->getShortName();
         $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : (OperationType::ITEM === $operationType ? $resourceMetadata->getItemOperations() : $this->subresourceOperationFactory->create($resourceClass));
         if (!$operations) {
-            return [$links, $schemas];
+            return;
         }
 
         $rootResourceClass = $resourceClass;
@@ -286,8 +286,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $paths->addPath($path, $pathItem);
         }
-
-        return [$links, $schemas];
     }
 
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
