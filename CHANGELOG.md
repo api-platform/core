@@ -3,6 +3,7 @@
 ## 2.6.5
 
 * OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
+* Serializer: Convert internal error to HTTP 400 in Ramsey uuid denormalization from invalid body string (#4200)
 
 ## 2.6.4
 
