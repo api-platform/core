@@ -254,13 +254,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $item;
         }
 
-        // Filter out input attributes that aren't allowed for updates
-        if (null !== $objectToPopulate) {
-            $data = array_filter($data, function (string $attribute) use ($context, $objectToPopulate) {
-                return $this->canAccessAttribute($objectToPopulate, $attribute, $context);
-            }, \ARRAY_FILTER_USE_KEY);
-        }
-
         $previousObject = null !== $objectToPopulate ? clone $objectToPopulate : null;
         $object = parent::denormalize($data, $resourceClass, $format, $context);
 
