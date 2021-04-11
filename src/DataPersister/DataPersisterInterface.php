@@ -23,17 +23,17 @@ interface DataPersisterInterface
     /**
      * Is the data supported by the persister?
      */
-    public function supports($data): bool;
+    public function supports($data, $context = []): bool;
 
     /**
      * Persists the data.
      *
      * @return object|void Void will not be supported in API Platform 3, an object should always be returned
      */
-    public function persist($data);
+    public function persist($data, $context = []);
 
     /**
      * Removes the data.
      */
-    public function remove($data);
+    public function remove($data, $context = []);
 }
