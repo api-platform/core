@@ -26,6 +26,9 @@
 * Symfony: Do not override Vary headers already set in the Response
 * Symfony: Make Twig dependency lazy (#4187)
 * Compatibility with `psr/cache` version 2 and 3 (#4117)
+* Docs: Upgrade Swagger UI to version 3.46.0
+* Docs: Upgrade ReDoc to version 2.0.0-rc.51
+* Docs: Upgrade GraphiQL to version 1.4.1
 
 ## 2.6.3
 
