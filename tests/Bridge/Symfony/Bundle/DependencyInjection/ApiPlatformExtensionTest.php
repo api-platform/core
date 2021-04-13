@@ -1358,6 +1358,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.validator',
             'api_platform.metadata.property_schema.choice_restriction',
+            'api_platform.metadata.property_schema.collection_restriction',
             'api_platform.metadata.property_schema.count_restriction',
             'api_platform.metadata.property_schema.length_restriction',
             'api_platform.metadata.property_schema.one_of_restriction',
