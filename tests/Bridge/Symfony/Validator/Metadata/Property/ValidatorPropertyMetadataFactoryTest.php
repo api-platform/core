@@ -629,14 +629,14 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertSame([
             'type' => 'object',
             'properties' => [
-                'name' => ['type' => 'string'],
-                'email' => ['type' => 'string', 'format' => 'email'],
-                'phone' => ['type' => 'string', 'pattern' => '[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*'],
-                'age' => ['type' => 'integer'],
+                'name' => [],
+                'email' => ['format' => 'email'],
+                'phone' => ['pattern' => '^(?:[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
+                'age' => [],
                 'social' => [
                     'type' => 'object',
                     'properties' => [
-                        'githubUsername' => ['type' => 'string'],
+                        'githubUsername' => [],
                     ],
                     'additionalProperties' => false,
                     'required' => ['githubUsername'],

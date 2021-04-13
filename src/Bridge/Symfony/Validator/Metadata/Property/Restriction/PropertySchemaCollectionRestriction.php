@@ -18,7 +18,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Required;
-use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * @author Tomas Norkūnas <norkunas.tom@gmail.com>
@@ -81,16 +80,10 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
      */
     private function mergeConstraintRestrictions(Constraint $constraint, PropertyMetadata $propertyMetadata): array
     {
-        $propertyRestrictions = [['type' => 'string']];
+        $propertyRestrictions = [];
         $nestedConstraints = method_exists($constraint, 'getNestedContraints') ? $constraint->getNestedContraints() : $constraint->constraints;
 
         foreach ($nestedConstraints as $nestedConstraint) {
-            if ($nestedConstraint instanceof Type) {
-                /** @var string $nestedType */
-                $nestedType = $nestedConstraint->type;
-                $propertyRestrictions[0]['type'] = $this->getConstraintType($nestedType);
-            }
-
             foreach ($this->restrictionsMetadata as $restrictionMetadata) {
                 if ($restrictionMetadata->supports($nestedConstraint, $propertyMetadata) && !empty($nestedConstraintRestriction = $restrictionMetadata->create($nestedConstraint, $propertyMetadata))) {
                     $propertyRestrictions[] = $nestedConstraintRestriction;
@@ -99,30 +92,5 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
         }
 
         return array_merge([], ...$propertyRestrictions);
-    }
-
-    private function getConstraintType(string $type): string
-    {
-        if (\in_array($type, ['bool', 'boolean'], true)) {
-            return 'boolean';
-        }
-
-        if (\in_array($type, ['int', 'integer', 'long'], true)) {
-            return 'integer';
-        }
-
-        if (\in_array($type, ['float', 'double', 'real', 'numeric'], true)) {
-            return 'number';
-        }
-
-        if (\in_array($type, ['array', 'iterable'], true)) {
-            return 'array';
-        }
-
-        if ('object' === $type) {
-            return 'object';
-        }
-
-        return 'string';
     }
 }

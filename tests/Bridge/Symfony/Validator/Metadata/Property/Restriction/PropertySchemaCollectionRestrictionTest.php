@@ -107,11 +107,11 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             [
                 'type' => 'object',
                 'properties' => [
-                    'name' => ['type' => 'string'],
-                    'email' => ['type' => 'string', 'format' => 'email'],
-                    'phone' => ['type' => 'string', 'pattern' => '[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*'],
-                    'age' => ['type' => 'integer'],
-                    'social' => ['type' => 'object', 'properties' => ['githubUsername' => ['type' => 'string']], 'additionalProperties' => false, 'required' => ['githubUsername']],
+                    'name' => [],
+                    'email' => ['format' => 'email'],
+                    'phone' => ['pattern' => '^(?:[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
+                    'age' => [],
+                    'social' => ['type' => 'object', 'properties' => ['githubUsername' => []], 'additionalProperties' => false, 'required' => ['githubUsername']],
                 ],
                 'additionalProperties' => true,
                 'required' => ['name', 'email', 'social'],
