@@ -167,6 +167,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
@@ -1365,8 +1366,7 @@ final class DoctrineContext implements Context
      */
     public function thereIsARamseyIdentifiedResource(string $uuid)
     {
-        $dummy = new RamseyUuidDummy();
-        $dummy->setId($uuid);
+        $dummy = new RamseyUuidDummy(Uuid::fromString($uuid));
 
         $this->manager->persist($dummy);
         $this->manager->flush();

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\RamseyUuid\Normalizer;
+namespace ApiPlatform\Core\Tests\Bridge\RamseyUuid\Identifier\Normalizer;
 
 use ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
