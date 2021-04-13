@@ -96,6 +96,7 @@ class OpenApiFactoryTest extends TestCase
                                 'Foo' => ['$ref' => '#/components/schemas/Dummy'],
                             ],
                         ],
+                        '205' => [],
                     ],
                     'requestBody' => [
                         'required' => true,
@@ -434,6 +435,7 @@ class OpenApiFactoryTest extends TestCase
                 ]), new \ArrayObject([
                     'Foo' => ['$ref' => '#/components/schemas/Dummy'],
                 ])),
+                '205' => new Model\Response(),
                 '404' => new Model\Response('Resource not found'),
             ],
             'Dummy',
