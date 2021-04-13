@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.5
+
+* OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
+
 ## 2.6.4
 
 * OpenAPI: Using an implicit flow is now valid, changes oauth configuration default values (#4115)
@@ -10,7 +14,7 @@
 * Serializer: Fix denormalization of basic property-types in XML and CSV (#4145)
 * Serializer: Fix denormalization of collection with one element in XML (#4154)
 * JSON Schema: Manage Sequentially and AtLeastOneOf constraints when generating property metadata (#4139 and #4147)
-* JSON Schema: properties regex pattern is now correctly anchored (#4176)
+* JSON Schema: properties regex pattern is now correctly anchored (#4176 and #4198)
 * JSON Schema: Fix PropertySchemaLengthRestriction string-only (#4177)
 * Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
 * Doctrine: Revert #3774 support for binary UUID in search filter (#4134)
@@ -23,7 +27,7 @@
 * GraphQL: Make sure the order of order filters is preserved if nested resources are used (#4171)
 * Metadata: Sort mapping resources (#3256)
 * UUID: manage Ulid in format property schema restriction (#4148)
-* Symfony: Do not override Vary headers already set in the Response
+* Symfony: Do not override Vary headers already set in the Response (#4146)
 * Symfony: Make Twig dependency lazy (#4187)
 * Compatibility with `psr/cache` version 2 and 3 (#4117)
 * Docs: Upgrade Swagger UI to version 3.46.0
