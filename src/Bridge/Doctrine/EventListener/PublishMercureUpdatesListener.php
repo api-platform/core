@@ -58,7 +58,7 @@ final class PublishMercureUpdatesListener
 
     private $iriConverter;
     private $serializer;
-    private $registry;
+    private $hubRegistry;
     private $expressionLanguage;
     private $createdObjects;
     private $updatedObjects;
@@ -69,12 +69,12 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param array<string, string[]|string> $formats
-     * @param HubRegistry|callable           $registry
+     * @param HubRegistry|callable           $hubRegistry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $registry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
-        if (null === $messageBus && null === $registry) {
-            throw new InvalidArgumentException('A message bus or a HubRegistry instance must be provided.');
+        if (null === $messageBus && null === $hubRegistry) {
+            throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
         }
 
         $this->resourceClassResolver = $resourceClassResolver;
@@ -83,7 +83,7 @@ final class PublishMercureUpdatesListener
         $this->serializer = $serializer;
         $this->formats = $formats;
         $this->messageBus = $messageBus;
-        $this->registry = $registry;
+        $this->hubRegistry = $hubRegistry;
         $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
         $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
@@ -193,15 +193,12 @@ final class PublishMercureUpdatesListener
                 throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
             }
 
-            if ('hub' === $key && !$this->registry instanceof HubRegistry) {
-                throw new InvalidArgumentException(sprintf('The option "hub" set in the "mercure" attribute of the "%s" resource is not supported. Please install symfony/mercure:^0.5 to enable it.', $resourceClass));
+            if ('hub' === $key && !$this->hubRegistry instanceof HubRegistry) {
+                throw new InvalidArgumentException(sprintf('The option "hub" of the "mercure" attribute cannot be set on the "%s" resource . Try running "composer require symfony/mercure:^0.5".', $resourceClass));
             }
         }
 
         $options['enable_async_update'] = $options['enable_async_update'] ?? true;
-        if ($options['enable_async_update']) {
-            @trigger_error(sprintf('Not setting "enable_async_update" option set in the "mercure" attribute of the "%s" resource to "false" is deprecated.', $resourceClass), \E_USER_DEPRECATED);
-        }
 
         if ('deletedObjects' === $property) {
             $this->deletedObjects[(object) [
@@ -220,10 +217,6 @@ final class PublishMercureUpdatesListener
      */
     private function publishUpdate($object, array $options, string $type): void
     {
-        if ((!$options['enable_async_update'] || null === $this->messageBus) && !$this->registry instanceof HubRegistry) {
-            @trigger_error(sprintf('Passing a callable as the seventh argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, HubRegistry::class), \E_USER_DEPRECATED);
-        }
-
         if ($object instanceof \stdClass) {
             // By convention, if the object has been deleted, we send only its IRI.
             // This may change in the feature, because it's not JSON Merge Patch compliant,
@@ -247,7 +240,7 @@ final class PublishMercureUpdatesListener
                 continue;
             }
 
-            $this->registry instanceof HubRegistry ? $this->registry->getHub($options['hub'] ?? null)->publish($update) : ($this->registry)($update);
+            $this->hubRegistry instanceof HubRegistry ? $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update) : ($this->hubRegistry)($update);
         }
     }
 

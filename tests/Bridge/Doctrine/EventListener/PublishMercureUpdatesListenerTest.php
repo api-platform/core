@@ -417,22 +417,6 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertSame(['2', '["data"]'], $data);
     }
 
-    public function testNoPublisher(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('A message bus or a HubRegistry instance must be provided.');
-
-        new PublishMercureUpdatesListener(
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $this->prophesize(IriConverterInterface::class)->reveal(),
-            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(SerializerInterface::class)->reveal(),
-            ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
-            null,
-            null
-        );
-    }
-
     public function testInvalidMercureAttribute(): void
     {
         if (!class_exists(HubInterface::class)) {

@@ -52,8 +52,6 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
     public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
         if (!$this->registry instanceof HubRegistry) {
-            @trigger_error(sprintf('Passing a string as the second argument to "%s::__construct()" is deprecated, pass a "%s" instance instead.', __CLASS__, HubRegistry::class), \E_USER_DEPRECATED);
-
             return sprintf('%s?topic=%s', $this->registry, $this->generateTopicIri($subscriptionId));
         }
 

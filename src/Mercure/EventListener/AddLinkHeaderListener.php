@@ -59,8 +59,6 @@ final class AddLinkHeaderListener
         }
 
         if (!$this->discovery instanceof Discovery) {
-            @trigger_error(sprintf('Using a string for the Mercure hub in the constructor of "%s" is deprecated since 2.6 in favor of an instance of "Discovery::class".', __CLASS__, Discovery::class), \E_USER_DEPRECATED);
-
             $link = new Link('mercure', $this->discovery);
             if (null === $linkProvider = $request->attributes->get('_links')) {
                 $request->attributes->set('_links', new GenericLinkProvider([$link]));
