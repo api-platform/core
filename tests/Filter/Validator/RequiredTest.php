@@ -101,4 +101,33 @@ class RequiredTest extends TestCase
             $filter->validate('some_filter', $explicitFilterDefinition, $request)
         );
     }
+
+    public function testBracketNotation()
+    {
+        $filter = new Required();
+
+        $request = ['foo' => ['bar' => ['bar']]];
+
+        $requiredFilter = [
+            'required' => true,
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('foo[bar]', $requiredFilter, $request)
+        );
+    }
+
+    public function testDotNotation()
+    {
+        $request = ['foo.bar' => 'bar'];
+        $filter = new Required();
+
+        $requiredFilter = [
+            'required' => true,
+        ];
+
+        $this->assertEmpty(
+            $filter->validate('foo.bar', $requiredFilter, $request)
+        );
+    }
 }
