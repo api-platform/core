@@ -15,25 +15,41 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Models;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Third Level.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(
- *     properties={
- *         "id",
- *         "level"={"groups"={"barcelona", "chicago"}},
- *         "test",
- *         "fourthLevel"={"groups"={"barcelona", "chicago", "friends"}},
- *         "badFourthLevel"
- *     }
- * )
+ * @ApiResource
  */
 class ThirdLevel extends Model
 {
     public $timestamps = false;
+
+    public function fourthLevel(): BelongsTo
+    {
+        return $this->belongsTo(FourthLevel::class);
+    }
+
+    public function badFourthLevel(): BelongsTo
+    {
+        return $this->belongsTo(FourthLevel::class);
+    }
+
+    protected $apiProperties = [
+        'id',
+        'level' => ['groups' => ['barcelona', 'chicago']],
+        'test',
+        'fourthLevel' => ['groups' => ['barcelona', 'chicago', 'friends']],
+        'badFourthLevel',
+    ];
+
+    protected $casts = [
+        'level' => 'integer',
+        'test' => 'boolean',
+    ];
 
     protected $attributes = [
         'level' => 3,

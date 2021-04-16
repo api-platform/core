@@ -13,38 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer\Mapping\Loader;
 
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 
 /**
- * Loader for resource from the properties attribute.
+ * Loader for resource from the apiProperties property.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ResourceMetadataLoader implements LoaderInterface
 {
-    private $resourceMetadataFactory;
-
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
-    {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        try {
-            $resourceMetadata = $this->resourceMetadataFactory->create($classMetadata->getName());
-        } catch (ResourceClassNotFoundException $e) {
-            return false;
-        }
+        $properties = (new \ReflectionClass($classMetadata->getName()))->getDefaultProperties()['apiProperties'] ?? null;
 
-        if (null === $properties = $resourceMetadata->getAttribute('properties')) {
+        if (null === $properties) {
             return false;
         }
 

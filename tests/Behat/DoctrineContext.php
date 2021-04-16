@@ -165,6 +165,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\WithJsonDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\Foo as FooModel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\PatchDummyRelation as PatchDummyRelationModel;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\RelatedDummy as RelatedDummyModel;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -206,7 +208,7 @@ final class DoctrineContext implements Context
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      *
-     * @param ManagerRegistry|Manager $registry
+     * @param ManagerRegistry|Manager                                  $registry
      * @param UserPasswordEncoderInterface|UserPasswordHasherInterface $passwordHasher
      */
     public function __construct(KernelInterface $kernel, $registry, $passwordHasher)
@@ -1866,10 +1868,17 @@ final class DoctrineContext implements Context
     {
         $dummy = $this->buildPatchDummyRelation();
         $related = $this->buildRelatedDummy();
-        $dummy->setRelated($related);
-        $this->manager->persist($related);
-        $this->manager->persist($dummy);
-        $this->manager->flush();
+        if ($this->isDoctrine()) {
+            $dummy->setRelated($related);
+            $this->manager->persist($related);
+            $this->manager->persist($dummy);
+            $this->manager->flush();
+        }
+        if ($dummy instanceof PatchDummyRelationModel && $related instanceof RelatedDummyModel) {
+            $related->save();
+            $dummy->related()->associate($related);
+            $dummy->save();
+        }
     }
 
     /**
@@ -2219,10 +2228,14 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return RelatedDummy|RelatedDummyDocument
+     * @return RelatedDummy|RelatedDummyDocument|RelatedDummyModel
      */
     private function buildRelatedDummy()
     {
+        if ($this->isEloquent()) {
+            return new RelatedDummyModel();
+        }
+
         return $this->isOrm() ? new RelatedDummy() : new RelatedDummyDocument();
     }
 
@@ -2379,10 +2392,14 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return PatchDummyRelation|PatchDummyRelationDocument
+     * @return PatchDummyRelation|PatchDummyRelationDocument|PatchDummyRelationModel
      */
     private function buildPatchDummyRelation()
     {
+        if ($this->isEloquent()) {
+            return new PatchDummyRelationModel();
+        }
+
         return $this->isOrm() ? new PatchDummyRelation() : new PatchDummyRelationDocument();
     }
 

@@ -57,6 +57,7 @@ class ApiPropertyTest extends TestCase
             'swaggerContext' => ['foo' => 'baz'],
             'openapiContext' => ['foo' => 'baz'],
             'push' => true,
+            'virtual' => true,
             'attributes' => ['unknown' => 'unknown', 'fetchable' => false],
         ]);
         $this->assertEquals([
@@ -69,6 +70,7 @@ class ApiPropertyTest extends TestCase
             'swagger_context' => ['foo' => 'baz'],
             'openapi_context' => ['foo' => 'baz'],
             'push' => true,
+            'virtual' => true,
             'unknown' => 'unknown',
         ], $property->attributes);
     }
@@ -89,6 +91,7 @@ return new \ApiPlatform\Core\Annotation\ApiProperty(
     swaggerContext: ['foo' => 'baz'],
     openapiContext: ['foo' => 'baz'],
     push: true,
+    virtual: true,
     attributes: ['unknown' => 'unknown', 'fetchable' => false]
 );
 PHP
@@ -104,6 +107,7 @@ PHP
             'swagger_context' => ['foo' => 'baz'],
             'openapi_context' => ['foo' => 'baz'],
             'push' => true,
+            'virtual' => true,
             'unknown' => 'unknown',
         ], $property->attributes);
     }

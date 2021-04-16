@@ -19,6 +19,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Illuminate\Database\Eloquent\Builder;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 /**
  * @group eloquent
@@ -36,6 +37,36 @@ class ItemDataProviderTest extends TestCase
     {
         $this->builderFactoryProphecy = $this->prophesize(BuilderFactoryInterface::class);
         $this->dataProvider = new ItemDataProvider($this->builderFactoryProphecy->reveal());
+    }
+
+    /**
+     * @dataProvider provideSupportsCases
+     */
+    public function testSupports($data, bool $expectedResult): void
+    {
+        self::assertSame($expectedResult, $this->dataProvider->supports($data));
+    }
+
+    public function provideSupportsCases(): \Generator
+    {
+        yield 'not supported' => ['sdtClass', false];
+        yield 'supported' => [Dummy::class, true];
+    }
+
+    public function testGetItemIdNotArray(): void
+    {
+        $this->builderFactoryProphecy->getQueryBuilder(Argument::cetera())->shouldNotBeCalled();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->dataProvider->getItem(Dummy::class, 'not an array', 'foo', []);
+    }
+
+    public function testGetItemNoIdentifier(): void
+    {
+        $this->builderFactoryProphecy->getQueryBuilder(Argument::cetera())->shouldNotBeCalled();
+
+        self::assertNull($this->dataProvider->getItem(Dummy::class, [], 'foo', []));
     }
 
     public function testGetItemSingleIdentifier(): void

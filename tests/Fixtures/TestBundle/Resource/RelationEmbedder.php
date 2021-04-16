@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Models;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Resource;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\RelationEmbedder as RelationEmbedderModel;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Relation Embedder.
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
  * @ApiResource(
+ *     dataModel=RelationEmbedderModel::class,
  *     attributes={
  *         "normalization_context"={"groups"={"barcelona"}},
  *         "denormalization_context"={"groups"={"chicago"}},
@@ -38,31 +40,42 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *     }
  * )
  */
-class RelationEmbedder extends Model
+class RelationEmbedder
 {
-    public $timestamps = false;
+    /**
+     * @ApiProperty(identifier=true)
+     */
+    public $id;
 
-    public static $snakeAttributes = false;
+    /**
+     * @Groups({"chicago"})
+     */
+    public $paris = 'Paris';
 
-    protected $attributes = [
-        'paris' => 'Paris',
-        'krondstadt' => 'Krondstadt',
-    ];
+    /**
+     * @Groups({"barcelona", "chicago"})
+     */
+    public $krondstadt = 'Krondstadt';
 
-    public function anotherRelated(): BelongsTo
+    /**
+     * @var ?RelatedDummy
+     *
+     * @Groups({"chicago", "barcelona"})
+     */
+    public $anotherRelated;
+
+    /**
+     * @Groups({"barcelona", "chicago"})
+     */
+    protected $related;
+
+    public function getRelated()
     {
-        return $this->belongsTo(RelatedDummy::class);
+        return $this->related;
     }
 
-    public function related(): BelongsTo
+    public function setRelated(?RelatedDummy $relatedDummy)
     {
-        return $this->belongsTo(RelatedDummy::class);
+        $this->related = $relatedDummy;
     }
-
-    protected $apiProperties = [
-        'paris' => ['groups' => ['chicago']],
-        'krondstadt' => ['groups' => ['barcelona', 'chicago']],
-        'anotherRelated' => ['relation' => RelatedDummy::class, 'groups' => ['barcelona', 'chicago']],
-        'related' => ['relation' => RelatedDummy::class, 'groups' => ['barcelona', 'chicago']],
-    ];
 }

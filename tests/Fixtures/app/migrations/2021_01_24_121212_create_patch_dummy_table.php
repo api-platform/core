@@ -11,26 +11,22 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\FourthLevel;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use WouterJ\EloquentBundle\Facade\Schema;
 
-class CreateThirdLevelTable extends Migration
+class CreatePatchDummyTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('third_levels', function (Blueprint $table) {
+        Schema::create('patch_dummies', function (Blueprint $table) {
             $table->id();
-            $table->integer('level');
-            $table->boolean('test');
-            $table->foreignIdFor(FourthLevel::class)->nullable(true)->constrained();
-            $table->foreignIdFor(FourthLevel::class, 'bad_fourth_level_id')->nullable(true)->constrained();
+            $table->string('name');
         });
     }
 
     public function down(): void
     {
-        Schema::drop('third_levels');
+        Schema::drop('patch_dummies');
     }
 }

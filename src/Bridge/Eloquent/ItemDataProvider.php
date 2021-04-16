@@ -50,6 +50,10 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
             throw new \InvalidArgumentException(sprintf('$id must be array when "%s" key is set to true in the $context', IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER));
         }
 
+        if (empty($id)) {
+            return null;
+        }
+
         $builder = $this->builderFactory->getQueryBuilder($resourceClass);
 
         foreach ($id as $identifier => $value) {

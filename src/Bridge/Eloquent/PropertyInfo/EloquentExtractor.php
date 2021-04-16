@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Eloquent\PropertyInfo;
 
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
@@ -30,13 +28,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class EloquentExtractor implements PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    private $resourceMetadataFactory;
-
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
-    {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -46,13 +37,9 @@ final class EloquentExtractor implements PropertyTypeExtractorInterface, Propert
             return null;
         }
 
-        try {
-            $resourceMetadata = $this->resourceMetadataFactory->create($class);
-        } catch (ResourceClassNotFoundException $e) {
-            return null;
-        }
+        $properties = (new \ReflectionClass($class))->getDefaultProperties()['apiProperties'] ?? null;
 
-        if (null === $properties = $resourceMetadata->getAttribute('properties')) {
+        if (null === $properties) {
             return null;
         }
 

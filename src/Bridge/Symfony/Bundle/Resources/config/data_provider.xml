@@ -17,10 +17,24 @@
         </service>
         <service id="ApiPlatform\Core\DataProvider\ItemDataProviderInterface" alias="api_platform.item_data_provider" />
 
+        <service id="api_platform.mapped_data_model_item_data_provider" class="ApiPlatform\Core\DataProvider\MappedDataModelItemDataProvider" public="false">
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.serializer" />
+            <tag name="api_platform.item_data_provider" />
+        </service>
+
         <service id="api_platform.collection_data_provider" class="ApiPlatform\Core\DataProvider\ChainCollectionDataProvider">
             <argument type="tagged" tag="api_platform.collection_data_provider" />
         </service>
         <service id="ApiPlatform\Core\DataProvider\CollectionDataProviderInterface" alias="api_platform.collection_data_provider" />
+
+        <service id="api_platform.mapped_data_model_collection_data_provider" class="ApiPlatform\Core\DataProvider\MappedDataModelCollectionDataProvider" public="false">
+            <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.serializer" />
+            <tag name="api_platform.collection_data_provider" />
+        </service>
 
         <service id="api_platform.subresource_data_provider" class="ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider">
             <argument type="tagged" tag="api_platform.subresource_data_provider" />

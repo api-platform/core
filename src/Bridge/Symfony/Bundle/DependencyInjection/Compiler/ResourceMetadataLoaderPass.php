@@ -17,7 +17,6 @@ use ApiPlatform\Core\Serializer\Mapping\Loader\ResourceMetadataLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Add resource metadata loader to Serializer chain loader.
@@ -37,7 +36,7 @@ final class ResourceMetadataLoaderPass implements CompilerPassInterface
 
         $serializerLoaders = $chainLoader->getArgument(0);
 
-        $definition = new Definition(ResourceMetadataLoader::class, [new Reference('api_platform.metadata.resource.metadata_factory')]);
+        $definition = new Definition(ResourceMetadataLoader::class);
         $definition->setPublic(false);
         $serializerLoaders[] = $definition;
 

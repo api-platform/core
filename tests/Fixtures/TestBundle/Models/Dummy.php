@@ -36,30 +36,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *             "my_dummy.search",
  *             "my_dummy.property"
  *         }
- *     },
- *     properties={
- *         "name",
- *         "alias",
- *         "foo",
- *         "description",
- *         "dummy",
- *         "dummyBoolean",
- *         "dummyDate",
- *         "dummyFloat",
- *         "dummyPrice",
- *         "relatedDummy"={"relation"=RelatedDummy::class},
- *         "relatedDummies"={"relationMany"=RelatedDummy::class},
- *         "jsonData",
- *         "arrayData",
- *         "nameConverted",
- *         "relatedOwnedDummy"={"relation"=RelatedOwnedDummy::class},
- *         "relatedOwningDummy"={"relation"=RelatedOwningDummy::class}
  *     }
  * )
  */
 class Dummy extends Model
 {
     public $timestamps = false;
+
+    public static $snakeAttributes = false;
 
     public function relatedDummy(): BelongsTo
     {
@@ -80,6 +64,25 @@ class Dummy extends Model
     {
         return $this->hasOne(RelatedOwningDummy::class);
     }
+
+    protected $apiProperties = [
+        'name',
+        'alias',
+        'foo',
+        'description',
+        'dummy',
+        'dummyBoolean',
+        'dummyDate',
+        'dummyFloat',
+        'dummyPrice',
+        'relatedDummy' => ['relation' => RelatedDummy::class],
+        'relatedDummies' => ['relationMany' => RelatedDummy::class],
+        'jsonData',
+        'arrayData',
+        'nameConverted',
+        'relatedOwnedDummy' => ['relation' => RelatedOwnedDummy::class],
+        'relatedOwningDummy' => ['relation' => RelatedOwningDummy::class],
+    ];
 
     protected $attributes = [
         'jsonData' => '[]',

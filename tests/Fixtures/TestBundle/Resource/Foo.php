@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Models;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Resource;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Illuminate\Database\Eloquent\Model;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\Foo as FooModel;
 
 /**
  * Foo.
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
  * @ApiResource(
+ *     dataModel=FooModel::class,
  *     attributes={
  *         "order"={"bar", "name"="DESC"}
  *     },
@@ -38,11 +40,47 @@ use Illuminate\Database\Eloquent\Model;
  *     }
  * )
  */
-class Foo extends Model
+class Foo
 {
-    public $timestamps = false;
+    /**
+     * @var int The id
+     *
+     * @ApiProperty(identifier=true)
+     */
+    private $id;
 
-    protected $apiProperties = [
-        'id',
-    ];
+    /**
+     * @var string The foo name
+     */
+    private $name;
+
+    /**
+     * @var string The foo bar
+     */
+    private $bar;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getBar()
+    {
+        return $this->bar;
+    }
+
+    public function setBar($bar)
+    {
+        $this->bar = $bar;
+    }
 }

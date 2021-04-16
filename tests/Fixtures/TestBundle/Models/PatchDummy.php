@@ -17,19 +17,20 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Fourth Level.
+ * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource
+ * @ApiResource(
+ *     itemOperations={
+ *         "get",
+ *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
+ *     }
+ * )
  */
-class FourthLevel extends Model
+class PatchDummy extends Model
 {
     public $timestamps = false;
 
-    protected $apiProperties = [];
-
-    protected $attributes = [
-        'level' => 4,
+    protected $apiProperties = [
+        'name',
     ];
 }

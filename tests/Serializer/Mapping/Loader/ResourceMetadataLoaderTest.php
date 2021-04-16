@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Serializer\Mapping\Loader;
 
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\Mapping\Loader\ResourceMetadataLoader;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\RelatedDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
@@ -30,50 +28,33 @@ class ResourceMetadataLoaderTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $resourceMetadataFactoryProphecy;
     private $resourceMetadataLoader;
 
     protected function setUp(): void
     {
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $this->resourceMetadataLoader = new ResourceMetadataLoader($this->resourceMetadataFactoryProphecy->reveal());
+        $this->resourceMetadataLoader = new ResourceMetadataLoader();
     }
 
-    public function testLoadClassMetadataResourceClassNotFound(): void
+    public function testLoadClassMetadataNoApiProperties(): void
     {
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willThrow(new ResourceClassNotFoundException());
-
-        self::assertFalse($this->resourceMetadataLoader->loadClassMetadata(new ClassMetadata(Dummy::class)));
-    }
-
-    public function testLoadClassMetadataNoProperties(): void
-    {
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
-
-        self::assertFalse($this->resourceMetadataLoader->loadClassMetadata(new ClassMetadata(Dummy::class)));
+        self::assertFalse($this->resourceMetadataLoader->loadClassMetadata(new ClassMetadata(DummyEntity::class)));
     }
 
     public function testLoadClassMetadata(): void
     {
-        $resourceMetadata = (new ResourceMetadata())->withAttributes(['properties' => [
-            'foo',
-            'bar' => ['baz'],
-            'withGroups' => ['groups' => ['one']],
-        ]]);
+        $classMetadata = new ClassMetadata(RelatedDummy::class);
+        $classMetadata->addAttributeMetadata(new AttributeMetadata('name'));
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
+        $nameAttributeMetadata = new AttributeMetadata('name');
+        $nameAttributeMetadata->addGroup('friends');
 
-        $classMetadata = new ClassMetadata(Dummy::class);
-        $classMetadata->addAttributeMetadata(new AttributeMetadata('bar'));
-
-        $withGroupsAttributeMetadata = new AttributeMetadata('withGroups');
-        $withGroupsAttributeMetadata->addGroup('one');
+        $symfonyAttributeMetadata = new AttributeMetadata('symfony');
+        $symfonyAttributeMetadata->addGroup('barcelona');
+        $symfonyAttributeMetadata->addGroup('chicago');
+        $symfonyAttributeMetadata->addGroup('friends');
 
         self::assertTrue($this->resourceMetadataLoader->loadClassMetadata($classMetadata));
-        self::assertEquals([
-            'bar' => new AttributeMetadata('bar'),
-            'foo' => new AttributeMetadata('foo'),
-            'withGroups' => $withGroupsAttributeMetadata,
-        ], $classMetadata->getAttributesMetadata());
+        self::assertEquals($nameAttributeMetadata, $classMetadata->getAttributesMetadata()['name']);
+        self::assertEquals($symfonyAttributeMetadata, $classMetadata->getAttributesMetadata()['symfony']);
     }
 }

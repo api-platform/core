@@ -5,8 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.eloquent.builder_factory"
-                 class="ApiPlatform\Core\Bridge\Eloquent\BuilderFactory">
+        <service id="api_platform.eloquent.builder_factory" class="ApiPlatform\Core\Bridge\Eloquent\BuilderFactory" public="false">
         </service>
 
         <service id="api_platform.eloquent.data_persister" class="ApiPlatform\Core\Bridge\Eloquent\DataPersister" public="false">
@@ -25,24 +24,24 @@
         <service id="api_platform.eloquent.default.collection_data_provider"
                  parent="api_platform.eloquent.collection_data_provider"
                  class="ApiPlatform\Core\Bridge\Eloquent\CollectionDataProvider">
-            <tag name="api_platform.collection_data_provider"/>
+            <tag name="api_platform.collection_data_provider" />
         </service>
 
         <service id="api_platform.eloquent.default.item_data_provider"
                  parent="api_platform.eloquent.item_data_provider"
                  class="ApiPlatform\Core\Bridge\Eloquent\ItemDataProvider">
-            <tag name="api_platform.item_data_provider"/>
+            <tag name="api_platform.item_data_provider" />
         </service>
 
         <service id="api_platform.eloquent.property_accessor"
                  class="ApiPlatform\Core\Bridge\Eloquent\PropertyAccess\EloquentPropertyAccessor"
                  decorates="api_platform.property_accessor"
+                 public="false"
         >
             <argument type="service" id="api_platform.eloquent.property_accessor.inner" />
         </service>
 
-        <service id="api_platform.eloquent.property_info_extractor" class="ApiPlatform\Core\Bridge\Eloquent\PropertyInfo\EloquentExtractor">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+        <service id="api_platform.eloquent.property_info_extractor" class="ApiPlatform\Core\Bridge\Eloquent\PropertyInfo\EloquentExtractor" public="false">
             <tag name="property_info.type_extractor" priority="-999" />
             <tag name="property_info.access_extractor" priority="-999" />
         </service>

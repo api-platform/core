@@ -38,6 +38,20 @@ class CollectionDataProviderTest extends TestCase
         $this->dataProvider = new CollectionDataProvider($this->builderFactoryProphecy->reveal());
     }
 
+    /**
+     * @dataProvider provideSupportsCases
+     */
+    public function testSupports($data, bool $expectedResult): void
+    {
+        self::assertSame($expectedResult, $this->dataProvider->supports($data));
+    }
+
+    public function provideSupportsCases(): \Generator
+    {
+        yield 'not supported' => ['sdtClass', false];
+        yield 'supported' => [Dummy::class, true];
+    }
+
     public function testGetCollection(): void
     {
         $result = [new \stdClass()];

@@ -9,6 +9,16 @@
             <argument type="tagged" tag="api_platform.data_persister" />
         </service>
         <service id="ApiPlatform\Core\DataPersister\DataPersisterInterface" alias="api_platform.data_persister" />
+
+        <service id="api_platform.mapped_data_model_data_persister" class="ApiPlatform\Core\DataPersister\MappedDataModelDataPersister" public="false">
+            <argument type="service" id="api_platform.data_persister" />
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.identifiers_extractor" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <tag name="api_platform.data_persister" priority="-1000" />
+        </service>
     </services>
 
 </container>

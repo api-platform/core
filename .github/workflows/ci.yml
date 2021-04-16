@@ -607,16 +607,19 @@ jobs:
         run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
 
   eloquent:
-    name: Behat (PHP ${{ matrix.php }}) (Eloquent)
+    name: Behat (PHP ${{ matrix.php }}) (${{ matrix.app_env }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
           - '7.4'
+        app_env:
+          - 'eloquent'
+          - 'eloquent_mapped'
       fail-fast: false
     env:
-      APP_ENV: eloquent
+      APP_ENV: ${{ matrix.app_env }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

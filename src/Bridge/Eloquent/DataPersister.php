@@ -18,7 +18,8 @@ use ApiPlatform\Core\Util\ClassInfoTrait;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Data persister for Eloquent.
@@ -43,7 +44,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function supports($data, array $context = []): bool
     {
-        return \is_object($data) ? is_subclass_of($this->getObjectClass($data), Model::class, true) : false;
+        return \is_object($data) && is_subclass_of($this->getObjectClass($data), Model::class, true);
     }
 
     /**
@@ -67,7 +68,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      *
      * @param Model $data
      */
-    public function remove($data, array $context = [])
+    public function remove($data, array $context = []): void
     {
         $data->delete();
     }
@@ -77,6 +78,19 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         $data->save();
 
         foreach ($data->getRelations() as $relationName => $relation) {
+            if (null === $relation) {
+                continue;
+            }
+
+            $related = $data->{$relationName}();
+
+            if (is_a($related, HasOne::class)) {
+                $related->save($relation);
+            }
+            if (is_iterable($relation) && is_a($related, HasMany::class)) {
+                $related->saveMany($relation);
+            }
+
             if (is_iterable($relation)) {
                 foreach ($relation as $relationItem) {
                     $this->save($relationItem);
@@ -85,12 +99,8 @@ final class DataPersister implements ContextAwareDataPersisterInterface
                 $this->save($relation);
             }
 
-            $related = $data->{$relationName}();
             if (is_a($related, BelongsTo::class)) {
                 $related->associate($relation);
-            }
-            if (is_iterable($relation) && is_a($related, HasOneOrMany::class)) {
-                $related->saveMany($relation);
             }
         }
 

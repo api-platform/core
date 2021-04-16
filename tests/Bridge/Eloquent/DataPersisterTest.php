@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -60,26 +61,32 @@ class DataPersisterTest extends TestCase
     public function testPersist(): void
     {
         $relatedModelProphecy = $this->prophesize(Model::class);
-        $relatedModelProphecy->save()->shouldBeCalled();
+        $relatedModelProphecy->save()->shouldBeCalledTimes(3);
         $relatedModelProphecy->getRelations()->willReturn([]);
-        $relatedModelProphecy->push()->shouldBeCalled();
+        $relatedModelProphecy->push()->shouldBeCalledTimes(3);
         $relatedModel = $relatedModelProphecy->reveal();
 
         $relatedModelCollection = new Collection([$relatedModel]);
 
         $belongsToProphecy = $this->prophesize(BelongsTo::class);
-        $belongsToProphecy->associate($relatedModel)->shouldBeCalled();
+        $belongsToProphecy->associate($relatedModel)->shouldBeCalledOnce();
 
         $hasManyProphecy = $this->prophesize(HasMany::class);
-        $hasManyProphecy->saveMany($relatedModelCollection)->shouldBeCalled();
+        $hasManyProphecy->saveMany($relatedModelCollection)->shouldBeCalledOnce();
+
+        $hasOneProphecy = $this->prophesize(HasOne::class);
+        $hasOneProphecy->save($relatedModel)->shouldBeCalledOnce();
 
         $modelProphecy = $this->prophesize(Dummy::class);
         $modelProphecy->save()->shouldBeCalledOnce();
         $modelProphecy->relatedDummy()->willReturn($belongsToProphecy->reveal());
         $modelProphecy->relatedDummies()->willReturn($hasManyProphecy->reveal());
+        $modelProphecy->relatedOwnedDummy()->willReturn($hasOneProphecy->reveal());
         $modelProphecy->getRelations()->willReturn([
             'relatedDummy' => $relatedModel,
             'relatedDummies' => $relatedModelCollection,
+            'relatedOwnedDummy' => $relatedModel,
+            'nullRelation' => null,
         ]);
         $modelProphecy->push()->shouldBeCalledOnce();
 
@@ -88,10 +95,10 @@ class DataPersisterTest extends TestCase
             $callback();
 
             return true;
-        }))->shouldBeCalled();
+        }))->shouldBeCalledOnce();
         $this->databaseManagerProphecy->connection()->willReturn($connectionProphecy->reveal());
 
-        $modelProphecy->refresh()->shouldBeCalled();
+        $modelProphecy->refresh()->shouldBeCalledOnce();
 
         $model = $modelProphecy->reveal();
 
@@ -102,7 +109,7 @@ class DataPersisterTest extends TestCase
     {
         $modelProphecy = $this->prophesize(Model::class);
 
-        $modelProphecy->delete()->shouldBeCalled();
+        $modelProphecy->delete()->shouldBeCalledOnce();
 
         $this->dataPersister->remove($modelProphecy->reveal());
     }

@@ -21,13 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Related To Dummy Friend represent an association table for a manytomany relation.
  *
  * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"fakemanytomany"}}, "filters"={"related_to_dummy_friend.name"}},
- *     properties={
- *         "name"={"groups"={"fakemanytomany", "friends"}},
- *         "description"={"groups"={"fakemanytomany", "friends"}},
- *         "dummyFriend"={"relation"=DummyFriend::class, "groups"={"fakemanytomany", "friends"}},
- *         "relatedDummy"={"relation"=RelatedDummy::class}
- *     }
+ *     attributes={"normalization_context"={"groups"={"fakemanytomany"}}, "filters"={"related_to_dummy_friend.name"}}
  * )
  */
 class RelatedToDummyFriend extends Model
@@ -43,4 +37,11 @@ class RelatedToDummyFriend extends Model
     {
         return $this->belongsTo(RelatedDummy::class);
     }
+
+    protected $apiProperties = [
+        'name' => ['groups' => ['fakemanytomany', 'friends']],
+        'description' => ['groups' => ['fakemanytomany', 'friends']],
+        'dummyFriend' => ['relation' => DummyFriend::class, 'groups' => ['fakemanytomany', 'friends']],
+        'relatedDummy' => ['relation' => RelatedDummy::class],
+    ];
 }

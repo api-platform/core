@@ -14,10 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Eloquent\PropertyInfo;
 
 use ApiPlatform\Core\Bridge\Eloquent\PropertyInfo\EloquentExtractor;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\RelatedDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -34,13 +32,11 @@ class EloquentExtractorTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $resourceMetadataFactoryProphecy;
     private $eloquentExtractor;
 
     protected function setUp(): void
     {
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $this->eloquentExtractor = new EloquentExtractor($this->resourceMetadataFactoryProphecy->reveal());
+        $this->eloquentExtractor = new EloquentExtractor();
     }
 
     public function testGetTypesNotModel(): void
@@ -48,44 +44,30 @@ class EloquentExtractorTest extends TestCase
         self::assertNull($this->eloquentExtractor->getTypes(NotAResource::class, 'foo'));
     }
 
-    public function testGetTypesNotResource(): void
+    public function testGetTypesNoApiProperties(): void
     {
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willThrow(new ResourceClassNotFoundException());
-
-        self::assertNull($this->eloquentExtractor->getTypes(Dummy::class, 'foo'));
-    }
-
-    public function testGetTypesNoProperties(): void
-    {
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
-
-        self::assertNull($this->eloquentExtractor->getTypes(Dummy::class, 'foo'));
+        self::assertNull($this->eloquentExtractor->getTypes(DummyEntity::class, 'foo'));
     }
 
     /**
      * @dataProvider provideGetTypesCases
      */
-    public function testGetTypes(array $properties, $expectedResult): void
+    public function testGetTypes(string $property, $expectedResult): void
     {
-        $resourceMetadata = new ResourceMetadata();
-        $resourceMetadata = $resourceMetadata->withAttributes(['properties' => $properties]);
-
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
-
-        self::assertEquals($expectedResult, $this->eloquentExtractor->getTypes(Dummy::class, 'foo'));
+        self::assertEquals($expectedResult, $this->eloquentExtractor->getTypes(Dummy::class, $property));
     }
 
     public function provideGetTypesCases(): \Generator
     {
-        yield 'not a relation' => [['foo'], null];
+        yield 'not a relation' => ['foo', null];
 
-        yield 'relation' => [['foo' => ['relation' => RelatedDummy::class]], [new Type(
+        yield 'relation' => ['relatedDummy', [new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
             RelatedDummy::class
         )]];
 
-        yield 'relation many' => [['foo' => ['relationMany' => RelatedDummy::class]], [new Type(
+        yield 'relation many' => ['relatedDummies', [new Type(
             Type::BUILTIN_TYPE_OBJECT,
             false,
             Collection::class,

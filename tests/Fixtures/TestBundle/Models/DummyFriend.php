@@ -21,9 +21,14 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @ApiResource(properties={"id", "name"={"groups"={"fakemanytomany", "friends"}}})
+ * @ApiResource
  */
 class DummyFriend extends Model
 {
     public $timestamps = false;
+
+    protected $apiProperties = [
+        'id',
+        'name' => ['groups' => ['fakemanytomany', 'friends']],
+    ];
 }

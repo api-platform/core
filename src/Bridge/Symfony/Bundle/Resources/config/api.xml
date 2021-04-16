@@ -122,6 +122,24 @@
             <tag name="serializer.normalizer" priority="-895" />
         </service>
 
+        <service id="api_platform.serializer.normalizer.mapped_data_model" class="ApiPlatform\Core\Serializer\MappedDataModelNormalizer" parent="serializer.normalizer.object" public="false">
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <!-- Run before api_platform.serializer.normalizer.item -->
+            <tag name="serializer.normalizer" priority="-894" />
+        </service>
+
+        <service id="api_platform.serializer.normalizer.data_model" class="ApiPlatform\Core\Serializer\DataModelNormalizer" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.identifiers_extractor" />
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
+            <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <!-- Run before serializer.normalizer.object -->
+            <tag name="serializer.normalizer" priority="-997" />
+        </service>
+
         <!-- Resources Operations path resolver -->
 
         <service id="api_platform.operation_path_resolver" alias="api_platform.operation_path_resolver.router" public="false" />

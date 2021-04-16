@@ -16,24 +16,18 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use WouterJ\EloquentBundle\Facade\Schema;
 
-class CreateEmbeddableDummyTable extends Migration
+class CreatePatchDummyRelationTable extends Migration
 {
     public function up(): void
     {
-        Schema::create('embeddable_dummies', function (Blueprint $table) {
+        Schema::create('patch_dummy_relations', function (Blueprint $table) {
             $table->id();
-            $table->string('dummyName')->nullable(true);
-            $table->boolean('dummyBoolean')->nullable(true);
-            $table->dateTime('dummyDate')->nullable(true);
-            $table->float('dummyFloat')->nullable(true);
-            $table->decimal('dummyPrice')->nullable(true);
-            $table->string('symfony')->nullable(true);
-            $table->foreignIdFor(RelatedDummy::class)->constrained();
+            $table->foreignIdFor(RelatedDummy::class, 'related_id')->nullable(true)->constrained();
         });
     }
 
     public function down(): void
     {
-        Schema::drop('embeddable_dummies');
+        Schema::drop('patch_dummy_relations');
     }
 }

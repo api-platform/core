@@ -29,6 +29,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("cacheHeaders", type="array"),
  *     @Attribute("collectionOperations", type="array"),
  *     @Attribute("compositeIdentifier", type="bool"),
+ *     @Attribute("dataModel", type="string"),
  *     @Attribute("denormalizationContext", type="array"),
  *     @Attribute("deprecationReason", type="string"),
  *     @Attribute("description", type="string"),
@@ -58,7 +59,6 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
  *     @Attribute("paginationMaximumItemsPerPage", type="int"),
  *     @Attribute("paginationPartial", type="bool"),
  *     @Attribute("paginationViaCursor", type="array"),
- *     @Attribute("properties", type="array"),
  *     @Attribute("routePrefix", type="string"),
  *     @Attribute("security", type="string"),
  *     @Attribute("securityMessage", type="string"),
@@ -139,6 +139,7 @@ final class ApiResource
      * @param array        $itemOperations                  https://api-platform.com/docs/core/operations
      * @param array        $subresourceOperations           https://api-platform.com/docs/core/subresources
      * @param array        $cacheHeaders                    https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
+     * @param string       $dataModel
      * @param array        $denormalizationContext          https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param string       $deprecationReason               https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param bool         $elasticsearch                   https://api-platform.com/docs/core/elasticsearch/
@@ -163,7 +164,6 @@ final class ApiResource
      * @param int          $paginationItemsPerPage          https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
      * @param int          $paginationMaximumItemsPerPage   https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
      * @param bool         $paginationPartial               https://api-platform.com/docs/core/performance/#partial-pagination
-     * @param array        $properties
      * @param string       $routePrefix                     https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
      * @param string       $security                        https://api-platform.com/docs/core/security
      * @param string       $securityMessage                 https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
@@ -191,6 +191,7 @@ final class ApiResource
         // attributes
         ?array $attributes = null,
         ?array $cacheHeaders = null,
+        ?string $dataModel = null,
         ?array $denormalizationContext = null,
         ?string $deprecationReason = null,
         ?bool $elasticsearch = null,
@@ -215,7 +216,6 @@ final class ApiResource
         ?int $paginationItemsPerPage = null,
         ?int $paginationMaximumItemsPerPage = null,
         ?bool $paginationPartial = null,
-        ?array $properties = null,
         ?string $routePrefix = null,
         ?string $security = null,
         ?string $securityMessage = null,
