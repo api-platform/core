@@ -20,6 +20,7 @@ use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MercureBundle\MercureBundle;
@@ -35,6 +36,7 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * AppKernel for tests.
@@ -109,6 +111,11 @@ class AppKernel extends Kernel
         $c->setParameter('kernel.project_dir', __DIR__);
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
+
+        /* @TODO remove this check in 3.0 */
+        if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
+            $loader->load(__DIR__.'/config/config_symfony_uid.yml');
+        }
 
         $c->prependExtensionConfig('framework', [
             'secret' => 'dunglas.fr',
