@@ -75,6 +75,7 @@ class OpenApiFactoryTest extends TestCase
                 'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
                 'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
                 'custom' => ['method' => 'HEAD', 'path' => '/foo/{id}', 'openapi_context' => [
+                    'x-visibility' => 'hide',
                     'description' => 'Custom description',
                     'parameters' => [
                         ['description' => 'Test parameter', 'name' => 'param', 'in' => 'path', 'required' => true],
@@ -454,7 +455,12 @@ class OpenApiFactoryTest extends TestCase
                         ],
                     ],
                 ],
-            ]), true)
+            ]), true),
+            null,
+            false,
+            null,
+            null,
+            ['x-visibility' => 'hide']
         ));
 
         $formattedPath = $paths->getPath('/formatted/{id}');
@@ -569,8 +575,6 @@ class OpenApiFactoryTest extends TestCase
 
     public function testOverrideDocumentation()
     {
-        $defaultContext = ['base_url' => '/app_dev.php/'];
-
         $dummyMetadata = new ResourceMetadata(
             'Dummy',
             'This is a dummy.',
