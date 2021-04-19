@@ -30,7 +30,7 @@ final class Operation
     private $servers;
     private $externalDocs;
 
-    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, ?array $security = null, ?array $servers = null, array $extentionProperties = [])
+    public function __construct(string $operationId = null, array $tags = [], array $responses = [], string $summary = '', string $description = '', ExternalDocumentation $externalDocs = null, array $parameters = [], RequestBody $requestBody = null, \ArrayObject $callbacks = null, bool $deprecated = false, ?array $security = null, ?array $servers = null, array $extensionProperties = [])
     {
         $this->tags = $tags;
         $this->summary = $summary;
@@ -44,7 +44,7 @@ final class Operation
         $this->security = $security;
         $this->servers = $servers;
         $this->externalDocs = $externalDocs;
-        $this->extensionProperties = $extentionProperties;
+        $this->extensionProperties = $extensionProperties;
     }
 
     public function addResponse(Response $response, $status = 'default'): self
