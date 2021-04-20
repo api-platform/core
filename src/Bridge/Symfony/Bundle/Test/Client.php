@@ -72,6 +72,17 @@ final class Client implements HttpClientInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function withOptions(array $options): self
+    {
+        $clone = clone $this;
+        $clone->setDefaultOptions($options);
+
+        return $clone;
+    }
+
+    /**
      * Sets the default options for the requests.
      *
      * @see HttpClientInterface::OPTIONS_DEFAULTS for available options
