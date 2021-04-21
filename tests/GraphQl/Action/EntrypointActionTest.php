@@ -73,7 +73,6 @@ class EntrypointActionTest extends TestCase
     public function testPostRawAction(): void
     {
         $request = new Request(['variables' => '["graphqlVariable"]', 'operationName' => 'graphqlOperationName'], [], [], [], [], [], 'graphqlQuery');
-        $request->setFormat('graphql', 'application/graphql');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'application/graphql');
         $mockedEntrypoint = $this->getEntrypointAction();
@@ -104,7 +103,6 @@ class EntrypointActionTest extends TestCase
             $requestParams['map'] = $map;
         }
         $request = new Request([], $requestParams, [], [], $files);
-        $request->setFormat('multipart', 'multipart/form-data');
         $request->setMethod('POST');
         $request->headers->set('Content-Type', 'multipart/form-data');
 
