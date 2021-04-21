@@ -194,3 +194,14 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  # @TODO remove the tag "@symfony/uid" in 3.0
+  @symfony/uid
+  @!mongodb
+  @createSchema
+  Scenario: Retrieve a resource identified by Symfony\Component\Uid\Uuid
+    Given there is a Symfony dummy identified resource with uuid "cdf8f706-ebe3-4fb6-b0bd-ae7b48028f24"
+    When I send a "GET" request to "/symfony_uuid_dummies/cdf8f706-ebe3-4fb6-b0bd-ae7b48028f24"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
