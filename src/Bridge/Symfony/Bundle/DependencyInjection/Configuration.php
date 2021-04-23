@@ -251,7 +251,7 @@ final class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('clientId')->defaultValue('')->info('The oauth client id.')->end()
                         ->scalarNode('clientSecret')->defaultValue('')->info('The oauth client secret.')->end()
-                        ->scalarNode('type')->defaultValue('oauth2')->info('The oauth client secret.')->end()
+                        ->scalarNode('type')->defaultValue('oauth2')->info('The oauth type.')->end()
                         ->scalarNode('flow')->defaultValue('application')->info('The oauth flow grant type.')->end()
                         ->scalarNode('tokenUrl')->defaultValue('')->info('The oauth token url.')->end()
                         ->scalarNode('authorizationUrl')->defaultValue('')->info('The oauth authentication url.')->end()
