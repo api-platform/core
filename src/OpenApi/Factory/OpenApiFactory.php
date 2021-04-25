@@ -281,7 +281,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null,
                 $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
                 $operation['openapi_context']['security'] ?? null,
-                $operation['openapi_context']['servers'] ?? null
+                $operation['openapi_context']['servers'] ?? null,
+                array_filter($operation['openapi_context'] ?? [], static function ($item) {
+                    return preg_match('/^x-.*$/i', $item);
+                }, \ARRAY_FILTER_USE_KEY)
             ));
 
             $paths->addPath($path, $pathItem);
