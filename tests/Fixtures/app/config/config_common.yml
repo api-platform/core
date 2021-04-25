@@ -25,7 +25,6 @@ api_platform:
     description: |
         This is a test API.
         Made with love
-    allow_plain_identifiers:           true
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
@@ -115,6 +114,20 @@ services:
     app.serializer.denormalizer.serializable_resource:
         class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
         public: false
+        tags:
+            -  { name: 'serializer.normalizer' }
+
+    app.serializer.denormalizer.related_dummy_plain_identifier:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\RelatedDummyPlainIdentifierDenormalizer'
+        public: false
+        arguments: ['@api_platform.iri_converter']
+        tags:
+            -  { name: 'serializer.normalizer' }
+
+    app.serializer.denormalizer.dummy_plain_identifier:
+        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DummyPlainIdentifierDenormalizer'
+        public: false
+        arguments: ['@api_platform.iri_converter']
         tags:
             -  { name: 'serializer.normalizer' }
 
