@@ -17,7 +17,11 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\Prop
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanOrEqualRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanOrEqualRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRangeRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
@@ -30,6 +34,7 @@ use ApiPlatform\Core\Tests\Fixtures\DummyCollectionValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyCompoundValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyCountValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyIriWithValidationEntity;
+use ApiPlatform\Core\Tests\Fixtures\DummyNumericValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyRangeValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummySequentiallyValidatedEntity;
 use ApiPlatform\Core\Tests\Fixtures\DummyUniqueValidatedEntity;
@@ -645,5 +650,89 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             'additionalProperties' => true,
             'required' => ['name', 'email', 'social'],
         ], $schema);
+    }
+
+    /**
+     * @dataProvider provideNumericConstraintCases
+     */
+    public function testCreateWithPropertyNumericRestriction(PropertyMetadata $propertyMetadata, string $property, array $expectedSchema): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyNumericValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyNumericValidatedEntity::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyNumericValidatedEntity::class, $property, [])->willReturn(
+            $propertyMetadata
+        )->shouldBeCalled();
+
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(),
+            [
+                new PropertySchemaGreaterThanOrEqualRestriction(),
+                new PropertySchemaGreaterThanRestriction(),
+                new PropertySchemaLessThanOrEqualRestriction(),
+                new PropertySchemaLessThanRestriction(),
+            ]
+        );
+
+        $schema = $validationPropertyMetadataFactory->create(DummyNumericValidatedEntity::class, $property)->getSchema();
+
+        $this->assertSame($expectedSchema, $schema);
+    }
+
+    public function provideNumericConstraintCases(): \Generator
+    {
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)),
+            'property' => 'greaterThanMe',
+            'expectedSchema' => ['minimum' => 10, 'exclusiveMinimum' => true],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT)),
+            'property' => 'greaterThanOrEqualToMe',
+            'expectedSchema' => ['minimum' => 10.99],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)),
+            'property' => 'lessThanMe',
+            'expectedSchema' => ['maximum' => 99, 'exclusiveMaximum' => true],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_FLOAT)),
+            'property' => 'lessThanOrEqualToMe',
+            'expectedSchema' => ['maximum' => 99.33],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)),
+            'property' => 'positive',
+            'expectedSchema' => ['minimum' => 0, 'exclusiveMinimum' => true],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)),
+            'property' => 'positiveOrZero',
+            'expectedSchema' => ['minimum' => 0],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)),
+            'property' => 'negative',
+            'expectedSchema' => ['maximum' => 0, 'exclusiveMaximum' => true],
+        ];
+
+        yield [
+            'propertyMetadata' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)),
+            'property' => 'negativeOrZero',
+            'expectedSchema' => ['maximum' => 0],
+        ];
     }
 }

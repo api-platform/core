@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* JSON Schema: Add support for generating property schema with numeric constraint restrictions (#4225)
 * JSON Schema: Add support for generating property schema with Collection restriction (#4182)
 * JSON Schema: Add support for generating property schema format for Url and Hostname (#4185)
 * JSON Schema: Add support for generating property schema with Count restriction (#4186)
