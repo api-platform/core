@@ -33,26 +33,26 @@ class VarnishPurgerTest extends TestCase
     public function testPurge()
     {
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy2 = $this->prophesize(ClientInterface::class);
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy3 = $this->prophesize(ClientInterface::class);
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/bar($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
 
         $clientProphecy4 = $this->prophesize(ClientInterface::class);
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/foo($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(^|\,)/bar($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
 
         $purger = new VarnishPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
 
-        $purger = new VarnishPurger([$clientProphecy3->reveal(), $clientProphecy4->reveal()], 5);
+        $purger = new VarnishPurger([$clientProphecy3->reveal(), $clientProphecy4->reveal()], 12);
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
@@ -118,58 +118,57 @@ class VarnishPurgerTest extends TestCase
         yield 'one iri' => [
             50,
             ['/foo'],
-            ['(^|\,)/foo($|\,)'],
+            ['(/foo)($|\,)'],
         ];
 
         yield 'few iris' => [
             50,
             ['/foo', '/bar'],
-            ['((^|\,)/foo($|\,))|((^|\,)/bar($|\,))'],
+            ['(/foo|/bar)($|\,)'],
         ];
 
         yield 'iris to generate a header with exactly the maximum length' => [
-            56,
+            22,
             ['/foo', '/bar', '/baz'],
-            ['((^|\,)/foo($|\,))|((^|\,)/bar($|\,))|((^|\,)/baz($|\,))'],
+            ['(/foo|/bar|/baz)($|\,)'],
         ];
 
         yield 'iris to generate a header with exactly the maximum length and a smaller one' => [
-            37,
+            17,
             ['/foo', '/bar', '/baz'],
             [
-                '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))',
-                '(^|\,)/baz($|\,)',
+                '(/foo|/bar)($|\,)',
+                '(/baz)($|\,)',
             ],
         ];
 
         yield 'with last iri too long to be part of the same header' => [
-            50,
+            35,
             ['/foo', '/bar', '/some-longer-tag'],
             [
-                '((^|\,)/foo($|\,))|((^|\,)/bar($|\,))',
-                '(^|\,)/some\-longer\-tag($|\,)',
+                '(/foo|/bar)($|\,)',
+                '(/some\-longer\-tag)($|\,)',
             ],
         ];
 
         yield 'iris to have five headers' => [
-            50,
+            25,
             ['/foo/1', '/foo/2', '/foo/3', '/foo/4', '/foo/5', '/foo/6', '/foo/7', '/foo/8', '/foo/9', '/foo/10'],
             [
-                '((^|\,)/foo/1($|\,))|((^|\,)/foo/2($|\,))',
-                '((^|\,)/foo/3($|\,))|((^|\,)/foo/4($|\,))',
-                '((^|\,)/foo/5($|\,))|((^|\,)/foo/6($|\,))',
-                '((^|\,)/foo/7($|\,))|((^|\,)/foo/8($|\,))',
-                '((^|\,)/foo/9($|\,))|((^|\,)/foo/10($|\,))',
+                '(/foo/1|/foo/2)($|\,)',
+                '(/foo/3|/foo/4)($|\,)',
+                '(/foo/5|/foo/6)($|\,)',
+                '(/foo/7|/foo/8)($|\,)',
+                '(/foo/9|/foo/10)($|\,)',
             ],
         ];
 
         yield 'with varnish default limit' => [
             8000,
-            array_fill(0, 1000, '/foo'),
+            array_fill(0, 3000, '/foo'),
             [
-                implode('|', array_fill(0, 421, '((^|\,)/foo($|\,))')),
-                implode('|', array_fill(0, 421, '((^|\,)/foo($|\,))')),
-                implode('|', array_fill(0, 158, '((^|\,)/foo($|\,))')),
+                sprintf('(%s)($|\,)', implode('|', array_fill(0, 1598, '/foo'))),
+                sprintf('(%s)($|\,)', implode('|', array_fill(0, 1402, '/foo'))),
             ],
         ];
     }
