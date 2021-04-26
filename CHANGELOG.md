@@ -25,6 +25,7 @@
 * GraphQL: Support `ApiProperty` security (#4143)
 * GraphQL: **BC** Fix security on association collection properties. The collection resource `item_query` security is no longer used. `ApiProperty` security can now be used to secure collection (or any other) properties. (#4143)
 * Deprecate `allow_plain_identifiers` option (#4167)
+* Exception: Add the ability to customize multiple status codes based on the validation exception (#4017)
 
 ## 2.6.5
 
