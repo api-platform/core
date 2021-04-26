@@ -32,13 +32,30 @@ class RamseyUuidDummy
      */
     private $id;
 
+    /**
+     * @var \Ramsey\Uuid\UuidInterface|null
+     *
+     * @ORM\Column(type="uuid", nullable=true)
+     */
+    private $other;
+
+    public function __construct(?UuidInterface $id = null)
+    {
+        $this->id = $id ?? Uuid::uuid4();
+    }
+
     public function getId(): UuidInterface
     {
         return $this->id;
     }
 
-    public function setId(string $uuid)
+    public function getOther(): ?UuidInterface
     {
-        $this->id = Uuid::fromString($uuid);
+        return $this->other;
+    }
+
+    public function setOther(UuidInterface $other)
+    {
+        $this->other = $other;
     }
 }

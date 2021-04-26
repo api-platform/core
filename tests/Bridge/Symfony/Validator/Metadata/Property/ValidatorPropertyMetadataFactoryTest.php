@@ -310,7 +310,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $schema = $validationPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummy')->getSchema();
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('pattern', $schema);
-        $this->assertEquals('^(?:dummy)$', $schema['pattern']);
+        $this->assertEquals('^(dummy)$', $schema['pattern']);
     }
 
     /**
@@ -447,7 +447,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('oneOf', $schema);
         $this->assertSame([
-            ['pattern' => '^(?:.*#.*)$'],
+            ['pattern' => '^(.*#.*)$'],
             ['minLength' => 10],
         ], $schema['oneOf']);
     }
@@ -636,7 +636,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             'properties' => [
                 'name' => [],
                 'email' => ['format' => 'email'],
-                'phone' => ['pattern' => '^(?:[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
+                'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
                 'age' => [],
                 'social' => [
                     'type' => 'object',

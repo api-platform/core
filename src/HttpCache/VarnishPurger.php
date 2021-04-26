@@ -25,6 +25,7 @@ use GuzzleHttp\ClientInterface;
 final class VarnishPurger implements PurgerInterface
 {
     private const DEFAULT_VARNISH_MAX_HEADER_LENGTH = 8000;
+    private const REGEXP_PATTERN = '(%s)($|\,)';
 
     private $clients;
     private $maxHeaderLength;
@@ -35,7 +36,7 @@ final class VarnishPurger implements PurgerInterface
     public function __construct(array $clients, int $maxHeaderLength = self::DEFAULT_VARNISH_MAX_HEADER_LENGTH)
     {
         $this->clients = $clients;
-        $this->maxHeaderLength = $maxHeaderLength;
+        $this->maxHeaderLength = $maxHeaderLength - mb_strlen(self::REGEXP_PATTERN) + 2; // 2 for %s
     }
 
     /**
@@ -60,8 +61,9 @@ final class VarnishPurger implements PurgerInterface
          * header length by the largest tag (minus the glue length)
          */
         $tagsize = max(array_map('mb_strlen', $escapedTags));
+        $gluesize = \strlen($glue);
 
-        return (int) floor($this->maxHeaderLength / ($tagsize + \strlen($glue))) ?: 1;
+        return (int) floor(($this->maxHeaderLength + $gluesize) / ($tagsize + $gluesize)) ?: 1;
     }
 
     /**
@@ -85,10 +87,12 @@ final class VarnishPurger implements PurgerInterface
     {
         // Create the regex to purge all tags in just one request
         $parts = array_map(static function ($iri) {
-            return sprintf('(^|\,)%s($|\,)', preg_quote($iri));
+            // here we should remove the prefix as it's not discriminent and cost a lot to compute
+            return preg_quote($iri);
         }, $iris);
 
         foreach ($this->chunkRegexParts($parts) as $regex) {
+            $regex = sprintf(self::REGEXP_PATTERN, $regex);
             $this->banRegex($regex);
         }
     }
@@ -108,7 +112,7 @@ final class VarnishPurger implements PurgerInterface
             return;
         }
 
-        $concatenatedParts = sprintf('(%s)', implode(")\n(", $parts));
+        $concatenatedParts = implode("\n", $parts);
 
         if (\strlen($concatenatedParts) <= $this->maxHeaderLength) {
             yield str_replace("\n", '|', $concatenatedParts);

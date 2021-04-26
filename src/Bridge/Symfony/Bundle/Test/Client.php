@@ -83,8 +83,6 @@ final class Client implements HttpClientInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return Response
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {

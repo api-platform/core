@@ -25,22 +25,46 @@
 * GraphQL: Support `ApiProperty` security (#4143)
 * GraphQL: **BC** Fix security on association collection properties. The collection resource `item_query` security is no longer used. `ApiProperty` security can now be used to secure collection (or any other) properties. (#4143)
 * Deprecate `allow_plain_identifiers` option (#4167)
+* Exception: Add the ability to customize multiple status codes based on the validation exception (#4017)
+
+## 2.6.5
+
+* Filter validation: Fix issue in Required filter validator with dot notation (#4221)
+* OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
+* OpenAPI: Do not use output for request body (#4213)
+* Serializer: Convert internal error to HTTP 400 in Ramsey uuid denormalization from invalid body string (#4200)
+* Symfony: Add tests with Symfony Uuid (#4230)
+* OpenAPI: Allow to set extensionProperties with YAML schema definition (#4228)
 
 ## 2.6.4
 
-* Serializer: Fix denormalization of basic property-types in XML and CSV (#3191)
+* OpenAPI: Using an implicit flow is now valid, changes oauth configuration default values (#4115)
+* OpenAPI: Fix `response` support via the `openapi_context` (#4116)
+* OpenAPI: Fix `Link->requestBody` default value (#4116)
+* OpenAPI: Make sure we do not override defined parameters (#4138)
+* Swagger UI: Remove Google fonts (#4112)
+* Serializer: Fix denormalization of basic property-types in XML and CSV (#4145)
 * Serializer: Fix denormalization of collection with one element in XML (#4154)
 * JSON Schema: Manage Sequentially and AtLeastOneOf constraints when generating property metadata (#4139 and #4147)
+* JSON Schema: properties regex pattern is now correctly anchored (#4176 and #4198)
+* JSON Schema: Fix PropertySchemaLengthRestriction string-only (#4177)
 * Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
 * Doctrine: Revert #3774 support for binary UUID in search filter (#4134)
 * Doctrine: Fix order filter when using embedded and nulls comparison (#4151)
+* Doctrine: Fix duplicated eager loading joins (#3525)
+* Doctrine: Fix joinRelations with multiple associations. (#2791)
+* Doctrine: Revert using `defaults.order` as `collection.order` (#4178)
 * GraphQL: Partial pagination support (#3223)
 * GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
-* Swagger UI: Remove Google fonts (#4112)
-* Doctrine: Revert #3774 support for binary UUID in search filter (#4134) 
-* Do not override Vary headers already set in the Response 
 * GraphQL: Make sure the order of order filters is preserved if nested resources are used (#4171)
-* Validation: properties regex pattern is now correctly anchored (#4176)
+* Metadata: Sort mapping resources (#3256)
+* UUID: manage Ulid in format property schema restriction (#4148)
+* Symfony: Do not override Vary headers already set in the Response (#4146)
+* Symfony: Make Twig dependency lazy (#4187)
+* Compatibility with `psr/cache` version 2 and 3 (#4117)
+* Docs: Upgrade Swagger UI to version 3.46.0
+* Docs: Upgrade ReDoc to version 2.0.0-rc.51
+* Docs: Upgrade GraphiQL to version 1.4.1
 
 ## 2.6.3
 
@@ -49,17 +73,16 @@
 * Security: Use a `NullToken` when using the new authenticator manager in the resource access checker (#4067)
 * Mercure: Do not use data in options when deleting (#4056)
 * Doctrine: Support for foreign identifiers (#4042)
+* Doctrine: Support for binary UUID in search filter (#3774, reverted in 2.6.4)
 * Doctrine: Do not add join or lookup for search filter with empty value (#3703)
+* Doctrine: Reduce code duplication in search filter (#3541)
 * JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`) (#4064)
 * OpenAPI: Fix missing 422 responses in the documentation (#4086)
 * OpenAPI: Fix error when schema is empty (#4051)
 * OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
 * OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
-* OpenAPI: Fix `response` support via the `openapi_context` (#4116)
-* OpenAPI: Fix `Link->requestBody` default value (#4116)
 * GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
 * Metadata: Check the output class when calculating serializer groups (#3696)
-* OpenAPI: Using an implicit flow is now valid, changes oauth configuration default values (#4115)
 
 ## 2.6.2
 

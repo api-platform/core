@@ -111,8 +111,7 @@ Feature: Using uuid identifier on resource
   @createSchema
   Scenario: Retrieve a resource identified by Ramsey\Uuid\Uuid
     Given there is a ramsey identified resource with uuid "41B29566-144B-11E6-A148-3E1D05DEFE78"
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78"
+    When I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -125,8 +124,7 @@ Feature: Using uuid identifier on resource
 
   @!mongodb
   Scenario: Retrieve a resource identified by a bad Ramsey\Uuid\Uuid
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-E1D05DEFE78"
+    When I send a "GET" request to "/ramsey_uuid_dummies/41B29566-144B-E1D05DEFE78"
     Then the response status code should be 404
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
@@ -142,5 +140,68 @@ Feature: Using uuid identifier on resource
     }
     """
     Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  Scenario: Create a resource with a Ramsey\Uuid\Uuid non-id field
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/ramsey_uuid_dummies" with body:
+    """
+    {
+      "other": "51b29566-144b-11e6-a148-3e1d05defe78"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  Scenario: Update a resource with a Ramsey\Uuid\Uuid non-id field
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/ramsey_uuid_dummies/41b29566-144b-11e6-a148-3e1d05defe78" with body:
+    """
+    {
+      "other": "61b29566-144b-11e6-a148-3e1d05defe78"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  Scenario: Create a resource identified by a bad Ramsey\Uuid\Uuid
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/ramsey_uuid_dummies" with body:
+    """
+    {
+      "id": "41b29566-144b-e1d05defe78"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  @!mongodb
+  Scenario: Update a resource with a bad Ramsey\Uuid\Uuid non-id field
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/ramsey_uuid_dummies/41b29566-144b-11e6-a148-3e1d05defe78" with body:
+    """
+    {
+      "other": "61b29566-144b-e1d05defe78"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+
+  # @TODO remove the tag "@symfony/uid" in 3.0
+  @symfony/uid
+  @!mongodb
+  @createSchema
+  Scenario: Retrieve a resource identified by Symfony\Component\Uid\Uuid
+    Given there is a Symfony dummy identified resource with uuid "cdf8f706-ebe3-4fb6-b0bd-ae7b48028f24"
+    When I send a "GET" request to "/symfony_uuid_dummies/cdf8f706-ebe3-4fb6-b0bd-ae7b48028f24"
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
+use ApiPlatform\Core\Util\RequestParser;
+
 final class Required implements ValidatorInterface
 {
     /**
@@ -47,8 +49,7 @@ final class Required implements ValidatorInterface
      */
     private function requestHasQueryParameter(array $queryParameters, string $name): bool
     {
-        $matches = [];
-        parse_str($name, $matches);
+        $matches = RequestParser::parseRequestParams($name);
         if (!$matches) {
             return false;
         }
@@ -76,8 +77,7 @@ final class Required implements ValidatorInterface
      */
     private function requestGetQueryParameter(array $queryParameters, string $name)
     {
-        $matches = [];
-        parse_str($name, $matches);
+        $matches = RequestParser::parseRequestParams($name);
         if (empty($matches)) {
             return null;
         }

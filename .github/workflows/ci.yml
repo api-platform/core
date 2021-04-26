@@ -252,7 +252,11 @@ jobs:
           if [ "$COVERAGE" = '1' ]; then
             vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default-coverage --no-interaction
           else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
+            if [ "${{ matrix.php }}" = '7.1' ]; then
+              vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@symfony/uid'
+            else
+              vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
+            fi
           fi
       - name: Merge code coverage reports
         if: matrix.coverage
@@ -384,7 +388,8 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+        # @TODO remove the tag "@symfony/uid" in 3.0
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@symfony/uid'
 
   postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
