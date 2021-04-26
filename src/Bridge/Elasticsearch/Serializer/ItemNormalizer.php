@@ -13,62 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\SerializerAwareInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Item denormalizer for Elasticsearch.
+ * Item normalizer decorator that prevents {@see \ApiPlatform\Core\Serializer\ItemNormalizer}
+ * from taking over for the {@see DocumentNormalizer::FORMAT} format because of priorities.
  *
  * @experimental
- *
- * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class ItemNormalizer extends ObjectNormalizer
+final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
-    public const FORMAT = 'elasticsearch';
+    private $decorated;
 
-    private $identifierExtractor;
-
-    public function __construct(IdentifierExtractorInterface $identifierExtractor, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(NormalizerInterface $decorated)
     {
-        parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
-
-        $this->identifierExtractor = $identifierExtractor;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization($data, $type, $format = null): bool
-    {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize($data, $class, $format = null, array $context = [])
-    {
-        if (\is_string($data['_id'] ?? null) && \is_array($data['_source'] ?? null)) {
-            $data = $this->populateIdentifier($data, $class)['_source'];
-        }
-
-        return parent::denormalize($data, $class, $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization($data, $format = null): bool
-    {
-        // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
-        return self::FORMAT === $format;
+        $this->decorated = $decorated;
     }
 
     /**
@@ -76,23 +40,70 @@ final class ItemNormalizer extends ObjectNormalizer
      *
      * @throws LogicException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function hasCacheableSupportsMethod(): bool
     {
-        throw new LogicException(sprintf('%s is a write-only format.', self::FORMAT));
+        if (!$this->decorated instanceof CacheableSupportsMethodInterface) {
+            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
+        }
+
+        return $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**
-     * Populates the resource identifier with the document identifier if not present in the original JSON document.
+     * {@inheritdoc}
+     *
+     * @throws LogicException
      */
-    private function populateIdentifier(array $data, string $class): array
+    public function denormalize($data, $type, $format = null, array $context = [])
     {
-        $identifier = $this->identifierExtractor->getIdentifierFromResourceClass($class);
-        $identifier = null === $this->nameConverter ? $identifier : $this->nameConverter->normalize($identifier, $class, self::FORMAT);
-
-        if (!isset($data['_source'][$identifier])) {
-            $data['_source'][$identifier] = $data['_id'];
+        if (!$this->decorated instanceof DenormalizerInterface) {
+            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
-        return $data;
+        return $this->decorated->denormalize($data, $type, $format, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws LogicException
+     */
+    public function supportsDenormalization($data, $type, $format = null)
+    {
+        if (!$this->decorated instanceof DenormalizerInterface) {
+            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
+        }
+
+        return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsDenormalization($data, $type, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize($object, $format = null, array $context = [])
+    {
+        return $this->decorated->normalize($object, $format, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization($data, $format = null)
+    {
+        return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws LogicException
+     */
+    public function setSerializer(SerializerInterface $serializer)
+    {
+        if (!$this->decorated instanceof SerializerAwareInterface) {
+            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
+        }
+
+        $this->decorated->setSerializer($serializer);
     }
 }

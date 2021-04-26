@@ -59,6 +59,11 @@ class User
     /**
      * @Groups({"user:read"})
      */
+    private $registeredAt;
+
+    /**
+     * @Groups({"user:read"})
+     */
     private $tweets = [];
 
     public function getId(): ?string
@@ -109,6 +114,16 @@ class User
     public function setLastName(string $lastName): void
     {
         $this->lastName = $lastName;
+    }
+
+    public function getRegisteredAt(): ?\DateTimeInterface
+    {
+        return $this->registeredAt;
+    }
+
+    public function setRegisteredAt(\DateTimeInterface $registeredAt): void
+    {
+        $this->registeredAt = $registeredAt;
     }
 
     public function getTweets(): array

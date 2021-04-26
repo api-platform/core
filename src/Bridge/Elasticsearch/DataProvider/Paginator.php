@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
+use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -115,7 +115,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
                 $object = $this->denormalizer->denormalize(
                     $document,
                     $this->resourceClass,
-                    ItemNormalizer::FORMAT,
+                    DocumentNormalizer::FORMAT,
                     $denormalizationContext
                 );
 

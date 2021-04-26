@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator;
-use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer;
+use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -178,7 +178,7 @@ class PaginatorTest extends TestCase
 
         foreach ($documents['hits']['hits'] as $document) {
             $denormalizerProphecy
-                ->denormalize($document, Foo::class, ItemNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true, 'groups' => ['custom']])
+                ->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true, 'groups' => ['custom']])
                 ->willReturn($this->denormalizeFoo($document['_source']));
         }
 

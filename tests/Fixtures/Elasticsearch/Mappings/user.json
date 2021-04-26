@@ -17,6 +17,10 @@
         "lastName": {
           "type": "text"
         },
+        "registeredAt": {
+          "type": "date",
+          "format": "yyyy-MM-dd"
+        },
         "tweets": {
           "type": "nested",
           "properties": {
