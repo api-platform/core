@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Core\Validator\Exception\ValidationException as BaseValidationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +25,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -61,5 +64,51 @@ class ValidationExceptionListenerTest extends TestCase
         $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
         $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
         $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
+    }
+
+    public function testOnKernelValidationExceptionWithCustomStatus(): void
+    {
+        $serializedConstraintViolationList = '{"foo": "bar"}';
+        $constraintViolationList = new ConstraintViolationList([]);
+        $exception = new class($constraintViolationList) extends BaseValidationException implements ConstraintViolationListAwareExceptionInterface {
+            private $constraintViolationList;
+
+            public function __construct(ConstraintViolationListInterface $constraintViolationList, $message = '', $code = 0, \Throwable $previous = null)
+            {
+                parent::__construct($message, $code, $previous);
+
+                $this->constraintViolationList = $constraintViolationList;
+            }
+
+            public function getConstraintViolationList(): ConstraintViolationListInterface
+            {
+                return $this->constraintViolationList;
+            }
+        };
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($constraintViolationList, 'hydra')->willReturn($serializedConstraintViolationList)->shouldBeCalledOnce();
+
+        $exceptionEvent = new ExceptionEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            $exception
+        );
+
+        (new ValidationExceptionListener(
+            $serializerProphecy->reveal(),
+            ['hydra' => ['application/ld+json']],
+            [\get_class($exception) => Response::HTTP_BAD_REQUEST]
+        ))->onKernelException($exceptionEvent);
+
+        $response = $exceptionEvent->getResponse();
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame($serializedConstraintViolationList, $response->getContent());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        self::assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 }
