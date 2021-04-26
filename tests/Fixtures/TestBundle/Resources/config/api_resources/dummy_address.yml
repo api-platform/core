@@ -1,0 +1,6 @@
+resources:
+    ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\DummyAddress:
+        collectionOperations:
+            get:
+                openapi_context:
+                    x-visibility: hide

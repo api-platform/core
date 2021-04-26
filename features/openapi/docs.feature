@@ -213,6 +213,13 @@ Feature: Documentation support
     And I should see text matching "My Dummy API"
     And I should see text matching "openapi"
 
+  Scenario: OpenAPI extension properties is enabled in JSON docs
+    Given I send a "GET" request to "/docs.json?spec_version=3"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json; charset=utf-8"
+    And the JSON node "paths./dummy_addresses.get.x-visibility" should be equal to "hide"
+
   Scenario: OpenAPI UI is enabled for an arbitrary endpoint
     Given I add "Accept" header equal to "text/html"
     And I send a "GET" request to "/dummies?spec_version=3"

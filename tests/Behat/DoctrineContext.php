@@ -157,6 +157,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SoMany;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
@@ -170,7 +171,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Uid\Uuid as SymfonyUuid;
 
 /**
  * Defines application features from the specific context.
@@ -1449,8 +1452,18 @@ final class DoctrineContext implements Context
      */
     public function thereIsARamseyIdentifiedResource(string $uuid)
     {
-        $dummy = new RamseyUuidDummy();
-        $dummy->setId($uuid);
+        $dummy = new RamseyUuidDummy(Uuid::fromString($uuid));
+
+        $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a Symfony dummy identified resource with uuid :uuid
+     */
+    public function thereIsASymfonyDummyIdentifiedResource(string $uuid)
+    {
+        $dummy = new SymfonyUuidDummy(SymfonyUuid::fromString($uuid));
 
         $this->manager->persist($dummy);
         $this->manager->flush();

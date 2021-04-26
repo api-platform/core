@@ -83,6 +83,11 @@ final class Parameter
         return $this->deprecated;
     }
 
+    public function canAllowEmptyValue(): bool
+    {
+        return $this->allowEmptyValue;
+    }
+
     public function getAllowEmptyValue(): bool
     {
         return $this->allowEmptyValue;

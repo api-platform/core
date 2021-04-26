@@ -93,12 +93,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $resourceShortName = $resourceMetadata->getShortName();
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
-            [$itemOperationLinks, $itemOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
-            $this->appendSchemaDefinitions($schemas, $itemOperationSchemas);
-            [$collectionOperationLinks, $collectionOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
+            $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
+            $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
 
-            [$subresourceOperationLinks, $subresourceOperationSchemas] = $this->collectPaths($resourceMetadata, $resourceClass, OperationType::SUBRESOURCE, $context, $paths, $links, $schemas);
-            $this->appendSchemaDefinitions($schemas, $collectionOperationSchemas);
+            $this->collectPaths($resourceMetadata, $resourceClass, OperationType::SUBRESOURCE, $context, $paths, $links, $schemas);
         }
 
         $securitySchemes = $this->getSecuritySchemes();
@@ -125,15 +123,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         );
     }
 
-    /**
-     * @return array | array
-     */
-    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, \ArrayObject $schemas): array
+    private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, \ArrayObject $schemas): void
     {
         $resourceShortName = $resourceMetadata->getShortName();
         $operations = OperationType::COLLECTION === $operationType ? $resourceMetadata->getCollectionOperations() : (OperationType::ITEM === $operationType ? $resourceMetadata->getItemOperations() : $this->subresourceOperationFactory->create($resourceClass));
         if (!$operations) {
-            return [$links, $schemas];
+            return;
         }
 
         $rootResourceClass = $resourceClass;
@@ -256,9 +251,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if ($contextResponses = $operation['openapi_context']['responses'] ?? false) {
                 foreach ($contextResponses as $statusCode => $contextResponse) {
-                    $responses[$statusCode] = new Model\Response($contextResponse['description'] ?? '', new \ArrayObject($contextResponse['content']), isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null);
+                    $responses[$statusCode] = new Model\Response($contextResponse['description'] ?? '', isset($contextResponse['content']) ? new \ArrayObject($contextResponse['content']) : null, isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null);
                 }
             }
+
+            $schema = new Schema('openapi');
+            $schema->setDefinitions($schemas);
 
             $requestBody = null;
             if ($contextRequestBody = $operation['openapi_context']['requestBody'] ?? false) {
@@ -286,13 +284,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null,
                 $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
                 $operation['openapi_context']['security'] ?? null,
-                $operation['openapi_context']['servers'] ?? null
+                $operation['openapi_context']['servers'] ?? null,
+                array_filter($operation['openapi_context'] ?? [], static function ($item) {
+                    return preg_match('/^x-.*$/i', $item);
+                }, \ARRAY_FILTER_USE_KEY)
             ));
 
             $paths->addPath($path, $pathItem);
         }
-
-        return [$links, $schemas];
     }
 
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
