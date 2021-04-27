@@ -276,7 +276,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 return null;
             }
 
-            $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType() : $graphqlType;
+            $graphqlWrappedType = $graphqlType instanceof WrappingType ? $graphqlType->getWrappedType(true) : $graphqlType;
             $isStandardGraphqlType = \in_array($graphqlWrappedType, GraphQLType::getStandardTypes(), true);
             if ($isStandardGraphqlType) {
                 $resourceClass = '';
