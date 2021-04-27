@@ -2,6 +2,7 @@
 
 ## 2.6.5
 
+* JsonSchema: Update Hydra `@context` property possible types
 * Filter validation: Fix issue in Required filter validator with dot notation (#4221)
 * OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
 * OpenAPI: Do not use output for request body (#4213)
