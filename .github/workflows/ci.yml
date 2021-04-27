@@ -9,6 +9,12 @@ env:
   COVERAGE: '0'
 
 jobs:
+  conventional-commit:
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+    - run: npx --no-install commitlint --edit ${{ github.event.head_commit.message }}
+
   php-cs-fixer:
     runs-on: ubuntu-latest
     timeout-minutes: 20
