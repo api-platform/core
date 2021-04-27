@@ -90,7 +90,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $resourceShortName = $resourceMetadata->getShortName();
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
             $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
@@ -255,6 +254,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
+            $schema = new Schema('openapi');
+            $schema->setDefinitions($schemas);
+
             $requestBody = null;
             if ($contextRequestBody = $operation['openapi_context']['requestBody'] ?? false) {
                 $requestBody = new Model\RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
@@ -281,7 +283,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null,
                 $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
                 $operation['openapi_context']['security'] ?? null,
-                $operation['openapi_context']['servers'] ?? null
+                $operation['openapi_context']['servers'] ?? null,
+                array_filter($operation['openapi_context'] ?? [], static function ($item) {
+                    return preg_match('/^x-.*$/i', $item);
+                }, \ARRAY_FILTER_USE_KEY)
             ));
 
             $paths->addPath($path, $pathItem);

@@ -834,6 +834,7 @@ class ApiPlatformExtensionTest extends TestCase
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c.yaml",
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c/a.yaml",
                     "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
+                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
                     "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
                 ]),
                 $normalizePaths($paths)
