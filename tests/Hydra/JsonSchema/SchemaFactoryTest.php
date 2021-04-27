@@ -80,7 +80,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
         $this->assertArrayHasKey('@context', $properties);
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'readOnly' => true,
                 'oneOf' => [
