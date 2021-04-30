@@ -505,6 +505,7 @@ class FieldsBuilderTest extends TestCase
             $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, $mutationName, null, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
             $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, null, $subscriptionName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
             $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, null, 'subresourceClass', $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), Argument::type('bool'), $queryName, null, null, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
         }
         $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);
         $this->typesContainerProphecy->all()->willReturn([]);
@@ -585,6 +586,24 @@ class FieldsBuilderTest extends TestCase
                     ],
                     'propertyBool' => [
                         'type' => GraphQLType::nonNull(GraphQLType::string()),
+                        'description' => null,
+                        'args' => [],
+                        'resolve' => null,
+                        'deprecationReason' => null,
+                    ],
+                ],
+            ],
+            'query with simple non-null string array property' => ['resourceClass', new ResourceMetadata(),
+                [
+                    'property' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), null, true, false),
+                ],
+                false, 'item_query', null, null, null,
+                [
+                    'id' => [
+                        'type' => GraphQLType::nonNull(GraphQLType::id()),
+                    ],
+                    'property' => [
+                        'type' => GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))),
                         'description' => null,
                         'args' => [],
                         'resolve' => null,

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hydra\JsonSchema;
 
+use ApiPlatform\Core\JsonLd\ContextBuilder;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
@@ -35,7 +36,26 @@ final class SchemaFactory implements SchemaFactoryInterface
         '@type' => self::BASE_PROP,
     ];
     private const BASE_ROOT_PROPS = [
-        '@context' => self::BASE_PROP,
+        '@context' => [
+            'readOnly' => true,
+            'oneOf' => [
+                ['type' => 'string'],
+                [
+                    'type' => 'object',
+                    'properties' => [
+                        '@vocab' => [
+                            'type' => 'string',
+                        ],
+                        'hydra' => [
+                            'type' => 'string',
+                            'enum' => [ContextBuilder::HYDRA_NS],
+                        ],
+                    ],
+                    'required' => ['@vocab', 'hydra'],
+                    'additionalProperties' => true,
+                ],
+            ],
+        ],
     ] + self::BASE_PROPS;
 
     private $schemaFactory;
