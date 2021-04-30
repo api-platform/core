@@ -30,12 +30,14 @@
 
 ## 2.6.5
 
+* JsonSchema: Update Hydra `@context` property possible types
 * Filter validation: Fix issue in Required filter validator with dot notation (#4221)
 * OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
 * OpenAPI: Do not use output for request body (#4213)
 * Serializer: Convert internal error to HTTP 400 in Ramsey uuid denormalization from invalid body string (#4200)
 * Symfony: Add tests with Symfony Uuid (#4230)
 * OpenAPI: Allow to set extensionProperties with YAML schema definition (#4228)
+* GraphQL: Fix `FieldsBuilder` not fully unwrapping nested types before deciding if a resolver is needed (#4251)
 
 ## 2.6.4
 

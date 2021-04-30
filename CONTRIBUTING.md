@@ -77,6 +77,32 @@ When you send a PR, just make sure that:
 that you did not make in your PR, you're doing it wrong.
 * Also don't forget to add a comment when you update a PR with a ping to [the maintainers](https://github.com/orgs/api-platform/people), so he/she will get a notification.
 
+The commit messages must follow the [Conventional Commits specification](https://www.conventionalcommits.org/).
+The following types are allowed:
+
+* `fix`: bug fix
+* `feat`: new feature
+* `docs`: change in the documentation
+* `spec`: spec change
+* `test`: test-related change
+* `perf`: performance optimization
+* `ci`: CI-related change
+* `chore`: updating dependencies and related changes
+
+Examples:
+
+    fix(metadata): resource identifiers from properties 
+
+    feat(validation): introduce a number constraint
+
+    feat(metadata)!: new resource metadata system, BC break
+
+    docs(doctrine): search filter on uuids
+
+    test(doctrine): mongodb disambiguation
+
+We strongly recommend the use of a scope on API Platform core.
+
 ### Tests
 
 On `api-platform/core` there are two kinds of tests: unit (`phpunit` through `simple-phpunit`) and integration tests (`behat`).

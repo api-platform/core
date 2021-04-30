@@ -57,8 +57,8 @@ Feature: Documentation support
     And the JSON node "paths./api/custom-call/{id}.get" should exist
     And the JSON node "paths./api/custom-call/{id}.put" should exist
     # Properties
-    And "id" property exists for the Swagger class "Dummy"
-    And "name" property is required for Swagger class "Dummy"
+    And the "id" property exists for the Swagger class "Dummy"
+    And the "name" property is required for the Swagger class "Dummy"
     # Filters
     And the JSON node "paths./dummies.get.parameters[0].name" should be equal to "dummyBoolean"
     And the JSON node "paths./dummies.get.parameters[0].in" should be equal to "query"

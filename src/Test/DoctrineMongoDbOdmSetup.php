@@ -62,7 +62,11 @@ class DoctrineMongoDbOdmSetup
         $cache = self::createCacheConfiguration($isDevMode, $proxyDir, $hydratorDir, $cache);
 
         $config = new Configuration();
-        $config->setMetadataCacheImpl($cache);
+        if (method_exists($config, 'setMetadataCache')) {
+            $config->setMetadataCache($cache);
+        } else {
+            $config->setMetadataCacheImpl($cache);
+        }
         $config->setProxyDir($proxyDir);
         $config->setHydratorDir($hydratorDir);
         $config->setProxyNamespace('DoctrineProxies');

@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- http://phpunit.de/manual/4.1/en/appendixes.configuration.html -->
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         backupGlobals="false"
-         bootstrap="tests/Fixtures/app/bootstrap.php"
-         colors="true"
->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false" bootstrap="tests/Fixtures/app/bootstrap.php" colors="true">
     <php>
         <ini name="error_reporting" value="-1" />
         <ini name="memory_limit" value="-1" />
@@ -25,19 +19,19 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <coverage processUncoveredFiles="true">
+        <include>
             <directory>.</directory>
-            <exclude>
-                <directory>features</directory>
-                <directory>tests</directory>
-                <directory>vendor</directory>
-                <directory>src/Bridge/NelmioApiDoc</directory>
-                <directory>src/Bridge/FosUser</directory>
-                <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
-            </exclude>
-        </whitelist>
-    </filter>
+        </include>
+        <exclude>
+            <directory>features</directory>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+            <directory>src/Bridge/NelmioApiDoc</directory>
+            <directory>src/Bridge/FosUser</directory>
+            <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
+        </exclude>
+    </coverage>
 
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
