@@ -129,7 +129,7 @@ jobs:
         if: matrix.coverage
         run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Remove Doctrine MongoDB ODM
-        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '7.1'))
         run: |
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
