@@ -12,6 +12,7 @@
 declare(strict_types=1);
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Core\Tests\Behat\DoctrineContext;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
@@ -117,6 +118,8 @@ class AppKernel extends Kernel
             $loader->load(__DIR__.'/config/config_symfony_uid.yml');
         }
 
+        $c->getDefinition(DoctrineContext::class)->setArgument('$passwordHasher', class_exists(NativePasswordHasher::class) ? 'security.user_password_encoder' : 'security.user_password_hasher');
+
         $c->prependExtensionConfig('framework', [
             'secret' => 'dunglas.fr',
             'validation' => ['enable_annotations' => true],
@@ -136,9 +139,9 @@ class AppKernel extends Kernel
             'router' => ['utf8' => true],
         ]);
 
-        $alg = class_exists(NativePasswordHasher::class) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
+        $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';
         $securityConfig = [
-            'encoders' => [
+            class_exists(NativePasswordHasher::class) ? 'password_hashers' : 'encoders' => [
                 User::class => $alg,
                 UserDocument::class => $alg,
                 // Don't use plaintext in production!
