@@ -172,6 +172,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Uid\Uuid as SymfonyUuid;
 
@@ -185,7 +186,7 @@ final class DoctrineContext implements Context
      */
     private $manager;
     private $doctrine;
-    private $passwordEncoder;
+    private $passwordHasher;
     private $schemaTool;
     private $schemaManager;
 
@@ -195,11 +196,13 @@ final class DoctrineContext implements Context
      * Every scenario gets its own context instance.
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
+     *
+     * @param UserPasswordEncoderInterface|UserPasswordHasherInterface $passwordHasher
      */
-    public function __construct(ManagerRegistry $doctrine, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(ManagerRegistry $doctrine, $passwordHasher)
     {
         $this->doctrine = $doctrine;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasher = $passwordHasher;
         $this->manager = $doctrine->getManager();
         $this->schemaTool = $this->manager instanceof EntityManagerInterface ? new SchemaTool($this->manager) : null;
         $this->schemaManager = $this->manager instanceof DocumentManager ? $this->manager->getSchemaManager() : null;
@@ -1282,7 +1285,7 @@ final class DoctrineContext implements Context
     public function thePasswordForUserShouldBeHashed(string $password, string $user)
     {
         $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
-        if (!$this->passwordEncoder->isPasswordValid($user, $password)) {
+        if (!$this->passwordHasher->isPasswordValid($user, $password)) {
             throw new \Exception('User password mismatch');
         }
     }

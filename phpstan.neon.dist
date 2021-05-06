@@ -35,6 +35,7 @@ parameters:
 		- tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/ProphecyTrait.php
 		- tests/Behat/CoverageContext.php
+		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
@@ -89,6 +90,8 @@ parameters:
 
 		# Expected, Symfony 5.3
 		- '#getCollectionValueT|getCollectionKeyTyp#'
+		- '#isPasswordValid#'
+		- '#UserPasswordHasherInterface#'
 
 		# Expected, due to PHP 8 attributes
 		- '#ReflectionProperty::getAttributes\(\)#'
