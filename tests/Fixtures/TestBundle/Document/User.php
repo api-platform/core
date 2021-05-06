@@ -18,8 +18,8 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -58,7 +58,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class User implements UserInterface
+class User extends AbstractSecurityUser
 {
     /**
      * @var int
@@ -156,7 +156,7 @@ class User implements UserInterface
         return ['ROLE_USER'];
     }
 
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return null;
     }

@@ -254,9 +254,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            $schema = new Schema('openapi');
-            $schema->setDefinitions($schemas);
-
             $requestBody = null;
             if ($contextRequestBody = $operation['openapi_context']['requestBody'] ?? false) {
                 $requestBody = new Model\RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false);
