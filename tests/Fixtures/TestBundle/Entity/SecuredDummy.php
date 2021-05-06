@@ -85,6 +85,17 @@ class SecuredDummy
     private $adminOnlyProperty = '';
 
     /**
+     * @var string Secret property, only readable/writable by owners
+     *
+     * @ORM\Column
+     * @ApiProperty(
+     *     security="object == null or object.getOwner() == user",
+     *     securityPostDenormalize="object.getOwner() == user",
+     * )
+     */
+    private $ownerOnlyProperty = '';
+
+    /**
      * @var string The owner
      *
      * @ORM\Column
@@ -196,6 +207,16 @@ class SecuredDummy
     public function setAdminOnlyProperty(?string $adminOnlyProperty)
     {
         $this->adminOnlyProperty = $adminOnlyProperty;
+    }
+
+    public function getOwnerOnlyProperty(): ?string
+    {
+        return $this->ownerOnlyProperty;
+    }
+
+    public function setOwnerOnlyProperty(?string $ownerOnlyProperty)
+    {
+        $this->ownerOnlyProperty = $ownerOnlyProperty;
     }
 
     public function getOwner(): string
