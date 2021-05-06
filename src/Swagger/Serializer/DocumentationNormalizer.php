@@ -637,9 +637,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $schema = new Schema($v3 ? Schema::VERSION_OPENAPI : Schema::VERSION_SWAGGER);
         $schema->setDefinitions($definitions);
 
-        $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
-
-        return $schema;
+        return $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
     }
 
     private function computeDoc(bool $v3, Documentation $documentation, \ArrayObject $definitions, \ArrayObject $paths, array $context): array

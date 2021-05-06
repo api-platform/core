@@ -69,7 +69,7 @@ final class SchemaFactory implements SchemaFactoryInterface
      */
     public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?string $operationType = null, ?string $operationName = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        $schema = $schema ?? new Schema();
+        $schema = $schema ? clone $schema : new Schema();
         if (null === $metadata = $this->getMetadata($className, $type, $operationType, $operationName, $serializerContext)) {
             return $schema;
         }

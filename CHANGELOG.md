@@ -6,6 +6,7 @@
 * Filter validation: Fix issue in Required filter validator with dot notation (#4221)
 * OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
 * OpenAPI: Do not use output for request body (#4213)
+* OpenAPI: Do not use jsonld schema for all media types (#4247) (BC note: `SchemaFactory::buildSchema()` is now immutable as it no longer modifies the passed `$schema`)
 * Serializer: Convert internal error to HTTP 400 in Ramsey uuid denormalization from invalid body string (#4200)
 * Symfony: Add tests with Symfony Uuid (#4230)
 * OpenAPI: Allow to set extensionProperties with YAML schema definition (#4228)
