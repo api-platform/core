@@ -70,7 +70,7 @@ jobs:
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         env:
-          SYMFONY_PHPUNIT_VERSION: '9.4'
+          SYMFONY_PHPUNIT_VERSION: '9.5'
         run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
         uses: actions/cache@v2
@@ -86,7 +86,7 @@ jobs:
           tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPStan analysis
         env:
-          SYMFONY_PHPUNIT_VERSION: '9.4'
+          SYMFONY_PHPUNIT_VERSION: '9.5'
         run: ./vendor/bin/phpstan analyse --no-interaction --no-progress --no-interaction --ansi
 
   phpunit:
@@ -102,7 +102,7 @@ jobs:
           - '7.4'
           - '8.0'
         include:
-          - php: '7.4'
+          - php: '8.0'
             coverage: true
       fail-fast: false
     steps:
@@ -197,7 +197,7 @@ jobs:
           - '7.4'
           - '8.0'
         include:
-          - php: '7.4'
+          - php: '8.0'
             coverage: true
       fail-fast: false
     steps:
