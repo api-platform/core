@@ -26,7 +26,7 @@ $finder = PhpCsFixer\Finder::create()
         'tests/Fixtures/app/console',
     ]);
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@DoctrineAnnotation' => true,
@@ -41,9 +41,6 @@ return PhpCsFixer\Config::create()
             'comment_type' => 'phpdocs_like',
         ],
         'array_indentation' => true,
-        'array_syntax' => [
-            'syntax' => 'short',
-        ],
         'compact_nullable_typehint' => true,
         'doctrine_annotation_array_assignment' => [
             'operator' => '=',
