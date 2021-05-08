@@ -244,4 +244,16 @@ final class Client implements HttpClientInterface
 
         return $headers;
     }
+
+    /**
+     * {@inheritdoc}
+     * TODO: Delete this when we can use symfony/http-client:^5.3.
+     */
+    public function withOptions(array $options): self
+    {
+        $clone = clone $this;
+        $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
+
+        return $clone;
+    }
 }

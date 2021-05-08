@@ -22,16 +22,32 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Runner\Version;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpClient\CurlHttpClient;
+use Symfony\Component\HttpClient\TraceableHttpClient;
 
 class ApiTestCaseTest extends ApiTestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * TODO: remove the deprecation HttpClientInterface::withOptions will be available in symfony:^5.3.
+     *
+     * @group legacy
+     */
     public function testAssertJsonContains(): void
     {
         if (version_compare(Version::id(), '8.0.0', '<')) {
             $this->markTestSkipped('Requires PHPUnit 8');
         }
 
-        self::createClient()->request('GET', '/');
+        $client = self::createClient();
+
+        if (!method_exists(CurlHttpClient::class, 'withOptions')) {
+            $this->expectDeprecation(sprintf('Class %s should implement method "Symfony\Contracts\HttpClient\HttpClientInterface::withOptions(array $options)": Returns a new instance of the client with new default options.', class_exists(TraceableHttpClient::class) ? TraceableHttpClient::class : \get_class($client)));
+        }
+
+        $client->request('GET', '/');
         $this->assertJsonContains(['@context' => '/contexts/Entrypoint']);
     }
 
