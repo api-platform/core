@@ -10,12 +10,13 @@ env:
 
 jobs:
   php-cs-fixer:
+    name: PHP-cs-fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8'
       fail-fast: false
     env:
       PHP_CS_FIXER_FUTURE_MODE: '1'
@@ -34,16 +35,17 @@ jobs:
         run: php-cs-fixer fix --dry-run --diff --ansi
 
   phpstan:
-    name: PHPStan
+    name: PHPStan (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '7.4'
+          - '8'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
+      SYMFONY_PHPUNIT_VERSION: '9.5'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -69,8 +71,6 @@ jobs:
       - name: Require Symfony components
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
-        env:
-          SYMFONY_PHPUNIT_VERSION: '9.5'
         run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
         uses: actions/cache@v2
