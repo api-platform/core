@@ -74,7 +74,7 @@ class ErrorNormalizerTest extends TestCase
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => 'An error occurred',
-            'detail' => ($debug || $status < 500) ? $originalMessage : Response::$statusTexts[$status],
+            'detail' => ($debug || $status < 500) ? $originalMessage : Response::$statusTexts[$status] ?? Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR],
         ];
 
         if ($debug) {
@@ -93,6 +93,7 @@ class ErrorNormalizerTest extends TestCase
             [Response::HTTP_INTERNAL_SERVER_ERROR, 'Sensitive SQL error displayed', true],
             [Response::HTTP_GATEWAY_TIMEOUT, 'Sensitive server error displayed', true],
             [Response::HTTP_BAD_REQUEST, 'Bad Request Message', true],
+            [509, Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR], true],
         ];
     }
 
