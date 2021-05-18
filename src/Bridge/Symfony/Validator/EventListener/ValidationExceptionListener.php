@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Util\ErrorFormatGuesser;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -43,7 +44,7 @@ final class ValidationExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = method_exists($event, 'getThrowable') ? $event->getThrowable() : $event->getException(); // @phpstan-ignore-line
-        if (!$exception instanceof ConstraintViolationListAwareExceptionInterface) {
+        if (!$exception instanceof ConstraintViolationListAwareExceptionInterface && !$exception instanceof FilterValidationException) {
             return;
         }
         $exceptionClass = \get_class($exception);
@@ -60,7 +61,7 @@ final class ValidationExceptionListener
         $format = ErrorFormatGuesser::guessErrorFormat($event->getRequest(), $this->errorFormats);
 
         $event->setResponse(new Response(
-                $this->serializer->serialize($exception->getConstraintViolationList(), $format['key']),
+                $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key']),
                 $statusCode,
                 [
                     'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),

@@ -42,7 +42,7 @@ final class Inflector
      */
     public static function tableize(string $word): string
     {
-        return class_exists(LegacyInflector::class) ? LegacyInflector::tableize($word) : self::getInstance()->tableize($word);
+        return class_exists(InflectorFactory::class) ? self::getInstance()->tableize($word) : LegacyInflector::tableize($word); // @phpstan-ignore-line
     }
 
     /**
@@ -50,6 +50,6 @@ final class Inflector
      */
     public static function pluralize(string $word): string
     {
-        return class_exists(LegacyInflector::class) ? LegacyInflector::pluralize($word) : self::getInstance()->pluralize($word);
+        return class_exists(InflectorFactory::class) ? self::getInstance()->pluralize($word) : LegacyInflector::pluralize($word); // @phpstan-ignore-line
     }
 }

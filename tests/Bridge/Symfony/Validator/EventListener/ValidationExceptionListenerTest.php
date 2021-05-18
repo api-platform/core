@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\EventListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException as BaseValidationException;
 use PHPUnit\Framework\TestCase;
@@ -110,5 +111,26 @@ class ValidationExceptionListenerTest extends TestCase
         self::assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
         self::assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
         self::assertSame('deny', $response->headers->get('X-Frame-Options'));
+    }
+
+    public function testValidationFilterException()
+    {
+        $exceptionJson = '{"message": "my message"}';
+        $exception = new FilterValidationException([], 'my message');
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($exception, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
+
+        $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, $exception);
+        $listener->onKernelException($event);
+
+        $response = $event->getResponse();
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame($exceptionJson, $response->getContent());
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $this->assertSame('deny', $response->headers->get('X-Frame-Options'));
     }
 }
