@@ -50,7 +50,7 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
         $clauseBody = [];
 
         foreach ($resourceFilters as $filterId) {
-            if ($this->filterLocator->has($filterId) && is_a($filter = $this->filterLocator->get($filterId), $this->getFilterInterface(), true)) {
+            if ($this->filterLocator->has($filterId) && is_a($filter = $this->filterLocator->get($filterId), $this->getFilterInterface())) {
                 $clauseBody = $filter->apply($clauseBody, $resourceClass, $operationName, $context);
             }
         }
