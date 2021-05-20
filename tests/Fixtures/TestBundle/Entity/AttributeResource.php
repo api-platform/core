@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource;
 
@@ -23,12 +24,15 @@ use ApiPlatform\Metadata\Resource;
 #[Get]
 #[Put]
 #[Delete]
-#[Resource('/dummy/{dummyId}/attribute_resources/{id}', identifiers: ['dummyId' => [Dummy::class, 'id'], 'id' => [AttributeResource::class, 'id']])]
+#[Resource('/dummy/{dummyId}/attribute_resources/{identifier}.{_format}', identifiers: ['dummyId' => [Dummy::class, 'id'], 'identifier' => [AttributeResource::class, 'identifier']], inputFormats: ['json' => ['application/merge-patch+json']])]
 #[Get]
+#[Patch]
 final class AttributeResource
 {
     #[ApiProperty(identifier: true)]
     private int $identifier;
+
+    public ?Dummy $dummy = null;
 
     public function __construct(int $identifier, public string $name)
     {

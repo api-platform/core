@@ -69,6 +69,7 @@ class Resource
      * @param int               $urlGenerationStrategy
      * @param bool              $compositeIdentifier
      * @param array             $identifiers
+     * @param array             $graphQl
      */
     public function __construct(
         public ?string $uriTemplate = null,

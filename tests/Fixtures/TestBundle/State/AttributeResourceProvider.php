@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResources;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\State\ProviderInterface;
 
 class AttributeResourceProvider implements ProviderInterface
@@ -22,10 +23,17 @@ class AttributeResourceProvider implements ProviderInterface
     public function provide(string $resourceClass, array $identifiers = [], array $context = [])
     {
         if (isset($identifiers['identifier'])) {
-            return new AttributeResource($identifiers['identifier'], 'Foo');
+            $resource = new AttributeResource($identifiers['identifier'], 'Foo');
+
+            if ($identifiers['dummyId'] ?? false) {
+                $resource->dummy = new Dummy();
+                $resource->dummy->setId($identifiers['dummyId']);
+            }
+
+            return $resource;
         }
 
-        return new AttributeResources([new AttributeResource(1, 'Foo'), new AttributeResource(2, 'Bar')]);
+        return new AttributeResources(new AttributeResource(1, 'Foo'), new AttributeResource(2, 'Bar'));
     }
 
     public function supports(string $resourceClass, array $identifiers = [], array $context = []): bool
