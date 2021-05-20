@@ -214,10 +214,10 @@ final class EntrypointAction
      */
     private function decodeVariables(string $variables): array
     {
-        if (!\is_array($variables = json_decode($variables, true))) {
+        if (!\is_array($decoded = json_decode($variables, true))) {
             throw new BadRequestHttpException('GraphQL variables are not valid JSON.');
         }
 
-        return $variables;
+        return $decoded;
     }
 }
