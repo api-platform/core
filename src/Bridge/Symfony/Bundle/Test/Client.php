@@ -44,7 +44,7 @@ final class Client implements HttpClientInterface
         'headers' => ['accept' => ['application/ld+json']],
         'body' => '',
         'json' => null,
-        'base_uri' => 'http://example.com',
+        'base_uri' => 'http://localhost',
         'extra' => [],
     ];
 
