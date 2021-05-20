@@ -69,7 +69,7 @@ class Operation
      * @param int          $urlGenerationStrategy
      * @param bool         $compositeIdentifier
      * @param array        $identifiers
-     * @param array        $graphql
+     * @param array        $graphQl
      */
     public function __construct(
         public string $method = 'GET',
@@ -125,7 +125,7 @@ class Operation
         public ?int $urlGenerationStrategy = null,
         public ?bool $compositeIdentifier = null,
         public ?array $identifiers = null,
-        public ?array $graphql = null,
+        public ?array $graphQl = null,
         ...$extraProperties
     ) {
         $this->extraProperties = $extraProperties;

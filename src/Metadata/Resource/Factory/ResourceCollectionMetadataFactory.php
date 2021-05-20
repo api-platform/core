@@ -62,7 +62,8 @@ final class ResourceCollectionMetadataFactory implements ResourceMetadataFactory
                 $itemOperations[$name] = $this->toArray($operation);
             }
             $attributes = $this->toArray($resourceMetadataCollection[0]);
-            $graphql = $resourceMetadataCollection[0]->graphQl ? $this->toArray($resourceMetadataCollection[0]->graphQl) : null;
+
+            $graphql = isset($resourceMetadataCollection[0]->graphQl) ? $this->toArray($resourceMetadataCollection[0]->graphQl) : null;
 
             return new ResourceMetadata($resourceMetadataCollection[0]->shortName, $resourceMetadataCollection[0]->description, null, $itemOperations, $collectionOperations, $attributes, null, $graphql);
         }

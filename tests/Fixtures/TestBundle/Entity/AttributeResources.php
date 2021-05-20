@@ -23,9 +23,12 @@ use IteratorAggregate;
 #[Post]
 final class AttributeResources implements IteratorAggregate
 {
+    /**
+     * @var AttributeResource[]
+     */
     private $collection;
 
-    public function __construct($collection)
+    public function __construct(AttributeResource ...$collection)
     {
         $this->collection = $collection;
     }

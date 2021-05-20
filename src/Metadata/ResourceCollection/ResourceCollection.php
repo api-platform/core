@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\ResourceCollection;
 
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource;
 
 /**
@@ -21,36 +22,12 @@ use ApiPlatform\Metadata\Resource;
  */
 final class ResourceCollection extends \ArrayObject
 {
-    private $metadataCache = [];
     private $operationCache = [];
 
-    public function getOperation(string $method, string $uriTemplate)
+    public function getOperation(string $operationName): ?Operation
     {
-        if (isset($this->operationCache[$uriTemplate][$method])) {
-            return $this->operationCache[$uriTemplate][$method];
-        }
-
-        if (!($resourceMetadata = $this->getResource($uriTemplate))) {
-            return null;
-        }
-
-        foreach ($resourceMetadata->operations as $operation) {
-            if ($operation->method === $method) {
-                if (!isset($this->operationCache[$uriTemplate])) {
-                    $this->operationCache[$uriTemplate] = [];
-                }
-
-                return $this->operationCache[$uriTemplate][$method] = $operation;
-            }
-        }
-
-        return null;
-    }
-
-    public function getResource(string $uriTemplate): ?Resource
-    {
-        if (isset($this->metadataCache[$uriTemplate])) {
-            return $this->metadataCache[$uriTemplate];
+        if (isset($this->operationCache[$operationName])) {
+            return $this->operationCache[$operationName];
         }
 
         $it = $this->getIterator();
@@ -59,10 +36,10 @@ final class ResourceCollection extends \ArrayObject
             /** @var resource */
             $metadata = $it->current();
 
-            if ($metadata->uriTemplate === $uriTemplate) {
-                $this->metadataCache[$uriTemplate] = $metadata;
-
-                return $metadata;
+            foreach ($metadata->operations as $name => $operation) {
+                if ($name === $operationName) {
+                    return $operation;
+                }
             }
 
             $it->next();
