@@ -11,6 +11,7 @@
 * Symfony: Add tests with Symfony Uuid (#4230)
 * OpenAPI: Allow to set extensionProperties with YAML schema definition (#4228)
 * GraphQL: Fix `FieldsBuilder` not fully unwrapping nested types before deciding if a resolver is needed (#4251)
+* GraphQL: Do not use a resolver for the nested payload of a mutation or subscription (#4289)
 
 ## 2.6.4
 
