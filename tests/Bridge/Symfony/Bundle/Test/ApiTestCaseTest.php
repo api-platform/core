@@ -71,7 +71,7 @@ JSON
         self::createClient()->request('GET', '/contexts/Address');
         $this->assertJsonEquals([
             '@context' => [
-                '@vocab' => 'http://example.com/docs.jsonld#',
+                '@vocab' => 'http://localhost/docs.jsonld#',
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',
                 'name' => 'Address/name',
             ],
@@ -84,7 +84,7 @@ JSON
         $this->assertJsonEquals(<<<JSON
 {
     "@context": {
-        "@vocab": "http://example.com/docs.jsonld#",
+        "@vocab": "http://localhost/docs.jsonld#",
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "name": "Address/name"
     }
