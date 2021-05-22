@@ -22,9 +22,12 @@ use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\LegacyResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\OpenApi\Model;
 use ApiPlatform\Core\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\Core\OpenApi\OpenApi;
@@ -40,6 +43,7 @@ use Symfony\Component\PropertyInfo\Type;
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     use FilterLocatorTrait;
+    use ResourceToResourceMetadataTrait;
 
     public const BASE_URL = 'base_url';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -56,8 +60,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $openApiOptions;
     private $paginationOptions;
     private $identifiersExtractor;
+    private $resourceCollectionMetadataFactory;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, SubresourceOperationFactoryInterface $subresourceOperationFactory, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, SubresourceOperationFactoryInterface $subresourceOperationFactory, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -72,6 +77,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->identifiersExtractor = $identifiersExtractor;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
+        $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
     }
 
     /**
@@ -88,7 +94,18 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $links = [];
         $schemas = new \ArrayObject();
 
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+        if ($this->resourceNameCollectionFactory instanceof LegacyResourceNameCollectionFactoryInterface && $this->resourceCollectionMetadataFactory) {
+            foreach ($this->resourceNameCollectionFactory->create(false) as $resourceClass) {
+                foreach ($this->resourceCollectionMetadataFactory->create($resourceClass) as $resource) {
+                    $resourceMetadata = $this->transformResourceToResourceMetadata($resource);
+                    // Items needs to be parsed first to be able to reference the lines from the collection operation
+                    $this->collectPaths($resourceMetadata, $resourceClass, OperationType::ITEM, $context, $paths, $links, $schemas);
+                    $this->collectPaths($resourceMetadata, $resourceClass, OperationType::COLLECTION, $context, $paths, $links, $schemas);
+                }
+            }
+        }
+
+        foreach ($this->resourceNameCollectionFactory instanceof LegacyResourceNameCollectionFactoryInterface ? $this->resourceNameCollectionFactory->create(true) : $this->resourceNameCollectionFactory->create() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             // Items needs to be parsed first to be able to reference the lines from the collection operation
@@ -334,7 +351,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function getPath(string $resourceShortName, string $operationName, array $operation, string $operationType): string
     {
-        $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
+        $path = $operation['uri_template'] ?? $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
         if ('.{_format}' === substr($path, -10)) {
             $path = substr($path, 0, -10);
         }

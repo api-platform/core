@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * BC layer with the < 3.0 ResourceMetadata system.
@@ -25,15 +25,14 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 final class ResourceCollectionMetadataFactory implements ResourceMetadataFactoryInterface
 {
+    use ResourceToResourceMetadataTrait;
     private $decorated;
     private $resourceCollectionMetadataFactory;
-    private $nameConverter;
 
     public function __construct(ResourceMetadataFactoryInterface $decorated, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory)
     {
         $this->decorated = $decorated;
         $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
-        $this->nameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**
@@ -44,38 +43,14 @@ final class ResourceCollectionMetadataFactory implements ResourceMetadataFactory
         try {
             return $this->decorated->create($resourceClass);
         } catch (ResourceClassNotFoundException $e) {
-            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($resourceClass);
-            if (!isset($resourceMetadataCollection[0])) {
+            $resourceCollection = $this->resourceCollectionMetadataFactory->create($resourceClass);
+            if (!isset($resourceCollection[0])) {
                 throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
             }
 
             @trigger_error(sprintf('Using a %s for a #[Resource] is deprecated since 2.7 and will not be possible in 3.0. Use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
 
-            $collectionOperations = [];
-            $itemOperations = [];
-            foreach ($resourceMetadataCollection[0]->operations as $name => $operation) {
-                if (!$operation->identifiers) {
-                    $collectionOperations[$name] = $this->toArray($operation);
-                    continue;
-                }
-
-                $itemOperations[$name] = $this->toArray($operation);
-            }
-            $attributes = $this->toArray($resourceMetadataCollection[0]);
-
-            $graphql = isset($resourceMetadataCollection[0]->graphQl) ? $this->toArray($resourceMetadataCollection[0]->graphQl) : null;
-
-            return new ResourceMetadata($resourceMetadataCollection[0]->shortName, $resourceMetadataCollection[0]->description, null, $itemOperations, $collectionOperations, $attributes, null, $graphql);
+            return $this->transformResourceToResourceMetadata($resourceCollection[0]);
         }
-    }
-
-    private function toArray($object): array
-    {
-        $arr = [];
-        foreach ($object as $key => $value) {
-            $arr[$this->nameConverter->normalize($key)] = $value;
-        }
-
-        return $arr;
     }
 }
