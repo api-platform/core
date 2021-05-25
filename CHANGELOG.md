@@ -29,6 +29,7 @@
 * Deprecate `allow_plain_identifiers` option (#4167)
 * Exception: Add the ability to customize multiple status codes based on the validation exception (#4017)
 * GraphQL: Fix graphql fetching with Elasticsearch (#4217)
+* ApiLoader: Support `_format` resolving (#4292)
 
 ## 2.6.5
 
@@ -41,7 +42,6 @@
 * Symfony: Add tests with Symfony Uuid (#4230)
 * OpenAPI: Allow to set extensionProperties with YAML schema definition (#4228)
 * GraphQL: Fix `FieldsBuilder` not fully unwrapping nested types before deciding if a resolver is needed (#4251)
-* ApiLoader: Support `_format` resolving (#4292)
 
 ## 2.6.4
 
