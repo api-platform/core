@@ -318,7 +318,7 @@ class ApiLoaderTest extends TestCase
             $path,
             [
                 '_controller' => $controller,
-                '_format' => !empty($extraDefaults['_format']) ? $extraDefaults['_format'] : null,
+                '_format' => $extraDefaults['_format'] ?? null,
                 '_api_resource_class' => $resourceClass,
                 '_api_identifiers' => ['id'],
                 '_api_has_composite_identifier' => false,
@@ -339,7 +339,7 @@ class ApiLoaderTest extends TestCase
             $path,
             [
                 '_controller' => $controller,
-                '_format' => !empty($extraDefaults['_format']) ? $extraDefaults['_format'] : null,
+                '_format' => $extraDefaults['_format'] ?? null,
                 '_api_resource_class' => $resourceClass,
                 '_api_subresource_operation_name' => $operationName,
                 '_api_subresource_context' => $context,
