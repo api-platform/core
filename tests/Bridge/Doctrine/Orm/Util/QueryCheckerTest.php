@@ -59,61 +59,61 @@ class QueryCheckerTest extends TestCase
     public function testHasRootEntityWithCompositeIdentifier()
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootEntities()->willReturn([Dummy::class]);
         $queryBuilder->getRootAliases()->willReturn(['d']);
-        $classMetadata = new ClassMetadata('Dummy');
+        $classMetadata = new ClassMetadata(Dummy::class);
         $classMetadata->isIdentifierComposite = true;
         $classMetadata->containsForeignIdentifier = false;
         $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
+        $objectManager->getClassMetadata(Dummy::class)->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass(Dummy::class)->willReturn($objectManager->reveal());
         $this->assertTrue(QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
     public function testHasRootEntityWithNoCompositeIdentifier()
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootEntities()->willReturn([Dummy::class]);
         $queryBuilder->getRootAliases()->willReturn(['d']);
-        $classMetadata = new ClassMetadata('Dummy');
+        $classMetadata = new ClassMetadata(Dummy::class);
         $classMetadata->isIdentifierComposite = false;
         $classMetadata->containsForeignIdentifier = true;
         $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
+        $objectManager->getClassMetadata(Dummy::class)->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass(Dummy::class)->willReturn($objectManager->reveal());
         $this->assertFalse(QueryChecker::hasRootEntityWithCompositeIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
     public function testHasRootEntityWithForeignKeyIdentifier()
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootEntities()->willReturn([Dummy::class]);
         $queryBuilder->getRootAliases()->willReturn(['d']);
-        $classMetadata = new ClassMetadata('Dummy');
+        $classMetadata = new ClassMetadata(Dummy::class);
         $classMetadata->setIdentifier(['id', 'name']);
         $classMetadata->isIdentifierComposite = false;
         $classMetadata->containsForeignIdentifier = true;
         $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
+        $objectManager->getClassMetadata(Dummy::class)->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass(Dummy::class)->willReturn($objectManager->reveal());
         $this->assertTrue(QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
     public function testHasRootEntityWithNoForeignKeyIdentifier()
     {
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->getRootEntities()->willReturn(['Dummy']);
+        $queryBuilder->getRootEntities()->willReturn([Dummy::class]);
         $queryBuilder->getRootAliases()->willReturn(['d']);
-        $classMetadata = new ClassMetadata('Dummy');
+        $classMetadata = new ClassMetadata(Dummy::class);
         $classMetadata->isIdentifierComposite = true;
         $classMetadata->containsForeignIdentifier = false;
         $objectManager = $this->prophesize(ObjectManager::class);
-        $objectManager->getClassMetadata('Dummy')->willReturn($classMetadata);
+        $objectManager->getClassMetadata(Dummy::class)->willReturn($classMetadata);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
-        $managerRegistry->getManagerForClass('Dummy')->willReturn($objectManager->reveal());
+        $managerRegistry->getManagerForClass(Dummy::class)->willReturn($objectManager->reveal());
         $this->assertFalse(QueryChecker::hasRootEntityWithForeignKeyIdentifier($queryBuilder->reveal(), $managerRegistry->reveal()));
     }
 
