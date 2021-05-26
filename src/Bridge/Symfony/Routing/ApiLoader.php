@@ -128,7 +128,7 @@ final class ApiLoader extends Loader
                     $operation['path'],
                     [
                         '_controller' => $controller,
-                        '_format' => null,
+                        '_format' => $operation['defaults']['_format'] ?? null,
                         '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
                         '_api_resource_class' => $operation['resource_class'],
                         '_api_identifiers' => $operation['identifiers'],
@@ -241,7 +241,7 @@ final class ApiLoader extends Loader
             $path,
             [
                 '_controller' => $controller,
-                '_format' => null,
+                '_format' => $operation['defaults']['_format'] ?? null,
                 '_stateless' => $operation['stateless'],
                 '_api_resource_class' => $resourceClass,
                 '_api_identifiers' => $operation['identifiers'],
