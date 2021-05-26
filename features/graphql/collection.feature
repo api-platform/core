@@ -909,3 +909,65 @@ Feature: GraphQL collection support
     Then the response status code should be 200
     And the response should be in JSON
     And the JSON node "data.fooDummies.collection" should have 1 element
+
+  @createSchema
+  Scenario: Retrieve a collection with a nested collection filtering by age through a GraphQL query
+    Given there are 4 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(name: "Dummy #1") {
+        totalCount
+        edges {
+          node {
+            name
+            relatedDummies(age: 31) {
+              totalCount
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    Then the JSON node "data.dummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.totalCount" should be equal to 1
+    Then the JSON node "data.dummies.edges[0].node.relatedDummies.edges[0].node.age" should be equal to "31"
+
+  @createSchema
+  Scenario: Retrieve a collection with a nested collection filtering by name through a GraphQL query
+    Given there are 4 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(name: "Dummy #1") {
+        totalCount
+        edges {
+          node {
+            name
+            relatedDummies(name: "RelatedDummy31") {
+              totalCount
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    Then the JSON node "data.dummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.totalCount" should be equal to 1
+    Then the JSON node "data.dummies.edges[0].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy31"
