@@ -84,14 +84,6 @@ parameters:
 		-
 			message: '#Service "test" is not registered in the container\.#'
 			path: tests/GraphQl/Type/TypesContainerTest.php
-		-
-			message: '#Property Doctrine\\ORM\\Mapping\\ClassMetadataInfo<object>::\$fieldMappings \(array.*\)>\) does not accept array\(.*\)\.#'
-			path: tests/Bridge/Doctrine/Orm/Metadata/Property/DoctrineOrmPropertyMetadataFactoryTest.php
-
-		# Expected, Symfony 5.3
-		- '#getCollectionValueT|getCollectionKeyTyp#'
-		- '#isPasswordValid#'
-		- '#UserPasswordHasherInterface#'
 
 		# Expected, due to PHP 8 attributes
 		- '#ReflectionProperty::getAttributes\(\)#'
