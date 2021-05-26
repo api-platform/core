@@ -31,7 +31,7 @@ trait ErrorNormalizerTrait
         if ($object instanceof FlattenException || $object instanceof LegacyFlattenException) {
             $statusCode = $context['statusCode'] ?? $object->getStatusCode();
             if ($statusCode >= 500 && $statusCode < 600) {
-                $message = Response::$statusTexts[$statusCode];
+                $message = Response::$statusTexts[$statusCode] ?? Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR];
             }
         }
 
