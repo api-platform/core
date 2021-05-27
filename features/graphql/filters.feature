@@ -270,3 +270,63 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges" should have 2 element
     And the JSON node "data.dummies.edges[0].node.relatedDummy.name" should be equal to "RelatedDummy #1"
     And the JSON node "data.dummies.edges[1].node.relatedDummy.name" should be equal to "RelatedDummy #2"
+
+  @createSchema
+  Scenario: Retrieve a collection with a nested collection filtering by age through a GraphQL query
+    Given there are 4 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(name: "Dummy #1") {
+        totalCount
+        edges {
+          node {
+            name
+            relatedDummies(age: 31) {
+              totalCount
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the JSON node "data.dummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[0].node.age" should be equal to "31"
+
+  @createSchema
+  Scenario: Retrieve a collection with a nested collection filtering by name through a GraphQL query
+    Given there are 4 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(name: "Dummy #1") {
+        totalCount
+        edges {
+          node {
+            name
+            relatedDummies(name: "RelatedDummy31") {
+              totalCount
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the JSON node "data.dummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[0].node.name" should be equal to "RelatedDummy31"
