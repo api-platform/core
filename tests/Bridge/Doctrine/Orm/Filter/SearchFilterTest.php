@@ -567,6 +567,12 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     [],
                     $filterFactory,
                 ],
+                'integer value' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.age = :age_p1', $this->alias, RelatedDummy::class),
+                    ['age_p1' => 46],
+                    $filterFactory,
+                    RelatedDummy::class,
+                ],
             ]
         );
     }

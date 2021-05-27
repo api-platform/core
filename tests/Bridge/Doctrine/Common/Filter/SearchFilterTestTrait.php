@@ -474,6 +474,14 @@ trait SearchFilterTestTrait
                     'relatedDummy.symfony' => [],
                 ],
             ],
+            'integer value' => [
+                [
+                    'age' => 'exact',
+                ],
+                [
+                    'age' => 46,
+                ],
+            ],
         ];
     }
 }
