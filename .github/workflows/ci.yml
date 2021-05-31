@@ -66,8 +66,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         env:
           SYMFONY_PHPUNIT_VERSION: '9.5'
@@ -140,9 +140,9 @@ jobs:
             composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
+      - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -235,9 +235,9 @@ jobs:
             doctrine/mongodb-odm-bundle \
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
+      - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -341,8 +341,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi --prefer-lowest
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Install PHPUnit
@@ -381,8 +381,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi --prefer-lowest
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -432,8 +432,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -484,8 +484,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -532,8 +532,8 @@ jobs:
         run: |
           composer update --no-interaction --no-progress --ansi
           # composer why doctrine/reflection
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -586,8 +586,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install Elasticsearch-php # there is a version matrix for this package: https://packagist.org/packages/elasticsearch/elasticsearch
         run: composer require "elasticsearch/elasticsearch:v6.7.2" --no-interaction --no-progress --ansi
       - name: Install PHPUnit
@@ -630,8 +630,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -678,8 +678,8 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid symfony/intl --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -740,8 +740,8 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -802,8 +802,8 @@ jobs:
             composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -850,8 +850,8 @@ jobs:
             composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Require Symfony Uid
-        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
