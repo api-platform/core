@@ -40,7 +40,7 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Generates an Open API v3 specification.
  */
-final class OpenApiFactory implements OpenApiFactoryInterface
+final class LegacyOpenApiFactory implements OpenApiFactoryInterface
 {
     use FilterLocatorTrait;
     use ResourceToResourceMetadataTrait;
