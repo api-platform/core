@@ -26,6 +26,7 @@ use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\HubRegistry;
@@ -88,6 +89,17 @@ final class PublishMercureUpdatesListener
         $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
         $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
         $this->reset();
+
+        $rawurlencode = ExpressionFunction::fromPhp('rawurlencode', 'escape');
+        $this->expressionLanguage->addFunction($rawurlencode);
+
+        $this->expressionLanguage->addFunction(
+            new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
+                return sprintf('iri(%s, %d)', $apiResource, $referenceType);
+            }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
+                return $iriConverter->getIriFromItem($apiResource, $referenceType);
+            })
+        );
     }
 
     /**
@@ -199,6 +211,29 @@ final class PublishMercureUpdatesListener
         }
 
         $options['enable_async_update'] = $options['enable_async_update'] ?? true;
+
+        if ($options['topics'] ?? false) {
+            $topics = [];
+            foreach ((array) $options['topics'] as $topic) {
+                if (!\is_string($topic)) {
+                    $topics[] = $topic;
+                    continue;
+                }
+
+                if (0 !== strpos($topic, '@=')) {
+                    $topics[] = $topic;
+                    continue;
+                }
+
+                if (null === $this->expressionLanguage) {
+                    throw new \LogicException('The "@=" expression syntax cannot be used without the Expression Language component. Try running "composer require symfony/expression-language".');
+                }
+
+                $topics[] = $this->expressionLanguage->evaluate(substr($topic, 2), ['object' => $object]);
+            }
+
+            $options['topics'] = $topics;
+        }
 
         if ('deletedObjects' === $property) {
             $this->deletedObjects[(object) [
