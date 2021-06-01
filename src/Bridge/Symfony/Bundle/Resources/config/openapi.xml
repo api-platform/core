@@ -51,6 +51,10 @@
         <service id="ApiPlatform\Core\OpenApi\Options" alias="api_platform.openapi.options" />
 
         <service id="api_platform.openapi.factory" class="ApiPlatform\Core\OpenApi\Factory\OpenApiFactory" public="false">
+            <!-- Remplacer api_platform.metadata.resource.metadata_factory par api_platform.metadata.resource_collection.metadata_factory -->
+        </service>
+
+        <service id="api_platform.openapi.legacy.factory" class="ApiPlatform\Core\OpenApi\Factory\LegacyOpenApiFactory" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -64,7 +68,6 @@
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
         </service>
         <service id="ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" alias="api_platform.openapi.factory" />
 
