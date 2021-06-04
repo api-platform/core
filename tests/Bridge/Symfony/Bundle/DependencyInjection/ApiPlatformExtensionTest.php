@@ -679,6 +679,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.eloquent.property_info_extractor', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.eloquent.metadata.property.name_collection_factory', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.eloquent.metadata.property.metadata_factory', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.eloquent.normalizer.collection.hydra', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.eloquent.enabled', true)->shouldNotBeCalled();
         $containerBuilderProphecy->setParameter('api_platform.eloquent.enabled', false)->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
@@ -1051,6 +1052,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.property_info',
             'api_platform.metadata.property.metadata_factory.serializer',
+            'api_platform.metadata.property.metadata_factory.class_property',
             'api_platform.metadata.property.metadata_factory.xml',
             'api_platform.metadata.property.name_collection_factory.cached',
             'api_platform.metadata.property.name_collection_factory.property_info',
@@ -1478,6 +1480,7 @@ class ApiPlatformExtensionTest extends TestCase
                 'api_platform.eloquent.property_info_extractor',
                 'api_platform.eloquent.metadata.property.name_collection_factory',
                 'api_platform.eloquent.metadata.property.metadata_factory',
+                'api_platform.eloquent.normalizer.collection.hydra',
             ]);
             $parameters['api_platform.eloquent.enabled'] = true;
         }

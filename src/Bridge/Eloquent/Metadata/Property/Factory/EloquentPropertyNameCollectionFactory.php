@@ -58,16 +58,16 @@ final class EloquentPropertyNameCollectionFactory implements PropertyNameCollect
             throw new ResourceClassNotFoundException(sprintf('The resource class "%s" is not an Eloquent model.', $resourceClass));
         }
 
+        /** @var Model $model */
+        $model = new $resourceClass();
+
+        $propertyNames[$model->getKeyName()] = $model->getKeyName();
+
         if (null !== $propertyNameCollection) {
             foreach ($propertyNameCollection as $propertyName) {
                 $propertyNames[$propertyName] = $propertyName;
             }
         }
-
-        /** @var Model $model */
-        $model = new $resourceClass();
-
-        $propertyNames[$model->getKeyName()] = $model->getKeyName();
 
         return new PropertyNameCollection(array_values($propertyNames));
     }

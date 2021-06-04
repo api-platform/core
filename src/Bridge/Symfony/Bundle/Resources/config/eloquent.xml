@@ -61,6 +61,13 @@
                  decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.eloquent.metadata.property.metadata_factory.inner" />
         </service>
+
+        <service id="api_platform.eloquent.normalizer.collection.hydra"
+                 class="ApiPlatform\Core\Bridge\Eloquent\Serializer\CollectionNormalizer">
+            <argument type="service" id="api_platform.hydra.normalizer.collection" />
+            <!-- Run before serializer.normalizer.json_serializable -->
+            <tag name="serializer.normalizer" priority="-885" />
+        </service>
     </services>
 
 </container>

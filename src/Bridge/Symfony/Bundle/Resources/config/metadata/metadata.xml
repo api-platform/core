@@ -69,6 +69,10 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
 
+        <service id="api_platform.metadata.property.metadata_factory.class_property" class="ApiPlatform\Core\Metadata\Property\Factory\ClassPropertyPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.class_property.inner" />
+        </service>
+
         <service id="api_platform.metadata.property.metadata_factory.cached" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.property" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.inner" />

@@ -63,6 +63,6 @@ class EloquentPropertyNameCollectionFactoryTest extends TestCase
     {
         $this->decoratedPropertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['name', 'foo']));
 
-        self::assertEquals(new PropertyNameCollection(['name', 'foo', 'id']), $this->eloquentPropertyNameCollectionFactory->create(Dummy::class, []));
+        self::assertEquals(new PropertyNameCollection(['id', 'name', 'foo']), $this->eloquentPropertyNameCollectionFactory->create(Dummy::class, []));
     }
 }

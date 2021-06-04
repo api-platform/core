@@ -1,3 +1,4 @@
+@!eloquent
 Feature: Circular references handling
   In order to handle circular references
   As a developer

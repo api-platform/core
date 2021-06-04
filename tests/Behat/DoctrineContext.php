@@ -164,6 +164,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\WithJsonDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\CustomMultipleIdentifierDummy as CustomMultipleIdentifierDummyModel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\Foo as FooModel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\PatchDummyRelation as PatchDummyRelationModel;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Models\RelatedDummy as RelatedDummyModel;
@@ -1899,12 +1900,20 @@ final class DoctrineContext implements Context
     public function thereIsACustomMultipleIdentifierDummy()
     {
         $dummy = $this->buildCustomMultipleIdentifierDummy();
-        $dummy->setName('Orwell');
-        $dummy->setFirstId(1);
-        $dummy->setSecondId(2);
+        if ($this->isDoctrine()) {
+            $dummy->setName('Orwell');
+            $dummy->setFirstId(1);
+            $dummy->setSecondId(2);
 
-        $this->manager->persist($dummy);
-        $this->manager->flush();
+            $this->manager->persist($dummy);
+            $this->manager->flush();
+        }
+        if ($dummy instanceof CustomMultipleIdentifierDummyModel) {
+            $dummy->name = 'Orwell';
+            $dummy->firstId = 1;
+            $dummy->secondId = 2;
+            $dummy->save();
+        }
     }
 
     private function isOrm(): bool
@@ -2412,10 +2421,14 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return CustomMultipleIdentifierDummy | CustomMultipleIdentifierDummyDocument
+     * @return CustomMultipleIdentifierDummy|CustomMultipleIdentifierDummyDocument|CustomMultipleIdentifierDummyModel
      */
     private function buildCustomMultipleIdentifierDummy()
     {
+        if ($this->isEloquent()) {
+            return new CustomMultipleIdentifierDummyModel();
+        }
+
         return $this->isOrm() ? new CustomMultipleIdentifierDummy() : new CustomMultipleIdentifierDummyDocument();
     }
 
