@@ -146,6 +146,10 @@ Feature: Documentation support
                             "type": "string",
                             "format": "iri-reference"
                         },
+                        "hydra:previous": {
+                            "type": "string",
+                            "format": "iri-reference"
+                        },
                         "hydra:next": {
                             "type": "string",
                             "format": "iri-reference"
