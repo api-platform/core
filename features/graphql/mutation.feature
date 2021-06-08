@@ -662,6 +662,44 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummyGroup.dummyGroup.__typename" should be equal to "createDummyGroupPayloadData"
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
+  @createSchema
+  Scenario: Use serialization groups with relations
+    Given there is 1 dummy object with relatedDummy and its thirdLevel
+    And there is a RelatedDummy with 2 friends
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateRelatedDummy(input: {id: "/related_dummies/2", symfony: "laravel", embeddedDummy: "{}", thirdLevel: "/third_levels/1"}) {
+        relatedDummy {
+          id
+          symfony
+          thirdLevel {
+            id
+            __typename
+          }
+          relatedToDummyFriend {
+            edges {
+              node {
+                name
+              }
+            }
+            __typename
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.id" should be equal to "/related_dummies/2"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.symfony" should be equal to "laravel"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.id" should be equal to "/third_levels/1"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.__typename" should be equal to "updateThirdLevelNestedPayload"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.__typename" should be equal to "updateRelatedToDummyFriendNestedPayloadConnection"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.edges[0].node.name" should be equal to "Relation-1"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.edges[1].node.name" should be equal to "Relation-2"
+
   Scenario: Trigger a validation error
     When I send the following GraphQL request:
     """

@@ -690,6 +690,21 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     [],
                     $filterFactory,
                 ],
+                'integer value' => [
+                    [
+                        [
+                            '$match' => [
+                                'age' => [
+                                    '$in' => [
+                                        '46',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                    RelatedDummy::class,
+                ],
             ]
         );
     }

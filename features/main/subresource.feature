@@ -104,7 +104,7 @@ Feature: Subresource support
       "hydra:totalItems": 2,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -123,6 +123,18 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "name",
             "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age",
+            "property": "age",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age[]",
+            "property": "age",
             "required": false
           }
         ]
@@ -167,7 +179,7 @@ Feature: Subresource support
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -186,6 +198,18 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "name",
             "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age",
+            "property": "age",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age[]",
+            "property": "age",
             "required": false
           }
         ]

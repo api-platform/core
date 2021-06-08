@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Subscription;
 
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Routing\RequestContext;
 
 /**
@@ -25,12 +26,15 @@ use Symfony\Component\Routing\RequestContext;
 final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGeneratorInterface
 {
     private $requestContext;
-    private $hub;
+    private $registry;
 
-    public function __construct(RequestContext $requestContext, string $hub)
+    /**
+     * @param HubRegistry|string $registry
+     */
+    public function __construct(RequestContext $requestContext, $registry)
     {
         $this->requestContext = $requestContext;
-        $this->hub = $hub;
+        $this->registry = $registry;
     }
 
     public function generateTopicIri(string $subscriptionId): string
@@ -45,8 +49,12 @@ final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGen
         return "$scheme://$host/subscriptions/$subscriptionId";
     }
 
-    public function generateMercureUrl(string $subscriptionId): string
+    public function generateMercureUrl(string $subscriptionId, ?string $hub = null): string
     {
-        return $this->hub.'?topic='.$this->generateTopicIri($subscriptionId);
+        if (!$this->registry instanceof HubRegistry) {
+            return sprintf('%s?topic=%s', $this->registry, $this->generateTopicIri($subscriptionId));
+        }
+
+        return sprintf('%s?topic=%s', $this->registry->getHub($hub)->getUrl(), $this->generateTopicIri($subscriptionId));
     }
 }

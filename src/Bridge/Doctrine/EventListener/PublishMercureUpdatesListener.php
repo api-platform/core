@@ -28,6 +28,7 @@ use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -51,11 +52,13 @@ final class PublishMercureUpdatesListener
         'type' => true,
         'retry' => true,
         'normalization_context' => true,
+        'hub' => true,
+        'enable_async_update' => true,
     ];
 
     private $iriConverter;
     private $serializer;
-    private $publisher;
+    private $hubRegistry;
     private $expressionLanguage;
     private $createdObjects;
     private $updatedObjects;
@@ -66,11 +69,12 @@ final class PublishMercureUpdatesListener
 
     /**
      * @param array<string, string[]|string> $formats
+     * @param HubRegistry|callable           $hubRegistry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, callable $publisher = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
-        if (null === $messageBus && null === $publisher) {
-            throw new InvalidArgumentException('A message bus or a publisher must be provided.');
+        if (null === $messageBus && null === $hubRegistry) {
+            throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
         }
 
         $this->resourceClassResolver = $resourceClassResolver;
@@ -79,7 +83,7 @@ final class PublishMercureUpdatesListener
         $this->serializer = $serializer;
         $this->formats = $formats;
         $this->messageBus = $messageBus;
-        $this->publisher = $publisher;
+        $this->hubRegistry = $hubRegistry;
         $this->expressionLanguage = $expressionLanguage ?? (class_exists(ExpressionLanguage::class) ? new ExpressionLanguage() : null);
         $this->graphQlSubscriptionManager = $graphQlSubscriptionManager;
         $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
@@ -188,7 +192,13 @@ final class PublishMercureUpdatesListener
             if (!isset(self::ALLOWED_KEYS[$key])) {
                 throw new InvalidArgumentException(sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
             }
+
+            if ('hub' === $key && !$this->hubRegistry instanceof HubRegistry) {
+                throw new InvalidArgumentException(sprintf('The option "hub" of the "mercure" attribute cannot be set on the "%s" resource . Try running "composer require symfony/mercure:^0.5".', $resourceClass));
+            }
         }
+
+        $options['enable_async_update'] = $options['enable_async_update'] ?? true;
 
         if ('deletedObjects' === $property) {
             $this->deletedObjects[(object) [
@@ -225,7 +235,12 @@ final class PublishMercureUpdatesListener
         $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
 
         foreach ($updates as $update) {
-            $this->messageBus ? $this->dispatch($update) : ($this->publisher)($update);
+            if ($options['enable_async_update'] && $this->messageBus) {
+                $this->dispatch($update);
+                continue;
+            }
+
+            $this->hubRegistry instanceof HubRegistry ? $this->hubRegistry->getHub($options['hub'] ?? null)->publish($update) : ($this->hubRegistry)($update);
         }
     }
 

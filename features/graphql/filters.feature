@@ -85,6 +85,36 @@ Feature: Collections filtering
     And the JSON node "data.dummies.edges[0].node.id" should be equal to "/dummies/2"
 
   @createSchema
+  Scenario: Retrieve a collection filtered using the search filter with an int
+    Given there are 4 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(name: "Dummy #1") {
+        totalCount
+        edges {
+          node {
+            name
+            relatedDummies(age: 31) {
+              totalCount
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the JSON node "data.dummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[0].node.age" should be equal to "31"
+
+  @createSchema
   Scenario: Retrieve a collection filtered using the search filter and a name converter
     Given there are 10 dummy objects
     When I send the following GraphQL request:
@@ -130,7 +160,7 @@ Feature: Collections filtering
     And the JSON node "data.convertedOwners.edges[1].node.name_converted.name_converted" should be equal to "Converted 20"
 
   @createSchema
-  Scenario: Retrieve a collection filtered using the search filter
+  Scenario: Retrieve a nested collection filtered using the search filter
     Given there are 3 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:
     """

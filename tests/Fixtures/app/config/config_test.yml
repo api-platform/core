@@ -64,7 +64,7 @@ services:
 
     app.related_dummy_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
-        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial', 'age': 'exact' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
 
     app.related_dummy_resource.complex_sub_query_filter:
