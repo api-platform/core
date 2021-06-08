@@ -1,5 +1,6 @@
 @!mongodb
 @!eloquent
+@!eloquent_mapped
 Feature: Retrieve data with Composite identifiers
   In order to retrieve relations with composite identifiers
   As a client software developer

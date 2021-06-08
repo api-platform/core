@@ -112,6 +112,14 @@ eloquent:
       filters:
         tags: '@eloquent&&~@!eloquent'
 
+eloquent-mapped:
+  suites:
+    default: false
+    eloquent:
+      <<: *eloquent-suite
+      filters:
+        tags: '@eloquent_mapped&&~@!eloquent_mapped'
+
 default-coverage:
   suites:
     default: &default-coverage-suite

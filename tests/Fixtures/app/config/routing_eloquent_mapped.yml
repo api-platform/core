@@ -1,2 +1,6 @@
 _main:
     resource: routing.yml
+
+controller:
+    resource: '@TestBundle/Controller/EloquentMapped'
+    type: annotation

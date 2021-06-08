@@ -1,3 +1,4 @@
+@eloquent_mapped
 Feature: Using validations groups
   As a client software developer
   I need to be able to use validation groups

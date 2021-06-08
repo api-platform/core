@@ -1,4 +1,5 @@
 @eloquent
+@eloquent_mapped
 Feature: Using custom identifier on resource
   In order to use an hypermedia API
   As a client software developer

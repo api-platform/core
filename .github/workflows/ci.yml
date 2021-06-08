@@ -650,7 +650,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=eloquent --no-interaction
+        run: vendor/bin/behat --out=std --format=progress --profile=${{ matrix.app_env == 'eloquent' && 'eloquent' || 'eloquent-mapped' }} --no-interaction
 
   phpunit-no-deprecations:
     name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)

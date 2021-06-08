@@ -1,4 +1,5 @@
 @eloquent
+@eloquent_mapped
 Feature: Sending PATCH requets
   As a client software developer
   I need to be able to send partial updates
