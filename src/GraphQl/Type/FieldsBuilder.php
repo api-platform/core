@@ -306,10 +306,12 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
             if ($isStandardGraphqlType || $input) {
                 $resolve = null;
-            } elseif ($mutationName) {
-                $resolve = ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $mutationName);
-            } elseif ($subscriptionName) {
-                $resolve = ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $subscriptionName);
+            } elseif (($mutationName || $subscriptionName) && $depth <= 0) {
+                if ($mutationName) {
+                    $resolve = ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $mutationName);
+                } else {
+                    $resolve = ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $subscriptionName);
+                }
             } elseif ($this->typeBuilder->isCollection($type)) {
                 $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $queryName);
             } else {

@@ -136,7 +136,7 @@ trait SearchFilterTrait
     protected function normalizeValues(array $values, string $property): ?array
     {
         foreach ($values as $key => $value) {
-            if (!\is_int($key) || !\is_string($value)) {
+            if (!\is_int($key) || !(\is_string($value) || \is_int($value))) {
                 unset($values[$key]);
             }
         }

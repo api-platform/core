@@ -77,11 +77,13 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
 
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($subscriptionId && $resourceMetadata->getAttribute('mercure', false)) {
+            if ($subscriptionId && ($mercure = $resourceMetadata->getAttribute('mercure', false))) {
                 if (!$this->mercureSubscriptionIriGenerator) {
                     throw new \LogicException('Cannot use Mercure for subscriptions when MercureBundle is not installed. Try running "composer require mercure".');
                 }
-                $result['mercureUrl'] = $this->mercureSubscriptionIriGenerator->generateMercureUrl($subscriptionId);
+
+                $hub = \is_array($mercure) ? ($mercure['hub'] ?? null) : null;
+                $result['mercureUrl'] = $this->mercureSubscriptionIriGenerator->generateMercureUrl($subscriptionId, $hub);
             }
 
             return $result;

@@ -54,7 +54,7 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.search' } ]
     app.related_dummy_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
-        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial', 'age': 'exact' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.mongodb.friends' } ]
     app.my_dummy_date_resource.mongodb.date_filter:
         parent:    'api_platform.doctrine_mongodb.odm.date_filter'

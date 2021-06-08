@@ -17,7 +17,7 @@ final class PathItem
 {
     use ExtensionTrait;
 
-    private static $methods = ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH', 'TRACE'];
+    public static $methods = ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH', 'TRACE'];
     private $ref;
     private $summary;
     private $description;

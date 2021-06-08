@@ -101,6 +101,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $propertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption', [])->shouldBeCalled()->willReturn($propertyMetadata);
 
         $classMetadata = new ClassMetadataInfo(DummyPropertyWithDefaultValue::class);
+        // @phpstan-ignore-next-line
         $classMetadata->fieldMappings = [
             'dummyDefaultOption' => ['options' => ['default' => 'default value']],
         ];

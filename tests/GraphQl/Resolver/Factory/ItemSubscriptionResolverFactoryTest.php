@@ -91,7 +91,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
 
         $mercureUrl = 'mercure-url';
-        $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl($subscriptionId)->shouldBeCalled()->willReturn($mercureUrl);
+        $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl($subscriptionId, null)->shouldBeCalled()->willReturn($mercureUrl);
 
         $this->assertSame($serializeStageData + ['mercureUrl' => $mercureUrl], ($this->itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
     }

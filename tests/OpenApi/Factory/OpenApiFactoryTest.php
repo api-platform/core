@@ -118,6 +118,7 @@ class OpenApiFactoryTest extends TestCase
                         ],
                     ],
                 ]] + self::OPERATION_FORMATS,
+                'custom-http-verb' => ['method' => 'TEST'] + self::OPERATION_FORMATS,
                 'formats' => ['method' => 'PUT', 'path' => '/formatted/{id}', 'output_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']], 'input_formats' => ['json' => ['application/json'], 'csv' => ['text/csv']]],
             ],
             [

@@ -728,7 +728,7 @@ final class DoctrineContext implements Context
             for ($j = 1; $j <= $nbrelated; ++$j) {
                 $relatedDummy = $this->buildRelatedDummy();
                 $relatedDummy->setName('RelatedDummy'.$j.$i);
-
+                $relatedDummy->setAge((int) ($j.$i));
                 $this->manager->persist($relatedDummy);
 
                 $dummy->addRelatedDummy($relatedDummy);
