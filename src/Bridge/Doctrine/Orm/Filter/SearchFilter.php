@@ -28,6 +28,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Uid\AbstractUid;
+use Symfony\Component\Uid\Ulid;
 
 /**
  * Filter the collection by given properties.
@@ -160,6 +162,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     {
         if (!\is_array($values)) {
             $values = [$values];
+        }
+
+        if (class_exists(AbstractUid::class)) {
+            foreach ($values as $key => $value) {
+                if ($value instanceof Ulid) {
+                    $values[$key] = $value->toBinary();
+                }
+            }
         }
 
         $wrapCase = $this->createWrapCase($caseSensitive);
