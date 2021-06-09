@@ -40,6 +40,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -256,7 +257,7 @@ class OpenApiNormalizerTest extends TestCase
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
 
         $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withOperations(
+            (new ApiResource())->withOperations(new Operations(
                 [
                     'get' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
                     'put' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
@@ -264,19 +265,19 @@ class OpenApiNormalizerTest extends TestCase
                     'get_collection' => (new GetCollection())->withUriTemplate('/dummies')->withOperation($baseOperation),
                     'post' => (new Post())->withUriTemplate('/dummies')->withOpenapiContext(['security' => [], 'servers' => ['url' => '/test']])->withOperation($baseOperation),
                 ]
-            ),
+            )),
         ]);
 
         $zorroBaseOperation = (new Operation())->withClass('Zorro')->withShortName('Zorro')->withDescription('This is zorro.')->withTypes(['http://schema.example.com/Zorro'])
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
 
         $zorroMetadata = new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withOperations(
+            (new ApiResource())->withOperations(new Operations(
                 [
                     'get' => (new Get())->withUriTemplate('/zorros/{id}')->withOperation($zorroBaseOperation),
                     'get_collection' => (new GetCollection())->withUriTemplate('/zorros')->withOperation($zorroBaseOperation),
                 ]
-            ),
+            )),
         ]);
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

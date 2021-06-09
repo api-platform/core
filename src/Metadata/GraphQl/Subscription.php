@@ -66,5 +66,6 @@ final class Subscription extends Operation
         array $extraProperties = []
     ) {
         parent::__construct(...\func_get_args());
+        $this->name = $name ?: 'update_subscription';
     }
 }

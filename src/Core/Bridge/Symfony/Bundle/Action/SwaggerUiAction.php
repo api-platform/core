@@ -18,8 +18,10 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction as OpenApiS
 use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -36,6 +38,7 @@ use Twig\Environment as TwigEnvironment;
 final class SwaggerUiAction
 {
     private $resourceNameCollectionFactory;
+    /** @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface */
     private $resourceMetadataFactory;
     private $normalizer;
     private $twig;
@@ -68,7 +71,7 @@ final class SwaggerUiAction
      * @param int[]      $swaggerVersions
      * @param mixed|null $assetPackage
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null, array $swaggerUiExtraConfiguration = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, NormalizerInterface $normalizer, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null, array $swaggerUiExtraConfiguration = [])
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -182,7 +185,7 @@ final class SwaggerUiAction
             $swaggerData['queryParameters'] = $request->query->all();
 
             $metadata = $this->resourceMetadataFactory->create($resourceClass);
-            $swaggerData['shortName'] = $metadata->getShortName();
+            $swaggerData['shortName'] = $metadata instanceof ResourceMetadata ? $metadata->getShortName() : $metadata[0]->getShortName();
 
             if (null !== $collectionOperationName = $request->attributes->get('_api_collection_operation_name')) {
                 $swaggerData['operationId'] = sprintf('%s%sCollection', $collectionOperationName, ucfirst($swaggerData['shortName']));

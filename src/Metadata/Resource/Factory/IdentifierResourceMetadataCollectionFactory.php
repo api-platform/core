@@ -53,18 +53,22 @@ final class IdentifierResourceMetadataCollectionFactory implements ResourceMetad
 
             $resource = $resource->withIdentifiers($this->normalizeIdentifiers($resource->getIdentifiers(), $resourceClass));
 
+            $operations = $resource->getOperations();
             // Copy identifiers to operations if not defined
-            foreach ($resource->getOperations() as $key => $operation) {
+            foreach ($operations as $key => $operation) {
                 if ($identifiers && !$operation->getIdentifiers() && !$operation->isCollection()) {
+                    if (0 === $i && 1 < \count($identifiers) && null === $operation->getCompositeIdentifier()) {
+                        trigger_deprecation('api-platform/core', '2.7', sprintf('You have multiple identifiers on the resource "%s" but did not specify the "compositeIdentifier" property, we will set this to "true". Not specifying this attribute in 3.0 will break.', $resourceClass));
+                        $operation = $operation->withCompositeIdentifier(true);
+                    }
+
                     $operation = $operation->withIdentifiers($identifiers);
                 }
 
-                $operations = iterator_to_array($resource->getOperations());
-                $operations[$key] = $operation->withIdentifiers($this->normalizeIdentifiers($operation->getIdentifiers(), $resourceClass));
-                $resource = $resource->withOperations($operations);
+                $operations->add($key, $operation->withIdentifiers($this->normalizeIdentifiers($operation->getIdentifiers(), $resourceClass)));
             }
 
-            $resourceMetadataCollection[$i] = $resource;
+            $resourceMetadataCollection[$i] = $resource->withOperations($operations);
         }
 
         return $resourceMetadataCollection;

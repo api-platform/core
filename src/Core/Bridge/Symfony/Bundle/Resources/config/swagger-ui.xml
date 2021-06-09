@@ -13,7 +13,7 @@
 
         <service id="api_platform.swagger.action.ui" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="twig" on-invalid="null" />
             <argument type="service" id="router" />
@@ -53,7 +53,7 @@
         </service>
 
         <service id="api_platform.swagger_ui.action" class="ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction" public="true">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="twig" on-invalid="null" />
             <argument type="service" id="router" />
             <argument type="service" id="api_platform.serializer" />

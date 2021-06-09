@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -60,13 +61,13 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
             $resourceInputFormats = $resourceMetadata->getInputFormats() ? $this->normalizeFormats($resourceMetadata->getInputFormats()) : $resourceFormats;
             $resourceOutputFormats = $resourceMetadata->getOutputFormats() ? $this->normalizeFormats($resourceMetadata->getOutputFormats()) : $resourceFormats;
 
-            $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, iterator_to_array($resourceMetadata->getOperations())));
+            $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $resourceMetadata->getOperations()));
         }
 
         return $resourceMetadataCollection;
     }
 
-    private function normalize(array $resourceInputFormats, array $resourceOutputFormats, array $operations): array
+    private function normalize(array $resourceInputFormats, array $resourceOutputFormats, Operations $operations): Operations
     {
         $newOperations = [];
         $patchFormats = null;
@@ -90,7 +91,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
         }
 
         if (!$patchFormats) {
-            return $newOperations;
+            return new Operations($newOperations);
         }
 
         // Prepare an Accept-Patch header
@@ -110,7 +111,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
             $newOperations[$operationName] = $operation->withAcceptPatch(implode(', ', $patchMimeTypes));
         }
 
-        return $newOperations;
+        return new Operations($newOperations);
     }
 
     /**

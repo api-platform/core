@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use RuntimeException;
+
 /**
  * @internal
  */
@@ -30,9 +32,7 @@ final class Operations implements \IteratorAggregate, \Countable
             $this->operations[] = [$operationName, $operation];
         }
 
-        usort($this->operations, function ($a, $b) {
-            return $a[1]->getPriority() - $b[1]->getPriority();
-        });
+        $this->sort();
     }
 
     public function getIterator(): \Traversable
@@ -44,8 +44,56 @@ final class Operations implements \IteratorAggregate, \Countable
         })();
     }
 
+    public function add(string $key, Operation $value): self
+    {
+        foreach ($this->operations as $i => [$operationName, $operation]) {
+            if ($operationName === $key) {
+                $this->operations[$i] = [$key, $value];
+
+                return $this;
+            }
+        }
+
+        $this->operations[] = [$key, $value];
+
+        return $this;
+    }
+
+    public function remove(string $key): self
+    {
+        foreach ($this->operations as $i => [$operationName, $operation]) {
+            if ($operationName === $key) {
+                unset($this->operations[$i]);
+
+                return $this;
+            }
+        }
+
+        throw new RuntimeException(sprintf('Could not remove operation "%s".', $key));
+    }
+
+    public function has(string $key): bool
+    {
+        foreach ($this->operations as $i => [$operationName, $operation]) {
+            if ($operationName === $key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function count(): int
     {
         return \count($this->operations);
+    }
+
+    public function sort(): self
+    {
+        usort($this->operations, function ($a, $b) {
+            return $a[1]->getPriority() - $b[1]->getPriority();
+        });
+
+        return $this;
     }
 }

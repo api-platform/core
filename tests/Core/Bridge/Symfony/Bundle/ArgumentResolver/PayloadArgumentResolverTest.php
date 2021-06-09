@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResol
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -227,12 +228,12 @@ class PayloadArgumentResolverTest extends KernelTestCase
     {
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(ResourceImplementation::class)->willReturn(new ResourceMetadataCollection(ResourceImplementation::class, [
-            (new ApiResource())->withShortName('ResourceImplementation')->withOperations([
+            (new ApiResource())->withShortName('ResourceImplementation')->withOperations(new Operations([
                 'update' => new Put(),
                 'update_no_deserialize' => (new Put())->withDeserialize(false),
                 'update_with_dto' => (new Put())->withInput(['class' => NotResource::class]),
                 'create' => new Post(),
-            ]),
+            ])),
         ]));
 
         $serializerContextBuilder = $this->prophesize(SerializerContextBuilderInterface::class);

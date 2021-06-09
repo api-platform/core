@@ -11,7 +11,9 @@
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.attributes" class="ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory" public="false">
             <argument>null</argument>
+            <argument type="service" id="logger" on-invalid="null" />
             <argument>%api_platform.defaults%</argument>
+            <argument>%api_platform.graphql.enabled%</argument>
         </service>
 
         <!-- compute legacy resources first -->
@@ -39,7 +41,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.uri_template.inner" />
         </service>
 
-        <!-- must run after uri template -->
+        <!-- must run after uri template, do not change uriTemplate neither the operation names in < 500 priorities -->
         <service id="api_platform.metadata.resource.metadata_collection_factory.operation_name" class="ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="200" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.operation_name.inner" />
         </service>

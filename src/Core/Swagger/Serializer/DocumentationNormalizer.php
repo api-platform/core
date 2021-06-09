@@ -387,7 +387,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
 
-            if ($resourceMetadata->getAttributes()['extra_properties']['is_legacy_subresource'] ?? false) {
+            if (
+                ($resourceMetadata->getAttributes()['extra_properties']['is_legacy_subresource'] ?? false) ||
+                ($resourceMetadata->getAttributes()['extra_properties']['legacy_subresource_behavior'] ?? false)) {
                 // Avoid duplicates parameters when there is a filter on a subresource identifier
                 $parametersMemory = [];
                 $pathOperation['parameters'] = [];

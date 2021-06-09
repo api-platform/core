@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -57,7 +58,7 @@ class ApiLoaderTest extends TestCase
         $path = '/dummies/{id}.{_format}';
 
         $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withShortName('dummy')->withOperations([
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
                 // Default operations based on OperationResourceMetadataFactory
                 'api_dummies_get_item' => (new Get())->withIdentifiers(['id'])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
                 'api_dummies_put_item' => (new Put())->withUriTemplate($path),
@@ -69,7 +70,7 @@ class ApiLoaderTest extends TestCase
                 'api_dummies_my_path_op_collection' => (new Get())->withUriTemplate('some/custom/path')->withCollection(true),
                 // Custom path
                 'api_dummies_my_stateless_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withStateless(true)->withCollection(true),
-            ]),
+            ])),
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
@@ -192,11 +193,11 @@ class ApiLoaderTest extends TestCase
         $prefix = '/foobar-prefix';
         $path = '/dummies/{id}.{_format}';
 
-        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withShortName('dummy')->withOperations([
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withShortName('dummy')->withOperations(new Operations([
             'api_dummies_get_item' => (new Get())->withUriTemplate($path)->withRoutePrefix($prefix)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+']),
             'api_dummies_put_item' => (new Put())->withUriTemplate($path)->withRoutePrefix($prefix),
             'api_dummies_delete_item' => (new Delete())->withUriTemplate($path)->withRoutePrefix($prefix),
-        ])]);
+        ]))]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
 

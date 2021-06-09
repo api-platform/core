@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -89,7 +90,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
         if (!$resourceMetadata->getGraphql()) {
             // GraphQl can be null or an empty array, an empty array doesn't disable graphql type creation
-            $resourceMetadataCollection[] = $resource->withGraphQlOperations($resourceMetadata->getGraphql())->withOperations($operations);
+            $resourceMetadataCollection[] = $resource->withGraphQlOperations($resourceMetadata->getGraphql())->withOperations(new Operations($operations));
 
             return $resourceMetadataCollection;
         }
@@ -130,7 +131,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             $graphQlOperations[$operationName] = $graphQlOperation;
         }
 
-        $resourceMetadataCollection[] = $resource->withOperations($operations)->withGraphQlOperations($graphQlOperations);
+        $resourceMetadataCollection[] = $resource->withOperations(new Operations($operations))->withGraphQlOperations($graphQlOperations);
 
         return $resourceMetadataCollection;
     }

@@ -23,6 +23,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -91,13 +92,13 @@ class EntrypointNormalizerTest extends TestCase
         $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $factoryProphecy->create(Dummy::class)->willReturn(
             new ResourceMetadataCollection(Dummy::class, [
-                (new ApiResource())->withUriTemplate('Dummy')->withShortName('dummy')->withOperations(['get' => (new Get())->withCollection(true)]),
+                (new ApiResource())->withUriTemplate('Dummy')->withShortName('dummy')->withOperations(new Operations(['get' => (new Get())->withCollection(true)])),
             ])
         )->shouldBeCalled();
 
         $factoryProphecy->create(FooDummy::class)->willReturn(
             new ResourceMetadataCollection(FooDummy::class, [
-                (new ApiResource())->withUriTemplate('FooDummy')->withShortName('fooDummy')->withOperations(['get' => (new Get())->withCollection(true)]),
+                (new ApiResource())->withUriTemplate('FooDummy')->withShortName('fooDummy')->withOperations(new Operations(['get' => (new Get())->withCollection(true)])),
             ])
         )->shouldBeCalled();
 

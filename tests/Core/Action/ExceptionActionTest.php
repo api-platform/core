@@ -20,6 +20,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use DomainException;
@@ -149,7 +150,7 @@ class ExceptionActionTest extends TestCase
             $operation = $operation->withExceptionToStatus($operationExceptionToStatus);
         }
 
-        $resource = $resource->withOperations(['operation' => $operation]);
+        $resource = $resource->withOperations(new Operations(['operation' => $operation]));
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [

@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use Symfony\Component\Routing\Route;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -47,27 +48,45 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 $resourceMetadataCollection[$i] = $resource->withExtraProperties($resource->getExtraProperties() + ['user_defined_uri_template' => true]);
             }
 
-            $operations = iterator_to_array($resource->getOperations());
+            $operations = $resource->getOperations();
 
             foreach ($resource->getOperations() as $key => $operation) {
                 if ($operation->getUriTemplate()) {
-                    $operations[$key] = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
+                    $route = (new Route($operation->getUriTemplate()))->compile();
+                    $variables = array_filter($route->getPathVariables(), function ($v) {
+                        return '_format' !== $v;
+                    });
+
+                    // TODO: remove in 3.0, guess identifiers
+                    if (\count($variables) && !$operation->getIdentifiers()) {
+                        trigger_deprecation('api-platform/core', '2.7', sprintf('In the uriTemplate "%s" we detected parameters that are not matched inside identifiers. Not providing identifiers on the operation will not be possible in 3.0.', $operation->getUriTemplate()));
+                        $identifiers = [];
+                        foreach ($variables as $variable) {
+                            $identifiers[$variable] = [$resourceClass, $variable];
+                        }
+
+                        $operation = $operation->withIdentifiers($identifiers);
+                    }
+
+                    $operation = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
+                    $operations->add($key, $operation);
                     continue;
                 }
 
                 if ($routeName = $operation->getRouteName()) {
-                    unset($operations[$key]);
-                    $operations[$routeName] = $operation;
+                    $operations->remove($key)->add($routeName, $operation);
                     continue;
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
+                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+
                 // Change the operation key
-                unset($operations[$key]);
-                $operations[sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '')] = $operation;
+                $operations->remove($key)
+                           ->add($operationName, $operation);
             }
 
-            $resource = $resource->withOperations($operations);
+            $resource = $resource->withOperations($operations->sort());
             $resourceMetadataCollection[$i] = $resource;
         }
 

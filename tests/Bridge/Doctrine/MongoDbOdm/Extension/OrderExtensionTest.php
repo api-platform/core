@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
@@ -86,7 +87,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(['get' => (new GetCollection())->withOrder(['foo' => 'DESC'])])]);
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withOrder(['foo' => 'DESC'])]))]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
@@ -111,7 +112,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(['get' => (new GetCollection())->withOrder(['foo', 'bar' => 'DESC'])])]);
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withOrder(['foo', 'bar' => 'DESC'])]))]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
@@ -146,7 +147,7 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy->hasReference('author')->shouldBeCalled()->willReturn(true);
         $classMetadataProphecy->getFieldMapping('author')->shouldBeCalled()->willReturn(['isOwningSide' => true, 'storeAs' => ClassMetadata::REFERENCE_STORE_AS_ID]);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(['get' => (new GetCollection())->withOrder(['author.name'])])]);
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withOrder(['author.name'])]))]);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);

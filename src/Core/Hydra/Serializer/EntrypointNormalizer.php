@@ -82,15 +82,19 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
             }
 
             foreach ($resourceMetadata as $resource) {
+                if ($resource->getExtraProperties()['is_alternate_resource_metadata'] ?? false) {
+                    continue;
+                }
+
                 foreach ($resource->getOperations() as $operationName => $operation) {
-                    if (!$operation->isCollection()) {
+                    $key = lcfirst($resource->getShortName());
+                    if (!$operation->isCollection() || isset($entrypoint[$key])) {
                         continue;
                     }
 
                     try {
-                        // TODO: use the `operationName` to get better results
-                        $entrypoint[lcfirst($resource->getShortName())] = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass) : $this->iriConverter->getIriFromResourceClass($resourceClass);
-                    } catch (OperationNotFoundException $ex) {
+                        $entrypoint[$key] = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, $operationName) : $this->iriConverter->getIriFromResourceClass($resourceClass);
+                    } catch (InvalidArgumentException|OperationNotFoundException $ex) {
                         // Ignore resources without GET operations
                     }
                 }

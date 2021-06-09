@@ -18,6 +18,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +30,7 @@ final class ResourceMetadataCollectionTest extends TestCase
     {
         $operation = new Get();
         $query = new Query();
-        $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(['name' => $operation])->withGraphQlOperations(['query' => $query]);
+        $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(new Operations(['name' => $operation]))->withGraphQlOperations(['query' => $query]);
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
         $this->assertEquals($operation, $resourceMetadataCollection->getOperation('name'));
@@ -40,7 +41,7 @@ final class ResourceMetadataCollectionTest extends TestCase
     {
         $this->expectException(OperationNotFoundException::class);
         $operation = new Get();
-        $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(['name' => $operation]);
+        $resource = (new ApiResource())->withUriTemplate('/dummies/{id}')->withOperations(new Operations(['name' => $operation]));
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
         $this->assertEquals($operation, $resourceMetadataCollection->getOperation('noname'));

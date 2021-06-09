@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -76,7 +77,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 $operation = $operation->{'with'.substr($methodName, 3)}($defaults->{$methodName}());
             }
 
-            $resourceMetadataCollection[] = $resource->withOperations([$operationName => $operation]);
+            $resourceMetadataCollection[] = $resource->withOperations(new Operations([$operationName => $operation]));
         }
 
         return $resourceMetadataCollection;
@@ -107,7 +108,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 $resource = (new ApiResource())
                     ->withUriTemplate($subresourceMetadata['path'])
                     ->withShortName($subresourceMetadata['shortNames'][0])
-                    ->withOperations([
+                    ->withOperations(new Operations([
                         $subresourceMetadata['route_name'] => (new Get())
                             ->withUriTemplate($subresourceMetadata['path'])
                             ->withShortName($subresourceMetadata['shortNames'][0])
@@ -127,7 +128,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                                 'legacy_subresource_property' => $subresourceMetadata['property'],
                                 'legacy_subresource_identifiers' => $subresourceMetadata['identifiers'],
                             ]),
-                    ])
+                    ]))
                     ->withIdentifiers($identifiers)
                     ->withDefaults($subresourceMetadata['defaults'])
                     ->withRequirements($subresourceMetadata['requirements'])

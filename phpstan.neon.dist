@@ -38,15 +38,20 @@ parameters:
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
 		- src/Core/Bridge/Symfony/Maker/Resources/skeleton
+		- src/Bridge/Symfony/Maker/Resources/skeleton
+		# Rector because new API Platform 3.0 classes don't exist yet
+		- src/Core/Bridge/Rector
+		- src/Core/Bridge/Symfony/Bundle/Command/RectorCommand.php
+		- tests/Core/Bridge/Rector/Rules
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
 		ApiPlatform\Metadata\Resource\ResourceMetadataCollection:
-			- handleNotFound 
+			- handleNotFound
 	ignoreErrors:
 		# False positives
 		- '#Parameter \#1 \$callback of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
-		- 
+		-
 			message: '#Unreachable statement - code above always terminates.#'
 			paths:
 				- tests/GraphQl/Resolver/Stage/SecurityPostDenormalizeStageTest.php

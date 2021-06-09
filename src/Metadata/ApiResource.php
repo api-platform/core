@@ -282,10 +282,10 @@ class ApiResource
         return $this->operations;
     }
 
-    public function withOperations(array $operations = []): self
+    public function withOperations(Operations $operations): self
     {
         $self = clone $this;
-        $self->operations = new Operations($operations);
+        $self->operations = $operations;
 
         return $self;
     }
