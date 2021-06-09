@@ -223,7 +223,7 @@ class IdentifierManagerTraitTest extends TestCase
      */
     public function testInvalidIdentifierConversion()
     {
-        DBALType::addType('uuid', UuidType::class);
+        DBALType::addType('ramsey-uuid', UuidType::class);
 
         $this->expectException(InvalidIdentifierException::class);
         $this->expectExceptionMessage('Invalid value "ida" provided for an identifier for resource "dummy".');
@@ -233,7 +233,7 @@ class IdentifierManagerTraitTest extends TestCase
         ]);
         $objectManager = $this->getEntityManager(Dummy::class, [
             'ida' => [
-                'type' => 'uuid',
+                'type' => 'ramsey-uuid',
             ],
         ]);
 

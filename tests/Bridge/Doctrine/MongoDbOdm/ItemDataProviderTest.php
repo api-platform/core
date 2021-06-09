@@ -26,6 +26,7 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
@@ -105,7 +106,7 @@ class ItemDataProviderTest extends TestCase
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withOperations(['foo' => (new Get())->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])]),
+            (new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])])),
         ]));
 
         $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
@@ -262,7 +263,7 @@ class ItemDataProviderTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection($nameCollection));
         $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [
-            (new ApiResource())->withOperations(['foo' => (new Get())->withShortName('dummy')->withIdentifiers($resourceIdentifiers)]),
+            (new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withShortName('dummy')->withIdentifiers($resourceIdentifiers)])),
         ]));
 
         return [$propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal()];

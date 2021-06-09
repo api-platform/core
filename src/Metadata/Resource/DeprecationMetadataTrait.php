@@ -69,6 +69,9 @@ trait DeprecationMetadataTrait
             $key = 'resolver';
         } elseif ('filters' === $key) {
             $value = null === $value ? [] : $value;
+        } elseif ('graphql' === $key) {
+            trigger_deprecation('api-platform/core', '2.7', 'The "graphql" option is deprecated and will be renamed to "graphQlOperations".');
+            $key = 'graphQlOperations';
         }
 
         return [$this->camelCaseToSnakeCaseNameConverter->denormalize($key), $value];

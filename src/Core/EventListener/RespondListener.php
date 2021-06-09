@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
@@ -104,11 +105,17 @@ final class RespondListener
 
             if (
                 $this->iriConverter &&
-                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
+                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) &&
+                !($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false)
                 && !$operation->getStatus()
             ) {
                 $status = 301;
-                $headers['Location'] = $this->iriConverter->getIriFromItem($request->attributes->get('data'));
+
+                if ($operation->isCollection()) {
+                    $headers['Location'] = $this->iriConverter->getIriFromResourceClass($operation->getClass(), $operation->getName(), UrlGeneratorInterface::ABS_PATH, ['operation' => $operation]);
+                } else {
+                    $headers['Location'] = $this->iriConverter->getIriFromItem($request->attributes->get('data'), $operation->getName(), UrlGeneratorInterface::ABS_PATH, ['operation' => $operation]);
+                }
             }
         }
 

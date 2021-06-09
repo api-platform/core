@@ -38,6 +38,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\State\ProviderInterface;
 use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
@@ -130,6 +131,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($container, $loader);
         $this->registerLegacyServices($container, $config);
+        $this->registerRectorConfiguration($container, $loader);
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');
@@ -141,6 +143,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.subresource_data_provider');
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
+        $container->registerForAutoconfiguration(ProviderInterface::class)
+            ->addTag('api_platform.state_provider');
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
@@ -172,6 +176,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony_uid.xml');
         }
 
+        $container->setParameter('api_platform.metadata_backward_compatibility_layer', $config['metadata_backward_compatibility_layer']);
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
         $container->setParameter('api_platform.title', $config['title']);
@@ -778,6 +783,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerLegacyServices(ContainerBuilder $container, array $config): void
     {
+        $container->setParameter('api_platform.metadata_backward_compatibility_layer', $config['metadata_backward_compatibility_layer']);
+
         if (!$config['metadata_backward_compatibility_layer']) {
             return;
         }
@@ -790,6 +797,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->removeDefinition('api_platform.openapi.factory');
         $container->setAlias('api_platform.openapi.factory', 'api_platform.openapi.factory.legacy');
+
+        $definition = $container->getDefinition('api_platform.metadata.property.metadata_factory.serializer');
+        $definition->setArgument(0, $container->getDefinition('api_platform.metadata.resource.metadata_factory'));
+        $container->setDefinition('api_platform.metadata.property.metadata_factory.serializer', $definition);
+    }
+
+    private function registerRectorConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
+    {
+        $loader->load('rector.xml');
     }
 
     private function buildDeprecationArgs(string $version, string $message): array

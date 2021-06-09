@@ -277,6 +277,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         } else {
             $classes[$resourceClass] = true;
             foreach ($resourceMetadata->getOperations() as $operation) {
+                if (!$operation->isCollection()) {
+                    continue;
+                }
+
                 $inputMetadata = $operation->getInput();
                 if (null !== $inputClass = $inputMetadata['class'] ?? null) {
                     $classes[$inputClass] = true;

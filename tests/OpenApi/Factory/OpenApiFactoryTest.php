@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -67,7 +68,7 @@ class OpenApiFactoryTest extends TestCase
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true);
 
-        $dummyResource = (new ApiResource())->withOperations([
+        $dummyResource = (new ApiResource())->withOperations(new Operations([
             'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']]),
             'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']]),
             'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']]),
@@ -134,7 +135,7 @@ class OpenApiFactoryTest extends TestCase
                                            ->withPaginationItemsPerPage(20)
                                        ->withPaginationMaximumItemsPerPage(80)
                                                ->withOperation($baseOperation),
-        ]
+        ])
         );
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);

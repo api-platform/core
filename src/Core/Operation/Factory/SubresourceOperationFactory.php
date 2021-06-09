@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 
 /**
  * @internal
@@ -51,7 +52,11 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
     public function create(string $resourceClass): array
     {
         $tree = [];
-        $this->computeSubresourceOperations($resourceClass, $tree);
+        try {
+            $this->computeSubresourceOperations($resourceClass, $tree);
+        } catch (ResourceClassNotFoundException $e) {
+            return [];
+        }
 
         return $tree;
     }
@@ -105,6 +110,9 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 'collection' => $subresource->isCollection(),
                 'resource_class' => $subresourceClass,
                 'shortNames' => [$subresourceMetadata->getShortName()],
+                'legacy_filters' => $subresourceMetadata->getAttribute('filters', []),
+                'legacy_normalization_context' => $subresourceMetadata->getAttribute('normalization_context', []),
+                'legacy_type' => $subresourceMetadata->getIri(),
             ];
 
             if (null === $parentOperation) {

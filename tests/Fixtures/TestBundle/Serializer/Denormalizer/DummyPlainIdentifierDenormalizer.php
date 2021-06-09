@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
@@ -44,14 +45,20 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        $iriConverterContext = ['force_collection' => false, 'operation' => null] + $context;
+
         $relatedDummyClass = DummyEntity::class === $class ? RelatedDummyEntity::class : RelatedDummyDocument::class;
         if (!empty($data['relatedDummy'])) {
-            $data['relatedDummy'] = $this->iriConverter->getItemIriFromResourceClass($relatedDummyClass, ['id' => $data['relatedDummy']]);
+            $data['relatedDummy'] = $this->iriConverter->getIriFromResourceClass($relatedDummyClass, null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => [
+                'id' => $data['relatedDummy'],
+            ]] + $iriConverterContext);
         }
 
         if (!empty($data['relatedDummies'])) {
             foreach ($data['relatedDummies'] as $k => $v) {
-                $data['relatedDummies'][$k] = $this->iriConverter->getItemIriFromResourceClass($relatedDummyClass, ['id' => $v]);
+                $data['relatedDummies'][$k] = $this->iriConverter->getIriFromResourceClass($relatedDummyClass, null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => [
+                    'id' => $v,
+                ]] + $iriConverterContext);
             }
         }
 

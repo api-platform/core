@@ -19,68 +19,68 @@ class Operation
 {
     use WithResourceTrait;
 
-    private $resolver;
-    private $collection;
-    private $args;
-    private $shortName;
-    private $class;
+    protected $resolver;
+    protected $collection;
+    protected $args;
+    protected $shortName;
+    protected $class;
     /**
      * @var array|string
      */
-    private $identifiers;
-    private $compositeIdentifier;
-    private $paginationEnabled;
-    private $paginationType;
-    private $paginationItemsPerPage;
-    private $paginationMaximumItemsPerPage;
-    private $paginationPartial;
-    private $paginationClientEnabled;
-    private $paginationClientItemsPerPage;
-    private $paginationClientPartial;
-    private $paginationFetchJoinCollection;
-    private $paginationUseOutputWalkers;
-    private $order;
-    private $description;
-    private $normalizationContext;
-    private $denormalizationContext;
-    private $security;
-    private $securityMessage;
-    private $securityPostDenormalize;
-    private $securityPostDenormalizeMessage;
-    private $deprecationReason;
+    protected $identifiers;
+    protected $compositeIdentifier;
+    protected $paginationEnabled;
+    protected $paginationType;
+    protected $paginationItemsPerPage;
+    protected $paginationMaximumItemsPerPage;
+    protected $paginationPartial;
+    protected $paginationClientEnabled;
+    protected $paginationClientItemsPerPage;
+    protected $paginationClientPartial;
+    protected $paginationFetchJoinCollection;
+    protected $paginationUseOutputWalkers;
+    protected $order;
+    protected $description;
+    protected $normalizationContext;
+    protected $denormalizationContext;
+    protected $security;
+    protected $securityMessage;
+    protected $securityPostDenormalize;
+    protected $securityPostDenormalizeMessage;
+    protected $deprecationReason;
     /**
      * @var string[]
      */
-    private $filters;
-    private $validationContext;
+    protected $filters;
+    protected $validationContext;
     /**
      * @var null
      */
-    private $input;
+    protected $input;
     /**
      * @var null
      */
-    private $output;
+    protected $output;
     /**
      * @var string|array|bool|null
      */
-    private $mercure;
+    protected $mercure;
     /**
      * @var string|bool|null
      */
-    private $messenger;
-    private $elasticsearch;
-    private $urlGenerationStrategy;
-    private $read;
-    private $deserialize;
-    private $validate;
-    private $write;
-    private $serialize;
-    private $fetchPartial;
-    private $forceEager;
-    private $priority;
-    private $name;
-    private $extraProperties;
+    protected $messenger;
+    protected $elasticsearch;
+    protected $urlGenerationStrategy;
+    protected $read;
+    protected $deserialize;
+    protected $validate;
+    protected $write;
+    protected $serialize;
+    protected $fetchPartial;
+    protected $forceEager;
+    protected $priority;
+    protected $name;
+    protected $extraProperties;
 
     /**
      * @param string            $resolver

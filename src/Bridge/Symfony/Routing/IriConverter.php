@@ -130,6 +130,7 @@ final class IriConverter implements IriConverterInterface
                 ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
                 ($operation->getExtraProperties()['user_defined_uri_template'] ?? false) ||
                 ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) ||
+                ($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false) ||
                 // When we want the Iri from an object, we don't want the collection uriTemplate, for this we use getIriFromResourceClass
                 $operation->isCollection()
             ) {
@@ -191,7 +192,7 @@ final class IriConverter implements IriConverterInterface
                 trigger_deprecation('api-platform/core', '2.7', 'The IRI will change and match the first operation of the resource. Switch to an alternate resource when possible instead of using subresources.');
                 $operationName = $operation->getExtraProperties()['legacy_subresource_operation_name'];
                 $operation = null;
-            } elseif ($operation->getExtraProperties()['user_defined_uri_template'] ?? false) {
+            } elseif (!($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false)) {
                 $operation = null;
                 $operationName = null;
             }

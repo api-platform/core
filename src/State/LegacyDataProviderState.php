@@ -18,25 +18,37 @@ use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 
-class LegacyDataProviderState implements ProviderInterface
+/**
+ * @deprecated
+ */
+final class LegacyDataProviderState implements ProviderInterface
 {
     private $itemDataProvider;
     private $collectionDataProvider;
     private $subresourceDataProvider;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
 
-    public function __construct(ItemDataProviderInterface $itemDataProvider, CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider)
+    public function __construct(ItemDataProviderInterface $itemDataProvider, CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
     }
 
     public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
         $operation = $context['operation'] ?? null;
-        if ($operation && ($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
-            $subresourceContext = ['identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'], 'filters' => $context['filters'] ?? []] + $context;
+        if ($operation && (
+            ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
+            ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
+        )) {
+            $subresourceContext = ['filters' => $context['filters'] ?? [], 'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'] ?? [], 'property' => $operation->getExtraProperties()['legacy_subresource_property'] ?? null, 'collection' => $operation->isCollection()] + $context;
             $subresourceIdentifiers = [];
             foreach ($operation->getIdentifiers() as $parameterName => [$class, $property]) {
                 $subresourceIdentifiers[$parameterName] = [$property => $identifiers[$parameterName]];

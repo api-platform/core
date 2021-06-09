@@ -42,11 +42,15 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
         }
 
         foreach ($resourceMetadataCollection as $i => $resource) {
-            $operations = iterator_to_array($resource->getOperations());
+            $operations = $resource->getOperations();
 
-            foreach ($resource->getOperations() as $operationName => $operation) {
+            foreach ($operations as $operationName => $operation) {
+                if ($operation->getName()) {
+                    continue;
+                }
+
                 if ($operation->getRouteName()) {
-                    $operations[$operationName] = $operation->withName($operation->getRouteName());
+                    $operations->add($operationName, $operation->withName($operation->getRouteName()));
                     continue;
                 }
 
@@ -58,11 +62,10 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
                     $operation = $operation->withExtraProperties($extraProperties);
                 }
 
-                unset($operations[$operationName]);
-                $operations[$newOperationName] = $operation->withName($newOperationName);
+                $operations->remove($operationName)->add($newOperationName, $operation->withName($newOperationName));
             }
 
-            $resourceMetadataCollection[$i] = $resource->withOperations($operations);
+            $resourceMetadataCollection[$i] = $resource->withOperations($operations->sort());
         }
 
         return $resourceMetadataCollection;

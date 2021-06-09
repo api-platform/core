@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -37,11 +39,12 @@ final class SwaggerUiAction
     private $openApiOptions;
     private $swaggerUiContext;
     private $formats;
+    /** @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface */
     private $resourceMetadataFactory;
     private $oauthClientId;
     private $oauthClientSecret;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null)
+    public function __construct($resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->twig = $twig;
@@ -98,7 +101,8 @@ final class SwaggerUiAction
             $swaggerData['queryParameters'] = $request->query->all();
 
             $metadata = $this->resourceMetadataFactory->create($resourceClass);
-            $swaggerData['shortName'] = $metadata->getShortName();
+
+            $swaggerData['shortName'] = $metadata instanceof ResourceMetadata ? $metadata->getShortName() : $metadata[0]->getShortName();
 
             if ($operationName = $request->attributes->get('_api_operation_name')) {
                 $swaggerData['operationId'] = $operationName;

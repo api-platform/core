@@ -43,10 +43,10 @@ final class AlternateUriResourceMetadataCollectionFactory implements ResourceMet
                 continue;
             }
 
-            $resourceMetadataCollection[$i] = $resource->withExtraProperties($resource->getExtraProperties() + ['is_alternate_resource_metadata' => true]);
-            $operations = iterator_to_array($resource->getOperations());
+            $resource = $resource->withExtraProperties($resource->getExtraProperties() + ['is_alternate_resource_metadata' => true]);
+            $operations = $resource->getOperations();
             foreach ($operations as $key => $operation) {
-                $operations[$key] = $operation->withExtraProperties($operation->getExtraProperties() + ['is_alternate_resource_metadata' => true]);
+                $operations->add($key, $operation->withExtraProperties($operation->getExtraProperties() + ['is_alternate_resource_metadata' => true]));
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations);

@@ -53,8 +53,32 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
 
             try {
                 $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
-                $resourceMetadata = $resourceMetadata->withDescription($docBlock->getSummary());
-                $resourceMetadataCollection[$key] = $resourceMetadata;
+                $resourceMetadataCollection[$key] = $resourceMetadata->withDescription($docBlock->getSummary());
+
+                $operations = $resourceMetadata->getOperations();
+                foreach ($operations as $operationName => $operation) {
+                    if (null !== $operation->getDescription()) {
+                        continue;
+                    }
+
+                    $operations->add($operationName, $operation->withDescription($docBlock->getSummary()));
+                }
+
+                $resourceMetadataCollection[$key] = $resourceMetadataCollection[$key]->withOperations($operations);
+
+                if (!$resourceMetadata->getGraphQlOperations()) {
+                    continue;
+                }
+
+                foreach ($graphQlOperations = $resourceMetadata->getGraphQlOperations() as $operationName => $operation) {
+                    if (null !== $operation->getDescription()) {
+                        continue;
+                    }
+
+                    $graphQlOperations[$operationName] = $operation->withDescription($docBlock->getSummary());
+                }
+
+                $resourceMetadataCollection[$key] = $resourceMetadataCollection[$key]->withGraphQlOperations($graphQlOperations);
             } catch (\InvalidArgumentException $e) {
                 // Ignore empty DocBlocks
             }

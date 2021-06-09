@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -62,16 +63,16 @@ class DocumentationNormalizerTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [
-            (new ApiResource())->withShortName('dummy')->withDescription('dummy')->withTypes(['#dummy'])->withOperations([
+            (new ApiResource())->withShortName('dummy')->withDescription('dummy')->withTypes(['#dummy'])->withOperations(new Operations([
                 'get' => (new Get())->withHydraContext(['hydra:foo' => 'bar', 'hydra:title' => 'foobar'])->withShortName('dummy')->withTypes(['#dummy']),
                 'put' => (new Put())->withShortName('dummy'),
                 'get_collection' => (new GetCollection())->withShortName('dummy'),
                 'post' => (new Post())->withShortName('dummy'),
-            ]),
-            (new ApiResource())->withShortName('relatedDummy')->withOperations(['get' => (new Get())->withShortName('relatedDummy')->withTypes(['#relatedDummy'])]),
+            ])),
+            (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withShortName('relatedDummy')->withTypes(['#relatedDummy'])])),
         ]));
         $resourceMetadataFactoryProphecy->create('relatedDummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('relatedDummy', [
-            (new ApiResource())->withShortName('relatedDummy')->withOperations(['get' => (new Get())->withShortName('relatedDummy')]),
+            (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withShortName('relatedDummy')])),
         ]));
 
         $this->doTestNormalize(null, $resourceMetadataFactoryProphecy->reveal());

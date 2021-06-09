@@ -32,6 +32,7 @@
             <directory>src/Bridge/NelmioApiDoc</directory>
             <directory>src/Bridge/FosUser</directory>
             <directory>src/Bridge/Symfony/Maker/Resources/skeleton</directory>
+            <directory>src/Core/Bridge/Rector</directory>
             <file>.php-cs-fixer.dist.php</file>
             <file>src/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php</file>
             <file>src/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php</file>

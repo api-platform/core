@@ -104,6 +104,13 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
+    related_questions.state_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
+        public: false
+        arguments: ['@doctrine']
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     contain_non_resource.item_data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false
@@ -132,14 +139,14 @@ services:
     app.serializer.denormalizer.related_dummy_plain_identifier:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\RelatedDummyPlainIdentifierDenormalizer'
         public: false
-        arguments: ['@api_platform.iri_converter.legacy']
+        arguments: ['@api_platform.iri_converter']
         tags:
             -  { name: 'serializer.normalizer' }
 
     app.serializer.denormalizer.dummy_plain_identifier:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DummyPlainIdentifierDenormalizer'
         public: false
-        arguments: ['@api_platform.iri_converter.legacy']
+        arguments: ['@api_platform.iri_converter']
         tags:
             -  { name: 'serializer.normalizer' }
 

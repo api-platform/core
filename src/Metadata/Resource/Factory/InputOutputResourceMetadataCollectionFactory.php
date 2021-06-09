@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -43,13 +45,12 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
             $resourceMetadata = $resourceMetadata->withOutput($this->transformInputOutput($resourceMetadata->getOutput()));
 
             if (\count($resourceMetadata->getOperations())) {
-                $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations(iterator_to_array($resourceMetadata->getOperations()), $resourceMetadata));
+                $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations($resourceMetadata->getOperations(), $resourceMetadata));
             }
 
-            // TODO: GraphQL operations as an object?
-            // if ($graphQlAttributes = $resourceMetadata->graphQl) {
-            //     $resourceMetadata->graphQl = $this->getTransformedOperations($resourceMetadata->graphQl, $resourceMetadata);
-            // }
+            if ($resourceMetadata->getGraphQlOperations()) {
+                $resourceMetadata = $resourceMetadata->withGraphQlOperations($this->getTransformedOperations($resourceMetadata->getGraphQlOperations(), $resourceMetadata));
+            }
 
             $resourceMetadataCollection[$key] = $resourceMetadata;
         }
@@ -57,28 +58,36 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
         return $resourceMetadataCollection;
     }
 
-    private function getTransformedOperations(array $operations, ApiResource $resourceMetadata): array
+    /**
+     * @param Operations|array $operations
+     *
+     * @return Operations|array
+     */
+    private function getTransformedOperations($operations, ApiResource $resourceMetadata)
     {
-        foreach ($operations as $key => &$operation) {
-            $operation = $operation->withInput($operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());
-            $operation = $operation->withOutput($operation->getOutput() ? $this->transformInputOutput($operation->getOutput()) : $resourceMetadata->getOutput());
+        foreach ($operations as $key => $operation) {
+            $operation = $operation->withInput(null !== $operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());
+            $operation = $operation->withOutput(null !== $operation->getOutput() ? $this->transformInputOutput($operation->getOutput()) : $resourceMetadata->getOutput());
 
             if (
                 $operation->getInput()
                 && \array_key_exists('class', $operation->getInput())
                 && null === $operation->getInput()['class']
             ) {
-                $operation = $operation->withDeserialize($operation->canDeserialize() ?: false);
-                $operation = $operation->withValidate($operation->canValidate() ?: false);
+                $operation = $operation->withDeserialize(false);
+                $operation = $operation->withValidate(false);
             }
 
             if (
-                $operation->getOutput()
+                $operation instanceof Operation
+                && $operation->getOutput()
                 && \array_key_exists('class', $operation->getOutput())
                 && null === $operation->getOutput()['class']
             ) {
                 $operation = $operation->withStatus($operation->getStatus() ?? 204);
             }
+
+            $operations instanceof Operations ? $operations->add($key, $operation) : $operations[$key] = $operation;
         }
 
         return $operations;
