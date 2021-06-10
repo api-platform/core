@@ -65,7 +65,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         if ($metadata->hasAssociation($property)) {
             $class = $metadata->getAssociationTargetClass($property);
 
-            if (null === $class) {
+            if (!\is_string($class) && null === $class) {
                 return null;
             }
 
