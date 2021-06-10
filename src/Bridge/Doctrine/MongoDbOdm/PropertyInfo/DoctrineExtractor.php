@@ -65,6 +65,10 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         if ($metadata->hasAssociation($property)) {
             $class = $metadata->getAssociationTargetClass($property);
 
+            if (null === $class) {
+                return null;
+            }
+
             if ($metadata->isSingleValuedAssociation($property)) {
                 $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
 
