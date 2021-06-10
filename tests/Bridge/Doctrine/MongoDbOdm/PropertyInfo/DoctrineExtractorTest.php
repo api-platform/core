@@ -200,14 +200,12 @@ class DoctrineExtractorTest extends TestCase
 
     public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
     {
-        $expectedTypes = null;
-
         $actualTypes = $this->createExtractor()->getTypes(
             DoctrineWithEmbedded::class,
             'embedManyOmittingTargetDocument'
         );
 
-        self::assertEquals($expectedTypes, $actualTypes);
+        self::assertNull($actualTypes);
     }
 
     private function createExtractor(): DoctrineExtractor
