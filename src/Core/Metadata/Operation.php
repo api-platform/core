@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-final class Operation
+class Operation
 {
     use AttributeTrait;
 
