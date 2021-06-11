@@ -27,10 +27,11 @@ interface ContextAwareIriConverterInterface extends IriConverterInterface
      * Gets the IRI associated with the given item.
      *
      * @param object         $item
-     * @param array|int|null $referenceType TODO: rename this to $context
+     * @param int            $referenceType
+     * @param array          $context
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromItem($item, $referenceType = null): string;
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
 }

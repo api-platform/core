@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\LegacyResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -61,7 +62,7 @@ final class ApiLoader extends Loader
     private $identifiersExtractor;
     private $resourceCollectionMetadataFactory;
 
-    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, IdentifiersExtractorInterface $identifiersExtractor = null, $resourceCollectionMetadataFactory = null)
+    public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -79,7 +80,10 @@ final class ApiLoader extends Loader
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
         $this->identifiersExtractor = $identifiersExtractor;
-        $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
+
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -94,94 +98,38 @@ final class ApiLoader extends Loader
 
         $this->loadExternalFiles($routeCollection);
 
-        if ($this->resourceNameCollectionFactory instanceof LegacyResourceNameCollectionFactoryInterface) {
-            foreach ($this->resourceNameCollectionFactory->create(true) as $resourceClass) {
-                foreach ($this->resourceCollectionMetadataFactory->create($resourceClass) as $resourceMetadata) {
-                    foreach ($resourceMetadata->operations as $operationName => $operation) {
-                        $route = new Route(
-                            ($operation->routePrefix ?? '').$operation->uriTemplate,
-                            [
-                                '_controller' => $operation->controller,
-                                '_format' => null,
-                                '_stateless' => $operation->stateless,
-                                '_api_resource_class' => $resourceClass,
-                                '_api_identifiers' => $operation->identifiers,
-                                '_api_has_composite_identifier' => $operation->compositeIdentifier,
-                                '_api_operation_name' => $operationName,
-                            ] + ($operation->defaults ?? []),
-                            $operation->requirements ?? [],
-                            $operation->options ?? [],
-                            $operation->host ?? '',
-                            $operation->schemes ?? [],
-                            [$operation->method],
-                            $operation->condition ?? ''
-                        );
-
-                        $routeCollection->add($operationName, $route);
-                    }
-                    continue;
-                }
-            }
-        }
-
-        // Legacy resources since 2.7
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $resourceShortName = $resourceMetadata->getShortName();
-
-            if (null === $resourceShortName) {
-                throw new InvalidResourceException(sprintf('Resource %s has no short name defined.', $resourceClass));
-            }
-
-            if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
-                foreach ($collectionOperations as $operationName => $operation) {
-                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, OperationType::COLLECTION);
-                }
-            }
-
-            if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
-                foreach ($itemOperations as $operationName => $operation) {
-                    $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, OperationType::ITEM);
-                }
-            }
-
-            if (null === $this->subresourceOperationFactory) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+                $this->loadLegacyMetadata($routeCollection, $resourceClass);
                 continue;
             }
 
-            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
-                if (null === $controller = $operation['controller'] ?? null) {
-                    $controller = self::DEFAULT_ACTION_PATTERN.'get_subresource';
+            foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
+                foreach ($resourceMetadata->operations as $operationName => $operation) {
+                    $route = new Route(
+                        ($operation->routePrefix ?? '').$operation->uriTemplate,
+                        [
+                            '_controller' => $operation->controller,
+                            '_format' => null,
+                            '_stateless' => $operation->stateless,
+                            '_api_resource_class' => $resourceClass,
+                            '_api_identifiers' => $operation->identifiers,
+                            // TODO: remove this
+                            '_api_has_composite_identifier' => $operation->compositeIdentifier,
+                            '_api_operation_name' => $operationName,
+                            '_api_operation' => (array) $operation
+                        ] + ($operation->defaults ?? []),
+                        $operation->requirements ?? [],
+                        $operation->options ?? [],
+                        $operation->host ?? '',
+                        $operation->schemes ?? [],
+                        [$operation->method],
+                        $operation->condition ?? ''
+                    );
 
-                    if (!$this->container->has($controller)) {
-                        throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', OperationType::SUBRESOURCE, 'GET'));
-                    }
+                    $routeCollection->add($operationName, $route);
                 }
-
-                $routeCollection->add($operation['route_name'], new Route(
-                    $operation['path'],
-                    [
-                        '_controller' => $controller,
-                        '_format' => $operation['defaults']['_format'] ?? null,
-                        '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
-                        '_api_resource_class' => $operation['resource_class'],
-                        '_api_identifiers' => $operation['identifiers'],
-                        '_api_has_composite_identifier' => false,
-                        '_api_subresource_operation_name' => $operation['route_name'],
-                        '_api_subresource_context' => [
-                            'property' => $operation['property'],
-                            'identifiers' => $operation['identifiers'],
-                            'collection' => $operation['collection'],
-                            'operationId' => $operationId,
-                        ],
-                    ] + ($operation['defaults'] ?? []),
-                    $operation['requirements'] ?? [],
-                    $operation['options'] ?? [],
-                    $operation['host'] ?? '',
-                    $operation['schemes'] ?? [],
-                    ['GET'],
-                    $operation['condition'] ?? ''
-                ));
+                continue;
             }
         }
 
@@ -232,6 +180,69 @@ final class ApiLoader extends Loader
         }
     }
 
+    /**
+     * TODO: remove in 3.0
+     */
+    private function loadLegacyMetadata(RouteCollection $routeCollection, string $resourceClass)
+    {
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceShortName = $resourceMetadata->getShortName();
+
+        if (null === $resourceShortName) {
+            throw new InvalidResourceException(sprintf('Resource %s has no short name defined.', $resourceClass));
+        }
+
+        if (null !== $collectionOperations = $resourceMetadata->getCollectionOperations()) {
+            foreach ($collectionOperations as $operationName => $operation) {
+                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, OperationType::COLLECTION);
+            }
+        }
+
+        if (null !== $itemOperations = $resourceMetadata->getItemOperations()) {
+            foreach ($itemOperations as $operationName => $operation) {
+                $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, OperationType::ITEM);
+            }
+        }
+
+        if (null === $this->subresourceOperationFactory) {
+            return;
+        }
+
+        foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+            if (null === $controller = $operation['controller'] ?? null) {
+                $controller = self::DEFAULT_ACTION_PATTERN.'get_subresource';
+
+                if (!$this->container->has($controller)) {
+                    throw new RuntimeException(sprintf('There is no builtin action for the %s %s operation. You need to define the controller yourself.', OperationType::SUBRESOURCE, 'GET'));
+                }
+            }
+
+            $routeCollection->add($operation['route_name'], new Route(
+                $operation['path'],
+                [
+                    '_controller' => $controller,
+                    '_format' => $operation['defaults']['_format'] ?? null,
+                    '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
+                    '_api_resource_class' => $operation['resource_class'],
+                    '_api_identifiers' => $operation['identifiers'],
+                    '_api_has_composite_identifier' => false,
+                    '_api_subresource_operation_name' => $operation['route_name'],
+                    '_api_subresource_context' => [
+                        'property' => $operation['property'],
+                        'identifiers' => $operation['identifiers'],
+                        'collection' => $operation['collection'],
+                        'operationId' => $operationId,
+                    ],
+                ] + ($operation['defaults'] ?? []),
+                $operation['requirements'] ?? [],
+                $operation['options'] ?? [],
+                $operation['host'] ?? '',
+                $operation['schemes'] ?? [],
+                ['GET'],
+                $operation['condition'] ?? ''
+            ));
+        }
+    }
     /**
      * Creates and adds a route for the given operation to the route collection.
      *

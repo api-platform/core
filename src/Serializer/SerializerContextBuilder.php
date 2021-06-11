@@ -56,7 +56,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 $context = $normalization ? $operation->normalizationContext : $operation->denormalizationContext;
                 $context['uri_template'] = $operation->uriTemplate;
                 $context['identifiers'] = $operation->identifiers;
-                // remove in 3.0, operation type will not exist anymore
+                // TODO: remove in 3.0, operation type will not exist anymore
                 $context['operation_type'] = ($attributes['identifiers'] ?? []) ? OperationType::ITEM : OperationType::COLLECTION;
                 $context['operation_name'] = $attributes['operation_name'];
                 $context['resource_class'] = $attributes['resource_class'];
