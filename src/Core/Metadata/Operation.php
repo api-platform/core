@@ -17,6 +17,12 @@ class Operation
 {
     use AttributeTrait;
 
+    public const METHOD_GET = 'GET';
+    public const METHOD_POST = 'POST';
+    public const METHOD_PUT = 'PUT';
+    public const METHOD_PATCH = 'PATCH';
+    public const METHOD_DELETE = 'DELETE';
+
     /**
      * @param string       $method
      * @param array        $defaults
@@ -73,7 +79,7 @@ class Operation
      * @param bool         $collection
      */
     public function __construct(
-        public string $method = 'GET',
+        public string $method = self::METHOD_GET,
         public ?array $defaults = [],
         public ?array $requirements = [],
         public ?array $options = [],
