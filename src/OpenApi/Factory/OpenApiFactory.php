@@ -21,13 +21,13 @@ use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\OpenApi\Model;
 use ApiPlatform\Core\OpenApi\Model\ExternalDocumentation;
-use ApiPlatform\Core\OpenApi\Model\PathItem;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
@@ -58,9 +58,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $openApiOptions;
     private $paginationOptions;
     private $identifiersExtractor;
-    private $decorated;
+    // TODO: remove this in 3.0
+    private $decorated = null;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceCollectionMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, LegacyOpenApiFactory $decorated = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -74,7 +75,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->identifiersExtractor = $identifiersExtractor;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
-        $this->decorated = $decorated;
+
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            $this->decorated = new LegacyOpenApiFactory($resourceNameCollectionFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $jsonSchemaFactory, $jsonSchemaTypeFactory, $operationPathResolver, $filterLocator, $identifiersExtractor, $formats, $openApiOptions, $paginationOptions);
+        }
     }
 
     /**
@@ -82,6 +87,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     public function __invoke(array $context = []): OpenApi
     {
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            return $this->decorated->__invoke($context);
+        }
+
         $baseUrl = $context[self::BASE_URL] ?? '/';
         $contact = null === $this->openApiOptions->getContactUrl() || null === $this->openApiOptions->getContactEmail() ? null : new Model\Contact($this->openApiOptions->getContactName(), $this->openApiOptions->getContactUrl(), $this->openApiOptions->getContactEmail());
         $license = null === $this->openApiOptions->getLicenseName() ? null : new Model\License($this->openApiOptions->getLicenseName(), $this->openApiOptions->getLicenseUrl());
@@ -146,7 +155,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            $operationId = $operation->openapiContext['operationId'] ?? lcfirst($operationName).ucfirst($resourceShortName);
+            $operationId = $operation->openapiContext['operationId'] ?? $operationName;
 
             $linkedOperationId = $this->getLinkedOperationName($resource->operations);
 
@@ -156,7 +165,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = new Model\PathItem();
             }
 
-            $forceSchemaCollection = false;
+            $forceSchemaCollection = $operation->collection ?? false;
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
 
@@ -188,6 +197,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $parameters[] = $parameter;
                 }
             }
+
             if ($operation->collection) {
                 $resources = $this->resourceMetadataFactory->create($resourceClass);
 

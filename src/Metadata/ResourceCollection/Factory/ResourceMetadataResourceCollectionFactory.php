@@ -92,7 +92,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
     private function createOperations(array $operations, string $type): iterable
     {
         foreach ($operations as $operationName => $operation) {
-            $newOperation = new Operation(method: $operation['method']);
+            $newOperation = new Operation(method: $operation['method'], collection: OperationType::COLLECTION === $type);
 
             if (isset($operation['path'])) {
                 $newOperation->uriTemplate = $operation['path'];
@@ -108,7 +108,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
             }
 
             // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceCollectionMetadataFactory
-            yield sprintf('%s%s', $operationName, OperationType::COLLECTION === $type && 'get' === $operationName ? '_collection' : '') => $newOperation;
+            yield sprintf('%s%s', $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
         }
     }
 

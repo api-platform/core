@@ -24,8 +24,12 @@ final class ResourceCollection extends \ArrayObject
 {
     private $operationCache = [];
 
-    public function getOperation(string $operationName): ?Operation
+    public function getOperation(?string $operationName): ?Operation
     {
+        if (!$operationName) {
+            return null;
+        }
+
         if (isset($this->operationCache[$operationName])) {
             return $this->operationCache[$operationName];
         }

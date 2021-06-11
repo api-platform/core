@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
 
 /**
  * Helps creating metadata on the Resource based on the properties of this same resource. Computes "identifiers".
@@ -57,7 +54,7 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
 
             // Copy identifiers to operations if not defined
             foreach ($resource->operations as $key => $operation) {
-                if (!$operation->identifiers && !$operation instanceof Post && !$operation instanceof GetCollection) {
+                if (!$operation->identifiers && !$operation->collection) {
                     $operation->identifiers = $identifiers;
                 }
 
@@ -102,11 +99,8 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
         $hasIdProperty = false;
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             $hasIdProperty = 'id' === $property;
-            try {
-                if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
-                    $identifiers[$property] = [$resourceClass, $property];
-                }
-            } catch (PropertyNotFoundException $e) {
+            if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
+                $identifiers[$property] = [$resourceClass, $property];
             }
         }
 

@@ -29,12 +29,8 @@ class AnnotationResourceNameCollectionFactoryTest extends TestCase
     use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testCreate()
     {
-        $this->expectDeprecation('Using a legacy ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceNameCollectionFactory is deprecated since 2.7 and will not be possible in 3.0.');
         $decorated = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $decorated->create()->willReturn(new ResourceNameCollection(['foo', 'bar']))->shouldBeCalled();
 
@@ -45,12 +41,8 @@ class AnnotationResourceNameCollectionFactoryTest extends TestCase
         $this->assertEquals(new ResourceNameCollection(['foo', 'bar']), $metadata->create());
     }
 
-    /**
-     * @group legacy
-     */
     public function testCreateAttribute()
     {
-        $this->expectDeprecation('Using a legacy ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceNameCollectionFactory is deprecated since 2.7 and will not be possible in 3.0.');
         $decorated = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $decorated->create()->willReturn(new ResourceNameCollection(['foo', 'bar']))->shouldBeCalled();
 
