@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -97,6 +98,18 @@ abstract class ApiTestCase extends KernelTestCase
             return null;
         }
 
-        return static::$container->get('api_platform.iri_converter')->getIriFromItem($item);
+        return static::$container->get('api_platform.iri_converter')->getIriFromItem($item, UrlGeneratorInterface::ABS_PATH, ['operation_name' => $this->getFirstItemOperationName($resourceClass)]);
+    }
+
+    private function getFirstItemOperationName(string $resourceClass): ?string {
+        foreach (static::$container->get('api_platform.metadata.resource_collection.metadata_factory')->create($resourceClass) as $resourceMetadata) {
+            foreach ($resourceMetadata->operations as $operationName => $operation) {
+                if ('GET' === $operation->method && !$operation->collection) {
+                    return $operationName;
+                }
+            }
+        }
+
+        return null;
     }
 }

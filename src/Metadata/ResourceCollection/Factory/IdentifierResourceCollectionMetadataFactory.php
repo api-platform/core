@@ -54,7 +54,7 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
 
             // Copy identifiers to operations if not defined
             foreach ($resource->operations as $key => $operation) {
-                if (!$operation->identifiers && !$operation->collection) {
+                if ($identifiers && !$operation->identifiers && !$operation->collection) {
                     $operation->identifiers = $identifiers;
                 }
 

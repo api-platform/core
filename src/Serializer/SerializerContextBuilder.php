@@ -32,12 +32,14 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
     private $resourceMetadataFactory;
-    private $resourceCollectionMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory = null)
+    public function __construct($resourceMetadataFactory = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
+
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be not be iused anymore in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -49,21 +51,24 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             throw new RuntimeException('Request attributes are not valid.');
         }
 
-        if ($this->resourceCollectionMetadataFactory && isset($attributes['operation_name'])) {
+        if (
+            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) 
+            && isset($attributes['operation_name'])
+        ) {
             try {
-                $resourceCollection = $this->resourceCollectionMetadataFactory->create($attributes['resource_class']);
-                $operation = $resourceCollection->getOperation($attributes['operation_name']);
-                $context = $normalization ? $operation->normalizationContext : $operation->denormalizationContext;
-                $context['uri_template'] = $operation->uriTemplate;
-                $context['identifiers'] = $operation->identifiers;
-                // TODO: remove in 3.0, operation type will not exist anymore
-                $context['operation_type'] = ($attributes['identifiers'] ?? []) ? OperationType::ITEM : OperationType::COLLECTION;
+                $operation = $attributes['operation'];
+                $context = $normalization ? $operation['normalization_context'] : $operation['denormalization_context'];
+                $context['uri_template'] = $operation['uri_template'];
+                $context['identifiers'] = $operation['identifiers'] ?? [];
                 $context['operation_name'] = $attributes['operation_name'];
                 $context['resource_class'] = $attributes['resource_class'];
-                $context['skip_null_values'] = $context['skip_null_values'] ?? true;
+                // TODO: 3.0 becomes true by default
+                $context['skip_null_values'] = $context['skip_null_values'] ?? $this->shouldSkipNullValues($attributes['resource_class'], $attributes['operation_name']);
+                // TODO: remove in 3.0, operation type will not exist anymore
+                $context['operation_type'] = $operation['collection'] ? OperationType::ITEM : OperationType::COLLECTION;
                 $context['iri_only'] = $context['iri_only'] ?? false;
-                $context['input'] = $operation->input;
-                $context['output'] = $operation->output;
+                $context['input'] = $operation['input'];
+                $context['output'] = $operation['output'];
                 $context['request_uri'] = $request->getRequestUri();
                 $context['uri'] = $request->getUri();
 
@@ -83,19 +88,14 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
                 return $context;
             } catch (ResourceClassNotFoundException $e) {
-                $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
             }
-        } else {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         }
 
+        // TODO: remove in 3.0
+        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
 
-        // TODO: remove in 3.0
-        if (isset($attributes['operation_name'])) {
-            $operationKey = 'operation_name';
-            $operationType = ($attributes['identifiers'] ?? []) ? OperationType::ITEM : OperationType::COLLECTION;
-        } elseif (isset($attributes['collection_operation_name'])) {
+        if (isset($attributes['collection_operation_name'])) {
             $operationKey = 'collection_operation_name';
             $operationType = OperationType::COLLECTION;
         } elseif (isset($attributes['item_operation_name'])) {
@@ -154,7 +154,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
-        // TODO: We should always use `skip_null_values` but changing this would be a BC break, for now use it only when `merge-patch+json` is activated on a Resource
         foreach ($resourceMetadata->getItemOperations() as $operation) {
             if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
                 $context['skip_null_values'] = true;
@@ -164,5 +163,22 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         return $context;
+    }
+
+    /**
+     * TODO: remove in 3.0, this will have no impact and skip_null_values will be default, no more resourceMetadataFactory call in this class
+     */
+    private function shouldSkipNullValues(string $class, string $operationName): bool
+    {
+        $collection = $this->resourceMetadataFactory->create($class);
+        foreach ($collection as $metadata) {
+            foreach ($metadata->operations as $operation) {
+                if ('PATCH' === ($operation->method ?? '') && \in_array('application/merge-patch+json', $operation->inputFormats ?? [], true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

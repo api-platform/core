@@ -33,6 +33,7 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Util\AttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Resource;
@@ -55,7 +56,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
     private $router;
     private $identifiersExtractor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ItemDataProviderInterface $itemDataProvider, RouteNameResolverInterface $routeNameResolver, RouterInterface $router, PropertyAccessorInterface $propertyAccessor = null, IdentifiersExtractorInterface $identifiersExtractor = null, SubresourceDataProviderInterface $subresourceDataProvider = null, IdentifierConverterInterface $identifierConverter = null, ResourceClassResolverInterface $resourceClassResolver = null, $resourceMetadataFactory = null)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->routeNameResolver = $routeNameResolver;
@@ -120,20 +121,6 @@ final class IriConverter implements ContextAwareIriConverterInterface
     {
         $resourceClass = $this->getResourceClass($item, true);
 
-        // Special case where the Resource has no identifiers (it's a collection) and we want the operation tight to the item
-        // if (!($context['identifiers'] ?? true) && $this->resourceCollectionMetadataFactory) {
-        //     $collection = $this->resourceCollectionMetadataFactory->create($resourceClass);
-        //     foreach ($collection as $resource) {
-        //         foreach ($resource->operations as $key => $operation) {
-        //             if ('GET' === $operation->method && $operation->identifiers) {
-        //                 $context['operation_name'] = $key;
-        //                 $context['identifiers'] = $operation->identifiers;
-        //                 break 2;
-        //             }
-        //         }
-        //     }
-        // }
-
         try {
             $identifiers = $this->identifiersExtractor instanceof ContextAwareIdentifiersExtractorInterface ? $this->identifiersExtractor->getIdentifiersFromItem($item, $context) : $this->identifiersExtractor->getIdentifiersFromItem($item);
         } catch (RuntimeException $e) {
@@ -147,17 +134,18 @@ final class IriConverter implements ContextAwareIriConverterInterface
             return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType));
         }
 
+        @trigger_error('Calling getIriFromItem without an operation_name (or route name) in the context is deprecated since 2.7 and will not be available anymore in 3.0. Create your own IriConverter if needed.', \E_USER_DEPRECATED);
+
         return $this->getItemIriFromResourceClass($resourceClass, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResourceClass(string $resourceClass, int $referenceType = null): string
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = null, array $context = []): string
     {
-        // TODO: use ResourceMetadataCollection somehow to fetch the correct route, this makes no sense as relying a lot on OperationType
         try {
-            return $this->router->generate($this->getRouteName($resourceClass, OperationType::COLLECTION), [], $this->getReferenceType($resourceClass, $referenceType));
+            return $this->router->generate($context['operation_name'] ?? $this->getRouteName($resourceClass, OperationType::COLLECTION), [], $this->getReferenceType($resourceClass, $referenceType));
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -169,6 +157,24 @@ final class IriConverter implements ContextAwareIriConverterInterface
      */
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
+        @trigger_error('getItemIriFromResourceClass is deprecated since 2.7 and will not be available anymore in 3.0', \E_USER_DEPRECATED);
+
+        if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
+                foreach ($resourceMetadata->operations as $operationName => $operation) {
+                    if ('GET' === $operation->method && !$operation->collection) {
+                        if (\count($identifiers) > 1 && $operation->compositeIdentifier) {
+                            $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
+                        }
+
+                        return $this->router->generate($operationName, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
+                    }
+                }
+            }
+
+            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass));
+        }
+
         $routeName = $this->getRouteName($resourceClass, OperationType::ITEM);
         $metadata = $this->resourceMetadataFactory->create($resourceClass);
 
@@ -185,6 +191,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
     /**
      * {@inheritdoc}
+     * TODO: remove in 3.0
      */
     public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = null): string
     {
@@ -209,27 +216,6 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
     private function getRouteName(string $resourceClass, string $operationType)
     {
-        // if (null !== $this->resourceCollectionMetadataFactory) {
-        //     try {
-        //         $collection = $this->resourceCollectionMetadataFactory->create($resourceClass);
-        //
-        //         foreach ($collection as $resource) {
-        //             foreach ($resource->operations as $key => $operation) {
-        //                 // TODO: This is wrong as it can happen but as we need to keep a layer with declaring every operation on a single entity we need to keep the behavior
-        //                 if (OperationType::COLLECTION === $operationType && $operation->identifiers) {
-        //                     continue;
-        //                 }
-        //
-        //                 if ('GET' === $operation->method) {
-        //                     return $key;
-        //                 }
-        //             }
-        //         }
-        //     } catch (ResourceClassNotFoundException $e) {
-        //         // This is probably a pre-2.7 resource
-        //     }
-        // }
-
         return $this->routeNameResolver->getRouteName($resourceClass, $operationType);
     }
 }

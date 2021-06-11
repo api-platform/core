@@ -262,7 +262,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $prefix = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getShortName() : $resourceMetadata->shortName;
         }
 
-        if (!$prefix) {
+        if (!isset($prefix)) {
             $prefix = (new \ReflectionClass($className))->getShortName();
         }
 

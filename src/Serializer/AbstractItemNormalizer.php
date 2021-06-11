@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
@@ -72,6 +74,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
+            //TODO: 2.7: hard problem ? need the operation name
             $defaultContext['circular_reference_handler'] = function ($object) {
                 return $this->iriConverter->getIriFromItem($object);
             };
@@ -147,7 +150,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $context['iri'] ?? $this->iriConverter->getIriFromItem($object);
+
+        if (isset($context['iri'])) {
+            $iri = $context['iri'];
+        } else {
+            $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL, $context) : $this->iriConverter->getIriFromItem($object);
+        }
+
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 

@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
+use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -79,10 +81,11 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
+        //TODO: remove in 3.0
         if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
             $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
         } else {
-            $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+            $data['@id'] = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_PATH, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
         }
 
         $data['@type'] = 'hydra:Collection';

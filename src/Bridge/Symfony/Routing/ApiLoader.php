@@ -114,10 +114,10 @@ final class ApiLoader extends Loader
                             '_stateless' => $operation->stateless,
                             '_api_resource_class' => $resourceClass,
                             '_api_identifiers' => $operation->identifiers,
-                            // TODO: remove this
+                            // TODO: remove this and use operation['has_composite_identifier']
                             '_api_has_composite_identifier' => $operation->compositeIdentifier,
                             '_api_operation_name' => $operationName,
-                            '_api_operation' => (array) $operation
+                            '_api_operation' => $operation->__serialize()
                         ] + ($operation->defaults ?? []),
                         $operation->requirements ?? [],
                         $operation->options ?? [],

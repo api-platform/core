@@ -50,6 +50,10 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
         foreach ($parentResourceMetadata as $i => $resource) {
             if (!$resource->uriTemplate) {
                 foreach ($resource->operations as $key => $operation) {
+                    if ($operation->collection) {
+                        $operation->links = $this->getLinks($parentResourceMetadata);
+                    }
+
                     if ($operation->uriTemplate) {
                         continue;
                     }
@@ -67,10 +71,25 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
         return $parentResourceMetadata;
     }
 
+    private function getLinks($resourceMetadata): array
+    {
+        $links = [];
+
+        foreach ($resourceMetadata as $resource) {
+            foreach ($resource->operations as $operationName => $operation) {
+                if (false === $operation->collection) {
+                    $links[] = $operationName;
+                }
+            }
+        }
+
+        return $links;
+    }
+
     private function generateUriTemplate(Operation $operation): string
     {
         $uriTemplate = $operation->routePrefix ?: '';
-        if (!$operation->identifiers) {
+        if ($operation->collection) {
             return sprintf('%s/%s.{_format}', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->shortName));
         }
 

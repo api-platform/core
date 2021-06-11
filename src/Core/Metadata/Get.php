@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Get extends Operation
+final class Get extends Operation
 {
     public function __construct(
         public ?array $defaults = [],

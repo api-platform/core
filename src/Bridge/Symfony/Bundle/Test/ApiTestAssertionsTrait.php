@@ -105,7 +105,7 @@ trait ApiTestAssertionsTrait
     public static function assertMatchesJsonSchema($jsonSchema, ?int $checkMode = null, string $message = ''): void
     {
         $constraint = new MatchesJsonSchema($jsonSchema, $checkMode);
-
+        
         static::assertThat(self::getHttpResponse()->toArray(false), $constraint, $message);
     }
 

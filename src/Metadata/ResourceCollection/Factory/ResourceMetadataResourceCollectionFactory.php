@@ -84,7 +84,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
         $resource->description = $resourceMetadata->getDescription();
         $resource->class = $resourceClass;
         $resource->types = [$resourceMetadata->getIri()];
-        $resource->graphQl = $resourceMetadata->getGraphql(); // TODO: fix this with graphql
+        // $resource->graphQl = $resourceMetadata->getGraphql(); // TODO: fix this with graphql
 
         return new ResourceCollection([$resource]);
     }
@@ -101,9 +101,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
 
             foreach ($operation as $operationKey => $operationValue) {
                 $camelCaseKey = $this->converter->denormalize($operationKey);
-
                 $operationValue = $this->sanitizeValueFromKey($operationKey, $operationValue);
-
                 $newOperation->{$camelCaseKey} = $operationValue;
             }
 

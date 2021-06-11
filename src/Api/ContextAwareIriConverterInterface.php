@@ -34,4 +34,16 @@ interface ContextAwareIriConverterInterface extends IriConverterInterface
      * @throws RuntimeException
      */
     public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
+
+    /**
+     * Gets the IRI associated with the given resource class.
+     *
+     * @param object         $item
+     * @param int            $referenceType
+     * @param array          $context
+     *
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     */
+    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
 }
