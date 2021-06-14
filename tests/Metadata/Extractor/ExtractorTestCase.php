@@ -14,12 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
-use function is_a;
 
 /**
  * @author Théo Fidry <theo.fidry@gmail.com>
@@ -45,8 +47,9 @@ abstract class ExtractorTestCase extends TestCase
         // There is a difference between XML & YAML here for example, one will parse `null` or the lack of value as `null`
         // whilst the other will parse it as an empty array. Since it doesn't affect the processing of those values, there is no
         // real need to fix this.
-        $this->assertSame([], $resources['App\Entity\Greeting']['collectionOperations']['post']);
-        $this->assertSame(['get' => [], 'put' => []], $resources['App\Entity\Greeting']['itemOperations']);
+        $this->assertEmpty($resources['App\Entity\Greeting']['collectionOperations']['post']);
+        $this->assertEmpty($resources['App\Entity\Greeting']['itemOperations']['get']);
+        $this->assertEmpty($resources['App\Entity\Greeting']['itemOperations']['put']);
     }
 
     final public function testCorrectResources()
@@ -54,7 +57,7 @@ abstract class ExtractorTestCase extends TestCase
         $resources = $this->createExtractor([$this->getCorrectResourceFile()])->getResources();
 
         $this->assertSame([
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class => [
+            Dummy::class => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,
@@ -65,7 +68,7 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => null,
             ],
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::class => [
+            FileConfigDummy::class => [
                 'shortName' => 'thedummyshortname',
                 'description' => 'Dummy resource',
                 'iri' => 'someirischema',
@@ -112,6 +115,7 @@ abstract class ExtractorTestCase extends TestCase
                         '@type' => 'hydra:Operation',
                         '@hydra:title' => 'File config Dummy',
                     ],
+                    'stateless' => true,
                 ],
                 'properties' => [
                     'foo' => [
@@ -161,14 +165,14 @@ abstract class ExtractorTestCase extends TestCase
     final public function testResourcesParametersResolution()
     {
         $containerProphecy = $this->prophesize(ContainerInterface::class);
-        $containerProphecy->get('dummy_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class);
-        $containerProphecy->getParameter('dummy_related_owned_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class);
-        $containerProphecy->get('file_config_dummy_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::class);
+        $containerProphecy->get('dummy_class')->willReturn(Dummy::class);
+        $containerProphecy->get('dummy_related_owned_class')->willReturn(RelatedOwnedDummy::class);
+        $containerProphecy->get('file_config_dummy_class')->willReturn(FileConfigDummy::class);
 
         $resources = $this->createExtractor([$this->getResourceWithParametersFile()], $containerProphecy->reveal())->getResources();
 
         $this->assertSame([
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class => [
+            Dummy::class => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,
@@ -179,11 +183,24 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => [
                     'relatedOwnedDummy' => [
-                        'resourceClass' => \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class,
+                        'description' => null,
+                        'readable' => null,
+                        'writable' => null,
+                        'readableLink' => null,
+                        'writableLink' => null,
+                        'required' => null,
+                        'identifier' => null,
+                        'iri' => null,
+                        'attributes' => [],
+                        'subresource' => [
+                            'collection' => null,
+                            'resourceClass' => RelatedOwnedDummy::class,
+                            'maxDepth' => null,
+                        ],
                     ],
                 ],
             ],
-            '\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis' => [
+            'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis' => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,
@@ -194,7 +211,7 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => null,
             ],
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::class => [
+            FileConfigDummy::class => [
                 'shortName' => 'thedummyshortname',
                 'description' => 'Dummy resource',
                 'iri' => 'someirischema',
@@ -263,6 +280,7 @@ abstract class ExtractorTestCase extends TestCase
                                 'baz' => 'Baz',
                             ],
                             'baz' => 'Baz',
+                            'const' => 0,
                         ],
                         'subresource' => [
                             'collection' => true,
@@ -286,20 +304,20 @@ abstract class ExtractorTestCase extends TestCase
             ],
         ], $resources);
 
-        $containerProphecy->get(Argument::cetera())->shouldHaveBeenCalledTimes(2);
+        $containerProphecy->get(Argument::cetera())->shouldHaveBeenCalledTimes(3);
     }
 
     final public function testResourcesParametersResolutionWithTheSymfonyContainer()
     {
         $containerProphecy = $this->prophesize(SymfonyContainerInterface::class);
-        $containerProphecy->getParameter('dummy_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class);
-        $containerProphecy->getParameter('dummy_related_owned_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class);
-        $containerProphecy->getParameter('file_config_dummy_class')->willReturn(\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::class);
+        $containerProphecy->getParameter('dummy_class')->willReturn(Dummy::class);
+        $containerProphecy->getParameter('dummy_related_owned_class')->willReturn(RelatedOwnedDummy::class);
+        $containerProphecy->getParameter('file_config_dummy_class')->willReturn(FileConfigDummy::class);
 
         $resources = $this->createExtractor([$this->getResourceWithParametersFile()], $containerProphecy->reveal())->getResources();
 
         $this->assertSame([
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy::class => [
+            Dummy::class => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,
@@ -310,11 +328,24 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => [
                     'relatedOwnedDummy' => [
-                        'resourceClass' => \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class,
+                        'description' => null,
+                        'readable' => null,
+                        'writable' => null,
+                        'readableLink' => null,
+                        'writableLink' => null,
+                        'required' => null,
+                        'identifier' => null,
+                        'iri' => null,
+                        'attributes' => [],
+                        'subresource' => [
+                            'collection' => null,
+                            'resourceClass' => RelatedOwnedDummy::class,
+                            'maxDepth' => null,
+                        ],
                     ],
                 ],
             ],
-            '\ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis' => [
+            'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyBis' => [
                 'shortName' => null,
                 'description' => null,
                 'iri' => null,
@@ -325,7 +356,7 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => null,
             ],
-            \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::class => [
+            FileConfigDummy::class => [
                 'shortName' => 'thedummyshortname',
                 'description' => 'Dummy resource',
                 'iri' => 'someirischema',
@@ -394,6 +425,7 @@ abstract class ExtractorTestCase extends TestCase
                                 'baz' => 'Baz',
                             ],
                             'baz' => 'Baz',
+                            'const' => 0,
                         ],
                         'subresource' => [
                             'collection' => true,
@@ -417,7 +449,7 @@ abstract class ExtractorTestCase extends TestCase
             ],
         ], $resources);
 
-        $containerProphecy->getParameter(Argument::cetera())->shouldHaveBeenCalledTimes(2);
+        $containerProphecy->getParameter(Argument::cetera())->shouldHaveBeenCalledTimes(3);
     }
 
     final public function testResourcesParametersResolutionWithoutAContainer()
@@ -436,7 +468,20 @@ abstract class ExtractorTestCase extends TestCase
                 'attributes' => null,
                 'properties' => [
                     'relatedOwnedDummy' => [
-                        'resourceClass' => '%dummy_related_owned_class%',
+                        'description' => null,
+                        'readable' => null,
+                        'writable' => null,
+                        'readableLink' => null,
+                        'writableLink' => null,
+                        'required' => null,
+                        'identifier' => null,
+                        'iri' => null,
+                        'attributes' => [],
+                        'subresource' => [
+                            'collection' => null,
+                            'resourceClass' => '%dummy_related_owned_class%',
+                            'maxDepth' => null,
+                        ],
                     ],
                 ],
             ],
@@ -520,6 +565,7 @@ abstract class ExtractorTestCase extends TestCase
                                 'baz' => 'Baz',
                             ],
                             'baz' => 'Baz',
+                            'const' => 0,
                         ],
                         'subresource' => [
                             'collection' => true,

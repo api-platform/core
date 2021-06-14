@@ -21,7 +21,7 @@ use Generator;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo Fidry <theo.fidry@gmail.com>
  */
-class YamlExtractorTestCase extends ExtractorTestCase
+class YamlExtractorTest extends ExtractorTestCase
 {
     public function testInvalidProperty()
     {

@@ -19,7 +19,7 @@ use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo Fidry <theo.fidry@gmail.com>
  */
-class XmlExtractorTestCase extends ExtractorTestCase
+class XmlExtractorTest extends ExtractorTestCase
 {
     /**
      * {@inheritdoc}
