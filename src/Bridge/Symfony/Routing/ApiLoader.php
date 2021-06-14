@@ -101,6 +101,7 @@ final class ApiLoader extends Loader
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
                 $this->loadLegacyMetadata($routeCollection, $resourceClass);
+                $this->loadLegacySubresources($routeCollection, $resourceClass);
                 continue;
             }
 
@@ -129,8 +130,11 @@ final class ApiLoader extends Loader
 
                     $routeCollection->add($operationName, $route);
                 }
+
                 continue;
             }
+
+            $this->loadLegacySubresources($routeCollection, $resourceClass);
         }
 
         return $routeCollection;
@@ -203,7 +207,13 @@ final class ApiLoader extends Loader
                 $this->addRoute($routeCollection, $resourceClass, $operationName, $operation, $resourceMetadata, OperationType::ITEM);
             }
         }
+    }
 
+    /**
+     * TODO: remove in 3.0
+     */
+    private function loadLegacySubresources(RouteCollection $routeCollection, string $resourceClass)
+    {
         if (null === $this->subresourceOperationFactory) {
             return;
         }
@@ -222,7 +232,7 @@ final class ApiLoader extends Loader
                 [
                     '_controller' => $controller,
                     '_format' => $operation['defaults']['_format'] ?? null,
-                    '_stateless' => $operation['stateless'] ?? $resourceMetadata->getAttribute('stateless'),
+                    '_stateless' => $operation['stateless'] ?? null,
                     '_api_resource_class' => $operation['resource_class'],
                     '_api_identifiers' => $operation['identifiers'],
                     '_api_has_composite_identifier' => false,

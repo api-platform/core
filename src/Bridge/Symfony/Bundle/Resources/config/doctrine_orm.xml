@@ -174,6 +174,11 @@
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-32" />
         </service>
         <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
+
+        <service id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" public="false">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
+        </service>
     </services>
 
 </container>

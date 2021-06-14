@@ -421,7 +421,7 @@ class ReadListenerTest extends TestCase
         $stateProvider = $this->prophesize(ProviderInterface::class);
         $stateProvider->provide('Foo', ['id' => 22], Argument::cetera())->shouldBeCalled()->willReturn(null);
 
-        $request = new Request([], [], ['id' => '22', '_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_identifiers' => ['id' => ['Foo', 'id']]]);
+        $request = new Request([], [], ['id' => '22', '_api_resource_class' => 'Foo', '_api_operation_name' => 'get',  '_api_operation' => [], '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_identifiers' => ['id' => ['Foo', 'id']]]);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);
@@ -446,7 +446,7 @@ class ReadListenerTest extends TestCase
         $itemDataProvider->getItem('Foo', ['id' => 22], 'get', Argument::cetera())->willReturn(null)->shouldBeCalled();
         $subresourceDataProvider = $this->prophesize(SubresourceDataProviderInterface::class);
 
-        $request = new Request([], [], ['id' => '22', '_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_identifiers' => ['id' => ['Foo', 'id']]]);
+        $request = new Request([], [], ['id' => '22', '_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_operation' => [], '_api_format' => 'json', '_api_mime_type' => 'application/json', '_api_identifiers' => ['id' => ['Foo', 'id']]]);
         $request->setMethod('GET');
 
         $event = $this->prophesize(RequestEvent::class);

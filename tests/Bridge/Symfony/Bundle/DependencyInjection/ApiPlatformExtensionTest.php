@@ -1015,6 +1015,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory.property_info',
             'api_platform.metadata.property.metadata_factory.serializer',
             'api_platform.metadata.property.metadata_factory.xml',
+            'api_platform.metadata.property.identifier_metadata_factory.property_info',
+            'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.metadata.property.name_collection_factory.cached',
             'api_platform.metadata.property.name_collection_factory.property_info',
             'api_platform.metadata.property.name_collection_factory.xml',
@@ -1022,7 +1024,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_factory.operation',
             'api_platform.metadata.resource.metadata_factory.formats',
             'api_platform.metadata.resource.metadata_factory.input_output',
-            'api_platform.metadata.resource.metadata_factory.resource_collection',
             'api_platform.metadata.resource.metadata_factory.short_name',
             'api_platform.metadata.resource.metadata_factory.xml',
             'api_platform.metadata.resource.name_collection_factory.cached',
@@ -1032,6 +1033,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource_collection.metadata_factory.formats',
             'api_platform.metadata.resource_collection.metadata_factory.identifier',
             'api_platform.metadata.resource_collection.metadata_factory.input_output',
+            'api_platform.metadata.resource_collection.metadata_factory.legacy_resource_metadata',
             'api_platform.metadata.resource_collection.metadata_factory.php_doc',
             'api_platform.metadata.resource_collection.metadata_factory.uri_template',
             'api_platform.metadata.property.metadata_factory.default_property',
@@ -1085,6 +1087,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.name_collection_factory' => 'api_platform.metadata.property.name_collection_factory.property_info',
             'api_platform.metadata.resource.metadata_factory' => 'api_platform.metadata.resource.metadata_factory.xml',
             'api_platform.metadata.resource.name_collection_factory' => 'api_platform.metadata.resource.name_collection_factory.xml',
+            'api_platform.metadata.property.identifier_metadata_factory' => 'api_platform.metadata.property.identifier_metadata_factory.property_info',
             'api_platform.operation_path_resolver' => 'api_platform.operation_path_resolver.router',
             'api_platform.operation_path_resolver.default' => 'api_platform.operation_path_resolver.underscore',
             'api_platform.path_segment_name_generator' => 'api_platform.path_segment_name_generator.underscore',
@@ -1429,6 +1432,7 @@ class ApiPlatformExtensionTest extends TestCase
                 'api_platform.doctrine_mongodb.odm.exists_filter',
                 'api_platform.doctrine_mongodb.odm.item_data_provider',
                 'api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory',
+                'api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory',
                 'api_platform.doctrine_mongodb.odm.numeric_filter',
                 'api_platform.doctrine_mongodb.odm.order_filter',
                 'api_platform.doctrine_mongodb.odm.range_filter',
@@ -1450,6 +1454,7 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.openapi.normalizer';
             $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
             $definitions[] = 'api_platform.openapi.factory';
+            $definitions[] = 'api_platform.openapi.legacy.factory';
             $definitions[] = 'api_platform.openapi.command';
             $definitions[] = 'api_platform.swagger_ui.context';
             $definitions[] = 'api_platform.swagger_ui.action';
@@ -1494,7 +1499,7 @@ class ApiPlatformExtensionTest extends TestCase
         $aliases = [
             'api_platform.http_cache.purger' => 'api_platform.http_cache.purger.varnish',
             'api_platform.message_bus' => 'messenger.default_bus',
-            'api_platform.metadata.property.identifier_metadata_factory' => 'api_platform.metadata.property.identifier_metadata_factory.annotation',
+            'api_platform.metadata.property.identifier_metadata_factory' => 'api_platform.metadata.property.identifier_metadata_factory.property_info',
             EagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.eager_loading',
             FilterExtension::class => 'api_platform.doctrine.orm.query_extension.filter',
             FilterEagerLoadingExtension::class => 'api_platform.doctrine.orm.query_extension.filter_eager_loading',

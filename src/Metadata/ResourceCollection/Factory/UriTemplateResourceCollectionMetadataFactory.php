@@ -77,7 +77,8 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
 
         foreach ($resourceMetadata as $resource) {
             foreach ($resource->operations as $operationName => $operation) {
-                if (false === $operation->collection) {
+                // About the routeName we can't do the link as we don't now enough
+                if (!$operation->routeName && false === $operation->collection) {
                     $links[] = $operationName;
                 }
             }

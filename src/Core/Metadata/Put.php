@@ -13,67 +13,76 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+/**
+ * @psalm-immutable
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Put extends Operation
 {
+    /**
+     * @inheritdoc
+     */
     public function __construct(
-        public ?array $defaults = [],
-        public ?array $requirements = [],
-        public ?array $options = [],
-        public ?string $host = '',
-        public ?array $schemes = [],
-        public ?string $condition = '',
-        public ?string $controller = 'api_platform.action.placeholder',
+        public string $method = self::METHOD_GET,
         public ?string $uriTemplate = null,
         public ?string $shortName = null,
         public ?string $description = null,
-        public ?string $class = null,
-        public ?array $types = null,
-
-        public ?array $cacheHeaders = null,
-        public ?array $denormalizationContext = null,
-        public ?string $deprecationReason = null,
-        public ?bool $elasticsearch = null,
-        public ?bool $fetchPartial = null,
-        public ?bool $forceEager = null,
+        public array $types = [],
         public mixed $formats = null,
         public mixed $inputFormats = null,
         public mixed $outputFormats = null,
-        public ?array $filters = null,
-        public ?array $hydraContext = null,
+        public array $identifiers = [],
+        public array $links = [],
+        public string $routePrefix = '',
+        public ?string $routeName = null,
+        public array $defaults = [],
+        public array $requirements = [],
+        public array $options = [],
+        public ?bool $stateless = null,
+        public ?string $sunset = null,
+        public string $host = '',
+        public array $schemes = [],
+        public string $condition = '',
+        public string $controller = 'api_platform.action.placeholder',
+        public ?string $class = null,
+        public ?int $urlGenerationStrategy = null,
+        public bool $collection = false,
+        public ?string $deprecationReason = null,
+        public array $cacheHeaders = [],
+        public array $normalizationContext = [],
+        public array $denormalizationContext = [],
+        public array $hydraContext = [],
+        public array $openapiContext = [],
+        // TODO: rename validationContext having ['groups' => []]
+        public array $validationGroups = [],
+        public array $filters = [],
+        public ?bool $elasticsearch = null,
+        public mixed $mercure = null,
+        public mixed $messenger = null,
         public mixed $input = null,
-        public $mercure = null,
-        public $messenger = null,
-        public ?array $normalizationContext = null,
-        public ?array $openapiContext = null,
-        public ?array $order = null,
         public mixed $output = null,
+        public array $order = [],
+        public ?bool $fetchPartial = null,
+        public ?bool $forceEager = null,
         public ?bool $paginationClientEnabled = null,
         public ?bool $paginationClientItemsPerPage = null,
         public ?bool $paginationClientPartial = null,
-        public ?array $paginationViaCursor = null,
+        public array $paginationViaCursor = [],
         public ?bool $paginationEnabled = null,
         public ?bool $paginationFetchJoinCollection = null,
         public ?int $paginationItemsPerPage = null,
         public ?int $paginationMaximumItemsPerPage = null,
         public ?bool $paginationPartial = null,
-        public ?string $routePrefix = null,
+        public ?string $paginationType = null,
         public ?string $security = null,
         public ?string $securityMessage = null,
         public ?string $securityPostDenormalize = null,
         public ?string $securityPostDenormalizeMessage = null,
-        public ?bool $stateless = null,
-        public ?string $sunset = null,
-        public ?array $swaggerContext = null,
-        public ?array $validationGroups = null,
-        public ?int $urlGenerationStrategy = null,
         public ?bool $compositeIdentifier = null,
-        public ?array $identifiers = null,
-        public ?array $graphQl = null,
-        public bool $collection = false,
+        public ?GraphQl $graphQl = null,
         ...$extraProperties
     ) {
         parent::__construct(...\func_get_args());
-        $this->method = Operation::METHOD_PUT;
+        $this->method = self::METHOD_PUT;
     }
 }

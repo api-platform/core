@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Util;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 
 /**
  * Retrieves information about a resource class.
@@ -32,7 +33,7 @@ trait ResourceClassInfoTrait
     private $resourceClassResolver;
 
     /**
-     * @var ResourceMetadataFactoryInterface|null
+     * @var ResourceMetadataFactoryInterface|ResourceCollectionMetadataFactoryInterface|null
      */
     private $resourceMetadataFactory;
 

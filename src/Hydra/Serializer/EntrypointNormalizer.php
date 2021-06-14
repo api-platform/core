@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
+use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -34,10 +36,16 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     private $iriConverter;
     private $urlGenerator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
+    public function __construct($resourceMetadataFactory, IriConverterInterface $iriConverter, UrlGeneratorInterface $urlGenerator)
     {
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
+        if ($iriConverter instanceof ContextAwareIriConverterInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', IriConverterInterface::class, ContextAwareIriConverterInterface::class), \E_USER_DEPRECATED);
+        }
         $this->urlGenerator = $urlGenerator;
     }
 
@@ -55,13 +63,32 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if (empty($resourceMetadata->getCollectionOperations())) {
+            if ($resourceMetadata instanceof ResourceMetadataFactoryInterface) {
+                if (empty($resourceMetadata->getCollectionOperations())) {
+                    continue;
+                }
+                try {
+                    $entrypoint[lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+                } catch (InvalidArgumentException $ex) {
+                    // Ignore resources without GET operations
+                }
                 continue;
             }
-            try {
-                $entrypoint[lcfirst($resourceMetadata->getShortName())] = $this->iriConverter->getIriFromResourceClass($resourceClass);
-            } catch (InvalidArgumentException $ex) {
-                // Ignore resources without GET operations
+
+            foreach($resourceMetadata as $resource) {
+                foreach ($resource->operations as $operationName => $operation) {
+                    if (!$operation->collection) {
+                        continue;
+                    }
+
+                    try {
+                        $entrypoint[lcfirst($resource->shortName)] = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_PATH, ['operation_name' => $operationName]) : $this->iriConverter->getIriFromResourceClass($resourceClass);
+                    } catch (InvalidArgumentException $ex) {
+                        // Ignore resources without GET operations
+                    }
+
+                }
+
             }
         }
 

@@ -82,11 +82,11 @@ class Resource
      * @readonly array        $graphQl
      */
     public function __construct(
-        public array $operations = [],
         public ?string $uriTemplate = null,
         public ?string $shortName = null,
         public ?string $description = null,
         public array $types = [],
+        public array $operations = [],
         public mixed $formats = null,
         public mixed $inputFormats = null,
         public mixed $outputFormats = null,

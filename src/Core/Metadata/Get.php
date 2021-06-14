@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+/**
+ * @psalm-immutable
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Get extends Operation
 {
@@ -31,6 +34,7 @@ final class Get extends Operation
         public array $identifiers = [],
         public array $links = [],
         public string $routePrefix = '',
+        public ?string $routeName = null,
         public array $defaults = [],
         public array $requirements = [],
         public array $options = [],
@@ -78,6 +82,6 @@ final class Get extends Operation
         public ?GraphQl $graphQl = null,
         ...$extraProperties
     ) {
-        parent::__construct(\func_get_args());
+        parent::__construct(...\func_get_args());
     }
 }

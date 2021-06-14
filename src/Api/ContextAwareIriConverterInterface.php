@@ -38,7 +38,7 @@ interface ContextAwareIriConverterInterface extends IriConverterInterface
     /**
      * Gets the IRI associated with the given resource class.
      *
-     * @param object         $item
+     * @param string         $resourceClass
      * @param int            $referenceType
      * @param array          $context
      *

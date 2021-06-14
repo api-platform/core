@@ -33,6 +33,8 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
@@ -53,6 +55,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
     use FilterLocatorTrait;
+    use ResourceToResourceMetadataTrait;
 
     public const FORMAT = 'json';
     public const BASE_URL = 'base_url';
@@ -112,7 +115,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * @param mixed|null                                                 $jsonSchemaTypeFactory
      * @param int[]                                                      $swaggerVersions
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null)
+    public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null)
     {
         if ($jsonSchemaTypeFactory instanceof OperationMethodResolverInterface) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
@@ -151,6 +154,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $this->setFilterLocator($filterLocator, true);
 
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -184,7 +191,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         if ($object instanceof OpenApi) {
             @trigger_error('Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.', \E_USER_DEPRECATED);
-
             return $this->openApiNormalizer->normalize($object, $format, $context);
         }
 
@@ -196,6 +202,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata[0]);
+            }
+
             if ($this->identifiersExtractor) {
                 $identifiers = [];
                 if ($resourceMetadata->getItemOperations()) {
@@ -452,10 +463,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if (null === $this->formatsProvider) {
             // TODO: Subresource operation metadata aren't available by default, for now we have to fallback on default formats.
             // TODO: A better approach would be to always populate the subresource operation array.
-            $responseFormats = $this
+            $subResourceMetadata = $this
                 ->resourceMetadataFactory
-                ->create($subresourceOperation['resource_class'])
-                ->getTypedOperationAttribute(OperationType::SUBRESOURCE, $operationName, 'output_formats', $this->formats, true);
+                ->create($subresourceOperation['resource_class']);
+
+            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                $subResourceMetadata = $this->transformResourceToResourceMetadata($subResourceMetadata[0]);
+            }
+
+            $responseFormats = $subResourceMetadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, $operationName, 'output_formats', $this->formats, true);
         } else {
             $responseFormats = $this->formatsProvider->getFormatsFromOperation($subresourceOperation['resource_class'], $operationName, OperationType::SUBRESOURCE);
         }

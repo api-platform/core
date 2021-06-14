@@ -96,6 +96,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
 
             if (isset($operation['path'])) {
                 $newOperation->uriTemplate = $operation['path'];
+                $newOperation->routeName = $operationName;
                 unset($operation['path']);
             }
 
@@ -106,7 +107,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
             }
 
             // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceCollectionMetadataFactory
-            yield sprintf('%s%s', $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
+            yield $newOperation->routeName ? $newOperation->routeName : sprintf('%s%s', $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
         }
     }
 

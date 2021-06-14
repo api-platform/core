@@ -34,6 +34,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Util\AttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Resource;
@@ -131,7 +132,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
             if (\count($identifiers) > 1 && ($context['has_composite_identifier'] ?? false)) {
                 $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
             }
-            return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType));
+            return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType, $context));
         }
 
         @trigger_error('Calling getIriFromItem without an operation_name (or route name) in the context is deprecated since 2.7 and will not be available anymore in 3.0. Create your own IriConverter if needed.', \E_USER_DEPRECATED);
@@ -145,7 +146,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = null, array $context = []): string
     {
         try {
-            return $this->router->generate($context['operation_name'] ?? $this->getRouteName($resourceClass, OperationType::COLLECTION), [], $this->getReferenceType($resourceClass, $referenceType));
+            return $this->router->generate($context['operation_name'] ?? $this->getRouteName($resourceClass, OperationType::COLLECTION), [], $this->getReferenceType($resourceClass, $referenceType, $context));
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
@@ -204,11 +205,17 @@ final class IriConverter implements ContextAwareIriConverterInterface
         }
     }
 
-    private function getReferenceType(string $resourceClass, ?int $referenceType): ?int
+    private function getReferenceType(string $resourceClass, ?int $referenceType, array $context = []): ?int
     {
         if (null === $referenceType && null !== $this->resourceMetadataFactory) {
-            $metadata = $this->resourceMetadataFactory->create($resourceClass);
-            $referenceType = $metadata->getAttribute('url_generation_strategy');
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+                $metadata = $this->resourceMetadataFactory->create($resourceClass);
+                $referenceType = $metadata->getAttribute('url_generation_strategy');
+            } else {
+                /** @var ResourceCollection **/
+                $metadata = $this->resourceMetadataFactory->create($resourceClass);
+                $referenceType = isset($context['operation_name']) ? $metadata->getOperation($context['operation_name'])->urlGenerationStrategy : $metadata[0]->urlGenerationStrategy;
+            }
         }
 
         return $referenceType ?? UrlGeneratorInterface::ABS_PATH;
