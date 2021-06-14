@@ -79,6 +79,7 @@
                 <attribute name="baz">Baz</attribute>
             </attribute>
             <attribute name="baz">Baz</attribute>
+            <attribute name="const" type="constant">ApiPlatform\Core\Api\UrlGeneratorInterface::ABS_URL</attribute>
         </property>
 
         <property name="name" description="The dummy name"/>

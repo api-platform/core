@@ -43,9 +43,9 @@ final class XmlExtractor extends AbstractExtractor
             $resourceClass = $this->resolve((string) $resource['class']);
 
             $this->resources[$resourceClass] = [
-                'shortName' => $this->phpize($resource, 'shortName', 'string'),
-                'description' => $this->phpize($resource, 'description', 'string'),
-                'iri' => $this->phpize($resource, 'iri', 'string'),
+                'shortName' => $this->phpizeAttribute($resource, 'shortName', 'string'),
+                'description' => $this->phpizeAttribute($resource, 'description', 'string'),
+                'iri' => $this->phpizeAttribute($resource, 'iri', 'string'),
                 'itemOperations' => $this->getOperations($resource, 'itemOperation'),
                 'collectionOperations' => $this->getOperations($resource, 'collectionOperation'),
                 'subresourceOperations' => $this->getOperations($resource, 'subresourceOperation'),
@@ -86,7 +86,7 @@ final class XmlExtractor extends AbstractExtractor
     {
         $attributes = [];
         foreach ($resource->{$elementName} as $attribute) {
-            $value = isset($attribute->attribute[0]) ? $this->getAttributes($attribute, 'attribute') : XmlUtils::phpize($attribute);
+            $value = isset($attribute->attribute[0]) ? $this->getAttributes($attribute, 'attribute') : $this->phpizeContent($attribute);
             // allow empty operations definition, like <collectionOperation name="post" />
             if ($topLevel && '' === $value) {
                 $value = [];
@@ -109,19 +109,19 @@ final class XmlExtractor extends AbstractExtractor
         $properties = [];
         foreach ($resource->property as $property) {
             $properties[(string) $property['name']] = [
-                'description' => $this->phpize($property, 'description', 'string'),
-                'readable' => $this->phpize($property, 'readable', 'bool'),
-                'writable' => $this->phpize($property, 'writable', 'bool'),
-                'readableLink' => $this->phpize($property, 'readableLink', 'bool'),
-                'writableLink' => $this->phpize($property, 'writableLink', 'bool'),
-                'required' => $this->phpize($property, 'required', 'bool'),
-                'identifier' => $this->phpize($property, 'identifier', 'bool'),
-                'iri' => $this->phpize($property, 'iri', 'string'),
+                'description' => $this->phpizeAttribute($property, 'description', 'string'),
+                'readable' => $this->phpizeAttribute($property, 'readable', 'bool'),
+                'writable' => $this->phpizeAttribute($property, 'writable', 'bool'),
+                'readableLink' => $this->phpizeAttribute($property, 'readableLink', 'bool'),
+                'writableLink' => $this->phpizeAttribute($property, 'writableLink', 'bool'),
+                'required' => $this->phpizeAttribute($property, 'required', 'bool'),
+                'identifier' => $this->phpizeAttribute($property, 'identifier', 'bool'),
+                'iri' => $this->phpizeAttribute($property, 'iri', 'string'),
                 'attributes' => $this->getAttributes($property, 'attribute'),
                 'subresource' => $property->subresource ? [
-                    'collection' => $this->phpize($property->subresource, 'collection', 'bool'),
-                    'resourceClass' => $this->resolve($this->phpize($property->subresource, 'resourceClass', 'string')),
-                    'maxDepth' => $this->phpize($property->subresource, 'maxDepth', 'integer'),
+                    'collection' => $this->phpizeAttribute($property->subresource, 'collection', 'bool'),
+                    'resourceClass' => $this->resolve($this->phpizeAttribute($property->subresource, 'resourceClass', 'string')),
+                    'maxDepth' => $this->phpizeAttribute($property->subresource, 'maxDepth', 'integer'),
                 ] : null,
             ];
         }
@@ -134,7 +134,7 @@ final class XmlExtractor extends AbstractExtractor
      *
      * @return string|int|bool|null
      */
-    private function phpize(\SimpleXMLElement $array, string $key, string $type)
+    private function phpizeAttribute(\SimpleXMLElement $array, string $key, string $type)
     {
         if (!isset($array[$key])) {
             return null;
@@ -150,5 +150,23 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         return null;
+    }
+
+    /**
+     * Transforms an XML element's content in a PHP value.
+     */
+    private function phpizeContent(\SimpleXMLElement $array)
+    {
+        $type = $array['type'] ?? null;
+        $value = (string) $array;
+
+        switch ($type) {
+            case 'string':
+                return $value;
+            case 'constant':
+                return \constant($value);
+            default:
+                return XmlUtils::phpize($value);
+        }
     }
 }
