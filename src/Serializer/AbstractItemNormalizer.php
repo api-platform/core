@@ -87,6 +87,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
+
+        if ($iriConverter instanceof ContextAwareIriConverterInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ContextAwareIriConverterInterface::class, IriConverterInterface::class), \E_USER_DEPRECATED);
+        }
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();

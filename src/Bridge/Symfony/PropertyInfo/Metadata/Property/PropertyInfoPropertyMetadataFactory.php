@@ -51,6 +51,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
 
         if (null === $propertyMetadata->getType()) {
             $types = $this->propertyInfo->getTypes($resourceClass, $property, $options);
+            // TODO: Use builtInTypes and keep compatibility with older versions using Type
             if (isset($types[0])) {
                 $propertyMetadata = $propertyMetadata->withType($types[0]);
             }

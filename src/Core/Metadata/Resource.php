@@ -141,5 +141,4 @@ class Resource
     ) {
         $this->extraProperties = $extraProperties;
     }
-
 }

@@ -129,13 +129,13 @@ class OpenApiFactoryTest extends TestCase
                     outputFormats: ['json' => ['application/json'], 'csv' => ['text/csv']]
                 ),
                 'get_collection' => new Get(
+                    inputFormats: self::OPERATION_FORMATS['input_formats'],
+                    outputFormats: self::OPERATION_FORMATS['output_formats'],
                     openapiContext: [
                         'parameters' => [
                             ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
                         ],
-                    ],
-                    inputFormats: self::OPERATION_FORMATS['input_formats'],
-                    outputFormats: self::OPERATION_FORMATS['output_formats']
+                    ]
                 ),
                 'post_collection' => new Post(
                     inputFormats: self::OPERATION_FORMATS['input_formats'],
@@ -143,19 +143,19 @@ class OpenApiFactoryTest extends TestCase
                 ),
                 // Filtered
                 'filtered_collection' => new Get(
-                    filters: ['f1', 'f2', 'f3', 'f4', 'f5'],
                     uriTemplate: '/filtered',
                     inputFormats: self::OPERATION_FORMATS['input_formats'],
-                    outputFormats: self::OPERATION_FORMATS['output_formats']
+                    outputFormats: self::OPERATION_FORMATS['output_formats'],
+                    filters: ['f1', 'f2', 'f3', 'f4', 'f5']
                 ),
                 // Paginated
                 'paginated_collection' => new Get(
-                    paginationClientEnabled: true,
-                    paginationClientItemsPerPage: true,
-                    paginationItemsPerPage: 20,
                     uriTemplate: '/paginated',
                     inputFormats: self::OPERATION_FORMATS['input_formats'],
-                    outputFormats: self::OPERATION_FORMATS['output_formats']
+                    outputFormats: self::OPERATION_FORMATS['output_formats'],
+                    paginationClientEnabled: true,
+                    paginationClientItemsPerPage: true,
+                    paginationItemsPerPage: 20
                 ),
             ],
             output: [
@@ -314,6 +314,10 @@ class OpenApiFactoryTest extends TestCase
         $components = $openApi->getComponents();
         $this->assertInstanceOf(Model\Components::class, $components);
 
+        /*
+        dump($components->getSchemas()["Dummy"]);
+        dump($dummySchema->getDefinitions());
+        */
         $this->assertEquals($components->getSchemas(), new \ArrayObject(['Dummy' => $dummySchema->getDefinitions(), 'Dummy.OutputDto' => $dummySchema->getDefinitions()]));
 
         $this->assertEquals($components->getSecuritySchemes(), new \ArrayObject([

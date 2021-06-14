@@ -17,12 +17,14 @@ use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,7 +39,7 @@ class EntrypointNormalizerTest extends TestCase
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
 
-        $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factoryProphecy = $this->prophesize(ResourceCollectionMetadataFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
@@ -54,9 +56,10 @@ class EntrypointNormalizerTest extends TestCase
         $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
 
-        $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
-        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadata('FooDummy', null, null, null, ['get']))->shouldBeCalled();
+        $factoryProphecy = $this->prophesize(ResourceCollectionMetadataFactoryInterface::class);
+        // TODO: Should shortName be loaded automatically by a decorator or I am allowed to manually define it below ?
+        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceCollection([new Resource(uriTemplate: 'Dummy', shortName: 'dummy', description: null, types: [], operations: ['get' => new Get(collection: true)])]))->shouldBeCalled();
+        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceCollection([new Resource(uriTemplate: 'FooDummy', shortName: 'fooDummy', description: null, types: [], operations: ['get' => new Get(collection: true)])]))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();

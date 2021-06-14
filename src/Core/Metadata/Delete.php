@@ -20,7 +20,7 @@ namespace ApiPlatform\Metadata;
 class Delete extends Operation
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(
         public string $method = self::METHOD_GET,

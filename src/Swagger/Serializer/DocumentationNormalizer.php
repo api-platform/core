@@ -33,8 +33,8 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
@@ -191,6 +191,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         if ($object instanceof OpenApi) {
             @trigger_error('Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.', \E_USER_DEPRECATED);
+
             return $this->openApiNormalizer->normalize($object, $format, $context);
         }
 

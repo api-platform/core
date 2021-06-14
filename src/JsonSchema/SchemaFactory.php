@@ -345,10 +345,10 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (null === $operationType || null === $operationName) {
             return $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getAttribute($attribute, []) : $resourceMetadata->getOperation($operationName)->{$attribute} ?? [];
         }
-        
+
         if ($resourceMetadata instanceof ResourceMetadata) {
-          return $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true);
-        } 
+            return $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true);
+        }
 
         return $resourceMetadata->getOperation($operationName)->{$attribute} ?? [];
     }

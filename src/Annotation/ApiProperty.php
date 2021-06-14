@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Annotation;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * ApiProperty annotation.
@@ -100,6 +101,16 @@ final class ApiProperty
     public $example;
 
     /**
+     * @var array
+     */
+    public $schema;
+
+    /**
+     * @var Type[]
+     */
+    public $builtinTypes;
+
+    /**
      * @param string                           $description
      * @param bool                             $readable
      * @param bool                             $writable
@@ -119,6 +130,8 @@ final class ApiProperty
      * @param string                           $security
      * @param array                            $swaggerContext
      * @param string                           $securityPostDenormalize
+     * @param array                            $schema
+     * @param string[]                         $builtinTypes
      *
      * @throws InvalidArgumentException
      */
@@ -133,6 +146,8 @@ final class ApiProperty
         ?bool $identifier = null,
         $default = null,
         $example = null,
+        $schema = null,
+        $builtinTypes = null,
 
         // attributes
         ?array $attributes = null,

@@ -26,7 +26,6 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -37,7 +36,6 @@ use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetad
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Util\AttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
-use ApiPlatform\Metadata\Resource;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
@@ -132,6 +130,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
             if (\count($identifiers) > 1 && ($context['has_composite_identifier'] ?? false)) {
                 $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
             }
+
             return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType, $context));
         }
 
@@ -154,7 +153,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
     /**
      * {@inheritdoc}
-     * TODO: remove in 3.0
+     * TODO: remove in 3.0.
      */
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
@@ -192,7 +191,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
     /**
      * {@inheritdoc}
-     * TODO: remove in 3.0
+     * TODO: remove in 3.0.
      */
     public function getSubresourceIriFromResourceClass(string $resourceClass, array $context, int $referenceType = null): string
     {
@@ -212,7 +211,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
                 $metadata = $this->resourceMetadataFactory->create($resourceClass);
                 $referenceType = $metadata->getAttribute('url_generation_strategy');
             } else {
-                /** @var ResourceCollection **/
+                /** @var ResourceCollection */
                 $metadata = $this->resourceMetadataFactory->create($resourceClass);
                 $referenceType = isset($context['operation_name']) ? $metadata->getOperation($context['operation_name'])->urlGenerationStrategy : $metadata[0]->urlGenerationStrategy;
             }

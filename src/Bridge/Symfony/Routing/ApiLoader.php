@@ -17,11 +17,10 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\LegacyResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Config\FileLocator;
@@ -68,6 +67,9 @@ final class ApiLoader extends Loader
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
         $this->fileLoader = new XmlFileLoader(new FileLocator($paths));
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->operationPathResolver = $operationPathResolver;
         $this->container = $container;
@@ -80,10 +82,6 @@ final class ApiLoader extends Loader
         $this->entrypointEnabled = $entrypointEnabled;
         $this->docsEnabled = $docsEnabled;
         $this->identifiersExtractor = $identifiersExtractor;
-
-        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
-        }
     }
 
     /**
@@ -118,7 +116,7 @@ final class ApiLoader extends Loader
                             // TODO: remove this and use operation['has_composite_identifier']
                             '_api_has_composite_identifier' => $operation->compositeIdentifier,
                             '_api_operation_name' => $operationName,
-                            '_api_operation' => $operation->__serialize()
+                            '_api_operation' => $operation->__serialize(),
                         ] + ($operation->defaults ?? []),
                         $operation->requirements ?? [],
                         $operation->options ?? [],
@@ -185,7 +183,10 @@ final class ApiLoader extends Loader
     }
 
     /**
-     * TODO: remove in 3.0
+     * TODO: remove in 3.0.
+     *
+     * @group legacy
+     * @expectedDeprecation The use of ResourceMetadataFactoryInterface is deprecated since API Platform 2.7 and will be removed in 3.0, use ResourceCollectionMetadataFactoryInterface instead.
      */
     private function loadLegacyMetadata(RouteCollection $routeCollection, string $resourceClass)
     {
@@ -210,7 +211,10 @@ final class ApiLoader extends Loader
     }
 
     /**
-     * TODO: remove in 3.0
+     * TODO: remove in 3.0.
+     *
+     * @group legacy
+     * @expectedDeprecation The use of ResourceMetadataFactoryInterface is deprecated since API Platform 2.7 and will be removed in 3.0, use ResourceCollectionMetadataFactoryInterface instead.
      */
     private function loadLegacySubresources(RouteCollection $routeCollection, string $resourceClass)
     {
@@ -253,6 +257,7 @@ final class ApiLoader extends Loader
             ));
         }
     }
+
     /**
      * Creates and adds a route for the given operation to the route collection.
      *

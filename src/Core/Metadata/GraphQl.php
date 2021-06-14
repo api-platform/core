@@ -25,5 +25,6 @@ final class GraphQl
         public array $mutations = [],
         public array $queries = [],
         public array $subscriptions = [],
-    ) {}
+    ) {
+    }
 }

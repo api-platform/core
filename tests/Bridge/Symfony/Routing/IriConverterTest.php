@@ -36,7 +36,6 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

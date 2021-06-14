@@ -20,7 +20,7 @@ namespace ApiPlatform\Metadata;
 class Post extends Operation
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function __construct(
         public string $method = self::METHOD_GET,

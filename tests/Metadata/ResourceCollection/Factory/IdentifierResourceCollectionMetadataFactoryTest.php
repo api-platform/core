@@ -92,7 +92,7 @@ class IdentifierResourceCollectionMetadataFactoryTest extends TestCase
                     class: AttributeResources::class,
                     operations: [
                         '_api_/attribute_resources.{_format}_get' => new Get(shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', identifiers: []),
-                        '_api_/attribute_resources.{_format}_post' => new Post(shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', identifiers: null),
+                        '_api_/attribute_resources.{_format}_post' => new Post(shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', identifiers: []),
                     ]
                 ),
             ]),

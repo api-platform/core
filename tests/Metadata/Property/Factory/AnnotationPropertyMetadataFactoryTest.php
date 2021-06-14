@@ -49,6 +49,9 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $this->assertTrue($metadata->isRequired());
         $this->assertEquals('foo', $metadata->getIri());
         $this->assertEquals(['foo' => 'bar'], $metadata->getAttributes());
+        $this->assertEquals('foo', $metadata->getExample());
+        $this->assertEquals(['foo'], $metadata->getSchema());
+        $this->assertEquals(['foo', 'bar'], $metadata->getBuiltinTypes());
     }
 
     /**
@@ -78,6 +81,9 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $annotation->required = true;
         $annotation->iri = 'foo';
         $annotation->attributes = ['foo' => 'bar'];
+        $annotation->example = 'foo';
+        $annotation->schema = ['foo'];
+        $annotation->builtinTypes = ['foo', 'bar'];
 
         $propertyReaderProphecy = $this->prophesize(Reader::class);
         $propertyReaderProphecy->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn($annotation)->shouldBeCalled();

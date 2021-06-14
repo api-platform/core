@@ -18,8 +18,8 @@ use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -42,10 +42,10 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
             @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
         }
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->iriConverter = $iriConverter;
         if ($iriConverter instanceof ContextAwareIriConverterInterface) {
-            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', IriConverterInterface::class, ContextAwareIriConverterInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ContextAwareIriConverterInterface::class, IriConverterInterface::class), \E_USER_DEPRECATED);
         }
+        $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;
     }
 
@@ -75,20 +75,17 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
                 continue;
             }
 
-            foreach($resourceMetadata as $resource) {
+            foreach ($resourceMetadata as $resource) {
                 foreach ($resource->operations as $operationName => $operation) {
                     if (!$operation->collection) {
                         continue;
                     }
-
                     try {
                         $entrypoint[lcfirst($resource->shortName)] = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_PATH, ['operation_name' => $operationName]) : $this->iriConverter->getIriFromResourceClass($resourceClass);
                     } catch (InvalidArgumentException $ex) {
                         // Ignore resources without GET operations
                     }
-
                 }
-
             }
         }
 

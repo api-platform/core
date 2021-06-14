@@ -17,10 +17,12 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\Operation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
@@ -38,7 +40,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be not be iused anymore in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be not be used anymore in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
         }
     }
 
@@ -52,7 +54,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         if (
-            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) 
+            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface)
             && isset($attributes['operation_name'])
         ) {
             try {
@@ -95,6 +97,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
 
+        if ($resourceMetadata instanceof ResourceCollection) {
+            $key = $normalization ? 'normalizationContext' : 'denormalizationContext';
+        }
+
         if (isset($attributes['collection_operation_name'])) {
             $operationKey = 'collection_operation_name';
             $operationType = OperationType::COLLECTION;
@@ -106,7 +112,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $operationType = OperationType::SUBRESOURCE;
         }
 
-        $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
+        $context = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true) : $resourceMetadata[0]->{$key};
         $context['operation_type'] = $operationType;
         $context[$operationKey] = $attributes[$operationKey];
 
@@ -125,9 +131,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['resource_class'] = $attributes['resource_class'];
-        $context['iri_only'] = $resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false;
-        $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true);
-        $context['output'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true);
+        $context['iri_only'] = $resourceMetadata instanceof ResourceMetadata ? ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) : ($resourceMetadata->normalizationContext['iri_only'] ?? false);
+        $context['input'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true) : $resourceMetadata->getOperation($operationType)->input ?? null;
+        $context['output'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true) : $resourceMetadata->getOperation($operationType)->output ?? null;
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
 
@@ -154,11 +160,22 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
-        foreach ($resourceMetadata->getItemOperations() as $operation) {
-            if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
-                $context['skip_null_values'] = true;
+        if ($resourceMetadata instanceof ResourceMetadata) {
+            foreach ($resourceMetadata->getItemOperations() as $operation) {
+                if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
+                    $context['skip_null_values'] = true;
 
-                break;
+                    break;
+                }
+            }
+        } else {
+            foreach ($resourceMetadata as $resourceName => $resource) {
+                foreach ($resource->operations as $operationName => $operation) {
+                    if ('PATCH' === ($operation->method ?? '') && \in_array('application/merge-patch+json', $operation->inputFormats['json'] ?? [], true)) {
+                        $context['skip_null_values'] = true;
+                        break;
+                    }
+                }
             }
         }
 
@@ -166,7 +183,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     }
 
     /**
-     * TODO: remove in 3.0, this will have no impact and skip_null_values will be default, no more resourceMetadataFactory call in this class
+     * TODO: remove in 3.0, this will have no impact and skip_null_values will be default, no more resourceMetadataFactory call in this class.
      */
     private function shouldSkipNullValues(string $class, string $operationName): bool
     {

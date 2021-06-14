@@ -50,6 +50,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
 
+        if ($iriConverter instanceof ContextAwareIriConverterInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ContextAwareIriConverterInterface::class, IriConverterInterface::class), \E_USER_DEPRECATED);
+        }
+
         $this->contextBuilder = $contextBuilder;
     }
 

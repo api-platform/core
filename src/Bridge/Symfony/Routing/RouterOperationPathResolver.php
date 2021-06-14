@@ -21,7 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Resolves the operations path using a Symfony route.
- * TODO: remove this in 3.0
+ * TODO: remove this in 3.0.
  *
  * @author Guilhem N. <egetick@gmail.com>
  */
@@ -38,6 +38,7 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
 
     /**
      * {@inheritdoc}
+     *
      * @throws InvalidArgumentException
      */
     public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string

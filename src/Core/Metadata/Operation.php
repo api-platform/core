@@ -65,7 +65,6 @@ class Operation
      * @param mixed        $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
      * @param mixed        $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
      * @param array        $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
-     *
      * @param bool         $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
      * @param bool         $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
      * @param bool         $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
@@ -151,16 +150,16 @@ class Operation
     public function __serialize(): array
     {
         return [
-          'stateless' => $this->stateless,
-          'identifiers' => $this->identifiers,
-          'has_composite_identifier' => $this->compositeIdentifier,
-          'normalization_context' => $this->normalizationContext,
-          'denormalization_context' => $this->denormalizationContext,
-          'collection' => $this->collection,
-          'links' => $this->links,
-          'uri_template' => $this->uriTemplate,
-          'input' => $this->input,
-          'output' => $this->output
+            'stateless' => $this->stateless,
+            'identifiers' => $this->identifiers,
+            'has_composite_identifier' => $this->compositeIdentifier,
+            'normalization_context' => $this->normalizationContext,
+            'denormalization_context' => $this->denormalizationContext,
+            'collection' => $this->collection,
+            'links' => $this->links,
+            'uri_template' => $this->uriTemplate,
+            'input' => $this->input,
+            'output' => $this->output,
         ];
     }
 }

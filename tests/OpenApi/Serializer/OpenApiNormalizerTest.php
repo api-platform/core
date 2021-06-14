@@ -21,11 +21,11 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\OpenApi\Factory\LegacyOpenApiFactory;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactory;
@@ -258,23 +258,23 @@ class OpenApiNormalizerTest extends TestCase
                     'put' => new Put(inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
                     'delete' => new Delete(inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
                     'get_collection' => new GetCollection(uriTemplate: '/dummies', inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
-                    'post' => new Post(uriTemplate: '/dummies', openapiContext: ['security' => [], 'servers' => ['url' => '/test']], inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats'])
+                    'post' => new Post(uriTemplate: '/dummies', openapiContext: ['security' => [], 'servers' => ['url' => '/test']], inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
                 ]
-            )
+            ),
         ]
         );
 
         $zorroMetadata = new ResourceCollection(
             [
-            new Resource(
-                shortName: 'Zorro',
-                description: 'This is zorro.',
-                types: ['http://schema.example.com/Zorro'],
-                operations: [
-                    'get' => new Get(uriTemplate: '/zorros/{id}', shortName: 'Zorro', inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
-                    'get_collection' => new GetCollection(uriTemplate: '/zorros', shortName: 'Zorro', inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
-                ]
-            )
+                new Resource(
+                    shortName: 'Zorro',
+                    description: 'This is zorro.',
+                    types: ['http://schema.example.com/Zorro'],
+                    operations: [
+                        'get' => new Get(uriTemplate: '/zorros/{id}', shortName: 'Zorro', inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
+                        'get_collection' => new GetCollection(uriTemplate: '/zorros', shortName: 'Zorro', inputFormats: self::OPERATION_FORMATS['input_formats'], outputFormats: self::OPERATION_FORMATS['output_formats']),
+                    ]
+                ),
             ]
         );
 

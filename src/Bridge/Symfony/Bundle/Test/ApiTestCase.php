@@ -101,7 +101,8 @@ abstract class ApiTestCase extends KernelTestCase
         return static::$container->get('api_platform.iri_converter')->getIriFromItem($item, UrlGeneratorInterface::ABS_PATH, ['operation_name' => $this->getFirstItemOperationName($resourceClass)]);
     }
 
-    private function getFirstItemOperationName(string $resourceClass): ?string {
+    private function getFirstItemOperationName(string $resourceClass): ?string
+    {
         foreach (static::$container->get('api_platform.metadata.resource_collection.metadata_factory')->create($resourceClass) as $resourceMetadata) {
             foreach ($resourceMetadata->operations as $operationName => $operation) {
                 if ('GET' === $operation->method && !$operation->collection) {
