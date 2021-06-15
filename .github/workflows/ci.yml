@@ -651,7 +651,9 @@ jobs:
           - '5.4'
       fail-fast: false
     env:
-      SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
+      # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
+      #SYMFONY_DEPRECATIONS_HELPER: max[direct]=0
+      SYMFONY_DEPRECATIONS_HELPER: max[self]=0
     steps:
       - name: Checkout
         uses: actions/checkout@v2
