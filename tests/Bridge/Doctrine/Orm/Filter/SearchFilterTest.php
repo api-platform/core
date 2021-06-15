@@ -343,7 +343,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $requestStack->push(Request::create('/api/dummies', 'GET', []));
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverter = $iriConverterProphecy->reveal();
-        $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
+        $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
         return new SearchFilter($this->managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, null, null);
     }
@@ -593,7 +593,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         });
 
         $iriConverter = $iriConverterProphecy->reveal();
-        $propertyAccessor = self::$kernel->getContainer()->get('test.property_accessor');
+        $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
         $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);

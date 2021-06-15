@@ -8,7 +8,7 @@
     "authors": [
         {
             "name": "Kévin Dunglas",
-            "email": "dunglas@gmail.com",
+            "email": "kevin@dunglas.fr",
             "homepage": "https://dunglas.fr"
         }
     ],
@@ -30,6 +30,7 @@
         "behat/behat": "^3.1",
         "behat/mink": "^1.7",
         "doctrine/annotations": "^1.7",
+        "doctrine/cache": "^1.11",
         "doctrine/common": "^2.11 || ^3.0",
         "doctrine/data-fixtures": "^1.2.2",
         "doctrine/doctrine-bundle": "^1.12 || ^2.0",

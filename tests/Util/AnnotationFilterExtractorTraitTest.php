@@ -31,7 +31,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->extractor = new AnnotationFilterExtractor(self::$kernel->getContainer()->get('test.annotation_reader'));
+        $this->extractor = new AnnotationFilterExtractor(static::$kernel->getContainer()->get('test.annotation_reader'));
     }
 
     public function testReadAnnotations()
