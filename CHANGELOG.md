@@ -2,16 +2,24 @@
 
 ## 2.6.5
 
-* JsonSchema: Update Hydra `@context` property possible types
+* Fix various usage of various deprecated methods
+* JsonSchema: Update Hydra `@context` property possible types (#4223)
+* JsonSchema: Add hydra:previous` to the `hydra:view` schema properties (#4310)
 * Filter validation: Fix issue in Required filter validator with dot notation (#4221)
 * OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
 * OpenAPI: Do not use output for request body (#4213)
-* OpenAPI: Do not use jsonld schema for all media types (#4247) (BC note: `SchemaFactory::buildSchema()` is now immutable as it no longer modifies the passed `$schema`)
+* OpenAPI: Do not use JSON-lD schema for all media types (#4247) (BC note: `SchemaFactory::buildSchema()` is now immutable as it no longer modifies the passed `$schema`)
+* OpenAPI: Allow setting extensionProperties with YAML schema definition (#4228)
+* OpenAPI: do not throw error with non-standard HTTP verb (#4304)
 * Serializer: Convert internal error to HTTP 400 in Ramsey uuid denormalization from invalid body string (#4200)
-* Symfony: Add tests with Symfony Uuid (#4230)
-* OpenAPI: Allow to set extensionProperties with YAML schema definition (#4228)
 * GraphQL: Fix `FieldsBuilder` not fully unwrapping nested types before deciding if a resolver is needed (#4251)
 * GraphQL: Do not use a resolver for the nested payload of a mutation or subscription (#4289)
+* GraphQL: Allow search filter to use an int for its value (#4295)
+* Varnish: Improve `BAN` regex performance (#4231)
+* MongoDB: Fix denormalization of properties with embeds many that omit target document directive (#4315)
+* MongoDB: Fix resolving proxy class in class metadata factory (#4322)
+* Test: Add `withOptions()` to our HttpClient implementation (#4282)
+* Metadata: Fix allow using constants in XML configuration (resource attribute) (#4321)
 
 ## 2.6.4
 
