@@ -75,7 +75,7 @@ final class IdentifiersExtractor implements ContextAwareIdentifiersExtractorInte
     {
         $identifiers = [];
         $resourceClass = $this->getResourceClass($item, true);
-        if (isset($context['identifiers'])) {
+        if ($context['identifiers'] ?? false) {
             foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
                 if ($item instanceof $class) {
                     $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, $property);

@@ -19,6 +19,7 @@ use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -42,8 +43,8 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
             @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
         }
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        if ($iriConverter instanceof ContextAwareIriConverterInterface) {
-            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ContextAwareIriConverterInterface::class, IriConverterInterface::class), \E_USER_DEPRECATED);
+        if ($iriConverter instanceof IriConverterInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', IriConverterInterface::class, ContextAwareIriConverterInterface::class), \E_USER_DEPRECATED);
         }
         $this->iriConverter = $iriConverter;
         $this->urlGenerator = $urlGenerator;
@@ -63,7 +64,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($resourceMetadata instanceof ResourceMetadataFactoryInterface) {
+            if ($resourceMetadata instanceof ResourceMetadata) {
                 if (empty($resourceMetadata->getCollectionOperations())) {
                     continue;
                 }

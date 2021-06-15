@@ -73,6 +73,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 $context['output'] = $operation['output'];
                 $context['request_uri'] = $request->getRequestUri();
                 $context['uri'] = $request->getUri();
+                $context['links'] = $operation['links'];
 
                 if (!$normalization) {
                     if (!isset($context['api_allow_update'])) {

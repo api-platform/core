@@ -16,15 +16,17 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider;
 use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
 use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\RestrictDataProviderTrait;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-final class TraceableChainItemDataProvider implements ItemDataProviderInterface
+final class TraceableChainItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
-    private $dataProviders = [];
+    use RestrictDataProviderTrait;
+
     private $context = [];
     private $providersResponse = [];
 

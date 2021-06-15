@@ -54,8 +54,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
-        if ($iriConverter instanceof ContextAwareIriConverterInterface) {
-            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ContextAwareIriConverterInterface::class, IriConverterInterface::class), \E_USER_DEPRECATED);
+        if ($iriConverter instanceof IriConverterInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', IriConverterInterface::class, ContextAwareIriConverterInterface::class), \E_USER_DEPRECATED);
         }
         $this->iriConverter = $iriConverter;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);

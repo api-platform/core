@@ -555,5 +555,6 @@ Feature: Create-Retrieve-Update-Delete
 
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
+    Then print last JSON response
     Then the response status code should be 204
     And the response should be empty

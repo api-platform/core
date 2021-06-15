@@ -150,7 +150,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $identifiers = $operation->identifiers;
             $resourceClass = $operation->class ?? $rootResourceClass;
-            $path = $operation->uriTemplate;
+            $path = $this->getPath($operation->uriTemplate);
             $method = $operation->method;
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);

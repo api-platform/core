@@ -20,14 +20,9 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ChainCollectionDataProvider implements ContextAwareCollectionDataProviderInterface
+final class ChainCollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
-    /**
-     * @var iterable<CollectionDataProviderInterface>
-     *
-     * @internal
-     */
-    public $dataProviders;
+    use RestrictDataProviderTrait;
 
     /**
      * @param CollectionDataProviderInterface[] $dataProviders

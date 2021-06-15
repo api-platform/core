@@ -9,5 +9,17 @@
             <argument type="tagged" tag="api_platform.state_provider" />
         </service>
         <service id="ApiPlatform\State\ProviderInterface" alias="api_platform.state_provider" />
+
+        <service id="api_platform.legacy_data_provider_state" class="ApiPlatform\State\LegacyDataProviderState">
+            <tag name="api_platform.state_provider" />
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.collection_data_provider" />
+        </service>
+
+        <service id="api_platform.state.legacy_data_persister_processor" class="ApiPlatform\State\LegacyDataPersisterProcessor">
+            <tag name="api_platform." />
+            <argument type="service" id="api_platform.data_persister" />
+        </service>
+
     </services>
 </container>

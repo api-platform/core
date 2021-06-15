@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -104,10 +105,10 @@ final class WriteListener
                 if ($this->iriConverter instanceof IriConverterInterface && $this->isResourceClass($this->getObjectClass($controllerResult))) {
                     $context = ['identifiers' => $attributes['identifiers'], 'has_composite_identifier' => $attributes['has_composite_identifier']];
                     if (isset($attributes['operation_name'])) {
-                        $context['operation_name'] = $attributes['operation_name'];
+                        $context['operation_name'] = $attributes['operation']['links'][0] ?? $attributes['operation_name'];
                     }
 
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult, UrlGeneratorInterface::ABS_PATH, $context));
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($controllerResult, UrlGeneratorInterface::ABS_PATH, $context) : $this->iriConverter->getIriFromItem($controllerResult));
                 }
 
                 break;

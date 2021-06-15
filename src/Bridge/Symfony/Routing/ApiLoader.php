@@ -23,6 +23,8 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -39,6 +41,7 @@ use Symfony\Component\Routing\RouteCollection;
  */
 final class ApiLoader extends Loader
 {
+    use ExpectDeprecationTrait;
     /**
      * @deprecated since version 2.1, to be removed in 3.0. Use {@see RouteNameGenerator::ROUTE_NAME_PREFIX} instead.
      */
@@ -95,7 +98,6 @@ final class ApiLoader extends Loader
         }
 
         $this->loadExternalFiles($routeCollection);
-
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
                 $this->loadLegacyMetadata($routeCollection, $resourceClass);
@@ -186,10 +188,11 @@ final class ApiLoader extends Loader
      * TODO: remove in 3.0.
      *
      * @group legacy
-     * @expectedDeprecation The use of ResourceMetadataFactoryInterface is deprecated since API Platform 2.7 and will be removed in 3.0, use ResourceCollectionMetadataFactoryInterface instead.
      */
     private function loadLegacyMetadata(RouteCollection $routeCollection, string $resourceClass)
     {
+        $this->expectDeprecation(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class));
+
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $resourceShortName = $resourceMetadata->getShortName();
 
@@ -214,10 +217,11 @@ final class ApiLoader extends Loader
      * TODO: remove in 3.0.
      *
      * @group legacy
-     * @expectedDeprecation The use of ResourceMetadataFactoryInterface is deprecated since API Platform 2.7 and will be removed in 3.0, use ResourceCollectionMetadataFactoryInterface instead.
      */
     private function loadLegacySubresources(RouteCollection $routeCollection, string $resourceClass)
     {
+        $this->expectDeprecation(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class));
+
         if (null === $this->subresourceOperationFactory) {
             return;
         }

@@ -50,8 +50,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
 
-        if ($iriConverter instanceof ContextAwareIriConverterInterface) {
-            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', ContextAwareIriConverterInterface::class, IriConverterInterface::class), \E_USER_DEPRECATED);
+        if ($iriConverter instanceof IriConverterInterface) {
+            @trigger_error(sprintf('The %s interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of %s instead.', IriConverterInterface::class, ContextAwareIriConverterInterface::class), \E_USER_DEPRECATED);
         }
 
         $this->contextBuilder = $contextBuilder;
@@ -80,7 +80,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, $context) : $this->iriConverter->getIriFromItem($object);
+        $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, ['operation_name' => $context['links'][0] ?? $context['operation_name']] + $context) : $this->iriConverter->getIriFromItem($object);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 

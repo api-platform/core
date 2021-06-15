@@ -130,7 +130,6 @@ final class IriConverter implements ContextAwareIriConverterInterface
             if (\count($identifiers) > 1 && ($context['has_composite_identifier'] ?? false)) {
                 $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
             }
-
             return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType, $context));
         }
 
@@ -158,7 +157,6 @@ final class IriConverter implements ContextAwareIriConverterInterface
     public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = null): string
     {
         @trigger_error('getItemIriFromResourceClass is deprecated since 2.7 and will not be available anymore in 3.0', \E_USER_DEPRECATED);
-
         if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->operations as $operationName => $operation) {
@@ -166,7 +164,6 @@ final class IriConverter implements ContextAwareIriConverterInterface
                         if (\count($identifiers) > 1 && $operation->compositeIdentifier) {
                             $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
                         }
-
                         return $this->router->generate($operationName, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
                     }
                 }

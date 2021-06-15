@@ -314,10 +314,6 @@ class OpenApiFactoryTest extends TestCase
         $components = $openApi->getComponents();
         $this->assertInstanceOf(Model\Components::class, $components);
 
-        /*
-        dump($components->getSchemas()["Dummy"]);
-        dump($dummySchema->getDefinitions());
-        */
         $this->assertEquals($components->getSchemas(), new \ArrayObject(['Dummy' => $dummySchema->getDefinitions(), 'Dummy.OutputDto' => $dummySchema->getDefinitions()]));
 
         $this->assertEquals($components->getSecuritySchemes(), new \ArrayObject([

@@ -20,9 +20,6 @@ use ApiPlatform\Core\Exception\RuntimeException;
  * Converts item and resources to IRI and vice versa.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @group legacy
- * @expectedDeprecation The ContextAwareIriConverterInterface interface is deprecated since version 2.7 and will be removed in 3.0. Provide an implementation of IriConverterInterface instead.
  */
 interface ContextAwareIriConverterInterface extends IriConverterInterface
 {

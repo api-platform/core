@@ -91,7 +91,6 @@ final class SerializeListener
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'resources_to_push';
 
         $request->attributes->set('_api_normalization_context', $context);
-
         $event->setControllerResult($this->serializer->serialize($controllerResult, $request->getRequestFormat(), $context));
 
         $request->attributes->set('_resources', $request->attributes->get('_resources', []) + (array) $resources);
