@@ -585,6 +585,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('doctrine_orm_http_cache_purger.xml');
         }
 
+        $loader->load('http_cache_tags.xml');
+
         if ($config['http_cache']['cloudflare'] === true) {
             $iriConverter = new Reference('api_platform.iri_converter');
             $container->register(
@@ -596,8 +598,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                     ["event" => "kernel.response", "method" => "onKernelResponse", "priority" => 2]
                 );
         }
-
-        $loader->load('http_cache_tags.xml');
 
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
