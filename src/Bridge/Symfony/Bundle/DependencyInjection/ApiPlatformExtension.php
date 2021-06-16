@@ -38,6 +38,7 @@ use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
@@ -582,6 +583,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_http_cache_purger.xml');
+        }
+
+        if ($config['http_cache']['cloudflare'] === true) {
+            $iriConverter = new Reference('api_platform.iri_converter');
+            $container->register(
+                'api_platform.http_cache.listener.response.add_tags',
+                AddTagsListener::class
+            )->addArgument($iriConverter)
+                ->addTag(
+                    'kernel.event_subscriber',
+                    ["event" => "kernel.response", "method" => "onKernelResponse", "priority" => 2]
+                );
         }
 
         $loader->load('http_cache_tags.xml');

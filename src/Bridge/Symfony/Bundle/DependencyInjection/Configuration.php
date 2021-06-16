@@ -388,6 +388,7 @@ final class Configuration implements ConfigurationInterface
                             ->info('Default values of the "Vary" HTTP header.')
                         ->end()
                         ->booleanNode('public')->defaultNull()->info('To make all responses public by default.')->end()
+                        ->booleanNode('cloudflare')->defaultTrue()->info('Include Cache-Tags in request headers for CloudFlare')->end()
                         ->arrayNode('invalidation')
                             ->info('Enable the tags-based cache invalidation system.')
                             ->canBeEnabled()
