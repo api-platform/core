@@ -147,6 +147,454 @@ class Operation
         $this->extraProperties = $extraProperties;
     }
 
+    /**
+     * @return string
+     */
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUriTemplate(): ?string
+    {
+        return $this->uriTemplate;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getShortName(): ?string
+    {
+        return $this->shortName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes(): array
+    {
+        return $this->types;
+    }
+
+    /**
+     * @return array|mixed|string|null
+     */
+    public function getFormats(): mixed
+    {
+        return $this->formats;
+    }
+
+    /**
+     * @return array|mixed|string|null
+     */
+    public function getInputFormats(): mixed
+    {
+        return $this->inputFormats;
+    }
+
+    /**
+     * @return array|mixed|string|null
+     */
+    public function getOutputFormats(): mixed
+    {
+        return $this->outputFormats;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIdentifiers(): array
+    {
+        return $this->identifiers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoutePrefix(): string
+    {
+        return $this->routePrefix;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRouteName(): ?string
+    {
+        return $this->routeName;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaults(): array
+    {
+        return $this->defaults;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequirements(): array
+    {
+        return $this->requirements;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getStateless(): ?bool
+    {
+        return $this->stateless;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSunset(): ?string
+    {
+        return $this->sunset;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost(): string
+    {
+        return $this->host;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSchemes(): array
+    {
+        return $this->schemes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCondition(): string
+    {
+        return $this->condition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getController(): string
+    {
+        return $this->controller;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClass(): ?string
+    {
+        return $this->class;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getUrlGenerationStrategy(): ?int
+    {
+        return $this->urlGenerationStrategy;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCollection(): bool
+    {
+        return $this->collection;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDeprecationReason(): ?string
+    {
+        return $this->deprecationReason;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCacheHeaders(): array
+    {
+        return $this->cacheHeaders;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNormalizationContext(): array
+    {
+        return $this->normalizationContext;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDenormalizationContext(): array
+    {
+        return $this->denormalizationContext;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getHydraContext(): array
+    {
+        return $this->hydraContext;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOpenapiContext(): array
+    {
+        return $this->openapiContext;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidationGroups(): array
+    {
+        return $this->validationGroups;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getElasticsearch(): ?bool
+    {
+        return $this->elasticsearch;
+    }
+
+    /**
+     * @return array|bool|mixed|null
+     */
+    public function getMercure(): mixed
+    {
+        return $this->mercure;
+    }
+
+    /**
+     * @return bool|mixed|null
+     */
+    public function getMessenger(): mixed
+    {
+        return $this->messenger;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getInput(): mixed
+    {
+        return $this->input;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOutput(): mixed
+    {
+        return $this->output;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOrder(): array
+    {
+        return $this->order;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getFetchPartial(): ?bool
+    {
+        return $this->fetchPartial;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getForceEager(): ?bool
+    {
+        return $this->forceEager;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPaginationClientEnabled(): ?bool
+    {
+        return $this->paginationClientEnabled;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPaginationClientItemsPerPage(): ?bool
+    {
+        return $this->paginationClientItemsPerPage;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPaginationClientPartial(): ?bool
+    {
+        return $this->paginationClientPartial;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaginationViaCursor(): array
+    {
+        return $this->paginationViaCursor;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPaginationEnabled(): ?bool
+    {
+        return $this->paginationEnabled;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPaginationFetchJoinCollection(): ?bool
+    {
+        return $this->paginationFetchJoinCollection;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPaginationItemsPerPage(): ?int
+    {
+        return $this->paginationItemsPerPage;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPaginationMaximumItemsPerPage(): ?int
+    {
+        return $this->paginationMaximumItemsPerPage;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getPaginationPartial(): ?bool
+    {
+        return $this->paginationPartial;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPaginationType(): ?string
+    {
+        return $this->paginationType;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSecurity(): ?string
+    {
+        return $this->security;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSecurityMessage(): ?string
+    {
+        return $this->securityMessage;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSecurityPostDenormalize(): ?string
+    {
+        return $this->securityPostDenormalize;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSecurityPostDenormalizeMessage(): ?string
+    {
+        return $this->securityPostDenormalizeMessage;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getCompositeIdentifier(): ?bool
+    {
+        return $this->compositeIdentifier;
+    }
+
+    /**
+     * @return GraphQl|null
+     */
+    public function getGraphQl(): ?GraphQl
+    {
+        return $this->graphQl;
+    }
+
     public function __serialize(): array
     {
         return [
@@ -160,6 +608,7 @@ class Operation
             'uri_template' => $this->uriTemplate,
             'input' => $this->input,
             'output' => $this->output,
+            'method' => $this->method,
         ];
     }
 }

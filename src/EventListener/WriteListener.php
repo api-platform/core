@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
@@ -41,8 +42,11 @@ final class WriteListener
     private $dataPersister;
     private $iriConverter;
 
-    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct($dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
+        if ($dataPersister instanceof DataPersisterInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', DataPersisterInterface::class, ProcessorInterface::class), \E_USER_DEPRECATED);
+        }
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -67,7 +71,13 @@ final class WriteListener
             return;
         }
 
-        if (!$this->dataPersister->supports($controllerResult, $attributes)) {
+        $context = $attributes['operation'] + ['operation_name' => $attributes['operation_name'], 'resource_class' => $attributes['resource_class']];
+
+        if ($this->dataPersister instanceof DataPersisterInterface && !$this->dataPersister->supports($controllerResult, $attributes)) {
+            return;
+        }
+
+        if ($this->dataPersister instanceof ProcessorInterface && !$this->dataPersister->supports($controllerResult, $attributes['identifiers'], $attributes)) {
             return;
         }
 
@@ -75,7 +85,7 @@ final class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $persistResult = $this->dataPersister->persist($controllerResult, $attributes);
+                $persistResult = $this->dataPersister instanceof DataPersisterInterface ? $this->dataPersister->persist($controllerResult, $attributes) : $this->dataPersister->process($controllerResult, $attributes['identifiers'], $context);
 
                 if (!\is_object($persistResult)) {
                     @trigger_error(sprintf('Not returning an object from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.', DataPersisterInterface::class), \E_USER_DEPRECATED);
@@ -113,7 +123,7 @@ final class WriteListener
 
                 break;
             case 'DELETE':
-                $this->dataPersister->remove($controllerResult, $attributes);
+                $this->dataPersister instanceof DataPersisterInterface ? $this->dataPersister->remove($controllerResult, $attributes) : $this->dataPersister->process($controllerResult, $attributes, $context);
                 $event->setControllerResult(null);
                 break;
         }

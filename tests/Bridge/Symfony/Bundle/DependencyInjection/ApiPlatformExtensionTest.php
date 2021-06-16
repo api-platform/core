@@ -90,6 +90,7 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\ValidatorInterface;
+use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
@@ -1061,6 +1062,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.uuid_denormalizer',
             'api_platform.serializer_locator',
             'api_platform.state_provider',
+            'api_platform.state_processor',
+            'api_platform.legacy_data_provider_state',
+            'api_platform.state.legacy_data_persister_processor',
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
@@ -1114,6 +1118,7 @@ class ApiPlatformExtensionTest extends TestCase
             UrlGeneratorInterface::class => 'api_platform.router',
             PaginationOptions::class => 'api_platform.pagination_options',
             ProviderInterface::class => 'api_platform.state_provider',
+            ProcessorInterface::class => 'api_platform.state_processor',
             ResourceCollectionMetadataFactoryInterface::class => 'api_platform.metadata.resource_collection.metadata_factory',
             'api_platform.metadata.resource_collection.metadata_factory' => 'api_platform.metadata.resource_collection.metadata_factory.attributes',
         ];

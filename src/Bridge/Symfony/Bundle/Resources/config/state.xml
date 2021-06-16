@@ -17,9 +17,14 @@
         </service>
 
         <service id="api_platform.state.legacy_data_persister_processor" class="ApiPlatform\State\LegacyDataPersisterProcessor">
-            <tag name="api_platform." />
+            <tag name="api_platform.state_processor" />
             <argument type="service" id="api_platform.data_persister" />
         </service>
+
+        <service id="api_platform.state_processor" class="ApiPlatform\State\ChainProcessor" public="false">
+            <argument type="tagged" tag="api_platform.state_processor" />
+        </service>
+        <service id="ApiPlatform\State\ProcessorInterface" alias="api_platform.state_processor" />
 
     </services>
 </container>

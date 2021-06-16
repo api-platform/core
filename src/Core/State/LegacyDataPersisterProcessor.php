@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
+use ApiPlatform\Metadata\Operation;
 
 class LegacyDataPersisterProcessor implements ProcessorInterface
 {
@@ -33,8 +35,8 @@ class LegacyDataPersisterProcessor implements ProcessorInterface
 
     public function supports($data, array $identifiers = [], array $context = []): bool
     {
-        if ($this->dataPersister instanceof ResumableDataPersisterInterface) {
-            return $this->dataPersister->supports($context);
+        if ($supports = $this->dataPersister instanceof ContextAwareDataPersisterInterface ? $this->dataPersister->supports($data, $context) : $this->dataPersister->supports($data)) {
+            return $supports;
         }
 
         return false;
@@ -42,7 +44,10 @@ class LegacyDataPersisterProcessor implements ProcessorInterface
 
     public function process($data, array $identifiers = [], array $context = [])
     {
-        dd('passons');
+        if (Operation::METHOD_DELETE === $context['method']) {
+            return $this->dataPersister instanceof ContextAwareDataPersisterInterface ? $this->dataPersister->remove($data, $context) : $this->dataPersister->remove($data);
+        }
 
+        return $this->dataPersister instanceof ContextAwareDataPersisterInterface ? $this->dataPersister->persist($data, $context) : $this->dataPersister->persist($data);
     }
 }

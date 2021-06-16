@@ -58,22 +58,16 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             && isset($attributes['operation_name'])
         ) {
             try {
-                $operation = $attributes['operation'];
-                $context = $normalization ? $operation['normalization_context'] : $operation['denormalization_context'];
-                $context['uri_template'] = $operation['uri_template'];
-                $context['identifiers'] = $operation['identifiers'] ?? [];
+                $context = $attributes['operation'] + ($normalization ? $attributes['operation']['normalization_context'] : $attributes['operation']['denormalization_context']);
                 $context['operation_name'] = $attributes['operation_name'];
                 $context['resource_class'] = $attributes['resource_class'];
                 // TODO: 3.0 becomes true by default
                 $context['skip_null_values'] = $context['skip_null_values'] ?? $this->shouldSkipNullValues($attributes['resource_class'], $attributes['operation_name']);
                 // TODO: remove in 3.0, operation type will not exist anymore
-                $context['operation_type'] = $operation['collection'] ? OperationType::ITEM : OperationType::COLLECTION;
+                $context['operation_type'] = $attributes['operation']['collection'] ? OperationType::ITEM : OperationType::COLLECTION;
                 $context['iri_only'] = $context['iri_only'] ?? false;
-                $context['input'] = $operation['input'];
-                $context['output'] = $operation['output'];
                 $context['request_uri'] = $request->getRequestUri();
                 $context['uri'] = $request->getUri();
-                $context['links'] = $operation['links'];
 
                 if (!$normalization) {
                     if (!isset($context['api_allow_update'])) {
