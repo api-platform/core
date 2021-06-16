@@ -46,20 +46,21 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
         $identifiers = null;
 
         foreach ($resourceMetadataCollection as $i => $resource) {
-            if (!$resource->identifiers) {
-                $resource->identifiers = $identifiers ?: ($identifiers = $this->getIdentifiersFromResourceClass($resourceClass));
+            if (!$resource->getIdentifiers()) {
+                $resource = $resource->withIdentifiers($identifiers ?: ($identifiers = $this->getIdentifiersFromResourceClass($resourceClass)));
             }
 
-            $resource->identifiers = $this->normalizeIdentifiers($resource->identifiers, $resourceClass);
+            $resource = $resource->withIdentifiers($this->normalizeIdentifiers($resource->getIdentifiers(), $resourceClass));
 
             // Copy identifiers to operations if not defined
-            foreach ($resource->operations as $key => $operation) {
-                if ($identifiers && !$operation->identifiers && !$operation->collection) {
-                    $operation->identifiers = $identifiers;
+            foreach ($resource->getOperations() as $key => $operation) {
+                if ($identifiers && !$operation->getIdentifiers() && !$operation->isCollection()) {
+                    $operation = $operation->withIdentifiers($identifiers);
                 }
 
-                $operation->identifiers = $this->normalizeIdentifiers($operation->identifiers, $resourceClass);
-                $resource->operations[$key] = $operation;
+                $operations = $resource->getOperations();
+                $operations[$key] = $operation->withIdentifiers($this->normalizeIdentifiers($operation->getIdentifiers(), $resourceClass));
+                $resource = $resource->withOperations($operations);
             }
 
             $resourceMetadataCollection[$i] = $resource;

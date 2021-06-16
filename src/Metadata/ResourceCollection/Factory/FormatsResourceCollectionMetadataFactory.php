@@ -54,12 +54,12 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
         foreach ($resourceMetadataCollection as $index => $resourceMetadata) {
-            $rawResourceFormats = $resourceMetadata->formats;
+            $rawResourceFormats = $resourceMetadata->getFormats();
             $resourceFormats = null === $rawResourceFormats ? $this->formats : $this->normalizeFormats($rawResourceFormats);
-            $resourceInputFormats = $resourceMetadata->inputFormats ? $this->normalizeFormats($resourceMetadata->inputFormats) : $resourceFormats;
-            $resourceOutputFormats = $resourceMetadata->outputFormats ? $this->normalizeFormats($resourceMetadata->outputFormats) : $resourceFormats;
+            $resourceInputFormats = $resourceMetadata->getInputFormats() ? $this->normalizeFormats($resourceMetadata->getInputFormats()) : $resourceFormats;
+            $resourceOutputFormats = $resourceMetadata->getOutputFormats() ? $this->normalizeFormats($resourceMetadata->getOutputFormats()) : $resourceFormats;
 
-            $resourceMetadataCollection[$index]->operations = $this->normalize($resourceInputFormats, $resourceOutputFormats, $resourceMetadata->operations);
+            $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $resourceMetadata->getOperations()));
         }
 
         return $resourceMetadataCollection;
@@ -69,16 +69,16 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
     {
         $newOperations = [];
         foreach ($operations as $operationName => $operation) {
-            if ('PATCH' === ($operation->method ?? '') && !$operation->formats && !$operation->inputFormats) {
-                $operation->inputFormats = $this->patchFormats;
+            if ('PATCH' === ($operation->getMethod() ?? '') && !$operation->getFormats() && !$operation->getInputFormats()) {
+                $operation->withInputFormats($this->patchFormats);
             }
 
-            if ($operation->formats) {
-                $operation->formats = $this->normalizeFormats($operation->formats);
+            if ($operation->getFormats()) {
+                $operation->withFormats($this->normalizeFormats($operation->getFormats()));
             }
 
-            $operation->inputFormats = $operation->inputFormats ? $this->normalizeFormats($operation->inputFormats) : $operation->formats ?? $resourceInputFormats;
-            $operation->outputFormats = $operation->outputFormats ? $this->normalizeFormats($operation->outputFormats) : $operation->formats ?? $resourceOutputFormats;
+            $operation = $operation->withInputFormats($operation->getInputFormats() ? $this->normalizeFormats($operation->getInputFormats()) : $operation->getFormats() ?? $resourceInputFormats);
+            $operation = $operation->withOutputFormats($operation->getOutputFormats() ? $this->normalizeFormats($operation->getOutputFormats()) : $operation->getFormats() ?? $resourceOutputFormats);
 
             $newOperations[$operationName] = $operation;
         }

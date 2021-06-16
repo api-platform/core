@@ -60,30 +60,32 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
             }
         }
 
-        $resource = new Resource();
+        $resource = (new Resource())->withOperations([]);
 
         foreach ($attributes as $key => $value) {
             $camelCaseKey = $this->converter->denormalize($key);
             $value = $this->sanitizeValueFromKey($key, $value);
-            $resource->{$camelCaseKey} = $value;
+            $resource = $resource->{'with'.ucfirst($camelCaseKey)}($value);
         }
 
-        $resource->operations = [];
-
         foreach ($this->createOperations($resourceMetadata->getItemOperations(), OperationType::ITEM) as $operationName => $operation) {
-            $operation->shortName = $resourceMetadata->getShortName();
-            $resource->operations[$operationName] = $operation;
+            $operation = $operation->withShortName($resourceMetadata->getShortName());
+            $operations = $resource->getOperations();
+            $operations[$operationName] = $operation;
+            $resource = $resource->withOperations($operations);
         }
 
         foreach ($this->createOperations($resourceMetadata->getCollectionOperations(), OperationType::COLLECTION) as $operationName => $operation) {
-            $operation->shortName = $resourceMetadata->getShortName();
-            $resource->operations[$operationName] = $operation;
+            $operation = $operation->withShortName($resourceMetadata->getShortName());
+            $operations = $resource->getOperations();
+            $operations[$operationName] = $operation;
+            $resource = $resource->withOperations($operations);
         }
 
-        $resource->shortName = $resourceMetadata->getShortName();
-        $resource->description = $resourceMetadata->getDescription();
-        $resource->class = $resourceClass;
-        $resource->types = [$resourceMetadata->getIri()];
+        $resource->withShortName($resourceMetadata->getShortName());
+        $resource->withDescription($resourceMetadata->getDescription());
+        $resource->withClass($resourceClass);
+        $resource->withTypes([$resourceMetadata->getIri()]);
         // $resource->graphQl = $resourceMetadata->getGraphql(); // TODO: fix this with graphql
 
         return new ResourceCollection([$resource]);
@@ -95,19 +97,19 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
             $newOperation = new Operation(method: $operation['method'], collection: OperationType::COLLECTION === $type);
 
             if (isset($operation['path'])) {
-                $newOperation->uriTemplate = $operation['path'];
-                $newOperation->routeName = $operationName;
+                $newOperation = $newOperation->withUriTemplate($operation['path']);
+                $newOperation = $newOperation->withRouteName($operationName);
                 unset($operation['path']);
             }
 
             foreach ($operation as $operationKey => $operationValue) {
                 $camelCaseKey = $this->converter->denormalize($operationKey);
                 $operationValue = $this->sanitizeValueFromKey($operationKey, $operationValue);
-                $newOperation->{$camelCaseKey} = $operationValue;
+                $newOperation = $newOperation->{'with' . ucFirst($camelCaseKey)}($operationValue);
             }
 
             // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceCollectionMetadataFactory
-            yield $newOperation->routeName ? $newOperation->routeName : sprintf('%s%s', $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
+            yield $newOperation->getRouteName() ? $newOperation->getRouteName() : sprintf('%s%s', $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
         }
     }
 

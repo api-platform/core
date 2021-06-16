@@ -48,20 +48,22 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
         }
 
         foreach ($parentResourceMetadata as $i => $resource) {
-            if (!$resource->uriTemplate) {
-                foreach ($resource->operations as $key => $operation) {
-                    if ($operation->collection) {
-                        $operation->links = $this->getLinks($parentResourceMetadata);
+            if (!$resource->getUriTemplate()) {
+                foreach ($resource->getOperations() as $key => $operation) {
+                    if ($operation->isCollection()) {
+                        $operation = $operation->withLinks($this->getLinks($parentResourceMetadata));
                     }
 
-                    if ($operation->uriTemplate) {
+                    if ($operation->getUriTemplate()) {
                         continue;
                     }
 
-                    $operation->uriTemplate = $this->generateUriTemplate($operation);
+                    $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
+                    $operations = $resource->getOperations();
                     // Change the operation key
-                    unset($resource->operations[$key]);
-                    $resource->operations[sprintf('_api_%s_%s', $operation->uriTemplate, strtolower($operation->method))] = $operation;
+                    unset($operations[$key]);
+                    $operations[sprintf('_api_%s_%s', $operation->uriTemplate, strtolower($operation->method))] = $operation;
+                    $resource = $resource->withOperations($operations);
                 }
             }
 
@@ -76,9 +78,9 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
         $links = [];
 
         foreach ($resourceMetadata as $resource) {
-            foreach ($resource->operations as $operationName => $operation) {
+            foreach ($resource->getOperations() as $operationName => $operation) {
                 // About the routeName we can't do the link as we don't now enough
-                if (!$operation->routeName && false === $operation->collection && Operation::METHOD_GET === $operation->method) {
+                if (!$operation->getRouteName() && false === $operation->isCollection() && Operation::METHOD_GET === $operation->getMethod()) {
                     $links[] = $operationName;
                 }
             }
@@ -89,13 +91,13 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
 
     private function generateUriTemplate(Operation $operation): string
     {
-        $uriTemplate = $operation->routePrefix ?: '';
-        if ($operation->collection) {
-            return sprintf('%s/%s.{_format}', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->shortName));
+        $uriTemplate = $operation->getRoutePrefix() ?: '';
+        if ($operation->isCollection()) {
+            return sprintf('%s/%s.{_format}', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         }
 
-        $uriTemplate = sprintf('%s/%s', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->shortName));
-        foreach (array_keys($operation->identifiers) as $parameterName) {
+        $uriTemplate = sprintf('%s/%s', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        foreach (array_keys($operation->getIdentifiers()) as $parameterName) {
             $uriTemplate .= sprintf('/{%s}', $parameterName);
         }
 

@@ -55,8 +55,8 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(Resource::class)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
                 foreach ($this->defaults as $key => $value) {
-                    if (!$resource->{$key}) {
-                        $resource->{$key} = $value;
+                    if (!$resource->{'get'.ucfirst($key)}()) {
+                        $resource = $resource->{'with'.ucfirst($key)}($value);
                     }
                 }
 
@@ -93,8 +93,8 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         foreach ($attributes as $attribute) {
             if (Resource::class === $attribute->getName()) {
                 $resource = $attribute->newInstance();
-                $resource->shortName = $shortName;
-                $resource->class = $resourceClass;
+                $resource = $resource->withShortName($shortName);
+                $resource = $resource->withClass($resourceClass);
                 $resources[++$index] = $resource;
                 continue;
             }
@@ -105,18 +105,22 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             }
 
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $attribute->newInstance());
-            $resources[$index]->operations[$key] = $operation;
+            $operations = $resources[$index]->getOperations();
+            $operations[$key] = $operation;
+            $resources[$index] = $resources[$index]->withOperations($operations);
         }
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
-            if ($resource->operations) {
+            if ($resource->getOperations()) {
                 continue;
             }
 
             foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $operation);
-                $resources[$index]->operations[$key] = $operation;
+                $operations = $resources[$index]->getOperations();
+                $operations[$key] = $operation;
+                $resources[$index] = $resources[$index]->withOperations($operations);
             }
         }
 
@@ -131,14 +135,14 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
                 continue;
             }
 
-            if ($operation->{$property} || !$value) {
+            if ($operation->{'get' . ucfirst($property)}() || !$value) {
                 continue;
             }
 
-            $operation->{$property} = $value;
+            $operation = $operation->{'with'.ucfirst($property)}($value);
         }
 
-        $key = sprintf('_api_%s_%s%s', $operation->uriTemplate ?: $operation->shortName, strtolower($operation->method), $operation instanceof GetCollection ? '_collection' : '');
+        $key = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof GetCollection ? '_collection' : '');
 
         return [$key, $operation];
     }

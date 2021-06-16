@@ -39,11 +39,11 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
         foreach ($resourceMetadataCollection as $key => $resourceMetadata) {
-            $resourceMetadata->input = $this->transformInputOutput($resourceMetadata->input);
-            $resourceMetadata->output = $this->transformInputOutput($resourceMetadata->output);
+            $resourceMetadata = $resourceMetadata->withInput($this->transformInputOutput($resourceMetadata->getInput()));
+            $resourceMetadata = $resourceMetadata->withOutput($this->transformInputOutput($resourceMetadata->getOutput()));
 
-            if ($resourceMetadata->operations) {
-                $resourceMetadata->operations = $this->getTransformedOperations($resourceMetadata->operations, $resourceMetadata);
+            if ($resourceMetadata->getOperations()) {
+                $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations($resourceMetadata->getOperations(), $resourceMetadata));
             }
 
             // TODO: GraphQL operations as an object?
@@ -60,24 +60,25 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
     private function getTransformedOperations(array $operations, Resource $resourceMetadata): array
     {
         foreach ($operations as $key => &$operation) {
-            $operation->input = $operation->input ? $this->transformInputOutput($operation->input) : $resourceMetadata->input;
-            $operation->output = $operation->output ? $this->transformInputOutput($operation->output) : $resourceMetadata->output;
+            $operation = $operation->withInput($operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());
+            $operation = $operation->withOutput($operation->getOutput() ? $this->transformInputOutput($operation->getOutput()) : $resourceMetadata->getOutput());
 
             if (
-                $operation->input
-                && \array_key_exists('class', $operation->input)
-                && null === $operation->input['class']
+                $operation->getInput()
+                && \array_key_exists('class', $operation->getInput())
+                && null === $operation->getInput()['class']
             ) {
-                $operation->deserialize = $operation->deserialize ?? false;
-                $operation->validate = $operation->validate ?? false;
+                // TODO: add these !
+                $operation = $operation->withDeserialize($operation->getDeserialize() ?? false);
+                $operation = $operation->withValidate($operation->getValidate() ?? false);
             }
 
             if (
-                $operation->output
-                && \array_key_exists('class', $operation->output)
-                && null === $operation->output['class']
+                $operation->getOutput()
+                && \array_key_exists('class', $operation->getOutput())
+                && null === $operation->getOutput()['class']
             ) {
-                $operation->status = $operation->status ?? 204;
+                $operation = $operation->withStatus($operation->getStatus() ?? 204);
             }
         }
 
