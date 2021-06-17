@@ -76,7 +76,7 @@ trait FieldDatatypeTrait
         ) {
             $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
 
-            return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
+            return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
         }
 
         if (
