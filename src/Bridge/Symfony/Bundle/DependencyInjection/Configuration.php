@@ -26,6 +26,7 @@ use Elasticsearch\Client as ElasticsearchClient;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
 use Symfony\Bundle\FullStack;
+use Symfony\Bundle\MakerBundle\MakerBundle;
 use Symfony\Bundle\MercureBundle\MercureBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\Config\Definition\BaseNode;
@@ -209,6 +210,7 @@ final class Configuration implements ConfigurationInterface
         $this->addMessengerSection($rootNode);
         $this->addElasticsearchSection($rootNode);
         $this->addOpenApiSection($rootNode);
+        $this->addMakerSection($rootNode);
 
         $this->addExceptionToStatusSection($rootNode);
 
@@ -627,6 +629,16 @@ final class Configuration implements ConfigurationInterface
             $snakeCased = $nameConverter->normalize($attribute);
             $defaultsNode->children()->variableNode($snakeCased);
         }
+    }
+
+    private function addMakerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('maker')
+                    ->{class_exists(MakerBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
+            ->end();
     }
 
     private function buildDeprecationArgs(string $version, string $message): array

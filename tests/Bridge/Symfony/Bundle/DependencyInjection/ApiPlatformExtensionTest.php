@@ -1356,6 +1356,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.json_schema.schema_factory',
             'api_platform.listener.view.validate',
             'api_platform.listener.view.validate_query_parameters',
+            'api_platform.maker.command.data_persister',
+            'api_platform.maker.command.data_provider',
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.messenger.data_persister',
             'api_platform.messenger.data_transformer',

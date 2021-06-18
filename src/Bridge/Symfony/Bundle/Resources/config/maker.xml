@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.maker.command.data_provider" class="ApiPlatform\Core\Bridge\Symfony\Maker\MakeDataProvider">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <tag name="maker.command" />
+        </service>
+
+        <service id="api_platform.maker.command.data_persister" class="ApiPlatform\Core\Bridge\Symfony\Maker\MakeDataPersister">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <tag name="maker.command" />
+        </service>
+    </services>
+
+</container>

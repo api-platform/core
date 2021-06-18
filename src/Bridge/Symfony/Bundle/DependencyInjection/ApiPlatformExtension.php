@@ -127,6 +127,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerElasticsearchConfiguration($container, $config, $loader);
         $this->registerDataTransformerConfiguration($container);
         $this->registerSecurityConfiguration($container, $loader);
+        $this->registerMakerConfiguration($container, $config, $loader);
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');
@@ -741,6 +742,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.contact.email', $config['openapi']['contact']['email']);
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
+    }
+
+    private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
+    {
+        if (!$this->isConfigEnabled($container, $config['maker'])) {
+            return;
+        }
+
+        $loader->load('maker.xml');
     }
 
     private function buildDeprecationArgs(string $version, string $message): array
