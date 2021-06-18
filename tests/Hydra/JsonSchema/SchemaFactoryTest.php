@@ -136,4 +136,18 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('@type', $properties);
         $this->assertArrayHasKey('@id', $properties);
     }
+
+    public function testHasHydraViewNavigationBuildSchema(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, OperationType::COLLECTION);
+
+        $this->assertNull($resultSchema->getRootDefinitionKey());
+        $this->assertArrayHasKey('properties', $resultSchema);
+        $this->assertArrayHasKey('hydra:view', $resultSchema['properties']);
+        $this->assertArrayHasKey('properties', $resultSchema['properties']['hydra:view']);
+        $this->assertArrayHasKey('hydra:first', $resultSchema['properties']['hydra:view']['properties']);
+        $this->assertArrayHasKey('hydra:last', $resultSchema['properties']['hydra:view']['properties']);
+        $this->assertArrayHasKey('hydra:previous', $resultSchema['properties']['hydra:view']['properties']);
+        $this->assertArrayHasKey('hydra:next', $resultSchema['properties']['hydra:view']['properties']);
+    }
 }

@@ -133,6 +133,10 @@ final class SchemaFactory implements SchemaFactoryInterface
                             'type' => 'string',
                             'format' => 'iri-reference',
                         ],
+                        'hydra:previous' => [
+                            'type' => 'string',
+                            'format' => 'iri-reference',
+                        ],
                         'hydra:next' => [
                             'type' => 'string',
                             'format' => 'iri-reference',

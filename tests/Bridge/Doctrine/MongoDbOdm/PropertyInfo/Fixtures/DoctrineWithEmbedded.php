@@ -39,4 +39,9 @@ class DoctrineWithEmbedded
      * @EmbedMany(targetDocument=DoctrineEmbeddable::class)
      */
     protected $embedMany;
+
+    /**
+     * @EmbedMany
+     */
+    protected $embedManyOmittingTargetDocument;
 }
