@@ -23,6 +23,9 @@ if ($generate_item) {
 }
 ?>RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
 <?php if (null !== $resource_class): ?>
@@ -34,8 +37,8 @@ if ($generate_item) {
 <?php if ($generate_collection) : ?>
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         // Retrieve the collection from somewhere
@@ -44,8 +47,8 @@ if ($generate_item) {
 <?php if ($generate_item) : ?>
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])<?php
     if (null !== $resource_class) {
         echo ": ?$resource_class";

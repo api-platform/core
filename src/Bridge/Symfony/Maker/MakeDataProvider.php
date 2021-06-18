@@ -47,17 +47,23 @@ class MakeDataProvider extends AbstractMaker
     /**
      * {@inheritdoc}
      */
+    public static function getCommandDescription(): string
+    {
+        return 'Creates an API Platform data provider';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Creates an API Platform data provider')
             ->addArgument('name', InputArgument::OPTIONAL, 'Choose a class name for your data provider (e.g. <fg=yellow>AwesomeDataProvider</>)')
             ->addArgument('resource-class', InputArgument::OPTIONAL, 'Choose a Resource class')
             ->addOption('item-only', null, InputOption::VALUE_NONE, 'Generate only an item data provider')
             ->addOption('collection-only', null, InputOption::VALUE_NONE, 'Generate only a collection data provider')
             ->setHelp(file_get_contents(__DIR__.'/Resources/help/MakeDataProvider.txt'));
 
-        $inputConfig->setArgumentAsNonInteractive('name');
         $inputConfig->setArgumentAsNonInteractive('resource-class');
     }
 
@@ -72,14 +78,6 @@ class MakeDataProvider extends AbstractMaker
     {
         if ($input->getOption('item-only') && $input->getOption('collection-only')) {
             throw new RuntimeCommandException('You should at least generate an item or a collection data provider');
-        }
-
-        if (null === $input->getArgument('name')) {
-            $argument = $command->getDefinition()->getArgument('name');
-
-            $question = new Question($argument->getDescription());
-
-            $input->setArgument('name', $io->askQuestion($question));
         }
 
         if (null === $input->getArgument('resource-class')) {
@@ -97,14 +95,14 @@ class MakeDataProvider extends AbstractMaker
      */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
-        $dataproviderClassNameDetails = $generator->createClassNameDetails(
+        $dataProviderClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
             'DataProvider\\'
         );
         $resourceClass = $input->getArgument('resource-class');
 
         $generator->generateClass(
-            $dataproviderClassNameDetails->getFullName(),
+            $dataProviderClassNameDetails->getFullName(),
             __DIR__.'/Resources/skeleton/DataProvider.tpl.php',
             [
                 'resource_class' => null !== $resourceClass ? Str::getShortClassName($resourceClass) : null,

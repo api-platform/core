@@ -1359,7 +1359,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.maker.command.data_persister',
             'api_platform.maker.command.data_provider',
             'api_platform.mercure.listener.response.add_link_header',
-            'api_platform.mercure.listener.response.add_link_header',
             'api_platform.messenger.data_persister',
             'api_platform.messenger.data_transformer',
             'api_platform.metadata.extractor.yaml',

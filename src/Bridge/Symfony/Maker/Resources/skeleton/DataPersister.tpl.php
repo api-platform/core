@@ -3,15 +3,16 @@
 namespace <?= $namespace ?>;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
 <?php if (null !== $resource_class): ?>
 use <?= $resource_full_class_name ?>;
 <?php endif; ?>
 
-final class <?= $class_name ?> implements ContextAwareDataPersisterInterface
+final class <?= $class_name ?> implements ContextAwareDataPersisterInterface, ResumableDataPersisterInterface
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function supports($data, array $context = []): bool
     {
 <?php if (null !== $resource_class): ?>
@@ -22,8 +23,16 @@ final class <?= $class_name ?> implements ContextAwareDataPersisterInterface
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
+    public function resumable(array $context = []): bool
+    {
+        return false; // Set it to true if you want to call the other data persisters
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function persist($data, array $context = [])<?php
    if (null !== $resource_class) {
        echo ": $resource_class";
@@ -32,16 +41,16 @@ final class <?= $class_name ?> implements ContextAwareDataPersisterInterface
    }?>
 
     {
-        // call your persistence layer to save $data
+        // Call your persistence layer to save $data
 
         return $data;
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function remove($data, array $context = []): void
     {
-        // call your persistence layer to delete $data
+        // Call your persistence layer to delete $data
     }
 }

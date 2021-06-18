@@ -45,10 +45,17 @@ final class MakeDataPersister extends AbstractMaker
     /**
      * {@inheritdoc}
      */
+    public static function getCommandDescription(): string
+    {
+        return 'Creates an API Platform data persister';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Creates an API Platform data persister')
             ->addArgument('name', InputArgument::OPTIONAL, 'Choose a class name for your data persister (e.g. <fg=yellow>AwesomeDataPersister</>)')
             ->addArgument('resource-class', InputArgument::OPTIONAL, 'Choose a Resource class')
             ->setHelp(file_get_contents(__DIR__.'/Resources/help/MakeDataPersister.txt'));

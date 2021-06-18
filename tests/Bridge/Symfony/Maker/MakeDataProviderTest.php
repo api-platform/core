@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\MakerBundle\Exception\RuntimeCommandException;
@@ -75,22 +75,25 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
 final class CustomDataProvider implements ContextAwareCollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return false; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         // Retrieve the collection from somewhere
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?object
     {
         // Retrieve the item from somewhere then return it or null if not found
@@ -112,27 +115,30 @@ namespace App\DataProvider;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 
 final class CustomDataProvider implements ContextAwareCollectionDataProviderInterface, ItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return Dummy::class === $resourceClass; // Add your custom conditions here
+        return Question::class === $resourceClass; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         // Retrieve the collection from somewhere
     }
 
     /**
-    * {@inheritdoc}
-    */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?Dummy
+     * {@inheritdoc}
+     */
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?Question
     {
         // Retrieve the item from somewhere then return it or null if not found
     }
@@ -142,12 +148,12 @@ EOF;
 
         yield 'Generate all with resource class' => [
             [],
-            ['CustomDataProvider', Dummy::class],
+            ['CustomDataProvider', Question::class],
             $expected,
         ];
 
         yield 'Generate all with resource class not interactively' => [
-            ['name' => 'CustomDataProvider', 'resource-class' => Dummy::class],
+            ['name' => 'CustomDataProvider', 'resource-class' => Question::class],
             [],
             $expected,
         ];
@@ -162,14 +168,17 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
 final class CustomDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return false; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?object
     {
         // Retrieve the item from somewhere then return it or null if not found
@@ -190,19 +199,22 @@ namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 
 final class CustomDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return Dummy::class === $resourceClass; // Add your custom conditions here
+        return Question::class === $resourceClass; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
-    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?Dummy
+     * {@inheritdoc}
+     */
+    public function getItem(string $resourceClass, $id, string $operationName = null, array $context = []): ?Question
     {
         // Retrieve the item from somewhere then return it or null if not found
     }
@@ -211,12 +223,12 @@ final class CustomDataProvider implements ItemDataProviderInterface, RestrictedD
 EOF;
         yield 'Generate an item data provider with a resource class' => [
             ['--item-only' => true],
-            ['CustomDataProvider', Dummy::class],
+            ['CustomDataProvider', Question::class],
             $expected,
         ];
 
         yield 'Generate an item data provider with a resource class not interactively' => [
-            ['name' => 'CustomDataProvider', 'resource-class' => Dummy::class, '--item-only' => true],
+            ['name' => 'CustomDataProvider', 'resource-class' => Question::class, '--item-only' => true],
             [],
             $expected,
         ];
@@ -231,14 +243,17 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
 final class CustomDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
         return false; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         // Retrieve the collection from somewhere
@@ -259,18 +274,21 @@ namespace App\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 
 final class CustomDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return Dummy::class === $resourceClass; // Add your custom conditions here
+        return Question::class === $resourceClass; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         // Retrieve the collection from somewhere
@@ -281,12 +299,12 @@ EOF;
 
         yield 'Generate a collection data provider with a resource class' => [
             ['--collection-only' => true],
-            ['CustomDataProvider', Dummy::class],
+            ['CustomDataProvider', Question::class],
             $expected,
         ];
 
         yield 'Generate a collection data provider with a resource class not interactively' => [
-            ['name' => 'CustomDataProvider', 'resource-class' => Dummy::class, '--collection-only' => true],
+            ['name' => 'CustomDataProvider', 'resource-class' => Question::class, '--collection-only' => true],
             [],
             $expected,
         ];
@@ -298,7 +316,7 @@ EOF;
         $this->expectException(RuntimeCommandException::class);
         $this->expectExceptionMessage('You should at least generate an item or a collection data provider');
 
-        $tester->execute(['name' => 'CustomDataProvider', 'resource-class' => Dummy::class, '--collection-only' => true, '--item-only' => true]);
+        $tester->execute(['name' => 'CustomDataProvider', 'resource-class' => Question::class, '--collection-only' => true, '--item-only' => true]);
     }
 
     private static function tempDir(): string

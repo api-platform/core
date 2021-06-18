@@ -635,9 +635,9 @@ final class Configuration implements ConfigurationInterface
     {
         $rootNode
             ->children()
-            ->arrayNode('maker')
-            ->{class_exists(MakerBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
-            ->end()
+                ->arrayNode('maker')
+                    ->{class_exists(MakerBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                ->end()
             ->end();
     }
 

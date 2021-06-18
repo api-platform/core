@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -68,33 +68,42 @@ EOF
 namespace App\DataPersister;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
 
-final class CustomDataPersister implements ContextAwareDataPersisterInterface
+final class CustomDataPersister implements ContextAwareDataPersisterInterface, ResumableDataPersisterInterface
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function supports($data, array $context = []): bool
     {
         return false; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
+    public function resumable(array $context = []): bool
+    {
+        return false; // Set it to true if you want to call the other data persisters
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function persist($data, array $context = []): object
     {
-        // call your persistence layer to save $data
+        // Call your persistence layer to save $data
 
         return $data;
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function remove($data, array $context = []): void
     {
-        // call your persistence layer to delete $data
+        // Call your persistence layer to delete $data
     }
 }
 
@@ -111,46 +120,55 @@ EOF;
 namespace App\DataPersister;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 
-final class CustomDataPersister implements ContextAwareDataPersisterInterface
+final class CustomDataPersister implements ContextAwareDataPersisterInterface, ResumableDataPersisterInterface
 {
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function supports($data, array $context = []): bool
     {
-        return $data instanceof Dummy::class; // Add your custom conditions here
+        return $data instanceof Question::class; // Add your custom conditions here
     }
 
     /**
-    * {@inheritdoc}
-    */
-    public function persist($data, array $context = []): Dummy
+     * {@inheritdoc}
+     */
+    public function resumable(array $context = []): bool
     {
-        // call your persistence layer to save $data
+        return false; // Set it to true if you want to call the other data persisters
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function persist($data, array $context = []): Question
+    {
+        // Call your persistence layer to save $data
 
         return $data;
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function remove($data, array $context = []): void
     {
-        // call your persistence layer to delete $data
+        // Call your persistence layer to delete $data
     }
 }
 
 EOF;
         yield 'Generate data persister with resource class' => [
             [],
-            ['CustomDataPersister', Dummy::class],
+            ['CustomDataPersister', Question::class],
             $expected,
         ];
 
         yield 'Generate data persister with resource class not interactively' => [
-            ['name' => 'CustomDataPersister', 'resource-class' => Dummy::class],
+            ['name' => 'CustomDataPersister', 'resource-class' => Question::class],
             [],
             $expected,
         ];
