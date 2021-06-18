@@ -22,8 +22,6 @@ namespace ApiPlatform\Metadata;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Resource
 {
-    private array $extraProperties = [];
-
     /**
      * @param array        $operations
      * @param string       $uriTemplate
@@ -136,9 +134,8 @@ class Resource
         private ?string $securityPostDenormalizeMessage = null,
         private ?bool $compositeIdentifier = null,
         private ?GraphQl $graphQl = null,
-        ...$extraProperties
+        private array $extraProperties = []
     ) {
-        $this->extraProperties = $extraProperties;
     }
 
     public function getOperations(): array

@@ -15,8 +15,6 @@ namespace ApiPlatform\Metadata;
 
 class Operation
 {
-    private array $extraProperties = [];
-
     public const METHOD_GET = 'GET';
     public const METHOD_POST = 'POST';
     public const METHOD_PUT = 'PUT';
@@ -153,9 +151,8 @@ class Operation
         private bool $validate = true,
         private bool $write = true,
         private bool $serialize = true,
-        ...$extraProperties
+        private array $extraProperties = []
     ) {
-        $this->extraProperties = $extraProperties;
     }
 
     public function getMethod(): string
@@ -1026,6 +1023,7 @@ class Operation
             'output' => $this->output,
             'method' => $this->method,
             'filters' => $this->filters,
+            'extra_properties' => $this->extraProperties,
         ];
     }
 }

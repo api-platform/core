@@ -87,7 +87,7 @@ final class Get extends Operation
         private bool $validate = true,
         private bool $write = true,
         private bool $serialize = true,
-        ...$extraProperties
+        private array $extraProperties = [],
     ) {
         parent::__construct(...\func_get_args());
     }

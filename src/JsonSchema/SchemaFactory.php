@@ -93,7 +93,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         if (null === $operationType || null === $operationName || !$operation) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
-        } else if ($resourceMetadata instanceof ResourceMetadata) {
+        } elseif ($resourceMetadata instanceof ResourceMetadata) {
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
         } else {
             $method = $operation->getMethod();
@@ -140,12 +140,11 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (
             Schema::VERSION_SWAGGER !== $version
         ) {
-            if (($resourceMetadata instanceof ResourceMetadata && 
+            if (($resourceMetadata instanceof ResourceMetadata &&
                 ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
             ) || ($operation && $operation->getDeprecationReason())
             ) {
                 $definition['deprecated'] = true;
-                
             }
         }
 
@@ -153,7 +152,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
         if ($resourceMetadata instanceof ResourceMetadata) {
             $definition['externalDocs'] = ['url' => $resourceMetadata->getIri()];
-        } else if ($operation) {
+        } elseif ($operation) {
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
@@ -359,7 +358,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     }
 
     /**
-     * @param null|Operation|ResourceMetadata $resourceMetadata
+     * @param Operation|ResourceMetadata|null $resourceMetadata
      */
     private function getValidationGroups($resourceMetadata, ?string $operationType, ?string $operationName): array
     {

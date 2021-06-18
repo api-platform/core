@@ -21,7 +21,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource;
 
 /**
- * We have to compute a local cache having all the resource => subresource matching
+ * We have to compute a local cache having all the resource => subresource matching.
+ *
  * @deprecated
  */
 final class SubresourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
@@ -98,6 +99,8 @@ final class SubresourceMetadataResourceCollectionFactory implements ResourceColl
                             condition: $subresourceMetadata['condition'],
                             class: $subresourceMetadata['resource_class'],
                             collection: $subresourceMetadata['collection'],
+                            compositeIdentifier: false,
+                            extraProperties: ['is_legacy_subresource' => true, 'legacy_subresource_property' => $subresourceMetadata['property']],
                         ),
                     ],
                     identifiers: $identifiers,
@@ -109,13 +112,15 @@ final class SubresourceMetadataResourceCollectionFactory implements ResourceColl
                     schemes: $subresourceMetadata['schemes'],
                     condition: $subresourceMetadata['condition'],
                     class: $subresourceMetadata['resource_class'],
+                    compositeIdentifier: false,
+                    extraProperties: ['is_legacy_subresource' => true, 'legacy_subresource_property' => $subresourceMetadata['property']],
                 );
 
                 if ($subresourceMetadata['controller']) { // manage null values from subresources
                     $resource = $resource->withController($subresourceMetadata['controller']);
                 }
 
-                $this->localCache[$resource->getClass()] = $resource;
+                $this->localCache[$resource->getClass()][] = $resource;
             }
         }
     }

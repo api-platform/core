@@ -115,7 +115,8 @@ final class WriteListener
                 if ($this->iriConverter instanceof IriConverterInterface && $this->isResourceClass($this->getObjectClass($controllerResult))) {
                     $context = ['identifiers' => $attributes['identifiers'], 'has_composite_identifier' => $attributes['has_composite_identifier']];
                     if (isset($attributes['operation_name'])) {
-                        $context['operation_name'] = $attributes['operation']['links'][0] ?? $attributes['operation_name'];
+                        $context['operation_name'] = $attributes['operation']['links'][0][0] ?? $attributes['operation_name'];
+                        $context['identifiers'] = $attributes['operation']['links'][0][1] ?? $attributes['identifiers'];
                     }
 
                     $request->attributes->set('_api_write_item_iri', $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($controllerResult, UrlGeneratorInterface::ABS_PATH, $context) : $this->iriConverter->getIriFromItem($controllerResult));

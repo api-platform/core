@@ -17,9 +17,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Operation;
@@ -69,6 +67,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 $context['iri_only'] = $context['iri_only'] ?? false;
                 $context['request_uri'] = $request->getRequestUri();
                 $context['uri'] = $request->getUri();
+
+                $context['identifiers_values'] = [];
+                foreach (array_keys($context['identifiers']) as $parameterName) {
+                    $context['identifiers_values'][$parameterName] = $request->attributes->get($parameterName);
+                }
 
                 if (!$normalization) {
                     if (!isset($context['api_allow_update'])) {

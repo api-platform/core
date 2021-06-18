@@ -145,7 +145,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = null, array $context = []): string
     {
         try {
-            return $this->router->generate($context['operation_name'] ?? $this->getRouteName($resourceClass, OperationType::COLLECTION), [], $this->getReferenceType($resourceClass, $referenceType, $context));
+            return $this->router->generate($context['operation_name'] ?? $this->getRouteName($resourceClass, OperationType::COLLECTION), $context['identifiers_values'] ?? [], $this->getReferenceType($resourceClass, $referenceType, $context));
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }

@@ -87,6 +87,8 @@ final class IdentifiersExtractor implements ContextAwareIdentifiersExtractorInte
                     $type = $propertyMetadata->getType();
                     if ($type && $type->getClassName() === $class) {
                         $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, "$propertyName.$property");
+                    } elseif ($type && $type->isCollection() && $type->getCollectionValueType()->getClassName() === $class) {
+                        $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property));
                     }
                 }
             }

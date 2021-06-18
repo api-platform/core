@@ -17,16 +17,20 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 
 class LegacyDataProviderState implements ProviderInterface
 {
-    // TODO: Manage subresources
-    public function __construct(private ItemDataProviderInterface $itemDataProvider, private CollectionDataProviderInterface $collectionDataProvider) // TODO: Manage subresources
+    public function __construct(private ItemDataProviderInterface $itemDataProvider, private CollectionDataProviderInterface $collectionDataProvider, private SubresourceDataProviderInterface $subresourceDataProvider)
     {
     }
 
     public function provide(string $resourceClass, array $identifiers = [], array $context = [])
     {
+        if ($context['extra_properties']['is_legacy_subresource'] ?? false) {
+            return $this->subresourceDataProvider->getSubresource($resourceClass, $identifiers, $context, $context['operation_name']);
+        }
+
         if ($identifiers) {
             return $this->itemDataProvider->getItem($resourceClass, $identifiers, $context['operation_name'], $context);
         }

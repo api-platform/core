@@ -61,15 +61,12 @@ final class LinksResourceCollectionMetadataFactory implements ResourceCollection
 
     private function getLinks($resourceMetadata): array
     {
-        // TODO: Check error here
         $links = [];
 
         foreach ($resourceMetadata as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
-                // About the routeName we can't do the link as we don't know enough
-                // TODO: find a better way to add links or not
                 if (!$operation->getRouteName() && false === $operation->isCollection() && Operation::METHOD_GET === $operation->getMethod()) {
-                    $links[] = $operationName;
+                    $links[] = [$operationName, $operation->getIdentifiers()];
                 }
             }
         }

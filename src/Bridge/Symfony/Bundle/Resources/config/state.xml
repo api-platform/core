@@ -14,6 +14,7 @@
             <tag name="api_platform.state_provider" />
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
         </service>
 
         <service id="api_platform.state.legacy_data_persister_processor" class="ApiPlatform\State\LegacyDataPersisterProcessor">

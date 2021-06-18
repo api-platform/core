@@ -80,7 +80,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, ['operation_name' => $context['links'][0] ?? $context['operation_name']] + $context) : $this->iriConverter->getIriFromItem($object);
+        if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
+            $iriContext = isset($context['links'][0]) ? ['operation_name' => $context['links'][0][0], 'identifiers' => $context['links'][0][1]] + $context : $context;
+            $iri = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, $iriContext);
+        } else {
+            $iri = $this->iriConverter->getIriFromItem($object);
+        }
+
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 

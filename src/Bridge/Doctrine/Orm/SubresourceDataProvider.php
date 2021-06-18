@@ -76,6 +76,10 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
 
+        if (isset($context['identifiers']) && !isset($context['property'])) {
+            $context['property'] = $context['extra_properties']['legacy_subresource_property'] ?? null;
+        }
+
         if (!isset($context['identifiers'], $context['property'])) {
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
@@ -160,8 +164,12 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $normalizedIdentifiers = [];
 
         if (isset($identifiers[$identifier])) {
-            // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
-            if ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
+            if ($context['extra_properties']['is_legacy_subresource'] ?? false) {
+                foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
+                    $normalizedIdentifiers[$property] = $context['identifiers_values'][$parameterName];
+                }
+                // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
+            } elseif ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
                 $normalizedIdentifiers = $identifiers[$identifier];
             } else {
                 $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);
