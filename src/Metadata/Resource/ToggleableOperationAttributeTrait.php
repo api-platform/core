@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Resource;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 
 /**
  * @internal
@@ -21,7 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 trait ToggleableOperationAttributeTrait
 {
     /**
-     * @var ResourceMetadataFactoryInterface|null
+     * @var ResourceCollectionMetadataFactoryInterface|ResourceMetadataFactoryInterface|null
      */
     private $resourceMetadataFactory;
 
@@ -29,6 +30,11 @@ trait ToggleableOperationAttributeTrait
     {
         if (null === $this->resourceMetadataFactory) {
             return $default;
+        }
+
+        if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name']);
+            return !$resourceMetadata->{'get'.ucfirst($attribute)}();
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);

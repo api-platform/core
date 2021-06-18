@@ -109,6 +109,7 @@ final class ApiLoader extends Loader
                     if ($operation->getRouteName()) {
                         continue;
                     }
+
                     $route = new Route(
                         ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
                         [

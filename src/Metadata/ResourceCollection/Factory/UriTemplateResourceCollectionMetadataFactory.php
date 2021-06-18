@@ -54,7 +54,7 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
                         continue;
                     }
 
-                    $operations = $resource->getOperations();
+                    $operations = iterator_to_array($resource->getOperations());
 
                     if ($routeName = $operation->getRouteName()) {
                         unset($operations[$key]);

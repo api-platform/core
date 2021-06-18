@@ -19,7 +19,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 trait InputOutputMetadataTrait
 {
     /**
-     * @var ResourceMetadataFactoryInterface
+     * @param ResourceMetadataFactoryInterface|ResourceCollectionMetadataFactoryInterface $resourceMetadataFactory
      */
     protected $resourceMetadataFactory;
 
@@ -39,12 +39,19 @@ trait InputOutputMetadataTrait
             return $context[$inputOrOutput]['class'] ?? null;
         }
 
-        try {
-            $metadata = $this->resourceMetadataFactory->create($class);
-        } catch (ResourceClassNotFoundException $e) {
-            return null;
+        // TODO: remove in 3.0
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            try {
+                $metadata = $this->resourceMetadataFactory->create($class);
+            } catch (ResourceClassNotFoundException $e) {
+                return null;
+            }
+
+            return $metadata->getAttribute($inputOrOutput)['class'] ?? null;
         }
 
-        return $metadata->getAttribute($inputOrOutput)['class'] ?? null;
+        // note we should always go through the context above this is not right
+        $metadata = $this->resourceMetadataFactory->create($class);
+        return \count($metadata) ? $metadata[0]->getInput()['class'] ?? null : null;
     }
 }

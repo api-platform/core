@@ -71,7 +71,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $dataTransformers = [];
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             //TODO: 2.7: hard problem ? need the operation name
@@ -103,6 +103,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $this->dataTransformers = $dataTransformers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if ($resourceMetadataFactory && $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
+
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
@@ -158,7 +163,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['iri'])) {
             $iri = $context['iri'];
         } else {
-            $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL, $context) : $this->iriConverter->getIriFromItem($object);
+            $iriContext = isset($context['links'][0]) ? ['operation_name' => $context['links'][0][0], 'identifiers' => $context['links'][0][1]] + $context : $context;
+            $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL, $iriContext) : $this->iriConverter->getIriFromItem($object);
         }
 
         $context['iri'] = $iri;
@@ -733,6 +739,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $normalizedRelatedObject;
         }
 
+        // TODO: 2.7 needs ContextAwarewhat to do with this
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;

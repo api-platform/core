@@ -20,7 +20,9 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
@@ -46,7 +48,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     private $contextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], iterable $dataTransformers = [], ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ContextBuilderInterface $contextBuilder, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], iterable $dataTransformers = [], ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
 
@@ -78,9 +80,37 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return parent::normalize($object, $format, $context);
         }
 
+        $context = $this->initContext($context['resource_class'], $context);
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
-        $context = $this->initContext($resourceClass, $context);
+        $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
+
         if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
+            // Note that this responsability should be transfered to the ResourceMetadataFactory
+            // it would only be possible if the Metadata defines the output of the Custom Controller and that the output is also a Resource
+            // this is the only case where it happens (or a Provider returning another class then the one requested)
+            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface && $resourceClass !== $context['resource_class']) {
+                foreach ($this->resourceMetadataFactory->create($resourceClass) as $resource) {
+                    // Trigger a deprecation because:
+                    // En gros une Resource peut avoir une Opération qui dans son controlleur retourne une autre Resource ! 
+                    //
+                    // Dans ce cas, je dois retrouver les Metadonnées liées a celui ci sauf que j'ai aucun moyen de le savoir en amont. Pour toi c'est la responsabilité:
+                    //
+                    // - Du SerializeListener
+                    // - Du JsonLd\ItemNormalizer (doit trouver le @id qui correspond a l'autre resource) 
+                    // - Du IriConverter
+                    //
+                    // Sachant qu'en vrai on devrait totalement déprecier ca car ce sera faisable avec:
+                    // #[Resource(operations=[new Post('/payments/{id}/void', identifiers: ['id' => [Payment::class, 'id']])])
+                    // class VoidPayment {}
+                    foreach ($resource->getOperations() as $operation) {
+                        if ($operation->getMethod() === Operation::METHOD_GET && !$operation->isCollection()) {
+                            $context['links'] = $operation->getLinks();
+                            break 2;
+                        }
+                    }
+                }
+            }
+
             $iriContext = isset($context['links'][0]) ? ['operation_name' => $context['links'][0][0], 'identifiers' => $context['links'][0][1]] + $context : $context;
             $iri = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, $iriContext);
         } else {
@@ -88,19 +118,23 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $context['iri'] = $iri;
+        $metadata['@id'] = $iri;
         $context['api_normalize'] = true;
-
-        $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             return $data;
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        $metadata['@id'] = $iri;
-        $metadata['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
+        // TODO: remove in 3.0
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $metadata['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
+        } else {
+            // TODO: multiple types?
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass)[0];
+            $metadata['@type'] = $resourceMetadata->getTypes()[0] ?: $resourceMetadata->getShortName();
+        }
 
         return $metadata + $data;
     }

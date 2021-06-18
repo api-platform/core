@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -66,14 +67,14 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
 
         foreach ($this->createOperations($resourceMetadata->getItemOperations(), OperationType::ITEM) as $operationName => $operation) {
             $operation = $operation->withShortName($resourceMetadata->getShortName());
-            $operations = $resource->getOperations();
+            $operations = iterator_to_array($resource->getOperations());
             $operations[$operationName] = $operation;
             $resource = $resource->withOperations($operations);
         }
 
         foreach ($this->createOperations($resourceMetadata->getCollectionOperations(), OperationType::COLLECTION) as $operationName => $operation) {
             $operation = $operation->withShortName($resourceMetadata->getShortName());
-            $operations = $resource->getOperations();
+            $operations = iterator_to_array($resource->getOperations());
             $operations[$operationName] = $operation;
             $resource = $resource->withOperations($operations);
         }
@@ -90,12 +91,12 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
 
     private function createOperations(array $operations, string $type): iterable
     {
+        $priority = 0;
         foreach ($operations as $operationName => $operation) {
-            $newOperation = new Operation(method: $operation['method'], collection: OperationType::COLLECTION === $type);
+            $newOperation = new Operation(method: $operation['method'], collection: OperationType::COLLECTION === $type, priority: $priority++);
 
             if (isset($operation['path'])) {
                 $newOperation = $newOperation->withUriTemplate($operation['path']);
-                $newOperation = $newOperation->withRouteName($operationName);
                 unset($operation['path']);
             }
 

@@ -49,6 +49,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     private $resourceNameCollectionFactory;
+    /**
+     * @param ResourceMetadataFactoryInterface|ResourceCollectionMetadataFactoryInterface $resourceMetadataFactory
+     */
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;

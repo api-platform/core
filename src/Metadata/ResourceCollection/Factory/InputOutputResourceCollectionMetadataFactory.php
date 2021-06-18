@@ -42,8 +42,8 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
             $resourceMetadata = $resourceMetadata->withInput($this->transformInputOutput($resourceMetadata->getInput()));
             $resourceMetadata = $resourceMetadata->withOutput($this->transformInputOutput($resourceMetadata->getOutput()));
 
-            if ($resourceMetadata->getOperations()) {
-                $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations($resourceMetadata->getOperations(), $resourceMetadata));
+            if (\count($resourceMetadata->getOperations())) {
+                $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations(iterator_to_array($resourceMetadata->getOperations()), $resourceMetadata));
             }
 
             // TODO: GraphQL operations as an object?

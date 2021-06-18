@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\ResourceList;
@@ -42,11 +43,15 @@ final class SerializeListener
     private $serializer;
     private $serializerContextBuilder;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if ($resourceMetadataFactory && $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -72,7 +77,6 @@ final class SerializeListener
         }
 
         $context = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-
         if (isset($context['output']) && \array_key_exists('class', $context['output']) && null === $context['output']['class']) {
             $event->setControllerResult(null);
 

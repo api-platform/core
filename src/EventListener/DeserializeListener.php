@@ -48,15 +48,17 @@ final class DeserializeListener
     /**
      * @param ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory, ResourceMetadataFactoryInterface $legacyResourceMetadataFactory = null, ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory = null)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory, ResourceMetadataFactoryInterface $legacyResourceMetadataFactory = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->resourceMetadataFactory = $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface ? $resourceMetadataFactory : $legacyResourceMetadataFactory;
-        $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;
-
+        $this->resourceMetadataFactory = ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface || $resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) ? $resourceMetadataFactory : $legacyResourceMetadataFactory;
         if (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             @trigger_error(sprintf('Passing an array or an instance of "%s" as 3rd parameter of the constructor of "%s" is deprecated since API Platform 2.5, pass an instance of "%s" instead', FormatsProviderInterface::class, __CLASS__, ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
+
+        if (!$resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface && $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
         }
 
         if (\is_array($resourceMetadataFactory)) {
@@ -89,9 +91,9 @@ final class DeserializeListener
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
         $formats = null;
-        if ($this->resourceCollectionMetadataFactory && isset($attributes['operation_name'])) {
+        if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface && isset($attributes['operation_name'])) {
             try {
-                $resourceCollection = $this->resourceCollectionMetadataFactory->create($attributes['resource_class']);
+                $resourceCollection = $this->resourceMetadataFactory->create($attributes['resource_class']);
                 $operation = $resourceCollection->getOperation($attributes['operation_name']);
                 $formats = $operation ? $operation->getInputFormats() : null;
             } catch (ResourceClassNotFoundException $e) {

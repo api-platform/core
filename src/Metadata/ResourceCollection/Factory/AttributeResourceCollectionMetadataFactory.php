@@ -114,20 +114,20 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             }
 
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $attribute->newInstance());
-            $operations = $resources[$index]->getOperations();
+            $operations = iterator_to_array($resources[$index]->getOperations());
             $operations[$key] = $operation;
             $resources[$index] = $resources[$index]->withOperations($operations);
         }
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
-            if ($resource->getOperations()) {
+            if (\count($resource->getOperations())) {
                 continue;
             }
 
             foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $operation);
-                $operations = $resources[$index]->getOperations();
+                $operations = iterator_to_array($resources[$index]->getOperations());
                 $operations[$key] = $operation;
                 $resources[$index] = $resources[$index]->withOperations($operations);
             }

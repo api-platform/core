@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use IteratorAggregate;
+
 /**
  * Resource metadata attribute.
  *
@@ -23,7 +25,7 @@ namespace ApiPlatform\Metadata;
 class Resource
 {
     /**
-     * @param array        $operations
+     * @param iterable     $operations
      * @param string       $uriTemplate
      * @param string       $shortName
      * @param string       $description
@@ -83,7 +85,7 @@ class Resource
         private ?string $shortName = null,
         private ?string $description = null,
         private array $types = [],
-        private array $operations = [],
+        private iterable $operations = [],
         private mixed $formats = null,
         private mixed $inputFormats = null,
         private mixed $outputFormats = null,
@@ -136,9 +138,10 @@ class Resource
         private ?GraphQl $graphQl = null,
         private array $extraProperties = []
     ) {
+        $this->operations = new Operations($operations);
     }
 
-    public function getOperations(): array
+    public function getOperations(): iterable
     {
         return $this->operations;
     }
@@ -146,7 +149,7 @@ class Resource
     public function withOperations(array $operations = []): self
     {
         $self = clone $this;
-        $self->operations = $operations;
+        $self->operations = new Operations($operations);
 
         return $self;
     }

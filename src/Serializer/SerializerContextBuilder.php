@@ -112,6 +112,15 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['iri_only'] = $operation->getNormalizationContext()['iri_only'] ?? false;
             $context['input'] = $operation->getInput();
             $context['output'] = $operation->getOutput();
+            $context['links'] = [];
+            foreach ($resourceMetadata as $resource) {
+                foreach ($resource->getOperations() as $operationName => $operation) {
+                    if (!$operation->getRouteName() && !$operation->isCollection() && $operation->getIdentifiers()) {
+                        $context['links'][] = [$operationName, $operation->getIdentifiers()];
+                        break 2;
+                    }
+                }
+            }
         } else {
             $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
             $context['operation_type'] = $operationType;

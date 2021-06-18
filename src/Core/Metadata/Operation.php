@@ -151,6 +151,7 @@ class Operation
         private bool $validate = true,
         private bool $write = true,
         private bool $serialize = true,
+        private int $priority = 0,
         private array $extraProperties = []
     ) {
     }
@@ -1008,8 +1009,22 @@ class Operation
         return $self;
     }
 
+    public function getPriority(): int
+    {
+        return $this->priority;
+    }
+
+    public function withPriority(int $priority = 0): self
+    {
+        $self = clone $this;
+        $self->priority = $priority;
+
+        return $self;
+    }
+
     public function __serialize(): array
     {
+        // TODO: 3.0 add deserialize, write, read etc.
         return [
             'stateless' => $this->stateless,
             'identifiers' => $this->identifiers,

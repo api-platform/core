@@ -69,7 +69,7 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
                     $operation = $operation->withIdentifiers($identifiers);
                 }
 
-                $operations = $resource->getOperations();
+                $operations = iterator_to_array($resource->getOperations());
                 $operations[$key] = $operation->withIdentifiers($this->normalizeIdentifiers($operation->getIdentifiers(), $resourceClass));
                 $resource = $resource->withOperations($operations);
             }

@@ -86,6 +86,7 @@ class Delete extends Operation
         private bool $validate = true,
         private bool $write = true,
         private bool $serialize = true,
+        private int $priority = 0,
         private array $extraProperties = [],
     ) {
         parent::__construct(...\func_get_args());

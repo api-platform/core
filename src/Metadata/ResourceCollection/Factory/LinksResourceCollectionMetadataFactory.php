@@ -45,12 +45,10 @@ final class LinksResourceCollectionMetadataFactory implements ResourceCollection
         }
 
         foreach ($parentResourceMetadata as $i => $resource) {
-            $operations = $resource->getOperations();
+            $operations = iterator_to_array($resource->getOperations());
 
             foreach ($operations as $key => $operation) {
-                if ($operation->isCollection()) {
-                    $operations[$key] = $operation->withLinks($this->getLinks($parentResourceMetadata));
-                }
+                $operations[$key] = $operation->withLinks($this->getLinks($parentResourceMetadata));
             }
 
             $parentResourceMetadata[$i] = $resource->withOperations($operations);

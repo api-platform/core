@@ -184,10 +184,9 @@
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
             <argument>null</argument>
 
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
         </service>
@@ -195,7 +194,8 @@
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
         </service>
@@ -328,6 +328,11 @@
                 <argument>api_platform.elasticsearch.cache.metadata.document</argument>
             </argument>
             <tag name="kernel.cache_warmer" priority="64" />
+        </service>
+
+        <service id="api_platform.debug.command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\DebugResourceCommand">
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <tag name="console.command" />
         </service>
     </services>
 

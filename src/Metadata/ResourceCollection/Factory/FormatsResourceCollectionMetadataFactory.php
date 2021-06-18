@@ -59,7 +59,7 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
             $resourceInputFormats = $resourceMetadata->getInputFormats() ? $this->normalizeFormats($resourceMetadata->getInputFormats()) : $resourceFormats;
             $resourceOutputFormats = $resourceMetadata->getOutputFormats() ? $this->normalizeFormats($resourceMetadata->getOutputFormats()) : $resourceFormats;
 
-            $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $resourceMetadata->getOperations()));
+            $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, iterator_to_array($resourceMetadata->getOperations())));
         }
 
         return $resourceMetadataCollection;
