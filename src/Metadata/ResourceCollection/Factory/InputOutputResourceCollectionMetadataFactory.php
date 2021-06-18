@@ -68,7 +68,6 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
                 && \array_key_exists('class', $operation->getInput())
                 && null === $operation->getInput()['class']
             ) {
-                // TODO: add these !
                 $operation = $operation->withDeserialize($operation->getDeserialize() ?? false);
                 $operation = $operation->withValidate($operation->getValidate() ?? false);
             }

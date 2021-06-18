@@ -20,7 +20,8 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 
 class LegacyDataProviderState implements ProviderInterface
 {
-    public function __construct(private ItemDataProviderInterface $itemDataProvider, private CollectionDataProviderInterface $collectionDataProvider)
+    // TODO: Manage subresources
+    public function __construct(private ItemDataProviderInterface $itemDataProvider, private CollectionDataProviderInterface $collectionDataProvider) // TODO: Manage subresources
     {
     }
 

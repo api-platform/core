@@ -53,6 +53,7 @@ class Delete extends Operation
         public array $denormalizationContext = [],
         public array $hydraContext = [],
         public array $openapiContext = [],
+        public array $swaggerContext = [],
         // TODO: rename validationContext having ['groups' => []]
         public array $validationGroups = [],
         public array $filters = [],
@@ -80,6 +81,11 @@ class Delete extends Operation
         public ?string $securityPostDenormalizeMessage = null,
         public ?bool $compositeIdentifier = null,
         public ?GraphQl $graphQl = null,
+        private bool $read = true,
+        private bool $deserialize = true,
+        private bool $validate = true,
+        private bool $write = true,
+        private bool $serialize = true,
         ...$extraProperties
     ) {
         parent::__construct(...\func_get_args());

@@ -33,10 +33,12 @@ use ApiPlatform\Metadata\Resource;
 final class AttributeResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
 {
     private $defaults;
+    private $decorated;
 
-    public function __construct(array $defaults = [])
+    public function __construct(array $defaults = [], ResourceCollectionMetadataFactoryInterface $decorated = null)
     {
         $this->defaults = $defaults;
+        $this->decorated = $decorated;
     }
 
     /**
@@ -45,6 +47,13 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
     public function create(string $resourceClass): ResourceCollection
     {
         $resourceMetadataCollection = [];
+
+        if ($this->decorated) {
+            try {
+                $resourceMetadataCollection = $this->decorated->create($resourceClass);
+            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
+            }
+        }
 
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
@@ -135,7 +144,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
                 continue;
             }
 
-            if ($operation->{'get' . ucfirst($property)}() || !$value) {
+            if ($operation->{'get'.ucfirst($property)}() || !$value) {
                 continue;
             }
 

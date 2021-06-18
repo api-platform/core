@@ -134,15 +134,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private function collectPaths(Resource $resource, string $resourceClass, array $context, Model\Paths $paths, \ArrayObject $schemas): void
     {
         $links = [];
-        $resourceShortName = $resource->shortName;
+        $resourceShortName = $resource->getShortName();
 
-        if (!$resource->operations) {
+        if (!$resource->getOperations()) {
             return;
         }
 
         $rootResourceClass = $resourceClass;
 
-        foreach ($resource->operations as $operationName => $operation) {
+        foreach ($resource->getOperations() as $operationName => $operation) {
             // No path to return
             if (null === $operation->getUriTemplate()) {
                 continue;
@@ -157,7 +157,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $operationId = $operation->getOpenapiContext()['operationId'] ?? $operationName;
 
-            $linkedOperationId = $this->getLinkedOperationName($resource->operations);
+            $linkedOperationId = $this->getLinkedOperationName($resource->getOperations());
 
             if ($path) {
                 $pathItem = $paths->getPath($path) ?: new Model\PathItem();
@@ -271,7 +271,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
                 $operationId,
-                $operation->getOpenapiContext()['tags'] ?? ([$operation->shortName] ?? [$resourceShortName]),
+                $operation->getOpenapiContext()['tags'] ?? ([$operation->getShortName()] ?? [$resourceShortName]),
                 $responses,
                 $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method),
                 $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method),
@@ -400,7 +400,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         $parameters = [];
 
-        $resourceFilters = $resource->getOperation($operationName)->filters;
+        $resourceFilters = $resource->getOperation($operationName)->getFilters();
         foreach ($resourceFilters ?? [] as $filterId) {
             if (!$filter = $this->getFilter($filterId)) {
                 continue;

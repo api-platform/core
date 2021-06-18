@@ -40,7 +40,7 @@ final class ResourceCollection extends \ArrayObject
             /** @var resource */
             $metadata = $it->current();
 
-            foreach ($metadata->operations as $name => $operation) {
+            foreach ($metadata->getOperations() as $name => $operation) {
                 if ($name === $operationName) {
                     return $operation;
                 }

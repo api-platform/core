@@ -161,9 +161,9 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
         if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
-                foreach ($resourceMetadata->operations as $operationName => $operation) {
-                    if ('GET' === $operation->method && !$operation->collection) {
-                        if (\count($identifiers) > 1 && $operation->compositeIdentifier) {
+                foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if ('GET' === $operation->getMethod() && !$operation->isCollection()) {
+                        if (\count($identifiers) > 1 && $operation->getCompositeIdentifier()) {
                             $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
                         }
 

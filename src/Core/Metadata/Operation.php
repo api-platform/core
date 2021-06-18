@@ -41,7 +41,7 @@ class Operation
      * @param array        $options
      * @param bool         $stateless
      * @param string       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string       $status                         
+     * @param string|int   $status
      * @param string       $host
      * @param array        $schemes
      * @param string       $condition
@@ -55,6 +55,7 @@ class Operation
      * @param array        $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param string[]     $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
      * @param array        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param array        $swaggerContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param array        $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
      * @param string[]     $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
      * @param bool         $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
@@ -81,6 +82,11 @@ class Operation
      * @param string       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param bool         $compositeIdentifier
      * @param GraphQl|null $graphQl
+     * @param bool         $read                           https://api-platform.com/docs/core/events/#the-event-system
+     * @param bool         $deserialize                    https://api-platform.com/docs/core/events/#the-event-system
+     * @param bool         $validate                       https://api-platform.com/docs/core/events/#the-event-system
+     * @param bool         $write                          https://api-platform.com/docs/core/events/#the-event-system
+     * @param bool         $serialize                      https://api-platform.com/docs/core/events/#the-event-system
      */
     public function __construct(
         private string $method = self::METHOD_GET,
@@ -114,6 +120,7 @@ class Operation
         private array $denormalizationContext = [],
         private array $hydraContext = [],
         private array $openapiContext = [],
+        private array $swaggerContext = [],
         //TODO: rename validationContext having ['groups' => []]
         private array $validationGroups = [],
         private array $filters = [],
@@ -141,29 +148,29 @@ class Operation
         private ?string $securityPostDenormalizeMessage = null,
         private ?bool $compositeIdentifier = null,
         private ?GraphQl $graphQl = null,
+        private bool $read = true,
+        private bool $deserialize = true,
+        private bool $validate = true,
+        private bool $write = true,
+        private bool $serialize = true,
         ...$extraProperties
     ) {
         $this->extraProperties = $extraProperties;
     }
 
-    /**
-     * @return string
-     */
     public function getMethod(): string
     {
         return $this->method;
     }
-    
+
     public function withMethod(string $method): self
     {
         $self = clone $this;
         $self->method = $method;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUriTemplate(): ?string
     {
         return $this->uriTemplate;
@@ -173,12 +180,10 @@ class Operation
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getShortName(): ?string
     {
         return $this->shortName;
@@ -188,12 +193,10 @@ class Operation
     {
         $self = clone $this;
         $self->shortName = $shortName;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDescription(): ?string
     {
         return $this->description;
@@ -203,12 +206,10 @@ class Operation
     {
         $self = clone $this;
         $self->description = $description;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getTypes(): array
     {
         return $this->types;
@@ -218,6 +219,7 @@ class Operation
     {
         $self = clone $this;
         $self->types = $types;
+
         return $self;
     }
 
@@ -228,11 +230,12 @@ class Operation
     {
         return $this->formats;
     }
-    
+
     public function withFormats(mixed $formats = null): self
     {
         $self = clone $this;
         $self->formats = $formats;
+
         return $self;
     }
 
@@ -243,11 +246,12 @@ class Operation
     {
         return $this->inputFormats;
     }
-    
+
     public function withInputFormats(mixed $inputFormats = null): self
     {
         $self = clone $this;
         $self->inputFormats = $inputFormats;
+
         return $self;
     }
 
@@ -258,257 +262,223 @@ class Operation
     {
         return $this->outputFormats;
     }
-    
+
     public function withOutputFormats(mixed $outputFormats = null): self
     {
         $self = clone $this;
         $self->outputFormats = $outputFormats;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getIdentifiers(): array
     {
         return $this->identifiers;
     }
-    
+
     public function withIdentifiers(array $identifiers = []): self
     {
         $self = clone $this;
         $self->identifiers = $identifiers;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getLinks(): array
     {
         return $this->links;
     }
-    
+
     public function withLinks(array $links = []): self
     {
         $self = clone $this;
         $self->links = $links;
+
         return $self;
     }
 
-    /**
-     * @return string
-     */
     public function getRoutePrefix(): string
     {
         return $this->routePrefix;
     }
-    
+
     public function withRoutePrefix(string $routePrefix = ''): self
     {
         $self = clone $this;
         $self->routePrefix = $routePrefix;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRouteName(): ?string
     {
         return $this->routeName;
     }
-    
+
     public function withRouteName(?string $routeName = null): self
     {
         $self = clone $this;
         $self->routeName = $routeName;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getDefaults(): array
     {
         return $this->defaults;
     }
-    
+
     public function withDefaults(array $defaults = []): self
     {
         $self = clone $this;
         $self->defaults = $defaults;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getRequirements(): array
     {
         return $this->requirements;
     }
-    
+
     public function withRequirements(array $requirements = []): self
     {
         $self = clone $this;
         $self->requirements = $requirements;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;
     }
-    
+
     public function withOptions(array $options = []): self
     {
         $self = clone $this;
         $self->options = $options;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getStateless(): ?bool
     {
         return $this->stateless;
     }
-    
+
     public function withStateless(?bool $stateless = null): self
     {
         $self = clone $this;
         $self->stateless = $stateless;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSunset(): ?string
     {
         return $this->sunset;
     }
-    
+
     public function withSunset(?string $sunset = null): self
     {
         $self = clone $this;
         $self->sunset = $sunset;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getStatus(): ?string
     {
         return $this->status;
     }
-    
-    public function withStatus(?string $status = null): self
+
+    public function withStatus(string | int | null $status = null): self
     {
         $self = clone $this;
-        $self->status = $status;
+        $self->status = \is_string($status) || null === $status ? $status : (string) $status;
+
         return $self;
     }
 
-    /**
-     * @return string
-     */
     public function getHost(): string
     {
         return $this->host;
     }
-    
+
     public function withHost(string $host = ''): self
     {
         $self = clone $this;
         $self->host = $host;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getSchemes(): array
     {
         return $this->schemes;
     }
-    
+
     public function withSchemes(array $schemes = []): self
     {
         $self = clone $this;
         $self->schemes = $schemes;
+
         return $self;
     }
 
-    /**
-     * @return string
-     */
     public function getCondition(): string
     {
         return $this->condition;
     }
-    
+
     public function withCondition(string $condition = ''): self
     {
         $self = clone $this;
         $self->condition = $condition;
+
         return $self;
     }
 
-    /**
-     * @return string
-     */
     public function getController(): string
     {
         return $this->controller;
     }
-    
+
     public function withController(string $controller = ''): self
     {
         $self = clone $this;
         $self->controller = $controller;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getClass(): ?string
     {
         return $this->class;
     }
-    
+
     public function withClass(?string $class = null): self
     {
         $self = clone $this;
         $self->class = $class;
+
         return $self;
     }
 
-    /**
-     * @return int|null
-     */
     public function getUrlGenerationStrategy(): ?int
     {
         return $this->urlGenerationStrategy;
     }
-    
+
     public function withUrlGenerationStrategy(?int $urlGenerationStrategy = null): self
     {
         $self = clone $this;
         $self->urlGenerationStrategy = $urlGenerationStrategy;
+
         return $self;
     }
 
-    /**
-     * @return bool
-     */
     public function isCollection(): bool
     {
         return $this->collection;
@@ -518,66 +488,59 @@ class Operation
     {
         $self = clone $this;
         $self->collection = $collection;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDeprecationReason(): ?string
     {
         return $this->deprecationReason;
     }
-    
+
     public function withDeprecationReason(?string $deprecationReason = null): self
     {
         $self = clone $this;
         $self->deprecationReason = $deprecationReason;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getCacheHeaders(): array
     {
         return $this->cacheHeaders;
     }
-    
+
     public function withCacheHeaders(array $cacheHeaders = []): self
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getNormalizationContext(): array
     {
         return $this->normalizationContext;
     }
-    
+
     public function withNormalizationContext(array $normalizationContext = []): self
     {
         $self = clone $this;
         $self->normalizationContext = $normalizationContext;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getDenormalizationContext(): array
     {
         return $this->denormalizationContext;
     }
-    
+
     public function withDenormalizationContext(array $denormalizationContext = []): self
     {
         $self = clone $this;
         $self->denormalizationContext = $denormalizationContext;
+
         return $self;
     }
 
@@ -588,41 +551,51 @@ class Operation
     {
         return $this->hydraContext;
     }
-    
+
     public function withHydraContext(array $hydraContext = []): self
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getOpenapiContext(): array
     {
         return $this->openapiContext;
     }
-    
+
     public function withOpenapiContext(array $openapiContext = []): self
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
+    public function getSwaggerContext(): array
+    {
+        return $this->swaggerContext;
+    }
+
+    public function withSwaggerContext(array $swaggerContext = []): self
+    {
+        $self = clone $this;
+        $self->swaggerContext = $swaggerContext;
+
+        return $self;
+    }
+
     public function getValidationGroups(): array
     {
         return $this->validationGroups;
     }
-    
+
     public function withValidationGroups(array $validationGroups = []): self
     {
         $self = clone $this;
         $self->validationGroups = $validationGroups;
+
         return $self;
     }
 
@@ -633,26 +606,25 @@ class Operation
     {
         return $this->filters;
     }
-    
+
     public function withFilters(array $filters = []): self
     {
         $self = clone $this;
         $self->filters = $filters;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getElasticsearch(): ?bool
     {
         return $this->elasticsearch;
     }
-    
+
     public function withElasticsearch(?bool $elasticsearch = null): self
     {
         $self = clone $this;
         $self->elasticsearch = $elasticsearch;
+
         return $self;
     }
 
@@ -663,11 +635,12 @@ class Operation
     {
         return $this->mercure;
     }
-    
+
     public function withMercure(mixed $mercure = null): self
     {
         $self = clone $this;
         $self->mercure = $mercure;
+
         return $self;
     }
 
@@ -678,341 +651,363 @@ class Operation
     {
         return $this->messenger;
     }
-    
+
     public function withMessenger(mixed $messenger = null): self
     {
         $self = clone $this;
         $self->messenger = $messenger;
+
         return $self;
     }
 
-    /**
-     * @return mixed
-     */
     public function getInput(): mixed
     {
         return $this->input;
     }
-    
+
     public function withInput(mixed $input = null): self
     {
         $self = clone $this;
         $self->input = $input;
+
         return $self;
     }
 
-    /**
-     * @return mixed
-     */
     public function getOutput(): mixed
     {
         return $this->output;
     }
-    
+
     public function withOutput(mixed $output = null): self
     {
         $self = clone $this;
         $self->output = $output;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getOrder(): array
     {
         return $this->order;
     }
-    
+
     public function withOrder(array $order = []): self
     {
         $self = clone $this;
         $self->order = $order;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getFetchPartial(): ?bool
     {
         return $this->fetchPartial;
     }
-    
+
     public function withFetchPartial(?bool $fetchPartial = null): self
     {
         $self = clone $this;
         $self->fetchPartial = $fetchPartial;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getForceEager(): ?bool
     {
         return $this->forceEager;
     }
-    
+
     public function withForceEager(?bool $forceEager = null): self
     {
         $self = clone $this;
         $self->forceEager = $forceEager;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getPaginationClientEnabled(): ?bool
     {
         return $this->paginationClientEnabled;
     }
-    
+
     public function withPaginationClientEnabled(?bool $paginationClientEnabled = null): self
     {
         $self = clone $this;
         $self->paginationClientEnabled = $paginationClientEnabled;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getPaginationClientItemsPerPage(): ?bool
     {
         return $this->paginationClientItemsPerPage;
     }
-    
+
     public function withPaginationClientItemsPerPage(?bool $paginationClientItemsPerPage = null): self
     {
         $self = clone $this;
         $self->paginationClientItemsPerPage = $paginationClientItemsPerPage;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getPaginationClientPartial(): ?bool
     {
         return $this->paginationClientPartial;
     }
-    
+
     public function withPaginationClientPartial(?bool $paginationClientPartial = null): self
     {
         $self = clone $this;
         $self->paginationClientPartial = $paginationClientPartial;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getPaginationViaCursor(): array
     {
         return $this->paginationViaCursor;
     }
-    
+
     public function withPaginationViaCursor(array $paginationViaCursor = []): self
     {
         $self = clone $this;
         $self->paginationViaCursor = $paginationViaCursor;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getPaginationEnabled(): ?bool
     {
         return $this->paginationEnabled;
     }
-    
+
     public function withPaginationEnabled(?bool $paginationEnabled = null): self
     {
         $self = clone $this;
         $self->paginationEnabled = $paginationEnabled;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getPaginationFetchJoinCollection(): ?bool
     {
         return $this->paginationFetchJoinCollection;
     }
-    
+
     public function withPaginationFetchJoinCollection(?bool $paginationFetchJoinCollection = null): self
     {
         $self = clone $this;
         $self->paginationFetchJoinCollection = $paginationFetchJoinCollection;
+
         return $self;
     }
 
-    /**
-     * @return int|null
-     */
     public function getPaginationItemsPerPage(): ?int
     {
         return $this->paginationItemsPerPage;
     }
-    
+
     public function withPaginationItemsPerPage(?int $paginationItemsPerPage = null): self
     {
         $self = clone $this;
         $self->paginationItemsPerPage = $paginationItemsPerPage;
+
         return $self;
     }
 
-    /**
-     * @return int|null
-     */
     public function getPaginationMaximumItemsPerPage(): ?int
     {
         return $this->paginationMaximumItemsPerPage;
     }
-    
+
     public function withPaginationMaximumItemsPerPage(?int $paginationMaximumItemsPerPage = null): self
     {
         $self = clone $this;
         $self->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getPaginationPartial(): ?bool
     {
         return $this->paginationPartial;
     }
-    
+
     public function withPaginationPartial(?bool $paginationPartial = null): self
     {
         $self = clone $this;
         $self->paginationPartial = $paginationPartial;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPaginationType(): ?string
     {
         return $this->paginationType;
     }
-    
+
     public function withPaginationType(?string $paginationType = null): self
     {
         $self = clone $this;
         $self->paginationType = $paginationType;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSecurity(): ?string
     {
         return $this->security;
     }
-    
+
     public function withSecurity(?string $security = null): self
     {
         $self = clone $this;
         $self->security = $security;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSecurityMessage(): ?string
     {
         return $this->securityMessage;
     }
-    
+
     public function withSecurityMessage(?string $securityMessage = null): self
     {
         $self = clone $this;
         $self->securityMessage = $securityMessage;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSecurityPostDenormalize(): ?string
     {
         return $this->securityPostDenormalize;
     }
-    
+
     public function withSecurityPostDenormalize(?string $securityPostDenormalize = null): self
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;
+
         return $self;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSecurityPostDenormalizeMessage(): ?string
     {
         return $this->securityPostDenormalizeMessage;
     }
-    
+
     public function withSecurityPostDenormalizeMessage(?string $securityPostDenormalizeMessage = null): self
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+
         return $self;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getCompositeIdentifier(): ?bool
     {
         return $this->compositeIdentifier;
     }
-    
+
     public function withCompositeIdentifier(?bool $compositeIdentifier = null): self
     {
         $self = clone $this;
         $self->compositeIdentifier = $compositeIdentifier;
+
         return $self;
     }
 
-    /**
-     * @return GraphQl|null
-     */
     public function getGraphQl(): ?GraphQl
     {
         return $this->graphQl;
     }
-    
+
     public function withGraphQl(?GraphQl $graphQl = null): self
     {
         $self = clone $this;
         $self->graphQl = $graphQl;
+
         return $self;
     }
 
-    /**
-     * @return array
-     */
     public function getExtraProperties(): array
     {
         return $this->extraProperties;
     }
-    
+
     public function withExtraProperties(array $extraProperties = []): self
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getRead(): bool
+    {
+        return $this->read;
+    }
+
+    public function withRead(bool $read = true): self
+    {
+        $self = clone $this;
+        $self->read = $read;
+
+        return $self;
+    }
+
+    public function getDeserialize(): bool
+    {
+        return $this->deserialize;
+    }
+
+    public function withDeserialize(bool $deserialize = true): self
+    {
+        $self = clone $this;
+        $self->deserialize = $deserialize;
+
+        return $self;
+    }
+
+    public function getValidate(): bool
+    {
+        return $this->validate;
+    }
+
+    public function withValidate(bool $validate = true): self
+    {
+        $self = clone $this;
+        $self->validate = $validate;
+
+        return $self;
+    }
+
+    public function getWrite(): bool
+    {
+        return $this->write;
+    }
+
+    public function withWrite(bool $write = true): self
+    {
+        $self = clone $this;
+        $self->write = $write;
+
+        return $self;
+    }
+
+    public function getSerialize(): bool
+    {
+        return $this->serialize;
+    }
+
+    public function withSerialize(bool $serialize = true): self
+    {
+        $self = clone $this;
+        $self->serialize = $serialize;
+
         return $self;
     }
 

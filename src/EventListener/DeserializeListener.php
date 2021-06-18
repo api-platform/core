@@ -32,6 +32,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+// TODO: Merge ResourceCollectionMetadataFactoryInterface & ResourceMetadataFactoryInterface
 final class DeserializeListener
 {
     use ToggleableOperationAttributeTrait;
@@ -92,7 +93,7 @@ final class DeserializeListener
             try {
                 $resourceCollection = $this->resourceCollectionMetadataFactory->create($attributes['resource_class']);
                 $operation = $resourceCollection->getOperation($attributes['operation_name']);
-                $formats = $operation ? $operation->inputFormats : null;
+                $formats = $operation ? $operation->getInputFormats() : null;
             } catch (ResourceClassNotFoundException $e) {
             }
         }

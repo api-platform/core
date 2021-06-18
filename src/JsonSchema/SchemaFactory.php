@@ -107,7 +107,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             if ($resourceMetadata instanceof ResourceMetadata) {
                 $method = $operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET') : 'GET';
             } else { // New Interface
-                $method = $operation->getMethod() ?? 'GET';
+                $method = $operation ? $operation->getMethod() : 'GET';
             }
 
             if ($forceCollection || (OperationType::COLLECTION === $operationType && 'POST' !== $method)) {
@@ -128,7 +128,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $definition = new \ArrayObject(['type' => 'object']);
         $definitions[$definitionName] = $definition;
 
-        if ($resourceMetadata && $description = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getDescription() : ($operation->getDescription() ?? null)) {
+        if ($resourceMetadata && $description = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getDescription() : ($operation ? $operation->getDescription() : null)) {
             $definition['description'] = $description;
         }
 
@@ -144,7 +144,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $resourceMetadata &&
             (
                 $resourceMetadata instanceof ResourceMetadata ? ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null)) :
-                ($operation->getDeprecationReason() ?? null)
+                ($operation ? $operation->getDeprecationReason() : null)
             )
         ) {
             $definition['deprecated'] = true;
@@ -152,7 +152,7 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
-        if ($resourceMetadata && $iri = ($resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getIri() : $operation->getTypes() ?? null)) {
+        if ($resourceMetadata && $iri = ($resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getIri() : ($operation ? $operation->getTypes() : null))) {
             $definition['externalDocs'] = ['url' => \is_array($iri) ? $iri[0] : $iri];
         }
 
@@ -372,7 +372,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             return \is_array($validationGroups = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true)) ? $validationGroups : [];
         }   // New interface
 
-        return $resourceMetadata->getValidationGroups();
+        return $resourceMetadata ? $resourceMetadata->getValidationGroups() : [];
     }
 
     /**

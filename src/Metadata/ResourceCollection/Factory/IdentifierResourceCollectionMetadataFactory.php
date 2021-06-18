@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
@@ -42,12 +43,22 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
      */
     public function create(string $resourceClass): ResourceCollection
     {
-        $resourceMetadataCollection = $this->decorated->create($resourceClass);
+        $resourceMetadataCollection = [];
+
+        if ($this->decorated) {
+            try {
+                $resourceMetadataCollection = $this->decorated->create($resourceClass);
+            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
+            }
+        }
+
         $identifiers = null;
 
         foreach ($resourceMetadataCollection as $i => $resource) {
             if (!$resource->getIdentifiers()) {
                 $resource = $resource->withIdentifiers($identifiers ?: ($identifiers = $this->getIdentifiersFromResourceClass($resourceClass)));
+            } else {
+                $identifiers = $resource->getIdentifiers();
             }
 
             $resource = $resource->withIdentifiers($this->normalizeIdentifiers($resource->getIdentifiers(), $resourceClass));

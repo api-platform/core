@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Metadata\Operation;
@@ -23,14 +22,12 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 
 final class ResourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
 {
-    private $decorated;
     private $resourceMetadataFactory;
     private $defaults;
     private $converter;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, array $defaults = [])
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null, array $defaults = [])
     {
-        $this->decorated = $decorated;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->defaults = $defaults + ['attributes' => []];
         $this->converter = new CamelCaseToSnakeCaseNameConverter();
@@ -38,22 +35,15 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
 
     public function create(string $resourceClass): ResourceCollection
     {
-        $parentResourceCollection = null;
-        if ($this->decorated) {
-            try {
-                $parentResourceCollection = $this->decorated->create($resourceClass);
-                if ($parentResourceCollection[0] ?? false) {
-                    return $parentResourceCollection;
-                }
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-            }
-        }
-
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $attributes = $resourceMetadata->getAttributes() ?? [];
 
         if ($attributes && $this->defaults['attributes']) {
             foreach ($attributes as $key => $value) {
+                if (!$value) { // When value is null, take the new default
+                    unset($attributes[$key]);
+                    continue;
+                }
                 if (!isset($attributes[$key])) {
                     $attributes[$key] = $value;
                 }
@@ -61,6 +51,12 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
         }
 
         $resource = (new Resource())->withOperations([]);
+
+        if (isset($attributes['access_control'])) { // Manage deprecated accessControl attribute
+            // TODO: throw deprecation
+            $attributes['security'] = $attributes['access_control'];
+            unset($attributes['access_control']);
+        }
 
         foreach ($attributes as $key => $value) {
             $camelCaseKey = $this->converter->denormalize($key);
@@ -82,11 +78,12 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
             $resource = $resource->withOperations($operations);
         }
 
-        $resource->withShortName($resourceMetadata->getShortName());
-        $resource->withDescription($resourceMetadata->getDescription());
-        $resource->withClass($resourceClass);
-        $resource->withTypes([$resourceMetadata->getIri()]);
-        // $resource->graphQl = $resourceMetadata->getGraphql(); // TODO: fix this with graphql
+        $resource = $resource
+            ->withShortName($resourceMetadata->getShortName())
+            ->withDescription($resourceMetadata->getDescription())
+            ->withClass($resourceClass)
+            ->withTypes([$resourceMetadata->getIri()]);
+        // $resource = $resource->withGraphql($resourceMetadata->getGraphql()); // TODO: fix this with graphql
 
         return new ResourceCollection([$resource]);
     }
@@ -102,10 +99,16 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
                 unset($operation['path']);
             }
 
+            if (isset($operation['access_control'])) { // Manage deprecated accessControl attribute
+                // TODO: throw deprecation
+                $newOperation = $newOperation->withSecurity($operation['access_control']);
+                unset($operation['access_control']);
+            }
+
             foreach ($operation as $operationKey => $operationValue) {
                 $camelCaseKey = $this->converter->denormalize($operationKey);
                 $operationValue = $this->sanitizeValueFromKey($operationKey, $operationValue);
-                $newOperation = $newOperation->{'with' . ucFirst($camelCaseKey)}($operationValue);
+                $newOperation = $newOperation->{'with'.ucfirst($camelCaseKey)}($operationValue);
             }
 
             // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceCollectionMetadataFactory

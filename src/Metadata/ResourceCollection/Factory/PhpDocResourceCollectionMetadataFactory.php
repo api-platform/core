@@ -45,7 +45,7 @@ final class PhpDocResourceCollectionMetadataFactory implements ResourceCollectio
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
         foreach ($resourceMetadataCollection as $key => $resourceMetadata) {
-            if (null !== $resourceMetadata->description) {
+            if (null !== $resourceMetadata->getDescription()) {
                 continue;
             }
 
@@ -53,7 +53,7 @@ final class PhpDocResourceCollectionMetadataFactory implements ResourceCollectio
 
             try {
                 $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
-                $resourceMetadata->description = $docBlock->getSummary();
+                $resourceMetadata = $resourceMetadata->withDescription($docBlock->getSummary());
                 $resourceMetadataCollection[$key] = $resourceMetadata;
             } catch (\InvalidArgumentException $e) {
                 // Ignore empty DocBlocks

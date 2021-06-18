@@ -107,7 +107,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $operationType = OperationType::SUBRESOURCE;
         }
 
-        $context = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true) : $resourceMetadata[0]->{$key};
+        if ($resourceMetadata instanceof ResourceMetadata) {
+            $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
+        } else {
+            $context = $normalization ? $resourceMetadata[0]->getNormalizationContext() : $resourceMetadata[0]->getDenormalizationContext();
+        }
         $context['operation_type'] = $operationType;
         $context[$operationKey] = $attributes[$operationKey];
 
@@ -126,9 +130,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['resource_class'] = $attributes['resource_class'];
-        $context['iri_only'] = $resourceMetadata instanceof ResourceMetadata ? ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) : ($resourceMetadata->normalizationContext['iri_only'] ?? false);
-        $context['input'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true) : $resourceMetadata->getOperation($operationType)->input ?? null;
-        $context['output'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true) : $resourceMetadata->getOperation($operationType)->output ?? null;
+        $context['iri_only'] = $resourceMetadata instanceof ResourceMetadata ? ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) : ($resourceMetadata[0]->getNormalizationContext()['iri_only'] ?? false);
+        $context['input'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true) : $resourceMetadata->getOperation($operationType)->getInput() ?? null;
+        $context['output'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true) : $resourceMetadata->getOperation($operationType)->getOutput() ?? null;
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
 
@@ -165,14 +169,15 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             }
         } else {
             foreach ($resourceMetadata as $resourceName => $resource) {
-                foreach ($resource->operations as $operationName => $operation) {
-                    if ('PATCH' === ($operation->method ?? '') && \in_array('application/merge-patch+json', $operation->inputFormats['json'] ?? [], true)) {
+                foreach ($resource->getOperations() as $operationName => $operation) {
+                    if ('PATCH' === ($operation->getMethod() ?? '') && \in_array('application/merge-patch+json', $operation->getInputFormats()['json'] ?? [], true)) {
                         $context['skip_null_values'] = true;
                         break;
                     }
                 }
             }
         }
+        dump('serializercontextbuilder:OUTPUT', $context);
 
         return $context;
     }
@@ -184,8 +189,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     {
         $collection = $this->resourceMetadataFactory->create($class);
         foreach ($collection as $metadata) {
-            foreach ($metadata->operations as $operation) {
-                if ('PATCH' === ($operation->method ?? '') && \in_array('application/merge-patch+json', $operation->inputFormats ?? [], true)) {
+            foreach ($metadata->getOperations() as $operation) {
+                if ('PATCH' === ($operation->getMethod() ?? '') && \in_array('application/merge-patch+json', $operation->getInputFormats() ?? [], true)) {
                     return true;
                 }
             }

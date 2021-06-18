@@ -23,7 +23,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ResourceWithInteger;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -106,26 +105,26 @@ final class ApiLoader extends Loader
             }
 
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
-                foreach ($resourceMetadata->operations as $operationName => $operation) {
+                foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     $route = new Route(
-                        ($operation->routePrefix ?? '').$operation->uriTemplate,
+                        ($operation->routePrefix ?? '').$operation->getUriTemplate(),
                         [
-                            '_controller' => $operation->controller,
+                            '_controller' => $operation->getController(),
                             '_format' => null,
-                            '_stateless' => $operation->stateless,
+                            '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
-                            '_api_identifiers' => $operation->identifiers,
+                            '_api_identifiers' => $operation->getIdentifiers(),
                             // TODO: remove this and use operation['has_composite_identifier']
-                            '_api_has_composite_identifier' => $operation->compositeIdentifier,
+                            '_api_has_composite_identifier' => $operation->getCompositeIdentifier(),
                             '_api_operation_name' => $operationName,
                             '_api_operation' => $operation->__serialize(),
-                        ] + ($operation->defaults ?? []),
-                        $operation->requirements ?? [],
-                        $operation->options ?? [],
-                        $operation->host ?? '',
-                        $operation->schemes ?? [],
-                        [$operation->method],
-                        $operation->condition ?? ''
+                        ] + ($operation->getDefaults() ?? []),
+                        $operation->getRequirements() ?? [],
+                        $operation->getOptions() ?? [],
+                        $operation->getHost() ?? '',
+                        $operation->getSchemes() ?? [],
+                        [$operation->getMethod()],
+                        $operation->getCondition() ?? ''
                     );
 
                     $routeCollection->add($operationName, $route);
