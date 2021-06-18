@@ -39,7 +39,8 @@ class Operation
      * @param array        $options
      * @param bool         $stateless
      * @param string       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string|int   $status
+     * @param string       $acceptPatch
+     * @param null|string|int   $status
      * @param string       $host
      * @param array        $schemes
      * @param string       $condition
@@ -104,7 +105,8 @@ class Operation
         private array $options = [],
         private ?bool $stateless = null,
         private ?string $sunset = null,
-        private ?string $status = null,
+        private ?string $acceptPatch = null,
+        private mixed $status = null,
         private string $host = '',
         private array $schemes = [],
         private string $condition = '',
@@ -382,6 +384,19 @@ class Operation
     {
         $self = clone $this;
         $self->sunset = $sunset;
+
+        return $self;
+    }
+
+    public function getAcceptPatch(): ?string
+    {
+        return $this->acceptPatch;
+    }
+
+    public function withAcceptPatch(?string $acceptPatch = null): self
+    {
+        $self = clone $this;
+        $self->acceptPatch = $acceptPatch;
 
         return $self;
     }
@@ -1039,6 +1054,11 @@ class Operation
             'method' => $this->method,
             'filters' => $this->filters,
             'extra_properties' => $this->extraProperties,
+            'status' => $this->status,
+            'sunset' => $this->sunset,
+            'accept_patch' => $this->acceptPatch,
+            'input_formats' => $this->inputFormats,
+            'output_formats' => $this->outputFormats,
         ];
     }
 }

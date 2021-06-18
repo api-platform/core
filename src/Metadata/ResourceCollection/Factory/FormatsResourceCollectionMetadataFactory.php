@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Normalizes enabled formats.
@@ -68,8 +69,9 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
     private function normalize(array $resourceInputFormats, array $resourceOutputFormats, array $operations): array
     {
         $newOperations = [];
+        $patchFormats = null;
         foreach ($operations as $operationName => $operation) {
-            if ('PATCH' === ($operation->getMethod() ?? '') && !$operation->getFormats() && !$operation->getInputFormats()) {
+            if ($isPatch = Operation::METHOD_PATCH === $operation->getMethod() && !$operation->getFormats() && !$operation->getInputFormats()) {
                 $operation->withInputFormats($this->patchFormats);
             }
 
@@ -80,7 +82,33 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
             $operation = $operation->withInputFormats($operation->getInputFormats() ? $this->normalizeFormats($operation->getInputFormats()) : $operation->getFormats() ?? $resourceInputFormats);
             $operation = $operation->withOutputFormats($operation->getOutputFormats() ? $this->normalizeFormats($operation->getOutputFormats()) : $operation->getFormats() ?? $resourceOutputFormats);
 
+
+            if ($isPatch) {
+                $patchFormats = $operation->getInputFormats();
+            }
+
             $newOperations[$operationName] = $operation;
+        }
+
+        if (!$patchFormats) {
+            return $newOperations;
+        }
+
+        // Prepare an Accept-Patch header
+        foreach ($operations as $operationName => $operation) {
+            if ($operation->isCollection()) {
+                continue;
+            }
+
+            $patchMimeTypes = [];
+
+            foreach ($patchFormats as $mimeTypes) {
+                foreach ($mimeTypes as $mimeType) {
+                    $patchMimeTypes[] = $mimeType;
+                }
+            }
+
+            $newOperations[$operationName] = $operation->withAcceptPatch(implode(', ', $patchMimeTypes));
         }
 
         return $newOperations;

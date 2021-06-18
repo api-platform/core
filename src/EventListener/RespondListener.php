@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 
 /**
  * Builds the response object.
@@ -33,8 +34,12 @@ final class RespondListener
 
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct($resourceMetadataFactory = null)
     {
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
@@ -65,14 +70,30 @@ final class RespondListener
 
         $status = null;
         if ($this->resourceMetadataFactory && $attributes) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+            // TODO: remove this in 3.x
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+                $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
-            if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {
-                $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+                if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {
+                    $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+                }
+
+                $headers = $this->addAcceptPatchHeader($headers, $attributes, $resourceMetadata);
+                $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
+            } else if ($attributes['operation_name']) {
+                $resourceMetadataCollection = $this->resourceMetadataFactory->create($attributes['resource_class']);
+                $operation = $resourceMetadataCollection->getOperation($attributes['operation_name']);
+
+                if ($sunset = $attributes['operation']['sunset']) {
+                    $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+                }
+
+                $status = $attributes['operation']['status'];
+
+                if ($acceptPatch = $attributes['operation']['accept_patch']) {
+                    $headers['Accept-Patch'] = $acceptPatch;
+                }
             }
-
-            $headers = $this->addAcceptPatchHeader($headers, $attributes, $resourceMetadata);
-            $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
         }
 
         $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;

@@ -85,23 +85,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
         if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
-            // Note that this responsability should be transfered to the ResourceMetadataFactory
-            // it would only be possible if the Metadata defines the output of the Custom Controller and that the output is also a Resource
-            // this is the only case where it happens (or a Provider returning another class then the one requested)
             if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface && $resourceClass !== $context['resource_class']) {
                 foreach ($this->resourceMetadataFactory->create($resourceClass) as $resource) {
-                    // Trigger a deprecation because:
-                    // En gros une Resource peut avoir une Opération qui dans son controlleur retourne une autre Resource ! 
-                    //
-                    // Dans ce cas, je dois retrouver les Metadonnées liées a celui ci sauf que j'ai aucun moyen de le savoir en amont. Pour toi c'est la responsabilité:
-                    //
-                    // - Du SerializeListener
-                    // - Du JsonLd\ItemNormalizer (doit trouver le @id qui correspond a l'autre resource) 
-                    // - Du IriConverter
-                    //
-                    // Sachant qu'en vrai on devrait totalement déprecier ca car ce sera faisable avec:
-                    // #[Resource(operations=[new Post('/payments/{id}/void', identifiers: ['id' => [Payment::class, 'id']])])
-                    // class VoidPayment {}
+                    // TODO: Document
+                    @trigger_error('You are trying to serialize a class is not the expected one, this behavior will not be possible anymore in 3.0. Possible reason is to return the wrong Resource in a controller or a Data Provider. Replace this behavior using an Alternate Route.');
                     foreach ($resource->getOperations() as $operation) {
                         if ($operation->getMethod() === Operation::METHOD_GET && !$operation->isCollection()) {
                             $context['links'] = $operation->getLinks();
