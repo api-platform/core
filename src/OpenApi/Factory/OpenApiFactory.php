@@ -35,6 +35,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Generates an Open API v3 specification.
@@ -58,10 +59,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $openApiOptions;
     private $paginationOptions;
     private $identifiersExtractor;
+    private $router;
     // TODO: remove this in 3.0
     private $decorated = null;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -75,6 +77,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->identifiersExtractor = $identifiersExtractor;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
+        $this->router = $router;
 
         if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
@@ -144,13 +147,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         foreach ($resource->getOperations() as $operationName => $operation) {
             // No path to return
-            if (null === $operation->getUriTemplate()) {
+            if (null === $operation->getUriTemplate() && null === $operation->getRouteName()) {
                 continue;
             }
 
             $identifiers = $operation->getIdentifiers();
             $resourceClass = $operation->getClass() ?? $rootResourceClass;
-            $path = $this->getPath($operation->getUriTemplate());
+
+            $path = $this->getPath($operation->getUriTemplate() ?? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath());
             $method = $operation->getMethod();
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);

@@ -54,8 +54,16 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
                         continue;
                     }
 
-                    $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
                     $operations = $resource->getOperations();
+
+                    if ($routeName = $operation->getRouteName()) {
+                        unset($operations[$key]);
+                        $operations[$routeName] = $operation;
+                        $resource = $resource->withOperations($operations);
+                        continue;
+                    }
+
+                    $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
                     // Change the operation key
                     unset($operations[$key]);
                     $operations[sprintf('_api_%s_%s', $operation->getUriTemplate(), strtolower($operation->getMethod()))] = $operation;

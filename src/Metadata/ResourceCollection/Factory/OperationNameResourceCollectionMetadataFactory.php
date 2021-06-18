@@ -51,6 +51,9 @@ final class OperationNameResourceCollectionMetadataFactory implements ResourceCo
             $operations = $resource->getOperations();
 
             foreach ($resource->getOperations() as $key => $operation) {
+                if ($operation->getRouteName()) {
+                    continue;
+                }
                 $newOperationKey = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof GetCollection ? '_collection' : '');
 
                 unset($operations[$key]);

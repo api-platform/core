@@ -106,6 +106,9 @@ final class ApiLoader extends Loader
 
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if ($operation->getRouteName()) {
+                        continue;
+                    }
                     $route = new Route(
                         ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
                         [

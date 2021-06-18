@@ -152,7 +152,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
         if ($resourceMetadata instanceof ResourceMetadata) {
             $definition['externalDocs'] = ['url' => $resourceMetadata->getIri()];
-        } elseif ($operation) {
+        } elseif ($operation && $operation->getTypes()) {
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 

@@ -112,7 +112,7 @@ final class ResourceMetadataResourceCollectionFactory implements ResourceCollect
             }
 
             // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceCollectionMetadataFactory
-            yield $newOperation->getRouteName() ? $newOperation->getRouteName() : sprintf('%s%s', $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
+            yield sprintf('%s%s', $newOperation->getRouteName() ?? $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
         }
     }
 

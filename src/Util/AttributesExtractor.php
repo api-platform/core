@@ -65,7 +65,7 @@ final class AttributesExtractor
             foreach (OperationType::TYPES as $operationType) {
                 $attribute = "_api_{$operationType}_operation_name";
                 if (isset($attributes[$attribute])) {
-                    $result["{$operationType}_operation_name"] = $attributes[$attribute];
+                    $result['operation_name'] = $result["{$operationType}_operation_name"] = $attributes[$attribute];
                     $hasRequestAttributeKey = true;
                     break;
                 }

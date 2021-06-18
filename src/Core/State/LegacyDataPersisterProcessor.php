@@ -44,7 +44,7 @@ class LegacyDataPersisterProcessor implements ProcessorInterface
 
     public function process($data, array $identifiers = [], array $context = [])
     {
-        if (Operation::METHOD_DELETE === $context['method']) {
+        if (Operation::METHOD_DELETE === ($context['method'] ?? null)) {
             return $this->dataPersister instanceof ContextAwareDataPersisterInterface ? $this->dataPersister->remove($data, $context) : $this->dataPersister->remove($data);
         }
 

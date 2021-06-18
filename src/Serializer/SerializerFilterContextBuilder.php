@@ -55,12 +55,14 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
 
         if (
             !$this->resourceMetadataFactory
-            && isset($attributes['operation_name'])
+            && isset($attributes['operation_name']) && isset($context['filters'])
         ) {
             $resourceFilters = $context['filters'];
-        } else {
+        } elseif ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
             $resourceFilters = $resourceMetadata->getOperationAttribute($attributes, 'filters', [], true);
+        } else { // New interface
+            $resourceFilters = $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name'])->getFilters();
         }
 
         if (!$resourceFilters) {

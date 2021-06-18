@@ -71,8 +71,6 @@ final class WriteListener
             return;
         }
 
-        $context = $attributes['operation'] + ['operation_name' => $attributes['operation_name'], 'resource_class' => $attributes['resource_class']];
-
         if ($this->dataPersister instanceof DataPersisterInterface && !$this->dataPersister->supports($controllerResult, $attributes)) {
             return;
         }
@@ -80,6 +78,8 @@ final class WriteListener
         if ($this->dataPersister instanceof ProcessorInterface && !$this->dataPersister->supports($controllerResult, $attributes['identifiers'], $attributes)) {
             return;
         }
+
+        $context = ($attributes['operation'] ?? []) + ['operation_name' => $attributes['operation_name'], 'resource_class' => $attributes['resource_class']];
 
         switch ($request->getMethod()) {
             case 'PUT':
