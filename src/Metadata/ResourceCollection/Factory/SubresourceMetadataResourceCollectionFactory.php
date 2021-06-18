@@ -14,23 +14,28 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
+/**
+ * We have to compute a local cache having all the resource => subresource matching
+ * @deprecated
+ */
 final class SubresourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
 {
     private $decorated;
+    private $resourceNameCollectionFactory;
     private $subresourceOperationFactory;
-    private $converter;
+    private $localCache = [];
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated = null, SubresourceOperationFactoryInterface $subresourceOperationFactory = null)
+    public function __construct(SubresourceOperationFactoryInterface $subresourceOperationFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceCollectionMetadataFactoryInterface $decorated = null)
     {
-        $this->decorated = $decorated;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
-        $this->converter = new CamelCaseToSnakeCaseNameConverter();
+        $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
+        $this->decorated = $decorated;
     }
 
     public function create(string $resourceClass): ResourceCollection
@@ -43,56 +48,75 @@ final class SubresourceMetadataResourceCollectionFactory implements ResourceColl
             }
         }
 
-        foreach ($this->subresourceOperationFactory->create($resourceClass) as $subresourceMetadata) {
-            $resource = new Resource(
-                uriTemplate: $subresourceMetadata['path'],
-                shortName: $subresourceMetadata['shortNames'][0],
-                operations: [
-                    $subresourceMetadata['route_name'] => new Get(
-                        uriTemplate: $subresourceMetadata['path'],
-                        shortName: $subresourceMetadata['shortNames'][0],
-                        identifiers: $subresourceMetadata['identifiers'],
-                        defaults: $subresourceMetadata['defaults'],
-                        requirements: $subresourceMetadata['requirements'],
-                        options: $subresourceMetadata['options'],
-                        stateless: $subresourceMetadata['stateless'],
-                        host: $subresourceMetadata['host'],
-                        schemes: $subresourceMetadata['schemes'],
-                        condition: $subresourceMetadata['condition'],
-                        class: $subresourceMetadata['resource_class'],
-                        collection: $subresourceMetadata['collection'],
-                    ),
-                ],
-                identifiers: $subresourceMetadata['identifiers'],
-                defaults: $subresourceMetadata['defaults'],
-                requirements: $subresourceMetadata['requirements'],
-                options: $subresourceMetadata['options'],
-                stateless: $subresourceMetadata['stateless'],
-                host: $subresourceMetadata['host'],
-                schemes: $subresourceMetadata['schemes'],
-                condition: $subresourceMetadata['condition'],
-                class: $subresourceMetadata['resource_class'],
-            );
-
-            if ($subresourceMetadata['controller']) { // manage null values from subresources
-                $resource = $resource->withController($subresourceMetadata['controller']);
-            }
-
-            if ($resource->getIdentifiers()) {
-                $resource = $resource->withIdentifiers(array_keys($resource->getIdentifiers()));
-            }
-
-            // creer des links avec le get de la resource actuelle
-
-            $parentResourceCollection[] = $resource;
-
-            // essayer de boucler dans les identifiers pour les transformer au bon format avec un array[2] avant de les renvoyer au resource
-            // passer dans le constructeur de resource tous mes withers
-
-            // property ??? on sait pas ce que c'est pour l'instant
-            // route_name ????
+        if (0 === \count($this->localCache)) {
+            $this->computeSubresourceCache();
         }
 
-        return $parentResourceCollection; //new ResourceCollection([$resource]);
+        if (!isset($this->localCache[$resourceClass])) {
+            return $parentResourceCollection;
+        }
+
+        foreach ($this->localCache[$resourceClass] as $resource) {
+            $parentResourceCollection[] = $resource;
+        }
+
+        return $parentResourceCollection;
+    }
+
+    private function computeSubresourceCache()
+    {
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            if (!isset($this->localCache[$resourceClass])) {
+                $this->localCache[$resourceClass] = [];
+            }
+
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $subresourceMetadata) {
+                if (!isset($this->localCache[$subresourceMetadata['resource_class']])) {
+                    $this->localCache[$subresourceMetadata['resource_class']] = [];
+                }
+
+                $identifiers = [];
+                // Removing the third tuple element
+                foreach ($subresourceMetadata['identifiers'] as $parameterName => [$property, $class]) {
+                    $identifiers[$parameterName] = [$property, $class];
+                }
+
+                $resource = new Resource(
+                    uriTemplate: $subresourceMetadata['path'],
+                    shortName: $subresourceMetadata['shortNames'][0],
+                    operations: [
+                        $subresourceMetadata['route_name'] => new Get(
+                            uriTemplate: $subresourceMetadata['path'],
+                            shortName: $subresourceMetadata['shortNames'][0],
+                            identifiers: $identifiers,
+                            defaults: $subresourceMetadata['defaults'],
+                            requirements: $subresourceMetadata['requirements'],
+                            options: $subresourceMetadata['options'],
+                            stateless: $subresourceMetadata['stateless'],
+                            host: $subresourceMetadata['host'],
+                            schemes: $subresourceMetadata['schemes'],
+                            condition: $subresourceMetadata['condition'],
+                            class: $subresourceMetadata['resource_class'],
+                            collection: $subresourceMetadata['collection'],
+                        ),
+                    ],
+                    identifiers: $identifiers,
+                    defaults: $subresourceMetadata['defaults'],
+                    requirements: $subresourceMetadata['requirements'],
+                    options: $subresourceMetadata['options'],
+                    stateless: $subresourceMetadata['stateless'],
+                    host: $subresourceMetadata['host'],
+                    schemes: $subresourceMetadata['schemes'],
+                    condition: $subresourceMetadata['condition'],
+                    class: $subresourceMetadata['resource_class'],
+                );
+
+                if ($subresourceMetadata['controller']) { // manage null values from subresources
+                    $resource = $resource->withController($subresourceMetadata['controller']);
+                }
+
+                $this->localCache[$resource->getClass()] = $resource;
+            }
+        }
     }
 }

@@ -107,7 +107,7 @@ final class ApiLoader extends Loader
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     $route = new Route(
-                        ($operation->routePrefix ?? '').$operation->getUriTemplate(),
+                        ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
                         [
                             '_controller' => $operation->getController(),
                             '_format' => null,
@@ -132,8 +132,6 @@ final class ApiLoader extends Loader
 
                 continue;
             }
-
-            $this->loadLegacySubresources($routeCollection, $resourceClass);
         }
 
         return $routeCollection;

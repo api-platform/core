@@ -86,7 +86,7 @@
         <service id="ApiPlatform\Core\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
         <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Core\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.serializer.context_builder.filter.inner" />
         </service>

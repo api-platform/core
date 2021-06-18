@@ -63,8 +63,9 @@
         </service>
 
         <service id="api_platform.metadata.resource_collection.metadata_factory.legacy_subresource_metadata" class="ApiPlatform\Core\Metadata\ResourceCollection\Factory\SubresourceMetadataResourceCollectionFactory" decorates="api_platform.metadata.resource_collection.metadata_factory" decoration-priority="600" public="false">
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory.legacy_subresource_metadata.inner" />
             <argument type="service" id="api_platform.subresource_operation_factory" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory.legacy_subresource_metadata.inner" />
         </service>
 
         <service id="api_platform.metadata.property.identifier_metadata_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" public="false">

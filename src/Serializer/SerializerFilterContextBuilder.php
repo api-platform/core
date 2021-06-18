@@ -31,10 +31,14 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
     private $filterLocator;
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContainerInterface $filterLocator, SerializerContextBuilderInterface $decorated)
+    public function __construct($resourceMetadataFactory, ContainerInterface $filterLocator, SerializerContextBuilderInterface $decorated)
     {
         $this->decorated = $decorated;
         $this->filterLocator = $filterLocator;
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be not be used anymore in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
@@ -48,9 +52,16 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         }
 
         $context = $this->decorated->createFromRequest($request, $normalization, $attributes);
-        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
-        $resourceFilters = $resourceMetadata->getOperationAttribute($attributes, 'filters', [], true);
+        if (
+            !$this->resourceMetadataFactory
+            && isset($attributes['operation_name'])
+        ) {
+            $resourceFilters = $context['filters'];
+        } else {
+            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+            $resourceFilters = $resourceMetadata->getOperationAttribute($attributes, 'filters', [], true);
+        }
 
         if (!$resourceFilters) {
             return $context;

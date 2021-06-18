@@ -53,6 +53,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             throw new RuntimeException('Request attributes are not valid.');
         }
 
+        // TODO: 3.0 change the condition to remove the ResourceMetadataFactorym only used to skip null values
         if (
             (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface)
             && isset($attributes['operation_name'])
@@ -91,11 +92,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         // TODO: remove in 3.0
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
-
-        if ($resourceMetadata instanceof ResourceCollection) {
-            $key = $normalization ? 'normalizationContext' : 'denormalizationContext';
-        }
-
         if (isset($attributes['collection_operation_name'])) {
             $operationKey = 'collection_operation_name';
             $operationType = OperationType::COLLECTION;
@@ -107,11 +103,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $operationType = OperationType::SUBRESOURCE;
         }
 
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
-        } else {
-            $context = $normalization ? $resourceMetadata[0]->getNormalizationContext() : $resourceMetadata[0]->getDenormalizationContext();
-        }
+        $context = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], $key, [], true);
         $context['operation_type'] = $operationType;
         $context[$operationKey] = $attributes[$operationKey];
 
@@ -130,9 +122,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['resource_class'] = $attributes['resource_class'];
-        $context['iri_only'] = $resourceMetadata instanceof ResourceMetadata ? ($resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false) : ($resourceMetadata[0]->getNormalizationContext()['iri_only'] ?? false);
-        $context['input'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true) : $resourceMetadata->getOperation($operationType)->getInput() ?? null;
-        $context['output'] = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true) : $resourceMetadata->getOperation($operationType)->getOutput() ?? null;
+        $context['iri_only'] = $resourceMetadata->getAttribute('normalization_context')['iri_only'] ?? false;
+        $context['input'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'input', null, true);
+        $context['output'] = $resourceMetadata->getTypedOperationAttribute($operationType, $attributes[$operationKey], 'output', null, true);
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();
 
@@ -159,25 +151,14 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            foreach ($resourceMetadata->getItemOperations() as $operation) {
-                if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
-                    $context['skip_null_values'] = true;
+        // TODO: We should always use `skip_null_values` but changing this would be a BC break, for now use it only when `merge-patch+json` is activated on a Resource
+        foreach ($resourceMetadata->getItemOperations() as $operation) {
+            if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
+                $context['skip_null_values'] = true;
 
-                    break;
-                }
-            }
-        } else {
-            foreach ($resourceMetadata as $resourceName => $resource) {
-                foreach ($resource->getOperations() as $operationName => $operation) {
-                    if ('PATCH' === ($operation->getMethod() ?? '') && \in_array('application/merge-patch+json', $operation->getInputFormats()['json'] ?? [], true)) {
-                        $context['skip_null_values'] = true;
-                        break;
-                    }
-                }
+                break;
             }
         }
-        dump('serializercontextbuilder:OUTPUT', $context);
 
         return $context;
     }
@@ -187,6 +168,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
      */
     private function shouldSkipNullValues(string $class, string $operationName): bool
     {
+        if (!$this->resourceMetadataFactory) {
+            return true;
+        }
+
         $collection = $this->resourceMetadataFactory->create($class);
         foreach ($collection as $metadata) {
             foreach ($metadata->getOperations() as $operation) {

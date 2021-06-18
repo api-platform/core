@@ -1025,6 +1025,7 @@ class Operation
             'input' => $this->input,
             'output' => $this->output,
             'method' => $this->method,
+            'filters' => $this->filters,
         ];
     }
 }
