@@ -75,6 +75,7 @@ class DoctrineExtractorTest extends TestCase
                 'id',
                 'embedOne',
                 'embedMany',
+                'embedManyOmittingTargetDocument',
             ],
             $this->createExtractor()->getProperties(DoctrineWithEmbedded::class)
         );
@@ -197,6 +198,16 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
         $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
+    }
+
+    public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
+    {
+        $actualTypes = $this->createExtractor()->getTypes(
+            DoctrineWithEmbedded::class,
+            'embedManyOmittingTargetDocument'
+        );
+
+        self::assertNull($actualTypes);
     }
 
     private function createExtractor(): DoctrineExtractor

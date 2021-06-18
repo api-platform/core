@@ -49,5 +49,6 @@ resources:
                         '0': ['Bar']
                         'baz': 'Baz'
                     'baz': 'Baz'
+                    const: !php/const ApiPlatform\Core\Api\UrlGeneratorInterface::ABS_URL
             'name':
                 description: 'The dummy name'
