@@ -133,8 +133,6 @@ final class ApiLoader extends Loader
 
                     $routeCollection->add($operationName, $route);
                 }
-
-                continue;
             }
         }
 

@@ -56,8 +56,7 @@ class Post extends Operation
         private array $hydraContext = [],
         private array $openapiContext = [],
         private array $swaggerContext = [],
-        // TODO: rename validationContext having ['groups' => []]
-        private array $validationGroups = [],
+        private array $validationContext = [],
         private array $filters = [],
         private ?bool $elasticsearch = null,
         private mixed $mercure = null,

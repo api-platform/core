@@ -35,26 +35,22 @@ final class LinksResourceCollectionMetadataFactory implements ResourceCollection
      */
     public function create(string $resourceClass): ResourceCollection
     {
-        $parentResourceMetadata = [];
+        $resourceMetadataCollection = new ResourceCollection();
         if ($this->decorated) {
-            try {
-                $parentResourceMetadata = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-                // Ignore not found exception from decorated factories
-            }
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
-        foreach ($parentResourceMetadata as $i => $resource) {
+        foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = iterator_to_array($resource->getOperations());
 
             foreach ($operations as $key => $operation) {
-                $operations[$key] = $operation->withLinks($this->getLinks($parentResourceMetadata));
+                $operations[$key] = $operation->withLinks($this->getLinks($resourceMetadataCollection));
             }
 
-            $parentResourceMetadata[$i] = $resource->withOperations($operations);
+            $resourceMetadataCollection[$i] = $resource->withOperations($operations);
         }
 
-        return $parentResourceMetadata;
+        return $resourceMetadataCollection;
     }
 
     private function getLinks($resourceMetadata): array

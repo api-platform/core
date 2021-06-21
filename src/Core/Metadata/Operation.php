@@ -55,7 +55,7 @@ class Operation
      * @param string[]     $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
      * @param array        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param array        $swaggerContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array        $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
+     * @param array        $validationCotnext              https://api-platform.com/docs/core/validation/#using-validation-groups
      * @param string[]     $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
      * @param bool         $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
      * @param bool|array   $mercure                        https://api-platform.com/docs/core/mercure
@@ -96,7 +96,7 @@ class Operation
         private mixed $formats = null,
         private mixed $inputFormats = null,
         private mixed $outputFormats = null,
-        private array $identifiers = [],
+        private mixed $identifiers = [],
         private array $links = [],
         private string $routePrefix = '',
         private ?string $routeName = null,
@@ -121,8 +121,7 @@ class Operation
         private array $hydraContext = [],
         private array $openapiContext = [],
         private array $swaggerContext = [],
-        //TODO: rename validationContext having ['groups' => []]
-        private array $validationGroups = [],
+        private array $validationContext = [],
         private array $filters = [],
         private ?bool $elasticsearch = null,
         private mixed $mercure = null,
@@ -271,12 +270,12 @@ class Operation
         return $self;
     }
 
-    public function getIdentifiers(): array
+    public function getIdentifiers(): mixed
     {
         return $this->identifiers;
     }
 
-    public function withIdentifiers(array $identifiers = []): self
+    public function withIdentifiers(mixed $identifiers = []): self
     {
         $self = clone $this;
         $self->identifiers = $identifiers;
@@ -599,15 +598,15 @@ class Operation
         return $self;
     }
 
-    public function getValidationGroups(): array
+    public function getValidationContext(): array
     {
-        return $this->validationGroups;
+        return $this->validationContext;
     }
 
-    public function withValidationGroups(array $validationGroups = []): self
+    public function withValidationContext(array $validationContext = []): self
     {
         $self = clone $this;
-        $self->validationGroups = $validationGroups;
+        $self->validationContext = $validationContext;
 
         return $self;
     }

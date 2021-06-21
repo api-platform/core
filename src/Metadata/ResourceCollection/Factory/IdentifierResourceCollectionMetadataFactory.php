@@ -43,17 +43,12 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
      */
     public function create(string $resourceClass): ResourceCollection
     {
-        $resourceMetadataCollection = [];
-
+        $resourceMetadataCollection = new ResourceCollection();
         if ($this->decorated) {
-            try {
-                $resourceMetadataCollection = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-            }
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
         $identifiers = null;
-
         foreach ($resourceMetadataCollection as $i => $resource) {
             if (!$resource->getIdentifiers()) {
                 $resource = $resource->withIdentifiers($identifiers ?: ($identifiers = $this->getIdentifiersFromResourceClass($resourceClass)));

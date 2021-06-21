@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Core\Metadata\ResourceCollection\DeprecationMetadataTrait;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -34,8 +36,9 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
 {
     private $defaults;
     private $decorated;
+    use DeprecationMetadataTrait;
 
-    public function __construct(array $defaults = [], ResourceCollectionMetadataFactoryInterface $decorated = null)
+    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated = null, array $defaults = [])
     {
         $this->defaults = $defaults;
         $this->decorated = $decorated;
@@ -46,13 +49,9 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
      */
     public function create(string $resourceClass): ResourceCollection
     {
-        $resourceMetadataCollection = [];
-
+        $resourceMetadataCollection = new ResourceCollection();
         if ($this->decorated) {
-            try {
-                $resourceMetadataCollection = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-            }
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
         try {
@@ -64,6 +63,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(Resource::class)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
                 foreach ($this->defaults as $key => $value) {
+                    [$key, $value] = $this->getKeyValue($key, $value);
                     if (!$resource->{'get'.ucfirst($key)}()) {
                         $resource = $resource->{'with'.ucfirst($key)}($value);
                     }
@@ -73,11 +73,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             }
         }
 
-        if (!$resourceMetadataCollection) {
-            throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
-        }
-
-        return new ResourceCollection($resourceMetadataCollection);
+        return $resourceMetadataCollection;
     }
 
     /**
@@ -101,10 +97,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         $index = -1;
         foreach ($attributes as $attribute) {
             if (Resource::class === $attribute->getName()) {
-                $resource = $attribute->newInstance();
-                $resource = $resource->withShortName($shortName);
-                $resource = $resource->withClass($resourceClass);
-                $resources[++$index] = $resource;
+                $resources[++$index] = $attribute->newInstance()->withShortName($shortName)->withClass($resourceClass);
                 continue;
             }
 
@@ -125,12 +118,13 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
                 continue;
             }
 
+            $operations = iterator_to_array($resource->getOperations());
             foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $operation);
-                $operations = iterator_to_array($resources[$index]->getOperations());
+                [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
                 $operations[$key] = $operation;
-                $resources[$index] = $resources[$index]->withOperations($operations);
             }
+
+            $resources[$index] = $resource->withOperations($operations);
         }
 
         return $resources;
@@ -139,16 +133,20 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
     private function getOperationWithDefaults(Resource $resource, Operation $operation): array
     {
         // @phpstan-ignore-next-line
-        foreach ($resource as $property => $value) {
-            if ('operations' === $property) {
+        foreach (get_class_methods($resource) as $methodName) {
+            if (0 !== strpos($methodName, 'get')) {
                 continue;
             }
 
-            if ($operation->{'get'.ucfirst($property)}() || !$value) {
+            if (!method_exists($operation, $methodName) || $operation->{$methodName}()) {
                 continue;
             }
 
-            $operation = $operation->{'with'.ucfirst($property)}($value);
+            if (!$value = $resource->{$methodName}()) {
+                continue;
+            }
+            
+             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
         $key = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof GetCollection ? '_collection' : '');

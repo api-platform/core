@@ -33,7 +33,8 @@ class Resource
      * @param array|string $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array        $identifiers
+     * @param mixed        $identifiers
+     * @param array        $links
      * @param string       $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
      * @param array        $defaults
      * @param array        $requirements
@@ -54,7 +55,7 @@ class Resource
      * @param array        $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param string[]     $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
      * @param array        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array        $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
+     * @param array        $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
      * @param string[]     $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
      * @param bool         $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
      * @param bool|array   $mercure                        https://api-platform.com/docs/core/mercure
@@ -90,7 +91,8 @@ class Resource
         private mixed $formats = null,
         private mixed $inputFormats = null,
         private mixed $outputFormats = null,
-        private array $identifiers = [],
+        private mixed $identifiers = [],
+        private array $links = [],
         private ?string $routePrefix = '',
         private array $defaults = [],
         private array $requirements = [],
@@ -111,8 +113,7 @@ class Resource
         private ?array $denormalizationContext = [],
         private ?array $hydraContext = [],
         private ?array $openapiContext = [],
-        //TODO: rename validationContext having ['groups' => []]
-        private array $validationGroups = [],
+        private array $validationContext = [],
         private array $filters = [],
         private ?bool $elasticsearch = null,
         private mixed $mercure = null,
@@ -256,12 +257,12 @@ class Resource
         return $self;
     }
 
-    public function getIdentifiers(): array
+    public function getIdentifiers(): mixed
     {
         return $this->identifiers;
     }
 
-    public function withIdentifiers(array $identifiers = []): self
+    public function withIdentifiers(mixed $identifiers = []): self
     {
         $self = clone $this;
         $self->identifiers = $identifiers;
@@ -291,19 +292,6 @@ class Resource
     {
         $self = clone $this;
         $self->routePrefix = $routePrefix;
-
-        return $self;
-    }
-
-    public function getRouteName(): ?string
-    {
-        return $this->routeName;
-    }
-
-    public function withRouteName(?string $routeName = null): self
-    {
-        $self = clone $this;
-        $self->routeName = $routeName;
 
         return $self;
     }
@@ -558,15 +546,15 @@ class Resource
         return $self;
     }
 
-    public function getValidationGroups(): array
+    public function getValidationContext(): array
     {
-        return $this->validationGroups;
+        return $this->validationContext;
     }
 
-    public function withValidationGroups(array $validationGroups = []): self
+    public function withValidationContext(array $validationContext = []): self
     {
         $self = clone $this;
-        $self->validationGroups = $validationGroups;
+        $self->validationContext = $validationContext;
 
         return $self;
     }

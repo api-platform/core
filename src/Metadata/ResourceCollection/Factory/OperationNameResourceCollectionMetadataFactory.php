@@ -38,16 +38,13 @@ final class OperationNameResourceCollectionMetadataFactory implements ResourceCo
      */
     public function create(string $resourceClass): ResourceCollection
     {
-        $parentResourceCollection = [];
+        $resourceMetadataCollection = new ResourceCollection();
 
         if ($this->decorated) {
-            try {
-                $parentResourceCollection = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-            }
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
-        foreach ($parentResourceCollection as $i => $resource) {
+        foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = iterator_to_array($resource->getOperations());
 
             foreach ($resource->getOperations() as $key => $operation) {
@@ -61,9 +58,9 @@ final class OperationNameResourceCollectionMetadataFactory implements ResourceCo
                 $operations[$newOperationKey] = $operation;
             }
 
-            $parentResourceCollection[$i] = $resource->withOperations($operations);
+            $resourceMetadataCollection[$i] = $resource->withOperations($operations);
         }
 
-        return $parentResourceCollection;
+        return $resourceMetadataCollection;
     }
 }

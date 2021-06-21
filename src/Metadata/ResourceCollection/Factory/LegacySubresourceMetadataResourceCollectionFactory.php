@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Resource;
  *
  * @deprecated
  */
-final class SubresourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
+final class LegacySubresourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
 {
     private $decorated;
     private $resourceNameCollectionFactory;
@@ -41,12 +41,9 @@ final class SubresourceMetadataResourceCollectionFactory implements ResourceColl
 
     public function create(string $resourceClass): ResourceCollection
     {
-        $parentResourceCollection = [];
+        $resourceMetadataCollection = new ResourceCollection();
         if ($this->decorated) {
-            try {
-                $parentResourceCollection = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-            }
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
         if (0 === \count($this->localCache)) {
@@ -54,14 +51,14 @@ final class SubresourceMetadataResourceCollectionFactory implements ResourceColl
         }
 
         if (!isset($this->localCache[$resourceClass])) {
-            return $parentResourceCollection;
+            return $resourceMetadataCollection;
         }
 
         foreach ($this->localCache[$resourceClass] as $resource) {
-            $parentResourceCollection[] = $resource;
+            $resourceMetadataCollection[] = $resource;
         }
 
-        return $parentResourceCollection;
+        return $resourceMetadataCollection;
     }
 
     private function computeSubresourceCache()

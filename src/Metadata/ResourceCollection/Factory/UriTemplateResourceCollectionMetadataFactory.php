@@ -38,16 +38,12 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
      */
     public function create(string $resourceClass): ResourceCollection
     {
-        $parentResourceMetadata = [];
+        $resourceMetadataCollection = new ResourceCollection();
         if ($this->decorated) {
-            try {
-                $parentResourceMetadata = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-                // Ignore not found exception from decorated factories
-            }
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
-        foreach ($parentResourceMetadata as $i => $resource) {
+        foreach ($resourceMetadataCollection as $i => $resource) {
             if (!$resource->getUriTemplate()) {
                 foreach ($resource->getOperations() as $key => $operation) {
                     if ($operation->getUriTemplate()) {
@@ -71,10 +67,10 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
                 }
             }
 
-            $parentResourceMetadata[$i] = $resource;
+            $resourceMetadataCollection[$i] = $resource;
         }
 
-        return $parentResourceMetadata;
+        return new ResourceCollection($resourceMetadataCollection);
     }
 
     private function generateUriTemplate(Operation $operation): string
