@@ -28,7 +28,6 @@ use ApiPlatform\Metadata\Resource;
 
 /**
  * Creates a resource metadata from {@see Resource} annotations.
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
@@ -62,14 +61,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
 
         if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(Resource::class)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
-                foreach ($this->defaults as $key => $value) {
-                    [$key, $value] = $this->getKeyValue($key, $value);
-                    if (!$resource->{'get'.ucfirst($key)}()) {
-                        $resource = $resource->{'with'.ucfirst($key)}($value);
-                    }
-                }
-
-                $resourceMetadataCollection[$i] = $resource;
+                $resourceMetadataCollection[] = $resource;
             }
         }
 
@@ -93,13 +85,25 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
     private function buildResourceOperations(array $attributes, string $resourceClass): array
     {
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
+        $operations = [];
         $resources = [];
         $index = -1;
         foreach ($attributes as $attribute) {
             if (Resource::class === $attribute->getName()) {
-                $resources[++$index] = $attribute->newInstance()->withShortName($shortName)->withClass($resourceClass);
+                $resource = $attribute->newInstance()->withShortName($shortName)->withClass($resourceClass);
+
+                foreach ($this->defaults as $key => $value) {
+                    [$key, $value] = $this->getKeyValue($key, $value);
+                    if (!$resource->{'get'.ucfirst($key)}()) {
+                        $resource = $resource->{'with'.ucfirst($key)}($value);
+                    }
+                }
+
+                $resources[++$index] = $resource;
+
                 continue;
             }
+
 
             // Create default operations
             if (!is_subclass_of($attribute->getName(), Operation::class)) {
@@ -111,6 +115,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             $operations[$key] = $operation;
             $resources[$index] = $resources[$index]->withOperations($operations);
         }
+
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
@@ -132,6 +137,13 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
 
     private function getOperationWithDefaults(Resource $resource, Operation $operation): array
     {
+        foreach ($this->defaults as $key => $value) {
+            [$key, $value] = $this->getKeyValue($key, $value);
+            if (!$operation->{'get'.ucfirst($key)}()) {
+                $operation = $operation->{'with'.ucfirst($key)}($value);
+            }
+        }
+
         // @phpstan-ignore-next-line
         foreach (get_class_methods($resource) as $methodName) {
             if (0 !== strpos($methodName, 'get')) {
@@ -145,7 +157,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             if (!$value = $resource->{$methodName}()) {
                 continue;
             }
-            
+
              $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 

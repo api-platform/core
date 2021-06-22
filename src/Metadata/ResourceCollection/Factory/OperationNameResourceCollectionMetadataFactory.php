@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource;
 

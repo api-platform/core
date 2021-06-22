@@ -55,6 +55,10 @@ final class ReadListener
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->identifierConverter = $identifierConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if ($resourceMetadataFactory) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
         $this->provider = $provider;
     }
 
@@ -70,7 +74,7 @@ final class ReadListener
             !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
             || $request->isMethod('POST') && (isset($attributes['collection_operation_name']) || !$attributes['identifiers'])
-            || (!isset($attributes['operation_name']) && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)) //TODO: fix this via route attributes for read/write etc., we want to avoid a link with ResourceMetadata here
+            || (!isset($attributes['operation_name']) && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
         ) {
             return;
         }

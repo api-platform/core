@@ -40,13 +40,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, $filterLocator)
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver, $filterLocator)
     {
         $this->setFilterLocator($filterLocator);
 
         $this->collectionNormalizer = $collectionNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+
+        if ($resourceMetadataFactory) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -80,13 +84,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceFilters = $context['filters'] ?? [];
+        
+        if ($this->resourceMetadataFactory) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-        $operationName = $context['collection_operation_name'] ?? null;
-        if (null === $operationName) {
-            $resourceFilters = $resourceMetadata->getAttribute('filters', []);
-        } else {
-            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+            $operationName = $context['collection_operation_name'] ?? null;
+            if (null === $operationName) {
+                $resourceFilters = $resourceMetadata->getAttribute('filters', []);
+            } else {
+                $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+            }
         }
 
         if (!$resourceFilters) {

@@ -17,7 +17,7 @@
         <service id="ApiPlatform\Core\Security\ResourceAccessCheckerInterface" alias="api_platform.security.resource_access_checker" />
 
         <service id="api_platform.security.listener.request.deny_access" class="ApiPlatform\Core\Security\EventListener\DenyAccessListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.security.resource_access_checker" />
 
             <!-- This method must be executed only when the current object is available, before deserialization -->

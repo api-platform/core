@@ -120,7 +120,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         } else {
             // TODO: multiple types?
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass)[0];
-            $metadata['@type'] = $resourceMetadata->getTypes()[0] ?: $resourceMetadata->getShortName();
+            $metadata['@type'] = $resourceMetadata->getTypes()[0] ?? $resourceMetadata->getShortName();
         }
 
         return $metadata + $data;

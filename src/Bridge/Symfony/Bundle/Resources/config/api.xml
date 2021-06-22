@@ -175,7 +175,7 @@
         <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.state_processor" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
@@ -184,7 +184,7 @@
         <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument>null</argument>
             <argument>null</argument>
 
 

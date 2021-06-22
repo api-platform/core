@@ -51,6 +51,10 @@ final class WriteListener
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+
+        if ($this->resourceMetadataFactory) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -98,16 +102,15 @@ final class WriteListener
                     break;
                 }
 
-                $hasOutput = true;
+                $outputMetadata = $attributes['operation']['output'] ?? ['class' => $attributes['resource_class']];
                 if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
                     $outputMetadata = $resourceMetadata->getOperationAttribute($attributes, 'output', [
                         'class' => $attributes['resource_class'],
                     ], true);
-
-                    $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
                 }
 
+                $hasOutput = \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
                 if (!$hasOutput) {
                     break;
                 }

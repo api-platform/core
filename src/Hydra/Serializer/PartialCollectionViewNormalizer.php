@@ -82,8 +82,12 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         $cursorPaginationAttribute = null;
-        $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
-        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'] ?? $context['subresource_operation_name'], 'pagination_via_cursor', null, true);
+        $isPaginatedWithCursor = $paginated && ($context['pagination_via_cursor'] ?? false);
+
+        if ($this->resourceMetadataFactory) {
+            $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
+            $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'] ?? $context['subresource_operation_name'], 'pagination_via_cursor', null, true);
+        }
 
         $data['hydra:view'] = ['@id' => null, '@type' => 'hydra:PartialCollectionView'];
 

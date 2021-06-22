@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource;
 
-#[Resource]
+#[Resource(normalizationContext: ['skip_null_values' => true])]
 #[Get]
 #[Put]
 #[Delete]

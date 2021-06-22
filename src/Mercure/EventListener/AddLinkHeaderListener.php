@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Mercure\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\CorsTrait;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -35,9 +36,12 @@ final class AddLinkHeaderListener
     /**
      * @param Discovery|string $discovery
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $discovery)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null, $discovery)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        if ($resourceMetadataFactory) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
         $this->discovery = $discovery;
     }
 
@@ -52,9 +56,18 @@ final class AddLinkHeaderListener
         }
 
         if (
-            null === ($resourceClass = $request->attributes->get('_api_resource_class')) ||
-            false === ($mercure = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false))
+            null === ($resourceClass = $request->attributes->get('_api_resource_class')) || 
+            !($attributes = RequestAttributesExtractor::extractAttributes($request))
         ) {
+            return;
+        }
+
+        $mercure = $attributes['mercure'] ?? false;
+        if ($this->resourceMetadataFactory) {
+            $mercure = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
+        }
+
+        if (!$mercure) {
             return;
         }
 

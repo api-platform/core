@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource;
 use IteratorAggregate;
 
-#[Resource('/attribute_resources.{_format}')]
+#[Resource('/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true])]
 #[Get]
 #[Post]
 final class AttributeResources implements IteratorAggregate

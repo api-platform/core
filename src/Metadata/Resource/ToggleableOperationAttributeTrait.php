@@ -29,9 +29,10 @@ trait ToggleableOperationAttributeTrait
     private function isOperationAttributeDisabled(array $attributes, string $attribute, bool $default = false, bool $resourceFallback = true): bool
     {
         if (null === $this->resourceMetadataFactory) {
-            return $default;
+            return $attributes[$attribute] ?? $default;
         }
 
+        // TODO: should be removed
         if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name']);
             return !$resourceMetadata->{'get'.ucfirst($attribute)}();

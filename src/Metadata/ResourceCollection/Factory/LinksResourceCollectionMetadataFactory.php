@@ -43,8 +43,8 @@ final class LinksResourceCollectionMetadataFactory implements ResourceCollection
         foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = iterator_to_array($resource->getOperations());
 
-            foreach ($operations as $key => $operation) {
-                $operations[$key] = $operation->withLinks($this->getLinks($resourceMetadataCollection));
+            foreach ($operations as $operationName => $operation) {
+                $operations[$operationName] = $operation->withLinks($this->getLinks($resourceMetadataCollection, $operationName));
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations);
@@ -53,12 +53,17 @@ final class LinksResourceCollectionMetadataFactory implements ResourceCollection
         return $resourceMetadataCollection;
     }
 
-    private function getLinks($resourceMetadata): array
+    private function getLinks($resourceMetadata, $resourceOperationName): array
     {
         $links = [];
 
         foreach ($resourceMetadata as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
+                if ($operationName === $resourceOperationName) {
+                    array_unshift($links, [$operationName, $operation->getIdentifiers()]);
+                    continue;
+                }
+
                 if (!$operation->getRouteName() && false === $operation->isCollection() && Operation::METHOD_GET === $operation->getMethod()) {
                     $links[] = [$operationName, $operation->getIdentifiers()];
                 }

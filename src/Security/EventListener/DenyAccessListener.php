@@ -39,7 +39,7 @@ final class DenyAccessListener
      */
     private $resourceAccessChecker;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, /*ResourceAccessCheckerInterface*/ $resourceAccessCheckerOrExpressionLanguage = null, AuthenticationTrustResolverInterface $authenticationTrustResolver = null, RoleHierarchyInterface $roleHierarchy = null, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null)
+    public function __construct(?ResourceMetadataFactoryInterface $resourceMetadataFactory = null, /*ResourceAccessCheckerInterface*/ $resourceAccessCheckerOrExpressionLanguage = null, AuthenticationTrustResolverInterface $authenticationTrustResolver = null, RoleHierarchyInterface $roleHierarchy = null, TokenStorageInterface $tokenStorage = null, AuthorizationCheckerInterface $authorizationChecker = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
 
@@ -51,6 +51,10 @@ final class DenyAccessListener
 
         $this->resourceAccessChecker = new ResourceAccessChecker($resourceAccessCheckerOrExpressionLanguage, $authenticationTrustResolver, $roleHierarchy, $tokenStorage, $authorizationChecker);
         @trigger_error(sprintf('Passing an instance of "%s" or null as second argument of "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Pass an instance of "%s" and no extra argument instead.', ExpressionLanguage::class, self::class, ResourceAccessCheckerInterface::class), \E_USER_DEPRECATED);
+
+        if ($resourceMetadataFactory) {
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0.', ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -81,15 +85,22 @@ final class DenyAccessListener
             return;
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+        $resourceMetadata = null;
+        $isGranted = null;
 
-        $isGranted = $resourceMetadata->getOperationAttribute($attributes, $attribute, null, true);
-        if ($backwardCompatibility && null === $isGranted) {
-            // Backward compatibility
-            $isGranted = $resourceMetadata->getOperationAttribute($attributes, 'access_control', null, true);
-            if (null !== $isGranted) {
-                @trigger_error('Using "access_control" attribute is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use "security" attribute instead.', \E_USER_DEPRECATED);
+        if ($this->resourceMetadataFactory) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+
+            $isGranted = $resourceMetadata->getOperationAttribute($attributes, $attribute, null, true);
+            if ($backwardCompatibility && null === $isGranted) {
+                // Backward compatibility
+                $isGranted = $resourceMetadata->getOperationAttribute($attributes, 'access_control', null, true);
+                if (null !== $isGranted) {
+                    @trigger_error('Using "access_control" attribute is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use "security" attribute instead.', \E_USER_DEPRECATED);
+                }
             }
+        } else if (isset($attributes['operation'])) {
+            $isGranted = $attributes['operation']['security'] ?? null;
         }
 
         if (null === $isGranted) {
@@ -101,7 +112,11 @@ final class DenyAccessListener
         $extraVariables['request'] = $request;
 
         if (!$this->resourceAccessChecker->isGranted($attributes['resource_class'], $isGranted, $extraVariables)) {
-            throw new AccessDeniedException($resourceMetadata->getOperationAttribute($attributes, $attribute.'_message', 'Access Denied.', true));
+            if ($resourceMetadata) {
+                throw new AccessDeniedException($resourceMetadata->getOperationAttribute($attributes, $attribute.'_message', 'Access Denied.', true));
+            }
+
+            throw new AccessDeniedException($attributes[$attribute.'_message'] ?? 'Access Denied.');
         }
     }
 }
