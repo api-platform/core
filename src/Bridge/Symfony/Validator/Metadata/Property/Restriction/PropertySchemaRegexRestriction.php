@@ -26,10 +26,16 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
 {
     /**
      * {@inheritdoc}
+     *
+     * @param Regex $constraint
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
     {
-        return $constraint instanceof Regex && $constraint->getHtmlPattern() ? ['pattern' => '^('.$constraint->getHtmlPattern().')$'] : [];
+        if (null !== ($htmlPattern = $constraint->getHtmlPattern())) {
+            return ['pattern' => '^('.$htmlPattern.')$'];
+        }
+
+        return [];
     }
 
     /**
@@ -37,6 +43,6 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
      */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
-        return $constraint instanceof Regex && $constraint->match;
+        return $constraint instanceof Regex;
     }
 }
