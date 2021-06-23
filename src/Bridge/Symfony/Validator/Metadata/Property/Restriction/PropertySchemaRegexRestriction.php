@@ -26,7 +26,7 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
 {
     /**
      * {@inheritdoc}
-     * 
+     *
      * @param Regex $constraint
      */
     public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
