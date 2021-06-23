@@ -53,7 +53,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
 
         foreach ($constraint->fields as $field => $baseConstraint) {
             /** @var Required|Optional $baseConstraint */
-            if ($baseConstraint instanceof Required) {
+            if ($baseConstraint instanceof Required && !$constraint->allowMissingFields) {
                 $required[] = $field;
             }
 
