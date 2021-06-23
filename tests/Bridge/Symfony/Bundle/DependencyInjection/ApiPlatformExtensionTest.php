@@ -1388,6 +1388,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.name_collection_factory.annotation',
             'api_platform.metadata.resource.name_collection_factory.yaml',
             'api_platform.metadata.subresource.metadata_factory.annotation',
+            'api_platform.argument_resolver.payload',
             'api_platform.problem.encoder',
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
