@@ -37,6 +37,6 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
      */
     public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
     {
-        return $constraint instanceof Regex && $constraint->match;
+        return $constraint instanceof Regex;
     }
 }
