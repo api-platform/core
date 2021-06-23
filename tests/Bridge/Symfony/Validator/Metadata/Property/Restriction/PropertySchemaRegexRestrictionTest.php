@@ -63,5 +63,8 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
         yield 'anchored' => [new Regex(['pattern' => '/^[0-9]+$/']), new PropertyMetadata(), ['pattern' => '^([0-9]+)$']];
         yield 'not anchored' => [new Regex(['pattern' => '/[0-9]/']), new PropertyMetadata(), ['pattern' => '^(.*[0-9].*)$']];
         yield 'inverted' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new PropertyMetadata(), ['pattern' => '^(((?![0-9]).)*)$']];
+
+        yield 'with options' => [new Regex(['pattern' => '/^[a-z]+$/i']), new PropertyMetadata(), []];
+        yield 'with options and manual htmlPattern' => [new Regex(['pattern' => '/^[a-z]+$/i', 'htmlPattern' => '[a-zA-Z]+']), new PropertyMetadata(), ['pattern' => '^([a-zA-Z]+)$']];
     }
 }
