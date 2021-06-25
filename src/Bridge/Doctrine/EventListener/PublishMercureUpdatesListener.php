@@ -90,16 +90,18 @@ final class PublishMercureUpdatesListener
         $this->graphQlMercureSubscriptionIriGenerator = $graphQlMercureSubscriptionIriGenerator;
         $this->reset();
 
-        $rawurlencode = ExpressionFunction::fromPhp('rawurlencode', 'escape');
-        $this->expressionLanguage->addFunction($rawurlencode);
+        if ($this->expressionLanguage) {
+            $rawurlencode = ExpressionFunction::fromPhp('rawurlencode', 'escape');
+            $this->expressionLanguage->addFunction($rawurlencode);
 
-        $this->expressionLanguage->addFunction(
-            new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
-                return sprintf('iri(%s, %d)', $apiResource, $referenceType);
-            }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
-                return $iriConverter->getIriFromItem($apiResource, $referenceType);
-            })
-        );
+            $this->expressionLanguage->addFunction(
+                new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
+                    return sprintf('iri(%s, %d)', $apiResource, $referenceType);
+                }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
+                    return $iriConverter->getIriFromItem($apiResource, $referenceType);
+                })
+            );
+        }
     }
 
     /**
