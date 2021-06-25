@@ -140,6 +140,13 @@ class ApiPlatformExtensionTest extends TestCase
         'http_cache' => ['invalidation' => [
             'enabled' => true,
             'varnish_urls' => ['test'],
+            'xkey' => [
+                'enabled' => false,
+                'glue' => ' ',
+            ],
+            'http_tags' => [
+                'enabled' => true,
+            ],
             'request_options' => [
                 'allow_redirects' => [
                     'max' => 5,
@@ -498,6 +505,38 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load($config, $containerBuilder);
     }
 
+    public function testRegisterHttpCacheWhenEnabledWithXkey()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.http_cache.invalidation.xkey.enabled', true)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.http_cache.invalidation.xkey.enabled', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.http_cache.purger.xkey', 'api_platform.http_cache.purger.varnish.xkey')->shouldBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['xkey'] = true;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
+    public function testRegisterHttpCacheWhenEnabledWithXkeyAndWithoutHttpTags()
+    {
+        $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
+        $containerBuilderProphecy->setParameter('api_platform.http_cache.invalidation.xkey.enabled', true)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.http_cache.invalidation.xkey.enabled', false)->shouldNotBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.http_cache.invalidation.http_tags.enabled', false)->shouldBeCalled();
+        $containerBuilderProphecy->setParameter('api_platform.http_cache.invalidation.http_tags.enabled', true)->shouldNotBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.http_cache.purger.xkey', 'api_platform.http_cache.purger.varnish.xkey')->shouldBeCalled();
+        $containerBuilderProphecy->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish')->shouldNotBeCalled();
+        $containerBuilder = $containerBuilderProphecy->reveal();
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['xkey'] = true;
+        $config['api_platform']['http_cache']['invalidation']['http_tags'] = false;
+
+        $this->extension->load($config, $containerBuilder);
+    }
+
     public function testDisabledDocsRemovesAddLinkHeaderService()
     {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
@@ -566,6 +605,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)->shouldNotBeCalled();
         $this->childDefinitionProphecy->setBindings(['$requestStack' => null])->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.listener.http_cache.purge', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.listener.http_cache.purge.xkey', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.boolean_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -942,6 +982,9 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.vary' => ['Accept'],
             'api_platform.http_cache.public' => null,
             'api_platform.http_cache.invalidation.max_header_length' => 7500,
+            'api_platform.http_cache.invalidation.xkey.enabled' => false,
+            'api_platform.http_cache.invalidation.xkey.glue' => ' ',
+            'api_platform.http_cache.invalidation.http_tags.enabled' => true,
             'api_platform.asset_package' => null,
             'api_platform.defaults' => ['attributes' => []],
             'api_platform.enable_entrypoint' => true,
@@ -1401,6 +1444,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.listener.response.configure',
             'api_platform.http_cache.purger.varnish_client',
             'api_platform.http_cache.purger.varnish',
+            'api_platform.http_cache.purger.varnish.xkey',
             'api_platform.json_schema.json_schema_generate_command',
             'api_platform.json_schema.type_factory',
             'api_platform.json_schema.schema_factory',
