@@ -61,6 +61,7 @@ use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Translation\ResourceTranslatorInterface;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -560,6 +561,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.hydra.normalizer.partial_collection_view',
             'api_platform.hydra.normalizer.collection_filters',
             'api_platform.hydra.json_schema.schema_factory',
+            'api_platform.hydra.json_schema.type_factory',
         ];
 
         $this->assertContainerHas($services, []);
@@ -1130,6 +1132,24 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['maker']['enabled'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
+    }
+
+    public function testTranslationConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $services = [
+            // translation.xml
+            'api_platform.translation.resource_translator',
+        ];
+
+        $aliases = [
+            // translation.xml
+            ResourceTranslatorInterface::class,
+        ];
+
+        $this->assertContainerHas($services, $aliases);
     }
 
     public function testArgumentResolverConfiguration(): void

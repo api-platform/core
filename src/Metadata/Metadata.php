@@ -24,6 +24,7 @@ abstract class Metadata
      * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param string|null $security                https://api-platform.com/docs/core/security
      * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param array|null  $translation             https://api-platform.com/docs/core/translation
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -60,6 +61,7 @@ abstract class Metadata
         protected ?string $securityPostDenormalizeMessage = null,
         protected ?string $securityPostValidation = null,
         protected ?string $securityPostValidationMessage = null,
+        protected ?array $translation = null,
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
@@ -517,6 +519,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;
+
+        return $self;
+    }
+
+    public function getTranslation(): ?array
+    {
+        return $this->translation;
+    }
+
+    public function withTranslation(?array $translation = null): static
+    {
+        $self = clone $this;
+        $self->translation = $translation;
 
         return $self;
     }

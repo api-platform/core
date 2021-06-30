@@ -393,6 +393,13 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:complexType name="translation">
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
+        <xsd:attribute type="xsd:boolean" name="allTranslationsEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="allTranslationsClientEnabled"/>
+        <xsd:attribute type="xsd:string" name="allTranslationsClientParameterName"/>
+    </xsd:complexType>
+
     <xsd:group name="base">
         <xsd:sequence>
             <xsd:element name="denormalizationContext" minOccurs="0" type="sequenceWithValues"/>
@@ -403,6 +410,7 @@
             <xsd:element name="order" minOccurs="0" type="order"/>
             <xsd:element name="validationContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="stateOptions" minOccurs="0" type="stateOptions"/>
+            <xsd:element name="translation" minOccurs="0" type="translation"/>
         </xsd:sequence>
     </xsd:group>
 

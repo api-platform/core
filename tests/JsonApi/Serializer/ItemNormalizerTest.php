@@ -74,6 +74,8 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable($dummy, 'id')->willReturn(true);
+        $propertyAccessorProphecy->isReadable($dummy, 'name')->willReturn(true);
         $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(10);
         $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('hello');
 
@@ -194,6 +196,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable($dummy, 'bar')->willReturn(true);
         $propertyAccessorProphecy->getValue($dummy, 'bar')->willThrow(new NoSuchPropertyException());
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

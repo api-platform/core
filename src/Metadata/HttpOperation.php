@@ -62,6 +62,7 @@ class HttpOperation extends Operation
      * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
      * @param array|null $openapiContext         {@see https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts}
+     * @param array|null $translation            {@see https://api-platform.com/docs/core/translation}
      * @param array{
      *     class?: string|null,
      *     name?: string,
@@ -127,6 +128,7 @@ class HttpOperation extends Operation
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?array $translation = null,
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,
@@ -174,6 +176,7 @@ class HttpOperation extends Operation
             securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
             securityPostValidation: $securityPostValidation,
             securityPostValidationMessage: $securityPostValidationMessage,
+            translation: $translation,
             deprecationReason: $deprecationReason,
             filters: $filters,
             validationContext: $validationContext,

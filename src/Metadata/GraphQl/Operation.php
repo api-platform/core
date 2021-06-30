@@ -21,6 +21,7 @@ class Operation extends AbstractOperation
 {
     /**
      * @param Link[]|null $links
+     * @param array|null  $translation {@see https://api-platform.com/docs/core/translation}
      * @param array{
      *     class?: string|null,
      *     name?: string,
@@ -63,6 +64,7 @@ class Operation extends AbstractOperation
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?array $translation = null,
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,
@@ -110,6 +112,7 @@ class Operation extends AbstractOperation
             securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
             securityPostValidation: $securityPostValidation,
             securityPostValidationMessage: $securityPostValidationMessage,
+            translation: $translation,
             deprecationReason: $deprecationReason,
             filters: $filters,
             validationContext: $validationContext,

@@ -25,8 +25,11 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTranslatable;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTranslation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Translation\ResourceTranslatorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -113,6 +116,9 @@ class AbstractItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromResource($relatedDummy, Argument::cetera())->willReturn('/dummies/2');
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable($dummy, 'name')->willReturn(true);
+        $propertyAccessorProphecy->isReadable($dummy, 'relatedDummy')->willReturn(true);
+        $propertyAccessorProphecy->isReadable($dummy, 'relatedDummies')->willReturn(true);
         $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo');
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy);
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn($relatedDummies);
@@ -172,6 +178,8 @@ class AbstractItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/secured_dummies/1');
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable($dummy, 'title')->willReturn(true);
+        $propertyAccessorProphecy->isReadable($dummy, 'adminOnlyProperty')->willReturn(true);
         $propertyAccessorProphecy->getValue($dummy, 'title')->willReturn('myPublicTitle');
         $propertyAccessorProphecy->getValue($dummy, 'adminOnlyProperty')->willReturn('secret');
 
@@ -534,6 +542,8 @@ class AbstractItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable($dummy, 'relatedDummy')->willReturn(true);
+        $propertyAccessorProphecy->isReadable($dummy, 'relatedDummies')->willReturn(true);
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy);
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn($relatedDummies);
 
@@ -601,6 +611,7 @@ class AbstractItemNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->isReadable($dummy, 'children')->willReturn(true);
         $propertyAccessorProphecy->getValue($dummy, 'children')->willReturn($abstractDummies);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -1295,6 +1306,109 @@ class AbstractItemNormalizerTest extends TestCase
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize($data, Dummy::class, 'xml');
+    }
+
+    public function testNormalizeWithTranslation(): void
+    {
+        $dummyTranslatable = new DummyTranslatable();
+        $dummyTranslatable->name = 'car';
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyTranslatable::class, [])->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyTranslatable::class, 'name', [])->willReturn((new ApiProperty())->withReadable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummyTranslatable, Argument::cetera())->willReturn('/dummy_translatables/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummyTranslatable, 'name')->willReturn('car');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyTranslatable::class)->willReturn(DummyTranslatable::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyTranslatable::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('voiture', null, Argument::type('array'))->willReturn('voiture');
+
+        $resourceTranslatorProphecy = $this->prophesize(ResourceTranslatorInterface::class);
+        $resourceTranslatorProphecy->translateAttributeValue($dummyTranslatable, 'name', Argument::type('array'))->willReturn('voiture');
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+            $resourceTranslatorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'name' => 'voiture',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummyTranslatable, null, [
+            'resources' => [],
+        ]));
+    }
+
+    public function testDenormalizeWithTranslation(): void
+    {
+        $data = [
+            'name' => 'voiture',
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyTranslatable::class, [])->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(DummyTranslatable::class, 'name', [])->willReturn((new ApiProperty())->withWritable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyTranslatable::class)->willReturn(DummyTranslatable::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyTranslatable::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+        $serializerProphecy->denormalize($data, DummyTranslation::class, null, Argument::type('array'))->willReturn(new DummyTranslation());
+
+        $resourceTranslatorProphecy = $this->prophesize(ResourceTranslatorInterface::class);
+        $resourceTranslatorProphecy->getLocale()->willReturn('fr');
+        $resourceTranslatorProphecy->isResourceTranslatable(Argument::type(DummyTranslatable::class))->willReturn(true);
+        $resourceTranslatorProphecy->getTranslationClass(DummyTranslatable::class)->willReturn(DummyTranslation::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+            $resourceTranslatorProphecy->reveal(),
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $actual = $normalizer->denormalize($data, DummyTranslatable::class);
+
+        $this->assertInstanceOf(DummyTranslatable::class, $actual);
+        $this->assertInstanceOf(DummyTranslation::class, $actual->getResourceTranslation('fr'));
+
+        $propertyAccessorProphecy->setValue($actual, 'name', 'voiture')->shouldHaveBeenCalled();
     }
 }
 

@@ -49,6 +49,9 @@ final class SchemaFactory implements SchemaFactoryInterface
                             'type' => 'string',
                             'enum' => [ContextBuilder::HYDRA_NS],
                         ],
+                        '@language' => [
+                            'type' => 'string',
+                        ],
                     ],
                     'required' => ['@vocab', 'hydra'],
                     'additionalProperties' => true,
@@ -78,7 +81,26 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
-            $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
+            if (isset($definitions[$key]['properties']['@context'])) {
+                return $schema;
+            }
+            $contextDefinition = self::BASE_ROOT_PROPS;
+            foreach (($definitions[$key]['properties'] ?? []) as $propertyName => $propertyDefinition) {
+                $contextDefinition['@context']['oneOf'][1]['properties'][$propertyName] = [
+                    'oneOf' => [
+                        ['type' => 'string'],
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                '@id' => ['type' => 'string'],
+                                '@type' => ['type' => 'string'],
+                                '@container' => ['type' => 'string'],
+                            ],
+                        ],
+                    ],
+                ];
+            }
+            $definitions[$key]['properties'] = $contextDefinition + ($definitions[$key]['properties'] ?? []);
 
             return $schema;
         }

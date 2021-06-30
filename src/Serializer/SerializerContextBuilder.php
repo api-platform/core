@@ -15,6 +15,7 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Translation\ResourceTranslatorInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -27,8 +28,10 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly ?ResourceTranslatorInterface $resourceTranslator = null,
+    ) {
     }
 
     /**
@@ -62,6 +65,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             foreach (array_keys($operation->getUriVariables()) as $parameterName) {
                 $context['uri_variables'][$parameterName] = $request->attributes->get($parameterName);
             }
+        }
+
+        if ($this->resourceTranslator) {
+            $context['all_translations_enabled'] = $this->resourceTranslator->isAllTranslationsEnabled($attributes['resource_class'], $request->query->all());
         }
 
         if (!$normalization) {

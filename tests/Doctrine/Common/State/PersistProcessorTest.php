@@ -25,6 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prediction\CallPrediction;
 use Prophecy\Prediction\NoCallsPrediction;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class PersistProcessorTest extends TestCase
 {
@@ -32,7 +33,7 @@ class PersistProcessorTest extends TestCase
 
     public function testConstruct(): void
     {
-        $this->assertInstanceOf(ProcessorInterface::class, new PersistProcessor($this->prophesize(ManagerRegistry::class)->reveal()));
+        $this->assertInstanceOf(ProcessorInterface::class, new PersistProcessor($this->prophesize(ManagerRegistry::class)->reveal(), PropertyAccess::createPropertyAccessor()));
     }
 
     public function testPersist(): void
@@ -48,7 +49,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
-        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal(), PropertyAccess::createPropertyAccessor()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 
@@ -66,7 +67,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
-        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal(), PropertyAccess::createPropertyAccessor()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 
@@ -77,7 +78,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
 
-        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal(), PropertyAccess::createPropertyAccessor()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 
@@ -115,7 +116,7 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy)->shouldBeCalled();
 
-        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal(), PropertyAccess::createPropertyAccessor()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 }

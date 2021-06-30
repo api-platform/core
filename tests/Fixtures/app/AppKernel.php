@@ -131,6 +131,7 @@ class AppKernel extends Kernel
             'messenger' => $messengerConfig,
             'router' => ['utf8' => true],
             'http_method_override' => false,
+            'set_locale_from_accept_language' => true,
         ]);
 
         $alg = class_exists(NativePasswordHasher::class, false) || class_exists('Symfony\Component\Security\Core\Encoder\NativePasswordEncoder') ? 'auto' : 'bcrypt';

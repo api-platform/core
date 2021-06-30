@@ -31,13 +31,16 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\NormalizerResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\State\OptionsInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTranslation;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlResourceAdapter;
@@ -160,6 +163,12 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             ],
             'exceptionToStatus' => [
                 'Symfony\Component\Serializer\Exception\ExceptionInterface' => 400,
+            ],
+            'translation' => [
+                'class' => DummyTranslation::class,
+                'allTranslationsEnabled' => true,
+                'allTranslationsClientEnabled' => false,
+                'allTranslationsClientParameterName' => 'allT',
             ],
             'extraProperties' => [
                 'custom_property' => 'Lorem ipsum dolor sit amet',
@@ -466,6 +475,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'denormalizationContext',
         'collectDenormalizationErrors',
         'validationContext',
+        'translation',
         'filters',
         'order',
         'extraProperties',
@@ -518,7 +528,21 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 
-        $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources()), $collection);
+        $resourceFactory = new class($this->buildApiResources()) implements ResourceMetadataCollectionFactoryInterface {
+            public function __construct(private readonly array $resources)
+            {
+            }
+
+            public function create(string $resourceClass): ResourceMetadataCollection
+            {
+                return new ResourceMetadataCollection($resourceClass, $this->resources);
+            }
+        };
+
+        $this->assertEquals(
+            (new NormalizerResourceMetadataCollectionFactory($resourceFactory))->create(self::RESOURCE_CLASS),
+            $collection
+        );
     }
 
     public function getExtractors(): array

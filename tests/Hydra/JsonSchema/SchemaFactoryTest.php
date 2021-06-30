@@ -105,6 +105,9 @@ class SchemaFactoryTest extends TestCase
                                 'type' => 'string',
                                 'enum' => [ContextBuilder::HYDRA_NS],
                             ],
+                            '@language' => [
+                                'type' => 'string',
+                            ],
                         ],
                         'required' => ['@vocab', 'hydra'],
                         'additionalProperties' => true,

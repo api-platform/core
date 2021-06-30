@@ -258,7 +258,7 @@ class CollectionNormalizerTest extends TestCase
         $data = [$fooOne, $fooThree];
 
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
-        $contextBuilderProphecy->getResourceContext(Foo::class)->willReturn([
+        $contextBuilderProphecy->getResourceContext(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::type('array'))->willReturn([
             '@vocab' => 'http://localhost:8080/docs.jsonld#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'hydra:member' => [

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 
@@ -37,7 +38,7 @@ trait JsonLdContextTrait
         $context['jsonld_has_context'] = true;
 
         if (isset($context['jsonld_embed_context'])) {
-            $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
+            $data['@context'] = $contextBuilder->getResourceContext($resourceClass, UrlGeneratorInterface::ABS_PATH, $context);
 
             return $data;
         }

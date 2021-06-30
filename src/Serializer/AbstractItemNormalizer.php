@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Translation\ResourceTranslatorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -57,7 +58,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, protected ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?ResourceTranslatorInterface $resourceTranslator = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
@@ -211,6 +212,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $object = parent::denormalize($data, $class, $format, $context);
 
+        $this->denormalizeTranslation($data, $resourceClass, $format, $object);
+
         if (!$this->resourceClassResolver->isResourceClass($class)) {
             return $object;
         }
@@ -228,6 +231,25 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return $object;
+    }
+
+    protected function denormalizeTranslation(array $data, string $resourceClass, ?string $format, object $object): void
+    {
+        if (!$this->resourceTranslator || !$this->resourceTranslator->isResourceTranslatable($object)) {
+            return;
+        }
+
+        $locale = $this->resourceTranslator->getLocale();
+        $translationToPopulate = $object->getResourceTranslation($locale);
+
+        if (!$this->serializer instanceof DenormalizerInterface) {
+            throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+        }
+        $translation = $this->serializer->denormalize($data, $this->resourceTranslator->getTranslationClass($resourceClass), $format, [self::OBJECT_TO_POPULATE => $translationToPopulate]);
+        $translation->setLocale($locale);
+
+        $object->removeResourceTranslation($translation);
+        $object->addResourceTranslation($translation);
     }
 
     /**
@@ -574,7 +596,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_attribute'] = $attribute;
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
-        $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+        $attributeValue = null;
+        if ($this->resourceTranslator) {
+            $attributeValue = $this->resourceTranslator->translateAttributeValue($object, $attribute, $context);
+        }
+        if (!$attributeValue && $this->propertyAccessor->isReadable($object, $attribute)) {
+            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+        }
 
         if ($context['api_denormalize'] ?? false) {
             return $attributeValue;

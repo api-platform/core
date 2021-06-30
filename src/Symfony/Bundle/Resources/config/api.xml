@@ -26,6 +26,7 @@
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.translation.resource_translator" />
         </service>
         <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
@@ -57,6 +58,12 @@
             <argument>null</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+            <argument type="collection">
+                <argument key="exclude_from_cache_key" type="collection">
+                    <argument>iri</argument>
+                </argument>
+            </argument>
+            <argument type="service" id="api_platform.translation.resource_translator" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
             <tag name="serializer.normalizer" priority="-895" />

@@ -27,6 +27,7 @@
 
         <service id="api_platform.doctrine_mongodb.odm.state.persist_processor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
             <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.property_accessor" />
 
             <tag name="api_platform.state_processor" priority="-100" key="api_platform.doctrine_mongodb.odm.state.persist_processor" />
             <tag name="api_platform.state_processor" priority="-100" key="ApiPlatform\Doctrine\Common\State\PersistProcessor" />

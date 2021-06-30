@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer;
 
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Translation\ResourceTranslatorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -25,8 +26,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    public function __construct(private readonly ?NameConverterInterface $nameConverter)
-    {
+    public function __construct(
+        private readonly ?NameConverterInterface $nameConverter,
+        private readonly ?ResourceTranslatorInterface $resourceTranslator = null,
+    ) {
     }
 
     public function create(?string $resourceClass, Operation $operation, array $resolverContext, bool $normalization): array
@@ -43,6 +46,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
         if ($operation->getOutput()) {
             $context['output'] = $operation->getOutput();
+        }
+        if ($this->resourceTranslator && $resourceClass) {
+            $context['all_translations_enabled'] = $this->resourceTranslator->isAllTranslationsEnabled($resourceClass, $resolverContext['args'] ?? []);
         }
         $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 

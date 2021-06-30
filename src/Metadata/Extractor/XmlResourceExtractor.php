@@ -132,6 +132,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'denormalizationContext' => isset($resource->denormalizationContext->values) ? $this->buildValues($resource->denormalizationContext->values) : null,
             'collectDenormalizationErrors' => $this->phpize($resource, 'collectDenormalizationErrors', 'bool'),
             'validationContext' => isset($resource->validationContext->values) ? $this->buildValues($resource->validationContext->values) : null,
+            'translation' => $this->buildTranslation($resource),
             'filters' => $this->buildArrayValue($resource, 'filter'),
             'order' => isset($resource->order->values) ? $this->buildValues($resource->order->values) : null,
             'extraProperties' => $this->buildExtraProperties($resource, 'extraProperties'),
@@ -350,6 +351,29 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $data = [];
         foreach ($resource->exceptionToStatus->exception as $exception) {
             $data[(string) $exception['class']] = (int) $exception['statusCode'];
+        }
+
+        return $data;
+    }
+
+    private function buildTranslation(\SimpleXMLElement $resource): ?array
+    {
+        if (!isset($resource->translation)) {
+            return null;
+        }
+
+        $data = [];
+        foreach ($resource->translation as $translation) {
+            $data['class'] = $this->phpize($translation, 'class', 'string');
+            if (null !== $allTranslationsEnabled = $this->phpize($translation, 'allTranslationsEnabled', 'bool')) {
+                $data['all_translations_enabled'] = $allTranslationsEnabled;
+            }
+            if (null !== $allTranslationsClientEnabled = $this->phpize($translation, 'allTranslationsClientEnabled', 'bool')) {
+                $data['all_translations_client_enabled'] = $allTranslationsClientEnabled;
+            }
+            if ($allTranslationsClientParameterName = $this->phpize($translation, 'allTranslationsClientParameterName', 'string')) {
+                $data['all_translations_client_parameter_name'] = $allTranslationsClientParameterName;
+            }
         }
 
         return $data;

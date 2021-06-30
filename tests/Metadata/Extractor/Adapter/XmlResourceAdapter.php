@@ -395,6 +395,14 @@ XML_WRAP
         }
     }
 
+    private function buildTranslation(\SimpleXMLElement $resource, array $values): void
+    {
+        $node = $resource->addChild('translation');
+        foreach ($values as $key => $value) {
+            $node->addAttribute($key, $this->parse($value));
+        }
+    }
+
     private function buildExtraProperties(\SimpleXMLElement $resource, array $values): void
     {
         $this->buildValues($resource->addChild('extraProperties'), $values);

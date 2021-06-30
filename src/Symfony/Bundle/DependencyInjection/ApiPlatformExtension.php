@@ -116,6 +116,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
         $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
         $this->registerHttpCacheConfiguration($container, $config, $loader);
+        $this->registerTranslationConfiguration($loader);
         $this->registerValidatorConfiguration($container, $config, $loader);
         $this->registerDataCollectorConfiguration($container, $config, $loader);
         $this->registerMercureConfiguration($container, $config, $loader);
@@ -438,6 +439,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
         }
+        if (!$container->has('api_platform.json_schema.type_factory')) {
+            $container->removeDefinition('api_platform.hydra.json_schema.type_factory');
+        }
 
         if (!$config['enable_docs']) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
@@ -637,6 +641,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         return $formats;
+    }
+
+    private function registerTranslationConfiguration(XmlFileLoader $loader): void
+    {
+        $loader->load('translation.xml');
     }
 
     private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

@@ -73,6 +73,7 @@ class ApiResource extends Metadata
      * @param string|null                                                     $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string                                                          $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
      * @param string                                                          $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param array|null                                                      $translation                    https://api-platform.com/docs/core/translation
      * @param mixed|null                                                      $provider
      * @param mixed|null                                                      $processor
      */
@@ -135,6 +136,7 @@ class ApiResource extends Metadata
         protected ?string $securityPostDenormalizeMessage = null,
         protected ?string $securityPostValidation = null,
         protected ?string $securityPostValidationMessage = null,
+        protected ?array $translation = null,
         protected ?bool $compositeIdentifier = null,
         protected ?array $exceptionToStatus = null,
         protected ?bool $queryParameterValidationEnabled = null,
@@ -179,6 +181,7 @@ class ApiResource extends Metadata
             securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
             securityPostValidation: $securityPostValidation,
             securityPostValidationMessage: $securityPostValidationMessage,
+            translation: $translation,
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,

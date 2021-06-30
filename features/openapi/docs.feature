@@ -86,21 +86,35 @@ Feature: Documentation support
     {
       "default": "male",
       "example": "male",
-      "type": "string",
-      "enum": [
-          "male",
-          "female",
-          null
-      ],
-      "nullable": true
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+              "male",
+              "female",
+              null
+          ],
+          "nullable": true
+        },
+        {
+          "type": "object"
+        }
+      ]
     }
     """
     And the "playMode" property exists for the OpenAPI class "VideoGame"
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
-      "type": "string",
-      "format": "iri-reference"
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "iri-reference"
+        },
+        {
+          "type": "object"
+        }
+      ]
     }
     """
     # Enable these tests when SF 4.4 / PHP 7.1 support is dropped
@@ -110,7 +124,7 @@ Feature: Documentation support
     And the JSON node "paths./dummies.get.parameters[3].name" should be equal to "dummyBoolean"
     And the JSON node "paths./dummies.get.parameters[3].in" should be equal to "query"
     And the JSON node "paths./dummies.get.parameters[3].required" should be false
-    And the JSON node "paths./dummies.get.parameters[3].schema.type" should be equal to "boolean"
+    And the JSON node "paths./dummies.get.parameters[3].schema.oneOf[0].type" should be equal to "boolean"
 
     # Subcollection - check filter on subResource
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[0].name" should be equal to "id"
@@ -136,7 +150,7 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].name" should be equal to "name"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].in" should be equal to "query"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].required" should be false
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].schema.type" should be equal to "string"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].schema.oneOf[0].type" should be equal to "string"
 
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].name" should be equal to "description"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].in" should be equal to "query"

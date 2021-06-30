@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Translation\ResourceTranslatorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -35,7 +36,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly UrlGeneratorInterface $urlGenerator, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?NameConverterInterface $nameConverter = null, private readonly ?ResourceTranslatorInterface $resourceTranslator = null)
     {
     }
 
@@ -73,7 +74,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
+    public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): array
     {
         /** @var HttpOperation $operation */
         $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
@@ -82,13 +83,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         }
 
         if ($operation->getNormalizationContext()['iri_only'] ?? false) {
-            $context = $this->getBaseContext($referenceType);
-            $context['hydra:member']['@type'] = '@id';
+            $resourceContext = $this->getBaseContext($referenceType);
+            $resourceContext['hydra:member']['@type'] = '@id';
 
-            return $context;
+            return $resourceContext;
         }
 
-        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation);
+        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation, $context);
     }
 
     /**
@@ -140,9 +141,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $jsonLdContext;
     }
 
-    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null): array
+    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null, array $context = []): array
     {
-        $context = $this->getBaseContext($referenceType);
+        $resourceContext = $this->getBaseContext($referenceType);
+        $allTranslationsEnabled = $context['all_translations_enabled'] ?? ($this->resourceTranslator && $this->resourceTranslator->isAllTranslationsEnabled($resourceClass, []));
+        if (!$allTranslationsEnabled && $this->resourceTranslator && $this->resourceTranslator->isResourceClassTranslatable($resourceClass) && $locale = $this->resourceTranslator->getLocale()) {
+            $resourceContext['@language'] = $locale;
+        }
         $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
@@ -170,15 +175,19 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 ];
             }
 
+            if ($allTranslationsEnabled) {
+                $jsonldContext += ['@container' => '@language'];
+            }
+
             if (empty($jsonldContext)) {
-                $context[$convertedName] = $id;
+                $resourceContext[$convertedName] = $id;
             } else {
-                $context[$convertedName] = $jsonldContext + [
+                $resourceContext[$convertedName] = $jsonldContext + [
                     '@id' => $id,
                 ];
             }
         }
 
-        return $context;
+        return $resourceContext;
     }
 }

@@ -52,6 +52,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyPassenger as DummyPassen
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct as DummyProductDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProperty as DummyPropertyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceNotApiResourceChild as DummyTableInheritanceNotApiResourceChildDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTranslatable as DummyTranslatableDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTranslation as DummyTranslationDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTravel as DummyTravelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\EmbeddableDummy as EmbeddableDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\EmbeddedDummy as EmbeddedDummyDocument;
@@ -129,6 +131,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPassenger;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTranslatable;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTranslation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddableDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
@@ -2123,6 +2127,27 @@ final class DoctrineContext implements Context
         $this->manager->persist($third);
         $this->manager->persist($relationMultiple1);
         $this->manager->persist($relationMultiple2);
+    }
+
+    /**
+     * @Given there is a translatable dummy with its translations
+     */
+    public function thereIsATranslatableDummyWithItsTranslations(): void
+    {
+        $dummyTranslationEn = $this->buildDummyTranslation();
+        $dummyTranslationEn->locale = 'en';
+        $dummyTranslationEn->name = 'Dummy translated in English';
+        $dummyTranslationEn->description = 'It\'s a dummy!';
+        $dummyTranslationFr = $this->buildDummyTranslation();
+        $dummyTranslationFr->locale = 'fr';
+        $dummyTranslationFr->name = 'Dummy traduit en français';
+        $dummyTranslationFr->description = 'C\'est un dummy !';
+        $dummyTranslatable = $this->buildDummyTranslatable();
+        $dummyTranslatable->notTranslatedField = 'not translated';
+        $dummyTranslatable->addTranslation($dummyTranslationEn);
+        $dummyTranslatable->addTranslation($dummyTranslationFr);
+
+        $this->manager->persist($dummyTranslatable);
 
         $this->manager->flush();
     }
@@ -2470,5 +2495,15 @@ final class DoctrineContext implements Context
     private function buildVideoGame(): VideoGame|VideoGameDocument
     {
         return $this->isOrm() ? new VideoGame() : new VideoGameDocument();
+    }
+
+    private function buildDummyTranslation(): DummyTranslation|DummyTranslationDocument
+    {
+        return $this->isOrm() ? new DummyTranslation() : new DummyTranslationDocument();
+    }
+
+    private function buildDummyTranslatable(): DummyTranslatable|DummyTranslatableDocument
+    {
+        return $this->isOrm() ? new DummyTranslatable() : new DummyTranslatableDocument();
     }
 }

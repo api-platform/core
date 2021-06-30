@@ -37,6 +37,7 @@ abstract class Operation extends Metadata
      * @param string|null                         $securityMessage                {@see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message}
      * @param string|null                         $securityPostDenormalize        {@see https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization}
      * @param string|null                         $securityPostDenormalizeMessage {@see https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message}
+     * @param array|null                          $translation                    {@see https://api-platform.com/docs/core/translation}
      * @param string|null                         $deprecationReason              {@see https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties}
      * @param string[]|null                       $filters                        {@see https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters}
      * @param array{
@@ -84,6 +85,7 @@ abstract class Operation extends Metadata
         protected ?string $securityPostDenormalizeMessage = null,
         protected ?string $securityPostValidation = null,
         protected ?string $securityPostValidationMessage = null,
+        protected ?array $translation = null,
         protected ?string $deprecationReason = null,
         protected ?array $filters = null,
         protected ?array $validationContext = null,
@@ -142,6 +144,7 @@ abstract class Operation extends Metadata
             securityPostDenormalizeMessage: $securityPostDenormalizeMessage,
             securityPostValidation: $securityPostValidation,
             securityPostValidationMessage: $securityPostValidationMessage,
+            translation: $translation,
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,

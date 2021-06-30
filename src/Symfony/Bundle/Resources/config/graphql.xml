@@ -145,6 +145,7 @@
 
         <service id="api_platform.graphql.serializer.context_builder" class="ApiPlatform\GraphQl\Serializer\SerializerContextBuilder" public="false">
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="service" id="api_platform.translation.resource_translator" />
         </service>
         <service id="ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface" alias="api_platform.graphql.serializer.context_builder" />
 
@@ -229,6 +230,8 @@
             <argument>null</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+            <argument type="collection" />
+            <argument type="service" id="api_platform.translation.resource_translator" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
             <tag name="serializer.normalizer" priority="-890" />

@@ -156,6 +156,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'denormalizationContext' => $this->buildArrayValue($resource, 'denormalizationContext'),
             'collectDenormalizationErrors' => $this->phpize($resource, 'collectDenormalizationErrors', 'bool'),
             'validationContext' => $this->buildArrayValue($resource, 'validationContext'),
+            'translation' => $this->buildTranslation($resource),
             'filters' => $this->buildArrayValue($resource, 'filters'),
             'order' => $this->buildArrayValue($resource, 'order'),
             'extraProperties' => $this->buildArrayValue($resource, 'extraProperties'),
@@ -260,6 +261,27 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $this->phpize($resource, 'messenger', 'bool|string');
+    }
+
+    private function buildTranslation(array $resource): ?array
+    {
+        if (!\array_key_exists('translation', $resource)) {
+            return null;
+        }
+
+        $data = [];
+        $data['class'] = $this->phpize($resource['translation'], 'class', 'string');
+        if (null !== $allTranslationsEnabled = $this->phpize($resource['translation'], 'allTranslationsEnabled', 'bool')) {
+            $data['all_translations_enabled'] = $allTranslationsEnabled;
+        }
+        if (null !== $allTranslationsClientEnabled = $this->phpize($resource['translation'], 'allTranslationsClientEnabled', 'bool')) {
+            $data['all_translations_client_enabled'] = $allTranslationsClientEnabled;
+        }
+        if ($allTranslationsClientParameterName = $this->phpize($resource['translation'], 'allTranslationsClientParameterName', 'string')) {
+            $data['all_translations_client_parameter_name'] = $allTranslationsClientParameterName;
+        }
+
+        return $data;
     }
 
     private function buildOperations(array $resource, array $root): ?array

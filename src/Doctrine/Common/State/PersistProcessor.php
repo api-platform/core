@@ -21,14 +21,18 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 final class PersistProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
     use LinksHandlerTrait;
 
-    public function __construct(private readonly ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly ?PropertyAccessorInterface $propertyAccessor = null)
     {
+        if (!$this->propertyAccessor) {
+            trigger_deprecation('api-platform/core', '3.2', 'Not injecting $propertyAccessor as 2nd argument to %s is deprecated.', self::class);
+        }
     }
 
     /**
@@ -89,7 +93,10 @@ final class PersistProcessor implements ProcessorInterface
                             continue;
                         }
 
-                        if (($newValue = $reflectionProperty->getValue($data)) !== $reflectionProperty->getValue($newData)) {
+                        if ($this->propertyAccessor && $this->propertyAccessor->isReadable($data, $propertyName) && ($newValue = $this->propertyAccessor->getValue($data, $propertyName)) !== ($this->propertyAccessor->isReadable($newData, $propertyName) ? $this->propertyAccessor->getValue($newData, $propertyName) : null)) {
+                            $this->propertyAccessor->setValue($newData, $propertyName, $newValue);
+                        }
+                        if (!$this->propertyAccessor && ($newValue = $reflectionProperty->getValue($data)) !== $reflectionProperty->getValue($newData)) {
                             $reflectionProperty->setValue($newData, $newValue);
                         }
                     }

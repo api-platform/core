@@ -270,7 +270,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if ($operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $method) {
-                foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation)) as $parameter) {
+                foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation), $this->getTranslationParameters($operation)) as $parameter) {
                     if ($this->hasParameter($openapiOperation, $parameter)) {
                         continue;
                     }
@@ -539,7 +539,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             foreach ($filter->getDescription($entityClass) as $name => $data) {
-                $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string']);
+                $filterType = \in_array($data['type'], Type::$builtinTypes, true) ? new Type($data['type'], false, null, $data['is_collection'] ?? false) : null;
+                $schema = $data['schema'] ?? ($filterType ? $this->jsonSchemaTypeFactory->getType($filterType) : ['type' => 'string']);
 
                 $parameters[] = new Parameter(
                     $name,
@@ -549,12 +550,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $data['openapi']['deprecated'] ?? false,
                     $data['openapi']['allowEmptyValue'] ?? true,
                     $schema,
-                    'array' === $schema['type'] && \in_array(
+                    $filterType?->isCollection() && \in_array(
                         $data['type'],
                         [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
                         true
                     ) ? 'deepObject' : 'form',
-                    $data['openapi']['explode'] ?? ('array' === $schema['type']),
+                    $data['openapi']['explode'] ?? $filterType?->isCollection() ?? false,
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
                     isset($data['openapi']['examples']
@@ -594,6 +595,19 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         if ($operation->getPaginationClientEnabled() ?? $this->paginationOptions->isPaginationClientEnabled()) {
             $parameters[] = new Parameter($this->paginationOptions->getPaginationClientEnabledParameterName(), 'query', 'Enable or disable pagination', false, false, true, ['type' => 'boolean']);
+        }
+
+        return $parameters;
+    }
+
+    private function getTranslationParameters(CollectionOperationInterface|HttpOperation $operation): array
+    {
+        $translationMetadata = $operation->getTranslation();
+
+        $parameters = [];
+
+        if ($translationMetadata['all_translations_client_enabled'] ?? false) {
+            $parameters[] = new Parameter($translationMetadata['all_translations_client_parameter_name'] ?? 'allTranslations', 'query', 'Enable retrieval of all translations', false, false, true, ['type' => 'boolean']);
         }
 
         return $parameters;

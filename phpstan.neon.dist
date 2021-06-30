@@ -70,6 +70,9 @@ parameters:
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface::supportsNormalization\(\) invoked with 3 parameters, 1-2 required\.#'
 
+		# Expected, due to deprecations
+		- '#Method ApiPlatform\\JsonLd\\ContextBuilderInterface::getResourceContext\(\) invoked with 3 parameters, 1-2 required\.#'
+
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
