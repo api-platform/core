@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\ResourceCollection;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\AsResource;
 
 /**
  * @experimental
- * @extends \ArrayObject<int, Resource>
+ * @extends \ArrayObject<int, AsResource>
  */
 final class ResourceCollection extends \ArrayObject
 {
@@ -50,5 +50,25 @@ final class ResourceCollection extends \ArrayObject
         }
 
         return null;
+    }
+
+    public function getFirstOperation(): ?array
+    {
+        $it = $this->getIterator();
+
+        while ($it->valid()) {
+            /** @var resource */
+            $metadata = $it->current();
+
+            foreach ($metadata->getOperations() as $name => $operation) {
+                if ($operation->getMethod() === Operation::METHOD_GET && !$operation->isCollection()) {
+                    return [$name, $operation];
+                }
+            }
+
+            $it->next();
+        }
+
+        return [null, null];
     }
 }

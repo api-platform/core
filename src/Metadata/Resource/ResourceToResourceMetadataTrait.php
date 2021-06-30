@@ -13,27 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource;
 
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\AsResource;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
+/**
+ * @internal
+ * @deprecated
+ */
 trait ResourceToResourceMetadataTrait
 {
-    private $nameConverter;
+    private $camelCaseToSnakeCaseNameConverter;
 
-    private function transformResourceToResourceMetadata(Resource $resource): ResourceMetadata
+    private function transformResourceToResourceMetadata(AsResource $resource): ResourceMetadata
     {
         $collectionOperations = [];
         $itemOperations = [];
-        foreach ($resource->operations as $name => $operation) {
+        foreach ($resource->getOperations() as $name => $operation) {
             $operation = $this->toArray($operation);
 
-            if (!\is_array($operation['openapi_context'])) {
+            if (!isset($operation['openapi_context'])) {
                 $operation['openapi_context'] = [];
             }
 
             $operation['openapi_context']['operationId'] = $name;
 
-            if (!$operation['identifiers']) {
+            if (!($operation['identifiers'] ?? [])) {
                 $collectionOperations[$name] = $operation;
                 continue;
             }
@@ -42,20 +46,28 @@ trait ResourceToResourceMetadataTrait
         }
         $attributes = $this->toArray($resource);
 
-        $graphql = isset($resource->graphQl) ? $this->toArray($resource->graphQl) : null;
+        $graphql = $resource->getGraphQl() ? $this->toArray($resource->getGraphQl()) : null;
 
-        return new ResourceMetadata($resource->shortName, $resource->description, null, $itemOperations, $collectionOperations, $attributes, null, $graphql);
+        return new ResourceMetadata($resource->getShortName(), $resource->getDescription(), $resource->getTypes()[0] ?? null, $itemOperations, $collectionOperations, $attributes, null, $graphql);
     }
 
     private function toArray($object): array
     {
-        if (!$this->nameConverter) {
-            $this->nameConverter = new CamelCaseToSnakeCaseNameConverter();
+        if (!$this->camelCaseToSnakeCaseNameConverter) {
+            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
         }
 
         $arr = [];
-        foreach ($object as $key => $value) {
-            $arr[$this->nameConverter->normalize($key)] = $value;
+        foreach (get_class_methods($object) as $methodName) {
+            if ('getOperations' === $methodName || 0 !== strpos($methodName, 'get')) {
+                continue;
+            }
+
+            if (!$value = $object->{$methodName}()) {
+                continue;
+            }
+            
+             $arr[$this->camelCaseToSnakeCaseNameConverter->normalize(lcfirst(substr($methodName, 3)))] = $value;
         }
 
         return $arr;

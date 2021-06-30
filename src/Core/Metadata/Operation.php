@@ -146,12 +146,15 @@ class Operation
         protected ?string $securityPostDenormalize = null,
         protected ?string $securityPostDenormalizeMessage = null,
         protected ?bool $compositeIdentifier = null,
+        protected array $exceptionToStatus = [],
+        protected ?bool $queryParameterValidationEnabled = null,
         protected ?GraphQl $graphQl = null,
         protected bool $read = true,
         protected bool $deserialize = true,
         protected bool $validate = true,
         protected bool $write = true,
         protected bool $serialize = true,
+        // TODO: replace by queryParameterValidationEnabled?
         protected bool $queryParameterValidate = true,
         protected int $priority = 0,
         protected array $extraProperties = []
@@ -929,6 +932,32 @@ class Operation
     {
         $self = clone $this;
         $self->compositeIdentifier = $compositeIdentifier;
+
+        return $self;
+    }
+
+    public function getExceptionToStatus(): ?array
+    {
+        return $this->exceptionToStatus;
+    }
+
+    public function withExceptionToStatus(?array $exceptionToStatus = []): self
+    {
+        $self = clone $this;
+        $self->exceptionToStatus = $exceptionToStatus;
+
+        return $self;
+    }
+
+    public function getQueryParameterValidationEnabled(): ?bool
+    {
+        return $this->queryParameterValidationEnabled;
+    }
+
+    public function withQueryParameterValidationEnabled(?bool $queryParameterValidationEnabled = null): self
+    {
+        $self = clone $this;
+        $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
 
         return $self;
     }

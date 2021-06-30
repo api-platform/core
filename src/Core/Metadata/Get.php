@@ -81,6 +81,8 @@ final class Get extends Operation
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
         ?bool $compositeIdentifier = null,
+        array $exceptionToStatus = [],
+        ?bool $queryParameterValidationEnabled = null,
         ?GraphQl $graphQl = null,
         bool $read = true,
         bool $deserialize = true,

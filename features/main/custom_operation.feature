@@ -95,6 +95,7 @@ Feature: Custom operation
 
   Scenario: Void a payment
     When I send a "POST" request to "/payments/1/void"
+    Then print last JSON response
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

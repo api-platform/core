@@ -43,6 +43,7 @@ final class DeserializeListener
     private $formats;
     private $formatsProvider;
     private $resourceCollectionMetadataFactory;
+    private $legacyResourceCollectionMetadataFactory;
 
     /**
      * @param ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
@@ -90,16 +91,13 @@ final class DeserializeListener
 
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
-        $formats = null;
-        if (!$this->resourceMetadataFactory && isset($attributes['operation_name'])) {
-            $formats = $attributes['operation']['input_formats'] ?? null;
-        }
+        $formats = $attributes['operation']['input_formats'] ?? null;
 
         if (!$formats) {
             // BC check to be removed in 3.0
             if ($this->resourceMetadataFactory) {
-                $formats = $this
-                    ->resourceMetadataFactory
+                @trigger_error('When using a "route_name", be sure to define the "_api_operation" route defaults as we will not rely on metadata in API Platform 3.0.', E_USER_DEPRECATED);
+                $formats = $this->resourceMetadataFactory
                     ->create($attributes['resource_class'])
                     ->getOperationAttribute($attributes, 'input_formats', [], true);
             } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {

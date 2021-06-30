@@ -116,9 +116,29 @@ final class IriConverter implements ContextAwareIriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
     {
+                    // if ($attributes['resource_class'] !== $resourceClass) {
+                    //     $attributes['operation'] = $this->getIriConverterContextWithDifferentClasses($resourceClass, $attributes['resource_class'], $attributes['operation']);
+                    // }
+                    //
+                    // $context = ['identifiers' => $attributes['identifiers'], 'has_composite_identifier' => $attributes['has_composite_identifier']];
+                    // if (isset($attributes['operation_name'])) {
+                    //     $context['operation_name'] = $attributes['operation']['links'][0][0] ?? $attributes['operation_name'];
+                    //     $context['identifiers'] = $attributes['operation']['links'][0][1] ?? $attributes['identifiers'];
+                    // }
+
         $resourceClass = $this->getResourceClass($item, true);
+
+        // TODO: Is this responsability correct? Maybe remove the context and use this instead?
+        if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            [$operationName, $operation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
+            if ($operationName) {
+                $context['operation_name'] = $operationName;
+                $context['identifiers'] = $operation->getIdentifiers();
+                $context['has_composite_identifier'] = $operation->getCompositeIdentifier();
+            }
+        }
 
         try {
             $identifiers = $this->identifiersExtractor instanceof ContextAwareIdentifiersExtractorInterface ? $this->identifiersExtractor->getIdentifiersFromItem($item, $context) : $this->identifiersExtractor->getIdentifiersFromItem($item);
@@ -128,7 +148,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
         if (isset($context['operation_name'])) {
             if (\count($identifiers) > 1 && ($context['has_composite_identifier'] ?? false)) {
-                $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
+                $identifiers = [key($context['identifiers']) => CompositeIdentifierParser::stringify($identifiers)];
             }
 
             return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType, $context));
@@ -164,7 +184,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if ('GET' === $operation->getMethod() && !$operation->isCollection()) {
                         if (\count($identifiers) > 1 && $operation->getCompositeIdentifier()) {
-                            $identifiers = ['id' => CompositeIdentifierParser::stringify($identifiers)];
+                            $identifiers = [key($operation->getIdentifiers()) => CompositeIdentifierParser::stringify($identifiers)];
                         }
 
                         return $this->router->generate($operationName, $identifiers, $this->getReferenceType($resourceClass, $referenceType));

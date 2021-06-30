@@ -133,7 +133,7 @@ final class PurgeHttpCacheListener
 
     private function addTagsFor($value): void
     {
-        if (!$value) {
+        if (!$value || is_scalar($value)) {
             return;
         }
 

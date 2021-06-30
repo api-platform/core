@@ -71,7 +71,7 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
         $newOperations = [];
         $patchFormats = null;
         foreach ($operations as $operationName => $operation) {
-            if ($isPatch = Operation::METHOD_PATCH === $operation->getMethod() && !$operation->getFormats() && !$operation->getInputFormats()) {
+            if (($isPatch = Operation::METHOD_PATCH === $operation->getMethod()) && !$operation->getFormats() && !$operation->getInputFormats()) {
                 $operation->withInputFormats($this->patchFormats);
             }
 

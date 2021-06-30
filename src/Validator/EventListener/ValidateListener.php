@@ -68,7 +68,8 @@ final class ValidateListener
 
         $validationContext = $attributes['operation']['validation_context'] ?? [];
 
-        if ($this->resourceMetadataFactory) {
+        if (!isset($attributes['operation']) && $this->resourceMetadataFactory) {
+            @trigger_error('When using a "route_name", be sure to define the "_api_operation" route defaults as we will not rely on metadata in API Platform 3.0.', E_USER_DEPRECATED);
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
             $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
             $validationContext = ['groups' => $validationGroups];

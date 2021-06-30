@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
+use ApiPlatform\Core\Api\DeprecateWrongIriConversionTrait;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -36,13 +37,14 @@ final class WriteListener
 {
     use ResourceClassInfoTrait;
     use ToggleableOperationAttributeTrait;
+    use DeprecateWrongIriConversionTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'write';
 
     private $dataPersister;
     private $iriConverter;
 
-    public function __construct($dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct($dataPersister, IriConverterInterface $iriConverter = null, $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         if ($dataPersister instanceof DataPersisterInterface) {
             @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', DataPersisterInterface::class, ProcessorInterface::class), \E_USER_DEPRECATED);
@@ -115,14 +117,8 @@ final class WriteListener
                     break;
                 }
 
-                if ($this->iriConverter instanceof IriConverterInterface && $this->isResourceClass($this->getObjectClass($controllerResult))) {
-                    $context = ['identifiers' => $attributes['identifiers'], 'has_composite_identifier' => $attributes['has_composite_identifier']];
-                    if (isset($attributes['operation_name'])) {
-                        $context['operation_name'] = $attributes['operation']['links'][0][0] ?? $attributes['operation_name'];
-                        $context['identifiers'] = $attributes['operation']['links'][0][1] ?? $attributes['identifiers'];
-                    }
-
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($controllerResult, UrlGeneratorInterface::ABS_PATH, $context) : $this->iriConverter->getIriFromItem($controllerResult));
+                if ($this->iriConverter instanceof IriConverterInterface && $this->isResourceClass($resourceClass = $this->getObjectClass($controllerResult))) {
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
                 }
 
                 break;

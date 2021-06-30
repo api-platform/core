@@ -199,7 +199,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $collection = $this->resourceMetadataFactory->create($class);
         foreach ($collection as $metadata) {
             foreach ($metadata->getOperations() as $operation) {
-                if ('PATCH' === ($operation->getMethod() ?? '') && \in_array('application/merge-patch+json', $operation->getInputFormats() ?? [], true)) {
+                if ('PATCH' === ($operation->getMethod() ?? '') && \in_array('application/merge-patch+json', $operation->getInputFormats()['json'] ?? [], true)) {
                     return true;
                 }
             }

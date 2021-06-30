@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\AsResource;
 
 /**
  * Creates a resource metadata from {@see Resource} annotations.
@@ -59,7 +59,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(Resource::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(AsResource::class)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
                 $resourceMetadataCollection[] = $resource;
             }
@@ -89,7 +89,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         $resources = [];
         $index = -1;
         foreach ($attributes as $attribute) {
-            if (Resource::class === $attribute->getName()) {
+            if (AsResource::class === $attribute->getName()) {
                 $resource = $attribute->newInstance()->withShortName($shortName)->withClass($resourceClass);
 
                 foreach ($this->defaults as $key => $value) {
@@ -135,7 +135,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         return $resources;
     }
 
-    private function getOperationWithDefaults(Resource $resource, Operation $operation): array
+    private function getOperationWithDefaults(AsResource $resource, Operation $operation): array
     {
         foreach ($this->defaults as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);
@@ -144,7 +144,6 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             }
         }
 
-        // @phpstan-ignore-next-line
         foreach (get_class_methods($resource) as $methodName) {
             if (0 !== strpos($methodName, 'get')) {
                 continue;

@@ -115,7 +115,7 @@
             <argument>%api_platform.allow_plain_identifiers%</argument>
             <argument>null</argument>
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" on-invalid="ignore" />
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
@@ -175,7 +175,7 @@
         <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.state_processor" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument>null</argument>
+            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
@@ -185,7 +185,7 @@
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument>null</argument>
-            <argument>null</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
 
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="2" />
@@ -194,7 +194,7 @@
         <service id="api_platform.listener.view.serialize" class="ApiPlatform\Core\EventListener\SerializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />

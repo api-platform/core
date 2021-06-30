@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\AsResource;
 use IteratorAggregate;
 
-#[Resource('/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true])]
-#[Get]
+#[AsResource('/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true])]
+#[GetCollection]
 #[Post]
 final class AttributeResources implements IteratorAggregate
 {

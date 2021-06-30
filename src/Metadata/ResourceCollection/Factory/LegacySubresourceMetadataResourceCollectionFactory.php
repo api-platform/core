@@ -18,7 +18,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\AsResource;
 
 /**
  * We have to compute a local cache having all the resource => subresource matching.
@@ -79,7 +79,7 @@ final class LegacySubresourceMetadataResourceCollectionFactory implements Resour
                     $identifiers[$parameterName] = [$property, $class];
                 }
 
-                $resource = new Resource(
+                $resource = new AsResource(
                     uriTemplate: $subresourceMetadata['path'],
                     shortName: $subresourceMetadata['shortNames'][0],
                     operations: [

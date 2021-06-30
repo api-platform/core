@@ -16,6 +16,9 @@ namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -76,13 +79,16 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
     private function generateUriTemplate(Operation $operation): string
     {
         $uriTemplate = $operation->getRoutePrefix() ?: '';
-        if ($operation->isCollection()) {
-            return sprintf('%s/%s.{_format}', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
-        }
-
         $uriTemplate = sprintf('%s/%s', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
-        foreach (array_keys($operation->getIdentifiers()) as $parameterName) {
-            $uriTemplate .= sprintf('/{%s}', $parameterName);
+        
+        if ($parameters = array_keys($operation->getIdentifiers())) {
+            if ($operation->getCompositeIdentifier()) {
+                $uriTemplate .= sprintf('/{%s}', $parameters[0]);
+            } else {
+                foreach ($parameters as $parameterName) {
+                    $uriTemplate .= sprintf('/{%s}', $parameterName);
+                }
+            }
         }
 
         return sprintf('%s.{_format}', $uriTemplate);

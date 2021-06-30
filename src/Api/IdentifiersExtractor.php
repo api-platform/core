@@ -75,26 +75,30 @@ final class IdentifiersExtractor implements ContextAwareIdentifiersExtractorInte
     {
         $identifiers = [];
         $resourceClass = $this->getResourceClass($item, true);
-        if ($context['identifiers'] ?? false) {
-            foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
-                if ($item instanceof $class) {
-                    $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, $property);
-                    continue;
-                }
-
-                foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-                    $type = $propertyMetadata->getType();
-                    if ($type && $type->getClassName() === $class) {
-                        $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, "$propertyName.$property");
-                    } elseif ($type && $type->isCollection() && $type->getCollectionValueType()->getClassName() === $class) {
-                        $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property));
-                    }
-                }
-            }
-
-            return $identifiers;
-        }
+        // if (isset($context['identifiers'])) {
+        //     // foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
+        //     //     if ($item instanceof $class) {
+        //     //         $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, $property);
+        //     //
+        //     //         if (!is_string($identifiers[$parameterName])) {
+        //     //             dump($identifiers[$parameterName]);
+        //     //         }
+        //     //         continue;
+        //     //     }
+        //     //
+        //     //     foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+        //     //         $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+        //     //         $type = $propertyMetadata->getType();
+        //     //         if ($type && $type->getClassName() === $class) {
+        //     //             $identifiers[$parameterName] = (string) $this->propertyAccessor->getValue($item, "$propertyName.$property");
+        //     //         } elseif ($type && $type->isCollection() && $type->getCollectionValueType()->getClassName() === $class) {
+        //     //             $identifiers[$parameterName] = (string) $this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property));
+        //     //         }
+        //     //     }
+        //     // }
+        //     //
+        //     // return $identifiers;
+        // }
 
         $identifierProperties = $this->getIdentifiersFromResourceClass($resourceClass);
 

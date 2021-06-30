@@ -22,7 +22,7 @@ use IteratorAggregate;
  * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Resource
+class AsResource
 {
     /**
      * @param iterable     $operations
@@ -80,6 +80,7 @@ class Resource
      * @param string       $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param bool         $compositeIdentifier
+     * @param array        $exceptionToStatus
      * @param array        $graphQl
      */
     public function __construct(
@@ -138,6 +139,8 @@ class Resource
         private ?string $securityPostDenormalize = null,
         private ?string $securityPostDenormalizeMessage = null,
         private ?bool $compositeIdentifier = null,
+        private array $exceptionToStatus = [],
+        private ?bool $queryParameterValidationEnabled = null,
         private ?GraphQl $graphQl = null,
         private array $extraProperties = []
     ) {
@@ -876,6 +879,32 @@ class Resource
     {
         $self = clone $this;
         $self->compositeIdentifier = $compositeIdentifier;
+
+        return $self;
+    }
+
+    public function getExceptionToStatus(): ?array
+    {
+        return $this->exceptionToStatus;
+    }
+
+    public function withExceptionToStatus(?array $exceptionToStatus = []): self
+    {
+        $self = clone $this;
+        $self->exceptionToStatus = $exceptionToStatus;
+
+        return $self;
+    }
+
+    public function getQueryParameterValidationEnabled(): ?bool
+    {
+        return $this->queryParameterValidationEnabled;
+    }
+
+    public function withQueryParameterValidationEnabled(?bool $queryParameterValidationEnabled = null): self
+    {
+        $self = clone $this;
+        $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
 
         return $self;
     }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
+use ApiPlatform\Core\Api\DeprecateWrongIriConversionTrait;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -43,6 +44,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use ClassInfoTrait;
     use ContextTrait;
     use JsonLdContextTrait;
+    use DeprecateWrongIriConversionTrait;
 
     public const FORMAT = 'jsonld';
 
@@ -86,16 +88,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
             if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface && $resourceClass !== $context['resource_class']) {
-                foreach ($this->resourceMetadataFactory->create($resourceClass) as $resource) {
-                    // TODO: Document
-                    @trigger_error('You are trying to serialize a class is not the expected one, this behavior will not be possible anymore in 3.0. Possible reason is to return the wrong Resource in a controller or a Data Provider. Replace this behavior using an Alternate Route.');
-                    foreach ($resource->getOperations() as $operation) {
-                        if ($operation->getMethod() === Operation::METHOD_GET && !$operation->isCollection()) {
-                            $context['links'] = $operation->getLinks();
-                            break 2;
-                        }
-                    }
-                }
+                $context = $this->getIriConverterContextWithDifferentClasses($resourceClass, $context['resource_class'], $context);
             }
 
             $iriContext = isset($context['links'][0]) ? ['operation_name' => $context['links'][0][0], 'identifiers' => $context['links'][0][1]] + $context : $context;

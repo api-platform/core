@@ -102,7 +102,7 @@ trait OperationDataProviderTrait
         foreach ($identifiersKeys as $parameterName => $identifiedBy) {
             if (!isset($parameters[$parameterName])) {
                 if ($attributes['has_composite_identifier']) {
-                    $identifiers = CompositeIdentifierParser::parse($parameters['id']);
+                    $identifiers = CompositeIdentifierParser::parse($parameters[key($identifiersKeys)] ?? $parameters['id']);
                     if (($currentIdentifiersNumber = \count($identifiers)) !== $identifiersNumber) {
                         throw new InvalidIdentifierException(sprintf('Expected %d identifiers, got %d', $identifiersNumber, $currentIdentifiersNumber));
                     }

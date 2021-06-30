@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Serializer;
 
+use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -37,7 +39,7 @@ class ItemNormalizer extends AbstractItemNormalizer
 {
     private $logger;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers, [], $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
 
@@ -88,8 +90,23 @@ class ItemNormalizer extends AbstractItemNormalizer
             if (null === $identifier) {
                 throw $e;
             }
+            
+            $iriContext = $context + ['fetch_data' => true];
+            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                [$operationName, $relatedOperation] = $this->resourceMetadataFactory->create($context['resource_class'])->getFirstOperation();
+                if ($operationName) {
+                    $iriContext['identifiers_values'] = [$identifier => $data[$identifier]];
+                    $iriContext['operation_name'] = $operationName;
+                }
+            }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]), $context + ['fetch_data' => true]);
+            if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
+                $iri = $this->iriConverter->getIriFromResourceClass($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $iriContext);
+            } else {
+                $iri = sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]);
+            }
+
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, $iriContext);
         }
     }
 }

@@ -30,6 +30,7 @@ use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetad
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Operation;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -662,6 +663,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
+            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                [$operationName, $relatedOperation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
+                $childContext['operation_name'] = $operationName;
+                $childContext['links'] = $relatedOperation->getLinks();
+                $childContext['identifiers'] = $relatedOperation->getIdentifiers();
+            }
             unset($childContext['iri']);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
@@ -679,6 +686,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
+            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                [$operationName, $relatedOperation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
+                $childContext['operation_name'] = $operationName;
+                $childContext['links'] = $relatedOperation->getLinks();
+                $childContext['identifiers'] = $relatedOperation->getIdentifiers();
+            }
             unset($childContext['iri']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
@@ -740,8 +753,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $normalizedRelatedObject;
         }
 
-        // TODO: 2.7 needs ContextAwarewhat to do with this
-        $iri = $this->iriConverter->getIriFromItem($relatedObject);
+        if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
+            $iri = $this->iriConverter->getIriFromItem($relatedObject, UrlGeneratorInterface::ABS_PATH, $context);
+        } else {
+            $iri = $this->iriConverter->getIriFromItem($relatedObject);
+        }
+
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
         }

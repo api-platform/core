@@ -80,16 +80,19 @@ final class RespondListener
 
                 $headers = $this->addAcceptPatchHeader($headers, $attributes, $resourceMetadata);
                 $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
-            } else if ($attributes['operation_name']) {
+            } else if (isset($attributes['operation_name'], $attributes['operation'])) {
                 $resourceMetadataCollection = $this->resourceMetadataFactory->create($attributes['resource_class']);
                 $operation = $resourceMetadataCollection->getOperation($attributes['operation_name']);
-
                 if ($sunset = $attributes['operation']['sunset']) {
                     $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
                 }
 
                 $status = $attributes['operation']['status'];
 
+                if ($status) {
+                    $status = (int) $status;
+                }
+                
                 if ($acceptPatch = $attributes['operation']['accept_patch']) {
                     $headers['Accept-Patch'] = $acceptPatch;
                 }

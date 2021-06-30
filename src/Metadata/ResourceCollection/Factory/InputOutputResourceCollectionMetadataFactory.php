@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
 
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
-use ApiPlatform\Metadata\Resource;
+use ApiPlatform\Metadata\AsResource;
 
 /**
  * Transforms the given input/output metadata to a normalized one.
@@ -57,7 +57,7 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
         return $resourceMetadataCollection;
     }
 
-    private function getTransformedOperations(array $operations, Resource $resourceMetadata): array
+    private function getTransformedOperations(array $operations, AsResource $resourceMetadata): array
     {
         foreach ($operations as $key => &$operation) {
             $operation = $operation->withInput($operation->getInput() ? $this->transformInputOutput($operation->getInput()) : $resourceMetadata->getInput());
@@ -68,8 +68,8 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
                 && \array_key_exists('class', $operation->getInput())
                 && null === $operation->getInput()['class']
             ) {
-                $operation = $operation->withDeserialize($operation->getDeserialize() ?? false);
-                $operation = $operation->withValidate($operation->getValidate() ?? false);
+                $operation = $operation->withDeserialize($operation->getDeserialize() ?: false);
+                $operation = $operation->withValidate($operation->getValidate() ?: false);
             }
 
             if (
