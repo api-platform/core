@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
-use ApiPlatform\Core\Api\DeprecateWrongIriConversionTrait;
+use ApiPlatform\Core\Api\IriContextTrait;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -37,7 +37,7 @@ final class WriteListener
 {
     use ResourceClassInfoTrait;
     use ToggleableOperationAttributeTrait;
-    use DeprecateWrongIriConversionTrait;
+    use IriContextTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'write';
 
@@ -118,7 +118,7 @@ final class WriteListener
                 }
 
                 if ($this->iriConverter instanceof IriConverterInterface && $this->isResourceClass($resourceClass = $this->getObjectClass($controllerResult))) {
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($controllerResult, UrlGeneratorInterface::ABS_PATH, $this->getIriContextFromOperationContext($context, $resourceClass, $context['resource_class'], true)) : $this->iriConverter->getIriFromItem($controllerResult));
                 }
 
                 break;

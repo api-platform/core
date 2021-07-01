@@ -90,7 +90,10 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         $index = -1;
         foreach ($attributes as $attribute) {
             if (AsResource::class === $attribute->getName()) {
-                $resource = $attribute->newInstance()->withShortName($shortName)->withClass($resourceClass);
+                $resource = $attribute->newInstance()
+                                      ->withShortName($shortName)
+                                      ->withClass($resourceClass)
+                                      ->withTypes([$shortName]);
 
                 foreach ($this->defaults as $key => $value) {
                     [$key, $value] = $this->getKeyValue($key, $value);

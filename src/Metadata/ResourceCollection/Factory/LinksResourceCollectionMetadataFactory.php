@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -61,24 +62,19 @@ final class LinksResourceCollectionMetadataFactory implements ResourceCollection
     {
         $links = [];
 
+        $hasSameOperationLink = false;
         foreach ($resourceMetadata as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
-                if ($operation->isCollection()) {
-                    continue;
-                }
-
-                if ($operationName === $resourceOperationName) {
-                    // TODO: 3.0 the current operation should take precedence using array_unshift, this breaks CustomActionDummy behavior which is wrong
-                    if ($currentOperation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) {
-                        $links[] = [$operationName, $operation->getIdentifiers()];
-                    } else {
-                        array_unshift($links, [$operationName, $operation->getIdentifiers()]);
-                    }
-                    continue;
-                }
-
                 if (!$operation->getRouteName() && Operation::METHOD_GET === $operation->getMethod()) {
-                    $links[] = [$operationName, $operation->getIdentifiers()];
+                    if ($currentOperation->isCollection() === $operation->isCollection()) {
+                        if (!$hasSameOperationLink) {
+                            $hasSameOperationLink = true;
+                            array_unshift($links, [$operationName, $operation->getIdentifiers(), $operation->getCompositeIdentifier(), $operation->isCollection()]);
+                        }
+                        continue;
+                    }
+
+                    array_push($links, [$operationName, $operation->getIdentifiers(), $operation->getCompositeIdentifier(), $operation->isCollection()]);
                 }
             }
         }

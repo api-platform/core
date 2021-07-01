@@ -75,30 +75,39 @@ final class IdentifiersExtractor implements ContextAwareIdentifiersExtractorInte
     {
         $identifiers = [];
         $resourceClass = $this->getResourceClass($item, true);
-        // if (isset($context['identifiers'])) {
-        //     // foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
-        //     //     if ($item instanceof $class) {
-        //     //         $identifiers[$parameterName] = $this->propertyAccessor->getValue($item, $property);
-        //     //
-        //     //         if (!is_string($identifiers[$parameterName])) {
-        //     //             dump($identifiers[$parameterName]);
-        //     //         }
-        //     //         continue;
-        //     //     }
-        //     //
-        //     //     foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
-        //     //         $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-        //     //         $type = $propertyMetadata->getType();
-        //     //         if ($type && $type->getClassName() === $class) {
-        //     //             $identifiers[$parameterName] = (string) $this->propertyAccessor->getValue($item, "$propertyName.$property");
-        //     //         } elseif ($type && $type->isCollection() && $type->getCollectionValueType()->getClassName() === $class) {
-        //     //             $identifiers[$parameterName] = (string) $this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property));
-        //     //         }
-        //     //     }
-        //     // }
-        //     //
-        //     // return $identifiers;
-        // }
+        if (isset($context['identifiers'])) {
+            foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
+                $identifierValue = $this->resolveIdentifierValue($item, $class, $property);
+
+                if (!$identifierValue) {
+                    throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
+                }
+
+                if (is_scalar($identifierValue) || method_exists($identifierValue , '__toString')) {
+                    $identifiers[$parameterName] = (string) $identifierValue;
+                    continue;
+                }
+
+                // Note: we should recurse to `$this->getIdentifiersFromItem` and use the ResourceCollectionMetadataFactoryInterface to find correct identifiers
+                // anyways this is not really supported yet and adds a lot of complexity
+                if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
+                    $relatedIdentifiers = $this->getIdentifiersFromResourceClass($relatedResourceClass);
+                    if (\count($relatedIdentifiers) === 1) {
+                        $identifierValue = $this->resolveIdentifierValue($identifierValue, $relatedResourceClass, $relatedIdentifiers[0]);
+
+                        if (is_scalar($identifierValue) || method_exists($identifierValue , '__toString')) {
+                            $identifiers[$parameterName] = (string) $identifierValue;
+                            continue;
+                        }
+                    }
+
+                }
+
+                throw new RuntimeException(sprintf('We were not able to resolve the identifier for "%s", implement a __toString method or specify a single identifier.', $relatedResourceClass));
+            }
+
+            return $identifiers;
+        }
 
         $identifierProperties = $this->getIdentifiersFromResourceClass($resourceClass);
 
@@ -137,5 +146,33 @@ final class IdentifiersExtractor implements ContextAwareIdentifiersExtractorInte
         }
 
         return $identifiers;
+    }
+
+    private function resolveIdentifierValue($item, string $class, string $property)
+    {
+        if ($item instanceof $class) {
+            return $this->propertyAccessor->getValue($item, $property);
+        }
+
+        $resourceClass = $this->getResourceClass($item, true);
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            $type = $propertyMetadata->getType();
+            if (!$type) {
+                continue;
+            }
+
+            if ($type->getClassName() === $class) {
+                return $this->propertyAccessor->getValue($item, "$propertyName.$property");
+            } 
+
+            if ($type->isCollection() && $type->getCollectionValueType()->getClassName() === $class) {
+                die('mhh identifiers extractor collection ?');
+                return $this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property));
+            }
+        }
+
+        // dump($item, $class, $property);
+        throw new \RuntimeException('Not able to retrieve identifiers.');
     }
 }

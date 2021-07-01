@@ -68,7 +68,7 @@ Feature: Resource attributes
     """
     {
       "@context": "/contexts/AttributeResource",
-      "@id": "/dummy/1/attribute_resources/2",
+      "@id": "/attribute_resources/2",
       "@type": "AttributeResource",
       "identifier": 2,
       "dummy": "/dummies/1",
@@ -92,7 +92,7 @@ Feature: Resource attributes
     """
     {
       "@context": "/contexts/AttributeResource",
-      "@id": "/dummy/1/attribute_resources/2",
+      "@id": "/attribute_resources/2",
       "@type": "AttributeResource",
       "identifier": 2,
       "dummy": "/dummies/1",

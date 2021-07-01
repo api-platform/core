@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
+use ApiPlatform\Core\Api\IriContextTrait;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
@@ -39,6 +40,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     use ContextTrait;
     use JsonLdContextTrait;
     use NormalizerAwareTrait;
+    use IriContextTrait;
 
     public const FORMAT = 'jsonld';
     public const IRI_ONLY = 'iri_only';
@@ -84,19 +86,25 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        //TODO: remove in 3.0
-        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
-            $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
+        if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
+            $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_PATH, $this->getIriContextFromOperationContext($context));
         } else {
-            $data['@id'] = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, UrlGeneratorInterface::ABS_PATH, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
+            //TODO: remove in 3.0
+            $data['@id'] = isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] ? $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
         }
 
         $data['@type'] = 'hydra:Collection';
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
         foreach ($object as $obj) {
-            // TODO: add ContextAwareIriConverterInterface
-            $data['hydra:member'][] = $iriOnly ? $this->iriConverter->getIriFromItem($obj) : $this->normalizer->normalize($obj, $format, $context);
+            if ($iriOnly) {
+                dump($context['links'] ?? null);
+                die('collection normalizer iris');
+                $iriContext = [];
+                $data['hydra:member'][] = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($obj, $iriContext) : $this->iriConverter->getIriFromItem($obj);
+            } else {
+                $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
+            }
         }
 
         if ($object instanceof PaginatorInterface) {

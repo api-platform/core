@@ -126,6 +126,7 @@ final class PurgeHttpCacheListener
         $associationMappings = $em->getClassMetadata(ClassUtils::getClass($entity))->getAssociationMappings();
         foreach (array_keys($associationMappings) as $property) {
             if ($this->propertyAccessor->isReadable($entity, $property)) {
+                $relation = $this->propertyAccessor->getValue($entity, $property);
                 $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
             }
         }
@@ -155,6 +156,7 @@ final class PurgeHttpCacheListener
     private function addTagForItem($value): void
     {
         try {
+            //TODO: test if this is a resource class
             $iri = $this->iriConverter->getIriFromItem($value);
             $this->tags[$iri] = $iri;
         } catch (InvalidArgumentException $e) {

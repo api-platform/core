@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Api\ContextAwareIriConverterInterface;
+use ApiPlatform\Core\Api\IriContextTrait;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
@@ -59,6 +60,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     use ClassInfoTrait;
     use ContextTrait;
     use InputOutputMetadataTrait;
+    use IriContextTrait;
 
     public const IS_TRANSFORMED_TO_SAME_CLASS = 'is_transformed_to_same_class';
 
@@ -165,8 +167,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['iri'])) {
             $iri = $context['iri'];
         } else {
-            $iriContext = isset($context['links'][0]) ? ['operation_name' => $context['links'][0][0], 'identifiers' => $context['links'][0][1]] + $context : $context;
-            $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL, $iriContext) : $this->iriConverter->getIriFromItem($object);
+            $iri = $this->iriConverter instanceof ContextAwareIriConverterInterface ? $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_URL, $this->getIriContextFromOperationContext($context)) : $this->iriConverter->getIriFromItem($object);
         }
 
         $context['iri'] = $iri;

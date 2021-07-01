@@ -85,11 +85,12 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         }
 
         if (isset($originalResource)) {
-            try {
-                $context['output']['iri'] = $this->iriConverter->getIriFromItem($originalResource);
-            } catch (InvalidArgumentException $e) {
-                // The original resource has no identifiers
-            }
+            // TODO: find out why
+            // try {
+            //     $context['output']['iri'] = $this->iriConverter->getIriFromItem($originalResource);
+            // } catch (InvalidArgumentException $e) {
+            //     // The original resource has no identifiers
+            // }
             $context['api_resource'] = $originalResource;
         }
 

@@ -77,36 +77,28 @@ class ItemNormalizer extends AbstractItemNormalizer
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
-            $identifier = null;
-            $options = $this->getFactoryOptions($context);
-
-            foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $options) as $propertyName) {
-                if (true === $this->propertyMetadataFactory->create($context['resource_class'], $propertyName)->isIdentifier()) {
-                    $identifier = $propertyName;
-                    break;
-                }
-            }
-
-            if (null === $identifier) {
-                throw $e;
-            }
             
-            $iriContext = $context + ['fetch_data' => true];
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
-                [$operationName, $relatedOperation] = $this->resourceMetadataFactory->create($context['resource_class'])->getFirstOperation();
-                if ($operationName) {
-                    $iriContext['identifiers_values'] = [$identifier => $data[$identifier]];
-                    $iriContext['operation_name'] = $operationName;
-                }
-            }
-
             if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
-                $iri = $this->iriConverter->getIriFromResourceClass($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $iriContext);
+                $iri = $this->iriConverter->getIriFromResourceClass($context['resource_class'], UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $context['identifiers_values']]);
             } else {
+                // remove in 3.0
+                $identifier = null;
+                $options = $this->getFactoryOptions($context);
+
+                foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $options) as $propertyName) {
+                    if (true === $this->propertyMetadataFactory->create($context['resource_class'], $propertyName)->isIdentifier()) {
+                        $identifier = $propertyName;
+                        break;
+                    }
+                }
+
+                if (null === $identifier) {
+                    throw $e;
+                }
                 $iri = sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]);
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, $iriContext);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]);
         }
     }
 }

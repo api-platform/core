@@ -116,7 +116,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string
+    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string
     {
                     // if ($attributes['resource_class'] !== $resourceClass) {
                     //     $attributes['operation'] = $this->getIriConverterContextWithDifferentClasses($resourceClass, $attributes['resource_class'], $attributes['operation']);
@@ -130,7 +130,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
 
         $resourceClass = $this->getResourceClass($item, true);
 
-        // TODO: Is this responsability correct? Maybe remove the context and use this instead?
+        // TODO: Deprecate the use of ResourceMetadataFactoryInterface
         if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
             [$operationName, $operation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
             if ($operationName) {
@@ -154,8 +154,6 @@ final class IriConverter implements ContextAwareIriConverterInterface
             return $this->router->generate($context['operation_name'], $identifiers, $this->getReferenceType($resourceClass, $referenceType, $context));
         }
 
-        @trigger_error('Calling getIriFromItem without an operation_name (or route name) in the context is deprecated since 2.7 and will not be available anymore in 3.0. Create your own IriConverter if needed.', \E_USER_DEPRECATED);
-
         return $this->getItemIriFromResourceClass($resourceClass, $identifiers, $this->getReferenceType($resourceClass, $referenceType));
     }
 
@@ -164,6 +162,16 @@ final class IriConverter implements ContextAwareIriConverterInterface
      */
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = null, array $context = []): string
     {
+        // TODO: Deprecate the use of ResourceMetadataFactoryInterface
+        if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            [$operationName, $operation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
+            if ($operationName) {
+                $context['operation_name'] = $operationName;
+                $context['identifiers'] = $operation->getIdentifiers();
+                $context['has_composite_identifier'] = $operation->getCompositeIdentifier();
+            }
+        }
+
         try {
             return $this->router->generate($context['operation_name'] ?? $this->getRouteName($resourceClass, OperationType::COLLECTION), $context['identifiers_values'] ?? [], $this->getReferenceType($resourceClass, $referenceType, $context));
         } catch (RoutingExceptionInterface $e) {
@@ -231,9 +239,11 @@ final class IriConverter implements ContextAwareIriConverterInterface
                 $metadata = $this->resourceMetadataFactory->create($resourceClass);
                 $referenceType = $metadata->getAttribute('url_generation_strategy');
             } else {
+                // TODO isntanceof
                 /** @var ResourceCollection */
                 $metadata = $this->resourceMetadataFactory->create($resourceClass);
-                $referenceType = isset($context['operation_name']) ? $metadata->getOperation($context['operation_name'])->urlGenerationStrategy : $metadata[0]->urlGenerationStrategy;
+                // TODO: Add UrlGenerationStrategy  in the metadata
+                $referenceType = isset($context['operation_name']) ? null : $metadata[0]->urlGenerationStrategy;
             }
         }
 

@@ -70,7 +70,7 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
             ->withShortName($resourceMetadata->getShortName())
             ->withDescription($resourceMetadata->getDescription())
             ->withClass($resourceClass)
-            ->withTypes([$resourceMetadata->getIri()]);
+            ->withTypes([$resourceMetadata->getIri() ?? $resourceMetadata->getShortName()]);
             // ->withGraphql($resourceMetadata->getGraphql()); // TODO: fix this with graphql
 
         foreach ($attributes as $key => $value) {

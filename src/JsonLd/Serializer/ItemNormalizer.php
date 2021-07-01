@@ -21,7 +21,6 @@ use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
@@ -82,17 +81,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return parent::normalize($object, $format, $context);
         }
 
-        $context = $this->initContext($context['resource_class'], $context);
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+        // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out it's not the same anyway as the requested one
+        $previousResourceClass = $context['resource_class'] ?? null;
+        $context = $this->initContext($context['resource_class'] ?? $outputClass ?? $objectClass, $context);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
         if ($this->iriConverter instanceof ContextAwareIriConverterInterface) {
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface && $resourceClass !== $context['resource_class']) {
-                $context = $this->getIriConverterContextWithDifferentClasses($resourceClass, $context['resource_class'], $context);
-            }
-
-            $iriContext = isset($context['links'][0]) ? ['operation_name' => $context['links'][0][0], 'identifiers' => $context['links'][0][1]] + $context : $context;
-            $iri = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, $iriContext);
+            $iri = $this->iriConverter->getIriFromItem($object, UrlGeneratorInterface::ABS_PATH, $this->getIriContextFromOperationContext($context, $previousResourceClass, $resourceClass, true));
         } else {
             $iri = $this->iriConverter->getIriFromItem($object);
         }
@@ -111,9 +107,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             $metadata['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
         } else {
-            // TODO: multiple types?
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass)[0];
-            $metadata['@type'] = $resourceMetadata->getTypes()[0] ?? $resourceMetadata->getShortName();
+            $types = $context['types'] ?? $resourceMetadata->getTypes() ?? [$resourceMetadata->getShortName()];
+            $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
         }
 
         return $metadata + $data;
