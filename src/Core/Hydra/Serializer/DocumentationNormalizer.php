@@ -26,7 +26,7 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -45,7 +45,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     public const FORMAT = 'jsonld';
 
     /**
-     * @var ResourceMetadataFactoryInterface|ResourceCollectionMetadataFactoryInterface
+     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
      */
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
@@ -65,7 +65,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if ($resourceMetadataFactory && $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be replaced by %s in 3.0.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be replaced by %s in 3.0.', ResourceMetadataFactoryInterface::class, ResourceMetadataCollectionFactoryInterface::class), \E_USER_DEPRECATED);
         }
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -88,7 +88,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata[0]);
             }
 
@@ -252,7 +252,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if (null !== $this->subresourceOperationFactory) {
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
                 $subresourceMetadata = $this->resourceMetadataFactory->create($operation['resource_class']);
-                if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                     $subresourceMetadata = $this->transformResourceToResourceMetadata($subresourceMetadata[0]);
                 }
                 $propertyMetadata = $this->propertyMetadataFactory->create(end($operation['identifiers'])[0], $operation['property']);
@@ -390,7 +390,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
                 if ($this->resourceClassResolver->isResourceClass($className)) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                    if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+                    if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                         $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata[0]);
                     }
 

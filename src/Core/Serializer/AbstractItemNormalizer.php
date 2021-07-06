@@ -27,7 +27,7 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
@@ -109,7 +109,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if ($resourceMetadataFactory && $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceMetadataCollectionFactoryInterface::class), \E_USER_DEPRECATED);
         }
 
         $this->resourceAccessChecker = $resourceAccessChecker;
@@ -668,7 +668,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 [$operationName, $relatedOperation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
                 $childContext['operation_name'] = $operationName;
                 $childContext['links'] = $relatedOperation->getLinks();
@@ -691,7 +691,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 [$operationName, $relatedOperation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
                 $childContext['operation_name'] = $operationName;
                 $childContext['links'] = $relatedOperation->getLinks();

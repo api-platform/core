@@ -30,7 +30,7 @@ use ApiPlatform\Metadata\ApiResource;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-final class AttributeResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
+final class AttributesResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $defaults;
     private $decorated;
@@ -45,9 +45,9 @@ final class AttributeResourceMetadataCollectionFactory implements ResourceMetada
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $resourceMetadataCollection = new ResourceCollection();
+        $resourceMetadataCollection = new ResourceMetadataCollection();
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }

@@ -32,8 +32,8 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Core\Util\AttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -121,7 +121,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
         $resourceClass = $this->getResourceClass($item, true);
 
         // TODO: Deprecate the use of ResourceMetadataFactoryInterface
-        if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+        if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
             [$operationName, $operation] = $resourceMetadata->getFirstOperation();
             if ($operationName) {
@@ -165,7 +165,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
         }
 
         // TODO: Deprecate the use of ResourceMetadataFactoryInterface
-        if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+        if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             [$operationName, $operation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
             if ($operationName) {
                 $context['operation_name'] = $operationName;
@@ -189,7 +189,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
     {
         @trigger_error('getItemIriFromResourceClass is deprecated since 2.7 and will not be available anymore in 3.0', \E_USER_DEPRECATED);
 
-        if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if ('GET' === $operation->getMethod() && !$operation->isCollection()) {
@@ -242,7 +242,7 @@ final class IriConverter implements ContextAwareIriConverterInterface
                 $referenceType = $metadata->getAttribute('url_generation_strategy');
             } else {
                 // TODO isntanceof
-                /** @var ResourceCollection */
+                /** @var ResourceMetadataCollection */
                 $metadata = $this->resourceMetadataFactory->create($resourceClass);
                 // TODO: Add UrlGenerationStrategy  in the metadata
                 $referenceType = isset($context['operation_name']) ? null : $metadata[0]->urlGenerationStrategy;

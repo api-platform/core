@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,7 +25,7 @@ class DebugResourceCommand extends Command
 
     private $resourceCollectionMetadataFactory;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $resourceCollectionMetadataFactory)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceCollectionMetadataFactory)
     {
         parent::__construct();
         $this->resourceCollectionMetadataFactory = $resourceCollectionMetadataFactory;

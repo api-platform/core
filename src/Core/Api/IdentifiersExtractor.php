@@ -88,7 +88,7 @@ final class IdentifiersExtractor implements ContextAwareIdentifiersExtractorInte
                     continue;
                 }
 
-                // Note: we should recurse to `$this->getIdentifiersFromItem` and use the ResourceCollectionMetadataFactoryInterface to find correct identifiers
+                // Note: we should recurse to `$this->getIdentifiersFromItem` and use the ResourceMetadataCollectionFactoryInterface to find correct identifiers
                 // anyways this is not really supported yet and adds a lot of complexity
                 if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
                     $relatedIdentifiers = $this->getIdentifiersFromResourceClass($relatedResourceClass);

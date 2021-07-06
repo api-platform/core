@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Operation;
 
 
 trait DeprecateWrongIriConversionTrait {
     public function getIriConverterContextWithDifferentClasses(string $resourceClass, string $expectedClass, array $context)
     {
-        if (!$this->resourceMetadataFactory || !$this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+        if (!$this->resourceMetadataFactory || !$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             return $context;
         }
 

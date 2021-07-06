@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -33,14 +33,14 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
     private $resourceMetadataFactory;
 
     /**
-     * @param ResourceMetadataFactoryInterface|ResourceCollectionMetadataFactoryInterface $resourceMetadataFactory
+     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
      */
     public function __construct(string $order = null, $resourceMetadataFactory = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if ($this->resourceMetadataFactory) {
-            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be replaced by %s in 3.0.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be replaced by %s in 3.0.', ResourceMetadataFactoryInterface::class, ResourceMetadataCollectionFactoryInterface::class), \E_USER_DEPRECATED);
         }
 
         $this->order = $order;
@@ -60,7 +60,7 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
         if (null !== $this->resourceMetadataFactory) {
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName)->getOrder();
             } else {
                 // TODO: remove in 3.0

@@ -18,7 +18,7 @@ use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +43,7 @@ final class DeserializeListener
     private $formats;
     private $formatsProvider;
     private $resourceCollectionMetadataFactory;
-    private $legacyResourceCollectionMetadataFactory;
+    private $legacyResourceMetadataCollectionMetadataFactory;
 
     /**
      * @param ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
@@ -52,7 +52,7 @@ final class DeserializeListener
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->resourceMetadataFactory = ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface || $resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) ? $resourceMetadataFactory : $legacyResourceMetadataFactory;
+        $this->resourceMetadataFactory = ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface || $resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) ? $resourceMetadataFactory : $legacyResourceMetadataFactory;
 
         if ($resourceMetadataFactory) {
             if (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {

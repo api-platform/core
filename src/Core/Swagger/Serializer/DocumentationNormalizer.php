@@ -34,7 +34,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceToResourceMetadataTrait;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
@@ -155,7 +155,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->setFilterLocator($filterLocator, true);
 
         if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceCollectionMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('The use of %s is deprecated since API Platform 2.7 and will be removed in 3.0, use %s instead.', ResourceMetadataFactoryInterface::class, ResourceMetadataCollectionFactoryInterface::class), \E_USER_DEPRECATED);
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -204,7 +204,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata[0]);
             }
 
@@ -468,7 +468,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 ->resourceMetadataFactory
                 ->create($subresourceOperation['resource_class']);
 
-            if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $subResourceMetadata = $this->transformResourceToResourceMetadata($subResourceMetadata[0]);
             }
 

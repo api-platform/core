@@ -17,7 +17,7 @@ use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\Factory\ResourceCollectionMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Operation;
@@ -53,7 +53,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         // TODO: 3.0 change the condition to remove the ResourceMetadataFactorym only used to skip null values
         if (
-            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface)
+            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface)
             && isset($attributes['operation_name']) && isset($attributes['operation'])
         ) {
             try {
@@ -105,7 +105,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $operationType = OperationType::SUBRESOURCE;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             $operation = $resourceMetadata->getOperation($attributes['operation_name']);
             $context = $normalization ? $operation->getNormalizationContext() : $operation->getDenormalizationContext();
             $context['operation_name'] = $attributes['operation_name'];
@@ -165,7 +165,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         // TODO: We should always use `skip_null_values` but changing this would be a BC break, for now use it only when `merge-patch+json` is activated on a Resource
-        if (!$this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
+        if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             foreach ($resourceMetadata->getItemOperations() as $operation) {
                 if ('PATCH' === ($operation['method'] ?? '') && \in_array('application/merge-patch+json', $operation['input_formats']['json'] ?? [], true)) {
                     $context['skip_null_values'] = true;
