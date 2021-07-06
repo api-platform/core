@@ -27,7 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     itemOperations={
  *         "get"={
  *             "method"="GET",
- *             "requirements"={"id"=".+"}
+ *             "requirements"={"id"=".*"}
  *         }
  *     }
  * )
@@ -38,7 +38,7 @@ class UrlEncodedId
      * @ORM\Column(type="string")
      * @ORM\Id
      */
-    private $id = '%encode:id';
+    private $id = '%./encode:001';
 
     public function getId()
     {

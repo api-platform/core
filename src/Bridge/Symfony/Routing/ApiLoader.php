@@ -22,6 +22,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedToUrlEncodedId;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -255,6 +257,7 @@ final class ApiLoader extends Loader
             [$operation['method']],
             $operation['condition'] ?? ''
         );
+        $name = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
 
         $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);
     }

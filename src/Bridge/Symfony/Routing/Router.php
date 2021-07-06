@@ -78,7 +78,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
             $pathInfo = substr($pathInfo, \strlen($baseUrl));
         }
 
-        $request = Request::create($pathInfo, 'GET', [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
+        $request = Request::create(str_replace(':', '%3A', $pathInfo), 'GET', [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
         try {
             $context = (new RequestContext())->fromRequest($request);
         } catch (RequestExceptionInterface $e) {
