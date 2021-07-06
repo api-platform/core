@@ -11,15 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\ApiResource;
 
@@ -28,23 +25,23 @@ use ApiPlatform\Metadata\ApiResource;
  *
  * @deprecated
  */
-final class LegacySubresourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
+final class LegacySubresourceMetadataResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $decorated;
     private $resourceNameCollectionFactory;
     private $subresourceOperationFactory;
     private $localCache = [];
 
-    public function __construct(SubresourceOperationFactoryInterface $subresourceOperationFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceCollectionMetadataFactoryInterface $decorated = null)
+    public function __construct(SubresourceOperationFactoryInterface $subresourceOperationFactory, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->decorated = $decorated;
     }
 
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $resourceMetadataCollection = new ResourceCollection();
+        $resourceMetadataCollection = new ResourceMetadataCollection();
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }

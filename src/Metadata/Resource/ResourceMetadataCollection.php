@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection;
+namespace ApiPlatform\Metadata\Resource;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\ApiResource;
  * @experimental
  * @extends \ArrayObject<int, ApiResource>
  */
-final class ResourceCollection extends \ArrayObject
+final class ResourceMetadataCollection extends \ArrayObject
 {
     private $operationCache = [];
 

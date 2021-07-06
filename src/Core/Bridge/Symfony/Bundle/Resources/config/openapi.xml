@@ -50,9 +50,9 @@
         </service>
         <service id="ApiPlatform\Core\OpenApi\Options" alias="api_platform.openapi.options" />
 
-        <service id="api_platform.openapi.factory" class="ApiPlatform\Core\OpenApi\Factory\OpenApiFactory" public="false">
+        <service id="api_platform.openapi.factory" class="ApiPlatform\OpenApi\Factory\OpenApiFactory" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.json_schema.schema_factory" />

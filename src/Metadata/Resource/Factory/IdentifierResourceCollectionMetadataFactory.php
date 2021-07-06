@@ -11,13 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * Helps creating metadata on the Resource based on the properties of this same resource. Computes "identifiers".
@@ -26,13 +25,13 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDu
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-final class IdentifierResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class IdentifierResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $decorated;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
         $this->decorated = $decorated;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -42,9 +41,9 @@ final class IdentifierResourceCollectionMetadataFactory implements ResourceColle
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $resourceMetadataCollection = new ResourceCollection();
+        $resourceMetadataCollection = new ResourceMetadataCollection();
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection;
+namespace ApiPlatform\Metadata\Resource;
 
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 

@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Cache\CachedTrait;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -23,7 +23,7 @@ use Psr\Cache\CacheItemPoolInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class CachedResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class CachedResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     use CachedTrait;
     public const CACHE_KEY_PREFIX = 'resource_metadata_collection_';
@@ -33,7 +33,7 @@ final class CachedResourceCollectionMetadataFactory implements ResourceCollectio
     private $cacheItemPool;
     private $localCache = [];
 
-    public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceCollectionMetadataFactoryInterface $decorated)
+    public function __construct(CacheItemPoolInterface $cacheItemPool, ResourceMetadataCollectionFactoryInterface $decorated)
     {
         $this->cacheItemPool = $cacheItemPool;
         $this->decorated = $decorated;
@@ -42,7 +42,7 @@ final class CachedResourceCollectionMetadataFactory implements ResourceCollectio
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
         if (isset($this->localCache[$cacheKey])) {
@@ -55,7 +55,7 @@ final class CachedResourceCollectionMetadataFactory implements ResourceCollectio
             return $this->localCache[$cacheKey] = $this->decorated->create($resourceClass);
         }
 
-        $resourceCollection = new ResourceCollection();
+        $resourceCollection = new ResourceMetadataCollection();
         if ($hasHit = $cacheCollection->isHit()) {
             $resourceCount = $cacheCollection->get();
             for ($i = 0; $i <= $resourceCount; $i++) {

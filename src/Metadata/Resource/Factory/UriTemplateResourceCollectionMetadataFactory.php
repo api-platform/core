@@ -11,26 +11,23 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
 use ApiPlatform\Metadata\Operation;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-final class UriTemplateResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class UriTemplateResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $pathSegmentNameGenerator;
     private $decorated;
 
-    public function __construct(PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, ResourceCollectionMetadataFactoryInterface $decorated = null)
+    public function __construct(PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->pathSegmentNameGenerator = $pathSegmentNameGenerator;
         $this->decorated = $decorated;
@@ -39,9 +36,9 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $resourceMetadataCollection = new ResourceCollection();
+        $resourceMetadataCollection = new ResourceMetadataCollection();
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
@@ -73,7 +70,7 @@ final class UriTemplateResourceCollectionMetadataFactory implements ResourceColl
             $resourceMetadataCollection[$i] = $resource;
         }
 
-        return new ResourceCollection($resourceMetadataCollection);
+        return new ResourceMetadataCollection($resourceMetadataCollection);
     }
 
     private function generateUriTemplate(Operation $operation): string

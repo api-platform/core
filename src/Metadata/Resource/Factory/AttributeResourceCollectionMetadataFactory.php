@@ -11,12 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\ResourceCollection\DeprecationMetadataTrait;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResource;
+use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -31,13 +30,13 @@ use ApiPlatform\Metadata\ApiResource;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-final class AttributeResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class AttributeResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $defaults;
     private $decorated;
     use DeprecationMetadataTrait;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated = null, array $defaults = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [])
     {
         $this->defaults = $defaults;
         $this->decorated = $decorated;

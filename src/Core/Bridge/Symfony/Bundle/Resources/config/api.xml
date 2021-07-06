@@ -32,7 +32,7 @@
         <service id="api_platform.route_loader" class="ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
             <argument type="service" id="api_platform.operation_path_resolver.custom" />
             <argument type="service" id="service_container" />
             <argument>%api_platform.formats%</argument>
@@ -66,7 +66,7 @@
             <argument type="service" id="api_platform.subresource_data_provider" on-invalid="ignore" />
             <argument type="service" id="api_platform.identifier.converter" on-invalid="ignore" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter" />
 
@@ -81,12 +81,12 @@
         <!-- Serializer -->
 
         <service id="api_platform.serializer.context_builder" class="ApiPlatform\Core\Serializer\SerializerContextBuilder" public="false">
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
         </service>
         <service id="ApiPlatform\Core\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
         <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Core\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.serializer.context_builder.filter.inner" />
         </service>
@@ -115,7 +115,7 @@
             <argument>%api_platform.allow_plain_identifiers%</argument>
             <argument>null</argument>
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" on-invalid="ignore" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
@@ -175,7 +175,7 @@
         <service id="api_platform.listener.view.write" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.state_processor" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
@@ -201,7 +201,7 @@
         </service>
 
         <service id="api_platform.listener.view.respond" class="ApiPlatform\Core\EventListener\RespondListener">
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
@@ -331,7 +331,7 @@
         </service>
 
         <service id="api_platform.debug.command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\DebugResourceCommand">
-            <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource_metadata_collection_factory" />
             <tag name="console.command" />
         </service>
     </services>

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Annotation;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\AttributesHydratorTrait;
 
 /**
  * ApiResource annotation.

@@ -11,38 +11,33 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\ResourceCollection\DeprecationMetadataTrait;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ApiResource;
 
-final class LegacyResourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
+final class LegacyResourceMetadataResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     use DeprecationMetadataTrait;
     private $decorated;
     private $resourceMetadataFactory;
     private $defaults;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, array $defaults = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, array $defaults = [])
     {
         $this->decorated = $decorated;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->defaults = $defaults + ['attributes' => []];
     }
 
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $resourceMetadataCollection = new ResourceCollection();
+        $resourceMetadataCollection = new ResourceMetadataCollection();
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
@@ -131,7 +126,7 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
             }
 
             $newOperation = $newOperation->withExtraProperties($newOperation->getExtraProperties() + ['is_legacy_resource_metadata' => true]);
-            // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceCollectionMetadataFactory
+            // Avoiding operation name collision by adding _collection, this is rewritten by the UriTemplateResourceMetadataCollectionFactory
             yield sprintf('%s%s', $newOperation->getRouteName() ?? $operationName, OperationType::COLLECTION === $type ? '_collection' : '') => $newOperation;
         }
     }

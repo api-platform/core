@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Annotation;
+namespace ApiPlatform\Metadata;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\Inflector;

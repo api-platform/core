@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\OpenApi\Factory;
+namespace ApiPlatform\OpenApi\Factory;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;

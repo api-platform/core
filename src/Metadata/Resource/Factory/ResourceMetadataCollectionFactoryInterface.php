@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * Creates a resource metadata value object.
@@ -22,12 +22,12 @@ use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-interface ResourceCollectionMetadataFactoryInterface
+interface ResourceMetadataCollectionFactoryInterface
 {
     /**
      * Creates a resource metadata.
      *
      * @throws ResourceClassNotFoundException
      */
-    public function create(string $resourceClass): ResourceCollection;
+    public function create(string $resourceClass): ResourceMetadataCollection;
 }

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ApiResource;
 
 /**
@@ -22,11 +22,11 @@ use ApiPlatform\Metadata\ApiResource;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-final class InputOutputResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class InputOutputResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $decorated;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated)
     {
         $this->decorated = $decorated;
     }
@@ -34,7 +34,7 @@ final class InputOutputResourceCollectionMetadataFactory implements ResourceColl
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 

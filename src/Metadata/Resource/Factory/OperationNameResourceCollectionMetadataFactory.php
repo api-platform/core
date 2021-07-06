@@ -11,12 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResource;
-use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource;
 
 /**
@@ -25,11 +23,11 @@ use ApiPlatform\Metadata\Resource;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
-final class OperationNameResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class OperationNameResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $decorated;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->decorated = $decorated;
     }
@@ -37,9 +35,9 @@ final class OperationNameResourceCollectionMetadataFactory implements ResourceCo
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $resourceMetadataCollection = new ResourceCollection();
+        $resourceMetadataCollection = new ResourceMetadataCollection();
 
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);

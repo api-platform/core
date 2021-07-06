@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -30,13 +30,13 @@ use ApiPlatform\Metadata\Operation;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @experimental
  */
-final class FormatsResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class FormatsResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $decorated;
     private $formats;
     private $patchFormats;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated, array $formats, array $patchFormats)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated, array $formats, array $patchFormats)
     {
         $this->decorated = $decorated;
         $this->formats = $formats;
@@ -50,7 +50,7 @@ final class FormatsResourceCollectionMetadataFactory implements ResourceCollecti
      *
      * @throws ResourceClassNotFoundException
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 

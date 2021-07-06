@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\ResourceCollection\Factory;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use phpDocumentor\Reflection\Types\ContextFactory;
@@ -24,13 +24,13 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @experimental
  */
-final class PhpDocResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
+final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     private $decorated;
     private $docBlockFactory;
     private $contextFactory;
 
-    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated, DocBlockFactoryInterface $docBlockFactory = null)
     {
         $this->decorated = $decorated;
         $this->docBlockFactory = $docBlockFactory ?: DocBlockFactory::createInstance();
@@ -40,7 +40,7 @@ final class PhpDocResourceCollectionMetadataFactory implements ResourceCollectio
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): ResourceCollection
+    public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
