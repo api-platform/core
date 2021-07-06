@@ -24,7 +24,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDu
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\AsResource;
+use ApiPlatform\Metadata\ApiResource;
 
 final class LegacyResourceMetadataResourceCollectionFactory implements ResourceCollectionMetadataFactoryInterface
 {
@@ -65,7 +65,7 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
             }
         }
 
-        $resource = (new AsResource())
+        $resource = (new ApiResource())
             ->withShortName($resourceMetadata->getShortName())
             ->withDescription($resourceMetadata->getDescription())
             ->withClass($resourceClass)
@@ -94,7 +94,7 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
         return $resourceMetadataCollection;
     }
 
-    private function createOperations(array $operations, string $type, AsResource $resource): iterable
+    private function createOperations(array $operations, string $type, ApiResource $resource): iterable
     {
         $priority = 0;
         foreach ($operations as $operationName => $operation) {

@@ -21,7 +21,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\AsResource;
+use ApiPlatform\Metadata\ApiResource;
 
 /**
  * We have to compute a local cache having all the resource => subresource matching.
@@ -110,7 +110,7 @@ final class LegacySubresourceMetadataResourceCollectionFactory implements Resour
                     $identifiers[$parameterName] = [$property, $class];
                 }
 
-                $resource = new AsResource(
+                $resource = new ApiResource(
                     uriTemplate: $subresourceMetadata['path'],
                     shortName: $subresourceMetadata['shortNames'][0],
                     operations: [

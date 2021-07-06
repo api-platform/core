@@ -22,7 +22,7 @@ use IteratorAggregate;
  * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class AsResource
+class ApiResource
 {
     /**
      * @param iterable     $operations

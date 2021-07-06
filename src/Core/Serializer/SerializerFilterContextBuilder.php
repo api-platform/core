@@ -53,6 +53,7 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
 
         $context = $this->decorated->createFromRequest($request, $normalization, $attributes);
 
+        // TODO: remove in 3.0
         if (
             !$this->resourceMetadataFactory
             && isset($attributes['operation_name']) && isset($context['filters'])
@@ -61,7 +62,7 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         } elseif ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
             $resourceFilters = $resourceMetadata->getOperationAttribute($attributes, 'filters', [], true);
-        } else { // New interface
+        } else {
             $resourceFilters = $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name'])->getFilters();
         }
 

@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\AsResource;
+use ApiPlatform\Metadata\ApiResource;
 
 /**
  * Creates a resource metadata from {@see Resource} annotations.
@@ -59,7 +59,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(AsResource::class)) {
+        if (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(ApiResource::class)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
                 $resourceMetadataCollection[] = $resource;
             }
@@ -89,7 +89,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         $resources = [];
         $index = -1;
         foreach ($attributes as $attribute) {
-            if (AsResource::class === $attribute->getName()) {
+            if (ApiResource::class === $attribute->getName()) {
                 $resource = $attribute->newInstance()
                                       ->withShortName($shortName)
                                       ->withClass($resourceClass)
@@ -138,7 +138,7 @@ final class AttributeResourceCollectionMetadataFactory implements ResourceCollec
         return $resources;
     }
 
-    private function getOperationWithDefaults(AsResource $resource, Operation $operation): array
+    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): array
     {
         foreach ($this->defaults as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);

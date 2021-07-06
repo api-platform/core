@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Annotation;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyInfo\Type;
 
+class_alias(ApiProperty::class, 'ApiPlatform\\Metadata\\ApiProperty');
+
 /**
  * ApiProperty annotation.
  *

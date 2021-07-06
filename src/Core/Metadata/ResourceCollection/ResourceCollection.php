@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\ResourceCollection;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\AsResource;
+use ApiPlatform\Metadata\ApiResource;
 
 /**
  * @experimental
- * @extends \ArrayObject<int, AsResource>
+ * @extends \ArrayObject<int, ApiResource>
  */
 final class ResourceCollection extends \ArrayObject
 {

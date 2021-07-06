@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource;
 
-use ApiPlatform\Metadata\AsResource;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
@@ -24,7 +24,7 @@ trait ResourceToResourceMetadataTrait
 {
     private $camelCaseToSnakeCaseNameConverter;
 
-    private function transformResourceToResourceMetadata(AsResource $resource): ResourceMetadata
+    private function transformResourceToResourceMetadata(ApiResource $resource): ResourceMetadata
     {
         $collectionOperations = [];
         $itemOperations = [];
