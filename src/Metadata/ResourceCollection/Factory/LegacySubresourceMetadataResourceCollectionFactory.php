@@ -17,6 +17,9 @@ use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Answer;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Question;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\AsResource;
 
@@ -54,9 +57,33 @@ final class LegacySubresourceMetadataResourceCollectionFactory implements Resour
             return $resourceMetadataCollection;
         }
 
+        $defaults = $resourceMetadataCollection[0];
+
         foreach ($this->localCache[$resourceClass] as $resource) {
-            $resourceMetadataCollection[] = $resource;
+            $operations = iterator_to_array($resource->getOperations());
+            $operation = current($operations);
+            $operationName = key($operations);
+
+            foreach (get_class_methods($defaults) as $methodName) {
+                if (0 !== strpos($methodName, 'get')) {
+                    continue;
+                }
+                
+                if (!method_exists($operation, $methodName)) {
+                    continue;
+                }
+
+                $operationValue = $operation->{$methodName}();
+                if (null !== $operationValue && [] !== $operationValue) {
+                    continue;
+                }
+
+                $operation = $operation->{'with'.substr($methodName, 3)}($defaults->{$methodName}());
+            }
+
+            $resourceMetadataCollection[] = $resource->withOperations([$operationName => $operation]);
         }
+
 
         return $resourceMetadataCollection;
     }
@@ -75,7 +102,11 @@ final class LegacySubresourceMetadataResourceCollectionFactory implements Resour
 
                 $identifiers = [];
                 // Removing the third tuple element
-                foreach ($subresourceMetadata['identifiers'] as $parameterName => [$property, $class]) {
+                foreach ($subresourceMetadata['identifiers'] as $parameterName => [$property, $class, $isPresent]) {
+                    if (!$isPresent) {
+                        continue;
+                    }
+
                     $identifiers[$parameterName] = [$property, $class];
                 }
 
@@ -97,7 +128,11 @@ final class LegacySubresourceMetadataResourceCollectionFactory implements Resour
                             class: $subresourceMetadata['resource_class'],
                             collection: $subresourceMetadata['collection'],
                             compositeIdentifier: false,
-                            extraProperties: ['is_legacy_subresource' => true, 'legacy_subresource_property' => $subresourceMetadata['property']],
+                            extraProperties: [
+                                'is_legacy_subresource' => true,
+                                'legacy_subresource_property' => $subresourceMetadata['property'],
+                                'legacy_subresource_identifiers' => $subresourceMetadata['identifiers'],
+                            ],
                         ),
                     ],
                     identifiers: $identifiers,
@@ -110,7 +145,11 @@ final class LegacySubresourceMetadataResourceCollectionFactory implements Resour
                     condition: $subresourceMetadata['condition'],
                     class: $subresourceMetadata['resource_class'],
                     compositeIdentifier: false,
-                    extraProperties: ['is_legacy_subresource' => true, 'legacy_subresource_property' => $subresourceMetadata['property']],
+                    extraProperties: [
+                        'is_legacy_subresource' => true, 
+                        'legacy_subresource_property' => $subresourceMetadata['property'], 
+                        'legacy_subresource_identifiers' => $subresourceMetadata['identifiers']
+                    ]
                 );
 
                 if ($subresourceMetadata['controller']) { // manage null values from subresources

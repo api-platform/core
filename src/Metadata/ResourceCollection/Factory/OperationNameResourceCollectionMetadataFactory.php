@@ -48,15 +48,21 @@ final class OperationNameResourceCollectionMetadataFactory implements ResourceCo
         foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = iterator_to_array($resource->getOperations());
 
-            foreach ($resource->getOperations() as $key => $operation) {
+            foreach ($resource->getOperations() as $operationName => $operation) {
                 if ($operation->getRouteName()) {
                     continue;
                 }
 
-                $newOperationKey = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof GetCollection ? '_collection' : '');
+                $newOperationName = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
 
-                unset($operations[$key]);
-                $operations[$newOperationKey] = $operation;
+                // TODO: remove in 3.0 this is used in the IRI converter to avoid a bc break
+                if (($extraProperties = $operation->getExtraProperties()) && isset($extraProperties['is_legacy_subresource'])) {
+                    $extraProperties['legacy_subresource_operation_name'] = $newOperationName;
+                    $operation = $operation->withExtraProperties($extraProperties);
+                }
+
+                unset($operations[$operationName]);
+                $operations[$newOperationName] = $operation;
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations);

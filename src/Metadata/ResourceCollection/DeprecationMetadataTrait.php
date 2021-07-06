@@ -46,7 +46,7 @@ trait DeprecationMetadataTrait
             @trigger_error('The "path" option is deprecated in 2.7 and will be renamed to "uri_tempalte" in 3.0.', E_USER_DEPRECATED);
         // Transform default value to an empty array if null
         } else if (in_array($key, ['denormalization_context', 'normalization_context', 'hydra_context', 'openapi_context', 'order', 'pagination_via_cursor', 'exception_to_status'], true)) {
-            $value = is_array($value) ? $value : [];
+            $value = is_array($value) ? $value : [$value];
         } else if (in_array($key, ['route_prefix'], true)) {
             $value = is_string($value) ? $value : '';
         } else if (in_array($key, ['swagger_context'], true)) {

@@ -78,6 +78,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         if (isset($context['identifiers']) && !isset($context['property'])) {
             $context['property'] = $context['extra_properties']['legacy_subresource_property'] ?? null;
+            unset($context['filters']);
         }
 
         if (!isset($context['identifiers'], $context['property'])) {
@@ -164,12 +165,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $normalizedIdentifiers = [];
 
         if (isset($identifiers[$identifier])) {
-            if ($context['extra_properties']['is_legacy_subresource'] ?? false) {
-                foreach ($context['identifiers'] as $parameterName => [$class, $property]) {
-                    $normalizedIdentifiers[$property] = $context['identifiers_values'][$parameterName];
-                }
-                // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
-            } elseif ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
+            if ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
                 $normalizedIdentifiers = $identifiers[$identifier];
             } else {
                 $normalizedIdentifiers = $this->normalizeIdentifiers($identifiers[$identifier], $manager, $identifierResourceClass);

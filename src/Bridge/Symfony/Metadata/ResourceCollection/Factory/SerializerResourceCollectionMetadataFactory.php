@@ -11,63 +11,51 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Core\Bridge\Symfony\Metadata\ResourceCollection\Factory;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
-use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\ResourceCollection\ResourceCollection;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
 
 /**
- * Populates read/write and link status using serialization groups.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
- * @author Teoh Han Hui <teohhanhui@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
+ * @experimental
  */
-final class SerializerPropertyMetadataFactory implements PropertyMetadataFactoryInterface
+final class SerializerResourceCollectionMetadataFactory implements ResourceCollectionMetadataFactoryInterface
 {
     use ResourceClassInfoTrait;
 
-    private $serializerClassMetadataFactory;
     private $decorated;
-    private $router;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null, RouterInterface $router = null)
+    public function __construct(ResourceCollectionMetadataFactoryInterface $decorated, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
         $this->decorated = $decorated;
-        $this->resourceClassResolver = $resourceClassResolver;
-        $this->router = $router;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass): ResourceCollection
     {
-        $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
-
-        // BC to be removed in 3.0
-        if (null !== ($childResourceClass = $propertyMetadata->getChildInherited())) {
-            $resourceClass = $childResourceClass;
+        $resourceMetadataCollection = new ResourceCollection();
+        if ($this->decorated) {
+            $resourceMetadataCollection = $this->decorated->create($resourceClass);
         }
 
-        try {
-            [$normalizationGroups, $denormalizationGroups] = $this->getEffectiveSerializerGroups($options, $resourceClass);
-        } catch (ResourceClassNotFoundException $e) {
-            // TODO: for input/output classes, the serializer groups must be read from the actual resource class
-            return $propertyMetadata;
+        $identifiers = null;
+        foreach ($resourceMetadataCollection as $i => $resource) {
+
+            $resourceMetadataCollection[$i] = $resource;
         }
 
-        $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
-
-        return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
+        return $resourceMetadataCollection;
     }
 
     /**
@@ -171,14 +159,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             return [$groups, $groups];
         }
 
-        if (isset($options['operation_name'])) {
-            $operation = $this->router->getRouteCollection()->get($options['operation_name']);
-            return [
-                $operation->getDefault('_api_operation')['normalization_context']['groups'] ?? null,
-                $operation->getDefault('_api_operation')['denormalization_context']['groups'] ?? null,
-            ];
-        }
-
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (isset($options['collection_operation_name'])) {
             $normalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'normalization_context', null, true);
@@ -220,7 +200,6 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      */
     private function getClassSerializerGroups(string $class): array
     {
-        //TODO: 3.0 hard problem
         $resourceMetadata = $this->resourceMetadataFactory->create($class);
         if ($outputClass = $resourceMetadata->getAttribute('output')['class'] ?? null) {
             $class = $outputClass;

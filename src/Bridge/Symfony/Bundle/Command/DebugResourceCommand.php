@@ -60,12 +60,14 @@ class DebugResourceCommand extends Command
         $output->writeln(sprintf('Class %s declares %d resource%s.', $shortName, \count($resourceCollection), \count($resourceCollection) > 1 ? 's' : '').\PHP_EOL);
 
         foreach ($resourceCollection as $resource) {
-            foreach ($resource->getOperations() as $operation) {
-                $table = new Table($output);
-                $table->setHeaders([sprintf('%s %s', $operation->getMethod(), $operation->getUriTemplate())]);
+            foreach ($resource->getOperations() as $operationName => $operation) {
+                $output->writeln(sprintf('%s %s', $operation->getMethod(), $operation->getUriTemplate()));
+                $output->writeln('Operation name: ' . $operationName);
+                $output->writeln('Normalization groups: ' . implode(', ', $operation->getNormalizationContext()['groups'] ?? []));
+                $output->writeln('Denormalization groups: ' . implode(', ', $operation->getDenormalizationContext()['groups'] ?? []));
 
                 foreach ($operation->getIdentifiers() ?? [] as $parameter => [$class, $property]) {
-                    $table->addRow([sprintf('%s: %s::%s ', $parameter, $class === $resourceClass ? $shortName : $class, $property)]);
+                    $output->writeln(sprintf('%s: %s::%s ', $parameter, $class === $resourceClass ? $shortName : $class, $property));
                 }
 
                 $links = [];
@@ -73,9 +75,7 @@ class DebugResourceCommand extends Command
                     $links[] = $link;
                 }
 
-                $table->addRow(['Links to: ' . implode(', ', $links)]);
-
-                $table->render();
+                $output->writeln('Links to: ' . implode(', ', $links));
             }
         }
 

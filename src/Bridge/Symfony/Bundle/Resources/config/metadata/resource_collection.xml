@@ -63,7 +63,6 @@
             <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory.links.inner" />
         </service>
 
-
         <!-- <service id="api_platform.metadata.resource_collection.metadata_factory.cached" class="ApiPlatform\Core\Metadata\ResourceCollection\Factory\CachedResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource_collection.metadata_factory" decoration&#45;priority="&#45;10" public="false"> -->
         <!--     <argument type="service" id="api_platform.cache.metadata.resource_collection" /> -->
         <!--     <argument type="service" id="api_platform.metadata.resource_collection.metadata_factory.cached.inner" /> -->

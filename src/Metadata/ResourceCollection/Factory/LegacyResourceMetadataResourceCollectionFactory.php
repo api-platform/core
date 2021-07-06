@@ -22,6 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomActionDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CustomMultipleIdentifierDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\AsResource;
 
@@ -54,15 +55,13 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
 
         $attributes = $resourceMetadata->getAttributes() ?? [];
 
-        if ($attributes && $this->defaults['attributes']) {
-            foreach ($attributes as $key => $value) {
-                if (!$value) {
-                    continue;
-                }
+        foreach ($this->defaults['attributes'] ?? [] as $key => $value) {
+            if (!$value) {
+                continue;
+            }
 
-                if (!isset($attributes[$key])) {
-                    $attributes[$key] = $value;
-                }
+            if (!isset($attributes[$key])) {
+                $attributes[$key] = $value;
             }
         }
 
@@ -92,7 +91,6 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
         }
 
         $resourceMetadataCollection[] = $resource->withOperations($operations);
-
         return $resourceMetadataCollection;
     }
 
@@ -114,16 +112,17 @@ final class LegacyResourceMetadataResourceCollectionFactory implements ResourceC
                 if (0 !== strpos($methodName, 'get')) {
                     continue;
                 }
-
-                if (!method_exists($newOperation, $methodName) || (null !== $newOperation->{$methodName}() && [] !== $newOperation->{$methodName}())) {
+                
+                if (!method_exists($newOperation, $methodName)) {
                     continue;
                 }
 
-                if (null === $value = $resource->{$methodName}()) {
+                $operationValue = $newOperation->{$methodName}();
+                if (null !== $operationValue && [] !== $operationValue) {
                     continue;
                 }
 
-                $newOperation = $newOperation->{'with'.substr($methodName, 3)}($value);
+                $newOperation = $newOperation->{'with'.substr($methodName, 3)}($resource->{$methodName}());
             }
 
             // Default behavior in API Platform < 2.7

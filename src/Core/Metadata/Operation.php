@@ -1081,7 +1081,6 @@ class Operation
 
     public function __serialize(): array
     {
-        // TODO: 3.0 add deserialize, write, read etc.
         return [
             'stateless' => $this->stateless,
             'identifiers' => $this->identifiers,

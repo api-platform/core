@@ -39,6 +39,7 @@ final class AttributesExtractor
             $result['subresource_context'] = $subresourceContext;
         }
 
+        //TODO: 3.0 these are properly normalized in the route attributes
         // Normalizing identifiers tuples
         $identifiers = [];
         foreach (($attributes['_api_identifiers'] ?? ['id']) as $parameterName => $identifiedBy) {

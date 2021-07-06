@@ -599,6 +599,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
+        if (isset($context['operation_name'])) {
+            $options['operation_name'] = $context['operation_name'];
+        }
+
         if (isset($context['collection_operation_name'])) {
             $options['collection_operation_name'] = $context['collection_operation_name'];
         }

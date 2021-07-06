@@ -118,21 +118,12 @@ final class IriConverter implements ContextAwareIriConverterInterface
      */
     public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string
     {
-                    // if ($attributes['resource_class'] !== $resourceClass) {
-                    //     $attributes['operation'] = $this->getIriConverterContextWithDifferentClasses($resourceClass, $attributes['resource_class'], $attributes['operation']);
-                    // }
-                    //
-                    // $context = ['identifiers' => $attributes['identifiers'], 'has_composite_identifier' => $attributes['has_composite_identifier']];
-                    // if (isset($attributes['operation_name'])) {
-                    //     $context['operation_name'] = $attributes['operation']['links'][0][0] ?? $attributes['operation_name'];
-                    //     $context['identifiers'] = $attributes['operation']['links'][0][1] ?? $attributes['identifiers'];
-                    // }
-
         $resourceClass = $this->getResourceClass($item, true);
 
         // TODO: Deprecate the use of ResourceMetadataFactoryInterface
         if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
-            [$operationName, $operation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            [$operationName, $operation] = $resourceMetadata->getFirstOperation();
             if ($operationName) {
                 $context['operation_name'] = $operationName;
                 $context['identifiers'] = $operation->getIdentifiers();
@@ -162,6 +153,17 @@ final class IriConverter implements ContextAwareIriConverterInterface
      */
     public function getIriFromResourceClass(string $resourceClass, int $referenceType = null, array $context = []): string
     {
+        if ($context['extra_properties']['is_legacy_subresource'] ?? false) {
+            @trigger_error('The IRI will change in 3.0 and match the operation of the resulting resource. Switch to an alternate resource when possible.');
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $operation = $resourceMetadata->getOperation($context['extra_properties']['legacy_subresource_operation_name']);
+            if ($operation) {
+                $context['operation_name'] = $context['extra_properties']['legacy_subresource_operation_name'];
+                $context['identifiers'] = $operation->getIdentifiers();
+                $context['has_composite_identifier'] = $operation->getCompositeIdentifier();
+            }
+        }
+
         // TODO: Deprecate the use of ResourceMetadataFactoryInterface
         if (!isset($context['operation_name']) && $this->resourceMetadataFactory instanceof ResourceCollectionMetadataFactoryInterface) {
             [$operationName, $operation] = $this->resourceMetadataFactory->create($resourceClass)->getFirstOperation();

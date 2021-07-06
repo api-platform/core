@@ -17,14 +17,16 @@ trait IriContextTrait
 {
     public function getIriContextFromOperationContext(array $context, string $resourceClass = null, string $objectClass = null, bool $forceItem = false): array
     {
+        $iriContext = ['extra_properties' => $context['extra_properties'] ?? [], 'identifiers_values' => $context['identifiers_values'] ?? []];
+
         // We can't be sure that the context is the correct one, this happens when the Object we want the IRI from is not the same as the requested one
         if ($objectClass && $resourceClass !== $objectClass) {
-            return [];
+            return $iriContext;
         }
 
         // This is probably an old version of the context, links are created in the Resource Metadata and are tighten to a given Operation
         if (!isset($context['links'])) {
-            return [];
+            return $iriContext;
         }
 
         $link = $context['links'][0];
@@ -38,7 +40,7 @@ trait IriContextTrait
             }
         }
 
-        return [
+        return $iriContext + [
             'operation_name' => $link[0],
             'identifiers' => $link[1], 
             'has_composite_identifier' => $link[2]

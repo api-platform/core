@@ -28,7 +28,13 @@ class LegacyDataProviderState implements ProviderInterface
     public function provide(string $resourceClass, array $identifiers = [], array $context = [])
     {
         if ($context['extra_properties']['is_legacy_subresource'] ?? false) {
-            return $this->subresourceDataProvider->getSubresource($resourceClass, $identifiers, $context, $context['operation_name']);
+            $subresourceContext = ['identifiers' => $context['extra_properties']['legacy_subresource_identifiers']] + $context;
+            $subresourceIdentifiers = [];
+            foreach($context['identifiers'] as $parameterName => [$class, $property]) {
+                $subresourceIdentifiers[$parameterName] = [$property => $identifiers[$parameterName]];
+            }
+
+            return $this->subresourceDataProvider->getSubresource($resourceClass, $subresourceIdentifiers, $subresourceContext, $context['operation_name']);
         }
 
         if ($identifiers) {
