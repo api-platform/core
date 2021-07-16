@@ -41,8 +41,7 @@ class FilterCollectionFactoryTest extends TestCase
         $filterLocatorProphecy->has('bar')->willReturn(false)->shouldBeCalled();
 
         $filterCollection = (new FilterCollectionFactory(['foo', 'bar']))->createFilterCollectionFromLocator($filterLocatorProphecy->reveal());
-
-        $this->assertArrayNotHasKey('bar', $filterCollection);
+        $this->assertArrayNotHasKey('bar', $filterCollection->getArrayCopy());
         $this->assertTrue(isset($filterCollection['foo']));
         $this->assertInstanceOf(FilterInterface::class, $filterCollection['foo']);
         $this->assertEquals(new FilterCollection(['foo' => $filter]), $filterCollection);
