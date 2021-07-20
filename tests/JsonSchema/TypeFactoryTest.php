@@ -384,7 +384,33 @@ class TypeFactoryTest extends TestCase
         $this->assertSame(['$ref' => 'ref'], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
     }
 
-    public function testGetClassTypeWithNullability(): void
+    public function testGetClassTypeWithNullabilityForJsonSchema(): void
+    {
+        $schemaFactory = $this->createMock(SchemaFactoryInterface::class);
+
+        $schemaFactory
+            ->method('buildSchema')
+            ->willReturnCallback(static function (): Schema {
+                $schema = new Schema();
+
+                $schema['$ref'] = 'the-ref-name';
+                $schema['description'] = 'more stuff here';
+
+                return $schema;
+            });
+
+        $typeFactory = new TypeFactory();
+        $typeFactory->setSchemaFactory($schemaFactory);
+
+        self::assertSame([
+            'anyOf' => [
+                ['$ref' => 'the-ref-name'],
+                ['type' => 'null'],
+            ],
+        ], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
+    }
+
+    public function testGetClassTypeWithNullabilityForOpenApi(): void
     {
         $schemaFactory = $this->createMock(SchemaFactoryInterface::class);
 
@@ -407,6 +433,6 @@ class TypeFactoryTest extends TestCase
             'anyOf' => [
                 ['$ref' => 'the-ref-name'],
             ],
-        ], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
+        ], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema(Schema::VERSION_OPENAPI)));
     }
 }
