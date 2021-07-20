@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property;
 
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaBlankRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction;
@@ -22,6 +23,7 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\Prop
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanOrEqualRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanRestriction;
+use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaNotBlankRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRangeRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
@@ -285,6 +287,59 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertNotNull($schema);
         $this->assertArrayHasKey('minLength', $schema);
         $this->assertArrayHasKey('maxLength', $schema);
+    }
+
+    public function testCreateWithPropertyBlankRestriction(): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyValidatedEntity::class)
+                                 ->willReturn($validatorClassMetadata)
+                                 ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $property = 'dummyBlank';
+        $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, $property, [])->willReturn(
+                new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING))
+            )->shouldBeCalled();
+
+        $blankRestrictions = new PropertySchemaBlankRestriction();
+        $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(), [$blankRestrictions]
+        );
+
+        $schema = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, $property)->getSchema();
+        $this->assertNotNull($schema);
+        $this->assertArrayHasKey('minLength', $schema);
+        $this->assertArrayHasKey('maxLength', $schema);
+    }
+
+    public function testCreateWithPropertyNotBlankRestriction(): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummyValidatedEntity::class);
+        (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyValidatedEntity::class)
+                                 ->willReturn($validatorClassMetadata)
+                                 ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $property = 'dummy';
+        $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, $property, [])->willReturn(
+                new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING))
+            )->shouldBeCalled();
+
+        $notBlankRestrictions = new PropertySchemaNotBlankRestriction();
+        $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(), [$notBlankRestrictions]
+        );
+
+        $schema = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, $property)->getSchema();
+        $this->assertNotNull($schema);
+        $this->assertArrayHasKey('minLength', $schema);
     }
 
     public function testCreateWithPropertyRegexRestriction(): void

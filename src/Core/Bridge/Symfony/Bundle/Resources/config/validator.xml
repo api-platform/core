@@ -17,6 +17,10 @@
             <argument type="tagged" tag="api_platform.metadata.property_schema_restriction" />
         </service>
 
+        <service id="api_platform.metadata.property_schema.blank_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaBlankRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
         <service id="api_platform.metadata.property_schema.choice_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction" public="false">
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
@@ -47,6 +51,10 @@
         </service>
 
         <service id="api_platform.metadata.property_schema.less_than_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
+        <service id="api_platform.metadata.property_schema.not_blank_restriction" class="ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaNotBlankRestriction" public="false">
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 

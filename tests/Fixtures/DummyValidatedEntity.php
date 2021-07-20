@@ -37,6 +37,13 @@ class DummyValidatedEntity
     public $dummy;
 
     /**
+     * @var string A blank dummy
+     *
+     * @Assert\Blank
+     */
+    public $dummyBlank;
+
+    /**
      * @var string
      *
      * @Assert\Email
