@@ -163,6 +163,15 @@ final class TypeFactory implements TypeFactoryInterface
         }
 
         if (\array_key_exists('$ref', $jsonSchema)) {
+            if ($schema && Schema::VERSION_JSON_SCHEMA === $schema->getVersion()) {
+                return [
+                    'anyOf' => [
+                        $jsonSchema,
+                        ['type' => 'null'],
+                    ],
+                ];
+            }
+            
             return [
                 'nullable' => true,
                 'anyOf' => [$jsonSchema],
