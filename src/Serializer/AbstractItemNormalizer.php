@@ -413,10 +413,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
     {
         $builtinType = $type->getBuiltinType();
+        $callback = 'is_'.$builtinType;
+        $isValid = false;
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
             $isValid = \is_float($value) || \is_int($value);
-        } else {
-            $isValid = \call_user_func('is_'.$builtinType, $value);
+        } elseif (\is_callable($callback)) {
+            $isValid = \call_user_func($callback, $value);
         }
 
         if (!$isValid) {
@@ -440,7 +442,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $values = [];
         foreach ($value as $index => $obj) {
-            if (null !== $collectionKeyBuiltinType && !\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
+            $callable = 'is_'.$collectionKeyBuiltinType;
+            if (null !== $collectionKeyBuiltinType && \is_callable($callable) && !\call_user_func($callable, $index)) {
                 throw new InvalidArgumentException(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyBuiltinType, \gettype($index)));
             }
 

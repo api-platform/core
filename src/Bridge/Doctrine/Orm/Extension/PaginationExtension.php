@@ -94,7 +94,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 if (\array_key_exists($pos, $args)) {
                     @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), \E_USER_DEPRECATED);
 
-                    if (!((null === $arg['default'] && null === $args[$pos]) || \call_user_func("is_{$arg['type']}", $args[$pos]))) {
+                    $callable = "is_{$arg['type']}";
+                    if (!((null === $arg['default'] && null === $args[$pos]) || (\is_callable($callable) && \call_user_func($callable, $args[$pos])))) {
                         throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', $arg['arg_name'], $arg['type'], null === $arg['default'] ? ' or null' : ''));
                     }
 

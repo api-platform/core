@@ -171,6 +171,7 @@ final class TypeFactory implements TypeFactoryInterface
                     ],
                 ];
             }
+
             return [
                 'nullable' => true,
                 'anyOf' => [$jsonSchema],
