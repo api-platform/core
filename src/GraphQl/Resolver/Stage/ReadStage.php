@@ -95,7 +95,8 @@ final class ReadStage implements ReadStageInterface
         $source = $context['source'];
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
+        $rootProperty = $normalizationContext['denormalizedProperty'] ?? $info->fieldName;
+        if (isset($source[$info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
             $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $rootResolvedClass = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
             $subresourceCollection = $this->getSubresource($rootResolvedClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext, $operationName);
