@@ -62,6 +62,8 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['attributes'] = $this->fieldsToAttributes($resourceClass, $resourceMetadata, $resolverContext, $context);
         }
 
+        $context['denormalizedProperty'] = $this->denormalizePropertyName($resolverContext['info']->fieldName, $resourceClass, $context);
+
         return $context;
     }
 
