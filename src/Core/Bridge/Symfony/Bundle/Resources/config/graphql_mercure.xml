@@ -6,7 +6,7 @@
 
     <services>
 
-        <service id="api_platform.graphql.subscription.mercure_iri_generator" class="ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGenerator">
+        <service id="api_platform.graphql.subscription.mercure_iri_generator" class="ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGenerator">
             <argument type="service" id="router.request_context" />
         </service>
 

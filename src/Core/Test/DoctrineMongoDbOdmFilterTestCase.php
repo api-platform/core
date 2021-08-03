@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Test;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
