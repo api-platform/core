@@ -16,6 +16,10 @@ namespace ApiPlatform\Core\DataProvider;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * Pagination configuration.
@@ -26,10 +30,18 @@ final class Pagination
 {
     private $options;
     private $graphQlOptions;
+
+    /**
+     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
+     */
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, array $options = [], array $graphQlOptions = [])
+    public function __construct($resourceMetadataFactory, array $options = [], array $graphQlOptions = [])
     {
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->options = array_merge([
             'enabled' => true,
@@ -112,10 +124,21 @@ final class Pagination
         $limit = $this->options['items_per_page'];
         $clientLimit = $this->options['client_items_per_page'];
 
+        $resourceMetadata = null;
         if (null !== $resourceClass) {
+            /**
+             * @var ResourceMetadata|ResourceMetadataCollection
+             */
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $limit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $limit, true);
-            $clientLimit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $clientLimit, true);
+
+            if ($resourceMetadata instanceof ResourceMetadata) {
+                $limit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $limit, true);
+                $clientLimit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $clientLimit, true);
+            } else {
+                $operation = $resourceMetadata->getOperation($operationName);
+                $limit = $operation->getPaginationItemsPerPage() ?? $limit;
+                $clientLimit = $operation->getPaginationClientItemsPerPage() ?? $clientLimit;
+            }
         }
 
         if ($graphql && null !== ($first = $this->getParameterFromContext($context, 'first'))) {
@@ -135,13 +158,15 @@ final class Pagination
             $limit = (int) $this->getParameterFromContext($context, $this->options['items_per_page_parameter_name'], $limit);
             $maxItemsPerPage = null;
 
-            if (null !== $resourceClass) {
-                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if ($resourceMetadata instanceof ResourceMetadata) {
                 $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
                 if (null !== $maxItemsPerPage) {
                     @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', \E_USER_DEPRECATED);
                 }
                 $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage ?? $this->options['maximum_items_per_page'], true);
+            } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
+                $operation = $resourceMetadata->getOperation($operationName);
+                $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
             }
 
             if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
@@ -211,7 +236,15 @@ final class Pagination
     {
         try {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            if ($resourceMetadata instanceof ResourceMetadataCollection) {
+                $operation = $resourceMetadata->getGraphQlOperation($operationName);
+
+                return $operation->getPaginationType() ?? 'cursor';
+            }
         } catch (ResourceClassNotFoundException $e) {
+            return 'cursor';
+        } catch (OperationNotFoundException $e) {
             return 'cursor';
         }
 
@@ -228,9 +261,15 @@ final class Pagination
 
         if (null !== $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
 
-            $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
+            if ($resourceMetadata instanceof ResourceMetadataCollection) {
+                $operation = $resourceMetadata->getOperation($operationName);
+                $enabled = $partial ? $operation->getPaginationPartial() : $operation->getPaginationEnabled();
+                $clientEnabled = $partial ? $operation->getPaginationClientPartial() : $operation->getPaginationClientEnabled();
+            } else {
+                $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
+                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
+            }
         }
 
         if ($clientEnabled) {
@@ -247,7 +286,15 @@ final class Pagination
         if (null !== $resourceClass) {
             try {
                 $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+                if ($resourceMetadata instanceof ResourceMetadataCollection) {
+                    $operation = $resourceMetadata->getGraphQlOperation($operationName);
+
+                    return $operation->getPaginationEnabled() ?? $enabled;
+                }
             } catch (ResourceClassNotFoundException $e) {
+                return $enabled;
+            } catch (OperationNotFoundException $e) {
                 return $enabled;
             }
 

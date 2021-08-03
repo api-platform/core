@@ -18,7 +18,6 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * Convenience class for setting up Doctrine from different installations and configurations.
@@ -64,7 +63,7 @@ class DoctrineMongoDbOdmSetup
 
         $config = new Configuration();
         if (method_exists($config, 'setMetadataCache')) {
-            $config->setMetadataCache(new ArrayAdapter());
+            $config->setMetadataCache($cache);
         } else {
             $config->setMetadataCacheImpl($cache);
         }

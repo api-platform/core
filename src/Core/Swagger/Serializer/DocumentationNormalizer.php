@@ -31,11 +31,13 @@ use ApiPlatform\Core\JsonSchema\TypeFactory;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -52,6 +54,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
 {
+    use ApiResourceToLegacyResourceMetadataTrait;
     use FilterLocatorTrait;
 
     public const FORMAT = 'json';
@@ -112,7 +115,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * @param mixed|null                                                 $jsonSchemaTypeFactory
      * @param int[]                                                      $swaggerVersions
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null)
+    public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null)
     {
         if ($jsonSchemaTypeFactory instanceof OperationMethodResolverInterface) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
@@ -150,6 +153,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $this->setFilterLocator($filterLocator, true);
+
+        if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
@@ -194,8 +201,26 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $paths = new \ArrayObject();
         $links = new \ArrayObject();
 
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            foreach ($object->getResourceNameCollection() as $resourceClass) {
+                $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+                foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
+                    $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata);
+                    // Items needs to be parsed first to be able to reference the lines from the collection operation
+                    $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceMetadata->getShortName(), $resourceMetadata, OperationType::ITEM, $links);
+                    $this->addPaths($v3, $paths, $definitions, $resourceClass, $resourceMetadata->getShortName(), $resourceMetadata, OperationType::COLLECTION, $links);
+                }
+            }
+
+            $definitions->ksort();
+            $paths->ksort();
+
+            return $this->computeDoc($v3, $object, $definitions, $paths, $context);
+        }
+
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
             if ($this->identifiersExtractor) {
                 $identifiers = [];
                 if ($resourceMetadata->getItemOperations()) {
@@ -236,7 +261,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         foreach ($operations as $operationName => $operation) {
-            $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
+            if (isset($operation['uri_template'])) {
+                $path = str_replace('.{_format}', '', $operation['uri_template']);
+                if (0 !== strpos($path, '/')) {
+                    $path = '/'.$path;
+                }
+            } else {
+                $path = $this->getPath($resourceShortName, $operationName, $operation, $operationType);
+            }
+
             if ($this->operationMethodResolver) {
                 $method = OperationType::ITEM === $operationType ? $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName) : $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
             } else {
@@ -353,7 +386,28 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
 
             $pathOperation['responses'] ?? $pathOperation['responses'] = [$successStatus => $successResponse];
-            $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata);
+
+            if ($resourceMetadata->getAttributes()['extra_properties']['is_legacy_subresource'] ?? false) {
+                // Avoid duplicates parameters when there is a filter on a subresource identifier
+                $parametersMemory = [];
+                $pathOperation['parameters'] = [];
+                foreach ($resourceMetadata->getAttributes()['identifiers'] as $parameterName => [$class, $identifier]) {
+                    $parameter = ['name' => $parameterName, 'in' => 'path', 'required' => true];
+                    $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
+                    $pathOperation['parameters'][] = $parameter;
+                    $parametersMemory[] = $parameterName;
+                }
+
+                if ($parameters = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata)) {
+                    foreach ($parameters as $parameter) {
+                        if (!\in_array($parameter['name'], $parametersMemory, true)) {
+                            $pathOperation['parameters'][] = $parameter;
+                        }
+                    }
+                }
+            } else {
+                $pathOperation['parameters'] ?? $pathOperation['parameters'] = $this->getFiltersParameters($v3, $resourceClass, $operationName, $resourceMetadata);
+            }
 
             $this->addPaginationParameters($v3, $resourceMetadata, OperationType::COLLECTION, $operationName, $pathOperation);
 
@@ -452,10 +506,15 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         if (null === $this->formatsProvider) {
             // TODO: Subresource operation metadata aren't available by default, for now we have to fallback on default formats.
             // TODO: A better approach would be to always populate the subresource operation array.
-            $responseFormats = $this
+            $subResourceMetadata = $this
                 ->resourceMetadataFactory
-                ->create($subresourceOperation['resource_class'])
-                ->getTypedOperationAttribute(OperationType::SUBRESOURCE, $operationName, 'output_formats', $this->formats, true);
+                ->create($subresourceOperation['resource_class']);
+
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+                $subResourceMetadata = $this->transformResourceToResourceMetadata($subResourceMetadata[0]);
+            }
+
+            $responseFormats = $subResourceMetadata->getTypedOperationAttribute(OperationType::SUBRESOURCE, $operationName, 'output_formats', $this->formats, true);
         } else {
             $responseFormats = $this->formatsProvider->getFormatsFromOperation($subresourceOperation['resource_class'], $operationName, OperationType::SUBRESOURCE);
         }
@@ -611,8 +670,9 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $identifiers = (array) $resourceMetadata
                 ->getTypedOperationAttribute(OperationType::ITEM, $operationName, 'identifiers', ['id'], true);
-        if (\count($identifiers) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false) {
-            $identifiers = ['id'];
+
+        if (\count($identifiers) > 1 ? $resourceMetadata->getItemOperationAttribute($operationName, 'composite_identifier', true, true) : false) {
+            $identifiers = [key($identifiers)];
         }
 
         if (!isset($pathOperation['parameters'])) {

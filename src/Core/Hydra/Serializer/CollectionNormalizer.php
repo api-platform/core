@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hydra\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
@@ -48,10 +50,14 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         self::IRI_ONLY => false,
     ];
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, array $defaultContext = [])
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, $iriConverter, array $defaultContext = [])
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceClassResolver = $resourceClassResolver;
+
+        if ($iriConverter instanceof LegacyIriConverterInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
+        }
         $this->iriConverter = $iriConverter;
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -79,17 +85,24 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
-            $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
+        if ($this->iriConverter instanceof IriConverterInterface) {
+            $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
         } else {
-            $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);
+            //TODO: remove in 3.0
+            $data['@id'] = isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] ? $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
         }
 
         $data['@type'] = 'hydra:Collection';
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
+        unset($context['operation'], $context['operation_name']);
+
         foreach ($object as $obj) {
-            $data['hydra:member'][] = $iriOnly ? $this->iriConverter->getIriFromItem($obj) : $this->normalizer->normalize($obj, $format, $context);
+            if ($iriOnly) {
+                $data['hydra:member'][] = $this->iriConverter->getIriFromItem($obj);
+            } else {
+                $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
+            }
         }
 
         if ($object instanceof PaginatorInterface) {

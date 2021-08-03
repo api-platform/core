@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
@@ -30,11 +32,13 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 final class AddTagsListener
 {
+    use OperationRequestInitiatorTrait;
     private $iriConverter;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->iriConverter = $iriConverter;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
@@ -43,6 +47,7 @@ final class AddTagsListener
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
+        $operation = $this->initializeOperation($request);
         $response = $event->getResponse();
 
         if (
@@ -54,7 +59,7 @@ final class AddTagsListener
         }
 
         $resources = $request->attributes->get('_resources');
-        if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false)) {
+        if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false) || ($operation && $operation->isCollection())) {
             // Allows to purge collections
             $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
             $resources[$iri] = $iri;

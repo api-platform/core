@@ -168,6 +168,14 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             return [$groups, $groups];
         }
 
+        if (\array_key_exists('normalization_groups', $options) && \array_key_exists('denormalization_groups', $options)) {
+            return [$options['normalization_groups'] ?? null, $options['denormalization_groups'] ?? null];
+        }
+
+        if (isset($options['operation_name'])) {
+            throw new \RuntimeException('You should specify "normalization_groups" and/or "denormalization_groups" when using the SerializerPropertyMetadataFactory.');
+        }
+
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (isset($options['collection_operation_name'])) {
             $normalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'normalization_context', null, true);
@@ -209,6 +217,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      */
     private function getClassSerializerGroups(string $class): array
     {
+        //TODO: 3.0 hard problem
         $resourceMetadata = $this->resourceMetadataFactory->create($class);
         if ($outputClass = $resourceMetadata->getAttribute('output')['class'] ?? null) {
             $class = $outputClass;

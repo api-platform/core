@@ -13,25 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver;
 
-use ApiPlatform\Core\EventListener\ToggleableDeserializationTrait;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 final class PayloadArgumentResolver implements ArgumentValueResolverInterface
 {
-    use ToggleableDeserializationTrait;
-
+    use OperationRequestInitiatorTrait;
     private $serializationContextBuilder;
 
     public function __construct(
-        ResourceMetadataFactoryInterface $resourceMetadataFactory,
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         SerializerContextBuilderInterface $serializationContextBuilder
     ) {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
@@ -67,13 +66,12 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
 
     private function getExpectedInputClass(Request $request): ?string
     {
-        $attributes = RequestAttributesExtractor::extractAttributes($request);
-
-        if (!$this->isRequestToDeserialize($request, $attributes)) {
+        $operation = $this->initializeOperation($request);
+        if (Request::METHOD_DELETE === $request->getMethod() || $request->isMethodSafe() || !$operation->canDeserialize()) {
             return null;
         }
 
-        $context = $this->serializationContextBuilder->createFromRequest($request, false, $attributes);
+        $context = $this->serializationContextBuilder->createFromRequest($request, false, RequestAttributesExtractor::extractAttributes($request));
 
         return $context['input'] ?? $context['resource_class'];
     }

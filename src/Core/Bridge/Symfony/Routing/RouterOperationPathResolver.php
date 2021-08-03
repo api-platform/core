@@ -21,6 +21,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Resolves the operations path using a Symfony route.
+ * TODO: remove this in 3.0.
  *
  * @author Guilhem N. <egetick@gmail.com>
  */
@@ -57,7 +58,7 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
         } elseif (null === $operationName) {
             return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
         } else {
-            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
+            $routeName = isset($operation['uri_template']) ? $operationName : RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
         }
 
         if (!$route = $this->router->getRouteCollection()->get($routeName)) {

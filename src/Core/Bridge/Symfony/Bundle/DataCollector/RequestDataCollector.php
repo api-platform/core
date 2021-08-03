@@ -21,8 +21,11 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +38,11 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 final class RequestDataCollector extends DataCollector
 {
+    use ApiResourceToLegacyResourceMetadataTrait;
+
+    /**
+     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
+     */
     private $metadataFactory;
     private $filterLocator;
     private $collectionDataProvider;
@@ -42,7 +50,7 @@ final class RequestDataCollector extends DataCollector
     private $subresourceDataProvider;
     private $dataPersister;
 
-    public function __construct(ResourceMetadataFactoryInterface $metadataFactory, ContainerInterface $filterLocator, CollectionDataProviderInterface $collectionDataProvider = null, ItemDataProviderInterface $itemDataProvider = null, SubresourceDataProviderInterface $subresourceDataProvider = null, DataPersisterInterface $dataPersister = null)
+    public function __construct($metadataFactory, ContainerInterface $filterLocator, CollectionDataProviderInterface $collectionDataProvider = null, ItemDataProviderInterface $itemDataProvider = null, SubresourceDataProviderInterface $subresourceDataProvider = null, DataPersisterInterface $dataPersister = null)
     {
         $this->metadataFactory = $metadataFactory;
         $this->filterLocator = $filterLocator;
@@ -50,6 +58,10 @@ final class RequestDataCollector extends DataCollector
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->dataPersister = $dataPersister;
+
+        if (!$metadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
     }
 
     /**
@@ -60,6 +72,10 @@ final class RequestDataCollector extends DataCollector
         $counters = ['ignored_filters' => 0];
         $resourceClass = $request->attributes->get('_api_resource_class');
         $resourceMetadata = $resourceClass ? $this->metadataFactory->create($resourceClass) : null;
+
+        if ($resourceMetadata instanceof ResourceMetadataCollection) {
+            $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata[0]);
+        }
 
         $filters = [];
         foreach ($resourceMetadata ? $resourceMetadata->getAttribute('filters', []) : [] as $id) {

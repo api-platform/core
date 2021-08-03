@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\HttpCache\PurgerInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -118,6 +119,7 @@ final class PurgeHttpCacheListener
                 $this->addTagForItem($entity);
             }
         } catch (InvalidArgumentException $e) {
+        } catch (OperationNotFoundException $e) {
         }
     }
 
@@ -155,6 +157,7 @@ final class PurgeHttpCacheListener
     private function addTagForItem($value): void
     {
         try {
+            //TODO: test if this is a resource class
             $iri = $this->iriConverter->getIriFromItem($value);
             $this->tags[$iri] = $iri;
         } catch (InvalidArgumentException $e) {

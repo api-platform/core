@@ -61,9 +61,13 @@ final class AddHeadersListener
         }
 
         $resourceCacheHeaders = [];
-        if ($this->resourceMetadataFactory && $attributes = RequestAttributesExtractor::extractAttributes($request)) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
+        if ($attributes = RequestAttributesExtractor::extractAttributes($request)) {
+            if ($this->resourceMetadataFactory) {
+                $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+                $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
+            } else {
+                $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
+            }
         }
 
         if ($this->etag && !$response->getEtag()) {

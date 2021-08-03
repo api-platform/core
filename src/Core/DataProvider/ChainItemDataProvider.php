@@ -20,14 +20,9 @@ use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ChainItemDataProvider implements ItemDataProviderInterface
+final class ChainItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface
 {
-    /**
-     * @var iterable<ItemDataProviderInterface>
-     *
-     * @internal
-     */
-    public $dataProviders;
+    use RestrictDataProviderTrait;
 
     /**
      * @param ItemDataProviderInterface[] $dataProviders

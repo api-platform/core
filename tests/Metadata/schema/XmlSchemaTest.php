@@ -24,7 +24,7 @@ class XmlSchemaTest extends TestCase
     public function testSchema(): void
     {
         $fixtures = __DIR__.'/../../Fixtures/Metadata/schema/';
-        $schema = __DIR__.'/../../../src/Metadata/schema/metadata.xsd';
+        $schema = __DIR__.'/../../../src/Core/Metadata/schema/metadata.xsd';
 
         try {
             XmlUtils::loadFile($fixtures.'invalid.xml', $schema);

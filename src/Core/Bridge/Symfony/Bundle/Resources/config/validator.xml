@@ -73,7 +73,7 @@
 
         <service id="api_platform.listener.view.validate" class="ApiPlatform\Core\Validator\EventListener\ValidateListener">
             <argument type="service" id="api_platform.validator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="64" />
         </service>
@@ -83,7 +83,7 @@
         </service>
 
         <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Core\EventListener\QueryParameterValidateListener" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.validator.query_parameter_validator" />
             <argument>%api_platform.validator.query_parameter_validation%</argument>
 

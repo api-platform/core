@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonApi\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -24,11 +27,18 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class TransformFieldsetsParametersListener
 {
+    /**
+     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
+     */
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct($resourceMetadataFactory)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -56,7 +66,9 @@ final class TransformFieldsetsParametersListener
             return;
         }
 
-        $resourceShortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
+        /** @var ResourceMetadata|ResourceMetadataCollection */
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceShortName = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getShortName() : $resourceMetadata->getOperation()->getShortName();
 
         $properties = [];
         foreach ($fieldsParameter as $resourceType => $fields) {

@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonLd\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -34,11 +34,15 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     private $iriConverter;
     private $anonymousContextBuilder;
 
-    public function __construct(NormalizerInterface $decorated, IriConverterInterface $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
+    public function __construct(NormalizerInterface $decorated, $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
     {
         $this->decorated = $decorated;
         $this->iriConverter = $iriConverter;
         $this->anonymousContextBuilder = $anonymousContextBuilder;
+
+        if ($iriConverter instanceof LegacyIriConverterInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
+        }
     }
 
     /**

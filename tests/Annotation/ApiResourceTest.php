@@ -20,14 +20,21 @@ use ApiPlatform\Core\Tests\Fixtures\AnnotatedClass;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ApiResourceTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
+    /**
+     * @group legacy
+     */
     public function testConstruct()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The class ApiPlatform\Core\Api\UrlGeneratorInterface is deprecated, use ApiPlatform\Api\UrlGeneratorInterface instead.');
         $resource = new ApiResource([
             'security' => 'is_granted("ROLE_FOO")',
             'securityMessage' => 'You are not foo.',

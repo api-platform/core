@@ -48,6 +48,11 @@ final class RouteNameResolver implements RouteNameResolverInterface
         foreach ($this->router->getRouteCollection()->all() as $routeName => $route) {
             $currentResourceClass = $route->getDefault('_api_resource_class');
             $operation = $route->getDefault(sprintf('_api_%s_operation_name', $operationType));
+
+            if (!$operation) {
+                $operation = $route->getDefault('_api_operation_name');
+            }
+
             $methods = $route->getMethods();
 
             if ($resourceClass === $currentResourceClass && null !== $operation && (empty($methods) || \in_array('GET', $methods, true))) {

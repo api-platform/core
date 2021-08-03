@@ -18,6 +18,7 @@ use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -40,13 +41,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, $filterLocator)
+    public function __construct(NormalizerInterface $collectionNormalizer, $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, $filterLocator)
     {
         $this->setFilterLocator($filterLocator);
 
         $this->collectionNormalizer = $collectionNormalizer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
     }
 
     /**
@@ -80,13 +85,20 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $resourceFilters = null;
 
-        $operationName = $context['collection_operation_name'] ?? null;
-        if (null === $operationName) {
-            $resourceFilters = $resourceMetadata->getAttribute('filters', []);
-        } else {
-            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            $operationName = $context['collection_operation_name'] ?? null;
+            if (null === $operationName) {
+                $resourceFilters = $resourceMetadata->getAttribute('filters', []);
+            } else {
+                $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+            }
+        } elseif ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
+            $resourceFilters = $operation->getFilters();
         }
 
         if (!$resourceFilters) {

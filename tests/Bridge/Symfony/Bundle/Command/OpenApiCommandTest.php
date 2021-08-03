@@ -41,6 +41,11 @@ class OpenApiCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
+    /**
+     * TODO: change this once we support #[Resource].
+     *
+     * @group legacy
+     */
     public function testExecute()
     {
         $this->tester->run(['command' => 'api:openapi:export']);
@@ -58,7 +63,7 @@ class OpenApiCommandTest extends KernelTestCase
         $expected = <<<YAML
   /dummy_cars:
     get:
-      operationId: getDummyCarCollection
+      operationId: '_api_/dummy_cars.{_format}_get_collection'
       tags:
         - DummyCar
 YAML;
@@ -68,7 +73,7 @@ YAML;
         $expected = <<<YAML
   '/dummy_cars/{id}':
     get:
-      operationId: getDummyCarItem
+      operationId: '_api_/dummy_cars/{id}.{_format}_get'
       tags: []
 YAML;
 

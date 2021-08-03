@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -108,7 +109,10 @@ trait SearchFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function getIriConverter(): IriConverterInterface;
+    /**
+     * @return IriConverterInterface|LegacyIriConverterInterface
+     */
+    abstract protected function getIriConverter();
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 

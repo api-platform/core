@@ -19,6 +19,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -32,8 +36,12 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
     private $resourceClassResolver;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct($resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
     {
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->forceEager = $forceEager;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -50,9 +58,27 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
+        /** @var Operation|GraphQlOperation|null */
+        $operation = null;
+        $forceEager = $this->forceEager;
 
-        if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
-            return;
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+            try {
+                $operation = isset($context['graphql_operation_name']) ? $resourceMetadataCollection->getGraphQlOperation($operationName) : $resourceMetadataCollection->getOperation($operationName);
+                $forceEager = $operation->getForceEager() ?? $this->forceEager;
+            } catch (OperationNotFoundException $e) {
+                // In some cases the operation may not exist
+            }
+
+            if (!$forceEager && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
+                return;
+            }
+        } else {
+            // TODO: remove in 3.0
+            if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
+                return;
+            }
         }
 
         //If no where part, nothing to do

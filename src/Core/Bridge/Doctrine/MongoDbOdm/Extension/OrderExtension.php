@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -38,8 +39,12 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     private $resourceMetadataFactory;
     private $managerRegistry;
 
-    public function __construct(string $order = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ManagerRegistry $managerRegistry = null)
+    public function __construct(string $order = null, $resourceMetadataFactory = null, ManagerRegistry $managerRegistry = null)
     {
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->order = $order;
         $this->managerRegistry = $managerRegistry;
@@ -53,8 +58,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
         $classMetaData = $this->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
         if (null !== $this->resourceMetadataFactory) {
-            $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)
-                   ->getCollectionOperationAttribute($operationName, 'order', [], true);
+            $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName)->getOrders();
             if (empty($defaultOrder)) {
                 $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
             }

@@ -40,6 +40,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ * @group legacy
  */
 class IriConverterTest extends TestCase
 {
@@ -186,6 +187,9 @@ class IriConverterTest extends TestCase
         $converter->getIriFromResourceClass(Dummy::class);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetSubresourceIriFromResourceClass()
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
@@ -198,6 +202,9 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]), '/dummies/1/related_dummies');
     }
 
+    /**
+     * @group legacy
+     */
     public function testNotAbleToGenerateGetSubresourceIriFromResourceClass()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -213,6 +220,9 @@ class IriConverterTest extends TestCase
         $converter->getSubresourceIriFromResourceClass(Dummy::class, ['subresource_identifiers' => ['id' => 1], 'subresource_resources' => [RelatedDummy::class => 1]]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetItemIriFromResourceClass()
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
@@ -228,6 +238,9 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), '/dummies/1');
     }
 
+    /**
+     * @group legacy
+     */
     public function testGetItemIriFromResourceClassAbsoluteUrl()
     {
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
@@ -243,6 +256,9 @@ class IriConverterTest extends TestCase
         $this->assertEquals($converter->getItemIriFromResourceClass(Dummy::class, ['id' => 1]), 'http://example.com/dummies/1');
     }
 
+    /**
+     * @group legacy
+     */
     public function testNotAbleToGenerateGetItemIriFromResourceClass()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -388,10 +404,14 @@ class IriConverterTest extends TestCase
             return true;
         });
 
+        $resourceClassResolver->getResourceClass(Argument::cetera())->will(function ($args) {
+            return \get_class($args[0]);
+        });
+
         return $resourceClassResolver->reveal();
     }
 
-    private function getIriConverter($routerProphecy = null, $routeNameResolverProphecy = null, $itemDataProviderProphecy = null, $subresourceDataProviderProphecy = null, $identifierConverterProphecy = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    private function getIriConverter($routerProphecy = null, $routeNameResolverProphecy = null, $itemDataProviderProphecy = null, $subresourceDataProviderProphecy = null, $identifierConverterProphecy = null, $resourceMetadataFactory = null)
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);

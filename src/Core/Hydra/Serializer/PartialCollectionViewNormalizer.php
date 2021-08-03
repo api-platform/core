@@ -17,6 +17,7 @@ use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\IriHelper;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -38,12 +39,17 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     private $resourceMetadataFactory;
     private $propertyAccessor;
 
-    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', ResourceMetadataFactoryInterface $resourceMetadataFactory = null, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(NormalizerInterface $collectionNormalizer, string $pageParameterName = 'page', string $enabledParameterName = 'pagination', $resourceMetadataFactory = null, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->collectionNormalizer = $collectionNormalizer;
         $this->pageParameterName = $pageParameterName;
         $this->enabledParameterName = $enabledParameterName;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
 
@@ -81,9 +87,15 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             return $data;
         }
 
+        $isPaginatedWithCursor = false;
         $cursorPaginationAttribute = null;
-        $metadata = isset($context['resource_class']) && null !== $this->resourceMetadataFactory ? $this->resourceMetadataFactory->create($context['resource_class']) : null;
-        $isPaginatedWithCursor = $paginated && null !== $metadata && null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'] ?? $context['subresource_operation_name'], 'pagination_via_cursor', null, true);
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && isset($context['resource_class']) && $paginated) {
+            $metadata = $this->resourceMetadataFactory->create($context['resource_class']);
+            $isPaginatedWithCursor = null !== $cursorPaginationAttribute = $metadata->getCollectionOperationAttribute($context['collection_operation_name'] ?? $context['subresource_operation_name'], 'pagination_via_cursor', null, true);
+        } elseif ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface && isset($context['resource_class']) && $paginated) {
+            $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation($context['operation_name'] ?? null);
+            $isPaginatedWithCursor = [] !== $cursorPaginationAttribute = $operation->getPaginationViaCursor();
+        }
 
         $data['hydra:view'] = ['@id' => null, '@type' => 'hydra:PartialCollectionView'];
 

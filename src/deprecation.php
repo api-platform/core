@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 spl_autoload_register(function ($className) {
     static $deprecatedClasses = [
-        ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
+        // TODO: we can not work with an alias with doctrine annotations
+        // ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
         ApiPlatform\Core\Api\UrlGeneratorInterface::class => ApiPlatform\Api\UrlGeneratorInterface::class,
     ];
 

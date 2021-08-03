@@ -83,6 +83,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',
+            'metadata_backward_compatibility_layer' => true,
             'version' => '1.0.0',
             'show_webby' => true,
             'formats' => [

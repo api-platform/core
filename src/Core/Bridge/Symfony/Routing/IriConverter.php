@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use ApiPlatform\Bridge\Symfony\Routing\IriConverter as NewIriConverter;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -62,6 +63,8 @@ final class IriConverter implements IriConverterInterface
         $this->resourceClassResolver = $resourceClassResolver;
         $this->identifiersExtractor = $identifiersExtractor ?: new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, $propertyAccessor ?? PropertyAccess::createPropertyAccessor());
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The service "%s" is deprecated, use %s instead.', self::class, NewIriConverter::class));
     }
 
     /**

@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
@@ -26,16 +29,28 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
  */
 final class RespondListener
 {
+    use OperationRequestInitiatorTrait;
+
     public const METHOD_TO_CODE = [
         'POST' => Response::HTTP_CREATED,
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
     private $resourceMetadataFactory;
+    private $iriConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct($resourceMetadataFactory = null, IriConverterInterface $iriConverter = null)
     {
+        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
+        if ($resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -45,13 +60,16 @@ final class RespondListener
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
+        $operation = $this->initializeOperation($request);
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
+
         if ($controllerResult instanceof Response && ($attributes['respond'] ?? false)) {
             $event->setResponse($controllerResult);
 
             return;
         }
+
         if ($controllerResult instanceof Response || !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond'))) {
             return;
         }
@@ -63,8 +81,10 @@ final class RespondListener
             'X-Frame-Options' => 'deny',
         ];
 
-        $status = null;
-        if ($this->resourceMetadataFactory && $attributes) {
+        $status = $operation ? $operation->getStatus() : null;
+
+        // TODO: remove this in 3.x
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && $attributes) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
 
             if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {
@@ -73,6 +93,23 @@ final class RespondListener
 
             $headers = $this->addAcceptPatchHeader($headers, $attributes, $resourceMetadata);
             $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
+        } elseif ($operation) {
+            if ($sunset = $operation->getSunset()) {
+                $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+            }
+
+            if ($acceptPatch = $operation->getAcceptPatch()) {
+                $headers['Accept-Patch'] = $acceptPatch;
+            }
+
+            if (
+                $this->iriConverter &&
+                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
+                && !$operation->getStatus()
+            ) {
+                $status = 301;
+                $headers['Location'] = $this->iriConverter->getIriFromItem($request->attributes->get('data'));
+            }
         }
 
         $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;

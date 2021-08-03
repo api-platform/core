@@ -155,6 +155,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $linkedOperationId = 'get'.ucfirst($resourceShortName).ucfirst(OperationType::ITEM);
             $pathItem = $paths->getPath($path) ?: new Model\PathItem();
             $forceSchemaCollection = OperationType::SUBRESOURCE === $operationType ? ($operation['collection'] ?? false) : false;
+
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
 

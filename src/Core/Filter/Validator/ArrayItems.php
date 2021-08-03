@@ -62,6 +62,7 @@ final class ArrayItems implements ValidatorInterface
 
         $collectionFormat = $filterDescription['swagger']['collectionFormat'] ?? 'csv';
 
+        /* @phpstan-ignore-next-line */
         return explode(self::getSeparator($collectionFormat), $value) ?: [];
     }
 

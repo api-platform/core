@@ -16,6 +16,10 @@ namespace ApiPlatform\Core\JsonLd\Action;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -32,13 +36,20 @@ final class ContextAction
 
     private $contextBuilder;
     private $resourceNameCollectionFactory;
+    /**
+     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
+     */
     private $resourceMetadataFactory;
 
-    public function __construct(ContextBuilderInterface $contextBuilder, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ContextBuilderInterface $contextBuilder, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory)
     {
         $this->contextBuilder = $contextBuilder;
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
     }
 
     /**
@@ -57,7 +68,16 @@ final class ContextAction
         }
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            /** @var ResourceMetadata|ResourceMetadataCollection */
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            if ($resourceMetadata instanceof ResourceMetadataCollection) {
+                try {
+                    $resourceMetadata = $resourceMetadata->getOperation();
+                } catch (OperationNotFoundException $e) {
+                    continue;
+                }
+            }
 
             if ($shortName === $resourceMetadata->getShortName()) {
                 return ['@context' => $this->contextBuilder->getResourceContext($resourceClass)];

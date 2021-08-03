@@ -17,6 +17,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -31,9 +33,17 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
     private $order;
     private $resourceMetadataFactory;
 
-    public function __construct(string $order = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    /**
+     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
+     */
+    public function __construct(string $order = null, $resourceMetadataFactory = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if ($this->resourceMetadataFactory && $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->order = $order;
     }
 
@@ -51,12 +61,21 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
         if (null !== $this->resourceMetadataFactory) {
-            $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)
-                   ->getCollectionOperationAttribute($operationName, 'order', [], true);
-            if (empty($defaultOrder)) {
-                $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+                $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+                try {
+                    $defaultOrder = isset($context['graphql_operation_name']) ? $resourceMetadataCollection->getGraphQlOperation($operationName)->getOrder() : $resourceMetadataCollection->getOperation($operationName)->getOrder();
+                } catch (OperationNotFoundException $e) {
+                    // In some cases the operation may not exist
+                    $defaultOrder = [];
+                }
+            } else {
+                // TODO: remove in 3.0
+                $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getCollectionOperationAttribute($operationName, 'order', [], true);
             }
-            if (null !== $defaultOrder) {
+
+            // TODO: 3.0 default value is [] not null
+            if (null !== $defaultOrder && [] !== $defaultOrder) {
                 foreach ($defaultOrder as $field => $order) {
                     if (\is_int($field)) {
                         // Default direction

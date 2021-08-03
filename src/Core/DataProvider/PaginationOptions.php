@@ -82,7 +82,7 @@ final class PaginationOptions
         return $this->itemsPerPage;
     }
 
-    public function getMaximumItemsPerPage(): int
+    public function getMaximumItemsPerPage(): ?int
     {
         return $this->maximumItemsPerPage;
     }

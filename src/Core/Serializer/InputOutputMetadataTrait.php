@@ -15,24 +15,61 @@ namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 trait InputOutputMetadataTrait
 {
     /**
-     * @var ResourceMetadataFactoryInterface
+     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface|null
      */
     protected $resourceMetadataFactory;
 
     protected function getInputClass(string $class, array $context = []): ?string
     {
-        return $this->getInputOutputMetadata($class, 'input', $context);
+        if (!$this->resourceMetadataFactory || !$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            return $this->getInputOutputMetadata($class, 'input', $context);
+        }
+
+        if (null !== ($context['input']['class'] ?? null)) {
+            return $context['input']['class'];
+        }
+
+        $operation = $context['operation'] ?? null;
+        if (!$operation) {
+            try {
+                $operation = $this->resourceMetadataFactory->create($class)->getOperation($context['operation_name'] ?? null);
+            } catch (OperationNotFoundException $e) {
+                return null;
+            }
+        }
+
+        return $operation ? $operation->getInput()['class'] ?? null : null;
     }
 
     protected function getOutputClass(string $class, array $context = []): ?string
     {
-        return $this->getInputOutputMetadata($class, 'output', $context);
+        if (!$this->resourceMetadataFactory || !$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            return $this->getInputOutputMetadata($class, 'output', $context);
+        }
+
+        if (null !== ($context['output']['class'] ?? null)) {
+            return $context['output']['class'];
+        }
+
+        $operation = $context['operation'] ?? null;
+        if (null === $operation) {
+            try {
+                $operation = $this->resourceMetadataFactory->create($class)->getOperation($context['operation_name'] ?? null);
+            } catch (OperationNotFoundException $e) {
+                return null;
+            }
+        }
+
+        return $operation ? $operation->getOutput()['class'] ?? null : null;
     }
 
+    // TODO: remove in 3.0
     private function getInputOutputMetadata(string $class, string $inputOrOutput, array $context)
     {
         if (null === $this->resourceMetadataFactory || null !== ($context[$inputOrOutput]['class'] ?? null)) {

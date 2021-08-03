@@ -18,8 +18,13 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use DomainException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,6 +40,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ExceptionActionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function testActionWithCatchableException()
@@ -62,13 +68,16 @@ class ExceptionActionTest extends TestCase
 
     /**
      * @dataProvider provideOperationExceptionToStatusCases
+     * @group legacy
      */
-    public function testActionWithOperationExceptionToStatus(
+    public function testLegacyActionWithOperationExceptionToStatus(
         array $globalExceptionToStatus,
         ?array $resourceExceptionToStatus,
         ?array $operationExceptionToStatus,
         int $expectedStatusCode
     ) {
+        $this->expectDeprecation('Since api-platform/core 2.7: Use "ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface" instead of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface".');
+
         $exception = new DomainException();
         $flattenException = FlattenException::create($exception);
 
@@ -102,6 +111,65 @@ class ExceptionActionTest extends TestCase
         $request->attributes->replace([
             '_api_resource_class' => 'Foo',
             '_api_item_operation_name' => 'operation',
+        ]);
+
+        $response = $exceptionAction($flattenException, $request);
+
+        $this->assertSame('', $response->getContent());
+        $this->assertSame($expectedStatusCode, $response->getStatusCode());
+        $this->assertTrue($response->headers->contains('Content-Type', 'application/problem+json; charset=utf-8'));
+        $this->assertTrue($response->headers->contains('X-Content-Type-Options', 'nosniff'));
+        $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
+    }
+
+    /**
+     * @dataProvider provideOperationExceptionToStatusCases
+     */
+    public function testActionWithOperationExceptionToStatus(
+        array $globalExceptionToStatus,
+        ?array $resourceExceptionToStatus,
+        ?array $operationExceptionToStatus,
+        int $expectedStatusCode
+    ) {
+        $exception = new DomainException();
+        $flattenException = FlattenException::create($exception);
+
+        $serializer = $this->prophesize(SerializerInterface::class);
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn();
+
+        $operation = (new Get())->withShortName('Foo');
+        $resource = (new ApiResource())->withShortName('Foo');
+        if ($resourceExceptionToStatus) {
+            $resource = $resource->withExceptionToStatus($resourceExceptionToStatus);
+            $operation = $operation->withExceptionToStatus($resourceExceptionToStatus);
+        }
+
+        if ($operationExceptionToStatus) {
+            $operation = $operation->withExceptionToStatus($operationExceptionToStatus);
+        }
+
+        $resource = $resource->withOperations(['operation' => $operation]);
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+            $resource,
+        ]));
+
+        $exceptionAction = new ExceptionAction(
+            $serializer->reveal(),
+            [
+                'jsonproblem' => ['application/problem+json'],
+                'jsonld' => ['application/ld+json'],
+            ],
+            $globalExceptionToStatus,
+            $resourceMetadataFactory->reveal()
+        );
+
+        $request = new Request();
+        $request->setFormat('jsonproblem', 'application/problem+json');
+        $request->attributes->replace([
+            '_api_resource_class' => 'Foo',
+            '_api_operation_name' => 'operation',
         ]);
 
         $response = $exceptionAction($flattenException, $request);

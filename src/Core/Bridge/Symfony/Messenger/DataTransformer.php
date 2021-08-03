@@ -15,6 +15,9 @@ namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 /**
  * Transforms an Input to itself. This gives the ability to send the Input to a
@@ -24,11 +27,20 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
  */
 final class DataTransformer implements DataTransformerInterface
 {
+    use ClassInfoTrait;
+
+    /**
+     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface
+     */
     private $resourceMetadataFactory;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct($resourceMetadataFactory)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
     }
 
     /**
@@ -50,6 +62,17 @@ final class DataTransformer implements DataTransformerInterface
             null === ($context['input']['class'] ?? null)
         ) {
             return false;
+        }
+
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            try {
+                $resourceMetadataCollection = $this->resourceMetadataFactory->create($context['resource_class'] ?? $to);
+                $operation = $resourceMetadataCollection->getOperation($context['operation_name'] ?? null);
+
+                return 'input' === $operation->getMessenger();
+            } catch (OperationNotFoundException $e) {
+                return false;
+            }
         }
 
         $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? $to);

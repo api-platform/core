@@ -23,6 +23,10 @@ use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FooDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,7 +41,7 @@ class EntrypointNormalizerTest extends TestCase
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
 
-        $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
@@ -49,7 +53,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
-    public function testNormalize()
+    public function testNormalizeWithResourceMetadata()
     {
         $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
         $entrypoint = new Entrypoint($collection);
@@ -57,6 +61,44 @@ class EntrypointNormalizerTest extends TestCase
         $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
         $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadata('FooDummy', null, null, null, ['get']))->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(FooDummy::class)->willReturn('/api/foo_dummies')->shouldBeCalled();
+
+        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/api')->shouldBeCalled();
+        $urlGeneratorProphecy->generate('api_jsonld_context', ['shortName' => 'Entrypoint'])->willReturn('/context/Entrypoint')->shouldBeCalled();
+
+        $normalizer = new EntrypointNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
+
+        $expected = [
+            '@context' => '/context/Entrypoint',
+            '@id' => '/api',
+            '@type' => 'Entrypoint',
+            'dummy' => '/api/dummies',
+            'fooDummy' => '/api/foo_dummies',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+    }
+
+    public function testNormalizeWithResourceCollection()
+    {
+        $collection = new ResourceNameCollection([FooDummy::class, Dummy::class]);
+        $entrypoint = new Entrypoint($collection);
+
+        $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factoryProphecy->create(Dummy::class)->willReturn(
+            new ResourceMetadataCollection(Dummy::class, [
+                (new ApiResource())->withUriTemplate('Dummy')->withShortName('dummy')->withOperations(['get' => (new Get())->withCollection(true)]),
+            ])
+        )->shouldBeCalled();
+
+        $factoryProphecy->create(FooDummy::class)->willReturn(
+            new ResourceMetadataCollection(FooDummy::class, [
+                (new ApiResource())->withUriTemplate('FooDummy')->withShortName('fooDummy')->withOperations(['get' => (new Get())->withCollection(true)]),
+            ])
+        )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();

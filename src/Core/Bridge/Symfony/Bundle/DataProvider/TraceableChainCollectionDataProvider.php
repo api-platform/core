@@ -16,15 +16,17 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider;
 use ApiPlatform\Core\DataProvider\ChainCollectionDataProvider;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\RestrictDataProviderTrait;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
  */
-final class TraceableChainCollectionDataProvider implements ContextAwareCollectionDataProviderInterface
+final class TraceableChainCollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
-    private $dataProviders = [];
+    use RestrictDataProviderTrait;
+
     private $context = [];
     private $providersResponse = [];
 

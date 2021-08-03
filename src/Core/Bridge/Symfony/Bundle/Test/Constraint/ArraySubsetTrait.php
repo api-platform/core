@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint;
 
-use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\SebastianBergmann\Comparator\ComparisonFailure;
 
 /**

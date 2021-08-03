@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -54,13 +57,26 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
 
         foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($this->paths) as $className => $reflectionClass) {
             if (
-                (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(ApiResource::class)) ||
-                (null !== $this->reader && $this->reader->getClassAnnotation($reflectionClass, ApiResource::class))
+                (\PHP_VERSION_ID >= 80000 && $this->isResource($reflectionClass)) ||
+                (null !== $this->reader && $this->reader->getClassAnnotation($reflectionClass, ApiResourceAnnotation::class))
             ) {
                 $classes[$className] = true;
             }
         }
 
         return new ResourceNameCollection(array_keys($classes));
+    }
+
+    private function isResource(\ReflectionClass $reflectionClass): bool
+    {
+        if ($reflectionClass->getAttributes(ApiResourceAnnotation::class) || $reflectionClass->getAttributes(ApiResource::class)) {
+            return true;
+        }
+
+        if ($reflectionClass->getAttributes(Operation::class, \ReflectionAttribute::IS_INSTANCEOF) || $reflectionClass->getAttributes(GraphQlOperation::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+            return true;
+        }
+
+        return false;
     }
 }

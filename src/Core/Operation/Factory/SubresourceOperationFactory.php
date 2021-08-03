@@ -37,6 +37,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
 
     public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PathSegmentNameGeneratorInterface $pathSegmentNameGenerator, IdentifiersExtractorInterface $identifiersExtractor = null)
     {
+        trigger_deprecation('api-platform/core', '2.7', 'Subresources are deprecated, use alternate URLs instead.');
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;

@@ -11,8 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\ArgumentResolver;
+namespace ApiPlatform\Exception;
 
-interface ResourceInterface
+/**
+ * Base exception interface.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+interface ExceptionInterface extends \Throwable
 {
 }

@@ -11,13 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\ArgumentResolver;
+namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\Put;
 
-/**
- * @ApiResource
- */
+#[Put]
 class ResourceImplementation implements ResourceInterface
 {
 }

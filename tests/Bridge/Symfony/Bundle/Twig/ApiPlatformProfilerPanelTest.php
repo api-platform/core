@@ -174,7 +174,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertSame('get', $tabContent->filter('table:nth-of-type(2) th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('_api_/dummies.{_format}_get_collection', $tabContent->filter('table:nth-of-type(2) th.status-success')->html(), 'The actual operation should be highlighted.');
         $this->assertEmpty($tabContent->filter('table:not(:nth-of-type(2)) .status-success'), 'Only the actual operation should be highlighted.');
 
         // Data provider tab
@@ -200,7 +200,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertSame('post', $tabContent->filter('table:nth-of-type(2) th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('_api_/dummies.{_format}_post_collection', $tabContent->filter('table:nth-of-type(2) th.status-success')->html(), 'The actual operation should be highlighted.');
         $this->assertEmpty($tabContent->filter('table:not(:nth-of-type(2)) .status-success'), 'Only the actual operation should be highlighted.');
 
         // Data provider tab
@@ -235,7 +235,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertSame('get', $tabContent->filter('table:nth-of-type(1) th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('_api_/dummies/{id}.{_format}_get', $tabContent->filter('table:nth-of-type(1) th.status-success')->html(), 'The actual operation should be highlighted.');
         $this->assertEmpty($tabContent->filter('table:not(:nth-of-type(1)) .status-success'), 'Only the actual operation should be highlighted.');
 
         // Data provider tab

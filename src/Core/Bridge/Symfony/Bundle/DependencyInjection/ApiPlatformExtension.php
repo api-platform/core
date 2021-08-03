@@ -129,6 +129,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerSecurityConfiguration($container, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($container, $loader);
+        $this->registerLegacyServices($container, $config);
 
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
             ->addTag('api_platform.data_persister');
@@ -147,6 +148,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.xml');
         $loader->load('data_persister.xml');
         $loader->load('data_provider.xml');
+        $loader->load('state.xml');
         $loader->load('filter.xml');
 
         $container->getDefinition('api_platform.operation_method_resolver')
@@ -262,6 +264,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         $loader->load('metadata/metadata.xml');
+        $loader->load('metadata/resource_collection.xml');
         $loader->load('metadata/xml.xml');
 
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
@@ -297,7 +300,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $dirname = $bundle['path'];
             foreach (['.yaml', '.yml', '.xml', ''] as $extension) {
                 $paths[] = "$dirname/Resources/config/api_resources$extension";
-                $paths[] = "$dirname/config/api_resources$extension";
             }
             if ($this->isConfigEnabled($container, $config['doctrine'])) {
                 $paths[] = "$dirname/Entity";
@@ -757,6 +759,22 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerArgumentResolverConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
     {
         $loader->load('argument_resolver.xml');
+    }
+
+    private function registerLegacyServices(ContainerBuilder $container, array $config): void
+    {
+        if (!$config['metadata_backward_compatibility_layer']) {
+            return;
+        }
+
+        $container->removeDefinition('api_platform.identifiers_extractor');
+        $container->setAlias('api_platform.identifiers_extractor', 'api_platform.identifiers_extractor.legacy');
+
+        $container->removeDefinition('api_platform.iri_converter');
+        $container->setAlias('api_platform.iri_converter', 'api_platform.iri_converter.legacy');
+
+        $container->removeDefinition('api_platform.openapi.factory');
+        $container->setAlias('api_platform.openapi.factory', 'api_platform.openapi.factory.legacy');
     }
 
     private function buildDeprecationArgs(string $version, string $message): array

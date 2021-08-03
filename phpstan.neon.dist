@@ -11,15 +11,15 @@ parameters:
 	bootstrapFiles:
 		- vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
-		- src/Bridge/Symfony/Bundle/Test/Constraint/ArraySubset.php
+		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludes_analyse:
 		# Symfony cache
 		- tests/Fixtures/app/var/cache
 		# Deprecated integrations (will be removed in API Platform 3)
-		- src/Bridge/NelmioApiDoc/*
+		- src/Core/Bridge/NelmioApiDoc/*
 		- tests/Bridge/NelmioApiDoc/*
-		- src/Bridge/FosUser/*
+		- src/Core/Bridge/FosUser/*
 		# BC layer
 		- tests/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
 		- tests/Annotation/ApiResourceTest.php
@@ -27,22 +27,25 @@ parameters:
 		- tests/Metadata/Resource/Factory/AnnotationResourceMetadataFactoryTest.php
 		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
-		- src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
 		# Phpstan runs on phpunit > 9, a signature changed in this file
-		- src/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
+		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Imported code (temporary)
-		- src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
+		- src/Core/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
 		- tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/ProphecyTrait.php
 		- tests/Behat/CoverageContext.php
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
-		- src/Bridge/Symfony/Maker/Resources/skeleton
+		- src/Core/Bridge/Symfony/Maker/Resources/skeleton
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
+		ApiPlatform\Metadata\Resource\ResourceMetadataCollection:
+			- handleNotFound 
 	ignoreErrors:
 		# False positives
+		- '#Parameter \#1 \$callback of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
 		-
 			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
 			paths:
@@ -51,15 +54,15 @@ parameters:
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
-				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php
+				- src/Core/Bridge/Doctrine/Common/PropertyHelperTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
-			path: src/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
+			path: src/Core/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
-			path: src/EventListener/AddFormatListener.php
+			path: src/Core/EventListener/AddFormatListener.php
 		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
 		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
 		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
@@ -76,7 +79,7 @@ parameters:
 		# https://github.com/phpstan/phpstan-doctrine/issues/115
 		-
 			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
-			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
+			path: src/Core/Test/DoctrineMongoDbOdmFilterTestCase.php
 		-
 			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
 			path: tests/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php

@@ -88,6 +88,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue('0.0.0')
                 ->end()
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
+                ->booleanNode('metadata_backward_compatibility_layer')->defaultTrue()->info('If true, declared services are using legacy interfaces for the following services: "api_platform.iri_converter", "api_platform.openapi.factory", "api_platform.identifiers_extractor".')->end()
                 ->scalarNode('default_operation_path_resolver')
                     ->defaultValue('api_platform.operation_path_resolver.underscore')
                     ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The use of the `default_operation_path_resolver` has been deprecated in 2.1 and will be removed in 3.0. Use `path_segment_name_generator` instead.'))

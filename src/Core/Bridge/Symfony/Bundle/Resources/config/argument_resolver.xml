@@ -6,7 +6,7 @@
 
     <services>
         <service id="api_platform.argument_resolver.payload" class="ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.serializer.context_builder" />
 
             <tag name="controller.argument_value_resolver" />

@@ -128,8 +128,8 @@
                 <h3 class="tab-title">Resource Metadata</h3>
                 <div class="tab-content">
                     <h3>Short name: "{{ collector.resourceMetadata.shortName }}"</h3>
-                    {{ apiPlatform.operationTable(collector.resourceMetadata.itemOperations, 'item', collector.requestAttributes.item_operation_name|default('')) }}
-                    {{ apiPlatform.operationTable(collector.resourceMetadata.collectionOperations, 'collection', collector.requestAttributes.collection_operation_name|default('')) }}
+                    {{ apiPlatform.operationTable(collector.resourceMetadata.itemOperations, 'item', collector.requestAttributes.operation_name|default('')) }}
+                    {{ apiPlatform.operationTable(collector.resourceMetadata.collectionOperations, 'collection', collector.requestAttributes.operation_name|default('')) }}
                     <table>
                         <thead>
                             <tr>
@@ -198,3 +198,4 @@
         </div>
     {% endif %}
 {% endblock %}
+

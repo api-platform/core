@@ -15,6 +15,9 @@ namespace ApiPlatform\Core\Mercure\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\CorsTrait;
+use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -28,16 +31,28 @@ use Symfony\Component\Mercure\Discovery;
 final class AddLinkHeaderListener
 {
     use CorsTrait;
+    use OperationRequestInitiatorTrait;
 
+    /**
+     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface
+     */
     private $resourceMetadataFactory;
     private $discovery;
 
     /**
      * @param Discovery|string $discovery
      */
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, $discovery)
+    public function __construct($resourceMetadataFactory, $discovery)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
+        if ($resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
+        }
+
         $this->discovery = $discovery;
     }
 
@@ -51,10 +66,22 @@ final class AddLinkHeaderListener
             return;
         }
 
+        $operation = $this->initializeOperation($request);
+
         if (
             null === ($resourceClass = $request->attributes->get('_api_resource_class')) ||
-            false === ($mercure = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false))
+            !($attributes = RequestAttributesExtractor::extractAttributes($request))
         ) {
+            return;
+        }
+
+        $mercure = $operation ? $operation->getMercure() : ($attributes['mercure'] ?? false);
+        // TODO: remove in 3.0
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            $mercure = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
+        }
+
+        if (!$mercure) {
             return;
         }
 

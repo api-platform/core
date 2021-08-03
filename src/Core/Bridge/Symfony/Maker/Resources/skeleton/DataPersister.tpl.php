@@ -1,25 +1,26 @@
-<?= "<?php\n" ?>
+<?php declare(strict_types=1);
+echo "<?php\n"; ?>
 
-namespace <?= $namespace ?>;
+namespace <?php echo $namespace; ?>;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
-<?php if (null !== $resource_class): ?>
-use <?= $resource_full_class_name ?>;
-<?php endif; ?>
+<?php if (null !== $resource_class) { ?>
+use <?php echo $resource_full_class_name; ?>;
+<?php } ?>
 
-final class <?= $class_name ?> implements ContextAwareDataPersisterInterface, ResumableDataPersisterInterface
+final class <?php echo $class_name; ?> implements ContextAwareDataPersisterInterface, ResumableDataPersisterInterface
 {
     /**
      * {@inheritdoc}
      */
     public function supports($data, array $context = []): bool
     {
-<?php if (null !== $resource_class): ?>
-        return $data instanceof <?= $resource_class ?>::class; // Add your custom conditions here
-<?php else : ?>
+<?php if (null !== $resource_class) { ?>
+        return $data instanceof <?php echo $resource_class; ?>::class; // Add your custom conditions here
+<?php } else { ?>
         return false; // Add your custom conditions here
-<?php endif; ?>
+<?php } ?>
     }
 
     /**
