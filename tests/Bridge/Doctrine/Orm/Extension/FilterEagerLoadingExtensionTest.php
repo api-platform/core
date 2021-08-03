@@ -414,12 +414,21 @@ SQL;
 
         $qb = new QueryBuilder($em->reveal());
 
+        $carJoin = new Expr\Join(
+            Expr\Join::LEFT_JOIN,
+            DummyCar::class,
+            'car',
+            'WITH',
+            'car.id = o.car',
+            null
+        );
+
         $qb->select('o')
             ->from(CompositeRelation::class, 'o')
             ->innerJoin('o.compositeItem', 'item')
             ->innerJoin('o.compositeLabel', 'label')
             ->leftJoin('o.foo', 'foo', 'WITH', 'o.bar = item.foo')
-            ->leftJoin(DummyCar::class, 'car', 'WITH', 'car.id = o.car')
+            ->add('join', ['o' => $carJoin], true)
             ->where('item.field1 = :foo')
             ->setParameter('foo', 1);
 
