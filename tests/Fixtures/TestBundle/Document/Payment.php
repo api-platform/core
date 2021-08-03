@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\Payment\VoidPaymentAction;
+use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Payment\VoidPaymentAction;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**

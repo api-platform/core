@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
+use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
 
 /**
  * Resolver for custom mutation (item not received and no result sent).

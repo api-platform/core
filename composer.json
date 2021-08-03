@@ -118,7 +118,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "ApiPlatform\\Core\\Tests\\": "tests/",
+            "ApiPlatform\\Core\\Tests\\": "tests/Core/",
+            "ApiPlatform\\Tests\\": "tests/",
             "App\\": "tests/Fixtures/app/var/tmp/src/"
         }
     },

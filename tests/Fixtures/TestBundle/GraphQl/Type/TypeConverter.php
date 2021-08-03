@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type;
 
-use ApiPlatform\Core\GraphQl\Type\TypeConverterInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\GraphQl\Type\TypeConverterInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Symfony\Component\PropertyInfo\Type;
 

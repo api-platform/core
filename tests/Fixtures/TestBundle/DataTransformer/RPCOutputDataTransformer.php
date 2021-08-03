@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RPC as RPCDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RPCOutput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RPC;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\RPC as RPCDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RPCOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RPC;
 
 final class RPCOutputDataTransformer implements DataTransformerInterface
 {

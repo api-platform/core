@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackToSameClass as DummyDtoOutputFallbackToSameClassDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDtoDummy;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackToSameClass as DummyDtoOutputFallbackToSameClassDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDtoDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 
 /**
  * @author Daniel West <daniel@silverback.is>

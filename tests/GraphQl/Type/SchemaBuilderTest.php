@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\GraphQl\Type\FieldsBuilderInterface;
-use ApiPlatform\Core\GraphQl\Type\SchemaBuilder;
-use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
-use ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
+use ApiPlatform\GraphQl\Type\SchemaBuilder;
+use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -45,7 +45,7 @@ class SlugChildDummy
     private $slug;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SlugParentDummy", inversedBy="childDummies")
+     * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy", inversedBy="childDummies")
      * @ORM\JoinColumn(name="parent_dummy_id", referencedColumnName="id")
      *
      * @ApiSubresource

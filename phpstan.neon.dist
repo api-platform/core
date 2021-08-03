@@ -18,13 +18,13 @@ parameters:
 		- tests/Fixtures/app/var/cache
 		# Deprecated integrations (will be removed in API Platform 3)
 		- src/Core/Bridge/NelmioApiDoc/*
-		- tests/Bridge/NelmioApiDoc/*
+		- tests/Core/Bridge/NelmioApiDoc/*
 		- src/Core/Bridge/FosUser/*
 		# BC layer
-		- tests/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
-		- tests/Annotation/ApiResourceTest.php
-		- tests/Annotation/ApiPropertyTest.php
-		- tests/Metadata/Resource/Factory/AnnotationResourceMetadataFactoryTest.php
+		- tests/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
+		- tests/Core/Annotation/ApiResourceTest.php
+		- tests/Core/Annotation/ApiPropertyTest.php
+		- tests/Core/Metadata/Resource/Factory/AnnotationResourceMetadataFactoryTest.php
 		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
 		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
@@ -32,9 +32,9 @@ parameters:
 		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Imported code (temporary)
 		- src/Core/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
-		- tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
-		- tests/ProphecyTrait.php
-		- tests/Behat/CoverageContext.php
+		- tests/Core/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
+		- tests/Core/ProphecyTrait.php
+		- tests/Core/Behat/CoverageContext.php
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
 		- src/Core/Bridge/Symfony/Maker/Resources/skeleton
@@ -53,7 +53,7 @@ parameters:
 		-
 			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
 			paths:
-				- tests/Bridge/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
+				- tests/Core/Bridge/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
 		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
@@ -73,27 +73,27 @@ parameters:
 		-
 			message: '#Parameter \#[0-9] \$filterLocator of class .+ constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface, ArrayObject<mixed, mixed> given\.#'
 			paths:
-				- tests/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
-				- tests/Hydra/Serializer/CollectionFiltersNormalizerTest.php
-				- tests/Swagger/Serializer/DocumentationNormalizerV2Test.php
-				- tests/Swagger/Serializer/DocumentationNormalizerV3Test.php
+				- tests/Core/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
+				- tests/Core/Hydra/Serializer/CollectionFiltersNormalizerTest.php
+				- tests/Core/Swagger/Serializer/DocumentationNormalizerV2Test.php
+				- tests/Core/Swagger/Serializer/DocumentationNormalizerV3Test.php
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: tests/GraphQl/Type/TypeBuilderTest.php
 		# https://github.com/phpstan/phpstan-doctrine/issues/115
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
 			path: src/Core/Test/DoctrineMongoDbOdmFilterTestCase.php
 		-
 			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-			path: tests/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
+			path: tests/Core/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
 		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
-			path: tests/Identifier/Normalizer/IntegerDenormalizerTest.php
+			path: tests/Core/Identifier/Normalizer/IntegerDenormalizerTest.php
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
-			path: tests/Util/SortTraitTest.php
+			path: tests/Core/Util/SortTraitTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
@@ -124,4 +124,4 @@ parameters:
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+			path: tests/Core/JsonApi/Serializer/ItemNormalizerTest.php

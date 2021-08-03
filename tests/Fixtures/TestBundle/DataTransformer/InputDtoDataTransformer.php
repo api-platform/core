@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyDtoInputOutputDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyDtoInputOutputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 
 final class InputDtoDataTransformer implements DataTransformerInterface
 {

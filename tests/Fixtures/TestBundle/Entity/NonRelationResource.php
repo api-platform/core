@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\NonResourceClass;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\NonResourceClass;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

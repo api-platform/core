@@ -1,5 +1,5 @@
 resources:
-    'ApiPlatform\Core\Tests\Fixtures\DummyResourceInterface':
+    'ApiPlatform\Tests\Fixtures\DummyResourceInterface':
         properties:
             something:
                 identifier: true

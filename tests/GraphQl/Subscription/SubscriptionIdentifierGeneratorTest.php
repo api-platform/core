@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
 
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGenerator;
+use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGenerator;
 use PHPUnit\Framework\TestCase;
 
 /**

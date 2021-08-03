@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\InitializeInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;
 
 final class InitializeInputDataTransformer implements DataTransformerInitializerInterface
 {

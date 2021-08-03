@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures;
+namespace ApiPlatform\Tests\Fixtures;
 
 /**
  * Replace Doctrine\ORM\Query in tests because it cannot be mocked.

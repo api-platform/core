@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\SerializableResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**

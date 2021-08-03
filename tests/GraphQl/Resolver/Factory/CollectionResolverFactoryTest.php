@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\Factory\CollectionResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Factory\CollectionResolverFactory;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;

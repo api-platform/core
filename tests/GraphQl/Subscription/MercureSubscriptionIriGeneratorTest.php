@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
 
-use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGenerator;
+use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGenerator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mercure\Hub;
 use Symfony\Component\Mercure\HubRegistry;

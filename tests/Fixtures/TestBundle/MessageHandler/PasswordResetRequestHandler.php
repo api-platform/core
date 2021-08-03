@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\MessageHandler;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\MessageHandler;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 

@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;

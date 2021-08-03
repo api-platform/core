@@ -1,6 +1,6 @@
 resources:
-    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy': ~
-    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
+    'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy': ~
+    'ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
         shortName: 'thedummyshortname'
         description: 'Dummy resource'
         itemOperations:
@@ -26,7 +26,7 @@ resources:
                 groups: ['default']
             hydra_context:
                 '@type': 'hydra:Operation'
-                '@hydra:title': !php/const ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::HYDRA_TITLE
+                '@hydra:title': !php/const ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy::HYDRA_TITLE
             stateless: true
         iri: 'someirischema'
         properties:

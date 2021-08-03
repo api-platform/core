@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter;
 
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 

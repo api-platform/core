@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\State;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\AttributeResources;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class AttributeResourceProvider implements ProviderInterface
 {

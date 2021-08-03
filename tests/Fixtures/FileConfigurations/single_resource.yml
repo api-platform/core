@@ -1,4 +1,4 @@
-'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
+'ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
     shortName: 'thedummyshortname'
     description: 'Dummy resource'
     itemOperations:

@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 
 final class DoubleBatAction
 {

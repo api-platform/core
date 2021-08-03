@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
 
-use ApiPlatform\Core\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use GraphQL\Error\Error;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

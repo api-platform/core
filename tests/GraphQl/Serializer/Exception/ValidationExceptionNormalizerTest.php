@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
-use ApiPlatform\Core\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
 use GraphQL\Error\Error;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;

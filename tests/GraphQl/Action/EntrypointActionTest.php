@@ -11,17 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Action;
+namespace ApiPlatform\Tests\GraphQl\Action;
 
-use ApiPlatform\Core\GraphQl\Action\EntrypointAction;
-use ApiPlatform\Core\GraphQl\Action\GraphiQlAction;
-use ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction;
-use ApiPlatform\Core\GraphQl\Error\ErrorHandler;
-use ApiPlatform\Core\GraphQl\ExecutorInterface;
-use ApiPlatform\Core\GraphQl\Serializer\Exception\ErrorNormalizer;
-use ApiPlatform\Core\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
-use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Action\EntrypointAction;
+use ApiPlatform\GraphQl\Action\GraphiQlAction;
+use ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction;
+use ApiPlatform\GraphQl\Error\ErrorHandler;
+use ApiPlatform\GraphQl\ExecutorInterface;
+use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
+use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;

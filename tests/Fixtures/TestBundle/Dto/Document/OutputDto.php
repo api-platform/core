@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as DocumentRelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as DocumentRelatedDummy;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataProvider\ArrayPaginator;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyDtoInputOutputDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyDtoInputOutputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 
 final class OutputDtoDataTransformer implements DataTransformerInterface
 {

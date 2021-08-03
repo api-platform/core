@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Core\Tests\Behat\DoctrineContext;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
+use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\Common\Inflector\Inflector;

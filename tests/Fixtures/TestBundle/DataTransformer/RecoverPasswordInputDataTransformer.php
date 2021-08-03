@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User as UserDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\User;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 
 final class RecoverPasswordInputDataTransformer implements DataTransformerInterface
 {

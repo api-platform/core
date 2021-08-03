@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Validator;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;

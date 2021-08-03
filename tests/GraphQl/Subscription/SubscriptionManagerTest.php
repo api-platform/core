@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManager;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
