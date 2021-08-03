@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManager;
@@ -189,8 +189,8 @@ class SubscriptionManagerTest extends TestCase
         ]);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
 
-        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update', ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']);
-        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update', ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['resultBar', 'clientSubscriptionId' => 'client-subscription-id']);
+        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update_subscription', ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']);
+        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update_subscription', ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['resultBar', 'clientSubscriptionId' => 'client-subscription-id']);
 
         $this->assertSame([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
     }

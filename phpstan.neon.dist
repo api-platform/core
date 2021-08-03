@@ -46,6 +46,10 @@ parameters:
 	ignoreErrors:
 		# False positives
 		- '#Parameter \#1 \$callback of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
+		- 
+			message: '#Unreachable statement - code above always terminates.#'
+			paths:
+				- tests/GraphQl/Resolver/Stage/SecurityPostDenormalizeStageTest.php
 		-
 			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
 			paths:

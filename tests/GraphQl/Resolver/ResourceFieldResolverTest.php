@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -31,7 +32,7 @@ class ResourceFieldResolverTest extends TestCase
     public function testId()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getItemIriFromResourceClass(Dummy::class, ['id' => 1])->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => ['id' => 1], 'force_collection' => false])->willReturn('/dummies/1')->shouldBeCalled();
 
         $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 

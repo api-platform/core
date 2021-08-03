@@ -25,10 +25,15 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
@@ -56,7 +61,7 @@ class FieldsBuilderTest extends TestCase
     private $propertyMetadataFactoryProphecy;
 
     /** @var ObjectProphecy */
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
 
     /** @var ObjectProphecy */
     private $typesContainerProphecy;
@@ -92,7 +97,7 @@ class FieldsBuilderTest extends TestCase
     {
         $this->propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $this->propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
         $this->typeBuilderProphecy = $this->prophesize(TypeBuilderInterface::class);
         $this->typeConverterProphecy = $this->prophesize(TypeConverterInterface::class);
@@ -106,7 +111,7 @@ class FieldsBuilderTest extends TestCase
 
     private function buildFieldsBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): FieldsBuilder
     {
-        return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->itemSubscriptionResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination($this->resourceMetadataFactoryProphecy->reveal()), $advancedNameConverter ?? new CustomConverter(), '__');
+        return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->itemSubscriptionResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal()), $advancedNameConverter ?? new CustomConverter(), '__');
     }
 
     public function testGetNodeQueryFields(): void
@@ -136,15 +141,15 @@ class FieldsBuilderTest extends TestCase
     /**
      * @dataProvider itemQueryFieldsProvider
      */
-    public function testGetItemQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
+    public function testGetItemQueryFields(string $resourceClass, Operation $operation, string $queryName, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, null, null, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$queryName => $operation])]));
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $queryName)->willReturn($resolver);
 
-        $queryFields = $this->fieldsBuilder->getItemQueryFields($resourceClass, $resourceMetadata, $queryName, $configuration);
+        $queryFields = $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $queryName, $configuration);
 
         $this->assertEquals($expectedQueryFields, $queryFields);
     }
@@ -152,8 +157,8 @@ class FieldsBuilderTest extends TestCase
     public function itemQueryFieldsProvider(): array
     {
         return [
-            'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal standard type case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], GraphQLType::string(), null,
+            'no resource field configuration' => ['resourceClass', (new Query()), 'action', [], null, null, []],
+            'nominal standard type case with deprecation reason and description' => ['resourceClass', (new Query())->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), 'action', [], GraphQLType::string(), null,
                 [
                     'actionShortName' => [
                         'type' => GraphQLType::string(),
@@ -166,7 +171,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'nominal item case' => ['resourceClass', new ResourceMetadata('ShortName'), 'action', [], $graphqlType = new ObjectType(['name' => 'item']), $resolver = function () {
+            'nominal item case' => ['resourceClass', (new Query())->withShortName('ShortName'), 'action', [], $graphqlType = new ObjectType(['name' => 'item']), $resolver = function () {
             },
                 [
                     'actionShortName' => [
@@ -181,7 +186,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'empty overridden args and add fields' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'item_query', ['args' => [], 'name' => 'customActionName'], GraphQLType::string(), null,
+                'resourceClass', (new Query())->withShortName('ShortName'), 'item_query', ['args' => [], 'name' => 'customActionName'], GraphQLType::string(), null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -194,7 +199,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'override args with custom ones' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'item_query', ['args' => ['customArg' => ['type' => 'a type']]], GraphQLType::string(), null,
+                'resourceClass', (new Query())->withShortName('ShortName'), 'item_query', ['args' => ['customArg' => ['type' => 'a type']]], GraphQLType::string(), null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -215,13 +220,13 @@ class FieldsBuilderTest extends TestCase
     /**
      * @dataProvider collectionQueryFieldsProvider
      */
-    public function testGetCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
+    public function testGetCollectionQueryFields(string $resourceClass, Operation $operation, string $queryName, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, null, null, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $queryName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(true);
         $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $queryName)->willReturn($graphqlType);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$queryName => $operation])]));
         $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $queryName)->willReturn($resolver);
         $this->filterLocatorProphecy->has('my_filter')->willReturn(true);
         $filterProphecy = $this->prophesize(FilterInterface::class);
@@ -237,7 +242,7 @@ class FieldsBuilderTest extends TestCase
         $this->typesContainerProphecy->set('ShortNameFilter_dateField', Argument::type(ListOfType::class));
         $this->typesContainerProphecy->set('ShortNameFilter_parent__child', Argument::type(ListOfType::class));
 
-        $queryFields = $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $resourceMetadata, $queryName, $configuration);
+        $queryFields = $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $queryName, $configuration);
 
         $this->assertEquals($expectedQueryFields, $queryFields);
     }
@@ -245,8 +250,8 @@ class FieldsBuilderTest extends TestCase
     public function collectionQueryFieldsProvider(): array
     {
         return [
-            'no resource field configuration' => ['resourceClass', new ResourceMetadata(), 'action', [], null, null, []],
-            'nominal collection case with deprecation reason and description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful', 'description' => 'Custom description.']]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'no resource field configuration' => ['resourceClass', new Query(), 'action', [], null, null, []],
+            'nominal collection case with deprecation reason and description' => ['resourceClass', (new Query())->withCollection(true)->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -275,7 +280,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with filters' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with filters' => ['resourceClass', (new Query())->withShortName('ShortName')->withCollection(true)->withFilters(['my_filter']), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -309,7 +314,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection empty overridden args and add fields' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', (new Query())->withCollection(true)->withShortName('ShortName')->withArgs([]), 'action', ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -323,7 +328,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection override args with custom ones' => [
-                'resourceClass', new ResourceMetadata('ShortName'), 'action', ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', (new Query())->withCollection(true)->withShortName('ShortName'), 'action', ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -339,7 +344,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with page-based pagination enabled' => ['resourceClass', (new ResourceMetadata('ShortName', null, null, null, null, ['pagination_type' => 'page']))->withGraphql(['action' => ['filters' => ['my_filter']]]), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+            'collection with page-based pagination enabled' => ['resourceClass', (new Query())->withCollection(true)->withShortName('ShortName')->withPaginationType('page')->withFilters(['my_filter']), 'action', [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
             },
                 [
                     'actionShortNames' => [
@@ -366,16 +371,16 @@ class FieldsBuilderTest extends TestCase
     /**
      * @dataProvider mutationFieldsProvider
      */
-    public function testGetMutationFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $mutationName, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $mutationResolver, array $expectedMutationFields): void
+    public function testGetMutationFields(string $resourceClass, Operation $operation, string $mutationName, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $mutationResolver, array $expectedMutationFields): void
     {
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, null, $mutationName, null, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, null, $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $mutationName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, $mutationName, $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
         $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $mutationName)->willReturn($graphqlType);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$mutationName => $operation])]));
         $this->itemMutationResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $mutationName)->willReturn($mutationResolver);
 
-        $mutationFields = $this->fieldsBuilder->getMutationFields($resourceClass, $resourceMetadata, $mutationName);
+        $mutationFields = $this->fieldsBuilder->getMutationFields($resourceClass, $operation, $mutationName);
 
         $this->assertEquals($expectedMutationFields, $mutationFields);
     }
@@ -383,7 +388,7 @@ class FieldsBuilderTest extends TestCase
     public function mutationFieldsProvider(): array
     {
         return [
-            'nominal case with deprecation reason' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['deprecation_reason' => 'not useful']]), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
+            'nominal case with deprecation reason' => ['resourceClass', (new Mutation())->withShortName('ShortName')->withDeprecationReason('not useful'), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
             },
                 [
                     'actionShortName' => [
@@ -403,7 +408,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'custom description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withGraphql(['action' => ['description' => 'Custom description.']]), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
+            'custom description' => ['resourceClass', (new Mutation())->withShortName('ShortName')->withDescription('Custom description.'), 'action', $graphqlType = new ObjectType(['name' => 'mutation']), $inputGraphqlType = new ObjectType(['name' => 'input']), $mutationResolver = function () {
             },
                 [
                     'actionShortName' => [
@@ -429,16 +434,16 @@ class FieldsBuilderTest extends TestCase
     /**
      * @dataProvider subscriptionFieldsProvider
      */
-    public function testGetSubscriptionFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $subscriptionName, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $subscriptionResolver, array $expectedSubscriptionFields): void
+    public function testGetSubscriptionFields(string $resourceClass, Operation $operation, string $subscriptionName, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $subscriptionResolver, array $expectedSubscriptionFields): void
     {
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, null, null, $subscriptionName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, null, $subscriptionName, $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, $subscriptionName, $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, $subscriptionName, $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
         $this->typeBuilderProphecy->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $subscriptionName)->willReturn($graphqlType);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$subscriptionName => $operation])]));
         $this->itemSubscriptionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $subscriptionName)->willReturn($subscriptionResolver);
 
-        $subscriptionFields = $this->fieldsBuilder->getSubscriptionFields($resourceClass, $resourceMetadata, $subscriptionName);
+        $subscriptionFields = $this->fieldsBuilder->getSubscriptionFields($resourceClass, $operation, $subscriptionName);
 
         $this->assertEquals($expectedSubscriptionFields, $subscriptionFields);
     }
@@ -446,9 +451,9 @@ class FieldsBuilderTest extends TestCase
     public function subscriptionFieldsProvider(): array
     {
         return [
-            'mercure not enabled' => ['resourceClass', new ResourceMetadata('ShortName'), 'action', new ObjectType(['name' => 'subscription']), new ObjectType(['name' => 'input']), null, [],
+            'mercure not enabled' => ['resourceClass', (new Subscription())->withShortName('ShortName'), 'action', new ObjectType(['name' => 'subscription']), new ObjectType(['name' => 'input']), null, [],
             ],
-            'nominal case with deprecation reason' => ['resourceClass', (new ResourceMetadata('ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['deprecation_reason' => 'not useful']]), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
+            'nominal case with deprecation reason' => ['resourceClass', (new Subscription())->withShortName('ShortName')->withMercure(true)->withDeprecationReason('not useful'), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
             },
                 [
                     'actionShortNameSubscribe' => [
@@ -468,7 +473,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'custom description' => ['resourceClass', (new ResourceMetadata('ShortName'))->withAttributes(['mercure' => true])->withGraphql(['action' => ['description' => 'Custom description.']]), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
+            'custom description' => ['resourceClass', (new Subscription())->withShortName('ShortName')->withMercure(true)->withDescription('Custom description.'), 'action', $graphqlType = new ObjectType(['name' => 'subscription']), $inputGraphqlType = new ObjectType(['name' => 'input']), $subscriptionResolver = function () {
             },
                 [
                     'actionShortNameSubscribe' => [
@@ -494,35 +499,40 @@ class FieldsBuilderTest extends TestCase
     /**
      * @dataProvider resourceObjectTypeFieldsProvider
      */
-    public function testGetResourceObjectTypeFields(string $resourceClass, ResourceMetadata $resourceMetadata, array $properties, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?AdvancedNameConverterInterface $advancedNameConverter = null): void
+    public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?AdvancedNameConverterInterface $advancedNameConverter = null): void
     {
         $this->propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection(array_keys($properties)));
         foreach ($properties as $propertyName => $propertyMetadata) {
-            $this->propertyMetadataFactoryProphecy->create($resourceClass, $propertyName, ['graphql_operation_name' => $queryName ?? $mutationName ?? $subscriptionName])->willReturn($propertyMetadata);
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_NULL), Argument::type('bool'), $queryName, null, null, '', $resourceClass, $propertyName, 1)->willReturn(null);
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_CALLABLE), Argument::type('bool'), $queryName, null, null, '', $resourceClass, $propertyName, 1)->willReturn('NotRegisteredType');
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $queryName, null, null, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, $mutationName, null, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->propertyMetadataFactoryProphecy->create($resourceClass, $propertyName, ['normalization_groups' => null, 'denormalization_groups' => null])->willReturn($propertyMetadata);
+            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_NULL), Argument::type('bool'), $queryName, '', $resourceClass, $propertyName, 1)->willReturn(null);
+            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_CALLABLE), Argument::type('bool'), $queryName, '', $resourceClass, $propertyName, 1)->willReturn('NotRegisteredType');
+            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $queryName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $mutationName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
             if ('propertyObject' === $propertyName) {
-                $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, $mutationName, null, 'objectClass', $resourceClass, $propertyName, 1)->willReturn(new ObjectType(['name' => 'objectType']));
-                $this->resourceMetadataFactoryProphecy->create('objectClass')->willReturn(new ResourceMetadata());
-                $this->itemResolverFactoryProphecy->__invoke('objectClass', $resourceClass, $queryName)->willReturn(static function () {
+                $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $mutationName, 'objectClass', $resourceClass, $propertyName, 1)->willReturn(new ObjectType(['name' => 'objectType']));
+                $this->resourceMetadataCollectionFactoryProphecy->create('objectClass')->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['item_query' => new Query()])]));
+                $this->itemResolverFactoryProphecy->__invoke('objectClass', $resourceClass, $queryName ?? $mutationName ?? $subscriptionName)->willReturn(static function () {
                 });
             }
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), null, null, $subscriptionName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, null, $mutationName, null, 'subresourceClass', $propertyName, 1)->willReturn(GraphQLType::string());
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), Argument::type('bool'), $queryName, null, null, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
+            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), $subscriptionName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, $mutationName, 'subresourceClass', $propertyName, 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), Argument::type('bool'), $queryName ?? $mutationName ?? $subscriptionName, '', $resourceClass, $propertyName, 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
         }
         $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);
         $this->typesContainerProphecy->all()->willReturn([]);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
-        $this->resourceMetadataFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadata());
+        $operation = $queryName ? new Query() : new Mutation();
+        if ($subscriptionName) {
+            $operation = new Subscription();
+        }
+        $this->resourceMetadataCollectionFactoryProphecy->create('resourceClass')->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$queryName ?? $mutationName ?? $subscriptionName => $operation])]));
+        $this->resourceMetadataCollectionFactoryProphecy->create('subresourceClass')->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['item_query' => new Query()])]));
 
         $fieldsBuilder = $this->fieldsBuilder;
         if ($advancedNameConverter) {
             $fieldsBuilder = $this->buildFieldsBuilder($advancedNameConverter);
         }
-        $resourceObjectTypeFields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, 0, $ioMetadata);
+        $resourceObjectTypeFields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $queryName ?? $mutationName ?? $subscriptionName, 0, $ioMetadata);
 
         $this->assertEquals($expectedResourceObjectTypeFields, $resourceObjectTypeFields);
     }
@@ -533,7 +543,7 @@ class FieldsBuilderTest extends TestCase
         $advancedNameConverter->normalize('field', 'resourceClass')->willReturn('normalizedField');
 
         return [
-            'query' => ['resourceClass', new ResourceMetadata(),
+            'query' => ['resourceClass', new Query(),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, false),
@@ -561,7 +571,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'query with advanced name converter' => ['resourceClass', new ResourceMetadata(),
+            'query with advanced name converter' => ['resourceClass', new Query(),
                 [
                     'field' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true, false),
                 ],
@@ -580,7 +590,7 @@ class FieldsBuilderTest extends TestCase
                 ],
                 $advancedNameConverter->reveal(),
             ],
-            'query input' => ['resourceClass', new ResourceMetadata(),
+            'query input' => ['resourceClass', new Query(),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
@@ -599,7 +609,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'query with simple non-null string array property' => ['resourceClass', new ResourceMetadata(),
+            'query with simple non-null string array property' => ['resourceClass', new Query(),
                 [
                     'property' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), null, true, false),
                 ],
@@ -617,7 +627,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'mutation non input' => ['resourceClass', new ResourceMetadata(),
+            'mutation non input' => ['resourceClass', new Mutation(),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
@@ -646,7 +656,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'mutation input' => ['resourceClass', new ResourceMetadata(),
+            'mutation input' => ['resourceClass', new Mutation(),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), 'propertyBool description', false, true))->withAttributes(['deprecation_reason' => 'not useful']),
@@ -682,7 +692,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'delete mutation input' => ['resourceClass', new ResourceMetadata(),
+            'delete mutation input' => ['resourceClass', new Mutation(),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -694,7 +704,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'create mutation input' => ['resourceClass', new ResourceMetadata(),
+            'create mutation input' => ['resourceClass', new Mutation(),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -710,7 +720,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'update mutation input' => ['resourceClass', new ResourceMetadata(),
+            'update mutation input' => ['resourceClass', new Mutation(),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -729,7 +739,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'subscription non input' => ['resourceClass', new ResourceMetadata(),
+            'subscription non input' => ['resourceClass', new Subscription(),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
@@ -749,7 +759,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'subscription input' => ['resourceClass', new ResourceMetadata(),
+            'subscription input' => ['resourceClass', new Subscription(),
                 [
                     'property' => new PropertyMetadata(),
                     'propertyBool' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), 'propertyBool description', false, true))->withAttributes(['deprecation_reason' => 'not useful']),
@@ -764,13 +774,13 @@ class FieldsBuilderTest extends TestCase
                     'clientSubscriptionId' => GraphQLType::string(),
                 ],
             ],
-            'null io metadata non input' => ['resourceClass', new ResourceMetadata(),
+            'null io metadata non input' => ['resourceClass', new Query(),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
                 false, null, 'update', null, ['class' => null], [],
             ],
-            'null io metadata input' => ['resourceClass', new ResourceMetadata(),
+            'null io metadata input' => ['resourceClass', new Query(),
                 [
                     'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
                 ],
@@ -779,7 +789,7 @@ class FieldsBuilderTest extends TestCase
                     'clientMutationId' => GraphQLType::string(),
                 ],
             ],
-            'invalid types' => ['resourceClass', new ResourceMetadata(),
+            'invalid types' => ['resourceClass', new Query(),
                 [
                     'propertyInvalidType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_NULL), null, true, false),
                     'propertyNotRegisteredType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_CALLABLE), null, true, false),

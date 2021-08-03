@@ -21,10 +21,12 @@ use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -46,7 +48,7 @@ class ItemMutationResolverFactoryTest extends TestCase
     private $writeStageProphecy;
     private $validateStageProphecy;
     private $mutationResolverLocatorProphecy;
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
 
     /**
      * {@inheritdoc}
@@ -61,7 +63,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->writeStageProphecy = $this->prophesize(WriteStageInterface::class);
         $this->validateStageProphecy = $this->prophesize(ValidateStageInterface::class);
         $this->mutationResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $this->itemMutationResolverFactory = new ItemMutationResolverFactory(
             $this->readStageProphecy->reveal(),
@@ -72,7 +74,7 @@ class ItemMutationResolverFactoryTest extends TestCase
             $this->writeStageProphecy->reveal(),
             $this->validateStageProphecy->reveal(),
             $this->mutationResolverLocatorProphecy->reveal(),
-            $this->resourceMetadataFactoryProphecy->reveal()
+            $this->resourceMetadataCollectionFactoryProphecy->reveal()
         );
     }
 
@@ -94,7 +96,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $deserializeStageItem->field = 'deserialize';
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Mutation()])]));
 
         $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -180,7 +182,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $deserializeStageItem = null;
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Mutation()])]));
 
         $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -262,9 +264,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $deserializeStageItem->field = 'deserialize';
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])
-        );
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Mutation())->withResolver('query_resolver_id')])]));
 
         $customItem = new \stdClass();
         $customItem->field = 'foo';
@@ -314,9 +314,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $deserializeStageItem->field = 'deserialize';
         $this->deserializeStageProphecy->__invoke($readStageItem, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($deserializeStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata('shortName'))->withGraphql([$operationName => ['mutation' => 'query_resolver_id']])
-        );
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Mutation())->withShortName('shortName')->withResolver('query_resolver_id')])]));
 
         $customItem = new Dummy();
         $this->mutationResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customItem) {
