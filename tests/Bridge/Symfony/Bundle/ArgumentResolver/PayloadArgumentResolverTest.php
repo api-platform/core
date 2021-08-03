@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResol
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Tests\ProphecyTrait;
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,8 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 class PayloadArgumentResolverTest extends KernelTestCase
 {
+    use ProphecyTrait;
+
     public function testItSupportsRequestWithPayloadOfExpectedType(): void
     {
         $resolver = $this->createArgumentResolver();

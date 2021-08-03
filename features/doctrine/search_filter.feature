@@ -192,6 +192,7 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search collection by name (partial)
     Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?name=my"
@@ -232,6 +233,7 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search collection by name (partial)
     Given there are 30 embedded dummy objects
     When I send a "GET" request to "/embedded_dummies?embeddedDummy.dummyName=my"
@@ -272,6 +274,7 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search collection by name (partial multiple values)
     Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?name[]=2&name[]=3"
@@ -312,7 +315,9 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search collection by name (partial case insensitive)
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?dummy=somedummytest1"
     Then the response status code should be 200
     And the response should be in JSON
@@ -340,7 +345,9 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search collection by alias (start)
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?alias=Ali"
     Then the response status code should be 200
     And the response should be in JSON
@@ -379,7 +386,9 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search collection by alias (start multiple values)
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?description[]=Sma&description[]=Not"
     Then the response status code should be 200
     And the response should be in JSON
@@ -419,7 +428,9 @@ Feature: Search filter on collections
     """
 
   @sqlite
+  @createSchema
   Scenario: Search collection by description (word_start)
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?description=smart"
     Then the response status code should be 200
     And the response should be in JSON
@@ -458,8 +469,10 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   @sqlite
   Scenario: Search collection by description (word_start multiple values)
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?description[]=smart&description[]=so"
     Then the response status code should be 200
     And the response should be in JSON
@@ -500,7 +513,9 @@ Feature: Search filter on collections
 
   # note on Postgres compared to sqlite the LIKE clause is case sensitive
   @postgres
+  @createSchema
   Scenario: Search collection by description (word_start)
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?description=smart"
     Then the response status code should be 200
     And the response should be in JSON
@@ -539,7 +554,9 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Search for entities within an impossible range
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?name=MuYm"
     Then the response status code should be 200
     And the response should be in JSON
@@ -568,7 +585,9 @@ Feature: Search filter on collections
     """
 
   @sqlite
+  @createSchema
   Scenario: Search for entities with an existing collection route name
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?relatedDummies=dummy_cars"
     Then the response status code should be 200
     And the response should be in JSON
@@ -659,7 +678,9 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Get collection by id 10
+    Given there are 30 dummy objects
     When I send a "GET" request to "/dummies?id=10"
     Then the response status code should be 200
     And the response should be in JSON
@@ -696,8 +717,10 @@ Feature: Search filter on collections
     }
     """
 
+  @createSchema
   Scenario: Get collection ordered by a non valid properties
     When I send a "GET" request to "/dummies?unknown=0"
+    Given there are 30 dummy objects
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"

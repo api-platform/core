@@ -2,6 +2,8 @@ Feature: HAL DTO input and output
   In order to use a hypermedia API
   As a client software developer
   I need to be able to use DTOs on my resources as Input or Output objects.
+  TODO: in 3.0 we should change the generated IRIs, /dummy_dto_custom_output/1 should retrieve /dummy_dto_custom_output/1 not /dumy_dto_customs/1
+  for the collection we can search for an Operation with the same Output class as the given one for the collection
 
   Background:
     Given I add "Accept" header equal to "application/hal+json"

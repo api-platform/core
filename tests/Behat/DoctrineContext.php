@@ -68,6 +68,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathDummy as Netw
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\NetworkPathRelationDummy as NetworkPathRelationDummyDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Order as OrderDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PatchDummyRelation as PatchDummyRelationDocument;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Payment as PaymentDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
@@ -142,6 +143,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Order;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PatchDummyRelation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Payment;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Pet;
@@ -1171,20 +1173,27 @@ final class DoctrineContext implements Context
         $foo->setCanSell(true);
         $foo->setAvailableAt(new \DateTime());
         $this->manager->persist($foo);
+        $this->manager->flush();
+
+        if (\is_object($foo->getId())) {
+            $this->manager->persist($foo->getId());
+            $this->manager->flush();
+        }
 
         $bar1 = $this->buildDummyCarColor();
         $bar1->setProp('red');
         $bar1->setCar($foo);
         $this->manager->persist($bar1);
+        $this->manager->flush();
 
         $bar2 = $this->buildDummyCarColor();
         $bar2->setProp('blue');
         $bar2->setCar($foo);
         $this->manager->persist($bar2);
+        $this->manager->flush();
 
         $foo->setColors([$bar1, $bar2]);
         $this->manager->persist($foo);
-
         $this->manager->flush();
     }
 
@@ -1837,8 +1846,9 @@ final class DoctrineContext implements Context
     {
         $dummy = $this->buildPatchDummyRelation();
         $related = $this->buildRelatedDummy();
-        $dummy->setRelated($related);
         $this->manager->persist($related);
+        $this->manager->flush();
+        $dummy->setRelated($related);
         $this->manager->persist($dummy);
         $this->manager->flush();
     }
@@ -1866,6 +1876,15 @@ final class DoctrineContext implements Context
         $dummy->setSecondId(2);
 
         $this->manager->persist($dummy);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is a payment
+     */
+    public function thereIsAPayment()
+    {
+        $this->manager->persist($this->buildPayment('123.45'));
         $this->manager->flush();
     }
 
@@ -2344,7 +2363,7 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return BookDocument | Book
+     * @return BookDocument|Book
      */
     private function buildBook()
     {
@@ -2352,7 +2371,7 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return CustomMultipleIdentifierDummy | CustomMultipleIdentifierDummyDocument
+     * @return CustomMultipleIdentifierDummy|CustomMultipleIdentifierDummyDocument
      */
     private function buildCustomMultipleIdentifierDummy()
     {
@@ -2365,5 +2384,13 @@ final class DoctrineContext implements Context
     private function buildWithJsonDummy()
     {
         return $this->isOrm() ? new WithJsonDummy() : new WithJsonDummyDocument();
+    }
+
+    /**
+     * @return Payment|PaymentDocument
+     */
+    private function buildPayment(string $amount)
+    {
+        return $this->isOrm() ? new Payment($amount) : new PaymentDocument($amount);
     }
 }

@@ -44,6 +44,11 @@ parameters:
 	ignoreErrors:
 		# False positives
 		-
+			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
+			paths:
+				- tests/Bridge/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
+		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
+		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
 				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php

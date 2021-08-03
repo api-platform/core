@@ -396,39 +396,7 @@ Feature: Relations support
     }
     """
 
-  Scenario: Issue #1222
-    Given there are people having pets
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "GET" request to "/people"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the JSON should be a superset of:
-    """
-    {
-      "@context": "/contexts/Person",
-      "@id": "/people",
-      "@type": "hydra:Collection",
-      "hydra:member": [
-        {
-          "@id": "/people/1",
-          "@type": "Person",
-          "name": "foo",
-          "pets": [
-            {
-              "@type": "PersonToPet",
-              "pet": {
-                "@id": "/pets/1",
-                "@type": "Pet",
-                "name": "bar"
-              }
-            }
-          ]
-        }
-      ],
-      "hydra:totalItems": 1
-    }
-    """
-
+  @createSchema
   Scenario: Eager load relations should not be duplicated
     Given there is an order with same customer and recipient
     When I add "Content-Type" header equal to "application/ld+json"
@@ -545,3 +513,38 @@ Feature: Relations support
       ]
     }
     """
+
+  @createSchema
+  Scenario: Issue #1222
+    Given there are people having pets
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/people"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be a superset of:
+    """
+    {
+      "@context": "/contexts/Person",
+      "@id": "/people",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/people/1",
+          "@type": "Person",
+          "name": "foo",
+          "pets": [
+            {
+              "@type": "PersonToPet",
+              "pet": {
+                "@id": "/pets/1",
+                "@type": "Pet",
+                "name": "bar"
+              }
+            }
+          ]
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
+
