@@ -16,6 +16,9 @@
       "additionalProperties": {
         "oneOf": [
           {
+            "type": "null"
+          },
+          {
             "$ref": "#/definitions/linkObject"
           },
           {
@@ -70,6 +73,9 @@
       "type": "object",
       "additionalProperties": {
         "oneOf": [
+          {
+            "type": "null"
+          },
           {
             "$ref": "#"
           },

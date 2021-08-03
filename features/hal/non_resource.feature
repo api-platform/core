@@ -27,7 +27,11 @@ Feature: HAL non-resource handling
           "_links": {
             "self": {
               "href": "/contain_non_resources/1-nested"
-            }
+            },
+            "nested": null
+          },
+          "_embedded": {
+            "nested": null
           },
           "id": "1-nested",
           "notAResource": {

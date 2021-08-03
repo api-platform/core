@@ -66,7 +66,9 @@ Feature: HAL support
           {
             "href": "/related_dummies/1"
           }
-        ]
+        ],
+        "relatedOwnedDummy": null,
+        "relatedOwningDummy": null
       },
       "description": null,
       "dummy": null,
@@ -109,7 +111,9 @@ Feature: HAL support
           {
             "href": "/related_dummies/1"
           }
-        ]
+        ],
+        "relatedOwnedDummy": null,
+        "relatedOwningDummy": null
       },
       "description": null,
       "dummy": null,
@@ -151,11 +155,13 @@ Feature: HAL support
         "self": {
           "href": "/relation_embedders/1"
         },
+        "anotherRelated": null,
         "related": {
           "href": "/related_dummies/1"
         }
       },
       "_embedded": {
+        "anotherRelated": null,
         "related": {
           "_links": {
             "self": {
@@ -170,7 +176,11 @@ Feature: HAL support
               "_links": {
                 "self": {
                   "href": "/third_levels/1"
-                }
+                },
+                "fourthLevel": null
+              },
+              "_embedded": {
+                "fourthLevel": null
               },
               "level": 3
             }

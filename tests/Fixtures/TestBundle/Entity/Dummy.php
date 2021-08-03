@@ -60,7 +60,7 @@ class Dummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -117,7 +117,7 @@ class Dummy
     public $dummyPrice;
 
     /**
-     * @var RelatedDummy A related dummy
+     * @var RelatedDummy|null A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      * @ApiProperty(push=true)

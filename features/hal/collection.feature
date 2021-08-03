@@ -68,7 +68,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/1"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Smart dummy.",
             "dummy": "SomeDummyTest1",
@@ -88,7 +91,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/2"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest2",
@@ -108,7 +114,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/3"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Smart dummy.",
             "dummy": "SomeDummyTest3",
@@ -175,7 +184,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/7"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Smart dummy.",
             "dummy": "SomeDummyTest7",
@@ -195,7 +207,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/8"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest8",
@@ -215,7 +230,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/9"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Smart dummy.",
             "dummy": "SomeDummyTest9",
@@ -273,7 +291,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/10"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest10",
@@ -334,7 +355,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/4"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest4",
@@ -354,7 +378,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/5"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Smart dummy.",
             "dummy": "SomeDummyTest5",
@@ -374,7 +401,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/6"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest6",
@@ -496,7 +526,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/2"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest2",
@@ -545,7 +578,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/8"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest8",
@@ -594,7 +630,10 @@ Feature: HAL Collections support
             "_links": {
               "self": {
                 "href": "/dummies/8"
-              }
+              },
+              "relatedDummy": null,
+              "relatedOwnedDummy": null,
+              "relatedOwningDummy": null
             },
             "description": "Not so smart dummy.",
             "dummy": "SomeDummyTest8",

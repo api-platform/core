@@ -299,7 +299,7 @@ class ItemNormalizerTest extends TestCase
             $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
             null,
             false,
-            [],
+            ['skip_null_values' => true],
             [],
             null
         );
@@ -372,5 +372,68 @@ class ItemNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => true]));
+    }
+
+    public function testSkipNullValuesFalse()
+    {
+        $dummy = new Dummy();
+        $dummy->setAlias(null);
+        $dummy->relatedDummy = null;
+
+        $propertyNameCollection = new PropertyNameCollection(['alias', 'relatedDummy']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'alias', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', true, false, false)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null);
+
+        $nameConverter = $this->prophesize(NameConverterInterface::class);
+        $nameConverter->normalize('alias', Argument::any(), Argument::any(), Argument::any())->willReturn('alias');
+        $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->willReturn('related_dummy');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            [],
+            [],
+            null
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            '_links' => [
+                'self' => [
+                    'href' => '/dummies/1',
+                ],
+                'related_dummy' => null,
+            ],
+            'alias' => null,
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['skip_null_values' => false]));
     }
 }
