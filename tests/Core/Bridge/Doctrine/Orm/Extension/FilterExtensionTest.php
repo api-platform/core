@@ -29,6 +29,7 @@ use Psr\Container\ContainerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @group legacy
  */
 class FilterExtensionTest extends TestCase
 {

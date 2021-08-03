@@ -40,6 +40,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class PaginationExtensionTest extends TestCase
 {

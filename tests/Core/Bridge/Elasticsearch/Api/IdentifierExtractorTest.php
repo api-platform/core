@@ -22,6 +22,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class IdentifierExtractorTest extends TestCase
 {
     use ProphecyTrait;

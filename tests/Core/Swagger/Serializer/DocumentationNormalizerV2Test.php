@@ -63,6 +63,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class DocumentationNormalizerV2Test extends TestCase
 {

@@ -36,6 +36,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
+/**
+ * @group legacy
+ */
 class ItemDataProviderTest extends TestCase
 {
     use ProphecyTrait;

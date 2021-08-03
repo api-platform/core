@@ -49,6 +49,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class SubresourceDataProviderTest extends TestCase
 {

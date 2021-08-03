@@ -34,6 +34,9 @@ use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadat
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
+/**
+ * @group legacy
+ */
 class SerializerPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;

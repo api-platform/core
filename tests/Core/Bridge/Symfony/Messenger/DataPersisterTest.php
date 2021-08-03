@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class DataPersisterTest extends TestCase
 {

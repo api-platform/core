@@ -34,6 +34,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class FilterEagerLoadingExtensionTest extends TestCase
 {

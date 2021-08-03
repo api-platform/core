@@ -22,6 +22,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @group legacy
  */
 class SwaggerCommandTest extends KernelTestCase
 {

@@ -22,6 +22,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
+/**
+ * @group legacy
+ */
 class TransformFieldsetsParametersListenerTest extends TestCase
 {
     use ProphecyTrait;

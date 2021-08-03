@@ -33,6 +33,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class CollectionNormalizerTest extends TestCase
 {

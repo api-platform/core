@@ -40,6 +40,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Julien DENIAU <julien.deniau@gmail.com>
+ * @group legacy
  */
 class RequestDataCollectorTest extends TestCase
 {

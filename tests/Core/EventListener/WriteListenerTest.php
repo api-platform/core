@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @group legacy
  */
 class WriteListenerTest extends TestCase
 {

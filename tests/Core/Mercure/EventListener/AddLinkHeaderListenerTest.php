@@ -33,6 +33,7 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class AddLinkHeaderListenerTest extends TestCase
 {

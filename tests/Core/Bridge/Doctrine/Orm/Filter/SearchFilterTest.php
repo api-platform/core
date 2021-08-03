@@ -32,6 +32,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
+ * @group legacy
  */
 class SearchFilterTest extends DoctrineOrmFilterTestCase
 {

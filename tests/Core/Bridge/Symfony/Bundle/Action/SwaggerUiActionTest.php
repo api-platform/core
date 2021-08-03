@@ -30,6 +30,7 @@ use Twig\Environment as TwigEnvironment;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class SwaggerUiActionTest extends TestCase
 {

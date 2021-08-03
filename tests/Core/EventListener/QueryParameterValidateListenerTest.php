@@ -25,6 +25,9 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
+/**
+ * @group legacy
+ */
 class QueryParameterValidateListenerTest extends TestCase
 {
     use ProphecyTrait;

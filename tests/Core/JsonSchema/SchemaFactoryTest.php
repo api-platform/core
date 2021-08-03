@@ -32,6 +32,9 @@ use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
+/**
+ * @group legacy
+ */
 class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;

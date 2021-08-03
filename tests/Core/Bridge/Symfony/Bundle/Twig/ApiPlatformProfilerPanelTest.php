@@ -28,6 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
+ * @group legacy
  */
 class ApiPlatformProfilerPanelTest extends WebTestCase
 {

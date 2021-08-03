@@ -26,6 +26,9 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Namespaces\CatNamespace;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class CatDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;

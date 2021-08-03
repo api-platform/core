@@ -23,6 +23,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Runner\Version;
 
+/**
+ * @group legacy
+ */
 class ApiTestCaseTest extends ApiTestCase
 {
     public function testAssertJsonContains(): void

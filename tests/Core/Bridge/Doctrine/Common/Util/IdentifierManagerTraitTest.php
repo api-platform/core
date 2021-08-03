@@ -37,6 +37,9 @@ use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Doctrine\UuidType;
 
+/**
+ * @group legacy
+ */
 class IdentifierManagerTraitTest extends TestCase
 {
     use ProphecyTrait;

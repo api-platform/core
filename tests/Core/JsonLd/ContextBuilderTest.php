@@ -31,6 +31,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Markus Mächler <markus.maechler@bithost.ch>
+ * @group legacy
  */
 class ContextBuilderTest extends TestCase
 {

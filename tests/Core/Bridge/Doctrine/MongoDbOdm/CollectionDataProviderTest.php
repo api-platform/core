@@ -30,9 +30,10 @@ use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @group mongodb
+ * @group legacy
  */
 class CollectionDataProviderTest extends TestCase
 {

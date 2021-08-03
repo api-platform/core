@@ -22,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class OperationResourceMetadataFactoryTest extends TestCase
 {

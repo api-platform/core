@@ -42,9 +42,10 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @group mongodb
+ * @group legacy
  */
 class SubresourceDataProviderTest extends TestCase
 {

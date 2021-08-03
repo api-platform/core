@@ -42,6 +42,9 @@ use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
+/**
+ * @group legacy
+ */
 class SubresourceDataProviderTest extends TestCase
 {
     use ProphecyTrait;

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Factory;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
@@ -47,9 +46,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     private $resourceNameCollectionFactory;
-    /**
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     */
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
@@ -59,10 +55,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $jsonSchemaTypeFactory;
     private $openApiOptions;
     private $paginationOptions;
-    private $identifiersExtractor;
     private $router;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, IdentifiersExtractorInterface $identifiersExtractor = null, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -73,7 +68,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->operationPathResolver = $operationPathResolver;
-        $this->identifiersExtractor = $identifiersExtractor;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
         $this->router = $router;

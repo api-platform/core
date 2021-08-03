@@ -31,6 +31,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
+/**
+ * @group legacy
+ */
 class MatchFilterTest extends TestCase
 {
     use ProphecyTrait;

@@ -23,6 +23,9 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 
+/**
+ *  @group legacy
+ */
 class AttributeDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;

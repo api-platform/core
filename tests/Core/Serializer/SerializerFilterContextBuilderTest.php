@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @group legacy
  */
 class SerializerFilterContextBuilderTest extends TestCase
 {

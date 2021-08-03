@@ -21,6 +21,9 @@ use ApiPlatform\Tests\Fixtures\ClassWithNoDocBlock;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class PhpDocResourceMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;

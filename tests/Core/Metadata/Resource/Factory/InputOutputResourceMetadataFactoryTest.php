@@ -20,6 +20,9 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class InputOutputResourceMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;

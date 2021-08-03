@@ -35,6 +35,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @group legacy
  */
 class DocumentationNormalizerTest extends TestCase
 {

@@ -27,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * @group legacy
  */
 class OrderExtensionTest extends TestCase
 {

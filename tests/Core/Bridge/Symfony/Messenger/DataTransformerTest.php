@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class DataTransformerTest extends TestCase
 {

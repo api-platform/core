@@ -32,6 +32,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class IdentifiersExtractorTest extends TestCase
 {

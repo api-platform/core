@@ -24,6 +24,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @group legacy
+ */
 class SortFilterExtensionTest extends TestCase
 {
     use ProphecyTrait;

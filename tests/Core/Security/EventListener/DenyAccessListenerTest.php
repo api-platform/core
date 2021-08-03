@@ -35,6 +35,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class DenyAccessListenerTest extends TestCase
 {

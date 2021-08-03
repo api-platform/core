@@ -20,6 +20,9 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class FormatsResourceMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;

@@ -27,6 +27,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class CachedIdentifiersExtractorTest extends TestCase
 {

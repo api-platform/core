@@ -122,6 +122,7 @@ use Symfony\Component\Uid\AbstractUid;
  * @group resource-hog
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class ApiPlatformExtensionTest extends TestCase
 {

@@ -25,9 +25,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @group mongodb
+ * @group legacy
  */
 class FilterExtensionTest extends TestCase
 {

@@ -49,6 +49,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @group legacy
  */
 class EagerLoadingExtensionTest extends TestCase
 {

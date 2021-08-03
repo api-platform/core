@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @group legacy
  */
 class SerializerContextBuilderTest extends TestCase
 {

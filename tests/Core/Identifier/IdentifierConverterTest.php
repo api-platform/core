@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class IdentifierConverterTest extends TestCase
 {

@@ -33,6 +33,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  * Tests extractor resource metadata factory.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFactoryProvider
 {

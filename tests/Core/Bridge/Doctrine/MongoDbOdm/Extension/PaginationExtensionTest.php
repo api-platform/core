@@ -36,9 +36,10 @@ use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @group mongodb
+ * @group legacy
  */
 class PaginationExtensionTest extends TestCase
 {

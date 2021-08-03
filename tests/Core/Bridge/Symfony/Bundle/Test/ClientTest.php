@@ -20,6 +20,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Runner\Version;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
+/**
+ * @group legacy
+ */
 class ClientTest extends ApiTestCase
 {
     protected function setUp(): void

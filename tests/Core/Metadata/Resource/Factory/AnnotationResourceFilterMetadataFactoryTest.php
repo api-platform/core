@@ -26,6 +26,7 @@ use Prophecy\Argument;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
+ * @group legacy
  */
 class AnnotationResourceFilterMetadataFactoryTest extends TestCase
 {

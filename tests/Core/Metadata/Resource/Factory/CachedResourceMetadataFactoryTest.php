@@ -25,6 +25,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @group legacy
  */
 class CachedResourceMetadataFactoryTest extends TestCase
 {

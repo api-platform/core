@@ -55,6 +55,9 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
+/**
+ * @group legacy
+ */
 class OpenApiNormalizerTest extends TestCase
 {
     use ProphecyTrait;
@@ -298,9 +301,6 @@ class OpenApiNormalizerTest extends TestCase
         $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
 
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-
         $factory = new OpenApiFactory(
             $resourceNameCollectionFactoryProphecy->reveal(),
             $resourceMetadataFactory,
@@ -310,7 +310,6 @@ class OpenApiNormalizerTest extends TestCase
             $typeFactory,
             $operationPathResolver,
             $filterLocatorProphecy->reveal(),
-            $identifiersExtractorProphecy->reveal(),
             [],
             new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
                 'header' => [
