@@ -721,7 +721,7 @@ jobs:
         php:
           - '8.0'
         symfony:
-          - '5.3'
+          - '5.4'
       fail-fast: false
     steps:
       - name: Checkout
