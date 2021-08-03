@@ -43,6 +43,7 @@ parameters:
 			- fail
 	ignoreErrors:
 		# False positives
+		- '#Parameter \#1 \$function of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
