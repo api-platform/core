@@ -1075,6 +1075,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.normalizer.item',
             'api_platform.serializer.property_filter',
             'api_platform.serializer.uuid_denormalizer',
+            'api_platform.serializer.mapping.class_metadata_factory',
             'api_platform.serializer_locator',
             'api_platform.state.legacy_data_persister_processor',
             'api_platform.state_processor',

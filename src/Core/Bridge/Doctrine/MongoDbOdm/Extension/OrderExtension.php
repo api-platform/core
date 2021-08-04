@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -41,7 +42,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
     public function __construct(string $order = null, $resourceMetadataFactory = null, ManagerRegistry $managerRegistry = null)
     {
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
         }
 
@@ -58,11 +59,22 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
         $classMetaData = $this->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
         if (null !== $this->resourceMetadataFactory) {
-            $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName)->getOrders();
-            if (empty($defaultOrder)) {
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+                if (isset($context['operation'])) {
+                    $defaultOrder = $context['operation']->getOrder();
+                } else {
+                    $metadata = $this->resourceMetadataFactory->create($resourceClass);
+                    try {
+                        $defaultOrder = isset($context['graphql_operation_name']) ? $metadata->getGraphQlOperation($operationName)->getOrder() : $metadata->getOperation($operationName)->getOrder();
+                    } catch (OperationNotFoundException $e) {
+                        $defaultOrder = $metadata->getOperation(null, true)->getOrder();
+                    }
+                }
+            } else {
                 $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
             }
-            if (null !== $defaultOrder) {
+
+            if ($defaultOrder) {
                 foreach ($defaultOrder as $field => $order) {
                     if (\is_int($field)) {
                         // Default direction

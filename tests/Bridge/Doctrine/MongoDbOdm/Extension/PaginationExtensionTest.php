@@ -19,10 +19,12 @@ use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
@@ -39,7 +41,6 @@ use PHPUnit\Framework\TestCase;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @group mongodb
- * @group legacy
  */
 class PaginationExtensionTest extends TestCase
 {
@@ -56,17 +57,13 @@ class PaginationExtensionTest extends TestCase
         parent::setUp();
 
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
     }
 
     public function testApplyToCollection()
     {
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_items_per_page' => 40,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(40)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -82,17 +79,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageZero()
     {
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_items_per_page' => 0,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(0)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -109,7 +102,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageZeroAndPage2()
@@ -117,12 +110,8 @@ class PaginationExtensionTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Page should not be greater than 1 if limit is equal to 0');
 
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_items_per_page' => 0,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(0)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -140,7 +129,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageLessThan0()
@@ -148,12 +137,8 @@ class PaginationExtensionTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Limit should not be less than 0');
 
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_items_per_page' => -20,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(-20)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -171,17 +156,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithItemPerPageTooHigh()
     {
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_client_items_per_page' => true,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationClientItemsPerPage(true)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -198,17 +179,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithGraphql()
     {
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_client_items_per_page' => 20,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationClientItemsPerPage(true)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -222,17 +199,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithGraphqlAndCountContext()
     {
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_client_items_per_page' => 20,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationClientItemsPerPage(true)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -255,12 +228,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionNoFilters()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -274,12 +248,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionPaginationDisabled()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => new GetCollection()])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -296,12 +271,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionGraphQlPaginationDisabled()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => new GetCollection()])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [], [
@@ -311,24 +287,20 @@ class PaginationExtensionTest extends TestCase
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldNotBeCalled();
 
-        $context = ['graphql_operation_name' => 'op'];
+        $context = ['graphql_operation_name' => 'get'];
 
         $extension = new PaginationExtension(
             $this->managerRegistryProphecy->reveal(),
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testApplyToCollectionWithMaximumItemsPerPage()
     {
-        $attributes = [
-            'pagination_enabled' => true,
-            'pagination_client_enabled' => true,
-            'pagination_maximum_items_per_page' => 80,
-        ];
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationMaximumItemsPerPage(80)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -346,12 +318,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'op', $context);
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
     public function testSupportsResult()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => (new GetCollection())->withPaginationEnabled(true)])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory);
@@ -361,12 +334,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $this->assertTrue($extension->supportsResult('Foo', 'op'));
+        $this->assertTrue($extension->supportsResult('Foo', 'get'));
     }
 
     public function testSupportsResultClientNotAllowedToPaginate()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => new GetCollection()])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -379,12 +353,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['pagination' => true]]));
+        $this->assertFalse($extension->supportsResult('Foo', 'get', ['filters' => ['pagination' => true]]));
     }
 
     public function testSupportsResultPaginationDisabled()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => new GetCollection()])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [
@@ -396,12 +371,13 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false]]));
+        $this->assertFalse($extension->supportsResult('Foo', 'get', ['filters' => ['enabled' => false]]));
     }
 
     public function testSupportsResultGraphQlPaginationDisabled()
     {
-        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], []));
+        $dummyMetadata = new ResourceMetadataCollection('Foo', [(new ApiResource())->withOperations(['get' => new GetCollection()])]);
+        $this->resourceMetadataFactoryProphecy->create('Foo')->willReturn($dummyMetadata);
         $resourceMetadataFactory = $this->resourceMetadataFactoryProphecy->reveal();
 
         $pagination = new Pagination($resourceMetadataFactory, [], [
@@ -413,7 +389,7 @@ class PaginationExtensionTest extends TestCase
             $resourceMetadataFactory,
             $pagination
         );
-        $this->assertFalse($extension->supportsResult('Foo', 'op', ['filters' => ['enabled' => false], 'graphql_operation_name' => 'op']));
+        $this->assertFalse($extension->supportsResult('Foo', 'get', ['filters' => ['enabled' => false], 'graphql_operation_name' => 'query']));
     }
 
     public function testGetResult()
@@ -428,7 +404,8 @@ class PaginationExtensionTest extends TestCase
 
         $this->managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($documentManager);
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(['get' => new GetCollection()])]);
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $iteratorProphecy = $this->prophesize(Iterator::class);
         $iteratorProphecy->toArray()->willReturn([
@@ -463,7 +440,7 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
 
-        $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class);
+        $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class, 'get');
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
@@ -481,13 +458,8 @@ class PaginationExtensionTest extends TestCase
 
         $this->managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($documentManager);
 
-        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(
-            'Dummy',
-            null,
-            null,
-            null,
-            ['foo' => ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]]]
-        ));
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(['get' => (new GetCollection())->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])])]);
+        $this->resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $iteratorProphecy = $this->prophesize(Iterator::class);
         $iteratorProphecy->toArray()->willReturn([
@@ -522,7 +494,7 @@ class PaginationExtensionTest extends TestCase
             $pagination
         );
 
-        $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class, 'foo');
+        $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class, 'get');
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);

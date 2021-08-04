@@ -25,6 +25,7 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -85,11 +86,23 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }
 
+        if (isset($context['identifiers'], $context['operation']) && !isset($context['property'])) {
+            $context['property'] = $context['operation']->getExtraProperties()['legacy_subresource_property'] ?? null;
+            $context['collection'] = $context['operation']->isCollection();
+        }
+
         if (!isset($context['identifiers'], $context['property'])) {
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
 
-        $attribute = $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName)->getExtraProperties();
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        try {
+            $operation = $context['operation'] ?? (isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName));
+            $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
+        } catch (OperationNotFoundException $e) {
+            $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
+        }
+
         $executeOptions = $attribute['execute_options'] ?? [];
 
         $aggregationBuilder = $this->buildAggregation($identifiers, $context, $executeOptions, $repository->createAggregationBuilder(), \count($context['identifiers']));

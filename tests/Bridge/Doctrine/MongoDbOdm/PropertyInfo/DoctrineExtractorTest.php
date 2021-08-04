@@ -11,16 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo\DoctrineExtractor;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineDummy;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineEmbeddable;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineFooType;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineRelation;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineDummy;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineEmbeddable;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineFooType;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineRelation;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;

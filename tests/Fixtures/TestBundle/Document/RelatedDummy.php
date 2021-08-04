@@ -57,7 +57,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var \DateTime A dummy date
      *
-     * @ODM\Field(type="date")
+     * @ODM\Field(type="date", nullable=true)
      * @Assert\DateTime
      * @Groups({"friends"})
      */

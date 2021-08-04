@@ -17,6 +17,7 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
@@ -54,7 +55,13 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
      */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
-        $resourceFilters = $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName)->getFilters();
+        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        try {
+            $operation = isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+            $resourceFilters = $operation->getFilters();
+        } catch (OperationNotFoundException $e) {
+            $resourceFilters = $resourceMetadata->getOperation(null, true)->getFilters();
+        }
 
         if (empty($resourceFilters)) {
             return;

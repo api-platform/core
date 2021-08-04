@@ -11,27 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\EmbeddedDocument;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Field;
-use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 
 /**
- * @Document
+ * @EmbeddedDocument
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class DoctrineGeneratedValue
+class DoctrineEmbeddable
 {
     /**
-     * @Id(strategy="INCREMENT", type="int")
+     * @Field(type="string")
      */
-    public $id;
-
-    /**
-     * @Field
-     */
-    public $foo;
+    protected $field;
 }

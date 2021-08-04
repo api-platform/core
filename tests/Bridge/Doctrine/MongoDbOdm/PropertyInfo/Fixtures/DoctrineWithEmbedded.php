@@ -11,18 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\EmbedMany;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\EmbedOne;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
-use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceOne;
 
 /**
  * @Document
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class DoctrineRelation
+class DoctrineWithEmbedded
 {
     /**
      * @Id
@@ -30,7 +31,17 @@ class DoctrineRelation
     public $id;
 
     /**
-     * @ReferenceOne(targetDocument=DoctrineDummy::class, inversedBy="indexedFoo")
+     * @EmbedOne(targetDocument=DoctrineEmbeddable::class)
      */
-    protected $foo;
+    protected $embedOne;
+
+    /**
+     * @EmbedMany(targetDocument=DoctrineEmbeddable::class)
+     */
+    protected $embedMany;
+
+    /**
+     * @EmbedMany
+     */
+    protected $embedManyOmittingTargetDocument;
 }

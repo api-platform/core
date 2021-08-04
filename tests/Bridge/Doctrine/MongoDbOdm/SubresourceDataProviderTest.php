@@ -22,9 +22,11 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy;
@@ -60,7 +62,7 @@ class SubresourceDataProviderTest extends TestCase
     {
         parent::setUp();
 
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
     }
 
     private function getMetadataProphecies(array $resourceClassesIdentifiers)
@@ -162,7 +164,9 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+            (new ApiResource())->withOperations(['get' => new Get()]),
+        ]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => ['id']]);
 
@@ -251,7 +255,9 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadataCollection(ThirdLevel::class, [
+            (new ApiResource())->withOperations(['get' => new Get()]),
+        ]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
@@ -340,15 +346,9 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata(
-            'ThirdLevel',
-            null,
-            null,
-            null,
-            null,
-            null,
-            ['third_level_operation_name' => ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]]]
-        ));
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadataCollection(ThirdLevel::class, [
+            (new ApiResource())->withOperations(['third_level_operation_name' => (new Get())->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])]),
+        ]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
@@ -400,7 +400,9 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadataCollection(RelatedOwningDummy::class, [
+            (new ApiResource())->withOperations(['get' => new Get()]),
+        ]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -448,7 +450,9 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+            (new ApiResource())->withOperations(['get' => new Get()]),
+        ]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -529,7 +533,9 @@ class SubresourceDataProviderTest extends TestCase
 
         $rDummyManagerProphecy->getRepository(RelatedDummy::class)->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+            (new ApiResource())->withOperations(['get' => new Get()]),
+        ]));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
