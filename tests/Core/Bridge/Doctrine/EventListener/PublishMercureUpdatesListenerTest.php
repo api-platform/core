@@ -14,15 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface as ApiUrlGeneratorInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
@@ -81,17 +85,24 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(DummyFriend::class)->willReturn(true);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($toInsert, null, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toUpdate, null, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDelete, null, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDelete, null, UrlGeneratorInterface::ABS_URL)->willReturn('/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, null, UrlGeneratorInterface::ABS_URL)->willReturn('/dummy_friends/4')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, null, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toInsert, null, ApiUrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toUpdate, null, ApiUrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDelete, null, ApiUrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem($toDeleteExpressionLanguage, null, ApiUrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
-        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata());
-        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => "['foo', 'bar']"]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(true)->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadataCollection(DummyCar::class, [(new ApiResource())->withOperations([
+            'get' => new Get(),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadataCollection(DummyFriend::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure("['foo', 'bar']"),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
@@ -185,12 +196,22 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($toDeleteMercureOptions, null, UrlGeneratorInterface::REL_PATH)->willReturn('./dummy_offers/5')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toDeleteMercureOptions, null, UrlGeneratorInterface::NET_PATH)->willReturn('//example.com/dummy_offers/5')->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true, 'normalization_context' => ['groups' => ['foo', 'bar']]]));
-        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata());
-        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['private' => true, 'retry' => 10]]));
-        $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['http://example.com/custom_topics/1', '@=iri(object)', '@=iri(object, '.UrlGeneratorInterface::ABS_URL.')', '@=iri(object, '.UrlGeneratorInterface::ABS_PATH.')', '@=iri(object, '.UrlGeneratorInterface::REL_PATH.')', '@=iri(object, '.UrlGeneratorInterface::NET_PATH.')', '@=iri(object) ~ "/?topic=" ~ escape(iri(object))', '@=iri(object) ~ "/?topic=" ~ escape(iri(object, '.UrlGeneratorInterface::ABS_PATH.'))'], 'data' => 'mercure_custom_data', 'normalization_context' => ['groups' => ['baz']]]]));
-        $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['/dummies/1', '/users/3'], 'normalization_context' => ['groups' => ['baz']]]]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(true)->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadataCollection(DummyCar::class, [(new ApiResource())->withOperations([
+            'get' => new Get(),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadataCollection(DummyFriend::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['private' => true, 'retry' => 10]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadataCollection(DummyOffer::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['topics' => ['http://example.com/custom_topics/1', '@=iri(object)', '@=iri(object, '.UrlGeneratorInterface::ABS_URL.')', '@=iri(object, '.UrlGeneratorInterface::ABS_PATH.')', '@=iri(object, '.UrlGeneratorInterface::REL_PATH.')', '@=iri(object, '.UrlGeneratorInterface::NET_PATH.')', '@=iri(object) ~ "/?topic=" ~ escape(iri(object))', '@=iri(object) ~ "/?topic=" ~ escape(iri(object, '.UrlGeneratorInterface::ABS_PATH.'))'], 'data' => 'mercure_custom_data'])->withNormalizationContext(['groups' => ['baz']]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadataCollection(DummyMercure::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['topics' => ['/dummies/1', '/users/3']])->withNormalizationContext(['groups' => ['baz']]),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
@@ -286,12 +307,25 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $iriConverterProphecy->getIriFromItem($toDeleteMercureOptions)->willReturn('/dummy_offers/5')->shouldBeCalled();
         $iriConverterProphecy->getIriFromItem($toDeleteMercureOptions, null, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_offers/5')->shouldBeCalled();
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['hub' => 'managed', 'enable_async_update' => false], 'normalization_context' => ['groups' => ['foo', 'bar']]]));
-        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata());
-        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['private' => true, 'retry' => 10, 'hub' => 'managed', 'enable_async_update' => false]]));
-        $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => 'http://example.com/custom_topics/1', 'data' => 'mercure_custom_data', 'normalization_context' => ['groups' => ['baz']], 'hub' => 'managed', 'enable_async_update' => false]]));
-        $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['/dummies/1', '/users/3'], 'normalization_context' => ['groups' => ['baz']], 'hub' => 'managed', 'enable_async_update' => false]]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+
+        $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => []]));
+
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadataCollection(DummyCar::class, [(new ApiResource())->withOperations([
+            'get' => new Get(),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadataCollection(DummyFriend::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['private' => true, 'retry' => 10, 'hub' => 'managed', 'enable_async_update' => false]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyOffer::class)->willReturn(new ResourceMetadataCollection(DummyOffer::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['topics' => 'http://example.com/custom_topics/1', 'data' => 'mercure_custom_data', 'hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['baz']]),
+        ])]));
+        $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadataCollection(DummyMercure::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['topics' => ['/dummies/1', '/users/3'], 'hub' => 'managed', 'enable_async_update' => false])->withNormalizationContext(['groups' => ['baz']]),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
@@ -361,8 +395,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($toUpdate, null, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2');
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['enable_async_update' => false], 'normalization_context' => ['groups' => ['foo', 'bar']]]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(['enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
@@ -438,8 +474,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => 1]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(1),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
@@ -479,8 +517,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => 1]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations([
+            'get' => (new Get())->withMercure(1),
+        ])]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 

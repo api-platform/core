@@ -11,7 +11,7 @@
         <service id="api_platform.doctrine.orm.listener.mercure.publish" class="ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />

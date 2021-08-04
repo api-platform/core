@@ -20,15 +20,22 @@ use ApiPlatform\Metadata\ApiResource;
 final class AttributeDefaultOperations
 {
     #[ApiProperty(identifier: true)]
-    private int $identifier;
+    private $identifier;
+    private $name;
 
-    public function __construct(int $identifier, public string $name)
+    public function __construct(int $identifier, string $name)
     {
         $this->identifier = $identifier;
+        $this->name = $name;
     }
 
     public function getIdentifier()
     {
         return $this->identifier;
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 }

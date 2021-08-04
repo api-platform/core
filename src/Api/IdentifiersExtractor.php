@@ -62,7 +62,8 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
             }
 
-            if (is_scalar($identifierValue) || $identifierValue instanceof \Stringable) {
+            // TODO: php 8 remove method_exists
+            if (is_scalar($identifierValue) || method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
                 $identifiers[$parameterName] = (string) $identifierValue;
                 continue;
             }
@@ -76,7 +77,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 if (1 === \count($relatedIdentifiers)) {
                     $identifierValue = $this->resolveIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)[1]);
 
-                    if (is_scalar($identifierValue) || $identifierValue instanceof \Stringable) {
+                    if (is_scalar($identifierValue) || method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
                         $identifiers[$parameterName] = (string) $identifierValue;
                         continue;
                     }

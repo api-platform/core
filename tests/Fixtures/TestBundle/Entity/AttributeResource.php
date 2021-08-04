@@ -30,17 +30,31 @@ use ApiPlatform\Metadata\Put;
 final class AttributeResource
 {
     #[ApiProperty(identifier: true)]
-    private int $identifier;
+    private $identifier;
 
-    public ?Dummy $dummy = null;
+    /**
+     * @var ?Dummy
+     */
+    public $dummy = null;
 
-    public function __construct(int $identifier, public string $name)
+    /**
+     * @var string
+     */
+    public $name;
+
+    public function __construct(int $identifier, string $name)
     {
         $this->identifier = $identifier;
+        $this->name = $name;
     }
 
     public function getIdentifier()
     {
         return $this->identifier;
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 }

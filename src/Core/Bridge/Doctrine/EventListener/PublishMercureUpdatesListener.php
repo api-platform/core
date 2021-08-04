@@ -20,6 +20,7 @@ use ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -72,7 +73,7 @@ final class PublishMercureUpdatesListener
      * @param array<string, string[]|string> $formats
      * @param HubRegistry|callable           $hubRegistry
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, SerializerInterface $serializer, array $formats, MessageBusInterface $messageBus = null, $hubRegistry = null, ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ExpressionLanguage $expressionLanguage = null)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
@@ -172,7 +173,11 @@ final class PublishMercureUpdatesListener
             return;
         }
 
-        $options = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('mercure', false);
+        try {
+            $options = $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getMercure() ?? false;
+        } catch (OperationNotFoundException $e) {
+            return;
+        }
 
         if (\is_string($options)) {
             if (null === $this->expressionLanguage) {
@@ -264,12 +269,7 @@ final class PublishMercureUpdatesListener
             $data = json_encode(['@id' => $object->id]);
         } else {
             $resourceClass = $this->getObjectClass($object);
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext();
-            } else {
-                // TODO: remove in 3.0
-                $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getAttribute('normalization_context', []);
-            }
+            $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext();
 
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($object, null, UrlGeneratorInterface::ABS_URL);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
