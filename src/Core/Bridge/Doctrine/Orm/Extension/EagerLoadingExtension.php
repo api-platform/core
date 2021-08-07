@@ -228,8 +228,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 continue;
             }
 
-            $isNotReadableLink = false === $propertyMetadata->isReadableLink();
-            if (null === $fetchEager && (false === $propertyMetadata->isReadable() || ((null === $inAttributes && $isNotReadableLink) || (false === $inAttributes)))) {
+            if (true !== $fetchEager && (false === $propertyMetadata->isReadable() || false === $inAttributes)) {
                 continue;
             }
 
@@ -270,6 +269,11 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // Avoid recursive joins for self-referencing relations
             if ($mapping['targetEntity'] === $resourceClass) {
+                continue;
+            }
+
+            // Only join the relation's relations recursively if it's a readableLink
+            if (true !== $fetchEager && (true !== $propertyMetadata->isReadableLink())) {
                 continue;
             }
 

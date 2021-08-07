@@ -11,11 +11,12 @@ Feature: Eager Loading
     Then the response status code should be 200
     And the DQL should be equal to:
     """
-    SELECT o, thirdLevel_a1, relatedToDummyFriend_a2, dummyFriend_a3
+    SELECT o, thirdLevel_a1, fourthLevel_a2, relatedToDummyFriend_a3, dummyFriend_a4
     FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
         LEFT JOIN o.thirdLevel thirdLevel_a1
-        LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a2
-        LEFT JOIN relatedToDummyFriend_a2.dummyFriend dummyFriend_a3
+        LEFT JOIN thirdLevel_a1.fourthLevel fourthLevel_a2
+        LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a3
+        LEFT JOIN relatedToDummyFriend_a3.dummyFriend dummyFriend_a4
     WHERE o.id = :id_id
     """
 
@@ -45,11 +46,12 @@ Feature: Eager Loading
     Then the response status code should be 200
     And the DQL should be equal to:
     """
-    SELECT o, thirdLevel_a4, relatedToDummyFriend_a1, dummyFriend_a5
+    SELECT o, thirdLevel_a4, fourthLevel_a5, relatedToDummyFriend_a1, dummyFriend_a6
     FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
         INNER JOIN o.relatedToDummyFriend relatedToDummyFriend_a1
         LEFT JOIN o.thirdLevel thirdLevel_a4
-        INNER JOIN relatedToDummyFriend_a1.dummyFriend dummyFriend_a5
+        LEFT JOIN thirdLevel_a4.fourthLevel fourthLevel_a5
+        INNER JOIN relatedToDummyFriend_a1.dummyFriend dummyFriend_a6
     WHERE o IN(
             SELECT o_a2
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o_a2
@@ -81,11 +83,12 @@ Feature: Eager Loading
     Then the response status code should be 200
     And the DQL should be equal to:
     """
-    SELECT o, thirdLevel_a3, relatedToDummyFriend_a4, dummyFriend_a5
+    SELECT o, thirdLevel_a3, fourthLevel_a4, relatedToDummyFriend_a5, dummyFriend_a6
     FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
         LEFT JOIN o.thirdLevel thirdLevel_a3
-        LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a4
-        LEFT JOIN relatedToDummyFriend_a4.dummyFriend dummyFriend_a5
+        LEFT JOIN thirdLevel_a3.fourthLevel fourthLevel_a4
+        LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a5
+        LEFT JOIN relatedToDummyFriend_a5.dummyFriend dummyFriend_a6
     WHERE o.id IN (
             SELECT related_dummy_a1.id
             FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy related_dummy_a1
