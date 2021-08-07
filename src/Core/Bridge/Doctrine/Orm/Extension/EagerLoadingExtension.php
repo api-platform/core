@@ -268,13 +268,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $queryBuilder->addSelect($associationAlias);
             }
 
-            // Avoid recursive joins
+            // Avoid recursive joins for self-referencing relations
             if ($mapping['targetEntity'] === $resourceClass) {
-                // Avoid joining the same association twice (see #1959)
-                if (!\in_array($associationAlias, $queryBuilder->getAllAliases(), true)) {
-                    $queryBuilder->addSelect($associationAlias);
-                }
-
                 continue;
             }
 
