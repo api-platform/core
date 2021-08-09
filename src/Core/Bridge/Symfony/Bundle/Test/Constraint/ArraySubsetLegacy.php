@@ -27,7 +27,7 @@ final class ArraySubsetLegacy extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function evaluate($other, $description = '', $returnResult = false)
+    public function evaluate($other, $description = '', $returnResult = false): ?bool
     {
         return $this->_evaluate($other, $description, $returnResult);
     }

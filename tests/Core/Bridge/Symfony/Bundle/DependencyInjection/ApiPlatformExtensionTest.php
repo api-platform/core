@@ -997,7 +997,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.collection_data_provider',
             'api_platform.data_persister',
             'api_platform.legacy_data_provider_state',
-            'api_platform.debug.command',
             'api_platform.filter_collection_factory',
             'api_platform.filter_locator',
             'api_platform.filters',

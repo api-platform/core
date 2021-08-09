@@ -354,11 +354,6 @@
             </argument>
             <tag name="kernel.cache_warmer" priority="64" />
         </service>
-
-        <service id="api_platform.debug.command" class="ApiPlatform\Bridge\Symfony\Bundle\Command\DebugResourceCommand">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <tag name="console.command" />
-        </service>
     </services>
 
 </container>

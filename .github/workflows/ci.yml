@@ -7,7 +7,7 @@ on:
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COVERAGE: '0'
-  SYMFONY_DEPRECATIONS_HELPER: 'disabled=1'
+  SYMFONY_DEPRECATIONS_HELPER: disabled=1
 
 jobs:
   php-cs-fixer:
@@ -148,7 +148,7 @@ jobs:
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml --log-junit build/logs/phpunit/junit.xml
+            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
           else
             vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
           fi
