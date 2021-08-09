@@ -1461,6 +1461,8 @@ final class DoctrineContext implements Context
 
     /**
      * @Given there is a ramsey identified resource with uuid :uuid
+     *
+     * @param non-empty-string $uuid
      */
     public function thereIsARamseyIdentifiedResource(string $uuid)
     {
