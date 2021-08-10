@@ -22,6 +22,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -337,5 +338,25 @@ class CollectionNormalizerTest extends TestCase
             'uri' => 'http://example.com/foos',
             'resource_class' => 'Foo',
         ]);
+    }
+
+    public function testPreserveEmptyObject()
+    {
+        $data = new \ArrayObject();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS => true
+        ]);
+
+        $this->assertSame($data, $actual);
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, []);
+
+        $this->assertSame([], $actual);
     }
 }
