@@ -10,10 +10,10 @@ api_platform:
             - '%kernel.project_dir%/config/api_resources_orm.yaml'
 
 services:
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager:
+    ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager:
         decorates: 'doctrine.orm.default_entity_manager'
         arguments:
-            $wrapped: '@ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager.inner'
+            $wrapped: '@ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager.inner'
             $repositoryFactory: '@doctrine.orm.container_repository_factory'
 
     app.my_dummy_resource.search_filter:
@@ -68,7 +68,7 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
 
     app.related_dummy_resource.complex_sub_query_filter:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ComplexSubQueryFilter
+        class: ApiPlatform\Tests\Fixtures\TestBundle\Filter\ComplexSubQueryFilter
         arguments: ['@doctrine']
         tags: [ { name: 'api_platform.filter', id: 'related_dummy.complex_sub_query' } ]
 
@@ -77,19 +77,19 @@ services:
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\GeneratorDataProvider:
+    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\GeneratorDataProvider:
         public: false
         tags:
             -   name: 'api_platform.item_data_provider'
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
+    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
         public: false
         arguments:
             $managerRegistry: '@doctrine'
         tags:
             -   name: 'api_platform.item_data_provider'
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
+    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
         public: false
         arguments:
             $managerRegistry: '@doctrine'
@@ -97,39 +97,39 @@ services:
             -   name: 'api_platform.item_data_provider'
 
     app.dummy_dto_no_input.data_provider:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
         public: false
         arguments: ['@doctrine']
         tags:
             -  { name: 'api_platform.collection_data_provider' }
 
     app.dummy_dto_no_output_data_persister:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        class: ApiPlatform\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
         arguments: ['@doctrine']
         public: false
         tags:
             -  { name: 'api_platform.data_persister' }
 
     app.graphql.query_resolver.dummy_custom_not_retrieved_item:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_only_persist:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistMutationResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistMutationResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.messenger_handler.messenger_with_inputs:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\Entity\MessengerWithInputHandler'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Entity\MessengerWithInputHandler'
         public: false
         tags:
             -  { name: 'messenger.message_handler' }

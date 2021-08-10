@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver;
+namespace ApiPlatform\GraphQl\Resolver;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -40,7 +41,7 @@ final class ResourceFieldResolver
     {
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
-            return $this->iriConverter->getItemIriFromResourceClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]);
+            return $this->iriConverter->getIriFromResourceClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], 'force_collection' => false]);
         }
 
         if ('_id' === $info->fieldName && !isset($source['_id']) && isset($source['id'])) {

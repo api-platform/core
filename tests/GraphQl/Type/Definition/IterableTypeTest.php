@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type\Definition;
 
-use ApiPlatform\Core\GraphQl\Type\Definition\IterableType;
+use ApiPlatform\GraphQl\Type\Definition\IterableType;
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;

@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\Payment;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\Payment;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Payment as PaymentDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Payment;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Payment as PaymentDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Payment;
 
 final class VoidPaymentAction
 {

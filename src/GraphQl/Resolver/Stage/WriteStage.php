@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 /**
  * Write stage of GraphQL resolvers.
@@ -27,13 +27,13 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
  */
 final class WriteStage implements WriteStageInterface
 {
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $dataPersister;
     private $serializerContextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContextAwareDataPersisterInterface $dataPersister, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ContextAwareDataPersisterInterface $dataPersister, SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->dataPersister = $dataPersister;
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
@@ -43,8 +43,9 @@ final class WriteStage implements WriteStageInterface
      */
     public function __invoke($data, string $resourceClass, string $operationName, array $context)
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (null === $data || !$resourceMetadata->getGraphqlAttribute($operationName, 'write', true, true)) {
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        if (null === $data || !$operation->canWrite()) {
             return $data;
         }
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
 
-use ApiPlatform\Core\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer;
 use GraphQL\Error\Error;
 use PHPUnit\Framework\TestCase;
 

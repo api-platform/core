@@ -1,5 +1,5 @@
 resources:
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\DummyAddress:
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyAddress:
         collectionOperations:
             get:
                 openapi_context:

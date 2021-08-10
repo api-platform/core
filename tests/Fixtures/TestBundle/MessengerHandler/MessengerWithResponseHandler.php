@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 

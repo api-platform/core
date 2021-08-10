@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Error;
+namespace ApiPlatform\GraphQl\Error;
 
 use GraphQL\Error\Error;
 

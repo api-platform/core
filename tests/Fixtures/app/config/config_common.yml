@@ -21,6 +21,7 @@ mercure:
             jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyJmb28iLCJiYXIiXSwicHVibGlzaCI6WyJmb28iXX19.LRLvirgONK13JgacQ_VbcjySbVhkSmHy3IznH3tA9PM
 
 api_platform:
+    metadata_backward_compatibility_layer: false
     title:                             'My Dummy API'
     description: |
         This is a test API.
@@ -78,7 +79,7 @@ parameters:
 
 services:
     test.client:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\BrowserKit\Client
+        class: ApiPlatform\Tests\Fixtures\TestBundle\BrowserKit\Client
         shared: false
         public: true
         arguments:
@@ -87,52 +88,58 @@ services:
             - '@test.client.history'
             - '@test.client.cookiejar'
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\MessageHandler\:
+    ApiPlatform\Tests\Fixtures\TestBundle\MessageHandler\:
         resource: '../../TestBundle/MessageHandler'
         autowire: true
         autoconfigure: true
 
+    attribute_resources.state_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     contain_non_resource.item_data_provider:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false
         tags:
             -  { name: 'api_platform.item_data_provider' }
 
     serializable.item_data_provider:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\SerializableItemDataProvider'
         public: false
         tags:
             -  { name: 'api_platform.item_data_provider' }
 
     resource_interface.data_provider:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ResourceInterfaceImplementationDataProvider'
         public: false
         tags:
             -  { name: 'api_platform.item_data_provider' }
             -  { name: 'api_platform.collection_data_provider' }
 
     app.serializer.denormalizer.serializable_resource:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\SerializableResourceDenormalizer'
         public: false
         tags:
             -  { name: 'serializer.normalizer' }
 
     app.serializer.denormalizer.related_dummy_plain_identifier:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\RelatedDummyPlainIdentifierDenormalizer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\RelatedDummyPlainIdentifierDenormalizer'
         public: false
-        arguments: ['@api_platform.iri_converter']
+        arguments: ['@api_platform.iri_converter.legacy']
         tags:
             -  { name: 'serializer.normalizer' }
 
     app.serializer.denormalizer.dummy_plain_identifier:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DummyPlainIdentifierDenormalizer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DummyPlainIdentifierDenormalizer'
         public: false
-        arguments: ['@api_platform.iri_converter']
+        arguments: ['@api_platform.iri_converter.legacy']
         tags:
             -  { name: 'serializer.normalizer' }
 
     app.name_converter:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
     app.my_dummy_resource.property_filter:
         parent:    'api_platform.serializer.property_filter'
@@ -142,50 +149,50 @@ services:
         parent: 'api_platform.serializer.property_filter'
         tags: [ { name: 'api_platform.filter', id: 'dummy_travel.property' } ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
         arguments: ['@doctrine']
         tags: ['api_platform.filter']
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\LengthFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\LengthFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\PatternFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\PatternFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\:
+    ApiPlatform\Tests\Fixtures\TestBundle\Controller\:
         resource: '../../TestBundle/Controller'
         autowire: true
         autoconfigure: true
         tags: ['controller.service_arguments']
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\EnumFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\EnumFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter:
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter:
         arguments: [ '@doctrine' ]
         tags: [ 'api_platform.filter' ]
 
     app.config_dummy_resource.action:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Action\ConfigCustom'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Action\ConfigCustom'
         arguments: ['@api_platform.item_data_provider']
         public: true
 
@@ -226,7 +233,7 @@ services:
         class: Psr\Log\NullLogger
 
     api_platform.http_cache.purger:
-        class: ApiPlatform\Core\Tests\Fixtures\NullPurger
+        class: ApiPlatform\Tests\Fixtures\NullPurger
 
     test.api_platform.http_cache.purger:
         alias: api_platform.http_cache.purger
@@ -241,148 +248,148 @@ services:
         public: true
 
     app.dummy_validation.group_generator:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
+        class: ApiPlatform\Tests\Fixtures\TestBundle\Validator\DummyValidationGroupsGenerator
         public: true
 
     mercure.hub.default.message_handler:
-        class: ApiPlatform\Core\Tests\Fixtures\DummyMercureUpdateHandler
+        class: ApiPlatform\Tests\Fixtures\DummyMercureUpdateHandler
         public: true
         tags: ['messenger.message_handler']
     mercure.hub.default.publisher: '@mercure.hub.default.message_handler'
 
     app.serializer.normalizer.override_documentation:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
+        class: ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
         decorates: api_platform.swagger.normalizer.documentation
         public: false
         arguments: ['@app.serializer.normalizer.override_documentation.inner']
 
     app.data_transformer.custom_input_dto:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\CustomInputDtoDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomInputDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.custom_output_dto:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\CustomOutputDtoDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomOutputDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.custom_output_dto_fallback_same_class:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
         public: false
         tags:
             - { name: 'api_platform.data_transformer' }
 
     app.data_transformer.input_dto:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\InputDtoDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\InputDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.output_dto:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.dummy_dto_no_input_to_output_dto:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\DummyDtoNoInputToOutputDtoDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\DummyDtoNoInputToOutputDtoDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.recover_password_input:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordInputDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordInputDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.recover_password_output:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordOutputDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordOutputDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.data_transformer.initialize_input:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\InitializeInputDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\InitializeInputDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.messenger_handler.messenger_with_response:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
         public: false
         tags:
             -  { name: 'messenger.message_handler' }
 
     app.graphql.query_resolver.dummy_custom_item:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryCollectionResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryCollectionResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.query_resolver.dummy_custom_collection_no_read_and_serialize:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeCollectionResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeCollectionResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.mutation_resolver.dummy_custom:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumMutationResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumMutationResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_not_persisted:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNotPersistedMutationResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNotPersistedMutationResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_no_write_custom_result:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNoWriteCustomResultMutationResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumNoWriteCustomResultMutationResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.graphql.mutation_resolver.upload_media_object:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMediaObjectResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.graphql.mutation_resolver.upload_multiple_media_object:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\UploadMultipleMediaObjectResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.graphql.date_time_type:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType'
         public: false
         tags:
             - { name: 'api_platform.graphql.type' }
 
     app.graphql.type_converter:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Type\TypeConverter'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\TypeConverter'
         decorates: 'api_platform.graphql.type_converter'
         arguments: ['@app.graphql.type_converter.inner']
         public: false
 
     app.data_transformer.rpc_output:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer\RPCOutputDataTransformer'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RPCOutputDataTransformer'
         public: false
         tags:
             -  { name: 'api_platform.data_transformer' }
 
     app.security.authentication_entrypoint:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\Security\AuthenticationEntryPoint'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Security\AuthenticationEntryPoint'
         arguments:
             $router: '@router'

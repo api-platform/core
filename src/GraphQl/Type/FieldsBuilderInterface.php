@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\GraphQl\Operation;
 
 /**
  * Interface implemented to build GraphQL fields.
@@ -32,27 +32,27 @@ interface FieldsBuilderInterface
     /**
      * Gets the item query fields of the schema.
      */
-    public function getItemQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array;
+    public function getItemQueryFields(string $resourceClass, Operation $operation, string $queryName, array $configuration): array;
 
     /**
      * Gets the collection query fields of the schema.
      */
-    public function getCollectionQueryFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $queryName, array $configuration): array;
+    public function getCollectionQueryFields(string $resourceClass, Operation $operation, string $queryName, array $configuration): array;
 
     /**
      * Gets the mutation fields of the schema.
      */
-    public function getMutationFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $mutationName): array;
+    public function getMutationFields(string $resourceClass, Operation $operation, string $mutationName): array;
 
     /**
      * Gets the subscription fields of the schema.
      */
-    public function getSubscriptionFields(string $resourceClass, ResourceMetadata $resourceMetadata, string $subscriptionName): array;
+    public function getSubscriptionFields(string $resourceClass, Operation $operation, string $subscriptionName): array;
 
     /**
      * Gets the fields of the type of the given resource.
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth, ?array $ioMetadata): array;
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, string $operationName, int $depth = 0, ?array $ioMetadata = null): array;
 
     /**
      * Resolve the args of a resource by resolving its types.

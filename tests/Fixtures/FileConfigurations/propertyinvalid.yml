@@ -1,4 +1,4 @@
 resources:
-    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
+    'ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
         properties:
             'foo': 'invalid'

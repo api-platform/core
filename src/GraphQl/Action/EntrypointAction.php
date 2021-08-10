@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Action;
+namespace ApiPlatform\GraphQl\Action;
 
-use ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface;
-use ApiPlatform\Core\GraphQl\ExecutorInterface;
-use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
+use ApiPlatform\GraphQl\ExecutorInterface;
+use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Error\Debug;
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;

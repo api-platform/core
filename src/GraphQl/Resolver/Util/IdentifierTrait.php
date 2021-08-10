@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Util;
+namespace ApiPlatform\GraphQl\Resolver\Util;
 
 /**
  * Identifier helper methods.

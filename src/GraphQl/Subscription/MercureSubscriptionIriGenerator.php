@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Subscription;
+namespace ApiPlatform\GraphQl\Subscription;
 
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Routing\RequestContext;

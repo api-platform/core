@@ -11,15 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -33,14 +34,14 @@ final class SerializeStage implements SerializeStageInterface
 {
     use IdentifierTrait;
 
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $normalizer;
     private $serializerContextBuilder;
     private $pagination;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->normalizer = $normalizer;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->pagination = $pagination;
@@ -51,12 +52,27 @@ final class SerializeStage implements SerializeStageInterface
      */
     public function __invoke($itemOrCollection, string $resourceClass, string $operationName, array $context): ?array
     {
+        //TODO: replace by $operation->isCollection and $operation instanceof Mutation
         $isCollection = $context['is_collection'];
         $isMutation = $context['is_mutation'];
         $isSubscription = $context['is_subscription'];
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (!$resourceMetadata->getGraphqlAttribute($operationName, 'serialize', true, true)) {
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        try {
+            $shortName = $resourceMetadataCollection->getGraphQlOperation($operationName)->getShortName();
+        } catch (OperationNotFoundException $e) {
+            $shortName = $resourceMetadataCollection->getOperation()->getShortName();
+        }
+
+        $operation = null;
+
+        try {
+            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        } catch (OperationNotFoundException $e) {
+            // In some cases the operation may not exist
+        }
+
+        if ($operation && !$operation->canSerialize()) {
             if ($isCollection) {
                 if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
                     return 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
@@ -107,7 +123,7 @@ final class SerializeStage implements SerializeStageInterface
         }
 
         if ($isMutation || $isSubscription) {
-            $wrapFieldName = lcfirst($resourceMetadata->getShortName());
+            $wrapFieldName = lcfirst($shortName);
 
             return [$wrapFieldName => $data] + ($isMutation ? $this->getDefaultMutationData($context) : $this->getDefaultSubscriptionData($context));
         }

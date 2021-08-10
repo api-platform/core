@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy as RelatedDummyEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy as RelatedDummyEntity;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;

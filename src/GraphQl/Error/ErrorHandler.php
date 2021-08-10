@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Error;
+namespace ApiPlatform\GraphQl\Error;
 
 /**
  * Handles the errors thrown by the GraphQL library by applying the formatter to them (default behavior).

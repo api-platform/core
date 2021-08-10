@@ -11,18 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ArrayTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -39,16 +40,16 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $iriConverter;
     private $collectionDataProvider;
     private $subresourceDataProvider;
     private $serializerContextBuilder;
     private $nestingSeparator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->iriConverter = $iriConverter;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
@@ -61,8 +62,14 @@ final class ReadStage implements ReadStageInterface
      */
     public function __invoke(?string $resourceClass, ?string $rootClass, string $operationName, array $context)
     {
-        $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;
-        if ($resourceMetadata && !$resourceMetadata->getGraphqlAttribute($operationName, 'read', true, true)) {
+        $operation = null;
+        try {
+            $operation = $resourceClass ? $this->resourceMetadataCollectionFactory->create($resourceClass)->getGraphQlOperation($operationName) : null;
+        } catch (OperationNotFoundException $e) {
+            // ReadStage may be invoked without an existing operation
+        }
+
+        if ($operation && !$operation->canRead()) {
             return $context['is_collection'] ? [] : null;
         }
 
@@ -79,7 +86,7 @@ final class ReadStage implements ReadStageInterface
                 }
 
                 if ($resourceClass !== $this->getObjectClass($item)) {
-                    throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()));
+                    throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $operation->getShortName()));
                 }
             }
 

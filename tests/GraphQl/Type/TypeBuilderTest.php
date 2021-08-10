@@ -14,14 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\DataProvider\Pagination;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\GraphQl\Type\FieldsBuilderInterface;
-use ApiPlatform\Core\GraphQl\Type\TypeBuilder;
-use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
+use ApiPlatform\GraphQl\Type\TypeBuilder;
+use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
@@ -52,7 +56,7 @@ class TypeBuilderTest extends TestCase
     private $fieldsBuilderLocatorProphecy;
 
     /** @var ObjectProphecy */
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
 
     /** @var TypeBuilder */
     private $typeBuilder;
@@ -66,25 +70,25 @@ class TypeBuilderTest extends TestCase
         $this->defaultFieldResolver = function () {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typeBuilder = new TypeBuilder(
             $this->typesContainerProphecy->reveal(),
             $this->defaultFieldResolver,
             $this->fieldsBuilderLocatorProphecy->reveal(),
-            new Pagination($this->resourceMetadataFactoryProphecy->reveal())
+            new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal())
         );
     }
 
     public function testGetResourceObjectType(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => (new Query())->withShortName('shortName')->withDescription('description')])]);
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, 'item_query', null, null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'item_query', false);
         $this->assertSame('shortName', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -92,22 +96,21 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, 'item_query', null, null, 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('item_query'), false, 'item_query', 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
 
     public function testGetResourceObjectTypeOutputClass(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql(['item_query' => ['output' => ['class' => 'outputClass']]]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => (new Query())->withShortName('shortName')->withDescription('description')->withOutput(['class' => 'outputClass'])])]);
         $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, 'item_query', null, null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'item_query', false);
         $this->assertSame('shortName', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -115,7 +118,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $resourceMetadata, false, 'item_query', null, null, 0, ['class' => 'outputClass'])->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $resourceMetadata->getGraphQlOperation('item_query'), false, 'item_query', 0, ['class' => 'outputClass'])->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
@@ -125,18 +128,17 @@ class TypeBuilderTest extends TestCase
      */
     public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, string $shortName, string $queryName)
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql([
-                'item_query' => ['normalization_context' => ['groups' => [$itemSerializationGroup]]],
-                'collection_query' => ['normalization_context' => ['groups' => [$collectionSerializationGroup]]],
-            ]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
+            'item_query' => (new Query())->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => [$itemSerializationGroup]]),
+            'collection_query' => (new Query())->withShortName('shortName')->withDescription('description')->withCollection(true)->withNormalizationContext(['groups' => [$collectionSerializationGroup]]),
+        ])]);
         $this->typesContainerProphecy->has($shortName)->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set($shortName, Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, $queryName, null, null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $queryName, false);
         $this->assertSame($shortName, $resourceObjectType->name);
     }
 
@@ -166,14 +168,14 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeInput(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations(['custom' => (new Mutation())->withShortName('shortName')->withDescription('description')])]);
         $this->typesContainerProphecy->has('customShortNameInput')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('customShortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var NonNull $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, true, null, 'custom', null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'custom', true);
         /** @var InputObjectType $wrappedType */
         $wrappedType = $resourceObjectType->getWrappedType();
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
@@ -183,22 +185,21 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, true, null, 'custom', null, 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('custom'), true, 'custom', 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
     }
 
     public function testGetResourceObjectTypeCustomMutationInputArgs(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql(['custom' => ['args' => []]]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations(['custom' => (new Mutation())->withShortName('shortName')->withDescription('description')->withArgs([])])]);
         $this->typesContainerProphecy->has('customShortNameInput')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('customShortNameInput', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var NonNull $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, true, null, 'custom', null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'custom', true);
         /** @var InputObjectType $wrappedType */
         $wrappedType = $resourceObjectType->getWrappedType();
         $this->assertInstanceOf(InputObjectType::class, $wrappedType);
@@ -208,7 +209,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, true, null, 'custom', null, 0, null)
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('custom'), true, 'custom', 0, null)
             ->shouldBeCalled()->willReturn(['clientMutationId' => GraphQLType::string()]);
         $fieldsBuilderProphecy->resolveResourceArgs([], 'custom', 'shortName')->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
@@ -217,14 +218,18 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeMutation(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
+            'create' => (new Mutation())->withShortName('shortName')->withDescription('description'),
+            'item_query' => (new Query())->withShortName('shortName')->withDescription('description'),
+        ]),
+        ]);
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNamePayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, 'create', null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'create', false);
         $this->assertSame('createShortNamePayload', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -244,18 +249,17 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeMutationWrappedType(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql([
-                'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
-                'create' => ['normalization_context' => ['groups' => ['create']]],
-            ]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
+            'item_query' => (new Query())->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['item_query']]),
+            'create' => (new Mutation())->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['create']]),
+        ])]);
         $this->typesContainerProphecy->has('createShortNamePayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNamePayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, 'create', null);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'create', false);
         $this->assertSame('createShortNamePayload', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -281,21 +285,21 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, null, 'create', null, 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('create'), false, 'create', 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
     }
 
     public function testGetResourceObjectTypeMutationNested(): void
     {
-        $resourceMetadata = new ResourceMetadata('shortName', 'description');
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations(['create' => (new Mutation())->withShortName('shortName')->withDescription('description')])]);
         $this->typesContainerProphecy->has('createShortNameNestedPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('createShortNameNestedPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, 'create', null, false, 1);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'create', false, false, 1);
         $this->assertSame('createShortNameNestedPayload', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -303,21 +307,25 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, null, 'create', null, 1, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('create'), false, 'create', 1, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
 
     public function testGetResourceObjectTypeSubscription(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))->withAttributes(['mercure' => true]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
+            'update' => (new Subscription())->withShortName('shortName')->withDescription('description')->withMercure(true),
+            'item_query' => (new Query())->withShortName('shortName')->withDescription('description'),
+        ]),
+        ]);
         $this->typesContainerProphecy->has('updateShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null, 'update');
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'update', false);
         $this->assertSame('updateShortNameSubscriptionPayload', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -339,18 +347,17 @@ class TypeBuilderTest extends TestCase
 
     public function testGetResourceObjectTypeSubscriptionWrappedType(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))
-            ->withGraphql([
-                'item_query' => ['normalization_context' => ['groups' => ['item_query']]],
-                'update' => ['normalization_context' => ['groups' => ['update']]],
-            ]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
+            'item_query' => (new Query())->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['item_query']]),
+            'update' => (new Subscription())->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['update']]),
+        ])]);
         $this->typesContainerProphecy->has('updateShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null, 'update');
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'update', false);
         $this->assertSame('updateShortNameSubscriptionPayload', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -377,21 +384,21 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $wrappedType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, null, null, 'update', 0, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('update'), false, 'update', 0, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $wrappedType->config['fields']();
     }
 
     public function testGetResourceObjectTypeSubscriptionNested(): void
     {
-        $resourceMetadata = (new ResourceMetadata('shortName', 'description'))->withAttributes(['mercure' => true]);
+        $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations(['update' => (new Subscription())->withShortName('shortName')->withDescription('description')->withMercure(true)])]);
         $this->typesContainerProphecy->has('updateShortNameSubscriptionNestedPayload')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('updateShortNameSubscriptionNestedPayload', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var ObjectType $resourceObjectType */
-        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, false, null, null, 'update', false, 1);
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, 'update', false, false, 1);
         $this->assertSame('updateShortNameSubscriptionNestedPayload', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
@@ -399,7 +406,7 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata, false, null, null, 'update', 1, null)->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('resourceClass', $resourceMetadata->getGraphQlOperation('update'), false, 'update', 1, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }
@@ -432,15 +439,11 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
-
-        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            null,
-            ['pagination_type' => 'cursor']
-        ));
+        $this->resourceMetadataCollectionFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('StringResourceClass', [
+            (new ApiResource())->withGraphQlOperations([
+                'operationName' => (new Query())->withPaginationType('cursor'),
+            ]),
+        ]));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
         $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
@@ -495,14 +498,11 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->set('StringConnection', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
-        $this->resourceMetadataFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            null,
-            ['pagination_type' => 'page']
-        ));
+        $this->resourceMetadataCollectionFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('StringResourceClass', [
+            (new ApiResource())->withGraphQlOperations([
+                'operationName' => (new Query())->withPaginationType('page'),
+            ]),
+        ]));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
         $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');

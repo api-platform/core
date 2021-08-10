@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -57,7 +57,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var \DateTime A dummy date
      *
-     * @ODM\Field(type="date")
+     * @ODM\Field(type="date", nullable=true)
      * @Assert\DateTime
      * @Groups({"friends"})
      */

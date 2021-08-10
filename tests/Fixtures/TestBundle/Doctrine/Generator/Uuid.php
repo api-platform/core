@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator;
 
 class Uuid implements \JsonSerializable
 {

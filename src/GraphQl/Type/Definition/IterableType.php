@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type\Definition;
+namespace ApiPlatform\GraphQl\Type\Definition;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\BooleanValueNode;

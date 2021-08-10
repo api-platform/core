@@ -11,15 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
+namespace ApiPlatform\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\CloneTrait;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -43,9 +44,9 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private $serializeStage;
     private $queryResolverLocator;
     private $requestStack;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestStack $requestStack = null)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, RequestStack $requestStack = null)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
@@ -53,7 +54,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
         $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
         $this->requestStack = $requestStack;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
@@ -79,9 +80,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 throw new \LogicException('Collection from read stage should be iterable.');
             }
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+            try {
+                $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+                $queryResolverId = $operation->getResolver();
+            } catch (OperationNotFoundException $e) {
+                $queryResolverId = null;
+            }
 
-            $queryResolverId = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query');
             if (null !== $queryResolverId) {
                 /** @var QueryCollectionResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);

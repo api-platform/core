@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManager;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
@@ -189,8 +189,8 @@ class SubscriptionManagerTest extends TestCase
         ]);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
 
-        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update', ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']);
-        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update', ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['resultBar', 'clientSubscriptionId' => 'client-subscription-id']);
+        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update_subscription', ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']);
+        $this->serializeStageProphecy->__invoke($object, Dummy::class, 'update_subscription', ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['resultBar', 'clientSubscriptionId' => 'client-subscription-id']);
 
         $this->assertSame([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
     }

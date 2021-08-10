@@ -11,16 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
+namespace ApiPlatform\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Core\Util\CloneTrait;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**
@@ -38,16 +38,16 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
     private $readStage;
     private $securityStage;
     private $serializeStage;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $subscriptionManager;
     private $mercureSubscriptionIriGenerator;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SerializeStageInterface $serializeStage, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubscriptionManagerInterface $subscriptionManager, ?MercureSubscriptionIriGeneratorInterface $mercureSubscriptionIriGenerator)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SerializeStageInterface $serializeStage, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SubscriptionManagerInterface $subscriptionManager, ?MercureSubscriptionIriGeneratorInterface $mercureSubscriptionIriGenerator)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
         $this->serializeStage = $serializeStage;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->subscriptionManager = $subscriptionManager;
         $this->mercureSubscriptionIriGenerator = $mercureSubscriptionIriGenerator;
     }
@@ -75,9 +75,10 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
 
             $subscriptionId = $this->subscriptionManager->retrieveSubscriptionId($resolverContext, $result);
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
 
-            if ($subscriptionId && ($mercure = $resourceMetadata->getAttribute('mercure', false))) {
+            if ($subscriptionId && ($mercure = $operation->getMercure())) {
                 if (!$this->mercureSubscriptionIriGenerator) {
                     throw new \LogicException('Cannot use Mercure for subscriptions when MercureBundle is not installed. Try running "composer require mercure".');
                 }

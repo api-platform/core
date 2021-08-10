@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\Core\DataProvider\ArrayPaginator;
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
+use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 
 /**
  * Resolver for dummy collection custom query (collection not read and no result serialized).

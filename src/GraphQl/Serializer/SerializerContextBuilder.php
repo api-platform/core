@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Serializer;
+namespace ApiPlatform\GraphQl\Serializer;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -28,38 +29,46 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $nameConverter;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?NameConverterInterface $nameConverter)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?NameConverterInterface $nameConverter)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->nameConverter = $nameConverter;
     }
 
     public function create(?string $resourceClass, string $operationName, array $resolverContext, bool $normalization): array
     {
-        $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;
+        $context = ['resource_class' => $resourceClass, 'graphql_operation_name' => $operationName];
+        $operation = null;
 
-        $context = [
-            'resource_class' => $resourceClass,
-            'graphql_operation_name' => $operationName,
-        ];
+        if ($resourceClass) {
+            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+            try {
+                $operation = $resourceMetadata->getGraphQlOperation($operationName);
+            } catch (OperationNotFoundException $e) {
+                // It's possible that the serialization context may not be tight to an existing operation
+            }
+
+            try {
+                $context['operation_name'] = $resourceMetadata->getOperation()->getName();
+            } catch (OperationNotFoundException $e) {
+            }
+        }
 
         if (isset($resolverContext['fields'])) {
             $context['no_resolver_data'] = true;
         }
 
-        if ($resourceMetadata) {
-            $context['input'] = $resourceMetadata->getGraphqlAttribute($operationName, 'input', null, true);
-            $context['output'] = $resourceMetadata->getGraphqlAttribute($operationName, 'output', null, true);
-
-            $key = $normalization ? 'normalization_context' : 'denormalization_context';
-            $context = array_merge($resourceMetadata->getGraphqlAttribute($operationName, $key, [], true), $context);
+        if ($operation) {
+            $context['input'] = $operation->getInput();
+            $context['output'] = $operation->getOutput();
+            $context = $normalization ? array_merge($operation->getNormalizationContext(), $context) : array_merge($operation->getDenormalizationContext(), $context);
         }
 
         if ($normalization) {
-            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $resourceMetadata, $resolverContext, $context);
+            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation, $resolverContext, $context);
         }
 
         return $context;
@@ -68,7 +77,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     /**
      * Retrieves fields, recursively replaces the "_id" key (the raw id) by "id" (the name of the property expected by the Serializer) and flattens edge and node structures (pagination).
      */
-    private function fieldsToAttributes(?string $resourceClass, ?ResourceMetadata $resourceMetadata, array $resolverContext, array $context): array
+    private function fieldsToAttributes(?string $resourceClass, ?Operation $operation, array $resolverContext, array $context): array
     {
         if (isset($resolverContext['fields'])) {
             $fields = $resolverContext['fields'];
@@ -81,11 +90,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields['collection'] ?? $fields, $resourceClass, $context);
 
         if ($resolverContext['is_mutation'] || $resolverContext['is_subscription']) {
-            if (!$resourceMetadata) {
-                throw new \LogicException('ResourceMetadata should always exist for a mutation or a subscription.');
+            if (!$operation) {
+                throw new \LogicException('An operation should always exist for a mutation or a subscription.');
             }
 
-            $wrapFieldName = lcfirst($resourceMetadata->getShortName());
+            $wrapFieldName = lcfirst($operation->getShortName());
 
             return $attributes[$wrapFieldName] ?? [];
         }

@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\OutputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 
 final class DummyDtoNoInputToOutputDtoDataTransformer implements DataTransformerInterface
 {

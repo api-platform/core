@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -37,19 +37,19 @@ final class TypeConverter implements TypeConverterInterface
 {
     private $typeBuilder;
     private $typesContainer;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
 
-    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
         $this->typeBuilder = $typeBuilder;
         $this->typesContainer = $typesContainer;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, string $operationName, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
@@ -62,7 +62,7 @@ final class TypeConverter implements TypeConverterInterface
                 return GraphQLType::string();
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if ($resourceType = $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $depth)) {
+                if ($resourceType = $this->getResourceType($type, $input, $operationName, $depth)) {
                     return $resourceType;
                 }
 
@@ -76,7 +76,7 @@ final class TypeConverter implements TypeConverterInterface
                     return GraphQLType::string();
                 }
 
-                return $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $depth);
+                return $this->getResourceType($type, $input, $operationName, $depth);
             default:
                 return null;
         }
@@ -100,7 +100,7 @@ final class TypeConverter implements TypeConverterInterface
         throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
     }
 
-    private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth): ?GraphQLType
+    private function getResourceType(Type $type, bool $input, string $operationName, int $depth): ?GraphQLType
     {
         if (
             $this->typeBuilder->isCollection($type) &&
@@ -116,19 +116,29 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         try {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            if (null === $resourceMetadata->getGraphql()) {
-                return null;
-            }
-            if ('Node' === $resourceMetadata->getShortName()) {
-                throw new \UnexpectedValueException('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
-            }
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
         } catch (ResourceClassNotFoundException $e) {
-            // Skip objects that are not resources for now
             return null;
         }
 
-        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, false, $depth);
+        $hasGraphQl = false;
+        $operation = null;
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            if (null !== $resourceMetadata->getGraphQlOperations()) {
+                $hasGraphQl = true;
+                break;
+            }
+        }
+
+        if (isset($resourceMetadataCollection[0]) && 'Node' === $resourceMetadataCollection[0]->getShortName()) {
+            throw new \UnexpectedValueException('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
+        }
+
+        if (!$hasGraphQl) {
+            return null;
+        }
+
+        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operationName, $input, false, $depth);
     }
 
     private function resolveAstTypeNode(TypeNode $astTypeNode, string $fromType): ?GraphQLType

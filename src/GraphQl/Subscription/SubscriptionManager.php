@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Subscription;
+namespace ApiPlatform\GraphQl\Subscription;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Core\Util\SortTrait;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -92,7 +92,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
             $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
 
-            $data = ($this->serializeStage)($object, $resourceClass, 'update', $resolverContext);
+            $data = ($this->serializeStage)($object, $resourceClass, 'update_subscription', $resolverContext);
             unset($data['clientSubscriptionId']);
 
             if ($data !== $subscriptionResult) {

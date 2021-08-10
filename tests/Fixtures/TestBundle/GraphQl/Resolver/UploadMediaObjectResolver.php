@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
-use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\MediaObject;
+use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\MediaObject;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**

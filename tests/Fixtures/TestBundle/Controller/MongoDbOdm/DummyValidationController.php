@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Controller\MongoDbOdm;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\MongoDbOdm;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyValidation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyValidation;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DummyValidationController

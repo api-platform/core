@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
+use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -28,7 +28,7 @@ class CustomGeneratedIdentifier
     /**
      * @var Uuid
      *
-     * @ODM\Id(strategy="CUSTOM", type="string", options={"class"="ApiPlatform\Core\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator"})
+     * @ODM\Id(strategy="CUSTOM", type="string", options={"class"="ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator"})
      */
     private $id;
 

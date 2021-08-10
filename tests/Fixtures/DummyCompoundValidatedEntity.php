@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures;
+namespace ApiPlatform\Tests\Fixtures;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Validator\Constraint\DummyCompoundRequirements;
+use ApiPlatform\Tests\Fixtures\TestBundle\Validator\Constraint\DummyCompoundRequirements;
 
 class DummyCompoundValidatedEntity
 {

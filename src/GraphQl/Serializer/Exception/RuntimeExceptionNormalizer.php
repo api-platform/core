@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Serializer\Exception;
+namespace ApiPlatform\GraphQl\Serializer\Exception;
 
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;

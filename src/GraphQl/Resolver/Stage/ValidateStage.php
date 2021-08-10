@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Validator\ValidatorInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 /**
  * Validate stage of GraphQL resolvers.
@@ -25,12 +25,12 @@ use ApiPlatform\Core\Validator\ValidatorInterface;
  */
 final class ValidateStage implements ValidateStageInterface
 {
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $validator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ValidatorInterface $validator)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ValidatorInterface $validator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->validator = $validator;
     }
 
@@ -39,12 +39,13 @@ final class ValidateStage implements ValidateStageInterface
      */
     public function __invoke($object, string $resourceClass, string $operationName, array $context): void
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (!$resourceMetadata->getGraphqlAttribute($operationName, 'validate', true, true)) {
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+
+        if (!$operation->canValidate()) {
             return;
         }
 
-        $validationGroups = $resourceMetadata->getGraphqlAttribute($operationName, 'validation_groups', null, true);
-        $this->validator->validate($object, ['groups' => $validationGroups]);
+        $this->validator->validate($object, $operation->getValidationContext());
     }
 }

@@ -12,7 +12,7 @@ Feature: Eager Loading
     And the DQL should be equal to:
     """
     SELECT o, thirdLevel_a1, relatedToDummyFriend_a2, dummyFriend_a3
-    FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
+    FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
         LEFT JOIN o.thirdLevel thirdLevel_a1
         LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a2
         LEFT JOIN relatedToDummyFriend_a2.dummyFriend dummyFriend_a3
@@ -26,12 +26,12 @@ Feature: Eager Loading
     And the DQL should be equal to:
     """
     SELECT o
-    FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o
+    FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy o
         INNER JOIN o.relatedDummy relatedDummy_a1
         INNER JOIN relatedDummy_a1.thirdLevel thirdLevel_a2
     WHERE o IN(
             SELECT o_a3
-            FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy o_a3
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy o_a3
                 INNER JOIN o_a3.relatedDummy relatedDummy_a4
                 INNER JOIN relatedDummy_a4.thirdLevel thirdLevel_a5
             WHERE thirdLevel_a5.level = :level_p1
@@ -46,13 +46,13 @@ Feature: Eager Loading
     And the DQL should be equal to:
     """
     SELECT o, thirdLevel_a4, relatedToDummyFriend_a1, dummyFriend_a5
-    FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
+    FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
         INNER JOIN o.relatedToDummyFriend relatedToDummyFriend_a1
         LEFT JOIN o.thirdLevel thirdLevel_a4
         INNER JOIN relatedToDummyFriend_a1.dummyFriend dummyFriend_a5
     WHERE o IN(
             SELECT o_a2
-            FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy o_a2
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o_a2
                 INNER JOIN o_a2.relatedToDummyFriend relatedToDummyFriend_a3
             WHERE relatedToDummyFriend_a3.dummyFriend = :dummyFriend_p1
         )
@@ -69,7 +69,7 @@ Feature: Eager Loading
     And the DQL should be equal to:
     """
     SELECT o, car_a1, passenger_a2
-    FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyTravel o
+    FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel o
         LEFT JOIN o.car car_a1
         LEFT JOIN o.passenger passenger_a2
     WHERE o.id = :id_id
@@ -82,13 +82,13 @@ Feature: Eager Loading
     And the DQL should be equal to:
     """
     SELECT o, thirdLevel_a3, relatedToDummyFriend_a4, dummyFriend_a5
-    FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
+    FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy o
         LEFT JOIN o.thirdLevel thirdLevel_a3
         LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a4
         LEFT JOIN relatedToDummyFriend_a4.dummyFriend dummyFriend_a5
     WHERE o.id IN (
             SELECT related_dummy_a1.id
-            FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy related_dummy_a1
+            FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy related_dummy_a1
             INNER JOIN related_dummy_a1.relatedToDummyFriend related_to_dummy_friend_a2
             WITH related_to_dummy_friend_a2.name = :name_p1
         )

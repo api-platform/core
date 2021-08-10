@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver;
+namespace ApiPlatform\GraphQl\Resolver;
 
 /**
  * A function resolving a GraphQL mutation.

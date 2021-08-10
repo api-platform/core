@@ -13,15 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
-use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
+use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -37,7 +39,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
     private $readStageProphecy;
     private $securityStageProphecy;
     private $serializeStageProphecy;
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
     private $subscriptionManagerProphecy;
     private $mercureSubscriptionIriGeneratorProphecy;
 
@@ -49,7 +51,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $this->readStageProphecy = $this->prophesize(ReadStageInterface::class);
         $this->securityStageProphecy = $this->prophesize(SecurityStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->subscriptionManagerProphecy = $this->prophesize(SubscriptionManagerInterface::class);
         $this->mercureSubscriptionIriGeneratorProphecy = $this->prophesize(MercureSubscriptionIriGeneratorInterface::class);
 
@@ -57,7 +59,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
             $this->readStageProphecy->reveal(),
             $this->securityStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
-            $this->resourceMetadataFactoryProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->subscriptionManagerProphecy->reveal(),
             $this->mercureSubscriptionIriGeneratorProphecy->reveal()
         );
@@ -88,7 +90,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $subscriptionId = 'subscriptionId';
         $this->subscriptionManagerProphecy->retrieveSubscriptionId($resolverContext, $serializeStageData)->shouldBeCalled()->willReturn($subscriptionId);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Subscription())->withMercure(true)])]));
 
         $mercureUrl = 'mercure-url';
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl($subscriptionId, null)->shouldBeCalled()->willReturn($mercureUrl);
@@ -157,7 +159,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
 
         $this->subscriptionManagerProphecy->retrieveSubscriptionId($resolverContext, $serializeStageData)->willReturn(null);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Subscription())->withMercure(true)])]));
 
         $this->mercureSubscriptionIriGeneratorProphecy->generateMercureUrl(Argument::any())->shouldNotBeCalled();
 
@@ -183,7 +185,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $subscriptionId = 'subscriptionId';
         $this->subscriptionManagerProphecy->retrieveSubscriptionId($resolverContext, $serializeStageData)->willReturn($subscriptionId);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn((new ResourceMetadata())->withAttributes(['mercure' => true]));
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Subscription())->withMercure(true)])]));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot use Mercure for subscriptions when MercureBundle is not installed. Try running "composer require mercure".');
@@ -192,7 +194,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
             $this->readStageProphecy->reveal(),
             $this->securityStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
-            $this->resourceMetadataFactoryProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->subscriptionManagerProphecy->reveal(),
             null
         );

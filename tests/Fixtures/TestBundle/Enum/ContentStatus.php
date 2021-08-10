@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Enum;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Enum;
 
 final class ContentStatus implements \JsonSerializable
 {

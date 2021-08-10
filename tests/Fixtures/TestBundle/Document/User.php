@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 

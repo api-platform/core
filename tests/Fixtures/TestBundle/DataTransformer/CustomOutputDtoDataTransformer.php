@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 
 final class CustomOutputDtoDataTransformer implements DataTransformerInterface
 {

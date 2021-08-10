@@ -32,6 +32,15 @@
 * Exception: Add the ability to customize multiple status codes based on the validation exception (#4017)
 * GraphQL: Fix graphql fetching with Elasticsearch (#4217)
 * ApiLoader: Support `_format` resolving (#4292)
+* Metadata: new namespace `ApiPlatform\Metadata` instead of `ApiPlatform\Core\Metadata`, for example `ApiPlatform\Metadata\ApiResource` (#4351)
+* Metadata: deprecation of `ApiPlatform\Core\Annotation` (#4351)
+* Metadata: `ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface` is deprecated in favor of `ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface` (#4351)
+* Metadata: item and collection prefixes for operations are deprecated, as well as the `ApiPlatform\Core\Api\OperationType` class (#4351)
+* Graphql: `ApiPlatform\Metadata\GraphQl` follow the same metadata conventions (a Subscription operation is available and isn't hidden behind an update Mutation anymore), interfaces got simplified (beeing @experimental) (#4351)
+* IriConverter: new interface for `ApiPlatform\Bridge\Symfony\Routing\IriConverter` that adds an operationName, same for `ApiPlatform\Api\IdentifiersExtractor` (#4351)
+* DataProvider: new `ApiPlatform\State\ProviderInterface` that replaces DataProviders (#4351)
+* DataPersister: new `ApiPlatform\State\ProcessorInterface` that replaces DataPersisters (#4351)
+* A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
 
 ## 2.6.5
 

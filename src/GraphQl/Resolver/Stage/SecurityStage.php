@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -26,12 +26,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 final class SecurityStage implements SecurityStageInterface
 {
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $resourceAccessChecker;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?ResourceAccessCheckerInterface $resourceAccessChecker)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?ResourceAccessCheckerInterface $resourceAccessChecker)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
@@ -40,9 +40,9 @@ final class SecurityStage implements SecurityStageInterface
      */
     public function __invoke(string $resourceClass, string $operationName, array $context): void
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        $isGranted = $resourceMetadata->getGraphqlAttribute($operationName, 'security', null, true);
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        $isGranted = $operation->getSecurity();
 
         if (null !== $isGranted && null === $this->resourceAccessChecker) {
             throw new \LogicException('Cannot check security expression when SecurityBundle is not installed. Try running "composer require symfony/security-bundle".');
@@ -52,6 +52,6 @@ final class SecurityStage implements SecurityStageInterface
             return;
         }
 
-        throw new AccessDeniedHttpException($resourceMetadata->getGraphqlAttribute($operationName, 'security_message', 'Access Denied.'));
+        throw new AccessDeniedHttpException($operation->getSecurityMessage() ?? 'Access Denied.');
     }
 }

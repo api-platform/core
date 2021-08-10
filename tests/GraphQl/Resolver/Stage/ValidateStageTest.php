@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\ValidateStage;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -32,7 +34,7 @@ class ValidateStageTest extends TestCase
 
     /** @var ValidateStage */
     private $validateStage;
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
     private $validatorProphecy;
 
     /**
@@ -40,11 +42,11 @@ class ValidateStageTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->validatorProphecy = $this->prophesize(ValidatorInterface::class);
 
         $this->validateStage = new ValidateStage(
-            $this->resourceMetadataFactoryProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->validatorProphecy->reveal()
         );
     }
@@ -53,10 +55,8 @@ class ValidateStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
-            $operationName => ['validate' => false],
-        ]);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $resourceMetadata = (new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withValidate(false)])]));
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
 
@@ -68,10 +68,8 @@ class ValidateStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
-            $operationName => ['validation_groups' => $validationGroups],
-        ]);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $resourceMetadata = (new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withValidationContext(['groups' => $validationGroups])])]));
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $object = new \stdClass();
         $this->validatorProphecy->validate($object, ['groups' => $validationGroups])->shouldBeCalled();
@@ -84,12 +82,10 @@ class ValidateStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
-            $operationName => ['validation_groups' => $validationGroups],
-        ]);
+        $resourceMetadata = (new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withValidationContext(['groups' => $validationGroups])])]));
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $context = ['info' => $info];
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $object = new \stdClass();
         $this->validatorProphecy->validate($object, ['groups' => $validationGroups])->shouldBeCalled()->willThrow(new ValidationException());
