@@ -20,11 +20,14 @@ use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * Sets the list of resources' IRIs included in this response in the "Cache-Tags" HTTP header.
+ * Sets the list of resources' IRIs included in this response in the "Cache-Tags" and/or "xkey" HTTP headers.
  *
  * The "Cache-Tags" is used because it is supported by CloudFlare.
  *
  * @see https://support.cloudflare.com/hc/en-us/articles/206596608-How-to-Purge-Cache-Using-Cache-Tags-Enterprise-only-
+ *
+ * The "xkey" is used because it is supported by Varnish.
+ * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
@@ -34,15 +37,21 @@ final class AddTagsListener
 {
     use OperationRequestInitiatorTrait;
     private $iriConverter;
+    private $xkeyEnabled;
+    private $xkeyGlue;
+    private $httpTagsEnabled;
 
-    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, bool $xkeyEnabled = false, string $xkeyGlue = ' ', bool $httpTagsEnabled = true)
     {
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->xkeyEnabled = $xkeyEnabled;
+        $this->xkeyGlue = $xkeyGlue;
+        $this->httpTagsEnabled = $httpTagsEnabled;
     }
 
     /**
-     * Adds the "Cache-Tags" header.
+     * Adds the "Cache-Tags" and "xkey" headers.
      */
     public function onKernelResponse(ResponseEvent $event): void
     {
@@ -69,6 +78,12 @@ final class AddTagsListener
             return;
         }
 
-        $response->headers->set('Cache-Tags', implode(',', $resources));
+        if ($this->httpTagsEnabled) {
+            $response->headers->set('Cache-Tags', implode(',', $resources));
+        }
+
+        if ($this->xkeyEnabled) {
+            $response->headers->set('xkey', implode($this->xkeyGlue, $resources));
+        }
     }
 }
