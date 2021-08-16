@@ -11,13 +11,15 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Exception;
 
 /**
- * Invalid argument exception.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * An exception which has a serializable application-specific error code.
  */
-class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+interface ErrorCodeSerializableInterface
 {
+    /**
+     * Gets the application-specific error code.
+     */
+    public static function getErrorCode(): string;
 }

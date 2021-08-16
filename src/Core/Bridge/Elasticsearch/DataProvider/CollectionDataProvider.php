@@ -21,8 +21,8 @@ use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMeta
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 

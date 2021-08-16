@@ -73,7 +73,7 @@ class FormatsProviderTest extends TestCase
 
     public function testBadFormatsShortDeclaration()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectException(\ApiPlatform\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('You either need to add the format \'foo\' to your project configuration or declare a mime type for it in your annotation.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -87,7 +87,7 @@ class FormatsProviderTest extends TestCase
 
     public function testInvalidFormatsShortDeclaration()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectException(\ApiPlatform\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The \'formats\' attributes value must be a string when trying to include an already configured format, array given.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -101,7 +101,7 @@ class FormatsProviderTest extends TestCase
 
     public function testInvalidFormatsDeclaration()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectException(\ApiPlatform\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The \'formats\' attributes must be an array, string given for resource class \'Foo\'.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -147,7 +147,7 @@ class FormatsProviderTest extends TestCase
 
     public function testBadFormatsShortDeclarationFromOperation()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectException(\ApiPlatform\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('You either need to add the format \'foo\' to your project configuration or declare a mime type for it in your annotation.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -161,7 +161,7 @@ class FormatsProviderTest extends TestCase
 
     public function testInvalidFormatsShortDeclarationFromOperation()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectException(\ApiPlatform\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The \'formats\' attributes value must be a string when trying to include an already configured format, array given.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -175,7 +175,7 @@ class FormatsProviderTest extends TestCase
 
     public function testInvalidFormatsDeclarationFromOperation()
     {
-        $this->expectException(\ApiPlatform\Core\Exception\InvalidArgumentException::class);
+        $this->expectException(\ApiPlatform\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The \'formats\' attributes must be an array, string given for resource class \'Foo\'.');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);

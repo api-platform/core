@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\PathResolver\UnderscoreOperationPathResolver;
+use ApiPlatform\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**

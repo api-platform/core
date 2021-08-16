@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer;
 
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
+use ApiPlatform\Exception\InvalidIdentifierException;
 use Ramsey\Uuid\Exception\InvalidUuidStringException;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;

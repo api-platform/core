@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Exception;
 
 /**
- * Resource class not found exception.
+ * Identifier is not valid exception.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class ResourceClassNotFoundException extends \Exception implements ExceptionInterface
+final class InvalidIdentifierException extends \Exception implements ExceptionInterface
 {
 }

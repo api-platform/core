@@ -12,10 +12,46 @@
 declare(strict_types=1);
 
 spl_autoload_register(function ($className) {
+    // We can not class alias when working with doctrine annotations
+    static $deprecatedAnnotations = [
+        'ApiResource' => [ApiPlatform\Core\Annotation\ApiResource::class, ApiPlatform\Metadata\ApiResource::class],
+        'ApiProperty' => [ApiPlatform\Core\Annotation\ApiProperty::class, ApiPlatform\Metadata\ApiProperty::class],
+    ];
+
     static $deprecatedClasses = [
-        // TODO: we can not work with an alias with doctrine annotations
-        // ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
         ApiPlatform\Core\Api\UrlGeneratorInterface::class => ApiPlatform\Api\UrlGeneratorInterface::class,
+        ApiPlatform\Core\Annotation\ApiResource::class => ApiPlatform\Metadata\ApiResource::class,
+        ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
+        ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
+        ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class,
+
+        ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory::class,
+        ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,
+        ApiPlatform\Core\Metadata\Property\Factory\DefaultPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\DefaultPropertyMetadataFactory::class,
+
+        ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class,
+        ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class,
+        // ApiPlatform\Core\Metadata\Extractor\ExtractorInterface::class => ApiPlatform\Metadata\Extractor\ExtractorInterface::class,
+        // ApiPlatform\Core\Metadata\Extractor\AbstractExtractor::class => ApiPlatform\Metadata\Extractor\AbstractExtractor::class,
+        // ApiPlatform\Core\Metadata\Extractor\XmlExtractor::class => ApiPlatform\Metadata\Extractor\XmlExtractor::class,
+        // ApiPlatform\Core\Metadata\Extractor\YamlExtractor::class => ApiPlatform\Metadata\Extractor\YamlExtractor::class,
+
+        ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class,
+        ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class => ApiPlatform\Metadata\Property\PropertyNameCollection::class,
+        ApiPlatform\Core\Api\ResourceClassResolverInterface::class => ApiPlatform\Api\ResourceClassResolverInterface::class,
+
+        // Exceptions
+        ApiPlatform\Core\Exception\DeserializationException::class => ApiPlatform\Exception\DeserializationException::class,
+        ApiPlatform\Core\Exception\FilterValidationException::class => ApiPlatform\Exception\FilterValidationException::class,
+        ApiPlatform\Core\Exception\InvalidArgumentException::class => ApiPlatform\Exception\InvalidArgumentException::class,
+        ApiPlatform\Core\Exception\InvalidIdentifierException::class => ApiPlatform\Exception\InvalidIdentifierException::class,
+        ApiPlatform\Core\Exception\InvalidResourceException::class => ApiPlatform\Exception\InvalidResourceException::class,
+        ApiPlatform\Core\Exception\InvalidValueException::class => ApiPlatform\Exception\InvalidValueException::class,
+        ApiPlatform\Core\Exception\PropertyNotFoundException::class => ApiPlatform\Exception\PropertyNotFoundException::class,
+        ApiPlatform\Core\Exception\RuntimeException::class => ApiPlatform\Exception\RuntimeException::class,
+        ApiPlatform\Core\Exception\ResourceClassNotFoundException::class => ApiPlatform\Exception\ResourceClassNotFoundException::class,
+        ApiPlatform\Core\Exception\ResourceClassNotSupportedException::class => ApiPlatform\Exception\ResourceClassNotSupportedException::class,
+        ApiPlatform\Core\Exception\ItemNotFoundException::class => ApiPlatform\Exception\ItemNotFoundException::class,
 
         // GraphQl
         ApiPlatform\Core\GraphQl\Executor::class => ApiPlatform\GraphQl\Executor::class,
@@ -81,9 +117,21 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Type\TypeBuilder::class => ApiPlatform\GraphQl\Type\TypeBuilder::class,
     ];
 
+    if (ApiPlatform\Core\Metadata\Property\PropertyMetadata::class === $className) {
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, ApiPlatform\Metadata\ApiProperty::class));
+    }
+
+    // No class alias
     if (isset($deprecatedClasses[$className])) {
         class_alias($deprecatedClasses[$className], $className);
         trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClasses[$className]));
+
+        return;
+    }
+
+    if (isset($deprecatedAnnotations[$className])) {
+        [$annotationClassName, $attributeClassName] = $deprecatedAnnotations[$className];
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The Doctrine annotation %s is deprecated, use the PHP attribute %s instead.', $annotationClassName, $attributeClassName));
 
         return;
     }

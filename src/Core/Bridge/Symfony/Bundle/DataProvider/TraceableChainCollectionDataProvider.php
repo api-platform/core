@@ -18,7 +18,7 @@ use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictDataProviderTrait;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Exception\ResourceClassNotSupportedException;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>

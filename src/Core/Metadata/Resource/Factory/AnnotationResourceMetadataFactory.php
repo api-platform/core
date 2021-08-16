@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use Doctrine\Common\Annotations\Reader;
 
 /**

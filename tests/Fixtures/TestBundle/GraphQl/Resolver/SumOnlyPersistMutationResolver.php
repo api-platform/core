@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomMutation;
 

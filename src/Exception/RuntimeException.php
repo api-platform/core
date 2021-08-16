@@ -11,8 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Exception;
 
-class InvalidValueException extends InvalidArgumentException
+/**
+ * Runtime exception.
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

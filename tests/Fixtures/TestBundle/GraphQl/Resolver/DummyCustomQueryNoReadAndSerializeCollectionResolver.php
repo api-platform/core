@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
 use ApiPlatform\Core\DataProvider\ArrayPaginator;
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;

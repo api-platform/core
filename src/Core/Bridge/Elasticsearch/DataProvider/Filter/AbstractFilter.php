@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 

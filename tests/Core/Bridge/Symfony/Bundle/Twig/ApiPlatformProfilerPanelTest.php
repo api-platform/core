@@ -218,7 +218,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     /**
      * @group legacy
-     * Group legacy is due ApiPlatform\Core\Exception\ResourceClassNotSupportedException, the annotation could be removed in 3.0 but the test should stay
+     * Group legacy is due ApiPlatform\Exception\ResourceClassNotSupportedException, the annotation could be removed in 3.0 but the test should stay
      */
     public function testGetItemProfiler()
     {

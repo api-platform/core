@@ -15,8 +15,6 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\ContextAwareIdentifierConverterInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -26,6 +24,8 @@ use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Util\CloneTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
+use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;

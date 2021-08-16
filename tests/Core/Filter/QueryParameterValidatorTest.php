@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Filter;
 
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Exception\FilterValidationException;
 use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
