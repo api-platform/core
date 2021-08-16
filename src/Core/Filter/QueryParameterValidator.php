@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Filter;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Exception\FilterValidationException;
+use ApiPlatform\Exception\FilterValidationException;
 use Psr\Container\ContainerInterface;
 
 /**

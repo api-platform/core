@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Serializer;
 
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Serializer\SerializerFilterContextBuilder;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;

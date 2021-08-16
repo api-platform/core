@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\HttpCache\PurgerInterface;
+use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Exception\RuntimeException;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;

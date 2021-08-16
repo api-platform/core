@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Annotation;
 
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\InvalidArgumentException;
 
 /**
  * Filter annotation.

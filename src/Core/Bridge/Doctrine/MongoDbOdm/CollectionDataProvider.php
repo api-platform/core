@@ -17,8 +17,8 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionE
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Exception\RuntimeException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;

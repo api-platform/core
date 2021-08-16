@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 

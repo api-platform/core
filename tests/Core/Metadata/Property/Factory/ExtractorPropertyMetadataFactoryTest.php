@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory;
@@ -22,6 +20,8 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;

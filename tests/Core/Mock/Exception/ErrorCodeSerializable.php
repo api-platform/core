@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Mock\Exception;
 
-use ApiPlatform\Core\Exception\ErrorCodeSerializableInterface;
+use ApiPlatform\Exception\ErrorCodeSerializableInterface;
 
 class ErrorCodeSerializable extends \Exception implements ErrorCodeSerializableInterface
 {

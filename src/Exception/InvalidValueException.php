@@ -11,13 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Exception;
 
-/**
- * Property not found exception.
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
- */
-class PropertyNotFoundException extends \Exception implements ExceptionInterface
+class InvalidValueException extends InvalidArgumentException
 {
 }

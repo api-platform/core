@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Exception\RuntimeException;
 
 /**
  * Extracts identifiers for a given Resource according to the retrieved Metadata.

@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\Annotation;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Tests\Fixtures\AnnotatedClass;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use Doctrine\Common\Annotations\AnnotationReader;

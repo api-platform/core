@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainSubresourc
 use ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Exception\ResourceClassNotSupportedException;
 use PHPUnit\Framework\TestCase;
 
 /**

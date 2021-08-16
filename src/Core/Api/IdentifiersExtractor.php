@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Api\IdentifiersExtractor as NewIdentifiersExtractor;
-use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

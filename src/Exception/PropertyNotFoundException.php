@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Exception;
 
 /**
- * Invalid resource exception.
+ * Property not found exception.
  *
- * @author Paul Le Corre <paul@lecorre.me>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class InvalidResourceException extends \Exception implements ExceptionInterface
+class PropertyNotFoundException extends \Exception implements ExceptionInterface
 {
 }

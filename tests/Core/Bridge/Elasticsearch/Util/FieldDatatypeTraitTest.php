@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Util;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;

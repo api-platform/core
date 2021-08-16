@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\RamseyUuid\Identifier\Normalizer;
 
 use ApiPlatform\Core\Bridge\RamseyUuid\Identifier\Normalizer\UuidNormalizer;
-use ApiPlatform\Core\Exception\InvalidIdentifierException;
+use ApiPlatform\Exception\InvalidIdentifierException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
