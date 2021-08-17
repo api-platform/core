@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Util;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\PropertyInfo\Type;
 

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\ItemNotFoundException;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\Exception\RuntimeException;
 
 /**
  * Converts item and resources to IRI and vice versa.

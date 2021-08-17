@@ -23,7 +23,7 @@ class DateTimeIdentifierNormalizerTest extends TestCase
 {
     public function testDenormalize()
     {
-        $this->expectException(\ApiPlatform\Exception\InvalidIdentifierException::class);
+        $this->expectException(\ApiPlatform\Core\Exception\InvalidIdentifierException::class);
 
         $normalizer = new DateTimeIdentifierDenormalizer();
         $normalizer->denormalize('not valid', \DateTimeImmutable::class);

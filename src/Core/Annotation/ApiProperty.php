@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Annotation;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 
 /**
  * ApiProperty annotation.

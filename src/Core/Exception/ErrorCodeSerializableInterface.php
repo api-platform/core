@@ -11,13 +11,15 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
+namespace ApiPlatform\Core\Exception;
 
 /**
- * Item not found exception.
- *
- * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ * An exception which has a serializable application-specific error code.
  */
-class ItemNotFoundException extends InvalidArgumentException
+interface ErrorCodeSerializableInterface
 {
+    /**
+     * Gets the application-specific error code.
+     */
+    public static function getErrorCode(): string;
 }

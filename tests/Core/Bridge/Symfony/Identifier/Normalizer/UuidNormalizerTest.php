@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Identifier\Normalizer;
 
 use ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer;
-use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;

@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
+namespace ApiPlatform\Core\Exception;
 
 /**
- * Invalid argument exception.
+ * Identifier is not valid exception.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+final class InvalidIdentifierException extends \Exception implements ExceptionInterface
 {
 }

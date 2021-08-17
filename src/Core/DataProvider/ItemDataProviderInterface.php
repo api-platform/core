@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * Retrieves items from a persistence layer.

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\Exception;
 
-use ApiPlatform\Exception\ExceptionInterface;
+use ApiPlatform\Core\Exception\ExceptionInterface;
 
 /**
  * Index not found exception.

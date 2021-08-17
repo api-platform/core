@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

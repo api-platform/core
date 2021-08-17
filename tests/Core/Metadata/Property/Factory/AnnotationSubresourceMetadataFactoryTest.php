@@ -18,7 +18,7 @@ use ApiPlatform\Core\Metadata\Property\Factory\AnnotationSubresourceMetadataFact
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\InvalidResourceException;
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;

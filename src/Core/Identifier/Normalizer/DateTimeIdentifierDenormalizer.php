@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Identifier\Normalizer;
 
-use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 

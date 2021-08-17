@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 
 /**

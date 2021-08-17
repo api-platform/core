@@ -17,8 +17,8 @@ use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
 use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
@@ -101,7 +101,7 @@ class ChainItemDataProviderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Throwing a "ApiPlatform\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
+     * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
     public function testLegacyGetItem()
     {
@@ -144,7 +144,7 @@ class ChainItemDataProviderTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Throwing a "ApiPlatform\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
+     * @expectedDeprecation Throwing a "ApiPlatform\Core\Exception\ResourceClassNotSupportedException" is deprecated in favor of implementing "ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface"
      */
     public function testLegacyGetItemExceptions()
     {

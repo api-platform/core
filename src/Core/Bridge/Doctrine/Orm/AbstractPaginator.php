@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\DataProvider\PartialPaginatorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 

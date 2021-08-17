@@ -16,7 +16,7 @@ namespace ApiPlatform\Metadata\Property\Factory;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
-use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 use Symfony\Component\PropertyInfo\Type;

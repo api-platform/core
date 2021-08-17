@@ -17,7 +17,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Util\Reflection;
-use ApiPlatform\Exception\InvalidResourceException;
+use ApiPlatform\Core\Exception\InvalidResourceException;
 use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\PropertyInfo\Type;

@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 

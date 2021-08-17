@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
+namespace ApiPlatform\Core\Exception;
 
 /**
- * Invalid resource exception.
+ * Base exception interface.
  *
- * @author Paul Le Corre <paul@lecorre.me>
+ * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class InvalidResourceException extends \Exception implements ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }

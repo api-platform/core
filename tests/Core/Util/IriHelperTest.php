@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Util;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Util\IriHelper;
-use ApiPlatform\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**

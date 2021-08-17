@@ -18,7 +18,7 @@ use ApiPlatform\Core\DataProvider\ChainItemDataProvider;
 use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider;
 use ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>

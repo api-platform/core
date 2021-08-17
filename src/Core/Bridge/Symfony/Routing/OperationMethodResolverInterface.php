@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationMethodResolverInterface as BaseOperationMethodResolverInterface;
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use Symfony\Component\Routing\Route;
 
 /**

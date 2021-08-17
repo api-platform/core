@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer;
 
-use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Core\Exception\InvalidIdentifierException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Uid\Uuid;
 

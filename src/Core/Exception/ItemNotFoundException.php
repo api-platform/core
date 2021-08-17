@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
+namespace ApiPlatform\Core\Exception;
 
 /**
- * Resource class not found exception.
+ * Item not found exception.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-class ResourceClassNotFoundException extends \Exception implements ExceptionInterface
+class ItemNotFoundException extends InvalidArgumentException
 {
 }

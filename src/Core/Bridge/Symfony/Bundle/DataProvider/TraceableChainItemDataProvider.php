@@ -18,7 +18,7 @@ use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderIn
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictDataProviderTrait;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>

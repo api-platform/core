@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\DataProvider;
 
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 
 /**
  * Tries each configured data provider and returns the result of the first able to handle the resource class.

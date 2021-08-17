@@ -11,15 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Validator\Exception;
-
-use ApiPlatform\Core\Exception\RuntimeException;
+namespace ApiPlatform\Core\Exception;
 
 /**
- * Thrown when a validation error occurs.
+ * Runtime exception.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ValidationException extends RuntimeException
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }

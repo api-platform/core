@@ -11,16 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
-
-use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
+namespace ApiPlatform\Core\Exception;
 
 /**
- * Deserialization exception.
+ * Resource class not supported exception.
  *
- * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DeserializationException extends \Exception implements ExceptionInterface, SerializerExceptionInterface
+class ResourceClassNotSupportedException extends \Exception implements ExceptionInterface
 {
 }

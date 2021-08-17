@@ -17,7 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainCollection
 use ApiPlatform\Core\DataProvider\ChainCollectionDataProvider;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
 use PHPUnit\Framework\TestCase;
 
 /**
