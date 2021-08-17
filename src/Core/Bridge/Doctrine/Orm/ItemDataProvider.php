@@ -64,7 +64,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface;
+        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface && 'item' === ($context['operation_type'] ?? '');
     }
 
     /**

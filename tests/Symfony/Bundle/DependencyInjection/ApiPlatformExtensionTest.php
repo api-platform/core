@@ -1157,6 +1157,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.uri_variables.converter',
             'api_platform.uri_variables.transformer.date_time',
             'api_platform.uri_variables.transformer.integer',
+            'api_platform.metadata.resource.metadata_collection_factory.extractor.xml',
         ];
 
         if (class_exists(AbstractUid::class)) {
@@ -1549,6 +1550,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator.query_parameter_validator',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.doctrine.orm.state.processor',
+            'api_platform.metadata.resource.metadata_collection_factory.extractor.xml',
+            'api_platform.metadata.resource.metadata_collection_factory.extractor.yaml',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {

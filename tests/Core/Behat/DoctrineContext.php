@@ -92,6 +92,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Book;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
@@ -148,6 +149,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Product;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -1290,6 +1292,77 @@ final class DoctrineContext implements Context
     {
         $urlEncodedIdResource = ($this->isOrm() ? new UrlEncodedId() : new UrlEncodedIdDocument());
         $this->manager->persist($urlEncodedIdResource);
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a Program
+     */
+    public function thereIsAProgram()
+    {
+        $this->thereArePrograms(1);
+    }
+
+    /**
+     * @Given there are :nb Programs
+     */
+    public function thereArePrograms(int $nb)
+    {
+        $author = new User();
+        $author->setEmail('john.doe@example.com');
+        $author->setFullname('John DOE');
+        $author->setPlainPassword('p4$$w0rd');
+
+        $this->manager->persist($author);
+        $this->manager->flush();
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $program = new Program();
+            $program->name = "Lorem ipsum $i";
+            $program->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
+            $program->author = $author;
+
+            $this->manager->persist($program);
+        }
+
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a Comment
+     */
+    public function thereIsAComment()
+    {
+        $this->thereAreComments(1);
+    }
+
+    /**
+     * @Given there are :nb Comments
+     */
+    public function thereAreComments(int $nb)
+    {
+        $author = $this->doctrine->getRepository(User::class)->findOneBy(['email' => 'john.doe@example.com']);
+        if (null === $author) {
+            $author = new User();
+            $author->setEmail('john.doe@example.com');
+            $author->setFullname('John DOE');
+            $author->setPlainPassword('p4$$w0rd');
+
+            $this->manager->persist($author);
+            $this->manager->flush();
+        }
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $comment = new Comment();
+            $comment->comment = "Lorem ipsum dolor sit amet $i";
+            $comment->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
+            $comment->author = $author;
+
+            $this->manager->persist($comment);
+        }
+
         $this->manager->flush();
         $this->manager->clear();
     }

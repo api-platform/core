@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.metadata.extractor.yaml" class="ApiPlatform\Core\Metadata\Extractor\YamlExtractor" public="false">
+        <service id="api_platform.metadata.extractor.yaml" class="ApiPlatform\Metadata\Extractor\YamlExtractor" public="false">
             <argument type="collection" />
             <argument type="service" id="service_container" />
         </service>
@@ -29,6 +29,12 @@
         <service id="api_platform.metadata.property.metadata_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
             <argument type="service" id="api_platform.metadata.extractor.yaml" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.yaml.inner" />
+        </service>
+
+        <service id="api_platform.metadata.resource.metadata_collection_factory.extractor.yaml" class="ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="800" public="false">
+            <argument type="service" id="api_platform.metadata.extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.extractor.yaml.inner" />
+            <argument>%api_platform.defaults%</argument>
         </service>
     </services>
 

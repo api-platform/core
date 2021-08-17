@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Extractor\ExtractorInterface;
 
 /**
  * Creates resource's metadata using an extractor.
@@ -60,7 +60,7 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
         $resource['collectionOperations'] = $resource['collectionOperations'] ?? $this->defaults['collection_operations'] ?? null;
         $resource['graphql'] = $resource['graphql'] ?? $this->defaults['graphql'] ?? null;
 
-        if (null !== $resource['attributes'] || [] !== $this->defaults['attributes']) {
+        if (\array_key_exists('attributes', $resource) && (null !== $resource['attributes'] || [] !== $this->defaults['attributes'])) {
             $resource['attributes'] = (array) $resource['attributes'];
             foreach ($this->defaults['attributes'] as $key => $value) {
                 if (!isset($resource['attributes'][$key])) {
@@ -92,7 +92,7 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
     private function update(ResourceMetadata $resourceMetadata, array $metadata): ResourceMetadata
     {
         foreach (['shortName', 'description', 'iri', 'itemOperations', 'collectionOperations', 'subresourceOperations', 'graphql', 'attributes'] as $property) {
-            if (null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
+            if (!\array_key_exists($property, $metadata) || null === $metadata[$property] || null !== $resourceMetadata->{'get'.ucfirst($property)}()) {
                 continue;
             }
 

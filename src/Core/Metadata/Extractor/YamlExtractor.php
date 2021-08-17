@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Extractor\AbstractExtractor;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -23,6 +24,8 @@ use Symfony\Component\Yaml\Yaml;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since 2.7, to remove in 3.0 (replaced by ApiPlatform\Metadata\Extractor\YamlExtractor)
  */
 final class YamlExtractor extends AbstractExtractor
 {
