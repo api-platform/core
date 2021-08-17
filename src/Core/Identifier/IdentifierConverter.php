@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Identifier;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -27,6 +30,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class IdentifierConverter implements ContextAwareIdentifierConverterInterface
 {
+    /**
+     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
+     */
     private $propertyMetadataFactory;
     private $identifiersExtractor;
     private $identifierDenormalizers;
@@ -37,7 +43,7 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
      *
      * @param iterable<DenormalizerInterface> $identifierDenormalizers
      */
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $identifierDenormalizers, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, $propertyMetadataFactory, iterable $identifierDenormalizers, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->identifiersExtractor = $identifiersExtractor;
@@ -82,7 +88,12 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
 
     private function getIdentifierType(string $resourceClass, string $property): ?string
     {
-        if (!$type = $this->propertyMetadataFactory->create($resourceClass, $property)->getType()) {
+        /** @var ApiProperty|PropertyMetadata */
+        $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
+
+        if (!$type) {
             return null;
         }
 

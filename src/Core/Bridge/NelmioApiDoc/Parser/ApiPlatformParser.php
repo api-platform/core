@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -192,10 +193,11 @@ if (interface_exists(ParserInterface::class)) {
         /**
          * Parses a property.
          *
-         * @param string   $io
-         * @param string[] $visited
+         * @param string                       $io
+         * @param string[]                     $visited
+         * @param ApiProperty|PropertyMetadata $propertyMetadata
          */
-        private function parseProperty(ResourceMetadata $resourceMetadata, PropertyMetadata $propertyMetadata, $io, Type $type = null, array $visited = []): array
+        private function parseProperty(ResourceMetadata $resourceMetadata, $propertyMetadata, $io, Type $type = null, array $visited = []): array
         {
             $data = [
                 'dataType' => null,
@@ -204,7 +206,8 @@ if (interface_exists(ParserInterface::class)) {
                 'readonly' => !$propertyMetadata->isWritable(),
             ];
 
-            if (null === $type && null === $type = $propertyMetadata->getType()) {
+            $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
+            if (null === $type && null === $type) {
                 // Default to string
                 $data['dataType'] = DataTypes::STRING;
 

@@ -17,11 +17,11 @@ use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -30,6 +30,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @group legacy
  */
 class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFactoryProvider
 {
@@ -38,7 +39,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider propertyMetadataProvider
      */
-    public function testCreateXml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateXml(ApiProperty $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.xml';
 
@@ -51,14 +52,14 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithParentPropertyMetadataFactoryXml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithParentPropertyMetadataFactoryXml(ApiProperty $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.xml';
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn(new PropertyMetadata(null, null, null, null, true, null, null, false, null, null, ['Foo'], new SubresourceMetadata('Foo', false)))
+            ->willReturn((new ApiProperty())->withReadableLink(true)->withIdentifier(false)->withSubresource(new SubresourceMetadata('Foo', false, null)))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
@@ -100,7 +101,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider propertyMetadataProvider
      */
-    public function testCreateYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateYaml(ApiProperty $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -113,14 +114,14 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithParentPropertyMetadataFactoryYaml(ApiProperty $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn(new PropertyMetadata(null, null, null, null, true, null, null, false, null, null, ['Foo'], new SubresourceMetadata('Foo', false)))
+            ->willReturn((new ApiProperty())->withReadableLink(true)->withIdentifier(false)->withSubresource(new SubresourceMetadata('Foo', false)))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
@@ -132,7 +133,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(ApiProperty $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -144,13 +145,13 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
                     new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
                 );
 
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withType($collectionType);
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withBuiltinTypes([$collectionType]);
         $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, true, 1));
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn(new PropertyMetadata($collectionType, null, null, null, true, null, null, false, null, null, ['Foo'], null))
+            ->willReturn((new ApiProperty())->withBuiltinTypes([$collectionType])->withReadableLink(true)->withIdentifier(false))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
@@ -162,19 +163,19 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
+    public function testCreateWithTypedParentPropertyMetadataFactoryYaml(ApiProperty $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
         $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
 
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withType($type);
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withBuiltinTypes([$type]);
         $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, false, 1));
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn(new PropertyMetadata($type, null, null, null, true, null, null, false, null, null, ['Foo'], null))
+            ->willReturn((new ApiProperty())->withBuiltinTypes([$type])->withReadableLink(true)->withIdentifier(false))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
@@ -250,8 +251,8 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $metadataSomething = $propertyMetadataFactory->create(DummyResourceInterface::class, 'something');
         $metadataSomethingElse = $propertyMetadataFactory->create(DummyResourceInterface::class, 'somethingElse');
 
-        $this->assertInstanceOf(PropertyMetadata::class, $metadataSomething);
-        $this->assertInstanceOf(PropertyMetadata::class, $metadataSomethingElse);
+        $this->assertInstanceOf(ApiProperty::class, $metadataSomething);
+        $this->assertInstanceOf(ApiProperty::class, $metadataSomethingElse);
         $this->assertTrue($metadataSomething->isIdentifier());
         $this->assertFalse($metadataSomethingElse->isWritable());
     }

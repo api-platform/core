@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Core\DataProvider\Pagination;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\Inflector;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
@@ -24,6 +22,8 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Operation as ApiOperation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NullableType;
@@ -232,14 +232,14 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
 
                 if (
-                    null === ($propertyType = $propertyMetadata->getType())
+                    null === ($propertyType = $propertyMetadata->getBuiltinTypes()[0] ?? null)
                     || (!$input && false === $propertyMetadata->isReadable())
                     || ($input && $operation instanceof Mutation && false === $propertyMetadata->isWritable())
                 ) {
                     continue;
                 }
 
-                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getAttribute('deprecation_reason', null), $propertyType, $resourceClass, $input, $operationName, $depth, null !== $propertyMetadata->getAttribute('security'))) {
+                if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operationName, $depth, null !== $propertyMetadata->getSecurity())) {
                     $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
                 }
             }

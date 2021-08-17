@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Util;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
@@ -48,7 +48,7 @@ class FieldDatatypeTraitTest extends TestCase
     public function testGetNestedFieldPathWithPropertyWithoutType()
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new PropertyMetadata())->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new ApiProperty())->shouldBeCalled();
 
         $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
@@ -58,7 +58,7 @@ class FieldDatatypeTraitTest extends TestCase
     public function testGetNestedFieldPathWithInvalidCollectionType()
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
 
         $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
@@ -79,8 +79,8 @@ class FieldDatatypeTraitTest extends TestCase
         $barType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new PropertyMetadata($fooType))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new PropertyMetadata($barType))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([$fooType]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([$barType]))->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();

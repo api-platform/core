@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Regex;
 
@@ -29,7 +29,7 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
      *
      * @param Regex $constraint
      */
-    public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
+    public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         if (null !== ($htmlPattern = $constraint->getHtmlPattern())) {
             return ['pattern' => '^('.$htmlPattern.')$'];
@@ -41,7 +41,7 @@ class PropertySchemaRegexRestriction implements PropertySchemaRestrictionMetadat
     /**
      * {@inheritdoc}
      */
-    public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
+    public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof Regex;
     }

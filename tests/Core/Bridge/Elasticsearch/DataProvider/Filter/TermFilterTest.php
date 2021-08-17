@@ -20,10 +20,10 @@ use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\ConstantScoreFilte
 use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -60,8 +60,8 @@ class TermFilterTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'name', 'bar']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
 
         $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
@@ -102,8 +102,8 @@ class TermFilterTest extends TestCase
         $barType = new Type(Type::BUILTIN_TYPE_STRING);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new PropertyMetadata($fooType))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new PropertyMetadata($barType))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([$fooType]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([$barType]))->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
@@ -138,8 +138,8 @@ class TermFilterTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'bar']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new PropertyMetadata())->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new ApiProperty())->shouldBeCalled();
 
         $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
@@ -169,11 +169,11 @@ class TermFilterTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'name', 'bar', 'date', 'weird']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT)))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new PropertyMetadata())->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'date')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'weird')->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_RESOURCE)))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new ApiProperty())->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'date')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeImmutable::class)]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'weird')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_RESOURCE)]))->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(\DateTimeImmutable::class)->willReturn(false)->shouldBeCalled();

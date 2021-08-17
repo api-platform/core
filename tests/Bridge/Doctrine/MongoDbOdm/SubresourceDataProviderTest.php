@@ -18,11 +18,11 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\SubresourceDataProvider;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -74,7 +74,7 @@ class SubresourceDataProviderTest extends TestCase
             $nameCollection = ['foobar'];
 
             foreach ($identifiers as $identifier) {
-                $metadata = new PropertyMetadata();
+                $metadata = new ApiProperty();
                 $metadata = $metadata->withIdentifier(true);
                 $propertyMetadataFactoryProphecy->create($resourceClass, $identifier)->willReturn($metadata);
 
@@ -82,7 +82,7 @@ class SubresourceDataProviderTest extends TestCase
             }
 
             //random property to prevent the use of non-identifiers metadata while looping
-            $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new PropertyMetadata());
+            $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new ApiProperty());
 
             $propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection($nameCollection));
         }

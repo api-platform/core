@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\Factory\InheritedPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +37,7 @@ class InheritedPropertyMetadataFactoryTest extends TestCase
         $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class, DummyTableInheritanceChild::class]))->shouldBeCalled();
 
         $type = new Type(Type::BUILTIN_TYPE_STRING);
-        $nicknameMetadata = new PropertyMetadata($type, 'nickname', true, true, false, false, true, false, 'http://example.com/foo', null, ['foo' => 'bar']);
+        $nicknameMetadata = (new ApiProperty())->withBuiltinTypes([$type])->withDescription('nickname')->withReadable(true)->withWritable(true)->withWritableLink(false)->withReadableLink(false)->withRequired(true)->withIdentifier(false)->withTypes(['http://example.com/foo'])->withExtraProperties(['foo' => 'bar']);
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(DummyTableInheritance::class, 'nickname', [])->willReturn($nicknameMetadata)->shouldBeCalled();
         $propertyMetadataFactory->create(DummyTableInheritanceChild::class, 'nickname', [])->willReturn($nicknameMetadata)->shouldBeCalled();
@@ -45,7 +45,6 @@ class InheritedPropertyMetadataFactoryTest extends TestCase
         $factory = new InheritedPropertyMetadataFactory($resourceNameCollectionFactory->reveal(), $propertyMetadataFactory->reveal());
         $metadata = $factory->create(DummyTableInheritance::class, 'nickname');
 
-        $shouldBe = new PropertyMetadata($type, 'nickname', true, true, false, false, true, false, 'http://example.com/foo', DummyTableInheritanceChild::class, ['foo' => 'bar']);
-        $this->assertEquals($metadata, $shouldBe);
+        $this->assertEquals($metadata, $nicknameMetadata->withChildInherited(DummyTableInheritanceChild::class));
     }
 }

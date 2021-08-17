@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property;
+namespace ApiPlatform\Metadata\Property;
 
 /**
  * A collection of property names for a given resource.

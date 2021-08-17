@@ -108,8 +108,10 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface,
         $propertyName = null;
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-            $type = $propertyMetadata->getType();
+            // TODO: 3.0 this is the default + allow multiple types
+            $type = $propertyMetadata instanceof ApiProperty ? ($propertyMetadata->getBuiltinTypes()[0] ?? null) : $propertyMetadata->getType();
 
             if ($type && $type->getClassName() === $relationClass) {
                 $propertyName = $property;

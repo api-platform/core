@@ -18,7 +18,6 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\ItemNormalizer as BaseItemNormalizer;
 use ApiPlatform\Core\Util\ClassInfoTrait;
@@ -91,7 +90,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function normalizeCollectionOfRelations(PropertyMetadata $propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
+    protected function normalizeCollectionOfRelations($propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         // to-many are handled directly by the GraphQL resolver
         return [];

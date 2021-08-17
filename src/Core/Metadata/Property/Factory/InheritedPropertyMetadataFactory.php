@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ApiProperty;
 
 /**
  * @deprecated since 2.6, to be removed in 3.0
@@ -35,11 +35,11 @@ final class InheritedPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
         @trigger_error(sprintf('"%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__), \E_USER_DEPRECATED);
 
-        $propertyMetadata = $this->decorated ? $this->decorated->create($resourceClass, $property, $options) : new PropertyMetadata();
+        $propertyMetadata = $this->decorated ? $this->decorated->create($resourceClass, $property, $options) : new ApiProperty();
 
         foreach ($this->resourceNameCollectionFactory->create() as $knownResourceClass) {
             if ($resourceClass === $knownResourceClass) {

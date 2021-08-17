@@ -20,11 +20,11 @@ use ApiPlatform\Core\JsonSchema\SchemaFactory;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OverriddenOperationDummy;
 use PHPUnit\Framework\TestCase;
@@ -61,8 +61,8 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true, null, null, null, null, null, null, null, null, null, null, '', ''));
-        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), null, true, null, null, null, null, null, null, null, null, null, null, 'default_bar', 'example_bar'));
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(true)->withDefault('default_bar')->withExample('example_bar'));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
@@ -131,11 +131,11 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::allOf(
             Argument::type('array'),
             Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
+        ))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
         $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::allOf(
             Argument::type('array'),
             Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true));
+        ))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);

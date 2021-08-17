@@ -26,6 +26,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -109,9 +110,9 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['id', 'name', '\bad_property']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(null, null, true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn(new PropertyMetadata(null, null, true, null, null, null, null, true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, '\bad_property', [])->willReturn(new PropertyMetadata(null, null, true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn((new ApiProperty())->withReadable(true)->withIdentifier(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, '\bad_property', [])->willReturn((new ApiProperty())->withReadable(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/10');
@@ -289,7 +290,7 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['bar']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'bar', [])->willReturn(new PropertyMetadata(null, null, true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'bar', [])->willReturn((new ApiProperty())->withReadable(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
@@ -359,10 +360,10 @@ class ItemNormalizerTest extends TestCase
         $relatedDummiesType = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), $relatedDummyType);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'ghost', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', false, true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(new PropertyMetadata($relatedDummyType, '', false, true, false, false));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(new PropertyMetadata($relatedDummiesType, '', false, true, false, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'ghost', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummyType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummiesType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
 
         $getItemFromIriSecondArgCallback = function ($arg) {
             return \is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
@@ -457,21 +458,11 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummies']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
-            new PropertyMetadata(
-                new Type(Type::BUILTIN_TYPE_OBJECT,
-                    false,
-                    ArrayCollection::class,
-                    true,
-                    new Type(Type::BUILTIN_TYPE_INT),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
-                ),
-                '',
-                false,
-                true,
-                false,
-                false
-            )
+
+        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())
+                ->withBuiltinTypes([$type])
+                ->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -526,21 +517,9 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummies']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
-            new PropertyMetadata(
-                new Type(Type::BUILTIN_TYPE_OBJECT,
-                    false,
-                    ArrayCollection::class,
-                    true,
-                    new Type(Type::BUILTIN_TYPE_STRING),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
-                ),
-                '',
-                false,
-                true,
-                false,
-                false
-            )
+            (new ApiProperty())->withBuiltinTypes([$type])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -591,14 +570,8 @@ class ItemNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
-            new PropertyMetadata(
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
-                '',
-                false,
-                true,
-                false,
-                false
-            )
+            (new ApiProperty())->withBuiltinTypes([
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), ])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

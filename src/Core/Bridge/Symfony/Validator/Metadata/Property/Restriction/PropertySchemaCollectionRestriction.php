@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Optional;
@@ -42,7 +42,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
      *
      * @param Collection $constraint
      */
-    public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
+    public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         $restriction = [
             'type' => 'object',
@@ -70,7 +70,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
     /**
      * {@inheritdoc}
      */
-    public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
+    public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof Collection;
     }
@@ -78,7 +78,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
     /**
      * @param Required|Optional $constraint
      */
-    private function mergeConstraintRestrictions(Constraint $constraint, PropertyMetadata $propertyMetadata): array
+    private function mergeConstraintRestrictions(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         $propertyRestrictions = [];
         $nestedConstraints = method_exists($constraint, 'getNestedContraints') ? $constraint->getNestedContraints() : $constraint->constraints;

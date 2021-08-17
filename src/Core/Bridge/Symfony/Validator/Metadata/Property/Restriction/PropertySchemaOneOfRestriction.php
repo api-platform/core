@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 
@@ -40,7 +40,7 @@ final class PropertySchemaOneOfRestriction implements PropertySchemaRestrictionM
      *
      * @param AtLeastOneOf $constraint
      */
-    public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
+    public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         $oneOfConstraints = $constraint->getNestedContraints();
         $oneOfRestrictions = [];
@@ -63,7 +63,7 @@ final class PropertySchemaOneOfRestriction implements PropertySchemaRestrictionM
     /**
      * {@inheritdoc}
      */
-    public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
+    public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
         return $constraint instanceof AtLeastOneOf;
     }

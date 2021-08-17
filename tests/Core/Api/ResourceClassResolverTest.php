@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Api;
+namespace ApiPlatform\Tests\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolver;
 use ApiPlatform\Core\DataProvider\PaginatorInterface;

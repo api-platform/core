@@ -17,8 +17,8 @@ use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\Prop
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Collection;
@@ -53,29 +53,29 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports(Constraint $constraint, PropertyMetadata $propertyMetadata, bool $expectedResult): void
+    public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
     {
-        yield 'supported' => [new Collection(['fields' => []]), new PropertyMetadata(), true];
+        yield 'supported' => [new Collection(['fields' => []]), new ApiProperty(), true];
 
-        yield 'not supported' => [new Positive(), new PropertyMetadata(), false];
+        yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
     /**
      * @dataProvider createProvider
      */
-    public function testCreate(Constraint $constraint, PropertyMetadata $propertyMetadata, array $expectedResult): void
+    public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator
     {
-        yield 'empty' => [new Collection(['fields' => []]), new PropertyMetadata(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
+        yield 'empty' => [new Collection(['fields' => []]), new ApiProperty(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
 
         $fields = [
             'name' => new Required([
@@ -112,7 +112,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             new Collection([
                 'fields' => $fields,
             ]),
-            new PropertyMetadata(),
+            new ApiProperty(),
             [
                 'type' => 'object',
                 'properties' => $properties,
@@ -126,7 +126,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
                 'fields' => $fields,
                 'allowExtraFields' => true,
             ]),
-            new PropertyMetadata(),
+            new ApiProperty(),
             [
                 'type' => 'object',
                 'properties' => $properties,
@@ -140,7 +140,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
                 'fields' => $fields,
                 'allowMissingFields' => true,
             ]),
-            new PropertyMetadata(),
+            new ApiProperty(),
             [
                 'type' => 'object',
                 'properties' => $properties,
@@ -154,7 +154,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
                 'allowExtraFields' => true,
                 'allowMissingFields' => true,
             ]),
-            new PropertyMetadata(),
+            new ApiProperty(),
             [
                 'type' => 'object',
                 'properties' => $properties,

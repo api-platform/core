@@ -18,8 +18,8 @@ use ApiPlatform\Core\DataProvider\PaginationOptions;
 use ApiPlatform\Core\JsonSchema\Schema;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\Core\OpenApi\Model;
@@ -29,6 +29,8 @@ use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Psr\Container\ContainerInterface;
@@ -47,7 +49,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
+    /**
+     * @var LegacyPropertyNameCollectionFactoryInterface|PropertyNameCollectionFactoryInterface
+     */
     private $propertyNameCollectionFactory;
+    /**
+     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
+     */
     private $propertyMetadataFactory;
     private $operationPathResolver;
     private $formats;
@@ -57,7 +65,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $paginationOptions;
     private $router;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;

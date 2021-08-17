@@ -54,16 +54,7 @@ final class PropertyMetadata
     private $example;
     private $schema;
 
-    /**
-     * @var Type[]
-     */
-    private $builtinTypes;
-    /**
-     * @var string[]
-     */
-    private $types;
-
-    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $initializable = null, $default = null, $example = null, array $schema = null, array $builtinTypes = null, array $types = null)
+    public function __construct(Type $type = null, string $description = null, bool $readable = null, bool $writable = null, bool $readableLink = null, bool $writableLink = null, bool $required = null, bool $identifier = null, string $iri = null, $childInherited = null, array $attributes = null, SubresourceMetadata $subresource = null, bool $initializable = null, $default = null, $example = null, array $schema = null)
     {
         $this->type = $type;
         $this->description = $description;
@@ -84,8 +75,6 @@ final class PropertyMetadata
         $this->default = $default;
         $this->example = $example;
         $this->schema = $schema;
-        $this->builtinTypes = $builtinTypes;
-        $this->types = $types;
     }
 
     /**
@@ -436,44 +425,6 @@ final class PropertyMetadata
     {
         $metadata = clone $this;
         $metadata->schema = $schema;
-
-        return $metadata;
-    }
-
-    /**
-     * @return Type[]
-     */
-    public function getBuiltinTypes(): ?array
-    {
-        return $this->builtinTypes;
-    }
-
-    /**
-     * Returns a new instance with the given builtinTypes.
-     */
-    public function withBuiltinTypes(array $builtinTypes = null): self
-    {
-        $metadata = clone $this;
-        $metadata->builtinTypes = $builtinTypes;
-
-        return $metadata;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getTypes(): ?array
-    {
-        return $this->types;
-    }
-
-    /**
-     * Returns a new instance with the given Types.
-     */
-    public function withTypes(array $types = null): self
-    {
-        $metadata = clone $this;
-        $metadata->types = $types;
 
         return $metadata;
     }

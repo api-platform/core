@@ -38,7 +38,6 @@ spl_autoload_register(function ($className) {
 
         ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class,
         ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class => ApiPlatform\Metadata\Property\PropertyNameCollection::class,
-        ApiPlatform\Core\Api\ResourceClassResolverInterface::class => ApiPlatform\Api\ResourceClassResolverInterface::class,
 
         // Exceptions
         ApiPlatform\Core\Exception\DeserializationException::class => ApiPlatform\Exception\DeserializationException::class,

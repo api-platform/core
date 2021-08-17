@@ -69,8 +69,8 @@ use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Core\JsonSchema\TypeFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
@@ -90,6 +90,8 @@ use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlSerializerContextBuilderInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -996,7 +998,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.cache_warmer.cache_pool_clearer',
             'api_platform.collection_data_provider',
             'api_platform.data_persister',
-            'api_platform.legacy_data_provider_state',
             'api_platform.filter_collection_factory',
             'api_platform.filter_locator',
             'api_platform.filters',
@@ -1011,6 +1012,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.iri_converter',
             'api_platform.iri_converter.legacy',
             'api_platform.item_data_provider',
+            'api_platform.legacy_data_provider_state',
             'api_platform.listener.exception',
             'api_platform.listener.exception.validation',
             'api_platform.listener.request.add_format',
@@ -1024,6 +1026,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.identifier_metadata_factory.property_info',
             'api_platform.metadata.property.identifier_metadata_factory.xml',
             'api_platform.metadata.property.identifier_metadata_factory.yaml',
+            'api_platform.metadata.property.metadata_factory.attribute',
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.default_property',
             'api_platform.metadata.property.metadata_factory.property_info',
@@ -1071,10 +1074,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.context_builder',
             'api_platform.serializer.context_builder.filter',
             'api_platform.serializer.group_filter',
+            'api_platform.serializer.mapping.class_metadata_factory',
             'api_platform.serializer.normalizer.item',
             'api_platform.serializer.property_filter',
             'api_platform.serializer.uuid_denormalizer',
-            'api_platform.serializer.mapping.class_metadata_factory',
             'api_platform.serializer_locator',
             'api_platform.state.legacy_data_persister_processor',
             'api_platform.state_processor',
@@ -1121,10 +1124,14 @@ class ApiPlatformExtensionTest extends TestCase
             CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
             DataPersisterInterface::class => 'api_platform.data_persister',
             GroupFilter::class => 'api_platform.serializer.group_filter',
-            LegacyIdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
+            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor',
             IriConverterInterface::class => 'api_platform.iri_converter',
             ItemDataProviderInterface::class => 'api_platform.item_data_provider',
+            LegacyIdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
             LegacyIriConverterInterface::class => 'api_platform.iri_converter.legacy',
+            LegacyPropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
+            LegacyPropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
+            ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
             NotFoundAction::class => 'api_platform.action.not_found',
             OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
             Pagination::class => 'api_platform.pagination',
@@ -1134,14 +1141,12 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
             ProviderInterface::class => 'api_platform.state_provider',
-            ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
             ResourceMetadataCollectionFactoryInterface::class => 'api_platform.metadata.resource.metadata_collection_factory',
             ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
             ResourceNameCollectionFactoryInterface::class => 'api_platform.metadata.resource.name_collection_factory',
             SerializerContextBuilderInterface::class => 'api_platform.serializer.context_builder',
             SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
             UrlGeneratorInterface::class => 'api_platform.router',
-            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor',
         ];
 
         foreach ($aliases as $alias => $service) {

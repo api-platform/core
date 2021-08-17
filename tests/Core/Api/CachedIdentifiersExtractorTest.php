@@ -24,6 +24,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -31,6 +32,7 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class CachedIdentifiersExtractorTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function itemProvider()
@@ -218,10 +220,10 @@ class CachedIdentifiersExtractorTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.
      */
     public function testDeprecationResourceClassResolver()
     {
+        $this->expectDeprecation('Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the CachedIdentifiersExtractor might introduce cache issues with object identifiers.');
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $decoration = $this->prophesize(IdentifiersExtractorInterface::class);
 

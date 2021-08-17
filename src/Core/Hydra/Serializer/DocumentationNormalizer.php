@@ -27,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -360,16 +361,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets the range of the property.
+     *
+     * @param ApiProperty|PropertyMetadata $propertyMetadata
      */
-    private function getRange(PropertyMetadata $propertyMetadata): ?string
+    private function getRange($propertyMetadata): ?string
     {
-        $jsonldContext = $propertyMetadata->getAttributes()['jsonld_context'] ?? [];
+        $jsonldContext = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttributes()['jsonld_context'] ?? [] : $propertyMetadata->getJsonldContext();
 
         if (isset($jsonldContext['@type'])) {
             return $jsonldContext['@type'];
         }
 
-        if (null === $type = $propertyMetadata->getType()) {
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        if (null === $type) {
             return null;
         }
 
@@ -493,17 +498,22 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets a property definition.
+     *
+     * @param ApiProperty|PropertyMetadata $propertyMetadata
      */
-    private function getProperty(PropertyMetadata $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
+    private function getProperty($propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
+        $iri = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getIri() : ($propertyMetadata->getTypes()[0] ?? null);
+
         $propertyData = [
-            '@id' => $propertyMetadata->getIri() ?? "#$shortName/$propertyName",
+            '@id' => $iri ?? "#$shortName/$propertyName",
             '@type' => false === $propertyMetadata->isReadableLink() ? 'hydra:Link' : 'rdf:Property',
             'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,
         ];
 
-        $type = $propertyMetadata->getType();
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
         if (null !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
             $propertyData['owl:maxCardinality'] = 1;
@@ -526,7 +536,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $property['hydra:description'] = $description;
         }
 
-        if ($propertyMetadata->getAttribute('deprecation_reason')) {
+        if ($deprecationReason = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('deprecation_reason') : $propertyMetadata->getDeprecationReason()) {
             $property['owl:deprecated'] = true;
         }
 

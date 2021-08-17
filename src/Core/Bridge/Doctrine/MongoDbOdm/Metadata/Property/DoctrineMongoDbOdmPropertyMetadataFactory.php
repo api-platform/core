@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,7 +39,7 @@ final class DoctrineMongoDbOdmPropertyMetadataFactory implements PropertyMetadat
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 

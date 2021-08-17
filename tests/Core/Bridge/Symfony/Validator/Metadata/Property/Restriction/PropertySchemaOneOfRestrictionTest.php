@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property\Rest
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
@@ -45,7 +45,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports(Constraint $constraint, PropertyMetadata $propertyMetadata, bool $expectedResult): void
+    public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         if (!class_exists(AtLeastOneOf::class)) {
             self::markTestSkipped();
@@ -56,15 +56,15 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 
     public function supportsProvider(): \Generator
     {
-        yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new PropertyMetadata(), true];
+        yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), true];
 
-        yield 'not supported' => [new Positive(), new PropertyMetadata(), false];
+        yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
     /**
      * @dataProvider createProvider
      */
-    public function testCreate(Constraint $constraint, PropertyMetadata $propertyMetadata, array $expectedResult): void
+    public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         if (!class_exists(AtLeastOneOf::class)) {
             self::markTestSkipped();
@@ -75,11 +75,11 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 
     public function createProvider(): \Generator
     {
-        yield 'empty' => [new AtLeastOneOf(['constraints' => []]), new PropertyMetadata(), []];
+        yield 'empty' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), []];
 
-        yield 'not supported constraints' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), new PropertyMetadata(), []];
+        yield 'not supported constraints' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), new ApiProperty(), []];
 
-        yield 'one supported constraint' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING)), [
+        yield 'one supported constraint' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), [
             'oneOf' => [['minLength' => 3]],
         ]];
     }

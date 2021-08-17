@@ -15,14 +15,17 @@ namespace ApiPlatform\Core\JsonSchema;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
@@ -42,12 +45,18 @@ final class SchemaFactory implements SchemaFactoryInterface
     use ResourceClassInfoTrait;
 
     private $typeFactory;
+    /**
+     * @var LegacyPropertyNameCollectionFactoryInterface|PropertyNameCollectionFactoryInterface
+     */
     private $propertyNameCollectionFactory;
+    /**
+     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
+     */
     private $propertyMetadataFactory;
     private $nameConverter;
     private $distinctFormats = [];
 
-    public function __construct(TypeFactoryInterface $typeFactory, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(TypeFactoryInterface $typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->typeFactory = $typeFactory;
         if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
@@ -174,27 +183,32 @@ final class SchemaFactory implements SchemaFactoryInterface
         return $schema;
     }
 
-    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, PropertyMetadata $propertyMetadata, array $serializerContext, string $format): void
+    private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, $propertyMetadata, array $serializerContext, string $format): void
     {
         $version = $schema->getVersion();
-        $swagger = false;
+        $swagger = Schema::VERSION_SWAGGER === $version;
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
-        switch ($version) {
-            case Schema::VERSION_SWAGGER:
-                $swagger = true;
-                $basePropertySchemaAttribute = 'swagger_context';
-                break;
-            case Schema::VERSION_OPENAPI:
-                $basePropertySchemaAttribute = 'openapi_context';
-                break;
-            default:
-                $basePropertySchemaAttribute = 'json_schema_context';
+        if ($propertyMetadata instanceof ApiProperty) {
+            $additionalPropertySchema = $propertyMetadata->getOpenapiContext() ?? [];
+        } else {
+            switch ($version) {
+                case Schema::VERSION_SWAGGER:
+                    $basePropertySchemaAttribute = 'swagger_context';
+                    break;
+                case Schema::VERSION_OPENAPI:
+                    $basePropertySchemaAttribute = 'openapi_context';
+                    break;
+                default:
+                    $basePropertySchemaAttribute = 'json_schema_context';
+            }
+
+            $additionalPropertySchema = $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? [];
         }
 
         $propertySchema = array_merge(
             $propertySchema,
-            $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? []
+            $additionalPropertySchema
         );
 
         if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
@@ -206,13 +220,17 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (null !== $description = $propertyMetadata->getDescription()) {
             $propertySchema['description'] = $description;
         }
+
+        $deprecationReason = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('deprecation_reason') : $propertyMetadata->getDeprecationReason();
+
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
-        if (!$swagger && null !== $propertyMetadata->getAttribute('deprecation_reason')) {
+        if (!$swagger && null !== $deprecationReason) {
             $propertySchema['deprecated'] = true;
         }
         // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
-        if (null !== $iri = $propertyMetadata->getIri()) { //TODO: use getTypes
+        $iri = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getIri() : $propertyMetadata->getTypes()[0] ?? null;
+        if (null !== $iri) {
             $propertySchema['externalDocs'] = ['url' => $iri];
         }
 
@@ -229,7 +247,9 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
 
         $valueSchema = [];
-        if (null !== $type = $propertyMetadata->getType()) {
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        if (null !== $type) {
             if ($isCollection = $type->isCollection()) {
                 $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
             } else {

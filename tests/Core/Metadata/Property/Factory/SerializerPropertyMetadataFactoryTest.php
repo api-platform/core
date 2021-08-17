@@ -20,7 +20,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Tests\Fixtures\DummyIgnoreProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
@@ -28,7 +27,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata as SerializerAttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassMetadata as SerializerClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
@@ -60,7 +58,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     /**
      * @dataProvider groupsProvider
      */
-    public function testCreate($readGroups, $writeGroups, ?string $relatedOutputClass = null)
+    public function testCreateLegacy($readGroups, $writeGroups, ?string $relatedOutputClass = null)
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $dummyResourceMetadata = (new ResourceMetadata())
@@ -182,50 +180,5 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $actual = $serializerPropertyMetadataFactory->create(DummyTableInheritance::class, 'nickname');
 
         $this->assertEquals($actual->getChildInherited(), DummyTableInheritanceChild::class);
-    }
-
-    public function testCreateWithIgnoredProperty(): void
-    {
-        // symfony/serializer < 5.1
-        if (!class_exists(Ignore::class)) {
-            self::markTestSkipped();
-        }
-
-        $dummyIgnorePropertyResourceMetadata = (new ResourceMetadata())
-            ->withAttributes([
-                'normalization_context' => [AbstractNormalizer::GROUPS => ['dummy']],
-                'denormalization_context' => [AbstractNormalizer::GROUPS => ['dummy']],
-            ]);
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(DummyIgnoreProperty::class)->willReturn($dummyIgnorePropertyResourceMetadata);
-
-        $ignoredSerializerAttributeMetadata = new SerializerAttributeMetadata('ignored');
-        $ignoredSerializerAttributeMetadata->addGroup('dummy');
-        $ignoredSerializerAttributeMetadata->addGroup('dummy');
-        $ignoredSerializerAttributeMetadata->setIgnore(true);
-
-        $dummyIgnorePropertySerializerClassMetadata = new SerializerClassMetadata(DummyIgnoreProperty::class);
-        $dummyIgnorePropertySerializerClassMetadata->addAttributeMetadata($ignoredSerializerAttributeMetadata);
-
-        $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
-        $serializerClassMetadataFactoryProphecy->getMetadataFor(DummyIgnoreProperty::class)->willReturn($dummyIgnorePropertySerializerClassMetadata);
-
-        $ignoredPropertyMetadata = (new PropertyMetadata())->withType(new Type(Type::BUILTIN_TYPE_STRING, true));
-
-        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decoratedProphecy->create(DummyIgnoreProperty::class, 'ignored', [])->willReturn($ignoredPropertyMetadata);
-
-        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $serializerClassMetadataFactoryProphecy->reveal(),
-            $decoratedProphecy->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal()
-        );
-
-        $result = $serializerPropertyMetadataFactory->create(DummyIgnoreProperty::class, 'ignored');
-
-        self::assertFalse($result->isReadable());
-        self::assertFalse($result->isWritable());
     }
 }

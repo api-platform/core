@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -24,6 +23,7 @@ use ApiPlatform\Core\Serializer\CacheKeyTrait;
 use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -51,7 +51,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     private $componentsCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter, $resourceMetadataFactory, array $defaultContext = [], iterable $dataTransformers = [], ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor, ?NameConverterInterface $nameConverter, $resourceMetadataFactory, array $defaultContext = [], iterable $dataTransformers = [], ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, null, null, false, $defaultContext, $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
     }
@@ -182,10 +182,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
+     * @param ApiProperty|PropertyMetadata $propertyMetadata
+     *
      * @throws RuntimeException
      * @throws NotNormalizableValueException
      */
-    protected function denormalizeRelation(string $attributeName, PropertyMetadata $propertyMetadata, string $className, $value, ?string $format, array $context)
+    protected function denormalizeRelation(string $attributeName, $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new NotNormalizableValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
@@ -201,9 +203,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      *
+     * @param ApiProperty|PropertyMetadata $propertyMetadata
+     *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      */
-    protected function normalizeRelation(PropertyMetadata $propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
+    protected function normalizeRelation($propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
         if (null !== $relatedObject) {
             $iri = $this->iriConverter->getIriFromItem($relatedObject);
@@ -269,11 +273,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
         ];
 
         foreach ($attributes as $attribute) {
+            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this
                 ->propertyMetadataFactory
                 ->create($context['resource_class'], $attribute, $options);
 
-            $type = $propertyMetadata->getType();
+            // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+            $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
             $isOne = $isMany = false;
 
             if (null !== $type) {
