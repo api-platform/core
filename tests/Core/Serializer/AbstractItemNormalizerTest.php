@@ -925,7 +925,7 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testBadType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The type of the "foo" attribute must be "float", "integer" given.');
 
         $data = [
