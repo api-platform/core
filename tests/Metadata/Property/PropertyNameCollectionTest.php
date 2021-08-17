@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Metadata\Property;
+namespace ApiPlatform\Tests\Metadata\Property;
 
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use PHPUnit\Framework\TestCase;

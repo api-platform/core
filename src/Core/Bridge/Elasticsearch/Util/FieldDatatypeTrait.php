@@ -15,7 +15,9 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Util;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -60,12 +62,16 @@ trait FieldDatatypeTrait
         }
 
         try {
+            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
         } catch (PropertyNotFoundException $e) {
             return null;
         }
 
-        if (null === $type = $propertyMetadata->getType()) {
+        // TODO: 3.0 this is the default + allow multiple types
+        $type = $propertyMetadata instanceof ApiProperty ? ($propertyMetadata->getBuiltinTypes()[0] ?? null) : $propertyMetadata->getType();
+
+        if (null === $type) {
             return null;
         }
 

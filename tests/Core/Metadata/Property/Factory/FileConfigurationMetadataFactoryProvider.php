@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,7 +33,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'readableLink' => false,
             'writableLink' => false,
             'required' => true,
-            'attributes' => [
+            'extraProperties' => [
                 'foo' => ['Foo'],
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
@@ -54,7 +54,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'writableLink' => false,
             'required' => true,
             'identifier' => false,
-            'attributes' => [
+            'extraProperties' => [
                 'foo' => ['Foo'],
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
@@ -65,9 +65,9 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
         return [[$this->getPropertyMetadata($metadata)]];
     }
 
-    private function getPropertyMetadata(array $metadata): PropertyMetadata
+    private function getPropertyMetadata(array $metadata): ApiProperty
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
 
         foreach ($metadata as $propertyName => $propertyValue) {
             $propertyMetadata = $propertyMetadata->{'with'.ucfirst($propertyName)}($propertyValue);

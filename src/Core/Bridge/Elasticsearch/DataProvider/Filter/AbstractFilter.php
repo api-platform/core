@@ -17,8 +17,10 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -95,12 +97,16 @@ abstract class AbstractFilter implements FilterInterface
 
         foreach ($properties as $index => $currentProperty) {
             try {
+                /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->propertyMetadataFactory->create($currentResourceClass, $currentProperty);
             } catch (PropertyNotFoundException $e) {
                 return $noop;
             }
 
-            if (null === $type = $propertyMetadata->getType()) {
+            // TODO: 3.0 this is the default + allow multiple types
+            $type = $propertyMetadata instanceof ApiProperty ? ($propertyMetadata->getBuiltinTypes()[0] ?? null) : $propertyMetadata->getType();
+
+            if (null === $type) {
                 return $noop;
             }
 

@@ -15,22 +15,21 @@ namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\DataProvider\Pagination;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\FieldsBuilder;
 use ApiPlatform\GraphQl\Type\TypeBuilderInterface;
 use ApiPlatform\GraphQl\Type\TypeConverterInterface;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
@@ -545,10 +544,10 @@ class FieldsBuilderTest extends TestCase
         return [
             'query' => ['resourceClass', new Query(),
                 [
-                    'property' => new PropertyMetadata(),
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, false),
-                    'propertyNotReadable' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
-                    'nameConverted' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true, false),
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(false),
+                    'propertyNotReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
+                    'nameConverted' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
                 ],
                 false, 'item_query', null, null, null,
                 [
@@ -573,7 +572,7 @@ class FieldsBuilderTest extends TestCase
             ],
             'query with advanced name converter' => ['resourceClass', new Query(),
                 [
-                    'field' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), null, true, false),
+                    'field' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
                 ],
                 false, 'item_query', null, null, null,
                 [
@@ -592,8 +591,8 @@ class FieldsBuilderTest extends TestCase
             ],
             'query input' => ['resourceClass', new Query(),
                 [
-                    'property' => new PropertyMetadata(),
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, false),
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
                 ],
                 true, 'item_query', null, null, null,
                 [
@@ -611,7 +610,9 @@ class FieldsBuilderTest extends TestCase
             ],
             'query with simple non-null string array property' => ['resourceClass', new Query(),
                 [
-                    'property' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), null, true, false),
+                    'property' => (new ApiProperty())->withBuiltinTypes([
+                        new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)),
+                    ])->withReadable(true)->withWritable(false),
                 ],
                 false, 'item_query', null, null, null,
                 [
@@ -629,10 +630,10 @@ class FieldsBuilderTest extends TestCase
             ],
             'mutation non input' => ['resourceClass', new Mutation(),
                 [
-                    'property' => new PropertyMetadata(),
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
-                    'propertyReadable' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, true),
-                    'propertyObject' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL, false, 'objectClass'), null, true, true),
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                    'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
+                    'propertyObject' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL, false, 'objectClass')])->withReadable(true)->withWritable(true),
                 ],
                 false, null, 'mutation', null, null,
                 [
@@ -658,10 +659,10 @@ class FieldsBuilderTest extends TestCase
             ],
             'mutation input' => ['resourceClass', new Mutation(),
                 [
-                    'property' => new PropertyMetadata(),
-                    'propertyBool' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), 'propertyBool description', false, true))->withAttributes(['deprecation_reason' => 'not useful']),
-                    'propertySubresource' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true))->withSubresource(new SubresourceMetadata('subresourceClass')),
-                    'id' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), null, false, true),
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                    'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                    'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
                 ],
                 true, null, 'mutation', null, null,
                 [
@@ -694,7 +695,7 @@ class FieldsBuilderTest extends TestCase
             ],
             'delete mutation input' => ['resourceClass', new Mutation(),
                 [
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
                 ],
                 true, null, 'delete', null, null,
                 [
@@ -706,7 +707,7 @@ class FieldsBuilderTest extends TestCase
             ],
             'create mutation input' => ['resourceClass', new Mutation(),
                 [
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
                 ],
                 true, null, 'create', null, null,
                 [
@@ -722,7 +723,7 @@ class FieldsBuilderTest extends TestCase
             ],
             'update mutation input' => ['resourceClass', new Mutation(),
                 [
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
                 ],
                 true, null, 'update', null, null,
                 [
@@ -741,9 +742,9 @@ class FieldsBuilderTest extends TestCase
             ],
             'subscription non input' => ['resourceClass', new Subscription(),
                 [
-                    'property' => new PropertyMetadata(),
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
-                    'propertyReadable' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, true, true),
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                    'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
                 ],
                 false, null, null, 'subscription', null,
                 [
@@ -761,10 +762,10 @@ class FieldsBuilderTest extends TestCase
             ],
             'subscription input' => ['resourceClass', new Subscription(),
                 [
-                    'property' => new PropertyMetadata(),
-                    'propertyBool' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), 'propertyBool description', false, true))->withAttributes(['deprecation_reason' => 'not useful']),
-                    'propertySubresource' => (new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true))->withSubresource(new SubresourceMetadata('subresourceClass')),
-                    'id' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_INT), null, false, true),
+                    'property' => new ApiProperty(),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                    'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                    'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
                 ],
                 true, null, null, 'subscription', null,
                 [
@@ -776,13 +777,13 @@ class FieldsBuilderTest extends TestCase
             ],
             'null io metadata non input' => ['resourceClass', new Query(),
                 [
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
                 ],
                 false, null, 'update', null, ['class' => null], [],
             ],
             'null io metadata input' => ['resourceClass', new Query(),
                 [
-                    'propertyBool' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_BOOL), null, false, true),
+                    'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
                 ],
                 true, null, 'update', null, ['class' => null],
                 [
@@ -791,8 +792,8 @@ class FieldsBuilderTest extends TestCase
             ],
             'invalid types' => ['resourceClass', new Query(),
                 [
-                    'propertyInvalidType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_NULL), null, true, false),
-                    'propertyNotRegisteredType' => new PropertyMetadata(new Type(Type::BUILTIN_TYPE_CALLABLE), null, true, false),
+                    'propertyInvalidType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_NULL)])->withReadable(true)->withWritable(false),
+                    'propertyNotRegisteredType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_CALLABLE)])->withReadable(true)->withWritable(false),
                 ],
                 false, 'item_query', null, null, null,
                 [

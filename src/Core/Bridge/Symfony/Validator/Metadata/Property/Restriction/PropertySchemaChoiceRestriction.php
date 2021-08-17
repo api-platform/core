@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -28,7 +28,7 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
      *
      * @param Choice $constraint
      */
-    public function create(Constraint $constraint, PropertyMetadata $propertyMetadata): array
+    public function create(Constraint $constraint, ApiProperty $propertyMetadata): array
     {
         $choices = [];
 
@@ -51,7 +51,11 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
         }
 
         $restriction['type'] = 'array';
-        $restriction['items'] = ['type' => Type::BUILTIN_TYPE_STRING === $propertyMetadata->getType()->getBuiltinType() ? 'string' : 'number', 'enum' => $choices];
+
+        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        if ($type) {
+            $restriction['items'] = ['type' => Type::BUILTIN_TYPE_STRING === $type->getBuiltinType() ? 'string' : 'number', 'enum' => $choices];
+        }
 
         if (null !== $constraint->min) {
             $restriction['minItems'] = $constraint->min;
@@ -67,8 +71,8 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
     /**
      * {@inheritdoc}
      */
-    public function supports(Constraint $constraint, PropertyMetadata $propertyMetadata): bool
+    public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        return $constraint instanceof Choice && null !== ($type = $propertyMetadata->getType()) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);
+        return $constraint instanceof Choice && null !== ($type = $propertyMetadata->getBuiltinTypes()[0] ?? null) && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true);
     }
 }

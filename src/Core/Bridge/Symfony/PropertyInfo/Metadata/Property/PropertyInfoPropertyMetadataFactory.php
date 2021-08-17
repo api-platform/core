@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 /**
@@ -37,24 +38,25 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
         if (null === $this->decorated) {
-            $propertyMetadata = new PropertyMetadata();
+            $propertyMetadata = new ApiProperty();
         } else {
             try {
+                /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
-                $propertyMetadata = new PropertyMetadata();
+                $propertyMetadata = new ApiProperty();
             }
         }
 
-        if (null === $propertyMetadata->getType()) {
-            $types = $this->propertyInfo->getTypes($resourceClass, $property, $options);
-            // TODO: Use builtInTypes and keep compatibility with older versions using Type
-            if (isset($types[0])) {
-                $propertyMetadata = $propertyMetadata->withType($types[0]);
+        if ($propertyMetadata instanceof ApiProperty) {
+            if (!$propertyMetadata->getBuiltinTypes()) {
+                $propertyMetadata = $propertyMetadata->withBuiltinTypes($this->propertyInfo->getTypes($resourceClass, $property, $options) ?? []);
             }
+        } elseif (null === $propertyMetadata->getType()) {
+            $propertyMetadata = $propertyMetadata->withType($this->propertyInfo->getTypes($resourceClass, $property, $options)[0] ?? null);
         }
 
         if (null === $propertyMetadata->getDescription() && null !== $description = $this->propertyInfo->getShortDescription($resourceClass, $property, $options)) {

@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Metadata\Property;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -34,7 +34,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateNoManager()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
 
@@ -48,7 +48,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateIsIdentifier()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -69,7 +69,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateIsWritable()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withWritable(false);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -94,7 +94,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateClassMetadata()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);

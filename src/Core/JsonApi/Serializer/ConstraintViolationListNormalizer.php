@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\JsonApi\Serializer;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -30,9 +33,12 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
     public const FORMAT = 'jsonapi';
 
     private $nameConverter;
+    /**
+     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
+     */
     private $propertyMetadataFactory;
 
-    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null)
+    public function __construct($propertyMetadataFactory, NameConverterInterface $nameConverter = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->nameConverter = $nameConverter;
@@ -78,6 +84,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
         }
 
         $class = \get_class($violation->getRoot());
+        /** @var ApiProperty|PropertyMetadata */
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(
                 // Im quite sure this requires some thought in case of validations over relationships
@@ -89,7 +96,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        if (($type = $propertyMetadata->getType()) && null !== $type->getClassName()) {
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
+        if ($type && null !== $type->getClassName()) {
             return "data/relationships/$fieldName";
         }
 

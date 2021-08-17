@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Metadata\Property;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPropertyWithDefaultValue;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -34,7 +34,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateNoManager()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
 
@@ -48,7 +48,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateIsIdentifier()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -69,7 +69,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateIsWritable()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withWritable(false);
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -95,7 +95,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateWithDefaultOption()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(DummyPropertyWithDefaultValue::class, 'dummyDefaultOption', [])->shouldBeCalled()->willReturn($propertyMetadata);
@@ -121,7 +121,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateClassMetadataInfo()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);
@@ -147,7 +147,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateClassMetadata()
     {
-        $propertyMetadata = new PropertyMetadata();
+        $propertyMetadata = new ApiProperty();
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(Dummy::class, 'id', [])->shouldBeCalled()->willReturn($propertyMetadata);

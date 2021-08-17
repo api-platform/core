@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property;
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\CardScheme;
@@ -88,15 +89,18 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
+        /**
+         * @var PropertyMetadata|ApiProperty
+         */
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
         $required = $propertyMetadata->isRequired();
-        $iri = $propertyMetadata->getIri();
+        $iri = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getIri() : ($propertyMetadata->getTypes()[0] ?? null);
         $schema = $propertyMetadata->getSchema();
 
-        if (null !== $required && null !== $iri && null !== $schema) {
+        if (null !== $required && $iri && $schema) {
             return $propertyMetadata;
         }
 
@@ -115,7 +119,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
                     $required = true;
                 }
 
-                if (null === $iri) {
+                if (!$iri) {
                     $iri = self::SCHEMA_MAPPED_CONSTRAINTS[\get_class($constraint)] ?? null;
                 }
 
@@ -127,7 +131,13 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
-        $propertyMetadata = $propertyMetadata->withIri($iri)->withRequired($required ?? false);
+        if ($iri) {
+            $propertyMetadata = (
+                $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->withIri($iri) : $propertyMetadata->withTypes([$iri])
+            );
+        }
+
+        $propertyMetadata = $propertyMetadata->withRequired($required ?? false);
 
         if (!empty($restrictions)) {
             if (null === $schema) {

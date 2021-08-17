@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Email;
@@ -40,47 +40,47 @@ final class PropertySchemaFormatTest extends TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports(Constraint $constraint, PropertyMetadata $propertyMetadata, bool $expectedResult): void
+    public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
     {
-        yield 'email' => [new Email(), new PropertyMetadata(), true];
-        yield 'url' => [new Url(), new PropertyMetadata(), true];
+        yield 'email' => [new Email(), new ApiProperty(), true];
+        yield 'url' => [new Url(), new ApiProperty(), true];
         if (class_exists(Hostname::class)) {
-            yield 'hostname' => [new Hostname(), new PropertyMetadata(), true];
+            yield 'hostname' => [new Hostname(), new ApiProperty(), true];
         }
-        yield 'uuid' => [new Uuid(), new PropertyMetadata(), true];
+        yield 'uuid' => [new Uuid(), new ApiProperty(), true];
         if (class_exists(Ulid::class)) {
-            yield 'ulid' => [new Ulid(), new PropertyMetadata(), true];
+            yield 'ulid' => [new Ulid(), new ApiProperty(), true];
         }
-        yield 'ip' => [new Ip(), new PropertyMetadata(), true];
-        yield 'not supported' => [new Positive(), new PropertyMetadata(), false];
+        yield 'ip' => [new Ip(), new ApiProperty(), true];
+        yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
     /**
      * @dataProvider createProvider
      */
-    public function testCreate(Constraint $constraint, PropertyMetadata $propertyMetadata, array $expectedResult): void
+    public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator
     {
-        yield 'email' => [new Email(), new PropertyMetadata(), ['format' => 'email']];
-        yield 'url' => [new Url(), new PropertyMetadata(), ['format' => 'uri']];
+        yield 'email' => [new Email(), new ApiProperty(), ['format' => 'email']];
+        yield 'url' => [new Url(), new ApiProperty(), ['format' => 'uri']];
         if (class_exists(Hostname::class)) {
-            yield 'hostname' => [new Hostname(), new PropertyMetadata(), ['format' => 'hostname']];
+            yield 'hostname' => [new Hostname(), new ApiProperty(), ['format' => 'hostname']];
         }
-        yield 'uuid' => [new Uuid(), new PropertyMetadata(), ['format' => 'uuid']];
+        yield 'uuid' => [new Uuid(), new ApiProperty(), ['format' => 'uuid']];
         if (class_exists(Ulid::class)) {
-            yield 'ulid' => [new Ulid(), new PropertyMetadata(), ['format' => 'ulid']];
+            yield 'ulid' => [new Ulid(), new ApiProperty(), ['format' => 'ulid']];
         }
-        yield 'ipv4' => [new Ip(['version' => '4']), new PropertyMetadata(), ['format' => 'ipv4']];
-        yield 'ipv6' => [new Ip(['version' => '6']), new PropertyMetadata(), ['format' => 'ipv6']];
-        yield 'not supported' => [new Positive(), new PropertyMetadata(), []];
+        yield 'ipv4' => [new Ip(['version' => '4']), new ApiProperty(), ['format' => 'ipv4']];
+        yield 'ipv6' => [new Ip(['version' => '6']), new ApiProperty(), ['format' => 'ipv6']];
+        yield 'not supported' => [new Positive(), new ApiProperty(), []];
     }
 }

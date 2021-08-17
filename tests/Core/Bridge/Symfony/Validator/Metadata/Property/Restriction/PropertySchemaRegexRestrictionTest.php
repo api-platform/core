@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -38,33 +38,33 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports(Constraint $constraint, PropertyMetadata $propertyMetadata, bool $expectedResult): void
+    public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
     {
-        yield 'supported' => [new Regex(['pattern' => '/^[0-9]+$/']), new PropertyMetadata(), true];
-        yield 'supported too' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new PropertyMetadata(), true];
-        yield 'not supported' => [new Positive(), new PropertyMetadata(), false];
+        yield 'supported' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), true];
+        yield 'supported too' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new ApiProperty(), true];
+        yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
     /**
      * @dataProvider createProvider
      */
-    public function testCreate(Constraint $constraint, PropertyMetadata $propertyMetadata, array $expectedResult): void
+    public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaRegexRestriction->create($constraint, $propertyMetadata));
     }
 
     public function createProvider(): \Generator
     {
-        yield 'anchored' => [new Regex(['pattern' => '/^[0-9]+$/']), new PropertyMetadata(), ['pattern' => '^([0-9]+)$']];
-        yield 'not anchored' => [new Regex(['pattern' => '/[0-9]/']), new PropertyMetadata(), ['pattern' => '^(.*[0-9].*)$']];
-        yield 'inverted' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new PropertyMetadata(), ['pattern' => '^(((?![0-9]).)*)$']];
+        yield 'anchored' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), ['pattern' => '^([0-9]+)$']];
+        yield 'not anchored' => [new Regex(['pattern' => '/[0-9]/']), new ApiProperty(), ['pattern' => '^(.*[0-9].*)$']];
+        yield 'inverted' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new ApiProperty(), ['pattern' => '^(((?![0-9]).)*)$']];
 
-        yield 'with options' => [new Regex(['pattern' => '/^[a-z]+$/i']), new PropertyMetadata(), []];
-        yield 'with options and manual htmlPattern' => [new Regex(['pattern' => '/^[a-z]+$/i', 'htmlPattern' => '[a-zA-Z]+']), new PropertyMetadata(), ['pattern' => '^([a-zA-Z]+)$']];
+        yield 'with options' => [new Regex(['pattern' => '/^[a-z]+$/i']), new ApiProperty(), []];
+        yield 'with options and manual htmlPattern' => [new Regex(['pattern' => '/^[a-z]+$/i', 'htmlPattern' => '[a-zA-Z]+']), new ApiProperty(), ['pattern' => '^([a-zA-Z]+)$']];
     }
 }

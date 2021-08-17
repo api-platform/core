@@ -236,8 +236,12 @@ PHP
         $this->assertSame('Hey PHP 8', (new \ReflectionClass(DummyPhp8::class))->getAttributes(ApiResource::class)[0]->getArguments()['description']);
     }
 
+    /**
+     * @group legacy
+     */
     public function testApiResourceAnnotation()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The Doctrine annotation ApiPlatform\Core\Annotation\ApiResource is deprecated, use the PHP attribute ApiPlatform\Metadata\ApiResource instead.');
         $reader = new AnnotationReader();
         /**
          * @var ApiResource

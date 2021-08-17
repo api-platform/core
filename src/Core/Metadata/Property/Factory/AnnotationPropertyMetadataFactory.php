@@ -17,6 +17,8 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Util\Reflection;
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
+use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -26,6 +28,7 @@ use Doctrine\Common\Annotations\Reader;
  */
 final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
+    use DeprecationMetadataTrait;
     private $reader;
     private $decorated;
 
@@ -33,12 +36,14 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
+
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The "%s" annotation is deprecated, use "%s" instead.', ApiProperty::class, ApiPropertyMetadata::class));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
         $parentPropertyMetadata = null;
         if ($this->decorated) {
@@ -98,9 +103,13 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
+     * @param ApiPropertyMetadata|PropertyMetadata|null $parentPropertyMetadata
+     *
      * @throws PropertyNotFoundException
+     *
+     * @return ApiPropertyMetadata|PropertyMetadata
      */
-    private function handleNotFound(?PropertyMetadata $parentPropertyMetadata, string $resourceClass, string $property): PropertyMetadata
+    private function handleNotFound($parentPropertyMetadata, string $resourceClass, string $property)
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -109,39 +118,51 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
         throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
-    private function createMetadata(ApiProperty $annotation, PropertyMetadata $parentPropertyMetadata = null): PropertyMetadata
+    /**
+     * @param ApiPropertyMetadata|PropertyMetadata $parentPropertyMetadata
+     *
+     * @return ApiPropertyMetadata|PropertyMetadata
+     */
+    private function createMetadata(ApiProperty $annotation, $parentPropertyMetadata = null)
     {
         if (null === $parentPropertyMetadata) {
-            return new PropertyMetadata(
-                null,
-                $annotation->description,
-                $annotation->readable,
-                $annotation->writable,
-                $annotation->readableLink,
-                $annotation->writableLink,
-                $annotation->required,
-                $annotation->identifier,
-                $annotation->iri,
-                null,
-                $annotation->attributes,
-                null,
-                null,
-                $annotation->default,
-                $annotation->example
-            );
+            return $this->withDeprecatedAttributes((new ApiPropertyMetadata())
+                ->withDescription($annotation->description)
+                ->withReadable($annotation->readable)
+                ->withWritable($annotation->writable)
+                ->withReadableLink($annotation->readableLink)
+                ->withWritableLink($annotation->writableLink)
+                ->withRequired($annotation->required)
+                ->withIdentifier($annotation->identifier)
+                ->withTypes([$annotation->iri])
+                ->withDefault($annotation->default)
+                ->withExample($annotation->example),
+            $annotation->attributes);
         }
 
         $propertyMetadata = $parentPropertyMetadata;
-        foreach ([['get', 'description'], ['is', 'readable'], ['is', 'writable'], ['is', 'readableLink'], ['is', 'writableLink'], ['is', 'required'], ['get', 'iri'], ['is', 'identifier'], ['get', 'attributes'], ['get', 'default'], ['get', 'example']] as $property) {
+        foreach ([['get', 'description'], ['is', 'readable'], ['is', 'writable'], ['is', 'readableLink'], ['is', 'writableLink'], ['is', 'required'], ['is', 'identifier'], ['get', 'default'], ['get', 'example']] as $property) {
             if (null !== $value = $annotation->{$property[1]}) {
                 $propertyMetadata = $this->createWith($propertyMetadata, $property, $value);
             }
         }
 
-        return $propertyMetadata;
+        if ($annotation->iri) {
+            if ($propertyMetadata instanceof ApiPropertyMetadata) {
+                trigger_deprecation('api-platform', '2.7', sprintf('Using "iri" on the "%s" annotation is deprecated, use "types" on the attribute "%s" instead.', ApiProperty::class, ApiPropertyMetadata::class));
+                $propertyMetadata = $propertyMetadata->withTypes([$annotation->iri]);
+            } else {
+                $propertyMetadata = $propertyMetadata->withIri($annotation->iri);
+            }
+        }
+
+        return $this->withDeprecatedAttributes($propertyMetadata, $annotation->attributes ?? []);
     }
 
-    private function createWith(PropertyMetadata $propertyMetadata, array $property, $value): PropertyMetadata
+    /**
+     * @param PropertyMetadata|ApiPropertyMetadata $propertyMetadata
+     */
+    private function createWith($propertyMetadata, array $property, $value)
     {
         $wither = 'with'.ucfirst($property[1]);
 

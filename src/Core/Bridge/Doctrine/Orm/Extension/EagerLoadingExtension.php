@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -25,6 +26,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
@@ -183,6 +185,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             }
 
             try {
+                /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
                 //skip properties not found
@@ -211,7 +214,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
-            if (
+            if ($propertyMetadata instanceof ApiProperty) {
+                $fetchEager = $propertyMetadata->getFetchEager();
+            } elseif (
                 (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
                 (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
             ) {
@@ -287,6 +292,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         }
 
         foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
+            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
 
             if (true === $propertyMetadata->isIdentifier()) {
@@ -296,8 +302,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // If it's an embedded property see below
             if (!\array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
+                $isFetchable = $propertyMetadata instanceof ApiProperty ? $propertyMetadata->isFetchable() : $propertyMetadata->getAttribute('fetchable');
                 //the field test allows to add methods to a Resource which do not reflect real database fields
-                if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                if ($targetClassMetadata->hasField($property) && (true === $isFetchable || $propertyMetadata->isReadable())) {
                     $select[] = $property;
                 }
 
@@ -306,9 +313,10 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // It's an embedded property, select relevant subfields
             foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+                $isFetchable = $propertyMetadata instanceof ApiProperty ? $propertyMetadata->isFetchable() : $propertyMetadata->getAttribute('fetchable');
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
                 $propertyName = "$property.$embeddedProperty";
-                if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                if ($targetClassMetadata->hasField($propertyName) && (true === $isFetchable || $propertyMetadata->isReadable())) {
                     $select[] = $propertyName;
                 }
             }

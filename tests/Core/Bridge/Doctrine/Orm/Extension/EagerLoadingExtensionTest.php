@@ -26,6 +26,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -71,22 +72,22 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', $callContext)->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2', $callContext)->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyNameCollectionFactoryProphecy->create(EmbeddableDummy::class)->willReturn($relatedEmbedableCollection)->shouldBeCalled();
 
-        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = new ApiProperty();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
-        $namePropertyMetadata = new PropertyMetadata();
+        $namePropertyMetadata = new ApiProperty();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
-        $embeddedPropertyMetadata = new PropertyMetadata();
+        $embeddedPropertyMetadata = new ApiProperty();
         $embeddedPropertyMetadata = $embeddedPropertyMetadata->withReadable(true);
-        $notInDatabasePropertyMetadata = new PropertyMetadata();
+        $notInDatabasePropertyMetadata = new ApiProperty();
         $notInDatabasePropertyMetadata = $notInDatabasePropertyMetadata->withReadable(true);
-        $notReadablePropertyMetadata = new PropertyMetadata();
+        $notReadablePropertyMetadata = new ApiProperty();
         $notReadablePropertyMetadata = $notReadablePropertyMetadata->withReadable(false);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', $callContext)->willReturn($idPropertyMetadata)->shouldBeCalled();
@@ -152,7 +153,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', $callContext)->willReturn($relationPropertyMetadata)->shouldBeCalled();
@@ -162,15 +163,15 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy5', $callContext)->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'singleInheritanceRelation', $callContext)->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
-        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = new ApiProperty();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
-        $namePropertyMetadata = new PropertyMetadata();
+        $namePropertyMetadata = new ApiProperty();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
-        $embeddedDummyPropertyMetadata = new PropertyMetadata();
+        $embeddedDummyPropertyMetadata = new ApiProperty();
         $embeddedDummyPropertyMetadata = $embeddedDummyPropertyMetadata->withReadable(true);
-        $notInDatabasePropertyMetadata = new PropertyMetadata();
+        $notInDatabasePropertyMetadata = new ApiProperty();
         $notInDatabasePropertyMetadata = $notInDatabasePropertyMetadata->withReadable(true);
-        $notReadablePropertyMetadata = new PropertyMetadata();
+        $notReadablePropertyMetadata = new ApiProperty();
         $notReadablePropertyMetadata = $notReadablePropertyMetadata->withReadable(false);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', $callContext)->willReturn($idPropertyMetadata)->shouldBeCalled();
@@ -250,7 +251,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', ['item_operation_name' => 'item_operation', 'serializer_groups' => ['foo']])->shouldBeCalled()->willReturn(new PropertyMetadata());
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', ['item_operation_name' => 'item_operation', 'serializer_groups' => ['foo']])->shouldBeCalled()->willReturn(new ApiProperty());
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
@@ -274,7 +275,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', ['collection_operation_name' => 'collection_operation', 'serializer_groups' => ['foo']])->shouldBeCalled()->willReturn(new PropertyMetadata());
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo', ['collection_operation_name' => 'collection_operation', 'serializer_groups' => ['foo']])->shouldBeCalled()->willReturn(new ApiProperty());
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
@@ -352,12 +353,12 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyNameCollection)->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
-        $relatedPropertyMetadata = new PropertyMetadata();
+        $relatedPropertyMetadata = new ApiProperty();
         $relatedPropertyMetadata = $relatedPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'dummy', ['serializer_groups' => ['foo']])->willReturn($relatedPropertyMetadata)->shouldBeCalled();
@@ -405,12 +406,12 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyNameCollection)->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
-        $relatedPropertyMetadata = new PropertyMetadata();
+        $relatedPropertyMetadata = new ApiProperty();
         $relatedPropertyMetadata = $relatedPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'dummy', ['serializer_groups' => ['foo']])->willReturn($relatedPropertyMetadata)->shouldBeCalled();
@@ -468,10 +469,10 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
-        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = new ApiProperty();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
 
         $propertyMetadataFactoryProphecy->create(UnknownDummy::class, 'id', ['serializer_groups' => ['foobar']])->willReturn($idPropertyMetadata)->shouldBeCalled();
@@ -513,7 +514,7 @@ class EagerLoadingExtensionTest extends TestCase
         //$propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relation', ['serializer_groups' => ['foobar']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
@@ -594,7 +595,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willThrow(new ResourceClassNotFoundException());
 
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relation', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata);
@@ -627,14 +628,14 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
-        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = new ApiProperty();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
-        $namePropertyMetadata = new PropertyMetadata();
+        $namePropertyMetadata = new ApiProperty();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', ['serializer_groups' => ['foo']])->willReturn($idPropertyMetadata)->shouldBeCalled();
@@ -692,15 +693,15 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
-        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = new ApiProperty();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
-        $namePropertyMetadata = new PropertyMetadata();
+        $namePropertyMetadata = new ApiProperty();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', ['serializer_groups' => ['foo']])->willReturn($idPropertyMetadata)->shouldBeCalled();
@@ -757,7 +758,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
@@ -802,15 +803,15 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
 
-        $idPropertyMetadata = new PropertyMetadata();
+        $idPropertyMetadata = new ApiProperty();
         $idPropertyMetadata = $idPropertyMetadata->withIdentifier(true);
-        $namePropertyMetadata = new PropertyMetadata();
+        $namePropertyMetadata = new ApiProperty();
         $namePropertyMetadata = $namePropertyMetadata->withReadable(true);
 
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', ['serializer_groups' => ['foo']])->willReturn($idPropertyMetadata)->shouldBeCalled();
@@ -866,7 +867,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', ['serializer_groups' => ['foo']])->willReturn($relationPropertyMetadata)->shouldBeCalled();
@@ -921,8 +922,16 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
-        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes([$legacy ? 'fetchEager' : 'fetch_eager' => true]);
+        if ($legacy) {
+            $relationPropertyMetadata = new PropertyMetadata();
+            $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => true]);
+        } else {
+            $relationPropertyMetadata = new ApiProperty();
+            $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(true);
+            $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
+            $relationPropertyMetadata = $relationPropertyMetadata->withReadable(false);
+        }
+
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
         $relationPropertyMetadata = $relationPropertyMetadata->withReadable(false);
 
@@ -970,7 +979,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
+        $relationPropertyMetadata = new ApiProperty();
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
 
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', $callContext)->willReturn($relationPropertyMetadata)->shouldBeCalled();
@@ -1029,8 +1038,13 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relationPropertyMetadata = new PropertyMetadata();
-        $relationPropertyMetadata = $relationPropertyMetadata->withAttributes([$legacy ? 'fetchEager' : 'fetch_eager' => false]);
+        if ($legacy) {
+            $relationPropertyMetadata = new PropertyMetadata();
+            $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => false]);
+        } else {
+            $relationPropertyMetadata = new ApiProperty();
+            $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(false);
+        }
         $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(true);
         $relationPropertyMetadata = $relationPropertyMetadata->withReadable(true);
 

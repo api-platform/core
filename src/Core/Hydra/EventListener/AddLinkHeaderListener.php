@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Hydra\EventListener;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilder;
 use ApiPlatform\Core\Util\CorsTrait;
 use Fig\Link\GenericLinkProvider;

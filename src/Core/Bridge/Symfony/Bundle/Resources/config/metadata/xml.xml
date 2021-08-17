@@ -20,13 +20,13 @@
             <argument type="service" id="api_platform.metadata.extractor.xml" />
         </service>
 
-        <service id="api_platform.metadata.property.name_collection_factory.xml" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">
+        <service id="api_platform.metadata.property.name_collection_factory.xml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">
             <argument type="service" id="api_platform.metadata.extractor.xml" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.xml.inner" />
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />
-        <service id="api_platform.metadata.property.metadata_factory.xml" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.xml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false">
             <argument type="service" id="api_platform.metadata.extractor.xml" />
         </service>
     </services>

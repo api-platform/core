@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Hydra\EventListener;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Fig\Link\GenericLinkProvider;

@@ -13,11 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -25,6 +22,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\IdentifierResourceMetadataCollectionFactory;
@@ -49,8 +49,8 @@ class IdentifierResourceMetadataCollectionFactoryTest extends TestCase
         $propertyNameCollectionProphecy->create(AttributeDefaultOperations::class)->willReturn(new PropertyNameCollection(['id']));
         $propertyNameCollectionProphecy->create(AttributeResources::class)->willReturn(new PropertyNameCollection([]));
         $propertyMetadataProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataProphecy->create(AttributeResource::class, 'id')->willReturn(new PropertyMetadata(identifier: true));
-        $propertyMetadataProphecy->create(AttributeDefaultOperations::class, 'id')->willReturn(new PropertyMetadata(identifier: true));
+        $propertyMetadataProphecy->create(AttributeResource::class, 'id')->willReturn(new ApiProperty(identifier: true));
+        $propertyMetadataProphecy->create(AttributeDefaultOperations::class, 'id')->willReturn(new ApiProperty(identifier: true));
         $decorated = new AttributesResourceMetadataCollectionFactory();
         $identifierResourceMetadataCollectionFactory = new IdentifierResourceMetadataCollectionFactory($decorated, $propertyNameCollectionProphecy->reveal(), $propertyMetadataProphecy->reveal());
 
