@@ -49,11 +49,11 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
         return $this->convertInnerFields($propertyName, false, $class, $format, $context);
     }
 
-    private function convertInnerFields(string $propertyName, bool $normalization, string $class = null, string $format = null, $context = []): string
+    private function convertInnerFields($propertyName, bool $normalization, string $class = null, string $format = null, $context = []): string
     {
         $convertedProperties = [];
 
-        foreach (explode('.', $propertyName) as $decomposedProperty) {
+        foreach (explode('.', (string) $propertyName) as $decomposedProperty) {
             $convertedProperties[] = $this->decorated->{$normalization ? 'normalize' : 'denormalize'}($decomposedProperty, $class, $format, $context);
         }
 
