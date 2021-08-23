@@ -42,6 +42,8 @@ class Operation
     protected $securityMessage;
     protected $securityPostDenormalize;
     protected $securityPostDenormalizeMessage;
+    protected $securityPostValidation;
+    protected $securityPostValidationMessage;
     protected $deprecationReason;
     /**
      * @var string[]
@@ -96,6 +98,8 @@ class Operation
      * @param string            $securityMessage
      * @param string            $securityPostDenormalize
      * @param string            $securityPostDenormalizeMessage
+     * @param string            $securityPostValidation
+     * @param string            $securityPostValidationMessage
      * @param string            $deprecationReason
      * @param string[]          $filters
      * @param bool|string|array $mercure
@@ -131,6 +135,8 @@ class Operation
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,
@@ -174,6 +180,8 @@ class Operation
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+        $this->securityPostValidation = $securityPostValidation;
+        $this->securityPostValidationMessage = $securityPostValidationMessage;
         $this->deprecationReason = $deprecationReason;
         $this->filters = $filters;
         $this->validationContext = $validationContext;
@@ -495,6 +503,32 @@ class Operation
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidation(): ?string
+    {
+        return $this->securityPostValidation;
+    }
+
+    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidation = $securityPostValidation;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidationMessage(): ?string
+    {
+        return $this->securityPostValidationMessage;
+    }
+
+    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidationMessage = $securityPostValidationMessage;
 
         return $self;
     }

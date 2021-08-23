@@ -42,6 +42,7 @@
 * DataProvider: new `ApiPlatform\State\ProviderInterface` that replaces DataProviders (#4351)
 * DataPersister: new `ApiPlatform\State\ProcessorInterface` that replaces DataPersisters (#4351)
 * A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
+* Add support for `security_post_validation` attribute
 
 ## 2.6.5
 

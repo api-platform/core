@@ -38,6 +38,7 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.validate" />
             <argument type="service" id="api_platform.graphql.mutation_resolver_locator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.graphql.resolver.stage.security_post_validation" />
         </service>
 
         <service id="api_platform.graphql.resolver.factory.item_subscription" class="ApiPlatform\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory" public="false">
@@ -66,6 +67,11 @@
         </service>
 
         <service id="api_platform.graphql.resolver.stage.security_post_denormalize" class="ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
+        </service>
+
+        <service id="api_platform.graphql.resolver.stage.security_post_validation" class="ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>

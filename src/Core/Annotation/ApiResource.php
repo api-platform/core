@@ -63,6 +63,8 @@ use ApiPlatform\Exception\InvalidArgumentException;
  *     @Attribute("securityMessage", type="string"),
  *     @Attribute("securityPostDenormalize", type="string"),
  *     @Attribute("securityPostDenormalizeMessage", type="string"),
+ *     @Attribute("securityPostValidation", type="string"),
+ *     @Attribute("securityPostValidationMessage", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("stateless", type="bool"),
  *     @Attribute("subresourceOperations", type="array"),
@@ -167,6 +169,8 @@ final class ApiResource
      * @param string       $securityMessage                 https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string       $securityPostDenormalize         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string       $securityPostDenormalizeMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string       $securityPostValidation          https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validation
+     * @param string       $securityPostValidationMessage   https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param bool         $stateless
      * @param string       $sunset                          https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
      * @param array        $swaggerContext                  https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
@@ -218,6 +222,8 @@ final class ApiResource
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?bool $stateless = null,
         ?string $sunset = null,
         ?array $swaggerContext = null,

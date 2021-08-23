@@ -18,6 +18,7 @@ use ApiPlatform\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
@@ -49,6 +50,7 @@ class ItemMutationResolverFactoryTest extends TestCase
     private $validateStageProphecy;
     private $mutationResolverLocatorProphecy;
     private $resourceMetadataCollectionFactoryProphecy;
+    private $securityPostValidationStageProphecy;
 
     /**
      * {@inheritdoc}
@@ -64,6 +66,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->validateStageProphecy = $this->prophesize(ValidateStageInterface::class);
         $this->mutationResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $this->securityPostValidationStageProphecy = $this->prophesize(SecurityPostValidationStageInterface::class);
 
         $this->itemMutationResolverFactory = new ItemMutationResolverFactory(
             $this->readStageProphecy->reveal(),
@@ -74,7 +77,8 @@ class ItemMutationResolverFactoryTest extends TestCase
             $this->writeStageProphecy->reveal(),
             $this->validateStageProphecy->reveal(),
             $this->mutationResolverLocatorProphecy->reveal(),
-            $this->resourceMetadataCollectionFactoryProphecy->reveal()
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->securityPostValidationStageProphecy->reveal()
         );
     }
 

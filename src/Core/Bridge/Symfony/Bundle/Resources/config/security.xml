@@ -24,6 +24,8 @@
             <tag name="kernel.event_listener" event="kernel.request" method="onSecurity" priority="3" />
             <!-- This method must be executed only when the current object is available, after deserialization -->
             <tag name="kernel.event_listener" event="kernel.request" method="onSecurityPostDenormalize" priority="1" />
+            <!-- This method must be executed only when the current object is available, after validation -->
+            <tag name="kernel.event_listener" event="kernel.view" method="onSecurityPostValidation" priority="63" />
         </service>
 
         <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Core\Security\Core\Authorization\ExpressionLanguageProvider" public="false">
