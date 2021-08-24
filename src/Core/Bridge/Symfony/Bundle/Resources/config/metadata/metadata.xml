@@ -69,7 +69,7 @@
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory.serializer" class="ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="30" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>null</argument>
             <argument type="service" id="serializer.mapping.class_metadata_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.serializer.inner" />
             <argument type="service" id="api_platform.resource_class_resolver" />

@@ -135,9 +135,13 @@ final class Pagination
                 $limit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $limit, true);
                 $clientLimit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $clientLimit, true);
             } else {
-                $operation = $resourceMetadata->getOperation($operationName);
-                $limit = $operation->getPaginationItemsPerPage() ?? $limit;
-                $clientLimit = $operation->getPaginationClientItemsPerPage() ?? $clientLimit;
+                try {
+                    $operation = $graphql ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+                    $limit = $operation->getPaginationItemsPerPage() ?? $limit;
+                    $clientLimit = $operation->getPaginationClientItemsPerPage() ?? $clientLimit;
+                } catch (OperationNotFoundException $e) {
+                    // GraphQl operation may not exist
+                }
             }
         }
 
@@ -165,8 +169,12 @@ final class Pagination
                 }
                 $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage ?? $this->options['maximum_items_per_page'], true);
             } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-                $operation = $resourceMetadata->getOperation($operationName);
-                $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
+                try {
+                    $operation = $graphql ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+                    $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
+                } catch (OperationNotFoundException $e) {
+                    $maxItemsPerPage = $this->options['maximum_items_per_page'];
+                }
             }
 
             if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
@@ -263,9 +271,13 @@ final class Pagination
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if ($resourceMetadata instanceof ResourceMetadataCollection) {
-                $operation = $resourceMetadata->getOperation($operationName);
-                $enabled = $partial ? $operation->getPaginationPartial() : $operation->getPaginationEnabled();
-                $clientEnabled = $partial ? $operation->getPaginationClientPartial() : $operation->getPaginationClientEnabled();
+                try {
+                    $operation = isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+                    $enabled = ($partial ? $operation->getPaginationPartial() : $operation->getPaginationEnabled()) ?? $enabled;
+                    $clientEnabled = ($partial ? $operation->getPaginationClientPartial() : $operation->getPaginationClientEnabled()) ?? $clientEnabled;
+                } catch (OperationNotFoundException $e) {
+                    // GraphQl operation may not exist
+                }
             } else {
                 $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
                 $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
