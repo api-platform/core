@@ -113,6 +113,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
         }
 
-        throw new \RuntimeException('Not able to retrieve identifiers.');
+        throw new RuntimeException('Not able to retrieve identifiers.');
     }
 }
