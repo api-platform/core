@@ -148,7 +148,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 continue;
             }
 
-            if (!$value = $resource->{$methodName}()) {
+            if (null === ($value = $resource->{$methodName}())) {
                 continue;
             }
 
