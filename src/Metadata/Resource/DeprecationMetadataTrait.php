@@ -67,6 +67,8 @@ trait DeprecationMetadataTrait
         } elseif (\in_array($key, ['collection_query', 'item_query', 'mutation'], true)) {
             trigger_deprecation('api-platform/core', '2.7', 'To specify a GraphQl resolver use "resolver" instead of "mutation", "item_query" or "collection_query".');
             $key = 'resolver';
+        } elseif ('filters' === $key) {
+            $value = null === $value ? [] : $value;
         }
 
         return [$this->camelCaseToSnakeCaseNameConverter->denormalize($key), $value];
