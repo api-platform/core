@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -143,7 +144,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             return $context;
         }
 
-        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName);
+        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation);
     }
 
     /**
@@ -203,12 +204,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $jsonLdContext;
     }
 
-    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName): array
+    private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?Operation $operation = null): array
     {
         $context = $this->getBaseContext($referenceType);
+        $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             /** @var PropertyMetadata|ApiProperty */
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
 
             if ($propertyMetadata->isIdentifier() && true !== $propertyMetadata->isWritable()) {
                 continue;

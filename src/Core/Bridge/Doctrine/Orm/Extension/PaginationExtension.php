@@ -199,11 +199,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         if (null === $request) {
-            if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
-                return null;
-            }
+            $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context) : $this->pagination->isEnabled($resourceClass, $operationName, $context);
 
-            if (($context['graphql_operation_name'] ?? false) && !$this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
+            if (!$enabled) {
                 return null;
             }
 
