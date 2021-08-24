@@ -68,7 +68,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             ->withShortName($resourceMetadata->getShortName())
             ->withDescription($resourceMetadata->getDescription())
             ->withClass($resourceClass)
-            ->withTypes([$resourceMetadata->getIri() ?? $resourceMetadata->getShortName()]);
+            ->withTypes($resourceMetadata->getIri() ? [$resourceMetadata->getIri()] : []);
 
         foreach ($attributes as $key => $value) {
             $resource = $this->setAttributeValue($resource, $key, $value);
