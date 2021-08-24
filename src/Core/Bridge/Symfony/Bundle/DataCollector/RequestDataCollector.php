@@ -24,8 +24,8 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,7 +41,7 @@ final class RequestDataCollector extends DataCollector
     use ApiResourceToLegacyResourceMetadataTrait;
 
     /**
-     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
+     * @var ResourceMetadataCollectionFactoryInterface
      */
     private $metadataFactory;
     private $filterLocator;
@@ -69,23 +69,20 @@ final class RequestDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $counters = ['ignored_filters' => 0];
         $resourceClass = $request->attributes->get('_api_resource_class');
-        $resourceMetadata = $resourceClass ? $this->metadataFactory->create($resourceClass) : null;
-
-        if ($resourceMetadata instanceof ResourceMetadataCollection) {
-            $resourceMetadata = $this->transformResourceToResourceMetadata($resourceMetadata[0]);
-        }
+        $resourceMetadataCollection = $resourceClass ? $this->metadataFactory->create($resourceClass) : [];
 
         $filters = [];
-        foreach ($resourceMetadata ? $resourceMetadata->getAttribute('filters', []) : [] as $id) {
-            if ($this->filterLocator->has($id)) {
-                $filters[$id] = \get_class($this->filterLocator->get($id));
-                continue;
-            }
+        $counters = ['ignored_filters' => 0];
+        $resourceMetadataCollectionData = [];
 
-            $filters[$id] = null;
-            ++$counters['ignored_filters'];
+        /** @var ApiResource $resourceMetadata */
+        foreach ($resourceMetadataCollection as $index => $resourceMetadata) {
+            $this->setFilters($resourceMetadata, $index, $filters, $counters);
+            $resourceMetadataCollectionData[] = [
+                'resource' => $resourceMetadata,
+                'operations' => iterator_to_array($resourceMetadata->getOperations()),
+            ];
         }
 
         $requestAttributes = RequestAttributesExtractor::extractAttributes($request);
@@ -95,7 +92,7 @@ final class RequestDataCollector extends DataCollector
 
         $this->data = [
             'resource_class' => $resourceClass,
-            'resource_metadata' => $resourceMetadata ? $this->cloneVar($resourceMetadata) : null,
+            'resource_metadata_collection' => $this->cloneVar($resourceMetadataCollectionData),
             'acceptable_content_types' => $request->getAcceptableContentTypes(),
             'filters' => $filters,
             'counters' => $counters,
@@ -130,6 +127,19 @@ final class RequestDataCollector extends DataCollector
         }
     }
 
+    private function setFilters(ApiResource $resourceMetadata, int $index, array &$filters, array &$counters): void
+    {
+        foreach ($resourceMetadata->getFilters() as $id) {
+            if ($this->filterLocator->has($id)) {
+                $filters[$index][$id] = \get_class($this->filterLocator->get($id));
+                continue;
+            }
+
+            $filters[$index][$id] = null;
+            ++$counters['ignored_filters'];
+        }
+    }
+
     public function getAcceptableContentTypes(): array
     {
         return $this->data['acceptable_content_types'] ?? [];
@@ -140,9 +150,9 @@ final class RequestDataCollector extends DataCollector
         return $this->data['resource_class'] ?? null;
     }
 
-    public function getResourceMetadata()
+    public function getResourceMetadataCollection()
     {
-        return $this->data['resource_metadata'] ?? null;
+        return $this->data['resource_metadata_collection'] ?? null;
     }
 
     public function getRequestAttributes(): array

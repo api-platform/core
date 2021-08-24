@@ -28,7 +28,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
- * @group legacy
  */
 class ApiPlatformProfilerPanelTest extends WebTestCase
 {
@@ -142,26 +141,25 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(3, $crawler->filter('.sf-tabs .tab'), 'Tabs must be presents on the panel.');
+        $this->assertCount(6, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
-        $this->assertSame('Resource Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
+        $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
         $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertStringEndsWith('"Dummy"', $tabContent->filter('h3')->html(), 'the resource shortname should be displayed.');
+        $this->assertStringEndsWith('Dummy', trim($tabContent->filter('h3')->html()), 'the resource shortname should be displayed.');
 
-        $this->assertCount(4, $tabContent->filter('table'));
-        $this->assertSame('Item operations', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
-        $this->assertSame('Collection operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
+        $this->assertCount(9, $tabContent->filter('table'));
+        $this->assertSame('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
+        $this->assertSame('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
         $this->assertSame('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
-        $this->assertSame('Attributes', $tabContent->filter('table:last-of-type thead th:first-of-type')->html());
 
         // Data providers tab
-        $this->assertSame('Data Providers', $crawler->filter('.tab:nth-of-type(2) .tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.tab:nth-of-type(2) .tab-content'));
+        $this->assertSame('Data Providers', $crawler->filter('.data-provider-tab-title')->html());
+        $this->assertNotEmpty($crawler->filter('.data-provider-tab-content'));
 
         // Data persisters tab
-        $this->assertSame('Data Persisters', $crawler->filter('.tab:last-child .tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.tab:nth-of-type(3) .tab-content'));
+        $this->assertSame('Data Persisters', $crawler->filter('.data-persister-tab-title')->html());
+        $this->assertNotEmpty($crawler->filter('.data-persister-tab-content .empty'));
     }
 
     public function testGetCollectionProfiler()
@@ -174,20 +172,19 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // Metadata tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertSame('_api_/dummies.{_format}_get_collection', $tabContent->filter('table:nth-of-type(2) th.status-success')->html(), 'The actual operation should be highlighted.');
-        $this->assertEmpty($tabContent->filter('table:not(:nth-of-type(2)) .status-success'), 'Only the actual operation should be highlighted.');
+        $tabContent = $crawler->filter('.metadata-tab-content th.status-success');
+        $this->assertSame('_api_/dummies.{_format}_get_collection', $tabContent->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(2) .tab-content');
+        $tabContent = $crawler->filter('.data-provider-tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString('mongodb' === $this->env ? OdmCollectionDataProvider::class : CollectionDataProvider::class, $tabContent->filter('table tbody')->html());
+        $this->assertStringContainsString('mongodb' === $this->env ? OdmCollectionDataProvider::class : CollectionDataProvider::class, $tabContent->html());
 
         $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
-        // Data persiters tab
-        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.tab:nth-of-type(3) .tab-content .empty')->html());
+        // Data persisters tab
+        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.data-persister-tab-content .empty')->html());
     }
 
     public function testPostCollectionProfiler()
@@ -200,20 +197,19 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // Metadata tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertSame('_api_/dummies.{_format}_post_collection', $tabContent->filter('table:nth-of-type(2) th.status-success')->html(), 'The actual operation should be highlighted.');
-        $this->assertEmpty($tabContent->filter('table:not(:nth-of-type(2)) .status-success'), 'Only the actual operation should be highlighted.');
+        $tabContent = $crawler->filter('.metadata-tab-content');
+        $this->assertSame('_api_/dummies.{_format}_post_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(2) .tab-content');
+        $tabContent = $crawler->filter('.data-provider-tab-content');
         $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
         // Data persiters tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(3) .tab-content');
+        $tabContent = $crawler->filter('.data-persister-tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString(DataPersister::class, $tabContent->filter('table tbody')->html());
+        $this->assertStringContainsString(DataPersister::class, $tabContent->html());
     }
 
     /**
@@ -235,22 +231,21 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
 
         // Metadata tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
-        $this->assertSame('_api_/dummies/{id}.{_format}_get', $tabContent->filter('table:nth-of-type(1) th.status-success')->html(), 'The actual operation should be highlighted.');
-        $this->assertEmpty($tabContent->filter('table:not(:nth-of-type(1)) .status-success'), 'Only the actual operation should be highlighted.');
+        $tabContent = $crawler->filter('.metadata-tab-content');
+        $this->assertSame('_api_/dummies/{id}.{_format}_get', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
-        $tabContent = $crawler->filter('.tab:nth-of-type(2) .tab-content');
-        $this->assertSame('FALSE', $tabContent->filter('table tbody tr:first-of-type .status-error')->html());
+        $tabContent = $crawler->filter('.data-provider-tab-content');
+        $this->assertSame('FALSE', $tabContent->filter('tr:first-of-type .status-error')->html());
         $this->assertSame(ContainNonResourceItemDataProvider::class, $tabContent->filter('table tbody tr:first-of-type td:nth-of-type(3)')->html());
 
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString('mongodb' === $this->env ? OdmItemDataProvider::class : ItemDataProvider::class, $tabContent->filter('table tbody')->html());
+        $this->assertStringContainsString('mongodb' === $this->env ? OdmItemDataProvider::class : ItemDataProvider::class, $tabContent->html());
 
         $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
-        // Data persiters tab
-        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.tab:nth-of-type(3) .tab-content .empty')->html());
+        // Data persisters tab
+        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.data-persister-tab-content .empty')->html());
     }
 }

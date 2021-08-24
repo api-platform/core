@@ -26,9 +26,10 @@ use ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use PackageVersions\Versions;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +41,6 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
  * @author Julien DENIAU <julien.deniau@gmail.com>
- * @group legacy
  */
 class RequestDataCollectorTest extends TestCase
 {
@@ -62,7 +62,7 @@ class RequestDataCollectorTest extends TestCase
             ->shouldBeCalled()
             ->willReturn(['foo', 'bar']);
 
-        $this->metadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->metadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->filterLocator = $this->prophesize(ContainerInterface::class);
     }
 
@@ -85,7 +85,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame(['ignored_filters' => 0], $dataCollector->getCounters());
         $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertNull($dataCollector->getResourceClass());
-        $this->assertNull($dataCollector->getResourceMetadata());
+        $this->assertEmpty($dataCollector->getResourceMetadataCollection()->getValue());
 
         $expected = ['context' => [], 'responses' => []];
         $this->assertSame($expected, $dataCollector->getCollectionDataProviders());
@@ -109,7 +109,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame([], $dataCollector->getFilters());
         $this->assertSame([], $dataCollector->getCounters());
         $this->assertNull($dataCollector->getResourceClass());
-        $this->assertNull($dataCollector->getResourceMetadata());
+        $this->assertNull($dataCollector->getResourceMetadataCollection());
 
         $expected = ['context' => [], 'responses' => []];
         $this->assertSame($expected, $dataCollector->getCollectionDataProviders());
@@ -152,10 +152,9 @@ class RequestDataCollectorTest extends TestCase
         ], $dataCollector->getRequestAttributes());
         $this->assertSame(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertSame(DummyEntity::class, $dataCollector->getResourceClass());
-        $this->assertSame(['foo' => null, 'a_filter' => \stdClass::class], $dataCollector->getFilters());
+        $this->assertSame([['foo' => null, 'a_filter' => \stdClass::class]], $dataCollector->getFilters());
         $this->assertSame(['ignored_filters' => 1], $dataCollector->getCounters());
-        $this->assertInstanceOf(Data::class, $dataCollector->getResourceMetadata());
-        $this->assertSame(ResourceMetadata::class, $dataCollector->getResourceMetadata()->getType());
+        $this->assertInstanceOf(Data::class, $dataCollector->getResourceMetadataCollection());
 
         $expected = ['context' => [], 'responses' => []];
         $this->assertSame($expected, $dataCollector->getCollectionDataProviders());
@@ -285,7 +284,7 @@ class RequestDataCollectorTest extends TestCase
                 ->create($data)
                 ->shouldBeCalled()
                 ->willReturn(
-                    new ResourceMetadata(null, null, null, [], [], ['filters' => ['foo', 'a_filter']])
+                    new ResourceMetadataCollection($data, [(new ApiResource())->withFilters(['foo', 'a_filter'])])
                 );
         }
     }
