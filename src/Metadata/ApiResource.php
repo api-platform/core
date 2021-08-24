@@ -509,12 +509,12 @@ class ApiResource
         return $self;
     }
 
-    public function getStatus(): ?string
+    public function getStatus()
     {
         return $this->status;
     }
 
-    public function withStatus(?string $status = null): self
+    public function withStatus($status = null): self
     {
         $self = clone $this;
         $self->status = $status;
