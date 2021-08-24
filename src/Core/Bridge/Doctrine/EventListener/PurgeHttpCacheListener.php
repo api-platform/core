@@ -173,8 +173,7 @@ final class PurgeHttpCacheListener
             //TODO: test if this is a resource class
             $iri = $this->iriConverter->getIriFromItem($value);
             $this->tags[$iri] = $iri;
-        } catch (InvalidArgumentException $e) {
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException | InvalidArgumentException $e) {
         }
     }
 }
