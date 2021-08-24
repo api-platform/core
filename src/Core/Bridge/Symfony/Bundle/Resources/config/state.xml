@@ -19,11 +19,6 @@
         </service>
         <service id="ApiPlatform\State\ProviderInterface" alias="api_platform.state_provider" />
 
-        <service id="api_platform.state.legacy_data_persister_processor" class="ApiPlatform\State\LegacyDataPersisterProcessor">
-            <tag name="api_platform.state_processor" />
-            <argument type="service" id="api_platform.data_persister" />
-        </service>
-
         <service id="api_platform.state_processor" class="ApiPlatform\State\ChainProcessor" public="false">
             <argument type="tagged" tag="api_platform.state_processor" />
         </service>

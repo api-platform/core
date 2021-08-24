@@ -11,7 +11,14 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.message_bus" />
 
-            <tag name="api_platform.data_persister" priority="-900" />
+            <tag name="api_platform.data_persister" priority="-1000" />
+        </service>
+
+        <service id="api_platform.messenger.processor" class="ApiPlatform\Symfony\Messenger\Processor" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.message_bus" />
+
+            <tag name="api_platform.state_processor" priority="-900" />
         </service>
 
         <service id="api_platform.messenger.data_transformer" class="ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer" public="false">
