@@ -12,7 +12,7 @@
     <table>
         <thead>
             <tr>
-                <th scope="col" class="key">{{- name|capitalize }} operations</th>
+                <th scope="col" class="key">{% if name is defined %}{{ name|capitalize }}{% endif %}Operations</th>
                 <th scope="col">Attributes</th>
             </tr>
         </thead>
@@ -122,76 +122,80 @@
         </div>
     </div>
 
-    {% if collector.resourceMetadata %}
+    {% if collector.resourceMetadataCollection is not empty %}
         <div class="sf-tabs">
             <div class="tab">
-                <h3 class="tab-title">Resource Metadata</h3>
-                <div class="tab-content">
-                    <h3>Short name: "{{ collector.resourceMetadata.shortName }}"</h3>
-                    {{ apiPlatform.operationTable(collector.resourceMetadata.itemOperations, 'item', collector.requestAttributes.operation_name|default('')) }}
-                    {{ apiPlatform.operationTable(collector.resourceMetadata.collectionOperations, 'collection', collector.requestAttributes.operation_name|default('')) }}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col" class="key">Filters</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for id, filter in collector.filters %}
-                                {% set ignored_filter = filter is same as(null) %}
-                                <tr{% if ignored_filter %} class="status-warning"{% endif %}>
-                                    <td>
-                                        {{ id }}
-                                        {% if ignored_filter %}
-                                            <span class="newline text-muted">ignored filter</span>
+                <h3 class="tab-title metadata-tab-title">Metadata</h3>
+                <h3>Resources</h3>
+                <div class="tab-content metadata-tab-content">
+                    <div class="sf-tabs">
+                        {% for resourceMetadata in collector.resourceMetadataCollection %}
+                            <div class="tab">
+                                <h3 class="tab-title">
+                                    {{ resourceMetadata.resource.uriTemplate ??  resourceMetadata.resource.shortName }}
+                                </h3>
+                                <div class="tab-content">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="key">Resource</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{- profiler_dump(resourceMetadata.resource, 1) -}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    {{ apiPlatform.operationTable(resourceMetadata.operations, '', collector.requestAttributes.operation_name|default('')) }}
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="key">Filters</th>
+                                                <th scope="col"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% if collector.filters and loop.index0 in collector.filters|keys %}
+                                            {% for id, filter in collector.filters[loop.index0] %}
+                                                {% set ignored_filter = filter is same as(null) %}
+                                                <tr{% if ignored_filter %} class="status-warning"{% endif %}>
+                                                    <td>
+                                                        {{ id }}
+                                                        {% if ignored_filter %}
+                                                            <span class="newline text-muted">ignored filter</span>
+                                                        {% else %}
+                                                            {{ dump(filter) }}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
                                         {% else %}
-                                            {{ dump(filter) }}
+                                            <tr>
+                                                <td class="text-muted" colspan="2">
+                                                    No available filter declared for this resource.
+                                                </td>
+                                            </tr>
                                         {% endif %}
-                                    </td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td class="text-muted">
-                                        No available filter declared for this resource.
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col" class="key">Attributes</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for key, value in collector.resourceMetadata.attributes %}
-                                {% if key != 'filters' %}
-                                    <tr>
-                                        <th scope="row">{{ key }}</th>
-                                        <td>{{- profiler_dump(value, 2) -}}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
             <div class="tab">
-                <h3 class="tab-title">Data Providers</h3>
-                <div class="tab-content">
+                <h3 class="tab-title data-provider-tab-title">Data Providers</h3>
+                <div class="tab-content data-provider-tab-content">
                     {{ apiPlatform.providerTable(collector.collectionDataProviders, 'collection data provider') }}
                     {{ apiPlatform.providerTable(collector.itemDataProviders, 'item data provider') }}
                     {{ apiPlatform.providerTable(collector.subresourceDataProviders, 'subresource data provider') }}
                 </div>
             </div>
             <div class="tab">
-                <h3 class="tab-title">Data Persisters</h3>
-                <div class="tab-content">
+                <h3 class="tab-title data-persister-tab-title">Data Persisters</h3>
+                <div class="tab-content data-persister-tab-content">
                     {{ apiPlatform.providerTable(collector.dataPersisters, 'data persister') }}
                 </div>
             </div>
