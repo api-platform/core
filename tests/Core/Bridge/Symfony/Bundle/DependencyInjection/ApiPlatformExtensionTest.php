@@ -291,6 +291,9 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('debug.api_platform.item_data_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('debug.api_platform.subresource_data_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('debug.api_platform.data_persister', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.api_platform.debug_resource.command', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.var_dumper.cloner', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.var_dumper.cli_dumper', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $config = self::DEFAULT_CONFIG;
@@ -794,6 +797,9 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('debug.api_platform.item_data_provider', Argument::type(Definition::class))->will(function () {});
         $containerBuilderProphecy->setDefinition('debug.api_platform.subresource_data_provider', Argument::type(Definition::class))->will(function () {});
         $containerBuilderProphecy->setDefinition('debug.api_platform.data_persister', Argument::type(Definition::class))->will(function () {});
+        $containerBuilderProphecy->setDefinition('debug.api_platform.debug_resource.command', Argument::type(Definition::class))->will(function () {});
+        $containerBuilderProphecy->setDefinition('debug.var_dumper.cloner', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.var_dumper.cli_dumper', Argument::type(Definition::class))->shouldBeCalled();
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
