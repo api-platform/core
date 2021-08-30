@@ -2244,7 +2244,7 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return BookDocument | Book
+     * @return BookDocument|Book
      */
     private function buildBook()
     {
@@ -2252,7 +2252,7 @@ final class DoctrineContext implements Context
     }
 
     /**
-     * @return CustomMultipleIdentifierDummy | CustomMultipleIdentifierDummyDocument
+     * @return CustomMultipleIdentifierDummy|CustomMultipleIdentifierDummyDocument
      */
     private function buildCustomMultipleIdentifierDummy()
     {
