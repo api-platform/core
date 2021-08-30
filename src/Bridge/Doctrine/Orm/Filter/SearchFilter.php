@@ -20,7 +20,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
-use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -38,7 +38,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 {
     use SearchFilterTrait;
 
-    public const DOCTRINE_INTEGER_TYPE = DBALType::INTEGER;
+    public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
     public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
     {
@@ -246,31 +246,25 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     protected function getType(string $doctrineType): string
     {
         switch ($doctrineType) {
-            case DBALType::TARRAY:
+            case Types::ARRAY:
                 return 'array';
-            case DBALType::BIGINT:
-            case DBALType::INTEGER:
-            case DBALType::SMALLINT:
+            case Types::BIGINT:
+            case Types::INTEGER:
+            case Types::SMALLINT:
                 return 'int';
-            case DBALType::BOOLEAN:
+            case Types::BOOLEAN:
                 return 'bool';
-            case DBALType::DATE:
-            case DBALType::TIME:
-            case DBALType::DATETIME:
-            case DBALType::DATETIMETZ:
+            case Types::DATE_MUTABLE:
+            case Types::TIME_MUTABLE:
+            case Types::DATETIME_MUTABLE:
+            case Types::DATETIMETZ_MUTABLE:
+            case Types::DATE_IMMUTABLE:
+            case Types::TIME_IMMUTABLE:
+            case Types::DATETIME_IMMUTABLE:
+            case Types::DATETIMETZ_IMMUTABLE:
                 return \DateTimeInterface::class;
-            case DBALType::FLOAT:
+            case Types::FLOAT:
                 return 'float';
-        }
-
-        if (\defined(DBALType::class.'::DATE_IMMUTABLE')) {
-            switch ($doctrineType) {
-                case DBALType::DATE_IMMUTABLE:
-                case DBALType::TIME_IMMUTABLE:
-                case DBALType::DATETIME_IMMUTABLE:
-                case DBALType::DATETIMETZ_IMMUTABLE:
-                    return \DateTimeInterface::class;
-            }
         }
 
         return 'string';

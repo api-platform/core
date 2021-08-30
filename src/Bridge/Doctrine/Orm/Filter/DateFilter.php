@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -31,14 +32,14 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     use DateFilterTrait;
 
     public const DOCTRINE_DATE_TYPES = [
-        DBALType::DATE => true,
-        DBALType::DATETIME => true,
-        DBALType::DATETIMETZ => true,
-        DBALType::TIME => true,
-        DBALType::DATE_IMMUTABLE => true,
-        DBALType::DATETIME_IMMUTABLE => true,
-        DBALType::DATETIMETZ_IMMUTABLE => true,
-        DBALType::TIME_IMMUTABLE => true,
+        Types::DATE_MUTABLE => true,
+        Types::DATETIME_MUTABLE => true,
+        Types::DATETIMETZ_MUTABLE => true,
+        Types::TIME_MUTABLE => true,
+        Types::DATE_IMMUTABLE => true,
+        Types::DATETIME_IMMUTABLE => true,
+        Types::DATETIMETZ_IMMUTABLE => true,
+        Types::TIME_IMMUTABLE => true,
     ];
 
     /**
