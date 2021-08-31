@@ -698,6 +698,9 @@ class ApiPlatformExtensionTest extends TestCase
         $this->extension->load(self::DEFAULT_CONFIG, $containerBuilder);
     }
 
+    /**
+     * @requires PHP >= 7.4
+     */
     public function testEnableElasticsearch()
     {
         $this->childDefinitionProphecy->addTag('api_platform.elasticsearch.request_body_search_extension.collection')->shouldBeCalled();

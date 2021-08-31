@@ -23,6 +23,7 @@ use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Elasticsearch\Client;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -41,18 +42,28 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     private $denormalizer;
     private $pagination;
     private $resourceMetadataFactory;
-    private $collectionExtensions;
 
     /**
-     * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
+     * @param RequestBodySearchCollectionExtensionInterface[]                             $collectionExtensions
+     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor, DenormalizerInterface $denormalizer, Pagination $pagination, ResourceMetadataFactoryInterface $resourceMetadataFactory, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor = null, DenormalizerInterface $denormalizer, Pagination $pagination, $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
+
+        if ($this->identifierExtractor) {
+            trigger_deprecation('api-platform', '2.7', sprintf('Passing an instance of "%s" is deprecated and will not be supported in 3.0.', IdentifierExtractorInterface::class));
+        }
+
         $this->identifierExtractor = $identifierExtractor;
         $this->denormalizer = $denormalizer;
         $this->pagination = $pagination;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->collectionExtensions = $collectionExtensions;
     }
@@ -77,10 +88,18 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             return false;
         }
 
-        try {
-            $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass);
-        } catch (NonUniqueIdentifierException $e) {
-            return false;
+        if ($this->identifierExtractor) {
+            try {
+                $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass);
+            } catch (NonUniqueIdentifierException $e) {
+                return false;
+            }
+        } else {
+            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName);
+
+            if (\count($operation->getIdentifiers()) > 1) {
+                return false;
+            }
         }
 
         return true;
@@ -120,4 +139,6 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             $context
         );
     }
+
+    private $collectionExtensions;
 }

@@ -39,6 +39,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @group legacy
+ * @requires PHP >= 7.4
  */
 class CollectionDataProviderTest extends TestCase
 {
