@@ -26,6 +26,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbOdmClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -64,7 +65,7 @@ class IdentifierManagerTraitTest extends TestCase
         ]);
         $objectManager = $this->getEntityManager(Dummy::class, [
             'id' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ]);
 
@@ -104,10 +105,10 @@ class IdentifierManagerTraitTest extends TestCase
         ]);
         $objectManager = $this->getEntityManager(Dummy::class, [
             'ida' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
             'idb' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ]);
 
@@ -130,10 +131,10 @@ class IdentifierManagerTraitTest extends TestCase
         ]);
         $objectManager = $this->getEntityManager(Dummy::class, [
             'ida' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
             'idb' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ]);
 
