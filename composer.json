@@ -88,6 +88,7 @@
     },
     "conflict": {
         "doctrine/common": "<2.7",
+        "doctrine/dbal": "<2.10",
         "doctrine/mongodb-odm": "<2.2",
         "doctrine/persistence": "<1.3"
     },

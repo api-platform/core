@@ -29,6 +29,10 @@ final class Components
 
     public function __construct(\ArrayObject $schemas = null, \ArrayObject $responses = null, \ArrayObject $parameters = null, \ArrayObject $examples = null, \ArrayObject $requestBodies = null, \ArrayObject $headers = null, \ArrayObject $securitySchemes = null, \ArrayObject $links = null, \ArrayObject $callbacks = null)
     {
+        if ($schemas) {
+            $schemas->ksort();
+        }
+
         $this->schemas = $schemas;
         $this->responses = $responses;
         $this->parameters = $parameters;

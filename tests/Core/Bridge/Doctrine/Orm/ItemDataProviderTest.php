@@ -30,7 +30,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -68,7 +68,7 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_id', 1, DBALType::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_id', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -77,7 +77,7 @@ class ItemDataProviderTest extends TestCase
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, [
             'id' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ], $queryBuilder);
 
@@ -107,8 +107,8 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
-        $queryBuilderProphecy->setParameter(':id_ida', 1, DBALType::INTEGER)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter(':id_idb', 2, DBALType::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_ida', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_idb', 2, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -118,10 +118,10 @@ class ItemDataProviderTest extends TestCase
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, [
             'ida' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
             'idb' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ], $queryBuilder);
 
@@ -147,10 +147,10 @@ class ItemDataProviderTest extends TestCase
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, [
             'ida' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
             'idb' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ], $this->prophesize(QueryBuilder::class)->reveal());
 
@@ -170,7 +170,7 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_id', 1, DBALType::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_id', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -179,7 +179,7 @@ class ItemDataProviderTest extends TestCase
         ]);
         $managerRegistry = $this->getManagerRegistry(Dummy::class, [
             'id' => [
-                'type' => DBALType::INTEGER,
+                'type' => Types::INTEGER,
             ],
         ], $queryBuilder);
 
@@ -219,7 +219,7 @@ class ItemDataProviderTest extends TestCase
         $classMetadataProphecy->getIdentifier()->willReturn([
             'id',
         ]);
-        $classMetadataProphecy->getTypeOfField('id')->willReturn(DBALType::INTEGER);
+        $classMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER);
 
         $platformProphecy = $this->prophesize(AbstractPlatform::class);
 
