@@ -6,17 +6,20 @@
 
     <services>
         <service id="api_platform.legacy_data_provider_state" class="ApiPlatform\State\LegacyDataProviderState">
-            <tag name="api_platform.state_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+
+            <tag name="api_platform.state_provider" />
         </service>
 
         <service id="api_platform.state_provider" class="ApiPlatform\State\ChainProvider">
             <argument type="tagged" tag="api_platform.state_provider" />
         </service>
+
         <service id="ApiPlatform\State\ProviderInterface" alias="api_platform.state_provider" />
 
         <service id="api_platform.state_processor" class="ApiPlatform\State\ChainProcessor" public="false">
