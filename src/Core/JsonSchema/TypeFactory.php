@@ -120,6 +120,12 @@ final class TypeFactory implements TypeFactoryInterface
                 'format' => 'ulid',
             ];
         }
+        if (is_a($className, \SplFileInfo::class, true)) {
+            return [
+                'type' => 'string',
+                'format' => 'binary',
+            ];
+        }
 
         // Skip if $schema is null (filters only support basic types)
         if (null === $schema) {

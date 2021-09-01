@@ -20,6 +20,8 @@ final class Paths
     public function addPath(string $path, PathItem $pathItem)
     {
         $this->paths[$path] = $pathItem;
+
+        ksort($this->paths);
     }
 
     public function getPath(string $path): ?PathItem

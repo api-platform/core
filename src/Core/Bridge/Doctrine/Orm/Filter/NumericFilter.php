@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -41,11 +41,11 @@ class NumericFilter extends AbstractContextAwareFilter
      * @see http://doctrine-orm.readthedocs.org/projects/doctrine-dbal/en/latest/reference/types.html
      */
     public const DOCTRINE_NUMERIC_TYPES = [
-        DBALType::BIGINT => true,
-        DBALType::DECIMAL => true,
-        DBALType::FLOAT => true,
-        DBALType::INTEGER => true,
-        DBALType::SMALLINT => true,
+        Types::BIGINT => true,
+        Types::DECIMAL => true,
+        Types::FLOAT => true,
+        Types::INTEGER => true,
+        Types::SMALLINT => true,
     ];
 
     /**
@@ -91,11 +91,11 @@ class NumericFilter extends AbstractContextAwareFilter
      */
     protected function getType(string $doctrineType = null): string
     {
-        if (null === $doctrineType || DBALType::DECIMAL === $doctrineType) {
+        if (null === $doctrineType || Types::DECIMAL === $doctrineType) {
             return 'string';
         }
 
-        if (DBALType::FLOAT === $doctrineType) {
+        if (Types::FLOAT === $doctrineType) {
             return 'float';
         }
 

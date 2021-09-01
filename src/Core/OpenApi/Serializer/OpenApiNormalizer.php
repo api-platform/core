@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\OpenApi\Serializer;
 
+use ApiPlatform\Core\OpenApi\Model\Paths;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -38,8 +39,14 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
      */
     public function normalize($object, $format = null, array $context = []): array
     {
+        $pathsCallback = static function ($innerObject) {
+            return $innerObject instanceof Paths ? $innerObject->getPaths() : [];
+        };
         $context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] = true;
         $context[AbstractObjectNormalizer::SKIP_NULL_VALUES] = true;
+        $context[AbstractObjectNormalizer::CALLBACKS] = [
+            'paths' => $pathsCallback,
+        ];
 
         return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
     }
@@ -54,23 +61,8 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
                 continue;
             }
 
-            if ('schemas' === $key && \is_array($value)) {
-                ksort($value);
-            }
-
-            // Side effect of using getPaths(): Paths which itself contains the array
-            if ('paths' === $key) {
-                $value = $data['paths'] = $data['paths']['paths'];
-                if ($value) {
-                    ksort($value);
-                }
-                unset($data['paths']['paths']);
-            }
-
             if (\is_array($value)) {
                 $data[$key] = $this->recursiveClean($value);
-                // arrays must stay even if empty
-                continue;
             }
         }
 
