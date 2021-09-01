@@ -40,6 +40,8 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+
+            <deprecated version="2.7" package="api-platform/core">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in API Platform 3.0. Use "api_platform.doctrine.state.item_provider" instead.</deprecated>
         </service>
 
         <service id="api_platform.doctrine.orm.subresource_data_provider" public="false" abstract="true">
@@ -49,6 +51,16 @@
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+
+            <deprecated version="2.7" package="api-platform/core">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in API Platform 3.0. Use "api_platform.doctrine.state.item_provider" instead.</deprecated>
+        </service>
+
+        <service id="api_platform.doctrine.state.item_provider" class="ApiPlatform\Bridge\Doctrine\Orm\State\ItemProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine" />
+            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
         </service>
 
         <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider">
@@ -59,10 +71,14 @@
 
         <service id="api_platform.doctrine.orm.default.item_data_provider" parent="api_platform.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider">
             <tag name="api_platform.item_data_provider" />
+
+            <deprecated version="2.7" package="api-platform/core">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in API Platform 3.0. Use "api_platform.doctrine.state.item_provider" instead.</deprecated>
         </service>
 
         <service id="api_platform.doctrine.orm.default.subresource_data_provider" parent="api_platform.doctrine.orm.subresource_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\SubresourceDataProvider">
-            <tag name="api_platform.subresource_data_provider" />
+            <tag name="api_platform.subresource_data_providerp" />
+
+            <deprecated version="2.7" package="api-platform/core">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in API Platform 3.0. Use "api_platform.doctrine.state.item_provider" instead.</deprecated>
         </service>
 
         <!-- Filter -->
