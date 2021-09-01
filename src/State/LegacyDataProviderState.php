@@ -18,8 +18,6 @@ use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 
 /**
  * @deprecated
@@ -29,16 +27,12 @@ final class LegacyDataProviderState implements ProviderInterface
     private $itemDataProvider;
     private $collectionDataProvider;
     private $subresourceDataProvider;
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
 
-    public function __construct(ItemDataProviderInterface $itemDataProvider, CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
+    public function __construct(ItemDataProviderInterface $itemDataProvider, CollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider)
     {
         $this->itemDataProvider = $itemDataProvider;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
-        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
-        $this->propertyMetadataFactory = $propertyMetadataFactory;
     }
 
     public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])

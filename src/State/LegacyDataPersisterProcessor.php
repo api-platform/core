@@ -18,6 +18,9 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataPersister\ResumableDataPersisterInterface;
 use ApiPlatform\Metadata\Operation;
 
+/**
+ * @deprecated
+ */
 class LegacyDataPersisterProcessor implements ProcessorInterface
 {
     private $dataPersister;
