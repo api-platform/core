@@ -114,6 +114,9 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Type\SchemaBuilder::class => ApiPlatform\GraphQl\Type\SchemaBuilder::class,
         ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
         ApiPlatform\Core\GraphQl\Type\TypeBuilder::class => ApiPlatform\GraphQl\Type\TypeBuilder::class,
+
+        // Doctrine
+        ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider::class => ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider::class,
     ];
 
     if (ApiPlatform\Core\Metadata\Property\PropertyMetadata::class === $className) {
