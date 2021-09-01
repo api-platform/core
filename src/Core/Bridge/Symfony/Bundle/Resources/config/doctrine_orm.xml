@@ -18,6 +18,8 @@
         <service id="api_platform.doctrine.orm.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
+
+            <deprecated version="2.7" package="api-platform/core">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in API Platform 3.0. Use "api_platform.doctrine.state.collection_provider" instead.</deprecated>
         </service>
 
         <service id="api_platform.doctrine.orm.state.collection_provider" class="ApiPlatform\Bridge\Doctrine\Orm\State\CollectionProvider" public="false">
@@ -47,6 +49,8 @@
 
         <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider">
             <tag name="api_platform.collection_data_provider" />
+
+            <deprecated version="2.7" package="api-platform/core">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in API Platform 3.0. Use "api_platform.doctrine.state.collection_provider" instead.</deprecated>
         </service>
 
         <service id="api_platform.doctrine.orm.default.item_data_provider" parent="api_platform.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider">

@@ -30,25 +30,17 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class CollectionProvider implements ProviderInterface
 {
+    private $resourceMetadataCollectionFactory;
+    private $managerRegistry;
+    private $collectionExtensions;
+
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(
-        private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        private ManagerRegistry $managerRegistry,
-        private iterable $collectionExtensions = [],
-    ) {
-    }
-
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface) {
-            return false;
-        }
-
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-
-        return $operation->isCollection();
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $collectionExtensions = []) {
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->managerRegistry = $managerRegistry;
+        $this->collectionExtensions = $collectionExtensions;
     }
 
     public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
@@ -72,5 +64,16 @@ final class CollectionProvider implements ProviderInterface
         }
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    {
+        if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface) {
+            return false;
+        }
+
+        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+
+        return $operation->isCollection();
     }
 }

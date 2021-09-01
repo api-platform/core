@@ -41,6 +41,7 @@ class LegacyDataPersisterProcessor implements ProcessorInterface
 
     public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
+        // FIXME: only return true if "is_legacy_resource_metadata" is set
         if ($supports = $this->dataPersister instanceof ContextAwareDataPersisterInterface ? $this->dataPersister->supports($data, $context['legacy_attributes'] ?? []) : $this->dataPersister->supports($data)) {
             return $supports;
         }
