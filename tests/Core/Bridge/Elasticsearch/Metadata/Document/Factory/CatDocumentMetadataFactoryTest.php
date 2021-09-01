@@ -28,6 +28,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @group legacy
+ * @requires PHP >= 7.4
  */
 class CatDocumentMetadataFactoryTest extends TestCase
 {

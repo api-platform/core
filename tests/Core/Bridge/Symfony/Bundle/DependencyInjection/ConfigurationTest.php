@@ -422,6 +422,9 @@ class ConfigurationTest extends TestCase
         $this->assertSame('', $config['description']);
     }
 
+    /**
+     * @requires PHP >= 7.4
+     */
     public function testEnableElasticsearch()
     {
         $config = $this->processor->processConfiguration($this->configuration, [

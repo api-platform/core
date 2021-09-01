@@ -135,6 +135,11 @@ jobs:
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Remove ElasticSearch
+        if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2')
+        run: |
+          composer remove --dev --no-interaction --no-progress --no-update --ansi \
+            elasticsearch/elasticsearch \
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -226,6 +231,11 @@ jobs:
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
+      - name: Remove ElasticSearch
+        if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2')
+        run: |
+          composer remove --dev --no-interaction --no-progress --no-update --ansi \
+            elasticsearch/elasticsearch \
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -553,6 +563,7 @@ jobs:
       matrix:
         php:
           - '7.4'
+          - '8.0'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
@@ -568,7 +579,7 @@ jobs:
       - name: Runs Elasticsearch
         uses: elastic/elastic-github-actions/elasticsearch@master
         with:
-          stack-version: '6.8-SNAPSHOT'
+          stack-version: '7.6.0'
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -591,7 +602,7 @@ jobs:
       - name: Require Symfony components
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install Elasticsearch-php # there is a version matrix for this package: https://packagist.org/packages/elasticsearch/elasticsearch
-        run: composer require "elasticsearch/elasticsearch:v6.7.2" --no-interaction --no-progress --ansi
+        run: composer require "elasticsearch/elasticsearch:v7.14.0" --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
