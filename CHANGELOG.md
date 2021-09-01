@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* Fix indexing relations resources IRIs in serializer
 * Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)
 * Security: `ApiProperty` now supports a `security_post_denormalize` attribute, which provides access to the `object` variable for the object being updated/created and `previous_object` for the object before it was updated (#4184)
 * Maker: Add `make:data-provider` and `make :data-persister` commands to generate a data provider / persister (#3850)
@@ -231,7 +232,7 @@ For compatibility reasons with Symfony 5.2 and PHP 8, we do not test anymore the
 * Doctrine: Order filter doesn't throw anymore with numeric key (#3673 and #3687)
 * Doctrine: Fix ODM check change tracking deferred (#3629)
 * Doctrine: Allow 2inflector version 2.0 (#3607)
-* OpenAPI: Allow subresources context to be added (#3685) 
+* OpenAPI: Allow subresources context to be added (#3685)
 * OpenAPI: Fix pagination documentation on subresources (#3678)
 * Subresource: Fix query when using a custom identifier (#3529 and #3671)
 * GraphQL: Fix relation types without Doctrine (#3591)
