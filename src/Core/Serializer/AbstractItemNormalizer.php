@@ -771,14 +771,20 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
             }
 
+            if (is_object($relatedObject) === true
+                && isset($context['resources']) === true
+            ) {
+                $iri = $this->iriConverter->getIriFromItem($relatedObject);
+
+                if ($normalizedRelatedObject !== $iri) {
+                    $context['resources'][$iri] = $iri;
+                }
+            }
+
             return $normalizedRelatedObject;
         }
 
         $iri = $this->iriConverter->getIriFromItem($relatedObject);
-
-        if (isset($context['resources'])) {
-            $context['resources'][$iri] = $iri;
-        }
 
         $push = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('push', false) : ($propertyMetadata->getPush() ?? false);
         if (isset($context['resources_to_push']) && $push) {

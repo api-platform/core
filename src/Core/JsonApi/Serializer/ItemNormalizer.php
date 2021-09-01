@@ -212,10 +212,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (null !== $relatedObject) {
             $iri = $this->iriConverter->getIriFromItem($relatedObject);
             $context['iri'] = $iri;
-
-            if (isset($context['resources'])) {
-                $context['resources'][$iri] = $iri;
-            }
         }
 
         if (null === $relatedObject || isset($context['api_included'])) {
@@ -227,6 +223,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
             // @phpstan-ignore-next-line throwing an explicit exception helps debugging
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
+            }
+
+            if (is_object($relatedObject) === true
+                && isset($context['resources']) === true
+            ) {
+                $iri = $this->iriConverter->getIriFromItem($relatedObject);
+
+                if ($normalizedRelatedObject !== $iri) {
+                    $context['resources'][$iri] = $iri;
+                }
             }
 
             return $normalizedRelatedObject;
