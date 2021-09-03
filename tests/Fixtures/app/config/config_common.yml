@@ -111,6 +111,13 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
+    operation_resources.state_processor:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
+        public: false
+        arguments: [ '@doctrine' ]
+        tags:
+            - { name: 'api_platform.state_processor' }
+
     contain_non_resource.item_data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false

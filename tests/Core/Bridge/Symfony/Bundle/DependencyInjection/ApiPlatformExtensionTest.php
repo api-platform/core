@@ -1074,6 +1074,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.write',
+            'api_platform.symfony.listener.view.write',
             'api_platform.metadata.extractor.xml',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.metadata.property.identifier_metadata_factory.property_info',
