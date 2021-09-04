@@ -1053,10 +1053,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.identifier.date_normalizer',
             'api_platform.identifier.integer',
             'api_platform.identifier.uuid_normalizer',
-            'api_platform.identifiers_extractor',
+            'api_platform.api.identifiers_extractor',
             'api_platform.identifiers_extractor.cached',
             'api_platform.identifiers_extractor.legacy',
-            'api_platform.iri_converter',
+            'api_platform.symfony.iri_converter',
             'api_platform.iri_converter.legacy',
             'api_platform.item_data_provider',
             'api_platform.legacy_data_provider_state',
@@ -1145,7 +1145,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         // Find missing definitions
         // $containerBuilderProphecy->setDefinition(Argument::type('string'), Argument::type(Definition::class))->will(function ($args) {
-        //     echo "'{$args[0]}'" . PHP_EOL;
+        //     echo "'{$args[0]}'".\PHP_EOL;
         // });
 
         $aliases = [
@@ -1156,6 +1156,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.action.patch_item' => 'api_platform.action.placeholder',
             'api_platform.action.post_collection' => 'api_platform.action.placeholder',
             'api_platform.action.put_item' => 'api_platform.action.placeholder',
+            'api_platform.identifiers_extractor' => 'api_platform.api.identifiers_extractor',
+            'api_platform.iri_converter' => 'api_platform.symfony.iri_converter',
             'api_platform.metadata.property.identifier_metadata_factory' => 'api_platform.metadata.property.identifier_metadata_factory.property_info',
             'api_platform.metadata.property.metadata_factory' => 'api_platform.metadata.property.metadata_factory.xml',
             'api_platform.metadata.property.name_collection_factory' => 'api_platform.metadata.property.name_collection_factory.property_info',
@@ -1171,14 +1173,13 @@ class ApiPlatformExtensionTest extends TestCase
             CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
             DataPersisterInterface::class => 'api_platform.data_persister',
             GroupFilter::class => 'api_platform.serializer.group_filter',
-            IdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor',
-            IriConverterInterface::class => 'api_platform.iri_converter',
+            IdentifiersExtractorInterface::class => 'api_platform.api.identifiers_extractor',
+            IriConverterInterface::class => 'api_platform.symfony.iri_converter',
             ItemDataProviderInterface::class => 'api_platform.item_data_provider',
             LegacyIdentifiersExtractorInterface::class => 'api_platform.identifiers_extractor.cached',
             LegacyIriConverterInterface::class => 'api_platform.iri_converter.legacy',
             LegacyPropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             LegacyPropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
-            ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
             NotFoundAction::class => 'api_platform.action.not_found',
             OperationAwareFormatsProviderInterface::class => 'api_platform.formats_provider',
             Pagination::class => 'api_platform.pagination',
@@ -1188,6 +1189,7 @@ class ApiPlatformExtensionTest extends TestCase
             PropertyMetadataFactoryInterface::class => 'api_platform.metadata.property.metadata_factory',
             PropertyNameCollectionFactoryInterface::class => 'api_platform.metadata.property.name_collection_factory',
             ProviderInterface::class => 'api_platform.state_provider',
+            ResourceClassResolverInterface::class => 'api_platform.resource_class_resolver',
             ResourceMetadataCollectionFactoryInterface::class => 'api_platform.metadata.resource.metadata_collection_factory',
             ResourceMetadataFactoryInterface::class => 'api_platform.metadata.resource.metadata_factory',
             ResourceNameCollectionFactoryInterface::class => 'api_platform.metadata.resource.name_collection_factory',
@@ -1202,7 +1204,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         // Find missing aliases
         // $containerBuilderProphecy->setAlias(Argument::type('string'), Argument::type(Alias::class))->will(function ($args) {
-        //     echo "'{$args[0]}' => '{$args[1]}'," . PHP_EOL;
+        //     echo "Alias: '{$args[0]}' => '{$args[1]}',".\PHP_EOL;
         // });
 
         $containerBuilderProphecy->getParameter('kernel.project_dir')->willReturn(__DIR__.'/../../../../../Fixtures/app');
@@ -1543,8 +1545,8 @@ class ApiPlatformExtensionTest extends TestCase
             $definitions[] = 'api_platform.swagger.normalizer.documentation';
             $definitions[] = 'api_platform.openapi.options';
             $definitions[] = 'api_platform.openapi.normalizer';
+            $definitions[] = 'api_platform.openapi.factory.next';
             $definitions[] = 'api_platform.openapi.normalizer.api_gateway';
-            $definitions[] = 'api_platform.openapi.factory';
             $definitions[] = 'api_platform.openapi.factory.legacy';
             $definitions[] = 'api_platform.openapi.command';
             $definitions[] = 'api_platform.swagger_ui.context';
@@ -1631,6 +1633,7 @@ class ApiPlatformExtensionTest extends TestCase
                 OpenApiNormalizer::class => 'api_platform.openapi.normalizer',
                 OpenApiFactoryInterface::class => 'api_platform.openapi.factory',
                 'api_platform.swagger_ui.listener' => 'api_platform.swagger.listener.ui',
+                'api_platform.openapi.factory' => 'api_platform.openapi.factory.next',
             ];
         }
 

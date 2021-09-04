@@ -38,6 +38,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $manager;
     private $schemaTool;
     private $env;
+    private $metadataBackwardCompatibilityLayer;
 
     protected function setUp(): void
     {
@@ -56,6 +57,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
         $this->schemaTool->createSchema($classes);
+        $this->metadataBackwardCompatibilityLayer = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
 
         $this->ensureKernelShutdown();
     }
@@ -174,7 +176,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.metadata-tab-content th.status-success');
-        $this->assertSame('_api_/dummies.{_format}_get_collection', $tabContent->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('api_dummies_get_collection_collection', $tabContent->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
         $tabContent = $crawler->filter('.data-provider-tab-content');
@@ -199,7 +201,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('_api_/dummies.{_format}_post_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('api_dummies_post_collection_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
         $tabContent = $crawler->filter('.data-provider-tab-content');
@@ -233,7 +235,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('_api_/dummies/{id}.{_format}_get', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('api_dummies_get_item', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
         $tabContent = $crawler->filter('.data-provider-tab-content');

@@ -50,7 +50,7 @@
         </service>
         <service id="ApiPlatform\Core\OpenApi\Options" alias="api_platform.openapi.options" />
 
-        <service id="api_platform.openapi.factory" class="ApiPlatform\OpenApi\Factory\OpenApiFactory" public="false">
+        <service id="api_platform.openapi.factory.next" class="ApiPlatform\OpenApi\Factory\OpenApiFactory" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -80,10 +80,11 @@
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />
         </service>
+        <service id="api_platform.openapi.factory" alias="api_platform.openapi.factory.next" />
         <service id="ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" alias="api_platform.openapi.factory" />
 
         <service id="api_platform.openapi.command" class="ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand">
-            <argument type="service" id="api_platform.openapi.factory" />
+            <argument type="service" id="api_platform.openapi.factory.next" />
             <argument type="service" id="api_platform.serializer" />
             <tag name="console.command" />
         </service>

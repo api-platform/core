@@ -35,6 +35,9 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     public const FORMAT = 'jsonapi';
 
     private $decorated;
+    /**
+     * @var IriConverterInterface|LegacyIriConverterInterface
+     */
     private $iriConverter;
     private $resourceClassResolver;
     /**
@@ -42,7 +45,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
      */
     private $resourceMetadataFactory;
 
-    public function __construct(NormalizerInterface $decorated, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, $resourceMetadataFactory)
+    public function __construct(NormalizerInterface $decorated, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, $resourceMetadataFactory)
     {
         $this->decorated = $decorated;
         $this->iriConverter = $iriConverter;

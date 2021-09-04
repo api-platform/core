@@ -116,6 +116,7 @@ final class ApiLoader extends Loader
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
                             '_api_operation_name' => $operationName,
+                            sprintf('_api_%s_operation_name', $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM) => $operationName,
                         ] + ($operation->getDefaults() ?? []),
                         $operation->getRequirements() ?? [],
                         $operation->getOptions() ?? [],

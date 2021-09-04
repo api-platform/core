@@ -53,7 +53,7 @@
 
         <service id="api_platform.graphql.resolver.stage.read" class="ApiPlatform\GraphQl\Resolver\Stage\ReadStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
@@ -95,7 +95,7 @@
         </service>
 
         <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\GraphQl\Resolver\ResourceFieldResolver" public="false">
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
         </service>
 
         <service id="api_platform.graphql.query_resolver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -209,7 +209,7 @@
         <service id="api_platform.graphql.normalizer.item" class="ApiPlatform\GraphQl\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.property_accessor" />
@@ -229,7 +229,7 @@
 
         <service id="api_platform.graphql.normalizer.object" class="ApiPlatform\GraphQl\Serializer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.normalizer.object" />
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
 
             <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
@@ -266,7 +266,7 @@
             <argument type="service" id="api_platform.graphql.cache.subscription" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_identifier_generator" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
         </service>
 
         <service id="api_platform.graphql.subscription.subscription_identifier_generator" class="ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGenerator" />

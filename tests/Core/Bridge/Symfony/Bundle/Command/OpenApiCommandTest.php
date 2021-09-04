@@ -65,7 +65,7 @@ class OpenApiCommandTest extends KernelTestCase
         $expected = <<<YAML
   /dummy_cars:
     get:
-      operationId: '_api_/dummy_cars.{_format}_get_collection'
+      operationId: api_dummy_cars_get_collection_collection
       tags:
         - DummyCar
 YAML;
@@ -75,7 +75,7 @@ YAML;
         $expected = <<<YAML
   '/dummy_cars/{id}':
     get:
-      operationId: '_api_/dummy_cars/{id}.{_format}_get'
+      operationId: api_dummy_cars_get_item
       tags: []
 YAML;
 

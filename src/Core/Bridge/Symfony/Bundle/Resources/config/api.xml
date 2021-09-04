@@ -71,15 +71,16 @@
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter.legacy" />
 
-        <service id="api_platform.iri_converter" class="ApiPlatform\Bridge\Symfony\Routing\IriConverter" public="false">
+        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Bridge\Symfony\Routing\IriConverter" public="false">
             <argument type="service" id="api_platform.state_provider" />
             <argument type="service" id="api_platform.router" />
-            <argument type="service" id="api_platform.identifiers_extractor" />
+            <argument type="service" id="api_platform.api.identifiers_extractor" />
             <argument type="service" id="api_platform.identifier.converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
         </service>
-        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.iri_converter" />
+        <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
+        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.formats_provider" class="ApiPlatform\Core\Api\FormatsProvider">
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
@@ -216,7 +217,7 @@
 
         <service id="api_platform.listener.view.respond" class="ApiPlatform\Core\EventListener\RespondListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 
@@ -262,7 +263,7 @@
             <argument>%api_platform.version%</argument>
             <argument>null</argument>
             <argument on-invalid="null">%api_platform.swagger.versions%</argument>
-            <argument type="service" id="api_platform.openapi.factory" on-invalid="null"></argument>
+            <argument type="service" id="api_platform.openapi.factory.next" on-invalid="null"></argument>
         </service>
 
         <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">
@@ -290,14 +291,15 @@
         </service>
         <service id="ApiPlatform\Core\Api\IdentifiersExtractorInterface" alias="api_platform.identifiers_extractor.cached" />
 
-        <service id="api_platform.identifiers_extractor" class="ApiPlatform\Api\IdentifiersExtractor" public="false">
+        <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Api\IdentifiersExtractor" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.property_accessor" />
         </service>
-        <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.identifiers_extractor" />
+        <service id="api_platform.identifiers_extractor" alias="api_platform.api.identifiers_extractor" />
+        <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
         <service id="api_platform.identifier.converter" class="ApiPlatform\Core\Identifier\IdentifierConverter" public="false">
             <argument type="service" id="api_platform.identifiers_extractor.cached" />

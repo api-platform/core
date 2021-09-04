@@ -124,7 +124,7 @@ JSON
 }
 JSON;
 
-        self::createClient()->request('GET', '/');
+        $res = self::createClient()->request('GET', '/');
         $this->assertMatchesJsonSchema($jsonSchema);
         $this->assertMatchesJsonSchema(json_decode($jsonSchema, true));
     }
