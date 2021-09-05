@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Put extends Operation
+final class Put extends Operation
 {
     /**
      * {@inheritdoc}
@@ -23,7 +23,7 @@ class Put extends Operation
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        array $types = [],
+        $types = [],
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,

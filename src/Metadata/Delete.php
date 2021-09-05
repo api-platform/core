@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Delete extends Operation
+final class Delete extends Operation
 {
     /**
      * {@inheritdoc}
@@ -24,7 +24,7 @@ class Delete extends Operation
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        array $types = [],
+        $types = [],
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,
