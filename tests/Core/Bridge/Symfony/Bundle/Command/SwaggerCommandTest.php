@@ -67,7 +67,7 @@ class SwaggerCommandTest extends KernelTestCase
         $expected = <<<YAML
   /dummy_cars:
     get:
-      operationId: '_api_/dummy_cars.{_format}_get_collection'
+      operationId: api_dummy_cars_get_collection_collection
       tags:
         - DummyCar
 YAML;
@@ -79,7 +79,7 @@ YAML;
   '/dummy_cars/{id}':
     get:
       tags: []
-      operationId: '_api_/dummy_cars/{id}.{_format}_get'
+      operationId: api_dummy_cars_get_item
 YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');

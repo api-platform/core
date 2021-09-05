@@ -31,15 +31,17 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
     private $reader;
     private $paths;
     private $decorated;
+    private $metadataBackwardCompatibilityLayer;
 
     /**
      * @param string[] $paths
      */
-    public function __construct(Reader $reader = null, array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(Reader $reader = null, array $paths, ResourceNameCollectionFactoryInterface $decorated = null, bool $metadataBackwardCompatibilityLayer = true)
     {
         $this->reader = $reader;
         $this->paths = $paths;
         $this->decorated = $decorated;
+        $this->metadataBackwardCompatibilityLayer = $metadataBackwardCompatibilityLayer;
     }
 
     /**
@@ -69,6 +71,10 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
 
     private function isResource(\ReflectionClass $reflectionClass): bool
     {
+        if ($this->metadataBackwardCompatibilityLayer) {
+            return $reflectionClass->getAttributes(ApiResourceAnnotation::class) ? true : false;
+        }
+
         if ($reflectionClass->getAttributes(ApiResourceAnnotation::class) || $reflectionClass->getAttributes(ApiResource::class)) {
             return true;
         }

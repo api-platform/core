@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
@@ -77,15 +78,17 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
         $operations = [];
         foreach ($this->createOperations($resourceMetadata->getItemOperations(), OperationType::ITEM, $resource) as $operationName => $operation) {
-            $operations[$operationName] = $operation->withShortName($resourceMetadata->getShortName());
+            $operationName = RouteNameGenerator::generate($operationName, $resourceMetadata->getShortName(), OperationType::ITEM);
+            $operations[$operationName] = $operation->withShortName($resourceMetadata->getShortName())->withName($operationName);
         }
 
         foreach ($this->createOperations($resourceMetadata->getCollectionOperations(), OperationType::COLLECTION, $resource) as $operationName => $operation) {
+            $operationName = RouteNameGenerator::generate($operationName, $resourceMetadata->getShortName(), OperationType::COLLECTION);
             if (!$operation->getUriTemplate() && !$operation->getRouteName() && $operation->getIdentifiers()) {
                 $operation = $operation->withIdentifiers([]);
             }
 
-            $operations[$operationName] = $operation->withShortName($resourceMetadata->getShortName());
+            $operations[$operationName] = $operation->withShortName($resourceMetadata->getShortName())->withName($operationName);
         }
 
         if (!$resourceMetadata->getGraphql()) {

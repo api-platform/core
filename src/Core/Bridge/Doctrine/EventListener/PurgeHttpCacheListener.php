@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\HttpCache\PurgerInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -45,10 +46,14 @@ final class PurgeHttpCacheListener
     private $xkeyEnabled;
     private $httpTagsEnabled;
 
-    public function __construct(PurgerInterface $purger, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, PurgerInterface $xKeyPurger = null, bool $xkeyEnabled = false, bool $httpTagsEnabled = true)
+    public function __construct(PurgerInterface $purger, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, PurgerInterface $xKeyPurger = null, bool $xkeyEnabled = false, bool $httpTagsEnabled = true)
     {
         $this->purger = $purger;
         $this->iriConverter = $iriConverter;
+        if ($iriConverter instanceof LegacyIriConverterInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
+        }
+
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
         $this->xKeyPurger = $xKeyPurger;

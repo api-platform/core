@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -296,6 +297,8 @@ class ApiLoaderTest extends TestCase
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
+        $isCollection = false !== strpos($operationName, 'collection');
+
         return new Route(
             $path,
             [
@@ -304,6 +307,7 @@ class ApiLoaderTest extends TestCase
                 '_stateless' => $stateless,
                 '_api_resource_class' => $resourceClass,
                 '_api_operation_name' => $operationName,
+                sprintf('_api_%s_operation_name', $isCollection ? OperationType::COLLECTION : OperationType::ITEM) => $operationName,
             ] + $extraDefaults,
             $requirements,
             $options,

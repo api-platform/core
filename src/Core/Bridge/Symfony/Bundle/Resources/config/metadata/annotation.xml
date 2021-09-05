@@ -9,6 +9,7 @@
             <argument type="service" id="annotation_reader" />
             <argument>%api_platform.resource_class_directories%</argument>
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.annotation.inner" />
+            <argument>%api_platform.metadata_backward_compatibility_layer%</argument>
         </service>
 
         <service id="api_platform.metadata.resource.metadata_factory.annotation" decorates="api_platform.metadata.resource.metadata_factory" decoration-priority="40" class="ApiPlatform\Core\Metadata\Resource\Factory\AnnotationResourceMetadataFactory" public="false">

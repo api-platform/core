@@ -33,6 +33,8 @@ use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
+use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
@@ -789,18 +791,23 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        $container->removeDefinition('api_platform.identifiers_extractor');
+        $container->removeAlias('api_platform.identifiers_extractor');
         $container->setAlias('api_platform.identifiers_extractor', 'api_platform.identifiers_extractor.legacy');
 
-        $container->removeDefinition('api_platform.iri_converter');
+        $container->removeAlias('api_platform.iri_converter');
         $container->setAlias('api_platform.iri_converter', 'api_platform.iri_converter.legacy');
 
-        $container->removeDefinition('api_platform.openapi.factory');
+        $container->removeAlias('api_platform.openapi.factory');
         $container->setAlias('api_platform.openapi.factory', 'api_platform.openapi.factory.legacy');
 
         $definition = $container->getDefinition('api_platform.metadata.property.metadata_factory.serializer');
-        $definition->setArgument(0, $container->getDefinition('api_platform.metadata.resource.metadata_factory'));
+        $definition->setArgument(0, new Reference('api_platform.metadata.resource.metadata_factory'));
         $container->setDefinition('api_platform.metadata.property.metadata_factory.serializer', $definition);
+
+        $container->getDefinition('api_platform.metadata.extractor.xml')->setClass(XmlExtractor::class);
+        if (class_exists(Yaml::class)) {
+            $container->getDefinition('api_platform.metadata.extractor.yaml')->setClass(YamlExtractor::class);
+        }
     }
 
     private function registerRectorConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
