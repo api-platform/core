@@ -62,4 +62,30 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $factory = new AttributePropertyMetadataFactory($decoratedProphecy->reveal());
         $this->assertEquals($propertyMetadata, $factory->create('\DoNotExist', 'foo'));
     }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testClassFoundAndParentFound()
+    {
+        $parentPropertyMetadata = (new ApiProperty('Desc', true, false, true, false, true, false, 'Default', 'Example'))->withTypes(['https://example.com']);
+
+        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedProphecy->create(DummyPhp8ApiPropertyAttribute::class, 'empty', [])->willReturn($parentPropertyMetadata);
+
+        $factory = new AttributePropertyMetadataFactory($decoratedProphecy->reveal());
+        $metadata = $factory->create(DummyPhp8ApiPropertyAttribute::class, 'empty');
+
+        $this->assertSame($parentPropertyMetadata, $metadata);
+        $this->assertSame('Desc', $metadata->getDescription());
+        $this->assertTrue($metadata->isReadable());
+        $this->assertFalse($metadata->isWritable());
+        $this->assertTrue($metadata->isReadableLink());
+        $this->assertFalse($metadata->isWritableLink());
+        $this->assertTrue($metadata->isRequired());
+        $this->assertFalse($metadata->isIdentifier());
+        $this->assertSame('Default', $metadata->getDefault());
+        $this->assertSame('Example', $metadata->getExample());
+        $this->assertSame(['https://example.com'], $metadata->getTypes());
+    }
 }

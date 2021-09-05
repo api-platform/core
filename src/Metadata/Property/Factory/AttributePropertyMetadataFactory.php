@@ -55,7 +55,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         if ($reflectionClass->hasProperty($property)) {
             $reflectionProperty = $reflectionClass->getProperty($property);
             if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
-                return $attributes[0]->newInstance();
+                return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
         }
 
@@ -70,9 +70,8 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
                 continue;
             }
 
-            $annotation = null;
             if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionMethod->getAttributes(ApiProperty::class)) {
-                return $attributes[0]->newInstance();
+                return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
         }
 
@@ -95,5 +94,32 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
+    }
+
+    private function createMetadata(ApiProperty $attribute, ApiProperty $propertyMetadata = null): ApiProperty
+    {
+        if (null === $propertyMetadata) {
+            return $attribute;
+        }
+
+        foreach ([
+            ['get', 'Description'],
+            ['is', 'Readable'],
+            ['is', 'Writable'],
+            ['is', 'ReadableLink'],
+            ['is', 'WritableLink'],
+            ['is', 'Required'],
+            ['is', 'Identifier'],
+            ['get', 'Default'],
+            ['get', 'Example'],
+            ['get', 'Types'],
+            // TODO: do we need to copy more properties?
+        ] as $property) {
+            if (null !== $val = $attribute->{$property[0].$property[1]}()) {
+                $propertyMetadata->{"with{$property[1]}"}($val);
+            }
+        }
+
+        return $propertyMetadata;
     }
 }
