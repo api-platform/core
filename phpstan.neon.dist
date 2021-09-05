@@ -50,7 +50,6 @@ parameters:
 			- handleNotFound
 	ignoreErrors:
 		# False positives
-		- '#Parameter \#1 \$callback of function call_user_func expects callable\(\): mixed, non-empty-string given\.#'
 		-
 			message: '#Unreachable statement - code above always terminates.#'
 			paths:

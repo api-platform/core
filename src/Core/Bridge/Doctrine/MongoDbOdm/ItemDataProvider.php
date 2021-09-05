@@ -108,7 +108,7 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
         if ($resourceMetadata instanceof ResourceMetadataCollection) {
-            $attribute = $resourceMetadata->getOperation($operationName)->getExtraProperties()['doctrine_mongodb'] ?? [];
+            $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
         } else {
             $attribute = $resourceMetadata->getItemOperationAttribute($operationName, 'doctrine_mongodb', [], true);
         }
