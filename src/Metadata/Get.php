@@ -23,7 +23,7 @@ final class Get extends Operation
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        array $types = [],
+        $types = [],
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,

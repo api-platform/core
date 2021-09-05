@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class GetCollection extends Operation
+final class GetCollection extends Operation
 {
     /**
      * {@inheritdoc}
@@ -23,7 +23,7 @@ class GetCollection extends Operation
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        array $types = [],
+        $types = [],
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,

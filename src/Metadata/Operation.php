@@ -125,6 +125,7 @@ class Operation
      * @param string          $uriTemplate
      * @param string          $shortName
      * @param string          $description
+     * @param string[]|string $types
      * @param array|string    $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string    $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string    $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
@@ -180,7 +181,7 @@ class Operation
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        array $types = [],
+        $types = [],
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,
@@ -251,7 +252,7 @@ class Operation
         $this->uriTemplate = $uriTemplate;
         $this->shortName = $shortName;
         $this->description = $description;
-        $this->types = $types;
+        $this->types = (array) $types;
         $this->formats = $formats;
         $this->inputFormats = $inputFormats;
         $this->outputFormats = $outputFormats;
@@ -367,7 +368,7 @@ class Operation
         return $this->shortName;
     }
 
-    public function withShortName(?string $shortName = null)
+    public function withShortName(?string $shortName = null): self
     {
         $self = clone $this;
         $self->shortName = $shortName;
@@ -380,7 +381,7 @@ class Operation
         return $this->description;
     }
 
-    public function withDescription(?string $description = null)
+    public function withDescription(?string $description = null): self
     {
         $self = clone $this;
         $self->description = $description;
@@ -393,7 +394,10 @@ class Operation
         return $this->types;
     }
 
-    public function withTypes(array $types = [])
+    /**
+     * @param string[]|string $types
+     */
+    public function withTypes($types = []): self
     {
         $self = clone $this;
         $self->types = $types;
