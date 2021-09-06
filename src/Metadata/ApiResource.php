@@ -215,7 +215,7 @@ final class ApiResource
         array $exceptionToStatus = [],
         ?bool $queryParameterValidationEnabled = null,
         ?array $graphQlOperations = null,
-        ?array $extraProperties = []
+        array $extraProperties = []
     ) {
         $this->operations = new Operations($operations);
         $this->uriTemplate = $uriTemplate;
@@ -332,10 +332,6 @@ final class ApiResource
 
     public function getTypes(): ?array
     {
-        if (!$this->types) {
-            $this->types = [$this->shortName];
-        }
-
         return $this->types;
     }
 
