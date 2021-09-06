@@ -120,6 +120,10 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
             $operation = (new $attributes['class']())->withShortName($resource->getShortName());
             if (isset($attributes)) {
                 foreach ($attributes as $key => $value) {
+                    if (null === $value) {
+                        continue;
+                    }
+
                     [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
                     $methodName = 'with'.ucfirst($camelCaseKey);
 

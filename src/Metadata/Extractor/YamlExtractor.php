@@ -117,12 +117,12 @@ final class YamlExtractor extends AbstractExtractor
                 'initializable' => $this->phpize($propertyValues, 'initializable', 'bool'),
                 'jsonldContext' => $this->getAttribute($propertyValues, 'jsonldContext'),
                 'openapiContext' => $this->getAttribute($propertyValues, 'openapiContext'),
-                'types' => $this->getAttribute($propertyValues, 'types', []),
+                'types' => $this->getAttribute($propertyValues, 'types'),
                 'extraProperties' => $this->getAttribute($propertyValues, 'extraProperties'),
                 'defaults' => $this->getAttribute($propertyValues, 'defaults'),
-                'example' => $this->getAttribute($propertyValues, 'example', null),
-                'builtinTypes' => $this->getAttribute($propertyValues, 'builtinTypes', []),
-                'schema' => $this->getAttribute($propertyValues, 'schema', null),
+                'example' => $this->getAttribute($propertyValues, 'example'),
+                'builtinTypes' => $this->getAttribute($propertyValues, 'builtinTypes'),
+                'schema' => $this->getAttribute($propertyValues, 'schema'),
             ];
         }
 
@@ -135,13 +135,13 @@ final class YamlExtractor extends AbstractExtractor
             'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
             'shortName' => $this->phpize($resource, 'shortName', 'string'),
             'description' => $this->phpize($resource, 'description', 'string'),
-            'routePrefix' => $this->phpize($resource, 'routePrefix', 'string', ''),
+            'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             'stateless' => $this->phpize($resource, 'stateless', 'bool'),
             'sunset' => $this->phpize($resource, 'sunset', 'string'),
             'acceptPatch' => $this->phpize($resource, 'acceptPatch', 'string'),
-            'host' => $this->phpize($resource, 'host', 'string', ''),
-            'condition' => $this->phpize($resource, 'condition', 'string', ''),
-            'controller' => $this->phpize($resource, 'controller', 'string', ''),
+            'host' => $this->phpize($resource, 'host', 'string'),
+            'condition' => $this->phpize($resource, 'condition', 'string'),
+            'controller' => $this->phpize($resource, 'controller', 'string'),
             'urlGenerationStrategy' => $this->phpize($resource, 'urlGenerationStrategy', 'integer'),
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
             'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
@@ -165,28 +165,28 @@ final class YamlExtractor extends AbstractExtractor
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
             'input' => $this->phpize($resource, 'input', 'bool|string'),
             'output' => $this->phpize($resource, 'output', 'bool|string'),
-            'types' => $this->getAttribute($resource, 'types', []),
-            'cacheHeaders' => $this->getAttribute($resource, 'cacheHeaders', []),
-            'normalizationContext' => $this->getAttribute($resource, 'normalizationContext', []),
-            'denormalizationContext' => $this->getAttribute($resource, 'denormalizationContext', []),
-            'hydraContext' => $this->getAttribute($resource, 'hydraContext', []),
-            'openapiContext' => $this->getAttribute($resource, 'openapiContext', []),
-            'validationContext' => $this->getAttribute($resource, 'validationContext', []),
+            'types' => $this->getAttribute($resource, 'types'),
+            'cacheHeaders' => $this->getAttribute($resource, 'cacheHeaders'),
+            'normalizationContext' => $this->getAttribute($resource, 'normalizationContext'),
+            'denormalizationContext' => $this->getAttribute($resource, 'denormalizationContext'),
+            'hydraContext' => $this->getAttribute($resource, 'hydraContext'),
+            'openapiContext' => $this->getAttribute($resource, 'openapiContext'),
+            'validationContext' => $this->getAttribute($resource, 'validationContext'),
             'filters' => $this->getAttribute($resource, 'filters'),
             'order' => $this->getAttribute($resource, 'order'),
-            'paginationViaCursor' => $this->getAttribute($resource, 'paginationViaCursor', []),
-            'exceptionToStatus' => $this->getAttribute($resource, 'exceptionToStatus', []),
-            'extraProperties' => $this->getAttribute($resource, 'extraProperties', []),
-            'defaults' => $this->getAttribute($resource, 'defaults', []),
-            'requirements' => $this->getAttribute($resource, 'requirements', []),
-            'options' => $this->getAttribute($resource, 'options', []),
+            'paginationViaCursor' => $this->getAttribute($resource, 'paginationViaCursor'),
+            'exceptionToStatus' => $this->getAttribute($resource, 'exceptionToStatus'),
+            'extraProperties' => $this->getAttribute($resource, 'extraProperties'),
+            'defaults' => $this->getAttribute($resource, 'defaults'),
+            'requirements' => $this->getAttribute($resource, 'requirements'),
+            'options' => $this->getAttribute($resource, 'options'),
             'status' => $this->phpize($resource, 'status', 'integer'),
             'schemes' => $this->getAttribute($resource, 'schemes'),
             'properties' => $this->getProperties($resource),
-            'formats' => $this->getAttribute($resource, 'formats', null),
-            'identifiers' => $this->getAttribute($resource, 'identifiers', null),
-            'inputFormats' => $this->getAttribute($resource, 'inputFormats', null),
-            'outputFormats' => $this->getAttribute($resource, 'outputFormats', null),
+            'formats' => $this->getAttribute($resource, 'formats'),
+            'identifiers' => $this->getAttribute($resource, 'identifiers'),
+            'inputFormats' => $this->getAttribute($resource, 'inputFormats'),
+            'outputFormats' => $this->getAttribute($resource, 'outputFormats'),
             'mercure' => $this->getMercure($resource),
             'messenger' => $this->getMessenger($resource),
         ];
@@ -255,14 +255,14 @@ final class YamlExtractor extends AbstractExtractor
             }
 
             $data[] = array_merge($datum, [
-                'read' => $this->phpize($operation, 'read', 'bool', true),
-                'deserialize' => $this->phpize($operation, 'deserialize', 'bool', true),
-                'validate' => $this->phpize($operation, 'validate', 'bool', true),
-                'write' => $this->phpize($operation, 'write', 'bool', true),
-                'serialize' => $this->phpize($operation, 'serialize', 'bool', true),
-                'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool', true),
-                'priority' => $this->phpize($operation, 'priority', 'integer', 0),
-                'name' => $this->phpize($operation, 'name', 'string', ''),
+                'read' => $this->phpize($operation, 'read', 'bool'),
+                'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
+                'validate' => $this->phpize($operation, 'validate', 'bool'),
+                'write' => $this->phpize($operation, 'write', 'bool'),
+                'serialize' => $this->phpize($operation, 'serialize', 'bool'),
+                'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
+                'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $class,
             ]);
         }
@@ -325,7 +325,7 @@ final class YamlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getAttribute(array $resource, string $key, $default = [])
+    private function getAttribute(array $resource, string $key, $default = null)
     {
         if (!\array_key_exists($key, $resource)) {
             return $default;

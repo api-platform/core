@@ -36,11 +36,21 @@
         <cacheHeaders>
             <cacheHeader name="max_age">60</cacheHeader>
             <cacheHeader name="shared_max_age">120</cacheHeader>
-            <cacheHeader name="vary">Authorization Accept-Language</cacheHeader>
+            <cacheHeader name="vary">
+                <values>
+                    <value>Authorization</value>
+                    <value>Accept-Language</value>
+                </values>
+            </cacheHeader>
         </cacheHeaders>
 
         <normalizationContext>
-            <attribute name="groups">comment:read comment:custom-read</attribute>
+            <attribute name="groups">
+                <values>
+                    <value>comment:read</value>
+                    <value>comment:custom-read</value>
+                </values>
+            </attribute>
         </normalizationContext>
 
         <denormalizationContext>

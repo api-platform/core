@@ -1309,13 +1309,16 @@ final class DoctrineContext implements Context
      */
     public function thereArePrograms(int $nb)
     {
-        $author = new User();
-        $author->setEmail('john.doe@example.com');
-        $author->setFullname('John DOE');
-        $author->setPlainPassword('p4$$w0rd');
+        $author = $this->doctrine->getRepository(User::class)->find(1);
+        if (null === $author) {
+            $author = new User();
+            $author->setEmail('john.doe@example.com');
+            $author->setFullname('John DOE');
+            $author->setPlainPassword('p4$$w0rd');
 
-        $this->manager->persist($author);
-        $this->manager->flush();
+            $this->manager->persist($author);
+            $this->manager->flush();
+        }
 
         for ($i = 1; $i <= $nb; ++$i) {
             $program = new Program();
@@ -1343,7 +1346,7 @@ final class DoctrineContext implements Context
      */
     public function thereAreComments(int $nb)
     {
-        $author = $this->doctrine->getRepository(User::class)->findOneBy(['email' => 'john.doe@example.com']);
+        $author = $this->doctrine->getRepository(User::class)->find(1);
         if (null === $author) {
             $author = new User();
             $author->setEmail('john.doe@example.com');

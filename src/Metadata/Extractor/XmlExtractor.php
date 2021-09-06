@@ -53,13 +53,13 @@ final class XmlExtractor extends AbstractExtractor
             'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
             'shortName' => $this->phpize($resource, 'shortName', 'string'),
             'description' => $this->phpize($resource, 'description', 'string'),
-            'routePrefix' => $this->phpize($resource, 'routePrefix', 'string', ''),
+            'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             'stateless' => $this->phpize($resource, 'stateless', 'bool'),
             'sunset' => $this->phpize($resource, 'sunset', 'string'),
             'acceptPatch' => $this->phpize($resource, 'acceptPatch', 'string'),
-            'host' => $this->phpize($resource, 'host', 'string', ''),
-            'condition' => $this->phpize($resource, 'condition', 'string', ''),
-            'controller' => $this->phpize($resource, 'controller', 'string', ''),
+            'host' => $this->phpize($resource, 'host', 'string'),
+            'condition' => $this->phpize($resource, 'condition', 'string'),
+            'controller' => $this->phpize($resource, 'controller', 'string'),
             'urlGenerationStrategy' => $this->phpize($resource, 'urlGenerationStrategy', 'integer'),
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
             'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
@@ -83,22 +83,22 @@ final class XmlExtractor extends AbstractExtractor
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
             'input' => $this->phpize($resource, 'input', 'bool|string'),
             'output' => $this->phpize($resource, 'output', 'bool|string'),
-            'types' => $this->getArrayValue($resource, 'type', []),
+            'types' => $this->getArrayValue($resource, 'type'),
             'formats' => $this->getFormats($resource, 'formats'),
             'identifiers' => $this->getIdentifiers($resource),
             'inputFormats' => $this->getFormats($resource, 'inputFormats'),
             'outputFormats' => $this->getFormats($resource, 'outputFormats'),
-            'defaults' => isset($resource->defaults->values) ? $this->getValues($resource->defaults->values) : [],
-            'requirements' => isset($resource->requirements->values) ? $this->getValues($resource->requirements->values) : [],
-            'options' => isset($resource->options->values) ? $this->getValues($resource->options->values) : [],
+            'defaults' => isset($resource->defaults->values) ? $this->getValues($resource->defaults->values) : null,
+            'requirements' => isset($resource->requirements->values) ? $this->getValues($resource->requirements->values) : null,
+            'options' => isset($resource->options->values) ? $this->getValues($resource->options->values) : null,
             'status' => $this->phpize($resource, 'status', 'integer'),
-            'schemes' => $this->getAttributes($resource, 'schemes') ?: [],
+            'schemes' => $this->getAttributes($resource, 'schemes') ?: null,
             'cacheHeaders' => $this->getCacheHeaders($resource),
-            'normalizationContext' => $this->getAttributes($resource, 'normalizationContext') ?: [],
-            'denormalizationContext' => $this->getAttributes($resource, 'denormalizationContext') ?: [],
-            'hydraContext' => $this->getAttributes($resource, 'hydraContext') ?: [],
-            'openapiContext' => $this->getAttributes($resource, 'openapiContext') ?: [],
-            'validationContext' => $this->getAttributes($resource, 'validationContext') ?: [],
+            'normalizationContext' => $this->getAttributes($resource, 'normalizationContext') ?: null,
+            'denormalizationContext' => $this->getAttributes($resource, 'denormalizationContext') ?: null,
+            'hydraContext' => $this->getAttributes($resource, 'hydraContext') ?: null,
+            'openapiContext' => $this->getAttributes($resource, 'openapiContext') ?: null,
+            'validationContext' => $this->getAttributes($resource, 'validationContext') ?: null,
             'filters' => $this->getArrayValue($resource, 'filter'),
             'mercure' => $this->getMercure($resource),
             'messenger' => $this->getMessenger($resource),
@@ -138,18 +138,18 @@ final class XmlExtractor extends AbstractExtractor
         $data = [];
         foreach ($resource->identifiers->identifier as $identifier) {
             $data[(string) $identifier['key']] = [
-                $this->phpize($identifier, 'propertyName', 'string'),
-                $this->phpize($identifier, 'class', 'string'),
+                $this->phpize($identifier, 'propertyName', 'string') ?: (string) $identifier['key'],
+                $this->phpize($identifier, 'class', 'string') ?: $resource['class'],
             ];
         }
 
         return $data;
     }
 
-    private function getCacheHeaders(\SimpleXMLElement $resource): array
+    private function getCacheHeaders(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->cacheHeaders->cacheHeader)) {
-            return [];
+            return null;
         }
 
         $data = [];
@@ -217,10 +217,10 @@ final class XmlExtractor extends AbstractExtractor
         return null;
     }
 
-    private function getPaginationViaCursor(\SimpleXMLElement $resource): array
+    private function getPaginationViaCursor(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->paginationViaCursor->paginationField)) {
-            return [];
+            return null;
         }
 
         $data = [];
@@ -234,10 +234,10 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getExceptionToStatus(\SimpleXMLElement $resource): array
+    private function getExceptionToStatus(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->exceptionToStatus->exception)) {
-            return [];
+            return null;
         }
 
         $data = [];
@@ -248,11 +248,11 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getExtraProperties(\SimpleXMLElement $resource, string $key = null): array
+    private function getExtraProperties(\SimpleXMLElement $resource, string $key = null): ?array
     {
         if (null !== $key) {
             if (!isset($resource->{$key})) {
-                return [];
+                return null;
             }
 
             $resource = $resource->{$key};
@@ -262,11 +262,6 @@ final class XmlExtractor extends AbstractExtractor
         foreach ($resource->extraProperty as $extraProperty) {
             if (isset($extraProperty->extraProperty)) {
                 $data[(string) $extraProperty['name']] = $this->getExtraProperties($extraProperty);
-                continue;
-            }
-
-            if ('' === trim((string) $extraProperty)) {
-                $data[(string) $extraProperty['name']] = null;
                 continue;
             }
 
@@ -301,11 +296,11 @@ final class XmlExtractor extends AbstractExtractor
                 'initializable' => $this->phpize($property, 'initializable', 'bool'),
                 'jsonldContext' => $this->getAttributes($property, 'jsonldContext'),
                 'openapiContext' => $this->getAttributes($property, 'openapiContext'),
-                'types' => $this->getArrayValue($property, 'type', []),
+                'types' => $this->getArrayValue($property, 'type'),
                 'extraProperties' => $this->getExtraProperties($property, 'extraProperties'),
-                'defaults' => isset($property->defaults->values) ? $this->getValues($property->defaults->values) : [],
+                'defaults' => isset($property->defaults->values) ? $this->getValues($property->defaults->values) : null,
                 'example' => isset($property->example->values) ? $this->getValues($property->example->values) : null,
-                'builtinTypes' => isset($property->builtinTypes->values) ? $this->getValues($property->builtinTypes->values) : [],
+                'builtinTypes' => isset($property->builtinTypes->values) ? $this->getValues($property->builtinTypes->values) : null,
                 'schema' => isset($property->schema->values) ? $this->getValues($property->schema->values) : null,
             ];
         }
@@ -329,14 +324,14 @@ final class XmlExtractor extends AbstractExtractor
             }
 
             $data[] = array_merge($datum, [
-                'read' => $this->phpize($operation, 'read', 'bool', true),
-                'deserialize' => $this->phpize($operation, 'deserialize', 'bool', true),
-                'validate' => $this->phpize($operation, 'validate', 'bool', true),
-                'write' => $this->phpize($operation, 'write', 'bool', true),
-                'serialize' => $this->phpize($operation, 'serialize', 'bool', true),
-                'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool', true),
-                'priority' => $this->phpize($operation, 'priority', 'integer', 0),
-                'name' => $this->phpize($operation, 'name', 'string', ''),
+                'read' => $this->phpize($operation, 'read', 'bool'),
+                'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
+                'validate' => $this->phpize($operation, 'validate', 'bool'),
+                'write' => $this->phpize($operation, 'write', 'bool'),
+                'serialize' => $this->phpize($operation, 'serialize', 'bool'),
+                'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
+                'priority' => $this->phpize($operation, 'priority', 'integer'),
+                'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $operation['class'],
             ]);
         }
@@ -427,11 +422,6 @@ final class XmlExtractor extends AbstractExtractor
 
             if (isset($attribute->values->value)) {
                 $data[(string) $attribute['name']] = $this->getValues($attribute->values);
-                continue;
-            }
-
-            if ('' === trim((string) $attribute)) {
-                $data[(string) $attribute['name']] = null;
                 continue;
             }
 
