@@ -441,7 +441,7 @@ final class ApiResource
         return $this->defaults;
     }
 
-    public function withDefaults(array $defaults = []): self
+    public function withDefaults(?array $defaults = []): self
     {
         $self = clone $this;
         $self->defaults = $defaults;
@@ -454,7 +454,7 @@ final class ApiResource
         return $this->requirements;
     }
 
-    public function withRequirements(array $requirements = []): self
+    public function withRequirements(?array $requirements = []): self
     {
         $self = clone $this;
         $self->requirements = $requirements;
@@ -467,7 +467,7 @@ final class ApiResource
         return $this->options;
     }
 
-    public function withOptions(array $options = []): self
+    public function withOptions(?array $options = []): self
     {
         $self = clone $this;
         $self->options = $options;
@@ -532,7 +532,7 @@ final class ApiResource
         return $this->host;
     }
 
-    public function withHost(string $host = ''): self
+    public function withHost(?string $host = ''): self
     {
         $self = clone $this;
         $self->host = $host;
@@ -545,7 +545,7 @@ final class ApiResource
         return $this->schemes;
     }
 
-    public function withSchemes(array $schemes = []): self
+    public function withSchemes(?array $schemes = []): self
     {
         $self = clone $this;
         $self->schemes = $schemes;
@@ -558,7 +558,7 @@ final class ApiResource
         return $this->condition;
     }
 
-    public function withCondition(string $condition = ''): self
+    public function withCondition(?string $condition = ''): self
     {
         $self = clone $this;
         $self->condition = $condition;
@@ -571,7 +571,7 @@ final class ApiResource
         return $this->controller;
     }
 
-    public function withController(string $controller = ''): self
+    public function withController(?string $controller = null): self
     {
         $self = clone $this;
         $self->controller = $controller;
@@ -623,7 +623,7 @@ final class ApiResource
         return $this->cacheHeaders;
     }
 
-    public function withCacheHeaders(array $cacheHeaders = []): self
+    public function withCacheHeaders(?array $cacheHeaders = []): self
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
@@ -636,7 +636,7 @@ final class ApiResource
         return $this->normalizationContext;
     }
 
-    public function withNormalizationContext(array $normalizationContext = []): self
+    public function withNormalizationContext(?array $normalizationContext = []): self
     {
         $self = clone $this;
         $self->normalizationContext = $normalizationContext;
@@ -649,7 +649,7 @@ final class ApiResource
         return $this->denormalizationContext;
     }
 
-    public function withDenormalizationContext(array $denormalizationContext = []): self
+    public function withDenormalizationContext(?array $denormalizationContext = []): self
     {
         $self = clone $this;
         $self->denormalizationContext = $denormalizationContext;
@@ -665,7 +665,7 @@ final class ApiResource
         return $this->hydraContext;
     }
 
-    public function withHydraContext(array $hydraContext = []): self
+    public function withHydraContext(?array $hydraContext = []): self
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
@@ -678,7 +678,7 @@ final class ApiResource
         return $this->openapiContext;
     }
 
-    public function withOpenapiContext(array $openapiContext = []): self
+    public function withOpenapiContext(?array $openapiContext = []): self
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
@@ -691,7 +691,7 @@ final class ApiResource
         return $this->validationContext;
     }
 
-    public function withValidationContext(array $validationContext = []): self
+    public function withValidationContext(?array $validationContext = []): self
     {
         $self = clone $this;
         $self->validationContext = $validationContext;
@@ -707,7 +707,7 @@ final class ApiResource
         return $this->filters;
     }
 
-    public function withFilters(array $filters = []): self
+    public function withFilters(?array $filters = []): self
     {
         $self = clone $this;
         $self->filters = $filters;
@@ -809,7 +809,7 @@ final class ApiResource
         return $this->order;
     }
 
-    public function withOrder(array $order = []): self
+    public function withOrder(?array $order = []): self
     {
         $self = clone $this;
         $self->order = $order;
@@ -887,7 +887,7 @@ final class ApiResource
         return $this->paginationViaCursor;
     }
 
-    public function withPaginationViaCursor(array $paginationViaCursor = []): self
+    public function withPaginationViaCursor(?array $paginationViaCursor = []): self
     {
         $self = clone $this;
         $self->paginationViaCursor = $paginationViaCursor;

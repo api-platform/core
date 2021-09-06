@@ -67,7 +67,7 @@ final class QueryParameterValidateListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !$operation->canQueryParameterValidate() || !$operation->isCollection())
+            (!$operation || !($operation->canQueryParameterValidate() ?? true) || !$operation->isCollection())
         ) {
             return;
         }

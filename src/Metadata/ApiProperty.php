@@ -132,8 +132,8 @@ final class ApiProperty
         ?bool $required = null,
         ?bool $identifier = null,
 
-               $default = null,
-               $example = null,
+        $default = null,
+        $example = null,
 
         ?string $deprecationReason = null,
         ?bool $fetchable = null,
@@ -403,7 +403,7 @@ final class ApiProperty
         return $this->types;
     }
 
-    public function withTypes(array $types = []): self
+    public function withTypes(?array $types = []): self
     {
         $self = clone $this;
         $self->types = $types;
@@ -412,7 +412,7 @@ final class ApiProperty
     }
 
     /**
-     * @return Type[]
+     * @return Type[]|null
      */
     public function getBuiltinTypes(): ?array
     {
@@ -420,9 +420,9 @@ final class ApiProperty
     }
 
     /**
-     * @param Type[] $builtinTypes
+     * @param Type[]|null $builtinTypes
      */
-    public function withBuiltinTypes(array $builtinTypes = []): self
+    public function withBuiltinTypes(?array $builtinTypes = []): self
     {
         $self = clone $this;
         $self->builtinTypes = $builtinTypes;
@@ -435,7 +435,7 @@ final class ApiProperty
         return $this->schema;
     }
 
-    public function withSchema(array $schema = []): self
+    public function withSchema(?array $schema = []): self
     {
         $self = clone $this;
         $self->schema = $schema;
@@ -472,7 +472,7 @@ final class ApiProperty
     /**
      * @deprecated since 2.7, to be removed in 3.0
      */
-    public function withSubresource(SubresourceMetadata $subresourceMetadata): self
+    public function withSubresource(?SubresourceMetadata $subresourceMetadata): self
     {
         trigger_deprecation('api-platform/core', '2.7', 'Declaring a subresource on a property is deprecated, use alternate URLs instead.');
         $self = clone $this;
@@ -528,7 +528,7 @@ final class ApiProperty
     /**
      * @deprecated since 2.6, to be removed in 3.0
      */
-    public function withChildInherited(string $childInherited): self
+    public function withChildInherited(?string $childInherited): self
     {
         trigger_deprecation('api-platform/core', '2.6', sprintf('"%s::%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__, __METHOD__));
 
@@ -553,7 +553,7 @@ final class ApiProperty
      *
      * @deprecated since 2.7, to be removed in 3.0, use withTypes instead
      */
-    public function withIri(string $iri = null): self
+    public function withIri(?string $iri = null): self
     {
         trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0, use Type instead.', __CLASS__, __METHOD__));
 
@@ -602,7 +602,7 @@ final class ApiProperty
      *
      * @deprecated since 2.7, to be removed in 3.0, renamed as withExtraProperties
      */
-    public function withAttributes(array $attributes): self
+    public function withAttributes(?array $attributes): self
     {
         trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0.', __CLASS__, __METHOD__));
 
@@ -626,7 +626,7 @@ final class ApiProperty
      *
      * @deprecated since 2.7, to be removed in 3.0, renamed as withBuiltinTypes
      */
-    public function withType(Type $type): self
+    public function withType(?Type $type): self
     {
         trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0, use builtinTypes instead.', __CLASS__, __METHOD__));
 

@@ -329,7 +329,7 @@ class Operation
         return $this->name;
     }
 
-    public function withName(string $name): self
+    public function withName(?string $name): self
     {
         $self = clone $this;
         $self->name = $name;
@@ -342,7 +342,7 @@ class Operation
         return $this->method;
     }
 
-    public function withMethod(string $method): self
+    public function withMethod(?string $method): self
     {
         $self = clone $this;
         $self->method = $method;
@@ -471,7 +471,7 @@ class Operation
         return $this->routePrefix;
     }
 
-    public function withRoutePrefix(string $routePrefix = ''): self
+    public function withRoutePrefix(?string $routePrefix = ''): self
     {
         $self = clone $this;
         $self->routePrefix = $routePrefix;
@@ -497,7 +497,7 @@ class Operation
         return $this->defaults;
     }
 
-    public function withDefaults(array $defaults = []): self
+    public function withDefaults(?array $defaults = []): self
     {
         $self = clone $this;
         $self->defaults = $defaults;
@@ -510,7 +510,7 @@ class Operation
         return $this->requirements;
     }
 
-    public function withRequirements(array $requirements = []): self
+    public function withRequirements(?array $requirements = []): self
     {
         $self = clone $this;
         $self->requirements = $requirements;
@@ -523,7 +523,7 @@ class Operation
         return $this->options;
     }
 
-    public function withOptions(array $options = []): self
+    public function withOptions(?array $options = []): self
     {
         $self = clone $this;
         $self->options = $options;
@@ -588,7 +588,7 @@ class Operation
         return $this->host;
     }
 
-    public function withHost(string $host = ''): self
+    public function withHost(?string $host = ''): self
     {
         $self = clone $this;
         $self->host = $host;
@@ -601,7 +601,7 @@ class Operation
         return $this->schemes;
     }
 
-    public function withSchemes(array $schemes = []): self
+    public function withSchemes(?array $schemes = []): self
     {
         $self = clone $this;
         $self->schemes = $schemes;
@@ -614,7 +614,7 @@ class Operation
         return $this->condition;
     }
 
-    public function withCondition(string $condition = ''): self
+    public function withCondition(?string $condition = ''): self
     {
         $self = clone $this;
         $self->condition = $condition;
@@ -627,7 +627,7 @@ class Operation
         return $this->controller;
     }
 
-    public function withController(string $controller = ''): self
+    public function withController(?string $controller = ''): self
     {
         $self = clone $this;
         $self->controller = $controller;
@@ -692,7 +692,7 @@ class Operation
         return $this->cacheHeaders;
     }
 
-    public function withCacheHeaders(array $cacheHeaders = []): self
+    public function withCacheHeaders(?array $cacheHeaders = []): self
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
@@ -705,7 +705,7 @@ class Operation
         return $this->normalizationContext;
     }
 
-    public function withNormalizationContext(array $normalizationContext = []): self
+    public function withNormalizationContext(?array $normalizationContext = []): self
     {
         $self = clone $this;
         $self->normalizationContext = $normalizationContext;
@@ -718,7 +718,7 @@ class Operation
         return $this->denormalizationContext;
     }
 
-    public function withDenormalizationContext(array $denormalizationContext = []): self
+    public function withDenormalizationContext(?array $denormalizationContext = []): self
     {
         $self = clone $this;
         $self->denormalizationContext = $denormalizationContext;
@@ -734,7 +734,7 @@ class Operation
         return $this->hydraContext;
     }
 
-    public function withHydraContext(array $hydraContext = []): self
+    public function withHydraContext(?array $hydraContext = []): self
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
@@ -747,7 +747,7 @@ class Operation
         return $this->openapiContext;
     }
 
-    public function withOpenapiContext(array $openapiContext = []): self
+    public function withOpenapiContext(?array $openapiContext = []): self
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
@@ -760,7 +760,7 @@ class Operation
         return $this->swaggerContext;
     }
 
-    public function withSwaggerContext(array $swaggerContext = []): self
+    public function withSwaggerContext(?array $swaggerContext = []): self
     {
         $self = clone $this;
         $self->swaggerContext = $swaggerContext;
@@ -773,7 +773,7 @@ class Operation
         return $this->validationContext;
     }
 
-    public function withValidationContext(array $validationContext = []): self
+    public function withValidationContext(?array $validationContext = []): self
     {
         $self = clone $this;
         $self->validationContext = $validationContext;
@@ -789,7 +789,7 @@ class Operation
         return $this->filters;
     }
 
-    public function withFilters(array $filters = []): self
+    public function withFilters(?array $filters = []): self
     {
         $self = clone $this;
         $self->filters = $filters;
@@ -951,7 +951,7 @@ class Operation
         return $this->paginationViaCursor;
     }
 
-    public function withPaginationViaCursor(array $paginationViaCursor = []): self
+    public function withPaginationViaCursor(?array $paginationViaCursor = []): self
     {
         $self = clone $this;
         $self->paginationViaCursor = $paginationViaCursor;
@@ -1120,7 +1120,7 @@ class Operation
         return $this->exceptionToStatus;
     }
 
-    public function withExceptionToStatus(array $exceptionToStatus = []): self
+    public function withExceptionToStatus(?array $exceptionToStatus = []): self
     {
         $self = clone $this;
         $self->exceptionToStatus = $exceptionToStatus;
@@ -1159,7 +1159,7 @@ class Operation
         return $this->read;
     }
 
-    public function withRead(bool $read = true): self
+    public function withRead(?bool $read = true): self
     {
         $self = clone $this;
         $self->read = $read;
@@ -1172,7 +1172,7 @@ class Operation
         return $this->deserialize;
     }
 
-    public function withDeserialize(bool $deserialize = true): self
+    public function withDeserialize(?bool $deserialize = true): self
     {
         $self = clone $this;
         $self->deserialize = $deserialize;
@@ -1185,7 +1185,7 @@ class Operation
         return $this->validate;
     }
 
-    public function withValidate(bool $validate = true): self
+    public function withValidate(?bool $validate = true): self
     {
         $self = clone $this;
         $self->validate = $validate;
@@ -1198,7 +1198,7 @@ class Operation
         return $this->write;
     }
 
-    public function withWrite(bool $write = true): self
+    public function withWrite(?bool $write = true): self
     {
         $self = clone $this;
         $self->write = $write;
@@ -1211,7 +1211,7 @@ class Operation
         return $this->serialize;
     }
 
-    public function withSerialize(bool $serialize = true): self
+    public function withSerialize(?bool $serialize = true): self
     {
         $self = clone $this;
         $self->serialize = $serialize;
@@ -1219,12 +1219,12 @@ class Operation
         return $self;
     }
 
-    public function canQueryParameterValidate(): bool
+    public function canQueryParameterValidate(): ?bool
     {
         return $this->validate;
     }
 
-    public function withQueryParameterValidate(bool $validate = true): self
+    public function withQueryParameterValidate(?bool $validate = true): self
     {
         $self = clone $this;
         $self->validate = $validate;

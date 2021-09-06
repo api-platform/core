@@ -112,7 +112,7 @@ final class ApiLoader extends Loader
                     $route = new Route(
                         ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
                         [
-                            '_controller' => $operation->getController() ?? 'api_platform.action.placeholder',
+                            '_controller' => $operation->getController() ?: 'api_platform.action.placeholder',
                             '_format' => null,
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
