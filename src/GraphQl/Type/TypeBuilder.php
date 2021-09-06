@@ -107,7 +107,7 @@ final class TypeBuilder implements TypeBuilderInterface
             return $resourceObjectType;
         }
 
-        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
+        $ioMetadata = $input ? $operation->getInput() ?? null : $operation->getOutput() ?? null;
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
         }
