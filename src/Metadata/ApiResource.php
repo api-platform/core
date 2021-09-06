@@ -113,6 +113,7 @@ final class ApiResource
      * @param string          $uriTemplate
      * @param string          $shortName
      * @param string          $description
+     * @param array           $operations
      * @param string[]|string $types
      * @param array|string    $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string    $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
@@ -167,27 +168,27 @@ final class ApiResource
         $outputFormats = null,
         $identifiers = [],
         ?string $routePrefix = '',
-        array $defaults = [],
-        array $requirements = [],
-        array $options = [],
+        ?array $defaults = [],
+        ?array $requirements = [],
+        ?array $options = [],
         ?bool $stateless = null,
         ?string $sunset = null,
         ?string $acceptPatch = null,
         $status = null,
-        string $host = '',
-        array $schemes = [],
-        string $condition = '',
-        string $controller = 'api_platform.action.placeholder',
+        ?string $host = '',
+        ?array $schemes = [],
+        ?string $condition = '',
+        ?string $controller = 'api_platform.action.placeholder',
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
         ?string $deprecationReason = null,
-        array $cacheHeaders = [],
+        ?array $cacheHeaders = [],
         ?array $normalizationContext = [],
         ?array $denormalizationContext = [],
         ?array $hydraContext = [],
         ?array $openapiContext = [],
-        array $validationContext = [],
-        array $filters = [],
+        ?array $validationContext = [],
+        ?array $filters = [],
         ?bool $elasticsearch = null,
         $mercure = null,
         $messenger = null,
@@ -212,12 +213,12 @@ final class ApiResource
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
         ?bool $compositeIdentifier = null,
-        array $exceptionToStatus = [],
+        ?array $exceptionToStatus = [],
         ?bool $queryParameterValidationEnabled = null,
         ?array $graphQlOperations = null,
         array $extraProperties = []
     ) {
-        $this->operations = new Operations($operations);
+        $this->operations = new Operations($operations ?? []);
         $this->uriTemplate = $uriTemplate;
         $this->shortName = $shortName;
         $this->description = $description;
@@ -330,7 +331,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getTypes(): array
+    public function getTypes(): ?array
     {
         return $this->types;
     }
@@ -422,7 +423,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getRoutePrefix(): string
+    public function getRoutePrefix(): ?string
     {
         return $this->routePrefix;
     }
@@ -435,7 +436,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getDefaults(): array
+    public function getDefaults(): ?array
     {
         return $this->defaults;
     }
@@ -448,7 +449,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getRequirements(): array
+    public function getRequirements(): ?array
     {
         return $this->requirements;
     }
@@ -461,7 +462,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getOptions(): array
+    public function getOptions(): ?array
     {
         return $this->options;
     }
@@ -526,7 +527,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->host;
     }
@@ -539,7 +540,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getSchemes(): array
+    public function getSchemes(): ?array
     {
         return $this->schemes;
     }
@@ -552,7 +553,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getCondition(): string
+    public function getCondition(): ?string
     {
         return $this->condition;
     }
@@ -565,7 +566,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getController(): string
+    public function getController(): ?string
     {
         return $this->controller;
     }
@@ -617,7 +618,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getCacheHeaders(): array
+    public function getCacheHeaders(): ?array
     {
         return $this->cacheHeaders;
     }
@@ -630,7 +631,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getNormalizationContext(): array
+    public function getNormalizationContext(): ?array
     {
         return $this->normalizationContext;
     }
@@ -643,7 +644,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getDenormalizationContext(): array
+    public function getDenormalizationContext(): ?array
     {
         return $this->denormalizationContext;
     }
@@ -657,9 +658,9 @@ final class ApiResource
     }
 
     /**
-     * @return string[]
+     * @return string[]|null
      */
-    public function getHydraContext(): array
+    public function getHydraContext(): ?array
     {
         return $this->hydraContext;
     }
@@ -672,7 +673,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getOpenapiContext(): array
+    public function getOpenapiContext(): ?array
     {
         return $this->openapiContext;
     }
@@ -685,7 +686,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getValidationContext(): array
+    public function getValidationContext(): ?array
     {
         return $this->validationContext;
     }
@@ -699,9 +700,9 @@ final class ApiResource
     }
 
     /**
-     * @return string[]
+     * @return string[]|null
      */
-    public function getFilters(): array
+    public function getFilters(): ?array
     {
         return $this->filters;
     }
@@ -803,7 +804,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getOrder(): array
+    public function getOrder(): ?array
     {
         return $this->order;
     }
@@ -881,7 +882,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getPaginationViaCursor(): array
+    public function getPaginationViaCursor(): ?array
     {
         return $this->paginationViaCursor;
     }
