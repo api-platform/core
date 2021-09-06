@@ -35,6 +35,9 @@ class DummyPhp8ApiPropertyAttribute
      */
     public $filtered;
 
+    #[ApiProperty]
+    public $empty;
+
     #[ApiProperty(description: 'a foo')]
     public function getFoo(): int
     {
