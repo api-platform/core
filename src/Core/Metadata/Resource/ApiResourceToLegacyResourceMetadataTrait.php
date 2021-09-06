@@ -57,7 +57,11 @@ trait ApiResourceToLegacyResourceMetadataTrait
             $graphqlOperations[$operationName] = $this->toArray($operation);
         }
 
-        return new ResourceMetadata($resource->getShortName(), $resource->getDescription(), $resource->getTypes()[0] ?? null, $itemOperations, $collectionOperations, $attributes, null, $graphqlOperations);
+        if (!$type = $resource->getTypes()) {
+            $type = [$resource->getShortName()];
+        }
+
+        return new ResourceMetadata($resource->getShortName(), $resource->getDescription(), $type[0] ?? null, $itemOperations, $collectionOperations, $attributes, null, $graphqlOperations);
     }
 
     private function toArray($object): array

@@ -160,46 +160,46 @@ final class ApiResource
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        $types = [],
-        $operations = [],
+        $types = null,
+        ?array $operations = [],
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,
         $identifiers = [],
         ?string $routePrefix = '',
-        array $defaults = [],
-        array $requirements = [],
-        array $options = [],
+        ?array $defaults = null,
+        ?array $requirements = null,
+        ?array $options = null,
         ?bool $stateless = null,
         ?string $sunset = null,
         ?string $acceptPatch = null,
         $status = null,
-        string $host = '',
-        array $schemes = [],
-        string $condition = '',
-        string $controller = 'api_platform.action.placeholder',
+        ?string $host = null,
+        ?array $schemes = null,
+        ?string $condition = null,
+        ?string $controller = 'api_platform.action.placeholder',
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
         ?string $deprecationReason = null,
-        array $cacheHeaders = [],
-        ?array $normalizationContext = [],
-        ?array $denormalizationContext = [],
-        ?array $hydraContext = [],
-        ?array $openapiContext = [],
-        array $validationContext = [],
-        array $filters = [],
+        ?array $cacheHeaders = null,
+        ?array $normalizationContext = null,
+        ?array $denormalizationContext = null,
+        ?array $hydraContext = null,
+        ?array $openapiContext = null,
+        ?array $validationContext = null,
+        ?array $filters = null,
         ?bool $elasticsearch = null,
         $mercure = null,
         $messenger = null,
         $input = null,
         $output = null,
-        ?array $order = [],
+        ?array $order = null,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?bool $paginationClientEnabled = null,
         ?bool $paginationClientItemsPerPage = null,
         ?bool $paginationClientPartial = null,
-        ?array $paginationViaCursor = [],
+        ?array $paginationViaCursor = null,
         ?bool $paginationEnabled = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
@@ -215,7 +215,7 @@ final class ApiResource
         array $exceptionToStatus = [],
         ?bool $queryParameterValidationEnabled = null,
         ?array $graphQlOperations = null,
-        array $extraProperties = []
+        ?array $extraProperties = []
     ) {
         $this->operations = new Operations($operations);
         $this->uriTemplate = $uriTemplate;
@@ -330,8 +330,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getTypes(): array
+    public function getTypes(): ?array
     {
+        if (!$this->types) {
+            $this->types = [$this->shortName];
+        }
+
         return $this->types;
     }
 
@@ -435,7 +439,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getDefaults(): array
+    public function getDefaults(): ?array
     {
         return $this->defaults;
     }
@@ -448,7 +452,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getRequirements(): array
+    public function getRequirements(): ?array
     {
         return $this->requirements;
     }
@@ -461,7 +465,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getOptions(): array
+    public function getOptions(): ?array
     {
         return $this->options;
     }
@@ -526,7 +530,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->host;
     }
@@ -539,7 +543,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getSchemes(): array
+    public function getSchemes(): ?array
     {
         return $this->schemes;
     }
@@ -552,7 +556,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getCondition(): string
+    public function getCondition(): ?string
     {
         return $this->condition;
     }
@@ -617,7 +621,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getCacheHeaders(): array
+    public function getCacheHeaders(): ?array
     {
         return $this->cacheHeaders;
     }
@@ -630,7 +634,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getNormalizationContext(): array
+    public function getNormalizationContext(): ?array
     {
         return $this->normalizationContext;
     }
@@ -643,7 +647,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getDenormalizationContext(): array
+    public function getDenormalizationContext(): ?array
     {
         return $this->denormalizationContext;
     }
@@ -659,7 +663,7 @@ final class ApiResource
     /**
      * @return string[]
      */
-    public function getHydraContext(): array
+    public function getHydraContext(): ?array
     {
         return $this->hydraContext;
     }
@@ -672,7 +676,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getOpenapiContext(): array
+    public function getOpenapiContext(): ?array
     {
         return $this->openapiContext;
     }
@@ -685,7 +689,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getValidationContext(): array
+    public function getValidationContext(): ?array
     {
         return $this->validationContext;
     }
@@ -803,7 +807,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getOrder(): array
+    public function getOrder(): ?array
     {
         return $this->order;
     }
@@ -881,7 +885,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getPaginationViaCursor(): array
+    public function getPaginationViaCursor(): ?array
     {
         return $this->paginationViaCursor;
     }
