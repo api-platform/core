@@ -35,7 +35,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Creates a resource metadata from {@see Resource} annotations.
+ * Creates a resource metadata from {@see ApiResource} annotations.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
@@ -43,6 +43,7 @@ use Psr\Log\NullLogger;
 final class AttributesResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     use DeprecationMetadataTrait;
+
     private $defaults;
     private $decorated;
     private $logger;
@@ -216,7 +217,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         ];
     }
 
-    private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource)
+    private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource
     {
         $resource = $resource
                         ->withShortName($shortName)
@@ -262,7 +263,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         return false;
     }
 
-    private function addDefaultGraphQlOperations(ApiResource $resource)
+    private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
         $graphQlOperations = [];
         foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new Mutation())->withName('delete'), (new Mutation())->withName('create')] as $i => $operation) {
