@@ -104,8 +104,14 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach (get_class_methods(ApiProperty::class) as $method) {
             if (
+                // TODO: remove these checks for deprecated methods in 3.0
                 'getAttribute' !== $method &&
                 'isChildInherited' !== $method &&
+                'getSubresource' !== $method &&
+                'getIri' !== $method &&
+                'getAttributes' !== $method &&
+                // end of deprecated methods
+
                 preg_match('/^(?:get|is)(.*)/', $method, $matches) &&
                 null !== $val = $attribute->{$method}()
             ) {

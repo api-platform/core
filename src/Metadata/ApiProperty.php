@@ -105,26 +105,26 @@ final class ApiProperty
     private $extraProperties;
 
     /**
-     * @param string                           $description
-     * @param bool                             $readable
-     * @param bool                             $writable
-     * @param bool                             $readableLink
-     * @param bool                             $writableLink
-     * @param bool                             $required
-     * @param bool                             $identifier
-     * @param string|int|float|bool|array      $default
-     * @param string|int|float|bool|array|null $example
-     * @param string                           $deprecationReason
-     * @param bool                             $fetchable
-     * @param bool                             $fetchEager
-     * @param array                            $jsonldContext
-     * @param array                            $openapiContext
-     * @param bool                             $push
-     * @param string                           $security
-     * @param string                           $securityPostDenormalize
+     * @param string                      $description
+     * @param bool                        $readable
+     * @param bool                        $writable
+     * @param bool                        $readableLink
+     * @param bool                        $writableLink
+     * @param bool                        $required
+     * @param bool                        $identifier
+     * @param string|int|float|bool|array $default
+     * @param string|int|float|bool|array $example
+     * @param string                      $deprecationReason
+     * @param bool                        $fetchable
+     * @param bool                        $fetchEager
+     * @param array                       $jsonldContext
+     * @param array                       $openapiContext
+     * @param bool                        $push
+     * @param string                      $security
+     * @param string                      $securityPostDenormalize
      */
     public function __construct(
-        $description = null,
+        ?string $description = null,
         ?bool $readable = null,
         ?bool $writable = null,
         ?bool $readableLink = null,
@@ -132,8 +132,8 @@ final class ApiProperty
         ?bool $required = null,
         ?bool $identifier = null,
 
-        $default = null,
-        $example = null,
+               $default = null,
+               $example = null,
 
         ?string $deprecationReason = null,
         ?bool $fetchable = null,
@@ -469,7 +469,9 @@ final class ApiProperty
         return $self;
     }
 
-    /** TODO: backward compatibility layer with previous PropertyMetadata to be removed in 3.0 */
+    /**
+     * @deprecated since 2.7, to be removed in 3.0
+     */
     public function withSubresource(SubresourceMetadata $subresourceMetadata): self
     {
         trigger_deprecation('api-platform/core', '2.7', 'Declaring a subresource on a property is deprecated, use alternate URLs instead.');
@@ -479,6 +481,9 @@ final class ApiProperty
         return $self;
     }
 
+    /**
+     * @deprecated since 2.7, to be removed in 3.0
+     */
     public function getSubresource(): ?SubresourceMetadata
     {
         return $this->extraProperties['subresource'] ?? null;
@@ -486,6 +491,8 @@ final class ApiProperty
 
     /**
      * Represents whether the property has a subresource.
+     *
+     * @deprecated since 2.7, to be removed in 3.0
      */
     public function hasSubresource(): bool
     {
@@ -533,6 +540,8 @@ final class ApiProperty
 
     /**
      * Gets IRI of this property.
+     *
+     * @deprecated since 2.7, to be removed in 3.0, use getTypes instead
      */
     public function getIri(): ?string
     {
@@ -541,6 +550,8 @@ final class ApiProperty
 
     /**
      * Returns a new instance with the given IRI.
+     *
+     * @deprecated since 2.7, to be removed in 3.0, use withTypes instead
      */
     public function withIri(string $iri = null): self
     {
@@ -554,6 +565,8 @@ final class ApiProperty
 
     /**
      * Gets an attribute.
+     *
+     * @deprecated since 2.7, to be removed in 3.0, use getExtraProperties instead
      *
      * @param mixed|null $defaultValue
      */
@@ -576,6 +589,8 @@ final class ApiProperty
 
     /**
      * Gets attributes.
+     *
+     * @deprecated since 2.7, to be removed in 3.0, renamed as getExtraProperties
      */
     public function getAttributes(): ?array
     {
@@ -584,9 +599,13 @@ final class ApiProperty
 
     /**
      * Returns a new instance with the given attribute.
+     *
+     * @deprecated since 2.7, to be removed in 3.0, renamed as withExtraProperties
      */
     public function withAttributes(array $attributes): self
     {
+        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0.', __CLASS__, __METHOD__));
+
         $metadata = clone $this;
 
         return $this->withDeprecatedAttributes($metadata, $attributes);
