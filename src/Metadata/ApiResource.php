@@ -178,7 +178,7 @@ final class ApiResource
         ?string $host = '',
         ?array $schemes = [],
         ?string $condition = '',
-        ?string $controller = 'api_platform.action.placeholder',
+        ?string $controller = null,
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
         ?string $deprecationReason = null,

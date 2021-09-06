@@ -22,6 +22,7 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Exception\InvalidResourceException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -111,7 +112,7 @@ final class ApiLoader extends Loader
                     $route = new Route(
                         ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
                         [
-                            '_controller' => $operation->getController(),
+                            '_controller' => $operation->getController() ?? 'api_platform.action.placeholder',
                             '_format' => null,
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
@@ -122,7 +123,7 @@ final class ApiLoader extends Loader
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
                         $operation->getSchemes() ?? [],
-                        [$operation->getMethod()],
+                        [$operation->getMethod() ?? Operation::METHOD_GET],
                         $operation->getCondition() ?? ''
                     );
 

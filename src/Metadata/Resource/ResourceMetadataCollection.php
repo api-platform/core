@@ -48,7 +48,7 @@ final class ResourceMetadataCollection extends \ArrayObject
             $metadata = $it->current();
 
             foreach ($metadata->getOperations() as $name => $operation) {
-                if ('' === $operationName && \in_array($operation->getMethod(), [Operation::METHOD_GET, Operation::METHOD_OPTIONS, Operation::METHOD_HEAD], true) && ($forceCollection ? $operation->isCollection() : !$operation->isCollection())) {
+                if ('' === $operationName && \in_array($operation->getMethod() ?? Operation::METHOD_GET, [Operation::METHOD_GET, Operation::METHOD_OPTIONS, Operation::METHOD_HEAD], true) && ($forceCollection ? $operation->isCollection() : !$operation->isCollection())) {
                     return $this->operationCache[$operationName] = $operation;
                 }
 

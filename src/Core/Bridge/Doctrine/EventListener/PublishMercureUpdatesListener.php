@@ -269,7 +269,7 @@ final class PublishMercureUpdatesListener
             $data = json_encode(['@id' => $object->id]);
         } else {
             $resourceClass = $this->getObjectClass($object);
-            $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext();
+            $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext() ?? [];
 
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($object, null, UrlGeneratorInterface::ABS_URL);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);

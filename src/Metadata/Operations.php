@@ -91,7 +91,7 @@ final class Operations implements \IteratorAggregate, \Countable
     public function sort(): self
     {
         usort($this->operations, function ($a, $b) {
-            return $a[1]->getPriority() - $b[1]->getPriority();
+            return ($a[1]->getPriority() ?? 0) - ($b[1]->getPriority() ?? 0);
         });
 
         return $this;

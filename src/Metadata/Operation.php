@@ -177,7 +177,7 @@ class Operation
      * @param bool            $serialize                      https://api-platform.com/docs/core/events/#the-event-system
      */
     public function __construct(
-        string $method = self::METHOD_GET,
+        ?string $method = self::METHOD_GET,
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
@@ -186,43 +186,43 @@ class Operation
         $inputFormats = null,
         $outputFormats = null,
         $identifiers = [],
-        string $routePrefix = '',
+        ?string $routePrefix = '',
         ?string $routeName = null,
-        array $defaults = [],
-        array $requirements = [],
-        array $options = [],
+        ?array $defaults = [],
+        ?array $requirements = [],
+        ?array $options = [],
         ?bool $stateless = null,
         ?string $sunset = null,
         ?string $acceptPatch = null,
         $status = null,
-        string $host = '',
-        array $schemes = [],
-        string $condition = '',
-        string $controller = 'api_platform.action.placeholder',
+        ?string $host = '',
+        ?array $schemes = [],
+        ?string $condition = '',
+        ?string $controller = null,
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
         bool $collection = false,
         ?string $deprecationReason = null,
-        array $cacheHeaders = [],
-        array $normalizationContext = [],
-        array $denormalizationContext = [],
-        array $hydraContext = [],
-        array $openapiContext = [],
-        array $swaggerContext = [],
-        array $validationContext = [],
-        array $filters = [],
+        ?array $cacheHeaders = [],
+        ?array $normalizationContext = [],
+        ?array $denormalizationContext = [],
+        ?array $hydraContext = [],
+        ?array $openapiContext = [],
+        ?array $swaggerContext = [],
+        ?array $validationContext = [],
+        ?array $filters = [],
         ?bool $elasticsearch = null,
         $mercure = null,
         $messenger = null,
         $input = null,
         $output = null,
-        array $order = [],
+        ?array $order = [],
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?bool $paginationClientEnabled = null,
         ?bool $paginationClientItemsPerPage = null,
         ?bool $paginationClientPartial = null,
-        array $paginationViaCursor = [],
+        ?array $paginationViaCursor = [],
         ?bool $paginationEnabled = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
@@ -235,17 +235,17 @@ class Operation
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
         ?bool $compositeIdentifier = null,
-        array $exceptionToStatus = [],
+        ?array $exceptionToStatus = [],
         ?bool $queryParameterValidationEnabled = null,
-        bool $read = true,
-        bool $deserialize = true,
-        bool $validate = true,
-        bool $write = true,
-        bool $serialize = true,
+        ?bool $read = true,
+        ?bool $deserialize = true,
+        ?bool $validate = true,
+        ?bool $write = true,
+        ?bool $serialize = true,
         // TODO: replace by queryParameterValidationEnabled?
-        bool $queryParameterValidate = true,
-        int $priority = 0,
-        string $name = '',
+        ?bool $queryParameterValidate = true,
+        ?int $priority = 0,
+        ?string $name = null,
         array $extraProperties = []
     ) {
         $this->method = $method;
@@ -324,7 +324,7 @@ class Operation
         return $this->copyFrom($operation);
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -337,7 +337,7 @@ class Operation
         return $self;
     }
 
-    public function getMethod(): string
+    public function getMethod(): ?string
     {
         return $this->method;
     }
@@ -466,7 +466,7 @@ class Operation
         return $self;
     }
 
-    public function getRoutePrefix(): string
+    public function getRoutePrefix(): ?string
     {
         return $this->routePrefix;
     }
@@ -492,7 +492,7 @@ class Operation
         return $self;
     }
 
-    public function getDefaults(): array
+    public function getDefaults(): ?array
     {
         return $this->defaults;
     }
@@ -505,7 +505,7 @@ class Operation
         return $self;
     }
 
-    public function getRequirements(): array
+    public function getRequirements(): ?array
     {
         return $this->requirements;
     }
@@ -518,7 +518,7 @@ class Operation
         return $self;
     }
 
-    public function getOptions(): array
+    public function getOptions(): ?array
     {
         return $this->options;
     }
@@ -583,7 +583,7 @@ class Operation
         return $self;
     }
 
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->host;
     }
@@ -596,7 +596,7 @@ class Operation
         return $self;
     }
 
-    public function getSchemes(): array
+    public function getSchemes(): ?array
     {
         return $this->schemes;
     }
@@ -609,7 +609,7 @@ class Operation
         return $self;
     }
 
-    public function getCondition(): string
+    public function getCondition(): ?string
     {
         return $this->condition;
     }
@@ -622,7 +622,7 @@ class Operation
         return $self;
     }
 
-    public function getController(): string
+    public function getController(): ?string
     {
         return $this->controller;
     }
@@ -687,7 +687,7 @@ class Operation
         return $self;
     }
 
-    public function getCacheHeaders(): array
+    public function getCacheHeaders(): ?array
     {
         return $this->cacheHeaders;
     }
@@ -700,7 +700,7 @@ class Operation
         return $self;
     }
 
-    public function getNormalizationContext(): array
+    public function getNormalizationContext(): ?array
     {
         return $this->normalizationContext;
     }
@@ -713,7 +713,7 @@ class Operation
         return $self;
     }
 
-    public function getDenormalizationContext(): array
+    public function getDenormalizationContext(): ?array
     {
         return $this->denormalizationContext;
     }
@@ -727,9 +727,9 @@ class Operation
     }
 
     /**
-     * @return string[]
+     * @return string[]|null
      */
-    public function getHydraContext(): array
+    public function getHydraContext(): ?array
     {
         return $this->hydraContext;
     }
@@ -742,7 +742,7 @@ class Operation
         return $self;
     }
 
-    public function getOpenapiContext(): array
+    public function getOpenapiContext(): ?array
     {
         return $this->openapiContext;
     }
@@ -755,7 +755,7 @@ class Operation
         return $self;
     }
 
-    public function getSwaggerContext(): array
+    public function getSwaggerContext(): ?array
     {
         return $this->swaggerContext;
     }
@@ -768,7 +768,7 @@ class Operation
         return $self;
     }
 
-    public function getValidationContext(): array
+    public function getValidationContext(): ?array
     {
         return $this->validationContext;
     }
@@ -782,9 +782,9 @@ class Operation
     }
 
     /**
-     * @return string[]
+     * @return string[]|null
      */
-    public function getFilters(): array
+    public function getFilters(): ?array
     {
         return $this->filters;
     }
@@ -868,7 +868,7 @@ class Operation
         return $self;
     }
 
-    public function getOrder(): array
+    public function getOrder(): ?array
     {
         return $this->order;
     }
@@ -946,7 +946,7 @@ class Operation
         return $self;
     }
 
-    public function getPaginationViaCursor(): array
+    public function getPaginationViaCursor(): ?array
     {
         return $this->paginationViaCursor;
     }
@@ -1115,7 +1115,7 @@ class Operation
         return $self;
     }
 
-    public function getExceptionToStatus(): array
+    public function getExceptionToStatus(): ?array
     {
         return $this->exceptionToStatus;
     }
@@ -1154,7 +1154,7 @@ class Operation
         return $self;
     }
 
-    public function canRead(): bool
+    public function canRead(): ?bool
     {
         return $this->read;
     }
@@ -1167,7 +1167,7 @@ class Operation
         return $self;
     }
 
-    public function canDeserialize(): bool
+    public function canDeserialize(): ?bool
     {
         return $this->deserialize;
     }
@@ -1180,7 +1180,7 @@ class Operation
         return $self;
     }
 
-    public function canValidate(): bool
+    public function canValidate(): ?bool
     {
         return $this->validate;
     }
@@ -1193,7 +1193,7 @@ class Operation
         return $self;
     }
 
-    public function canWrite(): bool
+    public function canWrite(): ?bool
     {
         return $this->write;
     }
@@ -1206,7 +1206,7 @@ class Operation
         return $self;
     }
 
-    public function canSerialize(): bool
+    public function canSerialize(): ?bool
     {
         return $this->serialize;
     }
@@ -1232,7 +1232,7 @@ class Operation
         return $self;
     }
 
-    public function getPriority(): int
+    public function getPriority(): ?int
     {
         return $this->priority;
     }

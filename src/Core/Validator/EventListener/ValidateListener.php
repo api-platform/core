@@ -71,7 +71,7 @@ final class ValidateListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !$operation->canValidate())
+            (!$operation || !($operation->canValidate() ?? true))
         ) {
             return;
         }
@@ -86,7 +86,7 @@ final class ValidateListener
             return;
         }
 
-        $validationContext = $operation ? $operation->getValidationContext() : [];
+        $validationContext = $operation ? ($operation->getValidationContext() ?? []) : [];
 
         if (!$validationContext && $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);

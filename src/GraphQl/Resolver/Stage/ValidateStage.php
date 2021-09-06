@@ -42,10 +42,10 @@ final class ValidateStage implements ValidateStageInterface
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
         $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
 
-        if (!$operation->canValidate()) {
+        if (!($operation->canValidate() ?? true)) {
             return;
         }
 
-        $this->validator->validate($object, $operation->getValidationContext());
+        $this->validator->validate($object, $operation->getValidationContext() ?? []);
     }
 }

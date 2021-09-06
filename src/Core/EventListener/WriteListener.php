@@ -86,7 +86,7 @@ final class WriteListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !$operation->canWrite() || !$attributes['persist'])
+            (!$operation || !($operation->canWrite() ?? true) || !$attributes['persist'])
         ) {
             return;
             // TODO: 3.0 remove condition

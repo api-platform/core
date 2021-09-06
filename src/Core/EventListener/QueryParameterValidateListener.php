@@ -89,7 +89,7 @@ final class QueryParameterValidateListener
         if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $resourceFilters = $this->resourceMetadataFactory->create($attributes['resource_class'])->getCollectionOperationAttribute($operationName, 'filters', [], true);
         } elseif ($operation) {
-            $resourceFilters = $operation->getFilters();
+            $resourceFilters = $operation->getFilters() ?? [];
         }
         $this->queryParameterValidator->validateFilters($attributes['resource_class'], $resourceFilters, $queryParameters);
     }

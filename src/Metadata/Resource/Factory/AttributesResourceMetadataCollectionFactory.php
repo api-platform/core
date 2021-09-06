@@ -212,7 +212,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof GetCollection ? '_collection' : ''),
+            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
             $operation,
         ];
     }
