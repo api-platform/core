@@ -102,21 +102,14 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             return $attribute;
         }
 
-        foreach ([
-            ['get', 'Description'],
-            ['is', 'Readable'],
-            ['is', 'Writable'],
-            ['is', 'ReadableLink'],
-            ['is', 'WritableLink'],
-            ['is', 'Required'],
-            ['is', 'Identifier'],
-            ['get', 'Default'],
-            ['get', 'Example'],
-            ['get', 'Types'],
-            // TODO: do we need to copy more properties?
-        ] as $property) {
-            if (null !== $val = $attribute->{$property[0].$property[1]}()) {
-                $propertyMetadata->{"with{$property[1]}"}($val);
+        foreach (get_class_methods(ApiProperty::class) as $method) {
+            if (
+                'getAttribute' !== $method &&
+                'isChildInherited' !== $method &&
+                preg_match('/^(?:get|is)(.*)/', $method, $matches) &&
+                null !== $val = $attribute->{$method}()
+            ) {
+                $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }
 
