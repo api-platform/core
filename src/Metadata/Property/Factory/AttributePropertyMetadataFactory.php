@@ -115,7 +115,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
                 preg_match('/^(?:get|is)(.*)/', $method, $matches) &&
                 null !== $val = $attribute->{$method}()
             ) {
-                $propertyMetadata->{"with{$matches[1]}"}($val);
+                $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }
 
