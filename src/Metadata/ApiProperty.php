@@ -83,8 +83,6 @@ final class ApiProperty
     private $securityPostDenormalize;
 
     /**
-     * The RDF types of this property.
-     *
      * @var string[]
      */
     private $types;
@@ -108,21 +106,21 @@ final class ApiProperty
      * @param string                      $description
      * @param bool                        $readable
      * @param bool                        $writable
-     * @param bool                        $readableLink
-     * @param bool                        $writableLink
-     * @param bool                        $required
-     * @param bool                        $identifier
+     * @param bool                        $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool                        $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool                        $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool                        $identifier              https://api-platform.com/docs/core/identifiers/
      * @param string|int|float|bool|array $default
-     * @param string|int|float|bool|array $example
-     * @param string                      $deprecationReason
+     * @param string|int|float|bool|array $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string                      $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param bool                        $fetchable
-     * @param bool                        $fetchEager
-     * @param array                       $jsonldContext
-     * @param array                       $openapiContext
-     * @param bool                        $push
-     * @param string                      $security
-     * @param string                      $securityPostDenormalize
-     * @param string[]|string             $types
+     * @param bool                        $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array                       $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array                       $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool                        $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string                      $security                https://api-platform.com/docs/core/security
+     * @param string                      $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string[]|string             $types                   the RDF types of this property
      */
     public function __construct(
         ?string $description = null,
