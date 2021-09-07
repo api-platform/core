@@ -66,7 +66,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['iri_only'] = $context['iri_only'] ?? false;
             $context['request_uri'] = $request->getRequestUri();
             $context['uri'] = $request->getUri();
-            $context['input'] = $operation->getInput() ?? null;
+            $context['input'] = $operation->getInput();
             $context['output'] = $operation->getOutput();
             $context['types'] = $operation->getTypes();
             $context['identifiers_values'] = [];
