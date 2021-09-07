@@ -20,7 +20,6 @@ final class Delete extends Operation
      * {@inheritdoc}
      */
     public function __construct(
-        string $method = self::METHOD_DELETE,
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
@@ -28,7 +27,7 @@ final class Delete extends Operation
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,
-        $identifiers = [],
+        $uriVariables = null,
         string $routePrefix = '',
         ?string $routeName = null,
         array $defaults = [],
@@ -44,7 +43,7 @@ final class Delete extends Operation
         string $controller = 'api_platform.action.placeholder',
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
-        bool $collection = false,
+        ?bool $collection = null,
         ?string $deprecationReason = null,
         array $cacheHeaders = [],
         array $normalizationContext = [],
@@ -90,7 +89,6 @@ final class Delete extends Operation
         string $name = '',
         array $extraProperties = []
     ) {
-        parent::__construct(...\func_get_args());
-        $this->method = self::METHOD_DELETE;
+        parent::__construct(self::METHOD_DELETE, ...\func_get_args());
     }
 }

@@ -37,6 +37,7 @@ use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -336,7 +337,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             case 'PUT':
                 return $this->updatePutOperation($v3, $pathOperation, $requestMimeTypes, $responseMimeTypes, $operationType, $resourceMetadata, $resourceClass, $resourceShortName, $operationName, $definitions);
             case 'DELETE':
-                return $this->updateDeleteOperation($v3, $pathOperation, $resourceShortName, $operationType, $operationName, $resourceMetadata);
+                return $this->updateDeleteOperation($v3, $pathOperation, $resourceShortName, $operationType, $operationName, $resourceMetadata, $resourceClass);
         }
 
         return $pathOperation;
@@ -419,7 +420,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $outputResourseShortName = $resourceMetadata->getItemOperations()[$operationName]['output']['name'] ?? $resourceShortName;
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Retrieves a %s resource.', $outputResourseShortName);
 
-        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
 
         $successResponse = ['description' => sprintf('%s resource response', $outputResourseShortName)];
         [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $mimeTypes);
@@ -572,10 +573,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
 
-        if (OperationType::ITEM === $operationType) {
-            $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
-        }
-
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
         [$successResponse, $defined] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
 
@@ -602,7 +600,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Replaces the %s resource.', $resourceShortName);
 
-        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
 
         $successResponse = ['description' => sprintf('%s resource updated', $resourceShortName)];
         [$successResponse] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
@@ -657,7 +655,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return false;
     }
 
-    private function updateDeleteOperation(bool $v3, \ArrayObject $pathOperation, string $resourceShortName, string $operationType, string $operationName, ResourceMetadata $resourceMetadata): \ArrayObject
+    private function updateDeleteOperation(bool $v3, \ArrayObject $pathOperation, string $resourceShortName, string $operationType, string $operationName, ResourceMetadata $resourceMetadata, string $resourceClass): \ArrayObject
     {
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Removes the %s resource.', $resourceShortName);
         $pathOperation['responses'] ?? $pathOperation['responses'] = [
@@ -665,16 +663,28 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             '404' => ['description' => 'Resource not found'],
         ];
 
-        return $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata);
+        return $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
     }
 
-    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation, string $operationType, string $operationName, ResourceMetadata $resourceMetadata): \ArrayObject
+    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation, string $operationType, string $operationName, ResourceMetadata $resourceMetadata, string $resourceClass): \ArrayObject
     {
         $identifiers = (array) $resourceMetadata
-                ->getTypedOperationAttribute(OperationType::ITEM, $operationName, 'identifiers', ['id'], true);
+                ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
+
+        if (!$identifiers && OperationType::COLLECTION !== $operationType) {
+            try {
+                $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);
+            } catch (RuntimeException $e) {
+                // Ignore exception here
+            }
+        }
 
         if (\count($identifiers) > 1 ? $resourceMetadata->getItemOperationAttribute($operationName, 'composite_identifier', true, true) : false) {
             $identifiers = [key($identifiers)];
+        }
+
+        if (!$identifiers && OperationType::COLLECTION === $operationType) {
+            return $pathOperation;
         }
 
         if (!isset($pathOperation['parameters'])) {

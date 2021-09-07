@@ -45,25 +45,25 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
-                    identifiers: ['id' => [AttributeResource::class, 'id']],
+                    uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                     operations: [
-                        '_api_AttributeResource_get' => new Get(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: ['id' => [AttributeResource::class, 'id']]),
-                        '_api_AttributeResource_put' => new Put(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: ['id' => [AttributeResource::class, 'id']]),
-                        '_api_AttributeResource_delete' => new Delete(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: ['id' => [AttributeResource::class, 'id']]),
-                        '_api_AttributeResource_get_collection' => new GetCollection(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: []),
+                        '_api_AttributeResource_get' => new Get(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]]),
+                        '_api_AttributeResource_put' => new Put(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]]),
+                        '_api_AttributeResource_delete' => new Delete(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]]),
+                        '_api_AttributeResource_get_collection' => new GetCollection(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder'),
                     ]
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    identifiers: ['dummyId' => [Dummy::class, 'id'], 'id' => [AttributeResource::class, 'id']],
+                    uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{id}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                             shortName: 'AttributeResource',
-                            identifiers: ['dummyId' => [Dummy::class, 'id'], 'id' => [AttributeResource::class, 'id']],
+                            uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                         ),
                     ]
                 ),
@@ -74,27 +74,27 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [
                 new ApiResource(
-                    identifiers: ['id' => [AttributeResource::class, 'id']],
+                    uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     operations: [
-                        '_api_/attribute_resources/{id}.{_format}_get' => new Get(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: ['id' => [AttributeResource::class, 'id']]),
-                        '_api_/attribute_resources/{id}.{_format}_put' => new Put(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: ['id' => [AttributeResource::class, 'id']]),
-                        '_api_/attribute_resources/{id}.{_format}_delete' => new Delete(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: ['id' => [AttributeResource::class, 'id']]),
-                        '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(uriTemplate: '/attribute_resources.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', identifiers: []),
+                        '_api_/attribute_resources/{id}.{_format}_get' => new Get(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]]),
+                        '_api_/attribute_resources/{id}.{_format}_put' => new Put(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]]),
+                        '_api_/attribute_resources/{id}.{_format}_delete' => new Delete(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]]),
+                        '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(uriTemplate: '/attribute_resources.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder'),
                     ]
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    identifiers: ['dummyId' => [Dummy::class, 'id'], 'id' => [AttributeResource::class, 'id']],
+                    uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{id}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                             shortName: 'AttributeResource',
-                            identifiers: ['dummyId' => [Dummy::class, 'id'], 'id' => [AttributeResource::class, 'id']],
+                            uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                             extraProperties: ['user_defined_uri_template' => true]
                         ),
                     ]

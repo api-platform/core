@@ -342,7 +342,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperations = [];
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if ($operation->isCollection() !== $collection) {
+                    if (($operation->isCollection() ?? false) !== $collection) {
                         continue;
                     }
 

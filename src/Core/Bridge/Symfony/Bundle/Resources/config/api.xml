@@ -71,13 +71,13 @@
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter.legacy" />
 
-        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Bridge\Symfony\Routing\IriConverter" public="false">
+        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
             <argument type="service" id="api_platform.state_provider" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.api.identifiers_extractor" />
-            <argument type="service" id="api_platform.identifier.converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.uri_variables.converter" />
         </service>
         <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
@@ -301,6 +301,7 @@
         <service id="api_platform.identifiers_extractor" alias="api_platform.api.identifiers_extractor" />
         <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
+        <!-- TODO: remove in 3.0 -->
         <service id="api_platform.identifier.converter" class="ApiPlatform\Core\Identifier\IdentifierConverter" public="false">
             <argument type="service" id="api_platform.identifiers_extractor.cached" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
@@ -314,6 +315,21 @@
         <service id="api_platform.identifier.date_normalizer" class="ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer" public="false">
             <tag name="api_platform.identifier.denormalizer" priority="-100" />
         </service>
+
+        <service id="api_platform.uri_variables.converter" class="ApiPlatform\Api\UriVariablesConverter" public="false">
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="tagged" tag="api_platform.uri_variables.transformer" />
+        </service>
+
+        <service id="api_platform.uri_variables.transformer.integer" class="ApiPlatform\Api\UriVariableTransformer\IntegerUriVariableTransformer" public="false">
+            <tag name="api_platform.uri_variables.transformer" priority="-100" />
+        </service>
+
+        <service id="api_platform.uri_variables.transformer.date_time" class="ApiPlatform\Api\UriVariableTransformer\DateTimeUriVariableTransformer" public="false">
+            <tag name="api_platform.uri_variables.transformer" priority="-100" />
+        </service>
+
 
         <!-- Subresources -->
 

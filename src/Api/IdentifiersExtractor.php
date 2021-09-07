@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
@@ -55,45 +56,30 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $resourceClass = $this->getResourceClass($item, true);
         $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName);
 
-        foreach ($operation->getIdentifiers() as $parameterName => [$class, $property]) {
-            $identifierValue = $this->resolveIdentifierValue($item, $class, $property);
+        foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariableDefinition) {
+            if (1 < \count($uriVariableDefinition['identifiers'])) {
+                $compositeIdentifiers = [];
+                foreach ($uriVariableDefinition['identifiers'] as $identifier) {
+                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $uriVariableDefinition['class'], $identifier, $parameterName);
+                }
 
-            if (null === $identifierValue) {
-                throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
-            }
-
-            // TODO: php 8 remove method_exists
-            if (is_scalar($identifierValue) || method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
-                $identifiers[$parameterName] = (string) $identifierValue;
+                $identifiers[$parameterName] = CompositeIdentifierParser::stringify($compositeIdentifiers);
                 continue;
             }
 
-            // we could recurse to find correct identifiers until there it is a scalar but this is not really supported and adds a lot of complexity
-            // instead we're deprecating this behavior in favor of something that can be transformed to a string
-            if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
-                trigger_deprecation('api-platform/core', '2.7', 'Using a resource class as identifier is deprecated, please make this identifier Stringable');
-                $relatedOperation = $this->resourceMetadataFactory->create($relatedResourceClass)->getOperation();
-                $relatedIdentifiers = $relatedOperation->getIdentifiers();
-                if (1 === \count($relatedIdentifiers)) {
-                    $identifierValue = $this->resolveIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)[1]);
-
-                    if (is_scalar($identifierValue) || method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
-                        $identifiers[$parameterName] = (string) $identifierValue;
-                        continue;
-                    }
-                }
-            }
-
-            throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $uriVariableDefinition['class'], $uriVariableDefinition['identifiers'][0], $parameterName);
         }
 
         return $identifiers;
     }
 
-    private function resolveIdentifierValue($item, string $class, string $property)
+    /**
+     * Gets the value of the given class property.
+     */
+    private function getIdentifierValue($item, string $class, string $property, string $parameterName)
     {
         if ($item instanceof $class) {
-            return $this->propertyAccessor->getValue($item, $property);
+            return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
         }
 
         $resourceClass = $this->getResourceClass($item, true);
@@ -105,14 +91,49 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             if ($type->getClassName() === $class) {
-                return $this->propertyAccessor->getValue($item, "$propertyName.$property");
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
             }
 
             if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && $collectionValueType->getClassName() === $class) {
-                return $this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property));
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
             }
         }
 
         throw new RuntimeException('Not able to retrieve identifiers.');
+    }
+
+    /**
+     * TODO: in 3.0 this method just uses $identifierValue instanceof \Stringable and we remove the weird behavior.
+     *
+     * @param mixed|\Stringable $identifierValue
+     */
+    private function resolveIdentifierValue($identifierValue, string $parameterName)
+    {
+        if (null === $identifierValue) {
+            throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
+        }
+
+        // TODO: php 8 remove method_exists
+        if (is_scalar($identifierValue) || method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
+            return (string) $identifierValue;
+        }
+
+        // TODO: remove this in 3.0
+        // we could recurse to find correct identifiers until there it is a scalar but this is not really supported and adds a lot of complexity
+        // instead we're deprecating this behavior in favor of something that can be transformed to a string
+        if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
+            trigger_deprecation('api-platform/core', '2.7', 'Using a resource class as identifier is deprecated, please make this identifier Stringable');
+            $relatedOperation = $this->resourceMetadataFactory->create($relatedResourceClass)->getOperation();
+            $relatedIdentifiers = $relatedOperation->getUriVariables();
+            if (1 === \count($relatedIdentifiers)) {
+                $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)['identifiers'][0], $parameterName);
+
+                if ($identifierValue instanceof \Stringable || is_scalar($identifierValue) || method_exists($identifierValue, '__toString')) {
+                    return (string) $identifierValue;
+                }
+            }
+        }
+
+        throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));
     }
 }

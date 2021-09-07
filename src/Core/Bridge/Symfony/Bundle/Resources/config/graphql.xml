@@ -210,7 +210,7 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.api.identifiers_extractor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />

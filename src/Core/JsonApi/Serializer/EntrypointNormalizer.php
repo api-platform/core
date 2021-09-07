@@ -79,7 +79,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
             foreach ($resourceMetadata as $resource) {
                 foreach ($resource->getOperations() as $operationName => $operation) {
-                    if (!$operation->isCollection() || $operation->getIdentifiers()) {
+                    if (!$operation->isCollection() || $operation->getUriVariables()) {
                         continue;
                     }
 

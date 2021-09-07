@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Bridge\Symfony\Routing;
+namespace ApiPlatform\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
@@ -61,7 +61,7 @@ class ApiLoaderTest extends TestCase
         $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
                 // Default operations based on OperationResourceMetadataFactory
-                'api_dummies_get_item' => (new Get())->withIdentifiers(['id'])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
+                'api_dummies_get_item' => (new Get())->withUriVariables(['id'])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
                 'api_dummies_put_item' => (new Put())->withUriTemplate($path),
                 'api_dummies_delete_item' => (new Delete())->withUriTemplate($path),
                 // Custom operations
@@ -250,7 +250,7 @@ class ApiLoaderTest extends TestCase
 
     private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
     {
-        $routingConfig = __DIR__.'/../../../../src/Core/Bridge/Symfony/Bundle/Resources/config/routing';
+        $routingConfig = __DIR__.'/../../../src/Core/Bridge/Symfony/Bundle/Resources/config/routing';
 
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);

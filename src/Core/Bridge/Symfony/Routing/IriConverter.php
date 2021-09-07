@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
-use ApiPlatform\Bridge\Symfony\Routing\IriConverter as NewIriConverter;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -34,6 +33,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Symfony\Routing\IriConverter as NewIriConverter;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;

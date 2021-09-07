@@ -97,12 +97,12 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
 
                 $identifiers = [];
                 // Removing the third tuple element
-                foreach ($subresourceMetadata['identifiers'] as $parameterName => [$property, $class, $isPresent]) {
+                foreach ($subresourceMetadata['identifiers'] as $parameterName => [$class, $property, $isPresent]) {
                     if (!$isPresent) {
                         continue;
                     }
 
-                    $identifiers[$parameterName] = [$property, $class];
+                    $identifiers[$parameterName] = ['class' => $class, 'identifiers' => [$property]];
                 }
 
                 $resource = (new ApiResource())
@@ -112,7 +112,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                         $subresourceMetadata['route_name'] => (new Get())
                             ->withUriTemplate($subresourceMetadata['path'])
                             ->withShortName($subresourceMetadata['shortNames'][0])
-                            ->withIdentifiers($identifiers)
+                            ->withUriVariables($identifiers)
                             ->withDefaults($subresourceMetadata['defaults'])
                             ->withRequirements($subresourceMetadata['requirements'])
                             ->withOptions($subresourceMetadata['options'])
@@ -129,7 +129,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                                 'legacy_subresource_identifiers' => $subresourceMetadata['identifiers'],
                             ]),
                     ]))
-                    ->withIdentifiers($identifiers)
+                    ->withUriVariables($identifiers)
                     ->withDefaults($subresourceMetadata['defaults'])
                     ->withRequirements($subresourceMetadata['requirements'])
                     ->withOptions($subresourceMetadata['options'])

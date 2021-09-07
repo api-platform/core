@@ -419,7 +419,7 @@ class ReadListenerTest extends TestCase
     public function testRetrieveOperationWithStateProvider()
     {
         $identifierConverter = $this->prophesize(ContextAwareIdentifierConverterInterface::class);
-        $identifierConverter->convert(['id' => '22'], 'Foo', ['identifiers' => ['id' => ['Foo', 'id']]])->shouldBeCalled()->willReturn(['id' => 22]);
+        $identifierConverter->convert(['id' => '22'], 'Foo')->shouldBeCalled()->willReturn(['id' => 22]);
         $this->expectException(NotFoundHttpException::class);
 
         $stateProvider = $this->prophesize(ProviderInterface::class);
@@ -433,7 +433,7 @@ class ReadListenerTest extends TestCase
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
-            (new ApiResource())->withShortName('Foo')->withOperations(new Operations(['get' => (new Get())->withShortName('Foo')->withIdentifiers(['id' => ['Foo', 'id']])])),
+            (new ApiResource())->withShortName('Foo')->withOperations(new Operations(['get' => (new Get())->withShortName('Foo')->withClass('Foo')->withUriVariables(['id' => ['class' => 'Foo', 'identifiers' => ['id']]])])),
         ]));
 
         $listener = new ReadListener($stateProvider->reveal(), null, null, null, $identifierConverter->reveal(), $resourceMetadataFactory->reveal());

@@ -33,7 +33,7 @@ final class AttributeResources implements IteratorAggregate
         $this->collection = $collection;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->collection);
     }
