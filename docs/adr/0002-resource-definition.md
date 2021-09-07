@@ -1,6 +1,6 @@
 # Resource definition
 
-* Status: proposed
+* Status: accepted
 * Deciders: @dunglas @soyuka @vincentchalamon @GregoireHebert
 
 ## Context and Problem Statement
@@ -151,13 +151,19 @@ class User {}
     </tr>
 </table>
 
-To link these operations with identifiers, refer to [Resource Identifiers decision record](./0001-resource-identifiers), for example:
+To link these operations with identifiers, refer to [URI Variables decision record](./0003-uri-variables), for example:
 
 ```php
 <?php
 use Company;
 
-#[Get("/companies/{companyId}/users/{id}", [identifiers=["companyId" => [Company::class, "id"], "id" => [User::class, "id"]]])]
+#[Get(
+    uriTemplate: "/companies/{companyId}/users/{id}", 
+    uriVariables: [
+        "companyId" => ["class" => Company::class, "identifiers" => ["id"], "property" => "user"], 
+        "id" => ["class" => User::class, "identifiers" => ["id"]]
+    ]
+)]
 class User {
   #[ApiProperty(identifier=true)]
   public $id;
