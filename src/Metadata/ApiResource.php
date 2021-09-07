@@ -113,7 +113,7 @@ final class ApiResource
      * @param string          $uriTemplate
      * @param string          $shortName
      * @param string          $description
-     * @param string[]|string $types
+     * @param string[]|string $types                          The RDF types of this resource
      * @param array|string    $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string    $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
      * @param array|string    $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
