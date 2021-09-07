@@ -133,7 +133,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $operationAttribute);
             $operation = $operation->withPriority(++$operationPriority);
-            $operations = $resources[$index]->getOperations();
+            $operations = $resources[$index]->getOperations() ?? new Operations();
             $resources[$index] = $resources[$index]->withOperations($operations->add($key, $operation)->sort());
         }
 
@@ -254,7 +254,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function hasSameOperation(ApiResource $resource, string $operationClass, Operation $operation): bool
     {
-        foreach ($resource->getOperations() as $o) {
+        foreach ($resource->getOperations() ?? [] as $o) {
             if ($o instanceof $operationClass && $operation->getUriTemplate() === $o->getUriTemplate() && $operation->getName() === $o->getName() && $operation->getRouteName() === $o->getRouteName()) {
                 return true;
             }
