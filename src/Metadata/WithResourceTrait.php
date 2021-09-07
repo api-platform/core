@@ -24,25 +24,29 @@ trait WithResourceTrait
 
     /**
      * @param ApiResource|Operation|GraphQlOperation $resource
+     *
+     * @otdo merge me with AttributePropertyMetadataFactory::createMetadata
      */
     private function copyFrom($resource): self
     {
         $self = clone $this;
-        foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
-                continue;
-            }
+        foreach (get_class_methods($resource) as $method) {
+            if (
+                // TODO: remove these checks for deprecated methods in 3.0
+                'getAttribute' !== $method &&
+                'isChildInherited' !== $method &&
+                'getSubresource' !== $method &&
+                'getIri' !== $method &&
+                'getAttributes' !== $method &&
+                // end of deprecated methods
 
-            if (!method_exists($self, $methodName)) {
-                continue;
+                method_exists($self, $method) &&
+                preg_match('/^(?:get|is)(.*)/', $method, $matches) &&
+                null === $self->{$method}() &&
+                null !== $val = $resource->{$method}()
+            ) {
+                $self = $self->{"with{$matches[1]}"}($val);
             }
-
-            $operationValue = $self->{$methodName}();
-            if (null !== $operationValue && [] !== $operationValue) {
-                continue;
-            }
-
-            $self = $self->{'with'.substr($methodName, 3)}($resource->{$methodName}());
         }
 
         return $self;
