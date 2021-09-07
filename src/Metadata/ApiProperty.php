@@ -83,7 +83,7 @@ final class ApiProperty
     private $securityPostDenormalize;
 
     /**
-     * The related schemas.
+     * The RDF types of this property.
      *
      * @var string[]
      */
@@ -122,6 +122,7 @@ final class ApiProperty
      * @param bool                        $push
      * @param string                      $security
      * @param string                      $securityPostDenormalize
+     * @param string[]|string             $types
      */
     public function __construct(
         ?string $description = null,
@@ -132,8 +133,8 @@ final class ApiProperty
         ?bool $required = null,
         ?bool $identifier = null,
 
-               $default = null,
-               $example = null,
+        $default = null,
+        $example = null,
 
         ?string $deprecationReason = null,
         ?bool $fetchable = null,
@@ -144,7 +145,7 @@ final class ApiProperty
         ?string $security = null,
         ?string $securityPostDenormalize = null,
 
-        ?array $types = [],
+        $types = [],
         ?array $builtinTypes = [],
         ?array $schema = [],
         ?bool $initializable = null,
@@ -170,7 +171,7 @@ final class ApiProperty
         $this->security = $security;
         $this->openapiContext = $openapiContext;
         $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->types = $types;
+        $this->types = (array) $types;
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
@@ -403,10 +404,13 @@ final class ApiProperty
         return $this->types;
     }
 
-    public function withTypes(array $types = []): self
+    /**
+     * @param string[]|string $types
+     */
+    public function withTypes($types = []): self
     {
         $self = clone $this;
-        $self->types = $types;
+        $self->types = (array) $types;
 
         return $self;
     }
