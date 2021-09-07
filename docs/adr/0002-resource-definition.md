@@ -24,17 +24,17 @@ In API Platform, this resource identifier is also named [IRI (Internationalized 
 ```php
 <?php
 
-#[Resource]
+#[ApiResource]
 class Users
 {
-    #[ApiProperty(iri="hydra:member")]
+    #[ApiProperty(types=["hydra:member"])]
     public User[] $member = [];
 
     public float $averageRate;
 }
 
-#[Resource("/companies/{companyId}/users/{id}", normalization_context=["groups"= [....]]), operations={}]
-#[Resource(normalization_context=["groups"= [....]], operations=[
+#[ApiResource("/companies/{companyId}/users/{id}", normalizationContext=["groups"= [....]]), operations={}]
+#[ApiResource(normalizationContext=["groups"= [....]], operations=[
  new Get(),
  new Post(),
 ])]
@@ -61,7 +61,7 @@ For convenience and to ease the upgrade path, these would still be available on 
 ```php
 <?php
 
-#[Resource]
+#[ApiResource]
 class User {}
 ```
 
@@ -78,7 +78,7 @@ corresponding to
 class User {}
 ```
 
-Verbs declared on a PHP class define API Platform operations. The `Resource` attributes would become optional and the only thing needed is to specify at least a verb and an IRI representing the Resource. Some examples:
+Verbs declared on a PHP class define API Platform operations. The `ApiResource` attributes would become optional and the only thing needed is to specify at least a verb and an IRI representing the Resource. Some examples:
 
 <table>
     <tr>
@@ -165,12 +165,12 @@ class User {
 }
 ```
 
-The `Resource` attribute could be used to set defaults properties on operations:
+The `ApiResource` attribute could be used to set defaults properties on operations:
 
 ```php
 <?php
 
-#[Resource(normalization_context=["groups"= [....]])]
+#[ApiResource(normalizationContext=["groups"= [....]])]
 #[Get("/users/{id}")]
 class User {}
 ```
@@ -184,11 +184,14 @@ These properties can also be specified directly on the verb attribute:
 class User {}
 ```
 
-Internally, HTTP verbs are aliases to the Resource Attribute holding a method and a default path. The Resource Attribute is a reflection of the underlying metadata:
+Internally, HTTP verbs are aliases to the Resource Attribute holding a method and a default path. The `ApiResource` attribute is a reflection of the underlying metadata:
 
 ```php
 <?php
-class Resource {
+
+namespace ApiPlatform\Metadata;
+
+class ApiResource {
     public string $iri;
     public bool $mercure;
     public string $security;
