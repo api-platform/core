@@ -66,35 +66,35 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
                     //TODO: 3.0 remove these
                     if ('item_query' === $operationName) {
-                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $operationName, $configuration);
+                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
                         continue;
                     }
 
                     if ('collection_query' === $operationName) {
-                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $operationName, $configuration);
+                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }
 
                     if ($operation instanceof Query && !$operation->isCollection()) {
-                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $operationName, $configuration);
+                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }
 
                     if ($operation instanceof Query && $operation->isCollection()) {
-                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $operationName, $configuration);
+                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }
 
                     if ($operation instanceof Subscription && $operation->getMercure()) {
-                        $subscriptionFields += $this->fieldsBuilder->getSubscriptionFields($resourceClass, $operation, $operationName);
+                        $subscriptionFields += $this->fieldsBuilder->getSubscriptionFields($resourceClass, $operation);
 
                         continue;
                     }
 
-                    $mutationFields += $this->fieldsBuilder->getMutationFields($resourceClass, $operation, $operationName);
+                    $mutationFields += $this->fieldsBuilder->getMutationFields($resourceClass, $operation);
                 }
             }
         }

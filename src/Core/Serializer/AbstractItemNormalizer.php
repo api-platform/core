@@ -864,6 +864,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
+            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+                $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
+            }
 
             return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
         }

@@ -13,19 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\GraphQl\Type\TypeBuilderInterface;
 use ApiPlatform\GraphQl\Type\TypeConverter;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type\Definition\DateTimeType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -45,6 +49,9 @@ class TypeConverterTest extends TestCase
     /** @var ObjectProphecy */
     private $resourceMetadataCollectionFactoryProphecy;
 
+    /** @var ObjectProphecy */
+    private $propertyMetadataFactoryProphecy;
+
     /** @var TypeConverter */
     private $typeConverter;
 
@@ -56,7 +63,8 @@ class TypeConverterTest extends TestCase
         $this->typeBuilderProphecy = $this->prophesize(TypeBuilderInterface::class);
         $this->typesContainerProphecy = $this->prophesize(TypesContainerInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $this->typeConverter = new TypeConverter($this->typeBuilderProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal());
+        $this->propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $this->typeConverter = new TypeConverter($this->typeBuilderProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal());
     }
 
     /**
@@ -68,7 +76,7 @@ class TypeConverterTest extends TestCase
     {
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
 
-        $graphqlType = $this->typeConverter->convertType($type, $input, 'test', 'resourceClass', 'rootClass', null, $depth);
+        $graphqlType = $this->typeConverter->convertType($type, $input, (new Operation())->withName('test'), 'resourceClass', 'rootClass', null, $depth);
         $this->assertEquals($expectedGraphqlType, $graphqlType);
     }
 
@@ -81,7 +89,6 @@ class TypeConverterTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_STRING), false, 0, GraphQLType::string()],
             [new Type(Type::BUILTIN_TYPE_ARRAY), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
-            [new Type(Type::BUILTIN_TYPE_OBJECT), true, 1, GraphQLType::string()],
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
             [new Type(Type::BUILTIN_TYPE_OBJECT), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_CALLABLE), false, 0, null],
@@ -97,7 +104,7 @@ class TypeConverterTest extends TestCase
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [new ApiResource()]));
 
-        $graphqlType = $this->typeConverter->convertType($type, false, 'test', 'resourceClass', 'rootClass', null, 0);
+        $graphqlType = $this->typeConverter->convertType($type, false, (new Operation())->withName('test'), 'resourceClass', 'rootClass', null, 0);
         $this->assertNull($graphqlType);
     }
 
@@ -111,7 +118,7 @@ class TypeConverterTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
 
-        $this->typeConverter->convertType($type, false, 'test', 'resourceClass', 'rootClass', null, 0);
+        $this->typeConverter->convertType($type, false, (new Operation())->withName('test'), 'resourceClass', 'rootClass', null, 0);
     }
 
     public function testConvertTypeResourceClassNotFound(): void
@@ -121,22 +128,52 @@ class TypeConverterTest extends TestCase
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
 
-        $graphqlType = $this->typeConverter->convertType($type, false, 'test', 'resourceClass', 'rootClass', null, 0);
+        $graphqlType = $this->typeConverter->convertType($type, false, (new Operation())->withName('test'), 'resourceClass', 'rootClass', null, 0);
         $this->assertNull($graphqlType);
+    }
+
+    public function testConvertTypeResourceIri(): void
+    {
+        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');
+
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['test' => new Query()])]);
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
+        $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
+        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new PropertyMetadata())->withWritableLink(false));
+
+        $graphqlType = $this->typeConverter->convertType($type, true, (new Operation())->withName('test'), 'dummy', 'rootClass', 'dummyProperty', 1);
+        $this->assertEquals(GraphQLType::string(), $graphqlType);
+    }
+
+    public function testConvertTypeInputResource(): void
+    {
+        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');
+        $operation = new Query();
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['test' => $operation])]);
+        $expectedGraphqlType = new ObjectType(['name' => 'resourceObjectType']);
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
+        $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
+        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new PropertyMetadata())->withWritableLink(true));
+        $this->typeBuilderProphecy->getResourceObjectType('dummy', $graphqlResourceMetadata, $operation, true, false, 1)->shouldBeCalled()->willReturn($expectedGraphqlType);
+
+        $graphqlType = $this->typeConverter->convertType($type, true, (new Operation())->withName('test'), 'dummy', 'rootClass', 'dummyProperty', 1);
+        $this->assertEquals($expectedGraphqlType, $graphqlType);
     }
 
     /**
      * @dataProvider convertTypeResourceProvider
      */
-    public function testConvertTypeResource(Type $type, ObjectType $expectedGraphqlType): void
+    public function testConvertTypeCollectionResource(Type $type, ObjectType $expectedGraphqlType): void
     {
-        $graphqlResourceMetadata = new ResourceMetadataCollection('dummyValue', [(new ApiResource())->withShortName('DummyValue')->withGraphQlOperations(['test' => new Query()])]);
+        $operation = (new Query())->withName('test');
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummyValue', [(new ApiResource())->withShortName('DummyValue')->withGraphQlOperations(['test' => $operation])]);
 
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(true);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummyValue')->shouldBeCalled()->willReturn($graphqlResourceMetadata);
-        $this->typeBuilderProphecy->getResourceObjectType('dummyValue', $graphqlResourceMetadata, 'test', false, false, 0)->shouldBeCalled()->willReturn($expectedGraphqlType);
+        $this->typeBuilderProphecy->getResourceObjectType('dummyValue', $graphqlResourceMetadata, $operation, false, false, 0)->shouldBeCalled()->willReturn($expectedGraphqlType);
 
-        $graphqlType = $this->typeConverter->convertType($type, false, 'test', 'resourceClass', 'rootClass', null, 0);
+        $graphqlType = $this->typeConverter->convertType($type, false, (new Operation())->withName('test'), 'resourceClass', 'rootClass', null, 0);
         $this->assertEquals($expectedGraphqlType, $graphqlType);
     }
 

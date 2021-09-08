@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Type;
 
 use ApiPlatform\GraphQl\Type\TypeConverterInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\Type as GraphQLType;
@@ -36,7 +37,7 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, string $operationName, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         if ('dummyDate' === $property
             && \in_array($rootResource, [Dummy::class, DummyDocument::class], true)
@@ -46,7 +47,7 @@ final class TypeConverter implements TypeConverterInterface
             return 'DateTime';
         }
 
-        return $this->defaultTypeConverter->convertType($type, $input, $operationName, $resourceClass, $rootResource, $property, $depth);
+        return $this->defaultTypeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
     }
 
     /**

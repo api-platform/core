@@ -14,7 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\ListTypeNode;
@@ -38,18 +42,24 @@ final class TypeConverter implements TypeConverterInterface
     private $typeBuilder;
     private $typesContainer;
     private $resourceMetadataCollectionFactory;
+    private $propertyMetadataFactory;
 
-    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory = null)
     {
         $this->typeBuilder = $typeBuilder;
         $this->typesContainer = $typesContainer;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
+
+        if (null === $this->propertyMetadataFactory) {
+            @trigger_error(sprintf('Not injecting %s in the TypeConverter is deprecated since 2.7 and will not be supported in 3.0.', PropertyMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, string $operationName, string $resourceClass, string $rootResource, ?string $property, int $depth)
+    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth)
     {
         switch ($type->getBuiltinType()) {
             case Type::BUILTIN_TYPE_BOOL:
@@ -62,21 +72,17 @@ final class TypeConverter implements TypeConverterInterface
                 return GraphQLType::string();
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if ($resourceType = $this->getResourceType($type, $input, $operationName, $depth)) {
+                if ($resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth)) {
                     return $resourceType;
                 }
 
                 return 'Iterable';
             case Type::BUILTIN_TYPE_OBJECT:
-                if ($input && $depth > 0) {
-                    return GraphQLType::string();
-                }
-
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     return GraphQLType::string();
                 }
 
-                return $this->getResourceType($type, $input, $operationName, $depth);
+                return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
             default:
                 return null;
         }
@@ -100,7 +106,7 @@ final class TypeConverter implements TypeConverterInterface
         throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
     }
 
-    private function getResourceType(Type $type, bool $input, string $operationName, int $depth): ?GraphQLType
+    private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if (
             $this->typeBuilder->isCollection($type) &&
@@ -122,7 +128,6 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         $hasGraphQl = false;
-        $operation = null;
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             if (null !== $resourceMetadata->getGraphQlOperations()) {
                 $hasGraphQl = true;
@@ -138,7 +143,29 @@ final class TypeConverter implements TypeConverterInterface
             return null;
         }
 
-        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operationName, $input, false, $depth);
+        $propertyMetadata = null;
+        if ($property && $this->propertyMetadataFactory) {
+            $context = [
+                'normalization_groups' => $rootOperation->getNormalizationContext()['groups'] ?? null,
+                'denormalization_groups' => $rootOperation->getDenormalizationContext()['groups'] ?? null,
+            ];
+            $propertyMetadata = $this->propertyMetadataFactory->create($rootResource, $property, $context);
+        }
+
+        if ($input && $depth > 0 && (!$propertyMetadata || !$propertyMetadata->isWritableLink())) {
+            return GraphQLType::string();
+        }
+
+        try {
+            $operation = $resourceMetadataCollection->getGraphQlOperation($rootOperation->getName());
+        } catch (OperationNotFoundException $e) {
+            $operation = (new Query())
+                ->withResource($resourceMetadataCollection[0])
+                ->withName($rootOperation->getName())
+                ->withCollection('collection_query' === $rootOperation->getName());
+        }
+
+        return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);
     }
 
     private function resolveAstTypeNode(TypeNode $astTypeNode, string $fromType): ?GraphQLType

@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -85,12 +86,24 @@ class SchemaBuilderTest extends TestCase
         $typeFoo->name = 'Foo';
         $this->typesContainerProphecy->get('Foo')->willReturn(GraphQLType::listOf($typeFoo));
         $this->fieldsBuilderProphecy->getNodeQueryFields()->shouldBeCalled()->willReturn(['node_fields']);
-        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::type(Operation::class), 'item_query', [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::type(Operation::class), 'collection_query', [])->willReturn(['query' => ['query_fields']]);
-        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::type(Operation::class), 'custom_item_query', [])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
-        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::type(Operation::class), 'custom_collection_query', [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
-        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::type(Operation::class), 'mutation')->willReturn(['mutation' => ['mutation_fields']]);
-        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::type(Operation::class), 'update')->willReturn(['subscription' => ['subscription_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
+            return 'item_query' === $arg->getName();
+        }), [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
+            return 'collection_query' === $arg->getName();
+        }), [])->willReturn(['query' => ['query_fields']]);
+        $this->fieldsBuilderProphecy->getItemQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
+            return 'custom_item_query' === $arg->getName();
+        }), [])->willReturn(['custom_item_query' => ['custom_item_query_fields']]);
+        $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static function (Operation $arg): bool {
+            return 'custom_collection_query' === $arg->getName();
+        }), [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
+        $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::that(static function (Operation $arg): bool {
+            return 'mutation' === $arg->getName();
+        }))->willReturn(['mutation' => ['mutation_fields']]);
+        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static function (Operation $arg): bool {
+            return 'update' === $arg->getName();
+        }))->willReturn(['subscription' => ['subscription_fields']]);
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
@@ -123,7 +136,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'collection query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['collection_query' => (new Query())->withCollection(true)])]),
+            'collection query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['collection_query' => new QueryCollection()])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -132,7 +145,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'custom item query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_item_query' => (new Query())->withResolver('item_query_resolver')])]),
+            'custom item query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_item_query' => (new Query())->withName('custom_item_query')->withResolver('item_query_resolver')])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -141,7 +154,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'custom collection query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_collection_query' => (new Query())->withCollection(true)->withResolver('collection_query_resolver')])]),
+            'custom collection query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_collection_query' => (new QueryCollection())->withName('custom_collection_query')->withResolver('collection_query_resolver')])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -150,7 +163,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'mutation' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['mutation' => new Mutation()])]),
+            'mutation' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['mutation' => (new Mutation())->withName('mutation')])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -165,7 +178,7 @@ class SchemaBuilderTest extends TestCase
                 ]),
                 null,
             ],
-            'subscription' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['update' => (new Subscription())->withMercure(true)])]),
+            'subscription' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['update' => (new Subscription())->withName('update')->withMercure(true)])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
