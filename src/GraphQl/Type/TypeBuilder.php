@@ -54,18 +54,10 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, string $operationName, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType
+    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType
     {
-        try {
-            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
-        } catch (OperationNotFoundException $e) {
-            $operation = (new Query())
-                ->withResource($resourceMetadataCollection[0])
-                ->withName($operationName)
-                ->withCollection('collection_query' === $operationName);
-        }
-
         $shortName = $operation->getShortName();
+        $operationName = $operation->getName();
 
         if ($operation instanceof Mutation) {
             $shortName = $operationName.ucfirst($shortName);
@@ -76,6 +68,9 @@ final class TypeBuilder implements TypeBuilderInterface
         }
 
         if ($input) {
+            if ($depth > 0) {
+                $shortName .= 'Nested';
+            }
             $shortName .= 'Input';
         } elseif ($operation instanceof Mutation || $operation instanceof Subscription) {
             if ($depth > 0) {
@@ -141,8 +136,17 @@ final class TypeBuilder implements TypeBuilderInterface
                         $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
                     }
 
+                    try {
+                        $wrappedOperation = $resourceMetadataCollection->getGraphQlOperation($wrappedOperationName);
+                    } catch (OperationNotFoundException $e) {
+                        $wrappedOperation = (new Query())
+                            ->withResource($resourceMetadataCollection[0])
+                            ->withName($wrappedOperationName)
+                            ->withCollection('collection_query' === $wrappedOperationName);
+                    }
+
                     $fields = [
-                        lcfirst($operation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperationName, $input, true, $depth),
+                        lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation, $input, true, $depth),
                     ];
 
                     if ($operation instanceof Subscription) {
@@ -158,10 +162,10 @@ final class TypeBuilder implements TypeBuilderInterface
                 }
 
                 $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
-                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $operationName, $depth, $ioMetadata);
+                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $depth, $ioMetadata);
 
                 if ($input && $operation instanceof Mutation && null !== $mutationArgs = $operation->getArgs()) {
-                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operationName, $operation->getShortName()) + ['clientMutationId' => $fields['clientMutationId']];
+                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operation) + ['clientMutationId' => $fields['clientMutationId']];
                 }
 
                 return $fields;

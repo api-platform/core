@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
@@ -34,7 +35,7 @@ interface TypeBuilderInterface
      *
      * @return ObjectType|NonNull the object type, possibly wrapped by NonNull
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, string $operationName, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType;
+    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType;
 
     /**
      * Get the interface type of a node.

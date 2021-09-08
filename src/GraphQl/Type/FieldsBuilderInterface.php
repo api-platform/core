@@ -32,30 +32,30 @@ interface FieldsBuilderInterface
     /**
      * Gets the item query fields of the schema.
      */
-    public function getItemQueryFields(string $resourceClass, Operation $operation, string $queryName, array $configuration): array;
+    public function getItemQueryFields(string $resourceClass, Operation $operation, array $configuration): array;
 
     /**
      * Gets the collection query fields of the schema.
      */
-    public function getCollectionQueryFields(string $resourceClass, Operation $operation, string $queryName, array $configuration): array;
+    public function getCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration): array;
 
     /**
      * Gets the mutation fields of the schema.
      */
-    public function getMutationFields(string $resourceClass, Operation $operation, string $mutationName): array;
+    public function getMutationFields(string $resourceClass, Operation $operation): array;
 
     /**
      * Gets the subscription fields of the schema.
      */
-    public function getSubscriptionFields(string $resourceClass, Operation $operation, string $subscriptionName): array;
+    public function getSubscriptionFields(string $resourceClass, Operation $operation): array;
 
     /**
      * Gets the fields of the type of the given resource.
      */
-    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, string $operationName, int $depth = 0, ?array $ioMetadata = null): array;
+    public function getResourceObjectTypeFields(?string $resourceClass, Operation $operation, bool $input, int $depth = 0, ?array $ioMetadata = null): array;
 
     /**
      * Resolve the args of a resource by resolving its types.
      */
-    public function resolveResourceArgs(array $args, string $operationName, string $shortName): array;
+    public function resolveResourceArgs(array $args, Operation $operation): array;
 }
