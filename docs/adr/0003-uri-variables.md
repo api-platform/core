@@ -27,7 +27,7 @@ To make this work, API Platform needs to know what property of the class User ha
 ## Considered Options
 
 * Keeping the tuple but adding a third value which is the property referenced by the parent class.
-* Using a map to allow granularity configuration of the URI variables
+* Using a map to allow granularity configuration of the URI variables.
 
 ## Decision Outcome
 
@@ -54,6 +54,8 @@ Where `uriTemplate` keys are the URI template's variable names. Its value is a m
 - `identifiers` are the properties of the class to which we map the URI variable
 - `composite_identifier` is used to match a single variable to multiple identifiers (`ida=1;idb=2` to `class::ida` and `class::idb`)
 - `property` represents the property that has a link to the next identifier
+
+As of PHP 8.1, PHP will support [nested attributes](https://wiki.php.net/rfc/new_in_initializers). We'll introduce a proper class as an alternative to the associative array when PHP 8.1 will be released.
 
 Thanks to these we can build our query which in this case is (pseudo-SQL):
 

@@ -27,8 +27,8 @@ In API Platform, this resource identifier is also named [IRI (Internationalized 
 #[ApiResource]
 class Users
 {
-    #[ApiProperty(types=["hydra:member"])]
-    public User[] $member = [];
+    #[ApiProperty(types="hydra:member")]
+    public iterable $member = [];
 
     public float $averageRate;
 }
