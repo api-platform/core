@@ -348,9 +348,12 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.validate', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.resource_field', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.executor', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.type_builder.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_builder', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.fields_builder.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.fields_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.fields_builder_locator', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.schema_builder', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.item', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.normalizer.object', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -360,6 +363,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.types_container', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.types_factory', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.type_converter.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.type_converter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.query_resolver_locator', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.mutation_resolver_locator', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1427,9 +1431,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.action.graphql_playground',
             'api_platform.graphql.error_handler',
             'api_platform.graphql.executor',
+            'api_platform.graphql.type_builder.legacy',
             'api_platform.graphql.type_builder',
+            'api_platform.graphql.fields_builder.legacy',
             'api_platform.graphql.fields_builder',
             'api_platform.graphql.fields_builder_locator',
+            'api_platform.graphql.schema_builder.legacy',
             'api_platform.graphql.schema_builder',
             'api_platform.graphql.resolver.factory.item',
             'api_platform.graphql.resolver.factory.collection',
@@ -1452,6 +1459,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.type_locator',
             'api_platform.graphql.types_container',
             'api_platform.graphql.types_factory',
+            'api_platform.graphql.type_converter.legacy',
             'api_platform.graphql.type_converter',
             'api_platform.graphql.query_resolver_locator',
             'api_platform.graphql.mutation_resolver_locator',

@@ -72,11 +72,7 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface::class => ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface::class,
         ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface::class,
         ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface::class => ApiPlatform\GraphQl\Type\TypesFactoryInterface::class,
-        ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface::class => ApiPlatform\GraphQl\Type\SchemaBuilderInterface::class,
-        ApiPlatform\Core\GraphQl\Type\FieldsBuilderInterface::class => ApiPlatform\GraphQl\Type\FieldsBuilderInterface::class,
         ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface::class => ApiPlatform\GraphQl\Type\Definition\TypeInterface::class,
-        ApiPlatform\Core\GraphQl\Type\TypeConverterInterface::class => ApiPlatform\GraphQl\Type\TypeConverterInterface::class,
-        ApiPlatform\Core\GraphQl\Type\TypeBuilderInterface::class => ApiPlatform\GraphQl\Type\TypeBuilderInterface::class,
         ApiPlatform\Core\GraphQl\Type\TypesContainerInterface::class => ApiPlatform\GraphQl\Type\TypesContainerInterface::class,
         ApiPlatform\Core\GraphQl\Error\ErrorHandler::class => ApiPlatform\GraphQl\Error\ErrorHandler::class,
         ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage::class => ApiPlatform\GraphQl\Resolver\Stage\ValidateStage::class,
@@ -105,15 +101,11 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer::class => ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer::class,
         ApiPlatform\Core\GraphQl\Serializer\ObjectNormalizer::class => ApiPlatform\GraphQl\Serializer\ObjectNormalizer::class,
         ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilder::class => ApiPlatform\GraphQl\Serializer\SerializerContextBuilder::class,
-        ApiPlatform\Core\GraphQl\Type\FieldsBuilder::class => ApiPlatform\GraphQl\Type\FieldsBuilder::class,
         ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class => ApiPlatform\GraphQl\Type\TypeNotFoundException::class,
-        ApiPlatform\Core\GraphQl\Type\TypeConverter::class => ApiPlatform\GraphQl\Type\TypeConverter::class,
         ApiPlatform\Core\GraphQl\Type\TypesFactory::class => ApiPlatform\GraphQl\Type\TypesFactory::class,
         ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class => ApiPlatform\GraphQl\Type\Definition\UploadType::class,
         ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class => ApiPlatform\GraphQl\Type\Definition\IterableType::class,
-        ApiPlatform\Core\GraphQl\Type\SchemaBuilder::class => ApiPlatform\GraphQl\Type\SchemaBuilder::class,
         ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
-        ApiPlatform\Core\GraphQl\Type\TypeBuilder::class => ApiPlatform\GraphQl\Type\TypeBuilder::class,
     ];
 
     if (ApiPlatform\Core\Metadata\Property\PropertyMetadata::class === $className) {

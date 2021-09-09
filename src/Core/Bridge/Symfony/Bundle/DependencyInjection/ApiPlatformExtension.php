@@ -808,6 +808,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (class_exists(Yaml::class)) {
             $container->getDefinition('api_platform.metadata.extractor.yaml')->setClass(YamlExtractor::class);
         }
+
+        $container->removeAlias('api_platform.graphql.type_converter');
+        $container->setAlias('api_platform.graphql.type_converter', 'api_platform.graphql.type_converter.legacy');
+
+        $container->removeAlias('api_platform.graphql.type_builder');
+        $container->setAlias('api_platform.graphql.type_builder', 'api_platform.graphql.type_builder.legacy');
+
+        $container->removeAlias('api_platform.graphql.fields_builder');
+        $container->setAlias('api_platform.graphql.fields_builder', 'api_platform.graphql.fields_builder.legacy');
+
+        $container->removeAlias('api_platform.graphql.schema_builder');
+        $container->setAlias('api_platform.graphql.schema_builder', 'api_platform.graphql.schema_builder.legacy');
     }
 
     private function registerRectorConfiguration(ContainerBuilder $container, XmlFileLoader $loader): void
