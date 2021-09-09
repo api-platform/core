@@ -1,6 +1,6 @@
 # Resource Identifiers
 
-* Status: proposed
+* Status: superseded by [0003-uri-variables](0003-uri-variables.md)]
 * Deciders: @dunglas @alanpoulain @soyuka
 
 Technical Story: [#2126][pull/2126]
