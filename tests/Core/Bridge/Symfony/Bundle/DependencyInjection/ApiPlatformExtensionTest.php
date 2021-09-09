@@ -1093,13 +1093,13 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.cached',
             'api_platform.metadata.resource.metadata_collection_factory.filters',
             'api_platform.metadata.resource.metadata_collection_factory.formats',
-            'api_platform.metadata.resource.metadata_collection_factory.identifier',
             'api_platform.metadata.resource.metadata_collection_factory.input_output',
             'api_platform.metadata.resource.metadata_collection_factory.legacy_resource_metadata',
             'api_platform.metadata.resource.metadata_collection_factory.legacy_subresource_metadata',
             'api_platform.metadata.resource.metadata_collection_factory.operation_name',
             'api_platform.metadata.resource.metadata_collection_factory.php_doc',
             'api_platform.metadata.resource.metadata_collection_factory.uri_template',
+            'api_platform.metadata.resource.metadata_collection_factory.uri_variables',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.formats',
             'api_platform.metadata.resource.metadata_factory.input_output',
@@ -1119,6 +1119,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.pagination_options',
             'api_platform.path_segment_name_generator.dash',
             'api_platform.path_segment_name_generator.underscore',
+            'api_platform.ramsey_uuid.uri_variables.transformer.uuid',
             'api_platform.resource_class_resolver',
             'api_platform.route_loader',
             'api_platform.route_name_resolver',
@@ -1138,11 +1139,16 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.subresource_data_provider',
             'api_platform.subresource_operation_factory',
             'api_platform.subresource_operation_factory.cached',
+            'api_platform.uri_variables.transformer.date_time',
+            'api_platform.uri_variables.transformer.integer',
+            'api_platform.uri_variables.converter',
         ];
 
         if (class_exists(AbstractUid::class)) {
             $definitions[] = 'api_platform.identifier.symfony_ulid_normalizer';
             $definitions[] = 'api_platform.identifier.symfony_uuid_normalizer';
+            $definitions[] = 'api_platform.symfony.uri_variables.transformer.ulid';
+            $definitions[] = 'api_platform.symfony.uri_variables.transformer.uuid';
         }
 
         foreach ($definitions as $definition) {

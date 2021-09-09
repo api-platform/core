@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Bridge\Symfony\Bundle\Command;
 
-use ApiPlatform\Bridge\Symfony\Bundle\Command\DebugResourceCommand;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
+use ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Console\Application;

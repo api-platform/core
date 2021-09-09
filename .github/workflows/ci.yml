@@ -822,6 +822,8 @@ jobs:
           tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --annotation-to-api-resource -s
           tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --transform-apisubresource -s 
           tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --annotation-to-api-resource -s
+      - name: Clear test app cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat

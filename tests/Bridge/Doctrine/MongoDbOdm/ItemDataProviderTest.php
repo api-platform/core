@@ -254,7 +254,7 @@ class ItemDataProviderTest extends TestCase
             $metadata = $metadata->withIdentifier(true);
             $propertyMetadataFactoryProphecy->create($resourceClass, $identifier)->willReturn($metadata);
 
-            $resourceIdentifiers[$identifier] = [$resourceClass, $identifier];
+            $resourceIdentifiers[$identifier] = ['class' => $resourceClass, 'identifiers' => [$identifier]];
             $nameCollection[] = $identifier;
         }
 
@@ -263,7 +263,7 @@ class ItemDataProviderTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection($nameCollection));
         $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [
-            (new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withShortName('dummy')->withIdentifiers($resourceIdentifiers)])),
+            (new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withShortName('dummy')->withUriVariables($resourceIdentifiers)])),
         ]));
 
         return [$propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal()];

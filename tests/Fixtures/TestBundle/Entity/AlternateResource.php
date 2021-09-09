@@ -17,7 +17,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Metadata\Get;
 
 #[Get]
-#[Get('/alternate/{id}', identifiers: ['id' => [AlternateResource::class, 'id']])]
+#[Get('/alternate/{id}', uriVariables: ['id' => ['class' => AlternateResource::class, 'identifiers' => ['id']]])]
 final class AlternateResource
 {
     #[ApiProperty(identifier: true)]

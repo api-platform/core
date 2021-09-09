@@ -40,9 +40,9 @@ final class ApiResource
      */
     private $outputFormats;
     /**
-     * @var array|mixed
+     * @var array|string|null
      */
-    private $identifiers;
+    private $uriVariables;
     private $routePrefix;
     private $defaults;
     private $requirements;
@@ -110,51 +110,52 @@ final class ApiResource
     private $extraProperties;
 
     /**
-     * @param string          $uriTemplate
-     * @param string          $shortName
-     * @param string          $description
-     * @param string[]|string $types                          The RDF types of this resource
-     * @param array|string    $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string    $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string    $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param string          $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
-     * @param bool            $stateless
-     * @param string          $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string          $acceptPatch
-     * @param string          $status
-     * @param string          $class
-     * @param int             $urlGenerationStrategy
-     * @param string          $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param array           $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
-     * @param array           $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param array           $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param string[]        $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
-     * @param array           $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array           $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
-     * @param string[]        $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
-     * @param bool            $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
-     * @param bool|array      $mercure                        https://api-platform.com/docs/core/mercure
-     * @param bool            $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
-     * @param mixed           $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param mixed           $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param array           $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
-     * @param bool            $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
-     * @param bool            $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
-     * @param bool            $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
-     * @param bool            $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
-     * @param bool            $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
-     * @param array           $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
-     * @param bool            $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
-     * @param bool            $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
-     * @param int             $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
-     * @param int             $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
-     * @param bool            $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
-     * @param string          $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
-     * @param string          $security                       https://api-platform.com/docs/core/security
-     * @param string          $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param string          $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string          $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param bool            $compositeIdentifier
+     * @param string            $uriTemplate
+     * @param string            $shortName
+     * @param string            $description
+     * @param string[]|string   $types                          The RDF types of this resource
+     * @param array|string      $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string      $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string      $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string|null $uriVariables
+     * @param string            $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
+     * @param bool              $stateless
+     * @param string            $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
+     * @param string            $acceptPatch
+     * @param string            $status
+     * @param string            $class
+     * @param int               $urlGenerationStrategy
+     * @param string            $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param array             $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
+     * @param array             $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
+     * @param array             $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
+     * @param string[]          $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
+     * @param array             $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param array             $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
+     * @param string[]          $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
+     * @param bool              $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
+     * @param bool|array        $mercure                        https://api-platform.com/docs/core/mercure
+     * @param bool              $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
+     * @param mixed             $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
+     * @param mixed             $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
+     * @param array             $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
+     * @param bool              $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
+     * @param bool              $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
+     * @param bool              $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
+     * @param bool              $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
+     * @param bool              $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
+     * @param array             $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
+     * @param bool              $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
+     * @param bool              $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
+     * @param int               $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
+     * @param int               $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
+     * @param bool              $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
+     * @param string            $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
+     * @param string            $security                       https://api-platform.com/docs/core/security
+     * @param string            $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string            $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string            $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param bool              $compositeIdentifier
      */
     public function __construct(
         ?string $uriTemplate = null,
@@ -165,7 +166,7 @@ final class ApiResource
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,
-        $identifiers = [],
+        $uriVariables = null,
         ?string $routePrefix = '',
         array $defaults = [],
         array $requirements = [],
@@ -225,7 +226,7 @@ final class ApiResource
         $this->formats = $formats;
         $this->inputFormats = $inputFormats;
         $this->outputFormats = $outputFormats;
-        $this->identifiers = $identifiers;
+        $this->uriVariables = $uriVariables;
         $this->routePrefix = $routePrefix;
         $this->defaults = $defaults;
         $this->requirements = $requirements;
@@ -404,20 +405,20 @@ final class ApiResource
     }
 
     /**
-     * @return array|mixed|string|null
+     * @return array|string|null
      */
-    public function getIdentifiers()
+    public function getUriVariables()
     {
-        return $this->identifiers;
+        return $this->uriVariables;
     }
 
     /**
-     * @param mixed|array $identifiers
+     * @param array|string|null $uriVariables
      */
-    public function withIdentifiers($identifiers = []): self
+    public function withUriVariables($uriVariables): self
     {
         $self = clone $this;
-        $self->identifiers = $identifiers;
+        $self->uriVariables = $uriVariables;
 
         return $self;
     }

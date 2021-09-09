@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Bridge\Symfony\Bundle\Command;
+namespace ApiPlatform\Symfony\Bundle\Command;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Console\Command\Command;

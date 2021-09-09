@@ -141,7 +141,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            $identifiers = $operation->getIdentifiers();
+            $identifiers = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
 
             $path = $this->getPath($operation->getUriTemplate() ?? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath());
@@ -183,15 +183,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             // Set up parameters
-            if ($identifiers) {
-                foreach (array_keys($identifiers) as $parameterName) {
-                    $parameter = new Model\Parameter($parameterName, 'path', $operation->getShortName().' identifier', true, false, false, ['type' => 'string']);
-                    if ($this->hasParameter($parameter, $parameters)) {
-                        continue;
-                    }
-
-                    $parameters[] = $parameter;
+            foreach (array_keys($identifiers ?? []) as $parameterName) {
+                $parameter = new Model\Parameter($parameterName, 'path', $operation->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                if ($this->hasParameter($parameter, $parameters)) {
+                    continue;
                 }
+
+                $parameters[] = $parameter;
             }
 
             if ($operation->isCollection() && Operation::METHOD_POST !== $method) {
@@ -266,8 +264,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operationId,
                 $operation->getOpenapiContext()['tags'] ?? ([$operation->getShortName()] ?? [$resourceShortName]),
                 $responses,
-                $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection()),
-                $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection()),
+                $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection() ?? false),
+                $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection() ?? false),
                 isset($operation->getOpenapiContext()['externalDocs']) ? new ExternalDocumentation($operation->getOpenapiContext()['externalDocs']['description'] ?? null, $operation->getOpenapiContext()['externalDocs']['url']) : null,
                 $parameters,
                 $requestBody,
@@ -378,26 +376,24 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                if ($currentOperation->getIdentifiers()) {
-                    foreach ($currentOperation->getIdentifiers() as $parameterName => [$class, $propertyName]) {
-                        $operationIdentifiers = $operation->getIdentifiers();
-                        if (!isset($operationIdentifiers[$parameterName])) {
-                            continue;
-                        }
+                $operationUriVariables = $operation->getUriVariables();
+                foreach ($currentOperation->getUriVariables() ?? [] as $parameterName => $uriVariableDefinition) {
+                    if (!isset($operationUriVariables[$parameterName])) {
+                        continue;
+                    }
 
-                        if ($operationIdentifiers[$parameterName] === [$class, $propertyName]) {
-                            $parameters[$parameterName] = '$request.path.'.$propertyName;
-                        }
+                    if ($operationUriVariables[$parameterName] === $uriVariableDefinition) {
+                        $parameters[$parameterName] = '$request.path.'.$uriVariableDefinition['identifiers'][0];
                     }
                 }
 
-                foreach ($operation->getIdentifiers() as $parameterName => [$class, $propertyName]) {
+                foreach ($operationUriVariables ?? [] as $parameterName => $uriVariableDefinition) {
                     if (isset($parameters[$parameterName])) {
                         continue;
                     }
 
-                    if ($class === $currentOperation->getClass()) {
-                        $parameters[$parameterName] = '$response.body#/'.$propertyName;
+                    if (($uriVariableDefinition['class'] ?? null) === $currentOperation->getClass()) {
+                        $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition['identifiers'][0];
                     }
                 }
 

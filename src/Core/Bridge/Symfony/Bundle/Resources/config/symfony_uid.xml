@@ -12,5 +12,13 @@
         <service id="api_platform.identifier.symfony_uuid_normalizer" class="ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer\UuidNormalizer" public="false">
             <tag name="api_platform.identifier.denormalizer" />
         </service>
+
+        <service id="api_platform.symfony.uri_variables.transformer.ulid" class="ApiPlatform\Symfony\UriVariableTransformer\UlidUriVariableTransformer" public="false">
+            <tag name="api_platform.uri_variables.transformer" />
+        </service>
+
+        <service id="api_platform.symfony.uri_variables.transformer.uuid" class="ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer" public="false">
+            <tag name="api_platform.uri_variables.transformer" />
+        </service>
     </services>
 </container>

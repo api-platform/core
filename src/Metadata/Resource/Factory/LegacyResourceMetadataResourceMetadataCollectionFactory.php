@@ -84,8 +84,8 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
         foreach ($this->createOperations($resourceMetadata->getCollectionOperations(), OperationType::COLLECTION, $resource) as $operationName => $operation) {
             $operationName = RouteNameGenerator::generate($operationName, $resourceMetadata->getShortName(), OperationType::COLLECTION);
-            if (!$operation->getUriTemplate() && !$operation->getRouteName() && $operation->getIdentifiers()) {
-                $operation = $operation->withIdentifiers([]);
+            if (!$operation->getUriTemplate() && !$operation->getRouteName() && $operation->getUriVariables()) {
+                $operation = $operation->withUriVariables([]);
             }
 
             $operations[$operationName] = $operation->withShortName($resourceMetadata->getShortName())->withName($operationName);
@@ -116,10 +116,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             foreach ($operation as $key => $value) {
                 $graphQlOperation = $this->setAttributeValue($graphQlOperation, $key, $value);
-            }
-
-            if (null === $graphQlOperation->getCompositeIdentifier()) {
-                $graphQlOperation = $graphQlOperation->withCompositeIdentifier(true);
             }
 
             $graphQlOperation = $graphQlOperation->withResource($resource);

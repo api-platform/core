@@ -74,10 +74,13 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
                                         ($resource[0] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource[0]
                                     ),
                                     'class'
-                                )
+                                ),
+                                new Node\Scalar\String_('class')
                             ),
                             new Node\Expr\ArrayItem(
-                                new Node\Scalar\String_($resource[1])
+                                new Node\Expr\Array_(
+                                    [new Node\Expr\ArrayItem(new Node\Scalar\String_($resource[1]))], ['kind' => Node\Expr\Array_::KIND_SHORT]),
+                                new Node\Scalar\String_('identifiers')
                             ),
                         ],
                         [
@@ -103,7 +106,7 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
                     false,
                     false,
                     [],
-                    new Node\Identifier('identifiers')
+                    new Node\Identifier('uriVariables')
                 ),
                 new Node\Arg(
                     new Node\Scalar\LNumber(200),

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Identifier;
 
+use ApiPlatform\Api\UriVariablesConverterInterface;
+use ApiPlatform\Api\UriVariableTransformerInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -49,6 +51,8 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
         $this->identifiersExtractor = $identifiersExtractor;
         $this->identifierDenormalizers = $identifierDenormalizers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The class "%s" is deprecated, implement the new "%s" interface instead. Note that identifier denormalizers are now implementing the new "%s" interface instead of "%s".', __CLASS__, UriVariablesConverterInterface::class, UriVariableTransformerInterface::class, DenormalizerInterface::class));
     }
 
     /**

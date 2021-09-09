@@ -27,7 +27,7 @@ final class Post extends Operation
         $formats = null,
         $inputFormats = null,
         $outputFormats = null,
-        $identifiers = [],
+        $uriVariables = null,
         string $routePrefix = '',
         ?string $routeName = null,
         array $defaults = [],
@@ -43,7 +43,7 @@ final class Post extends Operation
         string $controller = 'api_platform.action.placeholder',
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
-        bool $collection = false,
+        ?bool $collection = null,
         ?string $deprecationReason = null,
         array $cacheHeaders = [],
         array $normalizationContext = [],
@@ -90,6 +90,6 @@ final class Post extends Operation
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_POST, ...\func_get_args());
-        $this->collection = true;
+        $this->collection = $collection ?? true;
     }
 }

@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Put;
 #[Get]
 #[Put]
 #[Delete]
-#[ApiResource('/dummy/{dummyId}/attribute_resources/{identifier}.{_format}', identifiers: ['dummyId' => [Dummy::class, 'id'], 'identifier' => [AttributeResource::class, 'identifier']], inputFormats: ['json' => ['application/merge-patch+json']])]
+#[ApiResource('/dummy/{dummyId}/attribute_resources/{identifier}.{_format}', uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]], inputFormats: ['json' => ['application/merge-patch+json']])]
 #[Get]
 #[Patch]
 final class AttributeResource

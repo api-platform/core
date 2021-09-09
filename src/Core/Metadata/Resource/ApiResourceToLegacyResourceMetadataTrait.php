@@ -79,6 +79,27 @@ trait ApiResourceToLegacyResourceMetadataTrait
             $arr[$this->camelCaseToSnakeCaseNameConverter->normalize(lcfirst(substr($methodName, 3)))] = $value;
         }
 
-        return $arr;
+        return $this->transformUriVariablesToIdentifiers($arr);
+    }
+
+    private function transformUriVariablesToIdentifiers(array $arrayOperation): array
+    {
+        if (!isset($arrayOperation['uri_variables'])) {
+            return $arrayOperation;
+        }
+
+        if (!\is_array($arrayOperation['uri_variables'])) {
+            $arrayOperation['identifiers'] = $arrayOperation['uri_variables'];
+
+            return $arrayOperation;
+        }
+
+        $arrayOperation['identifiers'] = [];
+
+        foreach ($arrayOperation['uri_variables'] as $parameterName => $identifiedBy) {
+            $arrayOperation['identifiers'][$parameterName] = [$identifiedBy['class'], $identifiedBy['identifiers'][0]];
+        }
+
+        return $arrayOperation;
     }
 }

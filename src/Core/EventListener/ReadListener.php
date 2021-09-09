@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\OperationDataProviderTrait;
-use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\ContextAwareIdentifierConverterInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -28,6 +27,7 @@ use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -42,7 +42,10 @@ final class ReadListener
     use CloneTrait;
     use OperationDataProviderTrait;
     use OperationRequestInitiatorTrait;
+
+    // TODO: 3.0 remove these traits
     use ToggleableOperationAttributeTrait;
+    use UriVariablesResolverTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'read';
 
@@ -56,7 +59,7 @@ final class ReadListener
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->identifierConverter = $identifierConverter;
+        $this->identifierConverter = $this->uriVariablesConverter = $identifierConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if ($collectionDataProvider instanceof CollectionDataProviderInterface) {
@@ -97,7 +100,7 @@ final class ReadListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !$operation->canRead() || !$attributes['receive'] || (!$operation->getIdentifiers() && !$request->isMethodSafe()))
+            (!$operation || !$operation->canRead() || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe()))
         ) {
             return;
         }
@@ -119,7 +122,7 @@ final class ReadListener
             $filters = $queryString ? RequestParser::parseRequestParams($queryString) : null;
         }
 
-        $context = $operation ? ['operation' => $operation, 'legacy_attributes' => $attributes + ['identifiers' => $operation->getIdentifiers(), 'has_composite_identifier' => $operation->getCompositeIdentifier()]] : [];
+        $context = $operation ? ['operation' => $operation, 'legacy_attributes' => $attributes + ['has_composite_identifier' => $operation->getCompositeIdentifier()]] : [];
 
         if ($filters) {
             $context['filters'] = $filters;
@@ -137,32 +140,11 @@ final class ReadListener
 
         // TODO: 3.0 this is the default
         if ($this->provider && $operation) {
-            $shouldParseCompositeIdentifiers = $operation->getCompositeIdentifier() && \count($operation->getIdentifiers()) > 1;
             $parameters = $request->attributes->all();
-            $identifiers = [];
 
             try {
-                foreach ($operation->getIdentifiers() as $parameterName => $identifiedBy) {
-                    if (!isset($parameters[$parameterName])) {
-                        throw new InvalidIdentifierException(sprintf('Parameter "%s" not found, check the identifiers configuration.', $parameterName));
-                    }
-
-                    if ($shouldParseCompositeIdentifiers) {
-                        $identifiers = CompositeIdentifierParser::parse($parameters[$parameterName]);
-                        if (($identifiersNumber = \count($operation->getIdentifiers())) !== ($currentIdentifiersNumber = \count($identifiers))) {
-                            throw new InvalidIdentifierException(sprintf('Expected %d identifiers, got %d', $identifiersNumber, $currentIdentifiersNumber));
-                        }
-                        break;
-                    }
-
-                    $identifiers[$parameterName] = $parameters[$parameterName];
-                }
-
-                if ($this->identifierConverter) {
-                    $identifiers = $this->identifierConverter instanceof ContextAwareIdentifierConverterInterface ? $this->identifierConverter->convert($identifiers, $attributes['resource_class'], ['identifiers' => $operation->getIdentifiers()]) : $this->identifierConverter->convert($identifiers, $attributes['resource_class']);
-                }
-
-                $data = $this->provider->provide($attributes['resource_class'], $identifiers, $operation->getName(), $context);
+                $identifiers = $this->getOperationIdentifiers($operation, $parameters, $attributes['resource_class']);
+                $data = $this->provider->provide($operation->getClass() ?? $attributes['resource_class'], $identifiers, $operation->getName(), $context);
             } catch (InvalidIdentifierException $e) {
                 throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
             }
@@ -179,7 +161,7 @@ final class ReadListener
 
         if ($operation && isset($attributes['operation_name'])) {
             trigger_deprecation('api-platform/core', '2.7', 'Using a #[Resource] without a state provider is deprecated since 2.7 and will not be possible anymore in 3.0.');
-            $attributes[sprintf('%s_operation_name', ($operation->getIdentifiers() ?? []) ? 'item' : 'collection')] = $operation->getName();
+            $attributes[sprintf('%s_operation_name', $operation->isCollection() ? 'item' : 'collection')] = $operation->getName();
         }
 
         if (isset($attributes['collection_operation_name'])) {

@@ -24,11 +24,6 @@ class Operation
     protected $args;
     protected $shortName;
     protected $class;
-    /**
-     * @var array|string
-     */
-    protected $identifiers;
-    protected $compositeIdentifier;
     protected $paginationEnabled;
     protected $paginationType;
     protected $paginationItemsPerPage;
@@ -86,8 +81,6 @@ class Operation
      * @param string            $resolver
      * @param string            $shortName
      * @param string            $class
-     * @param array             $identifiers
-     * @param bool              $compositeIdentifier
      * @param bool              $paginationEnabled
      * @param string            $paginationType
      * @param int               $paginationItemsPerPage
@@ -120,8 +113,6 @@ class Operation
         ?array $args = null,
         ?string $shortName = null,
         ?string $class = null,
-        $identifiers = [],
-        ?bool $compositeIdentifier = null,
         ?bool $paginationEnabled = null,
         ?string $paginationType = null,
         ?int $paginationItemsPerPage = null,
@@ -165,8 +156,6 @@ class Operation
         $this->args = $args;
         $this->shortName = $shortName;
         $this->class = $class;
-        $this->identifiers = $identifiers;
-        $this->compositeIdentifier = $compositeIdentifier;
         $this->paginationEnabled = $paginationEnabled;
         $this->paginationType = $paginationType;
         $this->paginationItemsPerPage = $paginationItemsPerPage;
@@ -272,32 +261,6 @@ class Operation
     {
         $self = clone $this;
         $self->class = $class;
-
-        return $self;
-    }
-
-    public function getIdentifiers()
-    {
-        return $this->identifiers;
-    }
-
-    public function withIdentifiers($identifiers = []): self
-    {
-        $self = clone $this;
-        $self->identifiers = $identifiers;
-
-        return $self;
-    }
-
-    public function getCompositeIdentifier(): ?bool
-    {
-        return $this->compositeIdentifier;
-    }
-
-    public function withCompositeIdentifier(?bool $compositeIdentifier = null): self
-    {
-        $self = clone $this;
-        $self->compositeIdentifier = $compositeIdentifier;
 
         return $self;
     }

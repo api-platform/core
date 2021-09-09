@@ -58,14 +58,21 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     });
 
                     // TODO: remove in 3.0, guess identifiers
-                    if (\count($variables) && !$operation->getIdentifiers()) {
-                        trigger_deprecation('api-platform/core', '2.7', sprintf('In the uriTemplate "%s" we detected parameters that are not matched inside identifiers. Not providing identifiers on the operation will not be possible in 3.0.', $operation->getUriTemplate()));
+                    if (\count($variables) && !$operation->getUriVariables()) {
+                        trigger_deprecation('api-platform/core', '2.7', sprintf('In the uriTemplate "%s" we detected parameters that are not matched inside uriVariables. Not providing uriVariables on the operation will not be possible in 3.0.', $operation->getUriTemplate()));
                         $identifiers = [];
                         foreach ($variables as $variable) {
-                            $identifiers[$variable] = [$resourceClass, $variable];
+                            $identifiers[$variable] = [
+                                'class' => $resourceClass,
+                                'identifiers' => [$variable],
+                            ];
+
+                            if (null !== $operation->getCompositeIdentifier()) {
+                                $identifiers[$variable]['composite_identifier'] = $operation->getCompositeIdentifier();
+                            }
                         }
 
-                        $operation = $operation->withIdentifiers($identifiers);
+                        $operation = $operation->withUriVariables($identifiers);
                     }
 
                     $operation = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
@@ -98,13 +105,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         $uriTemplate = $operation->getRoutePrefix() ?: '';
         $uriTemplate = sprintf('%s/%s', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
 
-        if ($parameters = array_keys($operation->getIdentifiers())) {
-            if ($operation->getCompositeIdentifier()) {
-                $uriTemplate .= sprintf('/{%s}', $parameters[0]);
-            } else {
-                foreach ($parameters as $parameterName) {
-                    $uriTemplate .= sprintf('/{%s}', $parameterName);
-                }
+        if ($parameters = array_keys($operation->getUriVariables() ?? [])) {
+            foreach ($parameters as $parameterName) {
+                $uriTemplate .= sprintf('/{%s}', $parameterName);
             }
         }
 

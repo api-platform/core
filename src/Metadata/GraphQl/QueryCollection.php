@@ -25,8 +25,6 @@ final class QueryCollection extends Query
         ?array $args = null,
         ?string $shortName = null,
         ?string $class = null,
-        $identifiers = [],
-        ?bool $compositeIdentifier = null,
         ?bool $paginationEnabled = null,
         ?string $paginationType = null,
         ?int $paginationItemsPerPage = null,

@@ -27,7 +27,8 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\IdentifierResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\UriVariablesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
@@ -38,7 +39,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class IdentifierResourceMetadataCollectionFactoryTest extends TestCase
+class UriVariablesResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
@@ -52,50 +53,47 @@ class IdentifierResourceMetadataCollectionFactoryTest extends TestCase
         $propertyMetadataProphecy->create(AttributeResource::class, 'id')->willReturn(new ApiProperty(identifier: true));
         $propertyMetadataProphecy->create(AttributeDefaultOperations::class, 'id')->willReturn(new ApiProperty(identifier: true));
         $decorated = new AttributesResourceMetadataCollectionFactory();
-        $identifierResourceMetadataCollectionFactory = new IdentifierResourceMetadataCollectionFactory($decorated, $propertyNameCollectionProphecy->reveal(), $propertyMetadataProphecy->reveal());
+        $identifierResourceMetadataCollectionFactory = new UriVariablesResourceMetadataCollectionFactory($decorated, $propertyNameCollectionProphecy->reveal(), $propertyMetadataProphecy->reveal());
 
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [
                 new ApiResource(
                     shortName: 'AttributeResource',
-                    types: ['AttributeResource'],
                     normalizationContext: ['skip_null_values' => true],
                     class: AttributeResource::class,
-                    identifiers: ['id' => [attributeresource::class, 'id']],
+                    uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
                     operations: [
                         '_api_AttributeResource_get' => new Get(
-                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', types: ['AttributeResource'], normalizationContext: ['skip_null_values' => true], identifiers: ['id' => [attributeresource::class, 'id']]
+                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', normalizationContext: ['skip_null_values' => true], uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]], priority: 1
                         ),
                         '_api_AttributeResource_put' => new Put(
-                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', types: ['AttributeResource'], normalizationContext: ['skip_null_values' => true], identifiers: ['id' => [attributeresource::class, 'id']]
+                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', normalizationContext: ['skip_null_values' => true], uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]], priority: 2
                         ),
                         '_api_AttributeResource_delete' => new Delete(
-                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', types: ['AttributeResource'], normalizationContext: ['skip_null_values' => true], identifiers: ['id' => [attributeresource::class, 'id']]
+                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', normalizationContext: ['skip_null_values' => true], uriVariables: ['id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]], priority: 3
                         ),
                     ]
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
-                    types: ['AttributeResource'],
+
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
-                    identifiers: ['dummyId' => [Dummy::class, 'id'], 'identifier' => [AttributeResource::class, 'identifier']],
+                    uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_get' => new Get(
                             class: AttributeResource::class,
-                            types: ['AttributeResource'],
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
                             shortName: 'AttributeResource',
-                            identifiers: ['dummyId' => [Dummy::class, 'id'], 'identifier' => [AttributeResource::class, 'identifier']],
-                            inputFormats: ['json' => ['application/merge-patch+json']]
+                            uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]],
+                            inputFormats: ['json' => ['application/merge-patch+json']], priority: 4
                         ),
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_patch' => new Patch(
                             class: AttributeResource::class,
-                            types: ['AttributeResource'],
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
                             shortName: 'AttributeResource',
-                            identifiers: ['dummyId' => [Dummy::class, 'id'], 'identifier' => [AttributeResource::class, 'identifier']],
-                            inputFormats: ['json' => ['application/merge-patch+json']]
+                            uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]],
+                            inputFormats: ['json' => ['application/merge-patch+json']], priority: 5
                         ),
                     ],
                     inputFormats: ['json' => ['application/merge-patch+json']]
@@ -109,15 +107,14 @@ class IdentifierResourceMetadataCollectionFactoryTest extends TestCase
                 new ApiResource(
                     uriTemplate: '/attribute_resources.{_format}',
                     shortName: 'AttributeResources',
-                    types: ['AttributeResources'],
                     normalizationContext: ['skip_null_values' => true],
                     class: AttributeResources::class,
                     operations: [
                         '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(
-                            shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', types: ['AttributeResources'], normalizationContext: ['skip_null_values' => true],
+                            shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1
                         ),
                         '_api_/attribute_resources.{_format}_post' => new Post(
-                            shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', types: ['AttributeResources'], normalizationContext: ['skip_null_values' => true],
+                            shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2
                         ),
                     ]
                 ),
@@ -125,23 +122,37 @@ class IdentifierResourceMetadataCollectionFactoryTest extends TestCase
             $identifierResourceMetadataCollectionFactory->create(AttributeResources::class)
         );
 
-        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, controller: 'api_platform.action.placeholder', types: ['AttributeDefaultOperations'], collection: false);
+        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, controller: 'api_platform.action.placeholder', collection: false);
 
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
-                identifiers: ['id' => [AttributeDefaultOperations::class, 'id']],
+                uriVariables: ['id' => ['class' => AttributeDefaultOperations::class,  'identifiers' => ['id']]],
                 shortName: 'AttributeDefaultOperations',
-                types: ['AttributeDefaultOperations'],
                 class: AttributeDefaultOperations::class,
                 operations: [
-                    '_api_AttributeDefaultOperations_get' => (new Get())->withOperation($operation)->withIdentifiers(['id' => [AttributeDefaultOperations::class, 'id']]),
+                    '_api_AttributeDefaultOperations_get' => (new Get())->withOperation($operation)->withUriVariables(['id' => ['class' => AttributeDefaultOperations::class, 'identifiers' => ['id']]]),
                     '_api_AttributeDefaultOperations_get_collection' => (new GetCollection())->withOperation($operation),
-                    '_api_AttributeDefaultOperations_post' => (new Post())->withOperation($operation)->withCollection(true),
-                    '_api_AttributeDefaultOperations_put' => (new Put())->withOperation($operation)->withIdentifiers(['id' => [AttributeDefaultOperations::class, 'id']]),
-                    '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation)->withIdentifiers(['id' => [AttributeDefaultOperations::class, 'id']]),
-                    '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation)->withIdentifiers(['id' => [AttributeDefaultOperations::class, 'id']]),
+                    '_api_AttributeDefaultOperations_post' => (new Post())->withOperation($operation),
+                    '_api_AttributeDefaultOperations_put' => (new Put())->withOperation($operation)->withUriVariables(['id' => ['class' => AttributeDefaultOperations::class, 'identifiers' => ['id']]]),
+                    '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation)->withUriVariables(['id' => ['class' => AttributeDefaultOperations::class, 'identifiers' => ['id']]]),
+                    '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation)->withUriVariables(['id' => ['class' => AttributeDefaultOperations::class, 'identifiers' => ['id']]]),
                 ]
             ),
         ]), $identifierResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+    }
+
+    public function testDecorated()
+    {
+        $propertyNameCollectionProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->create('String')->willReturn(new ResourceMetadataCollection('String', [new ApiResource(uriVariables: 'id')]));
+        $decorated->create('Array')->willReturn(new ResourceMetadataCollection('String', [new ApiResource(uriVariables: ['id'])]));
+        $identifierResourceMetadataCollectionFactory = new UriVariablesResourceMetadataCollectionFactory($decorated->reveal(), $propertyNameCollectionProphecy->reveal(), $propertyMetadataProphecy->reveal());
+
+        $resourceMetadataCollection = $identifierResourceMetadataCollectionFactory->create('String');
+        $this->assertEquals($resourceMetadataCollection[0]->getUriVariables(), ['id' => ['class' => 'String', 'identifiers' => ['id']]]);
+        $resourceMetadataCollection = $identifierResourceMetadataCollectionFactory->create('Array');
+        $this->assertEquals($resourceMetadataCollection[0]->getUriVariables(), ['id' => ['class' => 'Array', 'identifiers' => ['id']]]);
     }
 }

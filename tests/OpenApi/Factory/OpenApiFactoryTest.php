@@ -69,10 +69,10 @@ class OpenApiFactoryTest extends TestCase
         ])->withPaginationClientItemsPerPage(true);
 
         $dummyResource = (new ApiResource())->withOperations(new Operations([
-            'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']]),
-            'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']]),
-            'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']]),
-            'customDummyItem' => (new Operation())->withMethod(Operation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withIdentifiers(['id' => [Dummy::class, 'id']])->withOpenapiContext([
+            'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => ['class' => Dummy::class, 'identifiers' => ['id']]]),
+            'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => ['class' => Dummy::class, 'identifiers' => ['id']]]),
+            'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => ['class' => Dummy::class, 'identifiers' => ['id']]]),
+            'customDummyItem' => (new Operation())->withMethod(Operation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => ['class' => Dummy::class, 'identifiers' => ['id']]])->withOpenapiContext([
                 'x-visibility' => 'hide',
                 'description' => 'Custom description',
                 'parameters' => [
@@ -118,7 +118,7 @@ class OpenApiFactoryTest extends TestCase
             ]
             ),
             'custom-http-verb' => (new Operation())->withMethod('TEST')->withOperation($baseOperation),
-            'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withIdentifiers(['id' => [Dummy::class, 'id']])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
+            'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => ['class' => Dummy::class, 'identifiers' => ['id']]])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
             'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([
                 'parameters' => [
                     ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],
