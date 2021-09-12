@@ -8,7 +8,7 @@ Implementation: [#4408][pull/4408]
 ## Context and Problem Statement
 
 For reference see the previously implemented [Resource identifier](0001-resource-identifiers) ADR. 
-URI variables are the URI template (e.g. `/books/{id}`) variables (e.g. `id`). When defining alternate resources (see [Resource definition](0002-resource-definition)), we need more informations then only a property and a class. The tuple accepted in [Resource identifier](0001-resource-identifiers) is not enough. For example:
+URI variables are the URI template (e.g. `/books/{id}`) variables (e.g. `id`). When defining alternate resources (see [Resource definition](0002-resource-definition)), we need more informations than only a property and a class. The tuple accepted in [Resource identifier](0001-resource-identifiers) is not enough. For example:
 
 ```php
 <?php
