@@ -64,7 +64,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if ($operation) {
             $context['input'] = $operation->getInput();
             $context['output'] = $operation->getOutput();
-            $context = $normalization ? array_merge($operation->getNormalizationContext(), $context) : array_merge($operation->getDenormalizationContext(), $context);
+            $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
         }
 
         if ($normalization) {

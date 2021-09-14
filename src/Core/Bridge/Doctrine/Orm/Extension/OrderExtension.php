@@ -64,7 +64,7 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
             if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
                 try {
-                    $defaultOrder = isset($context['graphql_operation_name']) ? $resourceMetadataCollection->getGraphQlOperation($operationName)->getOrder() : $resourceMetadataCollection->getOperation($operationName)->getOrder();
+                    $defaultOrder = isset($context['graphql_operation_name']) ? ($resourceMetadataCollection->getGraphQlOperation($operationName)->getOrder() ?? []) : ($resourceMetadataCollection->getOperation($operationName)->getOrder() ?? []);
                 } catch (OperationNotFoundException $e) {
                     // In some cases the operation may not exist
                     $defaultOrder = [];

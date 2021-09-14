@@ -149,8 +149,8 @@ final class SchemaFactory implements SchemaFactoryInterface
             Schema::VERSION_SWAGGER !== $version
         ) {
             if (($resourceMetadata instanceof ResourceMetadata &&
-                ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
-            ) || ($operation && $operation->getDeprecationReason())
+                    ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
+                ) || ($operation && $operation->getDeprecationReason())
             ) {
                 $definition['deprecated'] = true;
             }
@@ -366,14 +366,14 @@ final class SchemaFactory implements SchemaFactoryInterface
                 return $resourceMetadata->getAttribute($attribute, []);
             }
 
-            return Schema::TYPE_OUTPUT === $type ? $operation->getNormalizationContext() : $operation->getDenormalizationContext();
+            return Schema::TYPE_OUTPUT === $type ? ($operation->getNormalizationContext() ?? []) : ($operation->getDenormalizationContext() ?? []);
         }
 
         if ($resourceMetadata instanceof ResourceMetadata) {
             return $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true);
         }
 
-        return Schema::TYPE_OUTPUT === $type ? $operation->getNormalizationContext() : $operation->getDenormalizationContext();
+        return Schema::TYPE_OUTPUT === $type ? ($operation->getNormalizationContext() ?? []) : ($operation->getDenormalizationContext() ?? []);
     }
 
     /**
@@ -391,7 +391,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             return \is_array($validationGroups = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, $attribute, [], true)) ? $validationGroups : [];
         }
 
-        $groups = $resourceMetadata ? $resourceMetadata->getValidationContext()['groups'] ?? [] : [];
+        $groups = $resourceMetadata ? ($resourceMetadata->getValidationContext()['groups'] ?? []) : [];
 
         return \is_array($groups) ? $groups : [$groups];
     }

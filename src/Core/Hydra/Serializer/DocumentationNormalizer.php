@@ -372,7 +372,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getHydraOperation(string $resourceClass, $resourceMetadata, string $operationName, $operation, string $prefixedShortName, ?string $operationType = null, SubresourceMetadata $subresourceMetadata = null): array
     {
         if ($operation instanceof Operation) {
-            $method = $operation->getMethod();
+            $method = $operation->getMethod() ?? Operation::METHOD_GET;
         } elseif ($this->operationMethodResolver) {
             if (OperationType::COLLECTION === $operationType) {
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
@@ -385,7 +385,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
         }
 
-        $hydraOperation = $operation instanceof Operation ? $operation->getHydraContext() : ($operation['hydra_context'] ?? []);
+        $hydraOperation = $operation instanceof Operation ? ($operation->getHydraContext() ?? []) : ($operation['hydra_context'] ?? []);
         if ($operation instanceof Operation ? $operation->getDeprecationReason() : $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
             $hydraOperation['owl:deprecated'] = true;
         }

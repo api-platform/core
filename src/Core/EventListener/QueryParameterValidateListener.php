@@ -67,7 +67,7 @@ final class QueryParameterValidateListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !$operation->canQueryParameterValidate() || !$operation->isCollection())
+            (!$operation || !($operation->canQueryParameterValidate() ?? true) || !$operation->isCollection())
         ) {
             return;
         }
@@ -76,8 +76,8 @@ final class QueryParameterValidateListener
         $operationName = $attributes['collection_operation_name'] ?? null;
         if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
             (
-            null === $operationName
-            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled)
+                null === $operationName
+                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled)
             )
         ) {
             return;
@@ -89,7 +89,7 @@ final class QueryParameterValidateListener
         if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $resourceFilters = $this->resourceMetadataFactory->create($attributes['resource_class'])->getCollectionOperationAttribute($operationName, 'filters', [], true);
         } elseif ($operation) {
-            $resourceFilters = $operation->getFilters();
+            $resourceFilters = $operation->getFilters() ?? [];
         }
         $this->queryParameterValidator->validateFilters($attributes['resource_class'], $resourceFilters, $queryParameters);
     }

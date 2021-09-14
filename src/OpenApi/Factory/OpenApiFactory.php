@@ -145,7 +145,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $resourceClass = $operation->getClass() ?? $resource->getClass();
 
             $path = $this->getPath($operation->getUriTemplate() ?? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath());
-            $method = $operation->getMethod();
+            $method = $operation->getMethod() ?? Operation::METHOD_GET;
 
             if (!\in_array($method, Model\PathItem::$methods, true)) {
                 continue;
@@ -273,7 +273,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operation->getOpenapiContext()['deprecated'] ?? (bool) $operation->getDeprecationReason(),
                 $operation->getOpenapiContext()['security'] ?? null,
                 $operation->getOpenapiContext()['servers'] ?? null,
-                array_filter($operation->getOpenapiContext(), static function ($item) {
+                array_filter($operation->getOpenapiContext() ?? [], static function ($item) {
                     return preg_match('/^x-.*$/i', $item);
                 }, \ARRAY_FILTER_USE_KEY)
             ));
@@ -372,7 +372,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
                 $parameters = [];
-                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation->isCollection() || Operation::METHOD_GET !== $operation->getMethod()) {
+                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation->isCollection() || Operation::METHOD_GET !== $operation->getMethod() ?? Operation::METHOD_GET) {
                     continue;
                 }
 

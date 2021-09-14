@@ -45,7 +45,7 @@ final class WriteStage implements WriteStageInterface
     {
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
         $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
-        if (null === $data || !$operation->canWrite()) {
+        if (null === $data || !($operation->canWrite() ?? true)) {
             return $data;
         }
 

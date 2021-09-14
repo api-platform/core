@@ -71,7 +71,7 @@ final class WriteListener
             return;
         }
 
-        if (!$operation || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || !$operation->canWrite() || !$attributes['persist']) {
+        if (!$operation || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || !($operation->canWrite() ?? true) || !$attributes['persist']) {
             return;
         }
 

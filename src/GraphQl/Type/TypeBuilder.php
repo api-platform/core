@@ -116,13 +116,13 @@ final class TypeBuilder implements TypeBuilderInterface
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
                     try {
-                        $queryNormalizationContext = $operation instanceof Query ? $resourceMetadataCollection->getGraphQlOperation($operationName)->getNormalizationContext() : [];
+                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getGraphQlOperation($operationName)->getNormalizationContext() ?? []) : [];
                     } catch (OperationNotFoundException $e) {
                         $queryNormalizationContext = [];
                     }
 
                     try {
-                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? $resourceMetadataCollection->getGraphQlOperation($operationName)->getNormalizationContext() : [];
+                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getGraphQlOperation($operationName)->getNormalizationContext() ?? []) : [];
                     } catch (OperationNotFoundException $e) {
                         $mutationNormalizationContext = [];
                     }

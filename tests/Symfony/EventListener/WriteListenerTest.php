@@ -70,9 +70,9 @@ class WriteListenerTest extends TestCase
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_patch' => (new Patch()),
-            '_api_OperationResource_put' => (new Put()),
-            '_api_OperationResource_post_collection' => (new Post()),
+            '_api_OperationResource_patch' => (new Patch())->withName('_api_OperationResource_patch'),
+            '_api_OperationResource_put' => (new Put())->withName('_api_OperationResource_put'),
+            '_api_OperationResource_post_collection' => (new Post())->withName('_api_OperationResource_post_collection'),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);

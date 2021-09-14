@@ -126,18 +126,19 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
     private function createMetadata(ApiProperty $annotation, $parentPropertyMetadata = null)
     {
         if (null === $parentPropertyMetadata) {
-            return $this->withDeprecatedAttributes((new ApiPropertyMetadata())
-                ->withDescription($annotation->description)
-                ->withReadable($annotation->readable)
-                ->withWritable($annotation->writable)
-                ->withReadableLink($annotation->readableLink)
-                ->withWritableLink($annotation->writableLink)
-                ->withRequired($annotation->required)
-                ->withIdentifier($annotation->identifier)
-                ->withTypes([$annotation->iri])
-                ->withDefault($annotation->default)
-                ->withExample($annotation->example),
-            $annotation->attributes);
+            $apiPropertyMetadata = new ApiPropertyMetadata();
+            foreach (array_keys(get_class_vars(ApiProperty::class)) as $key) {
+                if ('iri' === $key) {
+                    continue;
+                }
+                $methodName = 'with'.ucfirst($key);
+
+                if (method_exists($apiPropertyMetadata, $methodName) && null !== $annotation->{$key}) {
+                    $apiPropertyMetadata = 'types' !== $key ? $apiPropertyMetadata->{$methodName}($annotation->{$key}) : $apiPropertyMetadata->{$methodName}([$annotation->iri]);
+                }
+            }
+
+            return $this->withDeprecatedAttributes($apiPropertyMetadata, $annotation->attributes);
         }
 
         $propertyMetadata = $parentPropertyMetadata;
