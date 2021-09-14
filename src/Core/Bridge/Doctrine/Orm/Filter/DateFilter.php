@@ -73,53 +73,53 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
         }
 
-        if (isset($values[self::PARAMETER_BEFORE])) {
+        if (isset($values[static::PARAMETER_BEFORE])) {
             $this->addWhere(
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
                 $field,
-                self::PARAMETER_BEFORE,
-                $values[self::PARAMETER_BEFORE],
+                static::PARAMETER_BEFORE,
+                $values[static::PARAMETER_BEFORE],
                 $nullManagement,
                 $type
             );
         }
 
-        if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
+        if (isset($values[static::PARAMETER_STRICTLY_BEFORE])) {
             $this->addWhere(
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
                 $field,
-                self::PARAMETER_STRICTLY_BEFORE,
-                $values[self::PARAMETER_STRICTLY_BEFORE],
+                static::PARAMETER_STRICTLY_BEFORE,
+                $values[static::PARAMETER_STRICTLY_BEFORE],
                 $nullManagement,
                 $type
             );
         }
 
-        if (isset($values[self::PARAMETER_AFTER])) {
+        if (isset($values[static::PARAMETER_AFTER])) {
             $this->addWhere(
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
                 $field,
-                self::PARAMETER_AFTER,
-                $values[self::PARAMETER_AFTER],
+                static::PARAMETER_AFTER,
+                $values[static::PARAMETER_AFTER],
                 $nullManagement,
                 $type
             );
         }
 
-        if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
+        if (isset($values[static::PARAMETER_STRICTLY_AFTER])) {
             $this->addWhere(
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
                 $field,
-                self::PARAMETER_STRICTLY_AFTER,
-                $values[self::PARAMETER_STRICTLY_AFTER],
+                static::PARAMETER_STRICTLY_AFTER,
+                $values[static::PARAMETER_STRICTLY_AFTER],
                 $nullManagement,
                 $type
             );
@@ -153,19 +153,19 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
         $operatorValue = [
-            self::PARAMETER_BEFORE => '<=',
-            self::PARAMETER_STRICTLY_BEFORE => '<',
-            self::PARAMETER_AFTER => '>=',
-            self::PARAMETER_STRICTLY_AFTER => '>',
+            static::PARAMETER_BEFORE => '<=',
+            static::PARAMETER_STRICTLY_BEFORE => '<',
+            static::PARAMETER_AFTER => '>=',
+            static::PARAMETER_STRICTLY_AFTER => '>',
         ];
         $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, $operatorValue[$operator], $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($baseWhere);
         } elseif (
-            (self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
-            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
-            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
+            (self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [static::PARAMETER_BEFORE, static::PARAMETER_STRICTLY_BEFORE], true)) ||
+            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [static::PARAMETER_AFTER, static::PARAMETER_STRICTLY_AFTER], true)) ||
+            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [static::PARAMETER_AFTER, static::PARAMETER_STRICTLY_AFTER, static::PARAMETER_BEFORE, static::PARAMETER_STRICTLY_BEFORE], true))
         ) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $baseWhere,

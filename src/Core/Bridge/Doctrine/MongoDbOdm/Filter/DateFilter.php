@@ -64,42 +64,42 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
             $aggregationBuilder->match()->field($matchField)->notEqual(null);
         }
 
-        if (isset($values[self::PARAMETER_BEFORE])) {
+        if (isset($values[static::PARAMETER_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
-                self::PARAMETER_BEFORE,
-                $values[self::PARAMETER_BEFORE],
+                static::PARAMETER_BEFORE,
+                $values[static::PARAMETER_BEFORE],
                 $nullManagement
             );
         }
 
-        if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
+        if (isset($values[static::PARAMETER_STRICTLY_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
-                self::PARAMETER_STRICTLY_BEFORE,
-                $values[self::PARAMETER_STRICTLY_BEFORE],
+                static::PARAMETER_STRICTLY_BEFORE,
+                $values[static::PARAMETER_STRICTLY_BEFORE],
                 $nullManagement
             );
         }
 
-        if (isset($values[self::PARAMETER_AFTER])) {
+        if (isset($values[static::PARAMETER_AFTER])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
-                self::PARAMETER_AFTER,
-                $values[self::PARAMETER_AFTER],
+                static::PARAMETER_AFTER,
+                $values[static::PARAMETER_AFTER],
                 $nullManagement
             );
         }
 
-        if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
+        if (isset($values[static::PARAMETER_STRICTLY_AFTER])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
-                self::PARAMETER_STRICTLY_AFTER,
-                $values[self::PARAMETER_STRICTLY_AFTER],
+                static::PARAMETER_STRICTLY_AFTER,
+                $values[static::PARAMETER_STRICTLY_AFTER],
                 $nullManagement
             );
         }
@@ -128,15 +128,15 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
         }
 
         $operatorValue = [
-            self::PARAMETER_BEFORE => '$lte',
-            self::PARAMETER_STRICTLY_BEFORE => '$lt',
-            self::PARAMETER_AFTER => '$gte',
-            self::PARAMETER_STRICTLY_AFTER => '$gt',
+            static::PARAMETER_BEFORE => '$lte',
+            static::PARAMETER_STRICTLY_BEFORE => '$lt',
+            static::PARAMETER_AFTER => '$gte',
+            static::PARAMETER_STRICTLY_AFTER => '$gt',
         ];
 
-        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true)) ||
-            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
-            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
+        if ((self::INCLUDE_NULL_BEFORE === $nullManagement && \in_array($operator, [static::PARAMETER_BEFORE, static::PARAMETER_STRICTLY_BEFORE], true)) ||
+            (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [static::PARAMETER_AFTER, static::PARAMETER_STRICTLY_AFTER], true)) ||
+            (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [static::PARAMETER_AFTER, static::PARAMETER_STRICTLY_AFTER, static::PARAMETER_BEFORE, static::PARAMETER_STRICTLY_BEFORE], true))
         ) {
             $aggregationBuilder->match()->addOr(
                 $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
