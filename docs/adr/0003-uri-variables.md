@@ -7,8 +7,8 @@ Implementation: [#4408][pull/4408]
 
 ## Context and Problem Statement
 
-For reference see the previously implemented [Resource identifier](0001-resource-identifiers) ADR. 
-URI variables are the URI template (e.g. `/books/{id}`) variables (e.g. `id`). When defining alternate resources (see [Resource definition](0002-resource-definition)), we need more informations than only a property and a class. The tuple accepted in [Resource identifier](0001-resource-identifiers) is not enough. For example:
+For reference see the previously implemented [Resource identifier](0001-resource-identifiers.md) ADR. 
+URI variables are the URI template (e.g. `/books/{id}`) variables (e.g. `id`). When defining alternate resources (see [Resource definition](0002-resource-definition.md)), we need more informations than only a property and a class. The tuple accepted in [Resource identifier](0001-resource-identifiers.md) is not enough. For example:
 
 ```php
 <?php
@@ -67,7 +67,6 @@ WHERE u.id = :id
 
 ## Links 
 
-* Superseeds the [0001-resource-identifiers][0001-resource-identifiers] ADR.
+* Superseeds the [0001-resource-identifiers](0001-resource-identifiers.md) ADR.
 
-[0001-resource-identifiers]: ./0001-resource-identifiers "Resource identifiers"
 [pull/4408]: https://github.com/api-platform/core/pull/4408 "URI variables implementation"

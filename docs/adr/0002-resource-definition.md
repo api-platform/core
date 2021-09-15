@@ -151,7 +151,7 @@ class User {}
     </tr>
 </table>
 
-To link these operations with identifiers, refer to [URI Variables decision record](./0003-uri-variables), for example:
+To link these operations with identifiers, refer to [URI Variables decision record](0003-uri-variables.md), for example:
 
 ```php
 <?php

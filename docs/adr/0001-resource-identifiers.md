@@ -10,7 +10,7 @@ Implementation: [#3825][pull/3825]
 
 In API Platform, a resource is identified by [IRIs][rfc/IRI], for example `/books/1`. Internally, this is also known as a route with an identifier parameter named `id`: `/books/{id}`. This `id` parameter is then matched to the resource identifiers, known by the `ApiProperty` metadata when `identifier` is true. When multiple identifiers are found, composite identifiers map the value of `id` to the resource identifiers (eg: `keya=value1;keyb=value2`, where `keya` and `keyb` are identifiers of the resource). This behavior is suggested by the [URI RFC][rfc/URI].
 Subresources IRIs have multiple parts, for example: `/books/{id}/author/{authorId}`. The router needs to know that `id` matches the `Book` resource, and `authorId` the `Author` resource. To do so, a Tuple representing the class and the property matching each parameter is linked to the route, for example: `id: [Book, id], authorId: [User, id]`.
-By normalizing the shape of (sub-)resources (see [0000-subresources-definition][0000-subresources-definition]), we need to normalize the resource identifiers.
+By normalizing the shape of (sub-)resources (see [0000-subresources-definition](0000-subresources-definition.md)), we need to normalize the resource identifiers.
 
 ## Decision Outcome
 
@@ -146,9 +146,8 @@ class Company {
 
 ## Links 
 
-* Adds up to the [0000-subresources-definition][0000-subresources-definition] rework.
+* Adds up to the [0000-subresources-definition](0000-subresources-definition.md) rework.
 
-[0000-subresources-definition]: ./0000-subresources-definition "Subresources definition"
 [pull/2126]: https://github.com/api-platform/core/pull/2126 "Ability to specify identifier property of custom item operations"
 [pull/3825]: https://github.com/api-platform/core/pull/3825 "Rework to improve and simplify identifiers management"
 [rfc/IRI]: https://tools.ietf.org/html/rfc3987 "RFC3987"
