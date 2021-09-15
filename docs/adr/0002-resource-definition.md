@@ -97,7 +97,9 @@ class User {}
             </pre>
         </td>
         <td>
-<ul><li>GET /users/{id}</li></ul>
+            <ul>
+                <li>GET /users/{id}</li>
+            </ul>
         </td>
     </tr>
     <tr>
@@ -108,7 +110,9 @@ class User {}
             </pre>
         </td>
         <td>
-<ul><li>GET /users</li></ul>
+            <ul>
+                <li>GET /users</li>
+            </ul>
         </td>
     </tr>
     <tr>
@@ -119,7 +123,9 @@ class User {}
             </pre>
         </td>
         <td>
-<ul><li>GET /users</li></ul>
+            <ul>
+                <li>GET /users</li>
+            </ul>
         </td>
     </tr>
     <tr>
@@ -131,8 +137,10 @@ class User {}
             </pre>
         </td>
         <td>
-<ul><li>POST /users</li>
-<li>PATCH /users/{id}</li></ul>
+            <ul>
+                <li>POST /users</li>
+                <li>PATCH /users/{id}</li>
+            </ul>
         </td>
     </tr>
     <tr>
@@ -145,8 +153,10 @@ class User {}
             </pre>
         </td>
         <td>
-<ul><li>GET /companies/{companyId}/users/{id}</li>
-<li>DELETE /companies/{companyId}/users/{id}</li></ul>
+            <ul>
+                <li>GET /companies/{companyId}/users/{id}</li>
+                <li>DELETE /companies/{companyId}/users/{id}</li>
+            </ul>
         </td>
     </tr>
 </table>
