@@ -97,7 +97,14 @@ trait ApiResourceToLegacyResourceMetadataTrait
         $arrayOperation['identifiers'] = [];
 
         foreach ($arrayOperation['uri_variables'] as $parameterName => $identifiedBy) {
-            $arrayOperation['identifiers'][$parameterName] = [$identifiedBy['class'], $identifiedBy['identifiers'][0]];
+            if (1 === \count($identifiedBy['identifiers'])) {
+                $arrayOperation['identifiers'][$parameterName] = [$identifiedBy['class'], $identifiedBy['identifiers'][0]];
+                continue;
+            }
+
+            foreach ($identifiedBy['identifiers'] as $identifier) {
+                $arrayOperation['identifiers'][$identifier] = [$identifiedBy['class'], $identifier];
+            }
         }
 
         return $arrayOperation;

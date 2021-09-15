@@ -20,6 +20,8 @@ use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 
 /**
+ * @internal
+ *
  * @deprecated
  */
 final class LegacyDataProviderState implements ProviderInterface

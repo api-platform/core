@@ -73,11 +73,7 @@ trait DeprecationMetadataTrait
             trigger_deprecation('api-platform/core', '2.7', 'The "graphql" option is deprecated and will be renamed to "graphQlOperations".');
             $key = 'graphQlOperations';
         } elseif ('identifiers' === $key) {
-            trigger_deprecation('api-platform/core', '2.7', 'The "identifiers" option is deprecated and will be renamed to "uriVariables".');
             $key = 'uriVariables';
-            if (\is_array($value)) {
-                $value = ['class' => $value[0], 'identifiers' => [$value[1]]];
-            }
         }
 
         return [$this->camelCaseToSnakeCaseNameConverter->denormalize($key), $value];

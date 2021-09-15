@@ -44,7 +44,11 @@ trait UriVariablesResolverTrait
 
         foreach ($operation->getUriVariables() ?? [] as $parameterName => $identifiedBy) {
             if (!isset($parameters[$parameterName])) {
-                throw new InvalidIdentifierException(sprintf('Parameter "%s" not found, check the identifiers configuration.', $parameterName));
+                if (!isset($parameters['id'])) {
+                    throw new InvalidIdentifierException(sprintf('Parameter "%s" not found, check the identifiers configuration.', $parameterName));
+                }
+
+                $parameterName = 'id';
             }
 
             if (($identifiedBy['composite_identifier'] ?? true) && 1 < ($numIdentifiers = \count($identifiedBy['identifiers'] ?? []))) {

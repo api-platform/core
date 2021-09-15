@@ -40,6 +40,7 @@ final class AttributesExtractor
         }
 
         // Normalizing identifiers tuples
+        // TODO: 3.0 remove
         $identifiers = [];
         foreach (($attributes['_api_identifiers'] ?? ['id']) as $parameterName => $identifiedBy) {
             if (\is_string($identifiedBy)) {
@@ -60,8 +61,10 @@ final class AttributesExtractor
             $hasRequestAttributeKey = true;
             $result['operation_name'] = $attributes['_api_operation_name'];
             $result['operation'] = $attributes['_api_operation'];
-        } else {
-            //TODO: remove in 3.0
+        }
+
+        // TODO: remove in 3.0
+        if (!isset($result['operation']) || ($result['operation']->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || ($result['operation']->getExtraProperties()['is_legacy_subresource'] ?? false)) {
             foreach (OperationType::TYPES as $operationType) {
                 $attribute = "_api_{$operationType}_operation_name";
                 if (isset($attributes[$attribute])) {

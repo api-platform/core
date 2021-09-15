@@ -24,10 +24,8 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\ResourceClassNotSupportedException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
@@ -47,21 +45,14 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     private $itemExtensions;
 
     /**
-     * @param QueryCollectionExtensionInterface[]             $collectionExtensions
-     * @param QueryItemExtensionInterface[]                   $itemExtensions
-     * @param ResourceMetadataCollectionFactoryInterface|null $resourceMetadataFactory
+     * @param QueryCollectionExtensionInterface[] $collectionExtensions
+     * @param QueryItemExtensionInterface[]       $itemExtensions
      */
-    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [], $resourceMetadataFactory = null)
+    public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {
         $this->managerRegistry = $managerRegistry;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->collectionExtensions = $collectionExtensions;
         $this->itemExtensions = $itemExtensions;
     }
@@ -81,11 +72,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $repository = $manager->getRepository($resourceClass);
         if (!method_exists($repository, 'createQueryBuilder')) {
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
-        }
-
-        if (isset($context['identifiers'], $context['operation']) && !isset($context['property'])) {
-            $context['property'] = $context['operation']->getExtraProperties()['legacy_subresource_property'] ?? null;
-            $context['collection'] = $context['operation']->isCollection();
         }
 
         if (!isset($context['identifiers'], $context['property'])) {
@@ -172,6 +158,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         $normalizedIdentifiers = [];
 
         if (isset($identifiers[$identifier])) {
+            // if it's an array it's already normalized, the IdentifierManagerTrait is deprecated
             if ($context[IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER] ?? false) {
                 $normalizedIdentifiers = $identifiers[$identifier];
             } else {

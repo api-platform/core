@@ -108,15 +108,37 @@ final class ApiLoader extends Loader
                         continue;
                     }
 
+                    $legacyDefaults = [];
+
+                    if ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) {
+                        $legacyDefaults['_api_subresource_operation_name'] = $operationName;
+                        $legacyDefaults['_api_subresource_context'] = [
+                            'property' => $operation->getExtraProperties()['legacy_subresource_property'],
+                            'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'],
+                            'collection' => $operation->isCollection(),
+                            'operationId' => $operation->getExtraProperties()['legacy_subresource_operation_name'] ?? null,
+                        ];
+                        $legacyDefaults['_api_identifiers'] = $operation->getExtraProperties()['legacy_subresource_identifiers'];
+                    } elseif ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) {
+                        $legacyDefaults[sprintf('_api_%s_operation_name', $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM)] = $operationName;
+                        $legacyDefaults['_api_identifiers'] = [];
+                        $legacyDefaults['_api_has_composite_identifier'] = $operation->getCompositeIdentifier();
+                        // Legacy identifiers
+                        foreach ($operation->getUriVariables() ?? [] as $parameterName => $identifiedBy) {
+                            foreach ($identifiedBy['identifiers'] ?? [] as $identifier) {
+                                $legacyDefaults['_api_identifiers'][] = $identifier;
+                            }
+                        }
+                    }
+
                     $route = new Route(
                         ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
-                        [
+                        $legacyDefaults + [
                             '_controller' => $operation->getController(),
                             '_format' => null,
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
                             '_api_operation_name' => $operationName,
-                            sprintf('_api_%s_operation_name', $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM) => $operationName,
                         ] + ($operation->getDefaults() ?? []),
                         $operation->getRequirements() ?? [],
                         $operation->getOptions() ?? [],
@@ -279,8 +301,6 @@ final class ApiLoader extends Loader
 
         if ($resourceMetadata->getItemOperations()) {
             $operation['identifiers'] = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
-        } else {
-            $operation['identifiers'] = $operation['identifiers'] ?? [];
         }
 
         $operation['has_composite_identifier'] = \count($operation['identifiers']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
@@ -294,7 +314,7 @@ final class ApiLoader extends Loader
                 '_format' => $operation['defaults']['_format'] ?? null,
                 '_stateless' => $operation['stateless'],
                 '_api_resource_class' => $resourceClass,
-                '_api_identifiers' => $operation['identifiers'],
+                '_api_identifiers' => $operation['identifiers'] ?? [],
                 '_api_has_composite_identifier' => $operation['has_composite_identifier'],
                 sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),

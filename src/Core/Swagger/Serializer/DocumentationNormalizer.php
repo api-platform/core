@@ -680,7 +680,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if (\count($identifiers) > 1 ? $resourceMetadata->getItemOperationAttribute($operationName, 'composite_identifier', true, true) : false) {
-            $identifiers = [key($identifiers)];
+            $identifiers = ['id'];
         }
 
         if (!$identifiers && OperationType::COLLECTION === $operationType) {
