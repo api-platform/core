@@ -132,7 +132,7 @@ class User {}
         </td>
         <td>
 <ul><li>POST /users</li>
-<li>PATCH /users/{id}</li>
+<li>PATCH /users/{id}</li></ul>
         </td>
     </tr>
     <tr>
@@ -146,7 +146,7 @@ class User {}
         </td>
         <td>
 <ul><li>GET /companies/{companyId}/users/{id}</li>
-<li>DELETE /companies/{companyId}/users/{id}</li>
+<li>DELETE /companies/{companyId}/users/{id}</li></ul>
         </td>
     </tr>
 </table>
