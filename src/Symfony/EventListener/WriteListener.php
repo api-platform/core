@@ -15,15 +15,16 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Bridges persistence and the API system.
@@ -35,8 +36,6 @@ final class WriteListener
 {
     use OperationRequestInitiatorTrait;
     use ResourceClassInfoTrait;
-
-    use ToggleableOperationAttributeTrait;
 
     use UriVariablesResolverTrait;
 
@@ -62,7 +61,6 @@ final class WriteListener
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
-
         $operation = $this->initializeOperation($request);
 
         if (
@@ -73,16 +71,16 @@ final class WriteListener
             return;
         }
 
-        if (!$operation || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
+        if (!$operation || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || !$operation->canWrite() || !$attributes['persist']) {
             return;
         }
 
-        if (!$operation->canWrite() || !$attributes['persist']) {
-            return;
-        }
         $context = ['operation' => $operation];
-
-        $identifiers = $this->getOperationIdentifiers($operation, $request->attributes->all(), $attributes['resource_class']);
+        try {
+            $identifiers = $this->getOperationIdentifiers($operation, $request->attributes->all(), $attributes['resource_class']);
+        } catch (InvalidIdentifierException $e) {
+            throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+        }
 
         if (!$this->processor->supports($controllerResult, $identifiers, $operation->getName(), $context)) {
             return;

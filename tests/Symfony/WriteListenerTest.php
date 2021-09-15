@@ -34,6 +34,7 @@ use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WriteListenerTest extends TestCase
@@ -62,7 +63,7 @@ class WriteListenerTest extends TestCase
     {
         $operationResource = new OperationResource(1, 'foo');
 
-        $this->processorProphecy->supports($operationResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn(true);
+        $this->processorProphecy->supports($operationResource, [], Argument::type('string'), Argument::type('array'))->willReturn(true);
         $this->processorProphecy->process($operationResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
 
         $this->iriConverterProphecy->getIriFromItem($operationResource)->willReturn('/operation_resources/1')->shouldBeCalled();
@@ -102,14 +103,14 @@ class WriteListenerTest extends TestCase
     {
         $operationResource = new OperationResource(1, 'foo');
 
-        $this->processorProphecy->supports($operationResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn(true);
+        $this->processorProphecy->supports($operationResource, [], 'create_no_output', Argument::type('array'))->willReturn(true);
         $this->processorProphecy->process($operationResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
 
         $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            'create_no_output' => (new Post())->withOutput(false),
+            'create_no_output' => (new Post())->withOutput(false)->withName('create_no_output'),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
@@ -134,18 +135,18 @@ class WriteListenerTest extends TestCase
     {
         $operationResource = new OperationResource(1, 'foo');
 
-        $this->processorProphecy->supports($operationResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn(true);
+        $this->processorProphecy->supports($operationResource, ['identifier' => 1], '_api_OperationResource_delete', Argument::type('array'))->willReturn(true);
         $this->processorProphecy->process($operationResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
 
         $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_delete' => (new Delete()),
+            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => ['class' => OperationResource::class, 'identifiers' => ['identifier']]]),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
 
-        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_delete']);
+        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_delete', 'identifier' => 1]);
         $request->setMethod('DELETE');
 
         $event = new ViewEvent(
@@ -165,13 +166,13 @@ class WriteListenerTest extends TestCase
     {
         $operationResource = new OperationResource(1, 'foo');
 
-        $this->processorProphecy->supports($operationResource, Argument::type('array'))->shouldNotBeCalled();
+        $this->processorProphecy->supports($operationResource, [], '_api_OperationResource_get', Argument::type('array'))->shouldNotBeCalled();
         $this->processorProphecy->process($operationResource, Argument::type('array'))->shouldNotBeCalled();
 
         $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_get' => (new Get()),
+            '_api_OperationResource_get' => (new Get())->withName('_api_OperationResource_get'),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
@@ -273,19 +274,54 @@ class WriteListenerTest extends TestCase
     {
         $attributeResource = new AttributeResource(1, 'name');
 
-        $this->processorProphecy->supports($attributeResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->willReturn(false)->shouldBeCalled();
+        $this->processorProphecy->supports($attributeResource, [], 'post', Argument::type('array'))->willReturn(false)->shouldBeCalled();
         $this->processorProphecy->process($attributeResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->shouldNotBeCalled();
 
         $this->iriConverterProphecy->getIriFromItem($attributeResource)->shouldNotBeCalled();
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->shouldNotBeCalled();
 
         $attributeResourceMetadata = new ResourceMetadataCollection(AttributeResource::class, [(new ApiResource())->withOperations(new Operations([
-            'post' => (new Post()),
+            'post' => (new Post())->withName('post'),
         ]))]);
         $this->resourceMetadataCollectionFactory->create(AttributeResource::class)->willReturn($attributeResourceMetadata);
 
         $request = new Request([], [], ['_api_resource_class' => AttributeResource::class, '_api_operation_name' => 'post']);
         $request->setMethod('POST');
+
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $attributeResource
+        );
+
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testOnKernelViewInvalidIdentifiers()
+    {
+        $attributeResource = new AttributeResource(1, 'name');
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Invalid identifier value or configuration.');
+
+        $this->processorProphecy->supports($attributeResource, ['slug' => 'test'], '_api_OperationResource_delete', Argument::type('array'))->shouldNotBeCalled();
+        $this->processorProphecy->process($attributeResource, Argument::type('array'), Argument::type('string'), Argument::type('array'))->shouldNotBeCalled();
+
+        $this->iriConverterProphecy->getIriFromItem($attributeResource)->shouldNotBeCalled();
+        $this->resourceClassResolver->isResourceClass(Argument::type('string'))->shouldNotBeCalled();
+
+        $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
+            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => ['class' => OperationResource::class, 'identifiers' => ['identifier']]]),
+        ]))]);
+
+        $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
+
+        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_delete', 'slug' => 'foo']);
+        $request->setMethod('DELETE');
 
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),

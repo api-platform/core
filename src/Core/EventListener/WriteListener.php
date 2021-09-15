@@ -20,6 +20,8 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 
@@ -33,6 +35,7 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
  */
 final class WriteListener
 {
+    use OperationRequestInitiatorTrait;
     use ResourceClassInfoTrait;
     use ToggleableOperationAttributeTrait;
 
@@ -41,14 +44,15 @@ final class WriteListener
     private $dataPersister;
     private $iriConverter;
 
-    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(DataPersisterInterface $dataPersister, IriConverterInterface $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
 
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The listener %s is deprecated and will be removed in 3.0', __CLASS__));
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The listener "%s" is deprecated and will be removed in 3.0, use "%s" instead', __CLASS__, \ApiPlatform\Symfony\EventListener\WriteListener::class));
     }
 
     /**
@@ -58,13 +62,14 @@ final class WriteListener
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
+        $operation = $this->initializeOperation($request);
 
         if (
             $controllerResult instanceof Response
             || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['persist']
-            || (isset($attributes['operation']) && !isset($attributes['operation']->getExtraProperties()['is_legacy_resource_metadata']))
+            || ($operation && !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false))
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
         ) {
             return;
