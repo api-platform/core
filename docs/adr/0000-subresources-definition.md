@@ -1,11 +1,11 @@
 # Subresource Definition
 
-* Status: superseded by [0002-resource-definition](0002-resource-definition.md)]
+* Status: superseded by [0002-resource-definition](0002-resource-definition.md)
 * Deciders: @dunglas, @vincentchalamon, @soyuka, @GregoireHebert, @Deuchnord
 
 ## Context and Problem Statement
 
-Subresources introduced in 2017 ([#904][pull/904]) the `ApiSubresource` annotation. This definition came along with its own set of issues ([#2706][issue/2706]) and needs a refreshment. On top of that, write support on subresources is a wanted feature and it is hard to implement currently ([#2598][pull/2598]) (See [ADR-0001-subresource-write-support](./0001-subresource-write-support.md)). How can we revamp the Subresource definition to improve the developer experience and reduce the complexity?
+Subresources introduced in 2017 ([#904][pull/904]) the `ApiSubresource` annotation. This definition came along with its own set of issues ([#2706][issue/2706]) and needs a refreshment. On top of that, write support on subresources is a wanted feature, and it is hard to implement currently ([#2598][pull/2598]) (See [ADR-0001-resource-identifiers](0001-resource-identifiers.md)). How can we revamp the Subresource definition to improve the developer experience and reduce the complexity?
 
 ## Considered Options
 
@@ -17,7 +17,7 @@ Subresources introduced in 2017 ([#904][pull/904]) the `ApiSubresource` annotati
 
 We choose to use multiple `ApiResource` annotations to declare subresources on a given Model class: 
 
-* Subresource declaration is an important feature and removing it would harm the software. 
+* Subresource's declaration is an important feature and removing it would harm the software. 
 * The `ApiSubresource` annotation is declared on a Model's properties, which was identified as the root of several issues. For example, finding what class it is defined on ([#3458][issue/3458]). Having multiple `ApiResource` would improve a lot the declaration of our internal metadata and would cause less confusion for developers. 
 * The `path` of these multiple `ApiResource` needs to be explicitly described. 
 * An `ApiResource` is always defined on the Resource it represents: `/companies/1/users` outputs Users and should be defined on the `User` model.
@@ -41,7 +41,7 @@ class User {
 }
 ```
 
-With explicit identifiers, the tuple is explained in [ADR-0002-identifiers](./0002-identifiers) `{parameterName: {Class, property}}`:
+With explicit identifiers, the tuple is explained in [ADR-0001-resource-identifiers](0001-resource-identifiers.md) `{parameterName: {Class, property}}`:
 
 ```php
 /**
@@ -148,7 +148,6 @@ This example will require a custom DataProvider as the discriminator needs to be
 ## Links
 
 * [Subresource refactor][pull/3689]
-
 
 [pull/904]: https://github.com/api-platform/core/pull/904  "Subresource feature"
 [issue/2706]: https://github.com/api-platform/core/issues/2706 "Subresource RFC"
