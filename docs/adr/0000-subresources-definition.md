@@ -1,6 +1,6 @@
 # Subresource Definition
 
-* Status: superseded by [0002-resource-definition](0002-resource-definition.md)]
+* Status: superseded by [0002-resource-definition](0002-resource-definition.md)
 * Deciders: @dunglas, @vincentchalamon, @soyuka, @GregoireHebert, @Deuchnord
 
 ## Context and Problem Statement
@@ -148,7 +148,6 @@ This example will require a custom DataProvider as the discriminator needs to be
 ## Links
 
 * [Subresource refactor][pull/3689]
-
 
 [pull/904]: https://github.com/api-platform/core/pull/904  "Subresource feature"
 [issue/2706]: https://github.com/api-platform/core/issues/2706 "Subresource RFC"
