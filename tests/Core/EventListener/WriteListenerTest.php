@@ -40,7 +40,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithControllerResultAndPersist()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -76,7 +76,7 @@ class WriteListenerTest extends TestCase
      */
     public function testOnKernelViewWithControllerResultAndPersistReturningVoid()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -108,7 +108,7 @@ class WriteListenerTest extends TestCase
      */
     public function testOnKernelViewWithControllerResultAndPersistWithImmutableResource()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -147,7 +147,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewDoNotCallIriConverterWhenOutputClassDisabled()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -177,7 +177,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithControllerResultAndRemove()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -203,7 +203,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithSafeMethod()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -230,7 +230,7 @@ class WriteListenerTest extends TestCase
 
     public function testDoNotWriteWhenControllerResultIsResponse()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
         $dataPersisterProphecy->supports(Argument::cetera())->shouldNotBeCalled();
         $dataPersisterProphecy->persist(Argument::cetera())->shouldNotBeCalled();
@@ -255,7 +255,7 @@ class WriteListenerTest extends TestCase
 
     public function testDoNotWriteWhenPersistFlagIsFalse()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -282,7 +282,7 @@ class WriteListenerTest extends TestCase
 
     public function testDoNotWriteWhenDisabledInOperationAttribute()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -318,7 +318,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithNoResourceClass()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
@@ -345,7 +345,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithParentResourceClass()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new ConcreteDummy();
 
         $dataPersisterProphecy = $this->prophesize(DataPersisterInterface::class);
@@ -370,7 +370,7 @@ class WriteListenerTest extends TestCase
 
     public function testOnKernelViewWithNoDataPersisterSupport()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The listener ApiPlatform\Core\EventListener\WriteListener is deprecated and will be removed in 3.0');
+        $this->expectDeprecation('Since api-platform/core 2.7: The listener "ApiPlatform\Core\EventListener\WriteListener" is deprecated and will be removed in 3.0, use "ApiPlatform\Symfony\EventListener\WriteListener" instead');
         $dummy = new Dummy();
         $dummy->setName('Dummyrino');
 
