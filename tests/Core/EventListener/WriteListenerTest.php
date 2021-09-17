@@ -84,6 +84,9 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
 
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1');
+
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
         $event = new ViewEvent(
@@ -97,7 +100,7 @@ class WriteListenerTest extends TestCase
             $request->setMethod($httpMethod);
             $request->attributes->set(sprintf('_api_%s_operation_name', 'POST' === $httpMethod ? 'collection' : 'item'), strtolower($httpMethod));
 
-            (new WriteListener($dataPersisterProphecy->reveal()))->onKernelView($event);
+            (new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal()))->onKernelView($event);
             $this->assertSame($dummy, $event->getControllerResult());
         }
     }

@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Type;
 
 use ApiPlatform\Core\DataProvider\Pagination;
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface as TypesContainerLegacyInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -63,6 +63,9 @@ final class TypeBuilder implements TypeBuilderInterface
             $shortName = $subscriptionName.ucfirst($shortName).'Subscription';
         }
         if ($input) {
+            if ($depth > 0) {
+                $shortName .= 'Nested';
+            }
             $shortName .= 'Input';
         } elseif (null !== $mutationName || null !== $subscriptionName) {
             if ($depth > 0) {

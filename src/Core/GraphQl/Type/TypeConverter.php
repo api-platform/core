@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface as TypesContainerLegacyInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -41,12 +42,18 @@ final class TypeConverter implements TypeConverterInterface
     /** @var TypesContainerLegacyInterface|TypesContainerInterface */
     private $typesContainer;
     private $resourceMetadataFactory;
+    private $propertyMetadataFactory;
 
-    public function __construct(TypeBuilderInterface $typeBuilder, $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(TypeBuilderInterface $typeBuilder, $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory = null)
     {
         $this->typeBuilder = $typeBuilder;
         $this->typesContainer = $typesContainer;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
+
+        if (null === $this->propertyMetadataFactory) {
+            @trigger_error(sprintf('Not injecting %s in the TypeConverter is deprecated since 2.7 and will not be supported in 3.0.', PropertyMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -65,21 +72,17 @@ final class TypeConverter implements TypeConverterInterface
                 return GraphQLType::string();
             case Type::BUILTIN_TYPE_ARRAY:
             case Type::BUILTIN_TYPE_ITERABLE:
-                if ($resourceType = $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $depth)) {
+                if ($resourceType = $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $rootResource, $property, $depth)) {
                     return $resourceType;
                 }
 
                 return 'Iterable';
             case Type::BUILTIN_TYPE_OBJECT:
-                if ($input && $depth > 0) {
-                    return GraphQLType::string();
-                }
-
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     return GraphQLType::string();
                 }
 
-                return $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $depth);
+                return $this->getResourceType($type, $input, $queryName, $mutationName, $subscriptionName, $rootResource, $property, $depth);
             default:
                 return null;
         }
@@ -103,7 +106,7 @@ final class TypeConverter implements TypeConverterInterface
         throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
     }
 
-    private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, int $depth): ?GraphQLType
+    private function getResourceType(Type $type, bool $input, ?string $queryName, ?string $mutationName, ?string $subscriptionName, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if (
             $this->typeBuilder->isCollection($type) &&
@@ -129,6 +132,25 @@ final class TypeConverter implements TypeConverterInterface
         } catch (ResourceClassNotFoundException $e) {
             // Skip objects that are not resources for now
             return null;
+        }
+
+        $propertyMetadata = null;
+        if ($property && $this->propertyMetadataFactory) {
+            $rootResourceMetadata = null;
+            try {
+                $rootResourceMetadata = $this->resourceMetadataFactory->create($rootResource);
+            } catch (ResourceClassNotFoundException $e) {
+            }
+
+            $context = [
+                'normalization_groups' => $rootResourceMetadata ? $rootResourceMetadata->getGraphqlAttribute($queryName ?? $mutationName ?? $subscriptionName, 'normalization_context', [], true)['groups'] ?? null : null,
+                'denormalization_groups' => $rootResourceMetadata ? $rootResourceMetadata->getGraphqlAttribute($queryName ?? $mutationName ?? $subscriptionName, 'denormalization_context', [], true)['groups'] ?? null : null,
+            ];
+            $propertyMetadata = $this->propertyMetadataFactory->create($rootResource, $property, $context);
+        }
+
+        if ($input && $depth > 0 && (!$propertyMetadata || !$propertyMetadata->isWritableLink())) {
+            return GraphQLType::string();
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $subscriptionName, false, $depth);

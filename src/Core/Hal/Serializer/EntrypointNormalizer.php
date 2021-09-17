@@ -38,6 +38,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
      * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
      */
     private $resourceMetadataFactory;
+    /** @var LegacyIriConverterInterface|IriConverterInterface */
     private $iriConverter;
     private $urlGenerator;
 
@@ -86,7 +87,8 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
                     }
 
                     try {
-                        $entrypoint['_links'][lcfirst($operation->getShortName())]['href'] = $this->iriConverter->getIriFromResourceClass($resourceClass, $operationName);
+                        $href = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, $operationName) : $this->iriConverter->getIriFromResourceClass($resourceClass);
+                        $entrypoint['_links'][lcfirst($operation->getShortName())]['href'] = $href;
                     } catch (InvalidArgumentException $ex) {
                         // Ignore resources without GET operations
                     }
