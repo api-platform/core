@@ -60,6 +60,8 @@ final class AttributesExtractor
         if (isset($attributes['_api_operation_name'])) {
             $hasRequestAttributeKey = true;
             $result['operation_name'] = $attributes['_api_operation_name'];
+        }
+        if (isset($attributes['_api_operation'])) {
             $result['operation'] = $attributes['_api_operation'];
         }
 

@@ -791,6 +791,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        $container->removeDefinition('api_platform.symfony.listener.view.write');
+
         $container->removeAlias('api_platform.identifiers_extractor');
         $container->setAlias('api_platform.identifiers_extractor', 'api_platform.identifiers_extractor.legacy');
 
@@ -799,6 +801,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->removeAlias('api_platform.openapi.factory');
         $container->setAlias('api_platform.openapi.factory', 'api_platform.openapi.factory.legacy');
+
+        $container->removeAlias('api_platform.graphql.type_converter');
+        $container->setAlias('api_platform.graphql.type_converter', 'api_platform.graphql.type_converter.legacy');
+
+        $container->removeAlias('api_platform.graphql.type_builder');
+        $container->setAlias('api_platform.graphql.type_builder', 'api_platform.graphql.type_builder.legacy');
+
+        $container->removeAlias('api_platform.graphql.fields_builder');
+        $container->setAlias('api_platform.graphql.fields_builder', 'api_platform.graphql.fields_builder.legacy');
+
+        $container->removeAlias('api_platform.graphql.schema_builder');
+        $container->setAlias('api_platform.graphql.schema_builder', 'api_platform.graphql.schema_builder.legacy');
 
         $definition = $container->getDefinition('api_platform.metadata.property.metadata_factory.serializer');
         $definition->setArgument(0, new Reference('api_platform.metadata.resource.metadata_factory'));
