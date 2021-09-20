@@ -37,7 +37,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      type2: __type(name: "DummyAggregateOfferConnection") {
+      type2: __type(name: "DummyAggregateOfferCursorConnection") {
         description,
         fields {
           name
@@ -76,7 +76,7 @@ Feature: GraphQL introspection support
     {
       "name":"offers",
       "type":{
-        "name":"DummyAggregateOfferConnection",
+        "name":"DummyAggregateOfferCursorConnection",
         "kind":"OBJECT",
         "ofType":null
       }
@@ -546,7 +546,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      typeNotAvailable: __type(name: "VoDummyInspectionConnection") {
+      typeNotAvailable: __type(name: "VoDummyInspectionCursorConnection") {
         description
       }
       typeOwner: __type(name: "VoDummyCar") {
@@ -563,6 +563,6 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionConnection" is not present in the types container'
+    And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionCursorConnection" is not present in the types container'
     And the JSON node "data.typeNotAvailable" should be null
-    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionConnection"
+    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionCursorConnection"

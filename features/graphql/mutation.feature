@@ -709,7 +709,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.__typename" should be equal to "updateThirdLevelNestedPayload"
     And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.fourthLevel.id" should be equal to "/fourth_levels/1"
     And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.fourthLevel.__typename" should be equal to "updateFourthLevelNestedPayload"
-    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.__typename" should be equal to "updateRelatedToDummyFriendNestedPayloadConnection"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.__typename" should be equal to "updateRelatedToDummyFriendNestedPayloadCursorConnection"
     And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.edges[0].node.name" should be equal to "Relation-1"
     And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.edges[1].node.name" should be equal to "Relation-2"
 

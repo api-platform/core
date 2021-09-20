@@ -9,7 +9,7 @@ Feature: GraphQL collection support
         ...dummyFields
       }
     }
-    fragment dummyFields on DummyConnection {
+    fragment dummyFields on DummyCursorConnection {
       edges {
         node {
           id

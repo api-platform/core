@@ -16,8 +16,8 @@ Feature: GraphQL schema-related features
       name: String!
     }
 
-    ###Connection for DummyFriend.###
-    type DummyFriendConnection {
+    ###Cursor connection for DummyFriend.###
+    type DummyFriendCursorConnection {
       edges: [DummyFriendEdge]
       pageInfo: DummyFriendPageInfo!
       totalCount: Int!
@@ -54,8 +54,8 @@ Feature: GraphQL schema-related features
       name: String!
     }
 
-    # Connection for DummyFriend.
-    type DummyFriendConnection {
+    # Cursor connection for DummyFriend.
+    type DummyFriendCursorConnection {
       edges: [DummyFriendEdge]
       pageInfo: DummyFriendPageInfo!
       totalCount: Int!
