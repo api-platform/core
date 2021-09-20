@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersi
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainCollectionDataProvider;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainItemDataProvider;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainSubresourceDataProvider;
+use ApiPlatform\Core\Bridge\Symfony\Bundle\Processor\TraceableChainProcessor;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -26,6 +27,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\State\ProcessorInterface;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,8 +51,9 @@ final class RequestDataCollector extends DataCollector
     private $itemDataProvider;
     private $subresourceDataProvider;
     private $dataPersister;
+    private $processor;
 
-    public function __construct($metadataFactory, ContainerInterface $filterLocator, CollectionDataProviderInterface $collectionDataProvider = null, ItemDataProviderInterface $itemDataProvider = null, SubresourceDataProviderInterface $subresourceDataProvider = null, DataPersisterInterface $dataPersister = null)
+    public function __construct($metadataFactory, ContainerInterface $filterLocator, CollectionDataProviderInterface $collectionDataProvider = null, ItemDataProviderInterface $itemDataProvider = null, SubresourceDataProviderInterface $subresourceDataProvider = null, DataPersisterInterface $dataPersister = null, ProcessorInterface $processor = null)
     {
         $this->metadataFactory = $metadataFactory;
         $this->filterLocator = $filterLocator;
@@ -58,6 +61,7 @@ final class RequestDataCollector extends DataCollector
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->dataPersister = $dataPersister;
+        $this->processor = $processor;
 
         if (!$metadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
@@ -99,6 +103,7 @@ final class RequestDataCollector extends DataCollector
             'dataProviders' => [],
             'dataPersisters' => ['responses' => []],
             'request_attributes' => $requestAttributes,
+            'processors' => ['responses' => []],
         ];
 
         if ($this->collectionDataProvider instanceof TraceableChainCollectionDataProvider) {
@@ -124,6 +129,10 @@ final class RequestDataCollector extends DataCollector
 
         if ($this->dataPersister instanceof TraceableChainDataPersister) {
             $this->data['dataPersisters']['responses'] = $this->dataPersister->getPersistersResponse();
+        }
+
+        if ($this->processor instanceof TraceableChainProcessor) {
+            $this->data['processors']['responses'] = $this->processor->getProcessorsResponse();
         }
     }
 
@@ -188,6 +197,11 @@ final class RequestDataCollector extends DataCollector
     public function getDataPersisters(): array
     {
         return $this->data['dataPersisters'] ?? ['responses' => []];
+    }
+
+    public function getProcessors(): array
+    {
+        return $this->data['processors'] ?? ['responses' => []];
     }
 
     public function getVersion(): ?string

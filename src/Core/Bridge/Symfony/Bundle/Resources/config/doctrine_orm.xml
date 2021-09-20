@@ -15,6 +15,11 @@
             <tag name="api_platform.data_persister" priority="-1000" />
         </service>
 
+        <service id="api_platform.doctrine.orm.state.processor" class="ApiPlatform\Doctrine\Orm\State\Processor">
+            <argument type="service" id="doctrine" />
+            <tag name="api_platform.state_processor" priority="-100" />
+        </service>
+
         <service id="api_platform.doctrine.orm.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />

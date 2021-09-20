@@ -22,6 +22,11 @@
             <tag name="api_platform.data_persister" priority="-1000" />
         </service>
 
+        <service id="api_platform.doctrine_mongodb.odm.state.processor" class="ApiPlatform\Doctrine\Orm\State\Processor">
+            <argument type="service" id="doctrine_mongodb" />
+            <tag name="api_platform.state_processor" priority="-100" />
+        </service>
+
         <service id="api_platform.doctrine_mongodb.odm.collection_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />

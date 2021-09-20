@@ -18,6 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider as OdmCol
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider as OdmItemDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
+use ApiPlatform\Doctrine\Orm\State\Processor;
 use ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -144,7 +145,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(6, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
+        $this->assertCount(7, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
         $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
@@ -160,9 +161,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Data Providers', $crawler->filter('.data-provider-tab-title')->html());
         $this->assertNotEmpty($crawler->filter('.data-provider-tab-content'));
 
-        // Data persisters tab
-        $this->assertSame('Data Persisters', $crawler->filter('.data-persister-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.data-persister-tab-content .empty'));
+        // Data processors tab
+        $this->assertSame('Processors', $crawler->filter('.data-processor-tab-title')->html());
+        $this->assertNotEmpty($crawler->filter('.data-processor-tab-content .empty'));
     }
 
     public function testGetCollectionProfiler()
@@ -186,8 +187,8 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
-        // Data persisters tab
-        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.data-persister-tab-content .empty')->html());
+        // Processors tab
+        $this->assertStringContainsString('No calls to processors have been recorded.', $crawler->filter('.data-processor-tab-content .empty')->html());
     }
 
     public function testPostCollectionProfiler()
@@ -213,6 +214,34 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $tabContent = $crawler->filter('.data-persister-tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
         $this->assertStringContainsString(DataPersister::class, $tabContent->html());
+    }
+
+    /**
+     * @requires PHP 8.0
+     */
+    public function testPostCollectionProcessorProfiler()
+    {
+        $client = static::createClient();
+        $client->enableProfiler();
+        $client->request('POST', '/processor_entities', [], [], ['HTTP_ACCEPT' => 'application/ld+json', 'CONTENT_TYPE' => 'application/ld+json'], '{"foo": "bar"}');
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
+        $crawler = $client->request('get', '/_profiler/latest?panel=api_platform.data_collector.request');
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // Metadata tab
+        $tabContent = $crawler->filter('.metadata-tab-content');
+        $this->assertSame('_api_/processor_entities.{_format}_post_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
+
+        // Data provider tab
+        $tabContent = $crawler->filter('.data-provider-tab-content');
+        $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
+        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
+
+        // Data processors tab
+        $tabContent = $crawler->filter('.data-processor-tab-content');
+        $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
+        $this->assertStringContainsString(Processor::class, $tabContent->html());
     }
 
     /**
@@ -248,7 +277,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
-        // Data persisters tab
-        $this->assertStringContainsString('No calls to data persister have been recorded.', $crawler->filter('.data-persister-tab-content .empty')->html());
+        // Data processors tab
+        $this->assertStringContainsString('No calls to processors have been recorded.', $crawler->filter('.data-processor-tab-content .empty')->html());
     }
 }

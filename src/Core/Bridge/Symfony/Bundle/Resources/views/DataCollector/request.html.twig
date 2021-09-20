@@ -193,10 +193,18 @@
                     {{ apiPlatform.providerTable(collector.subresourceDataProviders, 'subresource data provider') }}
                 </div>
             </div>
+
             <div class="tab">
                 <h3 class="tab-title data-persister-tab-title">Data Persisters</h3>
                 <div class="tab-content data-persister-tab-content">
                     {{ apiPlatform.providerTable(collector.dataPersisters, 'data persister') }}
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title data-processor-tab-title">Processors</h3>
+                <div class="tab-content data-processor-tab-content">
+                    {{ apiPlatform.providerTable(collector.processors, 'processors') }}
                 </div>
             </div>
         </div>

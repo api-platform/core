@@ -11,23 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common;
+namespace ApiPlatform\Doctrine\Orm\State;
 
-use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProcessorInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
-/**
- * Data persister for Doctrine.
- *
- * @author Baptiste Meyer <baptiste.meyer@gmail.com>
- *
- * @deprecated
- */
-final class DataPersister implements ContextAwareDataPersisterInterface
+final class Processor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
@@ -38,18 +32,17 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($data, array $context = []): bool
+    public function resumable(?string $operationName = null, array $context = []): bool
+    {
+        return false;
+    }
+
+    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
         return null !== $this->getManager($data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function persist($data, array $context = [])
+    private function persist($data, array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
             return $data;
@@ -65,10 +58,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($data, array $context = [])
+    private function remove($data, array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
             return;
@@ -76,6 +66,15 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
         $manager->remove($data);
         $manager->flush();
+    }
+
+    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
+    {
+        if (\array_key_exists('operation', $context) && Operation::METHOD_DELETE === ($context['operation']->getMethod() ?? null)) {
+            return $this->remove($data);
+        }
+
+        return $this->persist($data);
     }
 
     /**

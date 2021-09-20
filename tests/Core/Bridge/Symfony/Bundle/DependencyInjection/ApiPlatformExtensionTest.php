@@ -294,6 +294,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('debug.api_platform.debug_resource.command', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('debug.var_dumper.cloner', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('debug.var_dumper.cli_dumper', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.api_platform.processor', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $config = self::DEFAULT_CONFIG;
@@ -579,6 +580,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setAlias('api_platform.message_bus', 'messenger.default_bus')->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.messenger.data_transformer', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.messenger.processor', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilder = $containerBuilderProphecy->reveal();
 
         $config = self::DEFAULT_CONFIG;
@@ -614,6 +616,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.boolean_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.state.processor', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.date_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -672,6 +675,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.boolean_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.data_persister', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.state.processor', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.date_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.default.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine_mongodb.odm.default.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -803,6 +807,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('debug.api_platform.debug_resource.command', Argument::type(Definition::class))->will(function () {});
         $containerBuilderProphecy->setDefinition('debug.var_dumper.cloner', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('debug.var_dumper.cli_dumper', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('debug.api_platform.processor', Argument::type(Definition::class))->will(function () {});
 
         $containerBuilder = $containerBuilderProphecy->reveal();
 
@@ -1132,7 +1137,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.serializer.property_filter',
             'api_platform.serializer.uuid_denormalizer',
             'api_platform.serializer_locator',
-            'api_platform.state.legacy_data_persister_processor',
             'api_platform.state_processor',
             'api_platform.state_provider',
             'api_platform.subresource_data_provider',
@@ -1483,6 +1487,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.mercure.listener.response.add_link_header',
             'api_platform.messenger.data_persister',
             'api_platform.messenger.data_transformer',
+            'api_platform.messenger.processor',
             'api_platform.metadata.extractor.yaml',
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.validator',
@@ -1520,6 +1525,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator',
             'api_platform.validator.query_parameter_validator',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
+            'api_platform.doctrine.orm.state.processor',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {
@@ -1545,6 +1551,7 @@ class ApiPlatformExtensionTest extends TestCase
                 'api_platform.doctrine_mongodb.odm.range_filter',
                 'api_platform.doctrine_mongodb.odm.search_filter',
                 'api_platform.doctrine_mongodb.odm.subresource_data_provider',
+                'api_platform.doctrine_mongodb.odm.state.processor',
             ]);
         }
 
