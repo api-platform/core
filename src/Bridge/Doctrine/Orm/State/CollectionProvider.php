@@ -37,7 +37,8 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $collectionExtensions = []) {
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, iterable $collectionExtensions = [])
+    {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->managerRegistry = $managerRegistry;
         $this->collectionExtensions = $collectionExtensions;

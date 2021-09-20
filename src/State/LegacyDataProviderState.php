@@ -71,7 +71,7 @@ final class LegacyDataProviderState implements ProviderInterface
     {
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
         if (!($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
-        // FIXME: uncomment the following line when all providers will be ported
+            // FIXME: uncomment the following line when all providers will be ported
         //    return false;
         }
 
