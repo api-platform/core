@@ -13,15 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Identifier;
 
-use ApiPlatform\Api\UriVariablesConverterInterface;
-use ApiPlatform\Api\UriVariableTransformerInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -32,9 +27,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class IdentifierConverter implements ContextAwareIdentifierConverterInterface
 {
-    /**
-     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
-     */
     private $propertyMetadataFactory;
     private $identifiersExtractor;
     private $identifierDenormalizers;
@@ -45,14 +37,12 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
      *
      * @param iterable<DenormalizerInterface> $identifierDenormalizers
      */
-    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, $propertyMetadataFactory, iterable $identifierDenormalizers, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(IdentifiersExtractorInterface $identifiersExtractor, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $identifierDenormalizers, ResourceMetadataFactoryInterface $resourceMetadataFactory = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->identifiersExtractor = $identifiersExtractor;
         $this->identifierDenormalizers = $identifierDenormalizers;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The class "%s" is deprecated, implement the new "%s" interface instead. Note that identifier denormalizers are now implementing the new "%s" interface instead of "%s".', __CLASS__, UriVariablesConverterInterface::class, UriVariableTransformerInterface::class, DenormalizerInterface::class));
     }
 
     /**
@@ -92,12 +82,7 @@ final class IdentifierConverter implements ContextAwareIdentifierConverterInterf
 
     private function getIdentifierType(string $resourceClass, string $property): ?string
     {
-        /** @var ApiProperty|PropertyMetadata */
-        $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
-
-        if (!$type) {
+        if (!$type = $this->propertyMetadataFactory->create($resourceClass, $property)->getType()) {
             return null;
         }
 

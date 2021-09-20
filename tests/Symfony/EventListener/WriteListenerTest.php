@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;

@@ -63,7 +63,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                     $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $uriVariableDefinition['class'], $identifier, $parameterName);
                 }
 
-                $identifiers[$parameterName] = CompositeIdentifierParser::stringify($compositeIdentifiers);
+                $identifiers[($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) ? 'id' : $parameterName] = CompositeIdentifierParser::stringify($compositeIdentifiers);
                 continue;
             }
 

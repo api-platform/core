@@ -126,12 +126,14 @@ final class UriVariablesResourceMetadataCollectionFactory implements ResourceMet
             return $uriVariables;
         }
 
-        $uriVariables = [$identifiers[0] => ['class' => $resourceClass, 'identifiers' => $identifiers]];
+        $uriVariable = ['class' => $resourceClass, 'identifiers' => $identifiers];
+        $parameterName = $identifiers[0];
 
         if (1 < \count($identifiers)) {
-            $uriVariables[$identifiers[0]]['composite_identifier'] = true;
+            $parameterName = 'id';
+            $uriVariable['composite_identifier'] = true;
         }
 
-        return $uriVariables;
+        return [$parameterName => $uriVariable];
     }
 }

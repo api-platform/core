@@ -177,12 +177,22 @@
 
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.read" class="ApiPlatform\Core\EventListener\ReadListener">
-            <argument type="service" id="api_platform.state_provider" />
-            <argument>null</argument>
-            <argument>null</argument>
+            <argument type="service" id="api_platform.collection_data_provider" />
+            <argument type="service" id="api_platform.item_data_provider" />
+            <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.identifier.converter" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
+        </service>
+
+        <service id="api_platform.symfony.listener.request.read" class="ApiPlatform\Symfony\EventListener\ReadListener">
+            <argument type="service" id="api_platform.state_provider" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument type="service" id="api_platform.uri_variables.converter" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>

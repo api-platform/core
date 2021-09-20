@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Bridge\Symfony\Routing;
+namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -307,7 +306,6 @@ class ApiLoaderTest extends TestCase
                 '_stateless' => $stateless,
                 '_api_resource_class' => $resourceClass,
                 '_api_operation_name' => $operationName,
-                sprintf('_api_%s_operation_name', $isCollection ? OperationType::COLLECTION : OperationType::ITEM) => $operationName,
             ] + $extraDefaults,
             $requirements,
             $options,

@@ -70,7 +70,8 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             ->withShortName($resourceMetadata->getShortName())
             ->withDescription($resourceMetadata->getDescription())
             ->withClass($resourceClass)
-            ->withTypes($resourceMetadata->getIri() ? [$resourceMetadata->getIri()] : []);
+            ->withExtraProperties(['is_legacy_resource_metadata' => true])
+            ->withTypes($resourceMetadata->getIri() ? [$resourceMetadata->getIri()] : null);
 
         foreach ($attributes as $key => $value) {
             $resource = $this->setAttributeValue($resource, $key, $value);
@@ -84,10 +85,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
         foreach ($this->createOperations($resourceMetadata->getCollectionOperations(), OperationType::COLLECTION, $resource) as $operationName => $operation) {
             $operationName = RouteNameGenerator::generate($operationName, $resourceMetadata->getShortName(), OperationType::COLLECTION);
-            if (!$operation->getUriTemplate() && !$operation->getRouteName() && $operation->getUriVariables()) {
-                $operation = $operation->withUriVariables([]);
-            }
-
             $operations[$operationName] = $operation->withShortName($resourceMetadata->getShortName())->withName($operationName);
         }
 
@@ -112,6 +109,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             $graphQlOperation = $graphQlOperation
                 ->withArgs($operation['args'] ?? null)
+                ->withClass($resourceClass)
                 ->withResolver($operation['item_query'] ?? $operation['collection_query'] ?? $operation['mutation'] ?? null);
 
             foreach ($operation as $key => $value) {
@@ -142,6 +140,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             $newOperation = (new Operation())
                 ->withMethod($operation['method'])
                 ->withCollection(OperationType::COLLECTION === $type)
+                ->withClass($resource->getClass())
                 ->withPriority($priority++);
 
             foreach ($operation as $key => $value) {
@@ -149,6 +148,10 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             }
 
             $newOperation = $newOperation->withResource($resource);
+
+            if ($newOperation->isCollection()) {
+                $newOperation = $newOperation->withUriVariables([]);
+            }
 
             // Default behavior in API Platform < 2.7
             if (null === $newOperation->getCompositeIdentifier()) {
@@ -168,6 +171,24 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
      */
     private function setAttributeValue($operation, string $key, $value)
     {
+        if ('identifiers' === $key) {
+            if (!$operation instanceof ApiResource && $operation->isCollection()) {
+                return $operation;
+            }
+
+            trigger_deprecation('api-platform/core', '2.7', 'The "identifiers" option is deprecated and will be renamed to "uriVariables".');
+            if (\is_string($value)) {
+                $value = [$value => [$operation->getClass(), $value]];
+            }
+
+            $uriVariables = [];
+            foreach ($value ?? [] as $parameterName => $identifiedBy) {
+                $uriVariables[$parameterName] = ['class' => $identifiedBy[0], 'identifiers' => [$identifiedBy[1]]];
+            }
+
+            return $operation->withUriVariables($uriVariables);
+        }
+
         [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
         $methodName = 'with'.ucfirst($camelCaseKey);
 

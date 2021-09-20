@@ -104,8 +104,13 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     {
         $uriTemplate = $operation->getRoutePrefix() ?: '';
         $uriTemplate = sprintf('%s/%s', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        $uriVariables = $operation->getUriVariables() ?? [];
 
-        if ($parameters = array_keys($operation->getUriVariables() ?? [])) {
+        if ($parameters = array_keys($uriVariables)) {
+            if (($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && 1 < \count($uriVariables[$parameters[0]]['identifiers'] ?? [])) {
+                $parameters[0] = 'id';
+            }
+
             foreach ($parameters as $parameterName) {
                 $uriTemplate .= sprintf('/{%s}', $parameterName);
             }
