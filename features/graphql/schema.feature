@@ -17,7 +17,7 @@ Feature: GraphQL schema-related features
     }
 
     ###Connection for DummyFriend. (cursor)###
-    type DummyFriendConnection_cursor {
+    type DummyFriendCursorConnection {
       edges: [DummyFriendEdge]
       pageInfo: DummyFriendPageInfo!
       totalCount: Int!
@@ -55,7 +55,7 @@ Feature: GraphQL schema-related features
     }
 
     # Connection for DummyFriend. (cursor)
-    type DummyFriendConnection_cursor {
+    type DummyFriendCursorConnection {
       edges: [DummyFriendEdge]
       pageInfo: DummyFriendPageInfo!
       totalCount: Int!

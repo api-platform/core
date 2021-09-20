@@ -226,8 +226,9 @@ final class TypeBuilder implements TypeBuilderInterface
         $shortName = $resourceType->name;
         $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $operationName);
 
-        if ($this->typesContainer->has("{$shortName}Connection_{$paginationType}")) {
-            return $this->typesContainer->get("{$shortName}Connection_{$paginationType}");
+        $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
+        if ($this->typesContainer->has($connectionTypeKey)) {
+            return $this->typesContainer->get($connectionTypeKey);
         }
 
         $fields = 'cursor' === $paginationType ?
@@ -235,13 +236,13 @@ final class TypeBuilder implements TypeBuilderInterface
             $this->getPageBasedPaginationFields($resourceType);
 
         $configuration = [
-            'name' => "{$shortName}Connection_{$paginationType}",
-            'description' => "Connection for $shortName. ({$paginationType})",
+            'name' => $connectionTypeKey,
+            'description' => sprintf("%s connection for $shortName.", ucfirst($paginationType)),
             'fields' => $fields,
         ];
 
         $resourcePaginatedCollectionType = new ObjectType($configuration);
-        $this->typesContainer->set("{$shortName}Connection_{$paginationType}", $resourcePaginatedCollectionType);
+        $this->typesContainer->set($connectionTypeKey, $resourcePaginatedCollectionType);
 
         return $resourcePaginatedCollectionType;
     }
