@@ -485,7 +485,7 @@ class TypeBuilderTest extends TestCase
         /** @var ObjectType $resourcePaginatedCollectionType */
         $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
         $this->assertSame('StringCursorConnection', $resourcePaginatedCollectionType->name);
-        $this->assertSame('Connection for String. (cursor)', $resourcePaginatedCollectionType->description);
+        $this->assertSame('Cursor connection for String.', $resourcePaginatedCollectionType->description);
 
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('edges', $resourcePaginatedCollectionTypeFields);
@@ -544,7 +544,7 @@ class TypeBuilderTest extends TestCase
         /** @var ObjectType $resourcePaginatedCollectionType */
         $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
         $this->assertSame('StringPageConnection', $resourcePaginatedCollectionType->name);
-        $this->assertSame('Connection for String. (page)', $resourcePaginatedCollectionType->description);
+        $this->assertSame('Page connection for String.', $resourcePaginatedCollectionType->description);
 
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
