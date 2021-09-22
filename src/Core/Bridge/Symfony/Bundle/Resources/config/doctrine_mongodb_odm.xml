@@ -33,12 +33,28 @@
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
         </service>
 
+        <service id="api_platform.doctrine.odm.state.collection_provider" class="ApiPlatform\Bridge\Doctrine\Odm\State\CollectionProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
         <service id="api_platform.doctrine_mongodb.odm.item_data_provider" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory"/>
             <argument type="service" id="api_platform.metadata.property.metadata_factory"/>
             <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+        </service>
+
+        <service id="api_platform.doctrine.odm.state.item_provider" class="ApiPlatform\Bridge\Doctrine\Odm\State\ItemProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
         </service>
 
         <service id="api_platform.doctrine_mongodb.odm.subresource_data_provider" public="false" abstract="true">

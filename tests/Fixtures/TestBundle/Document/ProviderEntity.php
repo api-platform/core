@@ -15,19 +15,21 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * ProcessorEntity.
+ * ProviderEntity.
  *
  * @ODM\Document
  */
 #[ApiResource]
 #[Get]
+#[GetCollection]
 #[Post]
-class ProcessorEntity
+class ProviderEntity
 {
     /**
      * @var int|null

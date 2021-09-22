@@ -11,35 +11,39 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * ProcessorEntity.
+ * ProviderEntity.
  *
- * @ODM\Document
+ * @ORM\Entity
  */
 #[ApiResource]
 #[Get]
+#[GetCollection]
 #[Post]
-class ProcessorEntity
+class ProviderEntity
 {
     /**
      * @var int|null
      *
-     * @ODM\Id(strategy="INCREMENT", type="int")
+     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
      * @var string
      *
-     * @ODM\Field
+     * @ORM\Column
      * @Assert\NotBlank
      */
     private $foo;
