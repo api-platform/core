@@ -103,24 +103,20 @@ final class ApiProperty
     private $extraProperties;
 
     /**
-     * @param string                      $description
-     * @param bool                        $readable
-     * @param bool                        $writable
-     * @param bool                        $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool                        $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool                        $required                https://api-platform.com/docs/admin/validation/#client-side-validation
-     * @param bool                        $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param string|int|float|bool|array $default
-     * @param string|int|float|bool|array $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string                      $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param bool                        $fetchable
-     * @param bool                        $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
-     * @param array                       $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
-     * @param array                       $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param bool                        $push                    https://api-platform.com/docs/core/push-relations/
-     * @param string                      $security                https://api-platform.com/docs/core/security
-     * @param string                      $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string[]|string             $types                   the RDF types of this property
+     * @param bool|null   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null   $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool|null   $identifier              https://api-platform.com/docs/core/identifiers/
+     * @param string|null $default
+     * @param string|null $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param bool|null   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array|null  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array|null  $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|null   $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string|null $security                https://api-platform.com/docs/core/security
+     * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param array|null  $types                   the RDF types of this property
      */
     public function __construct(
         ?string $description = null,
@@ -143,13 +139,13 @@ final class ApiProperty
         ?string $security = null,
         ?string $securityPostDenormalize = null,
 
-        $types = [],
-        ?array $builtinTypes = [],
-        ?array $schema = [],
+        ?array $types = null,
+        ?array $builtinTypes = null,
+        ?array $schema = null,
         ?bool $initializable = null,
 
         // attributes
-        ?array $extraProperties = []
+        array $extraProperties = []
     ) {
         $this->description = $description;
         $this->readable = $readable;
@@ -169,7 +165,7 @@ final class ApiProperty
         $this->security = $security;
         $this->openapiContext = $openapiContext;
         $this->securityPostDenormalize = $securityPostDenormalize;
-        $this->types = (array) $types;
+        $this->types = $types;
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
@@ -181,7 +177,7 @@ final class ApiProperty
         return $this->description;
     }
 
-    public function withDescription(?string $description = null): self
+    public function withDescription(string $description): self
     {
         $self = clone $this;
         $self->description = $description;
@@ -194,7 +190,7 @@ final class ApiProperty
         return $this->readable;
     }
 
-    public function withReadable(?bool $readable = null): self
+    public function withReadable(bool $readable): self
     {
         $self = clone $this;
         $self->readable = $readable;
@@ -207,7 +203,7 @@ final class ApiProperty
         return $this->writable;
     }
 
-    public function withWritable(?bool $writable = null): self
+    public function withWritable(bool $writable): self
     {
         $self = clone $this;
         $self->writable = $writable;
@@ -220,7 +216,7 @@ final class ApiProperty
         return $this->readableLink;
     }
 
-    public function withReadableLink(?bool $readableLink = null): self
+    public function withReadableLink(bool $readableLink): self
     {
         $self = clone $this;
         $self->readableLink = $readableLink;
@@ -233,7 +229,7 @@ final class ApiProperty
         return $this->writableLink;
     }
 
-    public function withWritableLink(?bool $writableLink = null): self
+    public function withWritableLink(bool $writableLink): self
     {
         $self = clone $this;
         $self->writableLink = $writableLink;
@@ -246,7 +242,7 @@ final class ApiProperty
         return $this->required;
     }
 
-    public function withRequired(?bool $required = null): self
+    public function withRequired(bool $required): self
     {
         $self = clone $this;
         $self->required = $required;
@@ -259,7 +255,7 @@ final class ApiProperty
         return $this->identifier;
     }
 
-    public function withIdentifier(?bool $identifier = null): self
+    public function withIdentifier(bool $identifier): self
     {
         $self = clone $this;
         $self->identifier = $identifier;

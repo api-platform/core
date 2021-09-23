@@ -86,7 +86,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
-                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation->isCollection() ? '_collection' : '');
 
                 // Change the operation key
                 $operations->remove($key)

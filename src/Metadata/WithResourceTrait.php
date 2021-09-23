@@ -42,7 +42,9 @@ trait WithResourceTrait
                 continue;
             }
 
-            $self = $self->{'with'.substr($methodName, 3)}($resource->{$methodName}());
+            if ($resource->{$methodName}() !== null) {
+                $self = $self->{'with'.substr($methodName, 3)}($resource->{$methodName}());
+            }
         }
 
         return $self;

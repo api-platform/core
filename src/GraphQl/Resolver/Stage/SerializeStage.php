@@ -72,7 +72,7 @@ final class SerializeStage implements SerializeStageInterface
             // In some cases the operation may not exist
         }
 
-        if ($operation && !$operation->canSerialize()) {
+        if ($operation && !($operation->canSerialize() ?? true)) {
             if ($isCollection) {
                 if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
                     return 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?

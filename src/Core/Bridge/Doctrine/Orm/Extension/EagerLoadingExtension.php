@@ -135,7 +135,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
                 $context += $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
             } elseif ($operation) {
-                $context += 'denormalization_context' === $contextType ? $operation->getDenormalizationContext() : $operation->getNormalizationContext();
+                $context += 'denormalization_context' === $contextType ? ($operation->getDenormalizationContext() ?? []) : ($operation->getNormalizationContext() ?? []);
             } elseif (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 // TODO: remove in 3.0
                 $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);

@@ -133,13 +133,13 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
             [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $operationAttribute);
             $operation = $operation->withPriority(++$operationPriority);
-            $operations = $resources[$index]->getOperations();
+            $operations = $resources[$index]->getOperations() ?? new Operations();
             $resources[$index] = $resources[$index]->withOperations($operations->add($key, $operation)->sort());
         }
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
-            if (\count($resource->getOperations())) {
+            if (\count($resource->getOperations() ?? [])) {
                 continue;
             }
 
@@ -180,10 +180,9 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 continue;
             }
 
-            // Skip setting identifiers from the Resource on collections
             // TODO: remove in 3.0
             if ($operation instanceof Operation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation->isCollection() && !$operation->getUriVariables()) {
-                trigger_deprecation('api-platform', '2.7', 'Identifiers are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.');
+                trigger_deprecation('api-platform', '2.7', 'Identifiers are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 the collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.');
                 continue;
             }
 
@@ -204,7 +203,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         // Check for name conflict
         if ($operation->getName()) {
-            if (!$resource->getOperations()->has($operation->getName())) {
+            if (null !== $resource->getOperations() && !$resource->getOperations()->has($operation->getName())) {
                 return [$operation->getName(), $operation];
             }
 
@@ -213,7 +212,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof GetCollection ? '_collection' : ''),
+            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
             $operation,
         ];
     }
@@ -221,8 +220,8 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource
     {
         $resource = $resource
-                        ->withShortName($shortName)
-                        ->withClass($resourceClass);
+            ->withShortName($shortName)
+            ->withClass($resourceClass);
 
         foreach ($this->defaults['attributes'] as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);
@@ -255,7 +254,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function hasSameOperation(ApiResource $resource, string $operationClass, Operation $operation): bool
     {
-        foreach ($resource->getOperations() as $o) {
+        foreach ($resource->getOperations() ?? [] as $o) {
             if ($o instanceof $operationClass && $operation->getUriTemplate() === $o->getUriTemplate() && $operation->getName() === $o->getName() && $operation->getRouteName() === $o->getRouteName()) {
                 return true;
             }

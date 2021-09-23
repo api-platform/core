@@ -69,7 +69,7 @@ final class ReadStage implements ReadStageInterface
             // ReadStage may be invoked without an existing operation
         }
 
-        if ($operation && !$operation->canRead()) {
+        if ($operation && !($operation->canRead() ?? true)) {
             return $context['is_collection'] ? [] : null;
         }
 

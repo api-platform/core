@@ -65,17 +65,20 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return $this->update($parentPropertyMetadata, $propertyMetadata);
         }
 
-        $metadata = $this->withDeprecatedAttributes((new ApiProperty())->withDescription($propertyMetadata['description'])
-            ->withReadable($propertyMetadata['readable'])
-            ->withWritable($propertyMetadata['writable'])
-            ->withReadableLink($propertyMetadata['readableLink'])
-            ->withWritableLink($propertyMetadata['writableLink'])
-            ->withTypes($propertyMetadata['types'] ?? [])
-            ->withRequired($propertyMetadata['required'])
-            ->withSchema($propertyMetadata['schema'] ?? [])
-            ->withExample($propertyMetadata['example'] ?? null)
-            ->withDefault($propertyMetadata['default'] ?? null)
-            ->withIdentifier($propertyMetadata['identifier']), $propertyMetadata['attributes']);
+        $apiProperty = new ApiProperty();
+
+        foreach ($propertyMetadata as $key => $value) {
+            if ('subresource' === $key) {
+                continue;
+            }
+            $methodName = 'with'.ucfirst($key);
+
+            if (method_exists($apiProperty, $methodName) && null !== $value) {
+                $apiProperty = $apiProperty->{$methodName}($value);
+            }
+        }
+
+        $metadata = $this->withDeprecatedAttributes($apiProperty, $propertyMetadata['attributes']);
 
         if (isset($propertyMetadata['iri'])) {
             trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');

@@ -71,7 +71,7 @@ final class ValidateListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !$operation->canValidate())
+            (!$operation || !($operation->canValidate() ?? true))
         ) {
             return;
         }
@@ -79,14 +79,14 @@ final class ValidateListener
         // TODO: 3.0 remove condition
         if (
             $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (
-            !$attributes['receive']
-            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
+                !$attributes['receive']
+                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
             )
         ) {
             return;
         }
 
-        $validationContext = $operation ? $operation->getValidationContext() : [];
+        $validationContext = $operation ? ($operation->getValidationContext() ?? []) : [];
 
         if (!$validationContext && $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);

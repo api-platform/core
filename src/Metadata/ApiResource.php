@@ -110,97 +110,90 @@ final class ApiResource
     private $extraProperties;
 
     /**
-     * @param string            $uriTemplate
-     * @param string            $shortName
-     * @param string            $description
-     * @param string[]|string   $types                          The RDF types of this resource
-     * @param array|string      $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string      $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string      $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
-     * @param array|string|null $uriVariables
-     * @param string            $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
-     * @param bool              $stateless
-     * @param string            $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string            $acceptPatch
-     * @param string            $status
-     * @param string            $class
-     * @param int               $urlGenerationStrategy
-     * @param string            $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param array             $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
-     * @param array             $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param array             $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
-     * @param string[]          $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
-     * @param array             $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array             $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
-     * @param string[]          $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
-     * @param bool              $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
-     * @param bool|array        $mercure                        https://api-platform.com/docs/core/mercure
-     * @param bool              $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
-     * @param mixed             $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param mixed             $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
-     * @param array             $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
-     * @param bool              $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
-     * @param bool              $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
-     * @param bool              $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
-     * @param bool              $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
-     * @param bool              $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
-     * @param array             $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
-     * @param bool              $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
-     * @param bool              $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
-     * @param int               $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
-     * @param int               $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
-     * @param bool              $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
-     * @param string            $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
-     * @param string            $security                       https://api-platform.com/docs/core/security
-     * @param string            $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param string            $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string            $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param bool              $compositeIdentifier
+     * @param array|null        $types                          The RDF types of this resource
+     * @param mixed|null        $operations
+     * @param array|string|null $formats                        https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string|null $inputFormats                   https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param array|string|null $outputFormats                  https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation
+     * @param mixed|null        $uriVariables
+     * @param string|null       $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
+     * @param string|null       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
+     * @param string|null       $status
+     * @param string|null       $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param array|null        $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
+     * @param array|null        $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
+     * @param array|null        $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
+     * @param string[]|null     $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
+     * @param array|null        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param array|null        $validationContext              https://api-platform.com/docs/core/validation/#using-validation-groups
+     * @param string[]|null     $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
+     * @param bool|null         $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
+     * @param mixed|null        $mercure                        https://api-platform.com/docs/core/mercure
+     * @param mixed|null        $messenger                      https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus
+     * @param mixed|null        $input                          https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
+     * @param mixed|null        $output                         https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation
+     * @param array|null        $order                          https://api-platform.com/docs/core/default-order/#overriding-default-order
+     * @param bool|null         $fetchPartial                   https://api-platform.com/docs/core/performance/#fetch-partial
+     * @param bool|null         $forceEager                     https://api-platform.com/docs/core/performance/#force-eager
+     * @param bool|null         $paginationClientEnabled        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-1
+     * @param bool|null         $paginationClientItemsPerPage   https://api-platform.com/docs/core/pagination/#for-a-specific-resource-3
+     * @param bool|null         $paginationClientPartial        https://api-platform.com/docs/core/pagination/#for-a-specific-resource-6
+     * @param array|null        $paginationViaCursor            https://api-platform.com/docs/core/pagination/#cursor-based-pagination
+     * @param bool|null         $paginationEnabled              https://api-platform.com/docs/core/pagination/#for-a-specific-resource
+     * @param bool|null         $paginationFetchJoinCollection  https://api-platform.com/docs/core/pagination/#controlling-the-behavior-of-the-doctrine-orm-paginator
+     * @param int|null          $paginationItemsPerPage         https://api-platform.com/docs/core/pagination/#changing-the-number-of-items-per-page
+     * @param int|null          $paginationMaximumItemsPerPage  https://api-platform.com/docs/core/pagination/#changing-maximum-items-per-page
+     * @param bool|null         $paginationPartial              https://api-platform.com/docs/core/performance/#partial-pagination
+     * @param string|null       $paginationType                 https://api-platform.com/docs/core/graphql/#using-the-page-based-pagination
+     * @param string|null       $security                       https://api-platform.com/docs/core/security
+     * @param string|null       $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string|null       $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      */
     public function __construct(
         ?string $uriTemplate = null,
         ?string $shortName = null,
         ?string $description = null,
-        $types = [],
-        $operations = [],
-        $formats = null,
-        $inputFormats = null,
-        $outputFormats = null,
+                $types = null,
+                $operations = null,
+                $formats = null,
+                $inputFormats = null,
+                $outputFormats = null,
         $uriVariables = null,
-        ?string $routePrefix = '',
-        array $defaults = [],
-        array $requirements = [],
-        array $options = [],
+        ?string $routePrefix = null,
+        ?array $defaults = null,
+        ?array $requirements = null,
+        ?array $options = null,
         ?bool $stateless = null,
         ?string $sunset = null,
         ?string $acceptPatch = null,
-        $status = null,
-        string $host = '',
-        array $schemes = [],
-        string $condition = '',
-        string $controller = 'api_platform.action.placeholder',
+                $status = null,
+        ?string $host = null,
+        ?array $schemes = null,
+        ?string $condition = null,
+        ?string $controller = null,
         ?string $class = null,
         ?int $urlGenerationStrategy = null,
         ?string $deprecationReason = null,
-        array $cacheHeaders = [],
-        ?array $normalizationContext = [],
-        ?array $denormalizationContext = [],
-        ?array $hydraContext = [],
-        ?array $openapiContext = [],
-        array $validationContext = [],
-        array $filters = [],
+        ?array $cacheHeaders = null,
+        ?array $normalizationContext = null,
+        ?array $denormalizationContext = null,
+        ?array $hydraContext = null,
+        ?array $openapiContext = null,
+        ?array $validationContext = null,
+        ?array $filters = null,
         ?bool $elasticsearch = null,
-        $mercure = null,
-        $messenger = null,
-        $input = null,
-        $output = null,
-        ?array $order = [],
+                $mercure = null,
+                $messenger = null,
+                $input = null,
+                $output = null,
+        ?array $order = null,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?bool $paginationClientEnabled = null,
         ?bool $paginationClientItemsPerPage = null,
         ?bool $paginationClientPartial = null,
-        ?array $paginationViaCursor = [],
+        ?array $paginationViaCursor = null,
         ?bool $paginationEnabled = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
@@ -213,16 +206,16 @@ final class ApiResource
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
         ?bool $compositeIdentifier = null,
-        array $exceptionToStatus = [],
+        ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $graphQlOperations = null,
         array $extraProperties = []
     ) {
-        $this->operations = new Operations($operations);
+        $this->operations = null === $operations ? null : new Operations($operations);
         $this->uriTemplate = $uriTemplate;
         $this->shortName = $shortName;
         $this->description = $description;
-        $this->types = (array) $types;
+        $this->types = $types;
         $this->formats = $formats;
         $this->inputFormats = $inputFormats;
         $this->outputFormats = $outputFormats;
@@ -279,7 +272,7 @@ final class ApiResource
         $this->extraProperties = $extraProperties;
     }
 
-    public function getOperations(): Operations
+    public function getOperations(): ?Operations
     {
         return $this->operations;
     }
@@ -297,7 +290,7 @@ final class ApiResource
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate = null): self
+    public function withUriTemplate(string $uriTemplate): self
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
@@ -310,7 +303,7 @@ final class ApiResource
         return $this->shortName;
     }
 
-    public function withShortName(?string $shortName = null): self
+    public function withShortName(string $shortName): self
     {
         $self = clone $this;
         $self->shortName = $shortName;
@@ -323,7 +316,7 @@ final class ApiResource
         return $this->description;
     }
 
-    public function withDescription(?string $description = null): self
+    public function withDescription(string $description): self
     {
         $self = clone $this;
         $self->description = $description;
@@ -331,7 +324,7 @@ final class ApiResource
         return $self;
     }
 
-    public function getTypes(): array
+    public function getTypes(): ?array
     {
         return $this->types;
     }
@@ -339,7 +332,7 @@ final class ApiResource
     /**
      * @param string[]|string $types
      */
-    public function withTypes($types = []): self
+    public function withTypes($types): self
     {
         $self = clone $this;
         $self->types = (array) $types;
@@ -358,7 +351,7 @@ final class ApiResource
     /**
      * @param mixed|null $formats
      */
-    public function withFormats($formats = null): self
+    public function withFormats($formats): self
     {
         $self = clone $this;
         $self->formats = $formats;
@@ -377,7 +370,7 @@ final class ApiResource
     /**
      * @param mixed|null $inputFormats
      */
-    public function withInputFormats($inputFormats = null): self
+    public function withInputFormats($inputFormats): self
     {
         $self = clone $this;
         $self->inputFormats = $inputFormats;
@@ -396,7 +389,7 @@ final class ApiResource
     /**
      * @param mixed|null $outputFormats
      */
-    public function withOutputFormats($outputFormats = null): self
+    public function withOutputFormats($outputFormats): self
     {
         $self = clone $this;
         $self->outputFormats = $outputFormats;
@@ -423,12 +416,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getRoutePrefix(): string
+    public function getRoutePrefix(): ?string
     {
         return $this->routePrefix;
     }
 
-    public function withRoutePrefix(string $routePrefix = ''): self
+    public function withRoutePrefix(string $routePrefix): self
     {
         $self = clone $this;
         $self->routePrefix = $routePrefix;
@@ -436,12 +429,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getDefaults(): array
+    public function getDefaults(): ?array
     {
         return $this->defaults;
     }
 
-    public function withDefaults(array $defaults = []): self
+    public function withDefaults(array $defaults): self
     {
         $self = clone $this;
         $self->defaults = $defaults;
@@ -449,12 +442,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getRequirements(): array
+    public function getRequirements(): ?array
     {
         return $this->requirements;
     }
 
-    public function withRequirements(array $requirements = []): self
+    public function withRequirements(array $requirements): self
     {
         $self = clone $this;
         $self->requirements = $requirements;
@@ -462,12 +455,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getOptions(): array
+    public function getOptions(): ?array
     {
         return $this->options;
     }
 
-    public function withOptions(array $options = []): self
+    public function withOptions(array $options): self
     {
         $self = clone $this;
         $self->options = $options;
@@ -480,7 +473,7 @@ final class ApiResource
         return $this->stateless;
     }
 
-    public function withStateless(?bool $stateless = null): self
+    public function withStateless(bool $stateless): self
     {
         $self = clone $this;
         $self->stateless = $stateless;
@@ -493,7 +486,7 @@ final class ApiResource
         return $this->sunset;
     }
 
-    public function withSunset(?string $sunset = null): self
+    public function withSunset(string $sunset): self
     {
         $self = clone $this;
         $self->sunset = $sunset;
@@ -506,7 +499,7 @@ final class ApiResource
         return $this->acceptPatch;
     }
 
-    public function withAcceptPatch(?string $acceptPatch = null): self
+    public function withAcceptPatch(string $acceptPatch): self
     {
         $self = clone $this;
         $self->acceptPatch = $acceptPatch;
@@ -519,7 +512,7 @@ final class ApiResource
         return $this->status;
     }
 
-    public function withStatus($status = null): self
+    public function withStatus($status): self
     {
         $self = clone $this;
         $self->status = $status;
@@ -527,12 +520,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getHost(): string
+    public function getHost(): ?string
     {
         return $this->host;
     }
 
-    public function withHost(string $host = ''): self
+    public function withHost(string $host): self
     {
         $self = clone $this;
         $self->host = $host;
@@ -540,12 +533,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getSchemes(): array
+    public function getSchemes(): ?array
     {
         return $this->schemes;
     }
 
-    public function withSchemes(array $schemes = []): self
+    public function withSchemes(array $schemes): self
     {
         $self = clone $this;
         $self->schemes = $schemes;
@@ -553,12 +546,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getCondition(): string
+    public function getCondition(): ?string
     {
         return $this->condition;
     }
 
-    public function withCondition(string $condition = ''): self
+    public function withCondition(string $condition): self
     {
         $self = clone $this;
         $self->condition = $condition;
@@ -566,12 +559,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getController(): string
+    public function getController(): ?string
     {
         return $this->controller;
     }
 
-    public function withController(string $controller = ''): self
+    public function withController(string $controller): self
     {
         $self = clone $this;
         $self->controller = $controller;
@@ -584,7 +577,7 @@ final class ApiResource
         return $this->class;
     }
 
-    public function withClass(?string $class = null): self
+    public function withClass(string $class): self
     {
         $self = clone $this;
         $self->class = $class;
@@ -597,7 +590,7 @@ final class ApiResource
         return $this->urlGenerationStrategy;
     }
 
-    public function withUrlGenerationStrategy(?int $urlGenerationStrategy = null): self
+    public function withUrlGenerationStrategy(int $urlGenerationStrategy): self
     {
         $self = clone $this;
         $self->urlGenerationStrategy = $urlGenerationStrategy;
@@ -610,7 +603,7 @@ final class ApiResource
         return $this->deprecationReason;
     }
 
-    public function withDeprecationReason(?string $deprecationReason = null): self
+    public function withDeprecationReason(string $deprecationReason): self
     {
         $self = clone $this;
         $self->deprecationReason = $deprecationReason;
@@ -618,12 +611,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getCacheHeaders(): array
+    public function getCacheHeaders(): ?array
     {
         return $this->cacheHeaders;
     }
 
-    public function withCacheHeaders(array $cacheHeaders = []): self
+    public function withCacheHeaders(array $cacheHeaders): self
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
@@ -631,12 +624,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getNormalizationContext(): array
+    public function getNormalizationContext(): ?array
     {
         return $this->normalizationContext;
     }
 
-    public function withNormalizationContext(array $normalizationContext = []): self
+    public function withNormalizationContext(array $normalizationContext): self
     {
         $self = clone $this;
         $self->normalizationContext = $normalizationContext;
@@ -644,12 +637,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getDenormalizationContext(): array
+    public function getDenormalizationContext(): ?array
     {
         return $this->denormalizationContext;
     }
 
-    public function withDenormalizationContext(array $denormalizationContext = []): self
+    public function withDenormalizationContext(array $denormalizationContext): self
     {
         $self = clone $this;
         $self->denormalizationContext = $denormalizationContext;
@@ -658,14 +651,14 @@ final class ApiResource
     }
 
     /**
-     * @return string[]
+     * @return string[]|null
      */
-    public function getHydraContext(): array
+    public function getHydraContext(): ?array
     {
         return $this->hydraContext;
     }
 
-    public function withHydraContext(array $hydraContext = []): self
+    public function withHydraContext(array $hydraContext): self
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
@@ -673,12 +666,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getOpenapiContext(): array
+    public function getOpenapiContext(): ?array
     {
         return $this->openapiContext;
     }
 
-    public function withOpenapiContext(array $openapiContext = []): self
+    public function withOpenapiContext(array $openapiContext): self
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
@@ -686,12 +679,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getValidationContext(): array
+    public function getValidationContext(): ?array
     {
         return $this->validationContext;
     }
 
-    public function withValidationContext(array $validationContext = []): self
+    public function withValidationContext(array $validationContext): self
     {
         $self = clone $this;
         $self->validationContext = $validationContext;
@@ -700,14 +693,14 @@ final class ApiResource
     }
 
     /**
-     * @return string[]
+     * @return string[]|null
      */
-    public function getFilters(): array
+    public function getFilters(): ?array
     {
         return $this->filters;
     }
 
-    public function withFilters(array $filters = []): self
+    public function withFilters(array $filters): self
     {
         $self = clone $this;
         $self->filters = $filters;
@@ -720,7 +713,7 @@ final class ApiResource
         return $this->elasticsearch;
     }
 
-    public function withElasticsearch(?bool $elasticsearch = null): self
+    public function withElasticsearch(bool $elasticsearch): self
     {
         $self = clone $this;
         $self->elasticsearch = $elasticsearch;
@@ -736,10 +729,7 @@ final class ApiResource
         return $this->mercure;
     }
 
-    /**
-     * @param mixed|null $mercure
-     */
-    public function withMercure($mercure = null): self
+    public function withMercure($mercure): self
     {
         $self = clone $this;
         $self->mercure = $mercure;
@@ -747,18 +737,12 @@ final class ApiResource
         return $self;
     }
 
-    /**
-     * @return bool|mixed|null
-     */
     public function getMessenger()
     {
         return $this->messenger;
     }
 
-    /**
-     * @param mixed|null $messenger
-     */
-    public function withMessenger($messenger = null): self
+    public function withMessenger($messenger): self
     {
         $self = clone $this;
         $self->messenger = $messenger;
@@ -766,18 +750,12 @@ final class ApiResource
         return $self;
     }
 
-    /**
-     * @return mixed|null
-     */
     public function getInput()
     {
         return $this->input;
     }
 
-    /**
-     * @param mixed|null $input
-     */
-    public function withInput($input = null): self
+    public function withInput($input): self
     {
         $self = clone $this;
         $self->input = $input;
@@ -785,18 +763,12 @@ final class ApiResource
         return $self;
     }
 
-    /**
-     * @return mixed|null
-     */
     public function getOutput()
     {
         return $this->output;
     }
 
-    /**
-     * @param mixed|null $output
-     */
-    public function withOutput($output = null): self
+    public function withOutput($output): self
     {
         $self = clone $this;
         $self->output = $output;
@@ -804,12 +776,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getOrder(): array
+    public function getOrder(): ?array
     {
         return $this->order;
     }
 
-    public function withOrder(array $order = []): self
+    public function withOrder(array $order): self
     {
         $self = clone $this;
         $self->order = $order;
@@ -822,7 +794,7 @@ final class ApiResource
         return $this->fetchPartial;
     }
 
-    public function withFetchPartial(?bool $fetchPartial = null): self
+    public function withFetchPartial(bool $fetchPartial): self
     {
         $self = clone $this;
         $self->fetchPartial = $fetchPartial;
@@ -835,7 +807,7 @@ final class ApiResource
         return $this->forceEager;
     }
 
-    public function withForceEager(?bool $forceEager = null): self
+    public function withForceEager(bool $forceEager): self
     {
         $self = clone $this;
         $self->forceEager = $forceEager;
@@ -848,7 +820,7 @@ final class ApiResource
         return $this->paginationClientEnabled;
     }
 
-    public function withPaginationClientEnabled(?bool $paginationClientEnabled = null): self
+    public function withPaginationClientEnabled(bool $paginationClientEnabled): self
     {
         $self = clone $this;
         $self->paginationClientEnabled = $paginationClientEnabled;
@@ -861,7 +833,7 @@ final class ApiResource
         return $this->paginationClientItemsPerPage;
     }
 
-    public function withPaginationClientItemsPerPage(?bool $paginationClientItemsPerPage = null): self
+    public function withPaginationClientItemsPerPage(bool $paginationClientItemsPerPage): self
     {
         $self = clone $this;
         $self->paginationClientItemsPerPage = $paginationClientItemsPerPage;
@@ -874,7 +846,7 @@ final class ApiResource
         return $this->paginationClientPartial;
     }
 
-    public function withPaginationClientPartial(?bool $paginationClientPartial = null): self
+    public function withPaginationClientPartial(bool $paginationClientPartial): self
     {
         $self = clone $this;
         $self->paginationClientPartial = $paginationClientPartial;
@@ -882,12 +854,12 @@ final class ApiResource
         return $self;
     }
 
-    public function getPaginationViaCursor(): array
+    public function getPaginationViaCursor(): ?array
     {
         return $this->paginationViaCursor;
     }
 
-    public function withPaginationViaCursor(array $paginationViaCursor = []): self
+    public function withPaginationViaCursor(array $paginationViaCursor): self
     {
         $self = clone $this;
         $self->paginationViaCursor = $paginationViaCursor;
@@ -900,7 +872,7 @@ final class ApiResource
         return $this->paginationEnabled;
     }
 
-    public function withPaginationEnabled(?bool $paginationEnabled = null): self
+    public function withPaginationEnabled(bool $paginationEnabled): self
     {
         $self = clone $this;
         $self->paginationEnabled = $paginationEnabled;
@@ -913,7 +885,7 @@ final class ApiResource
         return $this->paginationFetchJoinCollection;
     }
 
-    public function withPaginationFetchJoinCollection(?bool $paginationFetchJoinCollection = null): self
+    public function withPaginationFetchJoinCollection(bool $paginationFetchJoinCollection): self
     {
         $self = clone $this;
         $self->paginationFetchJoinCollection = $paginationFetchJoinCollection;
@@ -926,7 +898,7 @@ final class ApiResource
         return $this->paginationUseOutputWalkers;
     }
 
-    public function withPaginationUseOutputWalkers(?bool $paginationUseOutputWalkers = null): self
+    public function withPaginationUseOutputWalkers(bool $paginationUseOutputWalkers): self
     {
         $self = clone $this;
         $self->paginationUseOutputWalkers = $paginationUseOutputWalkers;
@@ -939,7 +911,7 @@ final class ApiResource
         return $this->paginationItemsPerPage;
     }
 
-    public function withPaginationItemsPerPage(?int $paginationItemsPerPage = null): self
+    public function withPaginationItemsPerPage(int $paginationItemsPerPage): self
     {
         $self = clone $this;
         $self->paginationItemsPerPage = $paginationItemsPerPage;
@@ -952,7 +924,7 @@ final class ApiResource
         return $this->paginationMaximumItemsPerPage;
     }
 
-    public function withPaginationMaximumItemsPerPage(?int $paginationMaximumItemsPerPage = null): self
+    public function withPaginationMaximumItemsPerPage(int $paginationMaximumItemsPerPage): self
     {
         $self = clone $this;
         $self->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
@@ -965,7 +937,7 @@ final class ApiResource
         return $this->paginationPartial;
     }
 
-    public function withPaginationPartial(?bool $paginationPartial = null): self
+    public function withPaginationPartial(bool $paginationPartial): self
     {
         $self = clone $this;
         $self->paginationPartial = $paginationPartial;
@@ -978,7 +950,7 @@ final class ApiResource
         return $this->paginationType;
     }
 
-    public function withPaginationType(?string $paginationType = null): self
+    public function withPaginationType(string $paginationType): self
     {
         $self = clone $this;
         $self->paginationType = $paginationType;
@@ -991,7 +963,7 @@ final class ApiResource
         return $this->security;
     }
 
-    public function withSecurity(?string $security = null): self
+    public function withSecurity(string $security): self
     {
         $self = clone $this;
         $self->security = $security;
@@ -1004,7 +976,7 @@ final class ApiResource
         return $this->securityMessage;
     }
 
-    public function withSecurityMessage(?string $securityMessage = null): self
+    public function withSecurityMessage(string $securityMessage): self
     {
         $self = clone $this;
         $self->securityMessage = $securityMessage;
@@ -1017,7 +989,7 @@ final class ApiResource
         return $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize(?string $securityPostDenormalize = null): self
+    public function withSecurityPostDenormalize(string $securityPostDenormalize): self
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;
@@ -1030,7 +1002,7 @@ final class ApiResource
         return $this->securityPostDenormalizeMessage;
     }
 
-    public function withSecurityPostDenormalizeMessage(?string $securityPostDenormalizeMessage = null): self
+    public function withSecurityPostDenormalizeMessage(string $securityPostDenormalizeMessage): self
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
@@ -1043,7 +1015,7 @@ final class ApiResource
         return $this->compositeIdentifier;
     }
 
-    public function withCompositeIdentifier(?bool $compositeIdentifier = null): self
+    public function withCompositeIdentifier(bool $compositeIdentifier): self
     {
         $self = clone $this;
         $self->compositeIdentifier = $compositeIdentifier;
@@ -1056,7 +1028,7 @@ final class ApiResource
         return $this->exceptionToStatus;
     }
 
-    public function withExceptionToStatus(?array $exceptionToStatus = []): self
+    public function withExceptionToStatus(array $exceptionToStatus): self
     {
         $self = clone $this;
         $self->exceptionToStatus = $exceptionToStatus;
@@ -1069,7 +1041,7 @@ final class ApiResource
         return $this->queryParameterValidationEnabled;
     }
 
-    public function withQueryParameterValidationEnabled(?bool $queryParameterValidationEnabled = null): self
+    public function withQueryParameterValidationEnabled(bool $queryParameterValidationEnabled): self
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
@@ -1082,7 +1054,7 @@ final class ApiResource
         return $this->graphQlOperations;
     }
 
-    public function withGraphQlOperations(?array $graphQlOperations = null): self
+    public function withGraphQlOperations(array $graphQlOperations): self
     {
         $self = clone $this;
         $self->graphQlOperations = $graphQlOperations;
@@ -1095,7 +1067,7 @@ final class ApiResource
         return $this->extraProperties;
     }
 
-    public function withExtraProperties(array $extraProperties = []): self
+    public function withExtraProperties(array $extraProperties): self
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;

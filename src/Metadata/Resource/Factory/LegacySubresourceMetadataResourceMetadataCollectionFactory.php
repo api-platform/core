@@ -17,7 +17,10 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInte
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -27,6 +30,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class LegacySubresourceMetadataResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use DeprecationMetadataTrait;
     private $decorated;
     private $resourceNameCollectionFactory;
     private $subresourceOperationFactory;
@@ -74,7 +78,9 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                     continue;
                 }
 
-                $operation = $operation->{'with'.substr($methodName, 3)}($defaults->{$methodName}());
+                if (($value = $defaults->{$methodName}()) !== null) {
+                    $operation = $operation->{'with'.substr($methodName, 3)}($value);
+                }
             }
 
             $resourceMetadataCollection[] = $resource->withOperations(new Operations([$operationName => $operation]));
@@ -105,45 +111,49 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                     $identifiers[$parameterName] = ['class' => $class, 'identifiers' => [$property]];
                 }
 
-                $resource = (new ApiResource())
-                    ->withUriTemplate($subresourceMetadata['path'])
-                    ->withShortName($subresourceMetadata['shortNames'][0])
-                    ->withOperations(new Operations([
-                        $subresourceMetadata['route_name'] => (new Get())
-                            ->withUriTemplate($subresourceMetadata['path'])
-                            ->withShortName($subresourceMetadata['shortNames'][0])
-                            ->withUriVariables($identifiers)
-                            ->withDefaults($subresourceMetadata['defaults'])
-                            ->withRequirements($subresourceMetadata['requirements'])
-                            ->withOptions($subresourceMetadata['options'])
-                            ->withStateless($subresourceMetadata['stateless'])
-                            ->withHost($subresourceMetadata['host'])
-                            ->withSchemes($subresourceMetadata['schemes'])
-                            ->withCondition($subresourceMetadata['condition'])
-                            ->withClass($subresourceMetadata['resource_class'])
-                            ->withCollection($subresourceMetadata['collection'])
-                            ->withCompositeIdentifier(false)
-                            ->withExtraProperties([
-                                'is_legacy_subresource' => true,
-                                'legacy_subresource_property' => $subresourceMetadata['property'],
-                                'legacy_subresource_identifiers' => $subresourceMetadata['identifiers'],
-                            ]),
-                    ]))
-                    ->withUriVariables($identifiers)
-                    ->withDefaults($subresourceMetadata['defaults'])
-                    ->withRequirements($subresourceMetadata['requirements'])
-                    ->withOptions($subresourceMetadata['options'])
-                    ->withStateless($subresourceMetadata['stateless'])
-                    ->withHost($subresourceMetadata['host'])
-                    ->withSchemes($subresourceMetadata['schemes'])
-                    ->withCondition($subresourceMetadata['condition'])
-                    ->withClass($subresourceMetadata['resource_class'])
-                    ->withCompositeIdentifier(false)
-                    ->withExtraProperties([
-                        'is_legacy_subresource' => true,
-                        'legacy_subresource_property' => $subresourceMetadata['property'],
-                        'legacy_subresource_identifiers' => $subresourceMetadata['identifiers'],
-                    ]);
+                $extraProperties = ['is_legacy_subresource' => true];
+                if ($subresourceMetadata['property']) {
+                    $extraProperties['legacy_subresource_property'] = $subresourceMetadata['property'];
+                }
+
+                if ($subresourceMetadata['identifiers']) {
+                    $extraProperties['legacy_subresource_identifiers'] = $subresourceMetadata['identifiers'];
+                    unset($subresourceMetadata['identifiers']);
+                }
+
+                $resource = (new ApiResource())->withExtraProperties($extraProperties)->withCompositeIdentifier(false)->withUriVariables($identifiers)->withStateless(false);
+                $operation = (new Get())->withExtraProperties($extraProperties)->withCompositeIdentifier(false)->withUriVariables($identifiers);
+
+                if ($subresourceMetadata['path']) {
+                    $resource = $resource->withUriTemplate($subresourceMetadata['path']);
+                    $operation = $operation->withUriTemplate($subresourceMetadata['path']);
+                }
+
+                if ($subresourceMetadata['shortNames'][0]) {
+                    $resource = $resource->withShortName($subresourceMetadata['shortNames'][0]);
+                    $operation = $operation->withShortName($subresourceMetadata['shortNames'][0]);
+                }
+
+                if ($subresourceMetadata['resource_class']) {
+                    $resource = $resource->withClass($subresourceMetadata['resource_class']);
+                    $operation = $operation->withClass($subresourceMetadata['resource_class']);
+                }
+
+                if ($subresourceMetadata['collection']) {
+                    $operation = $operation->withCollection($subresourceMetadata['collection']);
+                }
+
+                foreach ($subresourceMetadata as $key => $value) {
+                    if ('route_name' === $key) {
+                        continue;
+                    }
+                    $resource = $this->setAttributeValue($resource, $key, $value);
+                    $operation = $this->setAttributeValue($operation, $key, $value);
+                }
+
+                $resource = $resource->withOperations(new Operations([
+                    $subresourceMetadata['route_name'] => $operation,
+                ]));
 
                 if ($subresourceMetadata['controller']) { // manage null values from subresources
                     $resource = $resource->withController($subresourceMetadata['controller']);
@@ -152,5 +162,22 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 $this->localCache[$resource->getClass()][] = $resource;
             }
         }
+    }
+
+    /**
+     * @param Operation|GraphQlOperation|ApiResource $operation
+     *
+     * @return Operation|GraphQlOperation|ApiResource
+     */
+    private function setAttributeValue($operation, string $key, $value)
+    {
+        [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
+        $methodName = 'with'.ucfirst($camelCaseKey);
+
+        if (method_exists($operation, $methodName) && null !== $value) {
+            return $operation->{$methodName}($value);
+        }
+
+        return $operation;
     }
 }

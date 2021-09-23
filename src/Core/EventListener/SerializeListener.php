@@ -88,7 +88,7 @@ final class SerializeListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            ($operation && !$operation->canSerialize())
+            ($operation && !($operation->canSerialize() ?? true))
         ) {
             return;
         }

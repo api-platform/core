@@ -55,7 +55,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             && isset($attributes['operation_name'])
         ) {
             $operation = $attributes['operation'] ?? $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name']);
-            $context = $normalization ? $operation->getNormalizationContext() : $operation->getDenormalizationContext();
+            $context = $normalization ? ($operation->getNormalizationContext() ?? []) : ($operation->getDenormalizationContext() ?? []);
             $context['operation_name'] = $attributes['operation_name'];
             $context['operation'] = $operation;
             $context['resource_class'] = $attributes['resource_class'];

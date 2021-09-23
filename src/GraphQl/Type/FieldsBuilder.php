@@ -398,7 +398,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             return $args;
         }
 
-        foreach ($operation->getFilters() as $filterId) {
+        foreach ($operation->getFilters() ?? [] as $filterId) {
             if (null === $this->filterLocator || !$this->filterLocator->has($filterId)) {
                 continue;
             }

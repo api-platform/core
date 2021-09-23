@@ -68,10 +68,16 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
         $resource = (new ApiResource())
             ->withShortName($resourceMetadata->getShortName())
-            ->withDescription($resourceMetadata->getDescription())
             ->withClass($resourceClass)
-            ->withExtraProperties(['is_legacy_resource_metadata' => true])
-            ->withTypes($resourceMetadata->getIri() ? [$resourceMetadata->getIri()] : null);
+            ->withExtraProperties(['is_legacy_resource_metadata' => true]);
+
+        if ($description = $resourceMetadata->getDescription()) {
+            $resource = $resource->withDescription($description);
+        }
+
+        if ($resourceMetadata->getIri()) {
+            $resource = $resource->withTypes([$resourceMetadata->getIri()]);
+        }
 
         foreach ($attributes as $key => $value) {
             $resource = $this->setAttributeValue($resource, $key, $value);
@@ -192,7 +198,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
         $methodName = 'with'.ucfirst($camelCaseKey);
 
-        if (method_exists($operation, $methodName)) {
+        if (method_exists($operation, $methodName) && null !== $value) {
             return $operation->{$methodName}($value);
         }
 

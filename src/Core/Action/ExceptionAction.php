@@ -74,7 +74,7 @@ final class ExceptionAction
 
         $exceptionToStatus = array_merge(
             $this->exceptionToStatus,
-            $operation ? $operation->getExceptionToStatus() : $this->getOperationExceptionToStatus($request)
+            $operation ? $operation->getExceptionToStatus() ?? [] : $this->getOperationExceptionToStatus($request)
         );
 
         foreach ($exceptionToStatus as $class => $status) {
