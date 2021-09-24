@@ -5,9 +5,9 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
     <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
 
-    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphql-playground/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/apiplatform/graphql-playground/index.css', assetPackage) }}">
 
-    <script src="{{ asset('bundles/apiplatform/graphql-playground/middleware.js') }}"></script>
+    <script src="{{ asset('bundles/apiplatform/graphql-playground/middleware.js', assetPackage) }}"></script>
     {# json_encode(65) is for JSON_UNESCAPED_SLASHES|JSON_HEX_TAG to avoid JS XSS #}
     <script id="graphql-playground-data" type="application/json">{{ graphql_playground_data|json_encode(65)|raw }}</script>
 </head>
@@ -522,7 +522,7 @@
 
 <div id="graphql-playground" />
 
-<script src="{{ asset('bundles/apiplatform/init-graphql-playground.js') }}"></script>
+<script src="{{ asset('bundles/apiplatform/init-graphql-playground.js', assetPackage) }}"></script>
 
 </body>
 </html>
