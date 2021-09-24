@@ -61,10 +61,15 @@ class ClientTest extends ApiTestCase
         $response = $client->request('POST', '/dummies', [
             'headers' => [
                 'content-type' => 'application/json',
+                'remote-addr' => '10.10.10.10',
                 'accept' => 'text/xml',
             ],
             'body' => '{"name": "Kevin"}',
         ]);
+        $server = $client->getKernelBrowser()->getInternalRequest()->getServer();
+        $this->assertSame('application/json', $server['CONTENT_TYPE']);
+        $this->assertSame('10.10.10.10', $server['REMOTE_ADDR']);
+        $this->assertSame('text/xml', $server['HTTP_ACCEPT']);
         $this->assertSame('application/xml; charset=utf-8', $response->getHeaders()['content-type'][0]);
         $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
