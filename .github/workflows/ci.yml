@@ -661,7 +661,7 @@ jobs:
         php:
           - '8.0'
         symfony:
-          - '5.4'
+          - '6.0'
       fail-fast: false
     env:
       # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
@@ -725,7 +725,7 @@ jobs:
         php:
           - '8.0'
         symfony:
-          - '5.4'
+          - '6.0'
       fail-fast: false
     steps:
       - name: Checkout
