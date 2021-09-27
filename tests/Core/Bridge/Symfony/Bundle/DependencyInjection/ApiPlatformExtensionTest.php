@@ -101,7 +101,6 @@ use Doctrine\ORM\OptimisticLockException;
 use Nelmio\ApiDocBundle\NelmioApiDocBundle;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Prophecy\Exception\Doubler\MethodNotFoundException;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -898,6 +897,9 @@ class ApiPlatformExtensionTest extends TestCase
 
             self::assertSame(
                 $normalizePaths([
+                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
+                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
+                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/B.yaml",
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/Bb.yaml",
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a.yaml",
@@ -905,9 +907,6 @@ class ApiPlatformExtensionTest extends TestCase
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/b/a.yaml",
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c.yaml",
                     "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c/a.yaml",
-                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
-                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
-                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
                 ]),
                 $normalizePaths($paths)
             );
@@ -1036,12 +1035,7 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $containerBuilderProphecy->fileExists(Argument::type('string'))->shouldBeCalled();
-
-        try {
-            $containerBuilderProphecy->fileExists(Argument::type('string'))->shouldBeCalled();
-        } catch (MethodNotFoundException $e) {
-            $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
-        }
+        $containerBuilderProphecy->addResource(Argument::type(ResourceInterface::class))->shouldBeCalled();
 
         $containerBuilderProphecy->hasExtension('http://symfony.com/schema/dic/services')->shouldBeCalled();
 
