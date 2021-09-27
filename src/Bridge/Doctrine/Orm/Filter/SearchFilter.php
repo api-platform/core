@@ -143,7 +143,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         $associationAlias = $alias;
         $associationField = $field;
-        if ($metadata->isCollectionValuedAssociation($associationField)) {
+        if ($metadata->isCollectionValuedAssociation($associationField) || $metadata->isAssociationInverseSide($field)) {
             $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
             $associationField = $associationFieldIdentifier;
         }
