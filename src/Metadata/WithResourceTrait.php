@@ -28,22 +28,14 @@ trait WithResourceTrait
     private function copyFrom($resource): self
     {
         $self = clone $this;
-        foreach (get_class_methods($resource) as $methodName) {
-            if (0 !== strpos($methodName, 'get')) {
-                continue;
-            }
-
-            if (!method_exists($self, $methodName)) {
-                continue;
-            }
-
-            $operationValue = $self->{$methodName}();
-            if (null !== $operationValue && [] !== $operationValue) {
-                continue;
-            }
-
-            if ($resource->{$methodName}() !== null) {
-                $self = $self->{'with'.substr($methodName, 3)}($resource->{$methodName}());
+        foreach (get_class_methods($resource) as $method) {
+            if (
+                method_exists($self, $method) &&
+                preg_match('/^(?:get|is|can)(.*)/', $method, $matches) &&
+                null === $self->{$method}() &&
+                null !== $val = $resource->{$method}()
+            ) {
+                $self = $self->{"with{$matches[1]}"}($val);
             }
         }
 
