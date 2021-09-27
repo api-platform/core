@@ -32,13 +32,15 @@ final class GraphiQlAction
     private $router;
     private $graphiqlEnabled;
     private $title;
+    private $assetPackage;
 
-    public function __construct(TwigEnvironment $twig, RouterInterface $router, bool $graphiqlEnabled = false, string $title = '')
+    public function __construct(TwigEnvironment $twig, RouterInterface $router, bool $graphiqlEnabled = false, string $title = '', $assetPackage = null)
     {
         $this->twig = $twig;
         $this->router = $router;
         $this->graphiqlEnabled = $graphiqlEnabled;
         $this->title = $title;
+        $this->assetPackage = $assetPackage;
     }
 
     public function __invoke(Request $request): Response
@@ -47,6 +49,7 @@ final class GraphiQlAction
             return new Response($this->twig->render('@ApiPlatform/Graphiql/index.html.twig', [
                 'title' => $this->title,
                 'graphiql_data' => ['entrypoint' => $this->router->generate('api_graphql_entrypoint')],
+                'assetPackage' => $this->assetPackage,
             ]));
         }
 
