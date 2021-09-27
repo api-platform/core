@@ -198,7 +198,11 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
         $methodName = 'with'.ucfirst($camelCaseKey);
 
-        if (method_exists($operation, $methodName) && null !== $value) {
+        if (null === $value) {
+            return $operation;
+        }
+
+        if (method_exists($operation, $methodName)) {
             return $operation->{$methodName}($value);
         }
 

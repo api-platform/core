@@ -123,32 +123,32 @@ class Operation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        array $order = [],
+        ?array $order = null,
         ?string $description = null,
-        array $normalizationContext = [],
-        array $denormalizationContext = [],
+        ?array $normalizationContext = null,
+        ?array $denormalizationContext = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
         ?string $deprecationReason = null,
-        array $filters = [],
-        array $validationContext = [],
+        ?array $filters = null,
+        ?array $validationContext = null,
         $input = null,
         $output = null,
         $mercure = null,
         $messenger = null,
         ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
-        bool $read = true,
-        bool $deserialize = true,
-        bool $validate = true,
-        bool $write = true,
-        bool $serialize = true,
+        ?bool $read = null,
+        ?bool $deserialize = null,
+        ?bool $validate = null,
+        ?bool $write = null,
+        ?bool $serialize = null,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
-        int $priority = 0,
-        string $name = '',
+        ?int $priority = null,
+        ?string $name = null,
         array $extraProperties = []
     ) {
         $this->resolver = $resolver;
@@ -395,7 +395,7 @@ class Operation
         return $self;
     }
 
-    public function getOrder(): array
+    public function getOrder(): ?array
     {
         return $this->order;
     }
@@ -421,7 +421,7 @@ class Operation
         return $self;
     }
 
-    public function getNormalizationContext(): array
+    public function getNormalizationContext(): ?array
     {
         return $this->normalizationContext;
     }
@@ -434,7 +434,7 @@ class Operation
         return $self;
     }
 
-    public function getDenormalizationContext(): array
+    public function getDenormalizationContext(): ?array
     {
         return $this->denormalizationContext;
     }
@@ -512,7 +512,7 @@ class Operation
         return $self;
     }
 
-    public function getFilters(): array
+    public function getFilters(): ?array
     {
         return $this->filters;
     }
@@ -525,7 +525,7 @@ class Operation
         return $self;
     }
 
-    public function getValidationContext(): array
+    public function getValidationContext(): ?array
     {
         return $this->validationContext;
     }
@@ -632,7 +632,7 @@ class Operation
         return $self;
     }
 
-    public function canRead(): bool
+    public function canRead(): ?bool
     {
         return $this->read;
     }
@@ -645,7 +645,7 @@ class Operation
         return $self;
     }
 
-    public function canDeserialize(): bool
+    public function canDeserialize(): ?bool
     {
         return $this->deserialize;
     }
@@ -658,7 +658,7 @@ class Operation
         return $self;
     }
 
-    public function canValidate(): bool
+    public function canValidate(): ?bool
     {
         return $this->validate;
     }
@@ -671,7 +671,7 @@ class Operation
         return $self;
     }
 
-    public function canWrite(): bool
+    public function canWrite(): ?bool
     {
         return $this->write;
     }
@@ -684,7 +684,7 @@ class Operation
         return $self;
     }
 
-    public function canSerialize(): bool
+    public function canSerialize(): ?bool
     {
         return $this->serialize;
     }
@@ -723,7 +723,7 @@ class Operation
         return $self;
     }
 
-    public function getPriority(): int
+    public function getPriority(): ?int
     {
         return $this->priority;
     }
@@ -736,7 +736,7 @@ class Operation
         return $self;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
