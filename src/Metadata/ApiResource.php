@@ -105,6 +105,8 @@ final class ApiResource
     private $securityMessage;
     private $securityPostDenormalize;
     private $securityPostDenormalizeMessage;
+    private $securityPostValidation;
+    private $securityPostValidationMessage;
     private $compositeIdentifier;
     private $exceptionToStatus;
     private $queryParameterValidationEnabled;
@@ -151,6 +153,8 @@ final class ApiResource
      * @param string|null       $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string|null       $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string            $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
+     * @param string            $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      */
     public function __construct(
         ?string $uriTemplate = null,
@@ -207,6 +211,8 @@ final class ApiResource
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?bool $compositeIdentifier = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -267,6 +273,8 @@ final class ApiResource
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+        $this->securityPostValidation = $securityPostValidation;
+        $this->securityPostValidationMessage = $securityPostValidationMessage;
         $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
@@ -1008,6 +1016,32 @@ final class ApiResource
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidation(): ?string
+    {
+        return $this->securityPostValidation;
+    }
+
+    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidation = $securityPostValidation;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidationMessage(): ?string
+    {
+        return $this->securityPostValidationMessage;
+    }
+
+    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidationMessage = $securityPostValidationMessage;
 
         return $self;
     }

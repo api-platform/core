@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -81,6 +82,14 @@ final class DenyAccessListener
     {
         $request = $event->getRequest();
         $this->checkSecurity($request, 'security_post_denormalize', true, [
+            'previous_object' => $request->attributes->get('previous_data'),
+        ]);
+    }
+
+    public function onSecurityPostValidation(ViewEvent $event): void
+    {
+        $request = $event->getRequest();
+        $this->checkSecurity($request, 'security_post_validation', false, [
             'previous_object' => $request->attributes->get('previous_data'),
         ]);
     }

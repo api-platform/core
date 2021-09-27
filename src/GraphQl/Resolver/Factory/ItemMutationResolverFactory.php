@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
@@ -49,8 +50,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $validateStage;
     private $mutationResolverLocator;
     private $resourceMetadataCollectionFactory;
+    private $securityPostValidationStage;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SecurityPostValidationStageInterface $securityPostValidationStage)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
@@ -61,6 +63,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         $this->validateStage = $validateStage;
         $this->mutationResolverLocator = $mutationResolverLocator;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->securityPostValidationStage = $securityPostValidationStage;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
@@ -119,6 +122,13 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             if (null !== $item) {
                 ($this->validateStage)($item, $resourceClass, $operationName, $resolverContext);
+
+                ($this->securityPostValidationStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $item,
+                        'previous_object' => $previousItem,
+                    ],
+                ]);
 
                 $persistResult = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
             }
