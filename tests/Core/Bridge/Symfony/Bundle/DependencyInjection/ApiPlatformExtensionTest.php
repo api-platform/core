@@ -624,6 +624,8 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.date_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.collection_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.state.collection_provider', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.state.item_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.default.subresource_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.exists_filter', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.doctrine.orm.item_data_provider', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1409,6 +1411,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.collection_data_provider',
             'api_platform.doctrine.orm.data_persister',
             'api_platform.doctrine.orm.date_filter',
+            'api_platform.doctrine.orm.state.collection_provider',
+            'api_platform.doctrine.orm.state.item_provider',
             'api_platform.doctrine.orm.default.collection_data_provider',
             'api_platform.doctrine.orm.default.item_data_provider',
             'api_platform.doctrine.orm.exists_filter',
@@ -1557,6 +1561,8 @@ class ApiPlatformExtensionTest extends TestCase
                 'api_platform.doctrine_mongodb.odm.search_filter',
                 'api_platform.doctrine_mongodb.odm.subresource_data_provider',
                 'api_platform.doctrine_mongodb.odm.state.processor',
+                'api_platform.doctrine.odm.state.collection_provider',
+                'api_platform.doctrine.odm.state.item_provider',
             ]);
         }
 

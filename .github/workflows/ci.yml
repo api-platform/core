@@ -530,8 +530,10 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
-          coverage: none
+          coverage: pcov
           ini-values: memory_limit=-1
+      - name: Enable code coverage
+        run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
@@ -551,9 +553,43 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit --group mongodb
+        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mongodb
       - name: Run Behat tests
-        run: vendor/bin/behat -vv --out=std --format=progress --profile=mongodb --no-interaction
+        run: |
+          mkdir -p build/logs/behat
+          if [ "$COVERAGE" = '1' ]; then
+            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction --tags='~@php8'
+          else
+            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@php8'
+          fi
+      - name: Merge code coverage reports
+        run: |
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          chmod +x /usr/local/bin/phpcov
+          phpcov merge --clover build/logs/behat/clover.xml build/coverage
+        continue-on-error: true
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}
+          path: build/logs/behat
+        continue-on-error: true
+      - name: Upload coverage results to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          name: behat-php${{ matrix.php }}
+          flags: behat
+          fail_ci_if_error: true
+        continue-on-error: true
+      - name: Upload coverage results to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          composer global require --prefer-dist --no-interaction --no-progress --ansi cedx/coveralls
+          export PATH="$PATH:$HOME/.composer/vendor/bin"
+          coveralls build/logs/behat/clover.xml
+        continue-on-error: true
 
   elasticsearch:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)

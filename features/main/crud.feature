@@ -583,3 +583,69 @@ Feature: Create-Retrieve-Update-Delete
       "foo": "bar"
     }
     """
+
+  @php8
+  Scenario: Create a resource ProviderEntity
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/provider_entities" with body:
+    """
+    {
+      "foo": "bar"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/provider_entities/1"
+    And the header "Location" should be equal to "/provider_entities/1"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/ProviderEntity",
+      "@id": "/provider_entities/1",
+      "@type": "ProviderEntity",
+      "id": 1,
+      "foo": "bar"
+    }
+    """
+
+  @php8
+  Scenario: Get a collection of Provider Entities
+    When I send a "GET" request to "/provider_entities"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+      {
+          "@context": "/contexts/ProviderEntity",
+          "@id": "/provider_entities",
+          "@type": "hydra:Collection",
+          "hydra:member": [
+              {
+                  "@id": "/provider_entities/1",
+                  "@type": "ProviderEntity",
+                  "id": 1,
+                  "foo": "bar"
+              }
+          ],
+          "hydra:totalItems": 1
+      }
+    """
+
+  @php8
+  Scenario: Get a resource ProviderEntity
+    When I send a "GET" request to "/provider_entities/1"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+      {
+          "@context": "/contexts/ProviderEntity",
+          "@id": "/provider_entities/1",
+          "@type": "ProviderEntity",
+          "id": 1,
+          "foo": "bar"
+      }
+    """

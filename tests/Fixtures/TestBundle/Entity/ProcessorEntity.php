@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  */
 #[ApiResource]
+#[Get]
 #[Post]
 class ProcessorEntity
 {
