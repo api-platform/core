@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.6.6
+
+* fix(json-schema): consider `SplFileInfo` class as a binary type (#4332)
+* fix(json-schema): use `collectionKeyType` for building JSON Schema (#4385)
+* fix(openapi): failing recursion on api resources with "paths" key (#4325)
+* fix(graphql): make sure form content type is recognized as a multipart request (#4461)
+* fix(doctrine): handle inverse side of OneToOne association in Doctrine search filter (#4366)
+* fix(doctrine): usage of deprecated DBAL type constants (#4399)
+* fix(test): fix `REMOTE_ADDR` support in `ApiTestCase` (#4446)
+* fix(docs): use `asset_package` for all assets (#4470)
+* fix(docs): upgrade Swagger UI to version 3.52.3 (#4477)
+* fix(docs): upgrade ReDoc to version 2.0.0-rc.56 (#4477)
+* fix(docs): upgrade Swagger UI to version 2.0.0-rc.56 (#4477)
+
 ## 2.6.5
 
 * Fix various usage of various deprecated methods
