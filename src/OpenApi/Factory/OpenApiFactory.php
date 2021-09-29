@@ -382,8 +382,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if ($operationUriVariables[$parameterName] === $uriVariableDefinition) {
-                        $parameters[$parameterName] = '$request.path.'.$uriVariableDefinition['identifiers'][0];
+                    if ($operationUriVariables[$parameterName]->getIdentifiers() === $uriVariableDefinition->getIdentifiers() && $operationUriVariables[$parameterName]->getTargetClass() === $uriVariableDefinition->getTargetClass()) {
+                        $parameters[$parameterName] = '$request.path.'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }
 
@@ -392,8 +392,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if (($uriVariableDefinition['class'] ?? null) === $currentOperation->getClass()) {
-                        $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition['identifiers'][0];
+                    if (($uriVariableDefinition->getTargetClass() ?? null) === $currentOperation->getClass()) {
+                        $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }
 

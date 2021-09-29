@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\UriVariable;
 
 /**
  * We have to compute a local cache having all the resource => subresource matching.
@@ -108,7 +109,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                         continue;
                     }
 
-                    $identifiers[$parameterName] = ['class' => $class, 'identifiers' => [$property]];
+                    $identifiers[$parameterName] = (new UriVariable())->withTargetClass($class)->withIdentifiers([$property]);
                 }
 
                 $extraProperties = ['is_legacy_subresource' => true];

@@ -42,7 +42,7 @@ trait UriVariablesResolverTrait
             return $identifiers;
         }
 
-        foreach ($operation->getUriVariables() ?? [] as $parameterName => $identifiedBy) {
+        foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariableDefinition) {
             if (!isset($parameters[$parameterName])) {
                 if (!isset($parameters['id'])) {
                     throw new InvalidIdentifierException(sprintf('Parameter "%s" not found, check the identifiers configuration.', $parameterName));
@@ -51,7 +51,7 @@ trait UriVariablesResolverTrait
                 $parameterName = 'id';
             }
 
-            if (($identifiedBy['composite_identifier'] ?? true) && 1 < ($numIdentifiers = \count($identifiedBy['identifiers'] ?? []))) {
+            if (($uriVariableDefinition->getCompositeIdentifier() ?? true) && 1 < ($numIdentifiers = \count($uriVariableDefinition->getIdentifiers() ?? []))) {
                 $currentIdentifiers = CompositeIdentifierParser::parse($parameters[$parameterName]);
 
                 if (($foundNumIdentifiers = \count($currentIdentifiers)) !== $numIdentifiers) {

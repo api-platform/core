@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\Fixtures\RelatedDummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -60,7 +61,7 @@ class ApiLoaderTest extends TestCase
         $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
                 // Default operations based on OperationResourceMetadataFactory
-                'api_dummies_get_item' => (new Get())->withUriVariables(['id'])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
+                'api_dummies_get_item' => (new Get())->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
                 'api_dummies_put_item' => (new Put())->withUriTemplate($path),
                 'api_dummies_delete_item' => (new Delete())->withUriTemplate($path),
                 // Custom operations

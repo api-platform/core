@@ -49,13 +49,13 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     class: AttributeResource::class,
                     operations: [
                         '_api_AttributeResource_get' => new Get(
-                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', normalizationContext: ['skip_null_values' => true], priority: 1
+                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 1
                         ),
                         '_api_AttributeResource_put' => new Put(
-                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', normalizationContext: ['skip_null_values' => true], priority: 2
+                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 2
                         ),
                         '_api_AttributeResource_delete' => new Delete(
-                            shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', normalizationContext: ['skip_null_values' => true], priority: 3
+                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 3
                         ),
                     ]
                 ),
@@ -97,10 +97,10 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     class: AttributeResources::class,
                     operations: [
                         '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(
-                            shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1
+                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1
                         ),
                         '_api_/attribute_resources.{_format}_post' => new Post(
-                            shortName: 'AttributeResources', class: AttributeResources::class, controller: 'api_platform.action.placeholder', uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2
+                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2
                         ),
                     ]
                 ),
@@ -108,7 +108,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
             $attributeResourceMetadataCollectionFactory->create(AttributeResources::class)
         );
 
-        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, controller: 'api_platform.action.placeholder', collection: false);
+        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',

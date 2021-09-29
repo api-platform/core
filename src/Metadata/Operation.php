@@ -42,7 +42,7 @@ class Operation
      */
     protected $outputFormats;
     /**
-     * @var array|string|null
+     * @var array|UriVariable|null
      */
     protected $uriVariables;
     protected $routePrefix;
@@ -444,7 +444,7 @@ class Operation
     }
 
     /**
-     * @return array|string|null
+     * @return UriVariable|array
      */
     public function getUriVariables()
     {
@@ -452,9 +452,9 @@ class Operation
     }
 
     /**
-     * @param array|string|null $uriVariables
+     * @param array<string, UriVariable> $uriVariables
      */
-    public function withUriVariables($uriVariables = null): self
+    public function withUriVariables(array $uriVariables): self
     {
         $self = clone $this;
         $self->uriVariables = $uriVariables;

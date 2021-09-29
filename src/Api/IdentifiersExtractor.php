@@ -57,17 +57,17 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName);
 
         foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariableDefinition) {
-            if (1 < \count($uriVariableDefinition['identifiers'])) {
+            if (1 < \count($uriVariableDefinition->getIdentifiers())) {
                 $compositeIdentifiers = [];
-                foreach ($uriVariableDefinition['identifiers'] as $identifier) {
-                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $uriVariableDefinition['class'], $identifier, $parameterName);
+                foreach ($uriVariableDefinition->getIdentifiers() as $identifier) {
+                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $uriVariableDefinition->getTargetClass() ?? $resourceClass, $identifier, $parameterName);
                 }
 
                 $identifiers[($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) ? 'id' : $parameterName] = CompositeIdentifierParser::stringify($compositeIdentifiers);
                 continue;
             }
 
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $uriVariableDefinition['class'], $uriVariableDefinition['identifiers'][0], $parameterName);
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $uriVariableDefinition->getTargetClass(), $uriVariableDefinition->getIdentifiers()[0], $parameterName);
         }
 
         return $identifiers;
@@ -126,7 +126,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             $relatedOperation = $this->resourceMetadataFactory->create($relatedResourceClass)->getOperation();
             $relatedIdentifiers = $relatedOperation->getUriVariables();
             if (1 === \count($relatedIdentifiers)) {
-                $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)['identifiers'][0], $parameterName);
+                $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)->getIdentifiers()[0], $parameterName);
 
                 if ($identifierValue instanceof \Stringable || is_scalar($identifierValue) || method_exists($identifierValue, '__toString')) {
                     return (string) $identifierValue;

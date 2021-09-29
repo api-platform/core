@@ -44,7 +44,7 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
             $resourceMetadata = $resourceMetadata->withInput($this->transformInputOutput($resourceMetadata->getInput()));
             $resourceMetadata = $resourceMetadata->withOutput($this->transformInputOutput($resourceMetadata->getOutput()));
 
-            if (\count($resourceMetadata->getOperations())) {
+            if ($resourceMetadata->getOperations()) {
                 $resourceMetadata = $resourceMetadata->withOperations($this->getTransformedOperations($resourceMetadata->getOperations(), $resourceMetadata));
             }
 

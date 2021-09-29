@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
@@ -55,7 +56,7 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
                 $docBlock = $this->docBlockFactory->create($reflectionClass, $this->contextFactory->createFromReflector($reflectionClass));
                 $resourceMetadataCollection[$key] = $resourceMetadata->withDescription($docBlock->getSummary());
 
-                $operations = $resourceMetadata->getOperations();
+                $operations = $resourceMetadata->getOperations() ?? new Operations();
                 foreach ($operations as $operationName => $operation) {
                     if (null !== $operation->getDescription()) {
                         continue;

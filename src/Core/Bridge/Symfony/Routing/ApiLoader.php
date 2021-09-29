@@ -126,7 +126,7 @@ final class ApiLoader extends Loader
                         $legacyDefaults['_api_has_composite_identifier'] = $operation->getCompositeIdentifier();
                         // Legacy identifiers
                         foreach ($operation->getUriVariables() ?? [] as $parameterName => $identifiedBy) {
-                            foreach ($identifiedBy['identifiers'] ?? [] as $identifier) {
+                            foreach ($identifiedBy->getIdentifiers() ?? [] as $identifier) {
                                 $legacyDefaults['_api_identifiers'][] = $identifier;
                             }
                         }

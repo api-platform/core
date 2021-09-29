@@ -42,7 +42,7 @@ final class ApiResource
      */
     private $outputFormats;
     /**
-     * @var array|string|null
+     * @var array|UriVariable
      */
     private $uriVariables;
     private $routePrefix;
@@ -408,7 +408,7 @@ final class ApiResource
     }
 
     /**
-     * @return array|string|null
+     * @return UriVariable|array
      */
     public function getUriVariables()
     {
@@ -416,9 +416,9 @@ final class ApiResource
     }
 
     /**
-     * @param array|string|null $uriVariables
+     * @param array<string, UriVariable> $uriVariables
      */
-    public function withUriVariables($uriVariables): self
+    public function withUriVariables(array $uriVariables): self
     {
         $self = clone $this;
         $self->uriVariables = $uriVariables;
