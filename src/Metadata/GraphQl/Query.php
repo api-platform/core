@@ -43,6 +43,8 @@ class Query extends Operation
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?string $deprecationReason = null,
         array $filters = [],
         array $validationContext = [],
