@@ -107,7 +107,7 @@ final class RespondListener
                 $this->iriConverter &&
                 ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) &&
                 !($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false)
-                && !$operation->getStatus()
+                && 301 === $operation->getStatus()
             ) {
                 $status = 301;
 

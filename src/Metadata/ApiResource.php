@@ -52,9 +52,7 @@ final class ApiResource
     private $stateless;
     private $sunset;
     private $acceptPatch;
-    /**
-     * @var mixed|string|null
-     */
+
     private $status;
     private $host;
     private $schemes;
@@ -122,7 +120,6 @@ final class ApiResource
      * @param mixed|null        $uriVariables
      * @param string|null       $routePrefix                    https://api-platform.com/docs/core/operations/#prefixing-all-routes-of-all-operations
      * @param string|null       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
-     * @param string|null       $status
      * @param string|null       $deprecationReason              https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param array|null        $cacheHeaders                   https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers
      * @param array|null        $normalizationContext           https://api-platform.com/docs/core/serialization/#using-serialization-groups
@@ -173,7 +170,7 @@ final class ApiResource
         ?bool $stateless = null,
         ?string $sunset = null,
         ?string $acceptPatch = null,
-                $status = null,
+        ?int $status = null,
         ?string $host = null,
         ?array $schemes = null,
         ?string $condition = null,

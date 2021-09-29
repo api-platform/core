@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -36,6 +38,8 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 final class AddTagsListener
 {
     use OperationRequestInitiatorTrait;
+    use UriVariablesResolverTrait;
+
     private $iriConverter;
     private $xkeyEnabled;
     private $xkeyGlue;
@@ -70,7 +74,8 @@ final class AddTagsListener
         $resources = $request->attributes->get('_resources');
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false) || ($operation && $operation->isCollection())) {
             // Allows to purge collections
-            $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class']);
+            $identifiers = $this->getOperationIdentifiers($operation, $request->attributes->all(), $attributes['resource_class']);
+            $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], $attributes['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $identifiers]);
             $resources[$iri] = $iri;
         }
 
