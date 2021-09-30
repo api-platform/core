@@ -164,7 +164,7 @@ class User extends AbstractSecurityUser
         return null;
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }

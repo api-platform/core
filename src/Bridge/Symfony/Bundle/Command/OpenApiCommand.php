@@ -44,7 +44,7 @@ final class OpenApiCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Dump the Open API documentation')
@@ -57,7 +57,7 @@ final class OpenApiCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Backwards compatibility
         if (2 === $specVersion = (int) $input->getOption('spec-version')) {

@@ -28,6 +28,11 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
         $this->documentationNormalizer = $documentationNormalizer;
     }
 
+    /**
+     * @param mixed|null $format
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
+     */
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
@@ -44,7 +49,7 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
         return $data;
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }

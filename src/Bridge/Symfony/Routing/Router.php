@@ -46,7 +46,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->router->setContext($context);
     }
@@ -54,7 +54,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->router->getContext();
     }
@@ -62,7 +62,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): \Symfony\Component\Routing\RouteCollection
     {
         return $this->router->getRouteCollection();
     }
@@ -70,11 +70,11 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function match($pathInfo)
+    public function match($pathInfo): array
     {
         $baseContext = $this->router->getContext();
         $baseUrl = $baseContext->getBaseUrl();
-        if ($baseUrl === substr($pathInfo, 0, \strlen($baseUrl))) {
+        if (0 === strpos($pathInfo, $baseUrl)) {
             $pathInfo = substr($pathInfo, \strlen($baseUrl));
         }
 
@@ -101,7 +101,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = null)
+    public function generate($name, $parameters = [], $referenceType = null): string
     {
         return $this->router->generate($name, $parameters, self::CONST_MAP[$referenceType ?? $this->urlGenerationStrategy]);
     }
