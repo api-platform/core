@@ -1,5 +1,7 @@
 # Changelog
 
+* Add return type in `Configuration` file to support symfony 6.
+
 ## 2.7.0
 
 * **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
