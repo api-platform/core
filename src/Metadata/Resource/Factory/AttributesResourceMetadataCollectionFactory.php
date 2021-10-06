@@ -51,7 +51,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], bool $graphQlEnabled = false)
     {
-        $this->defaults = ['attributes' => []] + $defaults;
+        $this->defaults = $defaults + ['attributes' => []];
         $this->decorated = $decorated;
         $this->logger = $logger ?? new NullLogger();
         $this->graphQlEnabled = $graphQlEnabled;
@@ -162,7 +162,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     {
         foreach ($this->defaults['attributes'] as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);
-            if (!$operation->{'get'.ucfirst($key)}()) {
+            if (method_exists($operation, 'get'.ucfirst($key)) && !$operation->{'get'.ucfirst($key)}()) {
                 $operation = $operation->{'with'.ucfirst($key)}($value);
             }
         }
@@ -225,7 +225,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         foreach ($this->defaults['attributes'] as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);
-            if (!$resource->{'get'.ucfirst($key)}()) {
+            if (method_exists($resource, 'get'.ucfirst($key)) && !$resource->{'get'.ucfirst($key)}()) {
                 $resource = $resource->{'with'.ucfirst($key)}($value);
             }
         }

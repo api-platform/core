@@ -128,8 +128,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Model\Paths $paths, \ArrayObject $schemas): void
     {
-        $links = [];
-
         if (0 === $resource->getOperations()->count()) {
             return;
         }
@@ -144,7 +142,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $identifiers = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
 
-            $path = $this->getPath($operation->getUriTemplate() ?? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath());
+            $path = $this->getPath($operation->getRouteName() ? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
             $method = $operation->getMethod() ?? Operation::METHOD_GET;
 
             if (!\in_array($method, Model\PathItem::$methods, true)) {

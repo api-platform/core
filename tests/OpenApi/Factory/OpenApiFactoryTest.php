@@ -118,6 +118,7 @@ class OpenApiFactoryTest extends TestCase
             ]
             ),
             'custom-http-verb' => (new Operation())->withMethod('TEST')->withOperation($baseOperation),
+            'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
             'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
             'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([
                 'parameters' => [
@@ -321,7 +322,7 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummiesPath->{'get'.$method}());
         }
 
-        $this->assertEquals($dummiesPath->getGet(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'getDummyCollection',
             ['Dummy'],
             [
@@ -349,9 +350,9 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ]
-        ));
+        ), $dummiesPath->getGet());
 
-        $this->assertEquals($dummiesPath->getPost(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'postDummyCollection',
             ['Dummy'],
             [
@@ -377,7 +378,7 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             )
-        ));
+        ), $dummiesPath->getPost());
 
         $dummyPath = $paths->getPath('/dummies/{id}');
         $this->assertNotNull($dummyPath);
@@ -385,7 +386,7 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummyPath->{'get'.$method}());
         }
 
-        $this->assertEquals($dummyPath->getGet(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'getDummyItem',
             ['Dummy'],
             [
@@ -401,9 +402,9 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves a Dummy resource.',
             null,
             [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
-        ));
+        ), $dummyPath->getGet());
 
-        $this->assertEquals($dummyPath->getPut(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'putDummyItem',
             ['Dummy'],
             [
@@ -430,9 +431,9 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             )
-        ));
+        ), $dummyPath->getPut());
 
-        $this->assertEquals($dummyPath->getDelete(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'deleteDummyItem',
             ['Dummy'],
             [
@@ -443,10 +444,10 @@ class OpenApiFactoryTest extends TestCase
             'Removes the Dummy resource.',
             null,
             [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
-        ));
+        ), $dummyPath->getDelete());
 
         $customPath = $paths->getPath('/foo/{id}');
-        $this->assertEquals($customPath->getHead(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'customDummyItem',
             ['Dummy', 'Profile'],
             [
@@ -484,10 +485,13 @@ class OpenApiFactoryTest extends TestCase
             null,
             null,
             ['x-visibility' => 'hide']
-        ));
+        ), $customPath->getHead());
+
+        $prefixPath = $paths->getPath('/prefix/dummies');
+        $this->assertNotNull($prefixPath);
 
         $formattedPath = $paths->getPath('/formatted/{id}');
-        $this->assertEquals($formattedPath->getPut(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'formatsDummyItem',
             ['Dummy'],
             [
@@ -516,10 +520,10 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 true
             )
-        ));
+        ), $formattedPath->getPut());
 
         $filteredPath = $paths->getPath('/filtered');
-        $this->assertEquals($filteredPath->getGet(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'filteredDummyCollection',
             ['Dummy'],
             [
@@ -561,10 +565,10 @@ class OpenApiFactoryTest extends TestCase
                     'enum' => ['asc', 'desc'],
                 ]),
             ]
-        ));
+        ), $filteredPath->getGet());
 
         $paginatedPath = $paths->getPath('/paginated');
-        $this->assertEquals($paginatedPath->getGet(), new Model\Operation(
+        $this->assertEquals(new Model\Operation(
             'paginatedDummyCollection',
             ['Dummy'],
             [
@@ -593,6 +597,6 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ]
-        ));
+        ), $paginatedPath->getGet());
     }
 }

@@ -27,7 +27,6 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,7 +36,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
 
@@ -63,13 +62,11 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
-                    uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
                             shortName: 'AttributeResource',
-                            uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]],
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 4
                         ),
@@ -77,7 +74,6 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
                             shortName: 'AttributeResource',
-                            uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]],
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 5
                         ),
@@ -121,6 +117,28 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation),
                     '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation),
                 ]
+            ),
+        ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+    }
+
+    public function testCreateWithDefaults(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['attributes' => ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']]);
+
+        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false, cacheHeaders: ['max_age' => 60]);
+        $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
+            new ApiResource(
+                shortName: 'AttributeDefaultOperations',
+                class: AttributeDefaultOperations::class,
+                operations: [
+                    '_api_AttributeDefaultOperations_get' => (new Get())->withOperation($operation),
+                    '_api_AttributeDefaultOperations_get_collection' => (new GetCollection())->withOperation($operation),
+                    '_api_AttributeDefaultOperations_post' => (new Post())->withOperation($operation),
+                    '_api_AttributeDefaultOperations_put' => (new Put())->withOperation($operation),
+                    '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation),
+                    '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation),
+                ],
+                cacheHeaders: ['max_age' => 60]
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
     }
