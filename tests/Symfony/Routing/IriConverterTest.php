@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -190,7 +191,7 @@ class IriConverterTest extends TestCase
     {
         $item = new Dummy();
         $operationName = 'operation_name';
-        $operation = (new Get())->withName($operationName)->withUriVariables(['id' => []]);
+        $operation = (new Get())->withName($operationName)->withUriVariables(['id' => new UriVariable()]);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
             '_api_resource_class' => Dummy::class,
@@ -212,7 +213,7 @@ class IriConverterTest extends TestCase
     {
         $this->expectExceptionMessage('Item not found for "/dummies/1"');
         $operationName = 'operation_name';
-        $operation = (new Get())->withName($operationName)->withUriVariables(['id' => []]);
+        $operation = (new Get())->withName($operationName)->withUriVariables(['id' => new UriVariable()]);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
             '_api_resource_class' => Dummy::class,

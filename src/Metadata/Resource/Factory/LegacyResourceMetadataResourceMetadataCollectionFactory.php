@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\UriVariable;
 
 final class LegacyResourceMetadataResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -189,7 +190,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             $uriVariables = [];
             foreach ($value ?? [] as $parameterName => $identifiedBy) {
-                $uriVariables[$parameterName] = ['class' => $identifiedBy[0], 'identifiers' => [$identifiedBy[1]]];
+                $uriVariables[$parameterName] = (new UriVariable())->withTargetClass($identifiedBy[0])->withIdentifiers([$identifiedBy[1]]);
             }
 
             return $operation->withUriVariables($uriVariables);

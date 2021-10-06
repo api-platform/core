@@ -19,12 +19,13 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\UriVariable;
 
 #[ApiResource(normalizationContext: ['skip_null_values' => true])]
 #[Get]
 #[Put]
 #[Delete]
-#[ApiResource('/dummy/{dummyId}/attribute_resources/{identifier}.{_format}', uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'identifier' => ['class' => AttributeResource::class, 'identifiers' => ['identifier']]], inputFormats: ['json' => ['application/merge-patch+json']])]
+#[ApiResource('/dummy/{dummyId}/attribute_resources/{identifier}.{_format}', inputFormats: ['json' => ['application/merge-patch+json']])]
 #[Get]
 #[Patch]
 final class AttributeResource
@@ -35,6 +36,7 @@ final class AttributeResource
     /**
      * @var ?Dummy
      */
+    #[UriVariable('dummyId')]
     public $dummy = null;
 
     /**

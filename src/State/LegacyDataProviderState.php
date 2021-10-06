@@ -50,7 +50,7 @@ final class LegacyDataProviderState implements ProviderInterface
             $subresourceContext = ['filters' => $context['filters'] ?? [], 'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'] ?? [], 'property' => $operation->getExtraProperties()['legacy_subresource_property'] ?? null, 'collection' => $operation->isCollection()] + $context;
             $subresourceIdentifiers = [];
             foreach ($operation->getUriVariables() as $parameterName => $uriTemplateDefinition) {
-                $subresourceIdentifiers[$parameterName] = [$uriTemplateDefinition['identifiers'][0] => $identifiers[$parameterName]];
+                $subresourceIdentifiers[$parameterName] = [$uriTemplateDefinition->getIdentifiers()[0] => $identifiers[$parameterName]];
             }
 
             return $this->subresourceDataProvider->getSubresource($resourceClass, $subresourceIdentifiers, $subresourceContext, $operationName);

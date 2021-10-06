@@ -49,7 +49,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
         $uriVariablesDefinition = $operation->getUriVariables() ?? [];
 
         foreach ($uriVariables as $parameterName => $value) {
-            if ([] === $types = $this->getIdentifierTypes($uriVariablesDefinition[$parameterName]['class'] ?? $class, $uriVariablesDefinition[$parameterName]['identifiers'] ?? [$parameterName])) {
+            if ([] === $types = $this->getIdentifierTypes($uriVariablesDefinition[$parameterName]->getTargetClass() ?? $class, $uriVariablesDefinition[$parameterName]->getIdentifiers() ?? [$parameterName])) {
                 continue;
             }
 
