@@ -90,8 +90,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     private function generateUriTemplate(Operation $operation): string
     {
-        $uriTemplate = $operation->getRoutePrefix() ?: '';
-        $uriTemplate = sprintf('%s/%s', $uriTemplate, $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        $uriTemplate = sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
 
         if ($parameters = array_keys($uriVariables)) {
