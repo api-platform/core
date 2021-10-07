@@ -61,27 +61,18 @@ class DummyValidation
      */
     private $code;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return DummyValidation
-     */
-    public function setId(int $id): DummyValidation
+    public function setId(int $id): self
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
@@ -89,19 +80,14 @@ class DummyValidation
 
     /**
      * @param string|null $name
-     *
-     * @return DummyValidation
      */
-    public function setName($name): DummyValidation
+    public function setName($name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTitle(): ?string
     {
         return $this->title;
@@ -109,19 +95,14 @@ class DummyValidation
 
     /**
      * @param string|null $title
-     *
-     * @return DummyValidation
      */
-    public function setTitle($title): DummyValidation
+    public function setTitle($title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
@@ -129,10 +110,8 @@ class DummyValidation
 
     /**
      * @param string $code
-     *
-     * @return DummyValidation
      */
-    public function setCode($code): DummyValidation
+    public function setCode($code): self
     {
         $this->code = $code;
 

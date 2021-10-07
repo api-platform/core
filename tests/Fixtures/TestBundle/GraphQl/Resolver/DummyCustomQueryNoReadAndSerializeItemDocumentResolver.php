@@ -26,8 +26,6 @@ class DummyCustomQueryNoReadAndSerializeItemDocumentResolver implements QueryIte
 {
     /**
      * @param DummyCustomQueryDocument|null $item
-     *
-     * @return DummyCustomQueryDocument
      */
     public function __invoke($item, array $context): DummyCustomQueryDocument
     {

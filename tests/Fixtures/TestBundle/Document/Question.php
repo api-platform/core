@@ -43,10 +43,8 @@ class Question
      * Set content.
      *
      * @param string $content
-     *
-     * @return Question
      */
-    public function setContent($content): Question
+    public function setContent($content): self
     {
         $this->content = $content;
 
@@ -55,8 +53,6 @@ class Question
 
     /**
      * Get content.
-     *
-     * @return string
      */
     public function getContent(): string
     {
@@ -65,8 +61,6 @@ class Question
 
     /**
      * Get id.
-     *
-     * @return string
      */
     public function getId(): string
     {
@@ -77,10 +71,8 @@ class Question
      * Set answer.
      *
      * @param Answer $answer
-     *
-     * @return Question
      */
-    public function setAnswer(Answer $answer = null): Question
+    public function setAnswer(Answer $answer = null): self
     {
         $this->answer = $answer;
 
@@ -89,8 +81,6 @@ class Question
 
     /**
      * Get answer.
-     *
-     * @return Answer
      */
     public function getAnswer(): Answer
     {

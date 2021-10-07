@@ -46,8 +46,6 @@ class CompositeItem
 
     /**
      * Gets id.
-     *
-     * @return int
      */
     public function getId(): int
     {
@@ -56,8 +54,6 @@ class CompositeItem
 
     /**
      * Gets field1.
-     *
-     * @return string|null
      */
     public function getField1(): ?string
     {
@@ -76,8 +72,6 @@ class CompositeItem
 
     /**
      * Gets compositeValues.
-     *
-     * @return CompositeRelation
      */
     public function getCompositeValues(): CompositeRelation
     {

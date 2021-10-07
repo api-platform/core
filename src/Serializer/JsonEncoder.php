@@ -54,7 +54,6 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supportsEncoding($format): bool
     {
@@ -63,7 +62,6 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
-     * @return string
      */
     public function encode($data, $format, array $context = []): string
     {
@@ -72,7 +70,6 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supportsDecoding($format): bool
     {
@@ -81,7 +78,6 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
 
     /**
      * {@inheritdoc}
-     * @return mixed
      */
     public function decode($data, $format, array $context = [])
     {

@@ -105,9 +105,6 @@ class EmbeddedDummy
         $this->embeddedDummy = $embeddedDummy;
     }
 
-    /**
-     * @return \DateTime
-     */
     public function getDummyDate(): \DateTime
     {
         return $this->dummyDate;
@@ -118,9 +115,6 @@ class EmbeddedDummy
         $this->dummyDate = $dummyDate;
     }
 
-    /**
-     * @return RelatedDummy
-     */
     public function getRelatedDummy(): RelatedDummy
     {
         return $this->relatedDummy;

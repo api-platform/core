@@ -49,17 +49,11 @@ class FourthLevel
      */
     public $badThirdLevel;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return int
-     */
     public function getLevel(): int
     {
         return $this->level;

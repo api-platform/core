@@ -52,8 +52,6 @@ class CompositePrimitiveItem
 
     /**
      * Gets id.
-     *
-     * @return int
      */
     public function getId(): int
     {
@@ -62,8 +60,6 @@ class CompositePrimitiveItem
 
     /**
      * Gets name.
-     *
-     * @return string
      */
     public function getName(): string
     {
@@ -72,8 +68,6 @@ class CompositePrimitiveItem
 
     /**
      * Gets year.
-     *
-     * @return int
      */
     public function getYear(): int
     {
@@ -90,8 +84,6 @@ class CompositePrimitiveItem
 
     /**
      * Gets description.
-     *
-     * @return string
      */
     public function getDescription(): string
     {

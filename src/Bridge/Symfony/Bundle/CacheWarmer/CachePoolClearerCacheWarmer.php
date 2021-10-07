@@ -36,6 +36,7 @@ final class CachePoolClearerCacheWarmer implements CacheWarmerInterface
 
     /**
      * {@inheritdoc}
+     *
      * @return string[]
      */
     public function warmUp($cacheDirectory): array

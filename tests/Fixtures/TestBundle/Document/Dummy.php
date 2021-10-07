@@ -312,9 +312,6 @@ class Dummy
         $this->relatedOwningDummy = $relatedOwningDummy;
     }
 
-    /**
-     * @return bool
-     */
     public function isDummyBoolean(): bool
     {
         return $this->dummyBoolean;

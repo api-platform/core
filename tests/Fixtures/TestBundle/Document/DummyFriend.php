@@ -49,8 +49,6 @@ class DummyFriend
 
     /**
      * Get id.
-     *
-     * @return int
      */
     public function getId(): int
     {
@@ -69,8 +67,6 @@ class DummyFriend
 
     /**
      * Get name.
-     *
-     * @return string
      */
     public function getName(): string
     {

@@ -56,9 +56,6 @@ class DummyPropertyWithDefaultValue
      */
     public $dummyDefaultOption;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;

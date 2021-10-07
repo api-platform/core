@@ -101,9 +101,6 @@ class DummyEntityWithConstructor
         return $this->items;
     }
 
-    /**
-     * @return string
-     */
     public function getBaz(): string
     {
         return $this->baz;

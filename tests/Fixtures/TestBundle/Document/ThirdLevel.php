@@ -63,17 +63,11 @@ class ThirdLevel
      */
     public $badFourthLevel;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return int
-     */
     public function getLevel(): int
     {
         return $this->level;
@@ -87,9 +81,6 @@ class ThirdLevel
         $this->level = $level;
     }
 
-    /**
-     * @return bool
-     */
     public function isTest(): bool
     {
         return $this->test;
@@ -103,9 +94,6 @@ class ThirdLevel
         $this->test = $test;
     }
 
-    /**
-     * @return FourthLevel|null
-     */
     public function getFourthLevel(): ?FourthLevel
     {
         return $this->fourthLevel;

@@ -96,6 +96,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
      * @return bool
      */
     public function supportsNormalization($data, $format = null)
@@ -174,6 +175,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
      * @return bool
      */
     public function supportsDenormalization($data, $type, $format = null)
@@ -183,7 +185,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
-     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -262,6 +263,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @internal
+     *
      * @return object
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
@@ -348,6 +350,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * Unused in this context.
+     *
      * @return string[]
      */
     protected function extractAttributes($object, $format = null, array $context = [])
@@ -383,6 +386,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
      * @return bool
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
@@ -560,7 +564,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws UnexpectedValueException
      * @throws LogicException
-     * @return mixed
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {

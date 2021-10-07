@@ -60,9 +60,6 @@ class DummyTableInheritanceRelated
         return $this->id;
     }
 
-    /**
-     * @return ArrayCollection
-     */
     public function getChildren(): ArrayCollection
     {
         return $this->children;

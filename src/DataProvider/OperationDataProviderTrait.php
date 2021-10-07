@@ -46,8 +46,6 @@ trait OperationDataProviderTrait
 
     /**
      * Retrieves data for a collection operation.
-     *
-     * @return iterable
      */
     private function getCollectionData(array $attributes, array $context): iterable
     {

@@ -38,8 +38,6 @@ class CompositeLabel
 
     /**
      * Gets id.
-     *
-     * @return int
      */
     public function getId(): int
     {
@@ -48,8 +46,6 @@ class CompositeLabel
 
     /**
      * Gets value.
-     *
-     * @return string|null
      */
     public function getValue(): ?string
     {

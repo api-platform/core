@@ -40,7 +40,6 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
 
     /**
      * {@inheritdoc}
-     * @return string
      */
     public function normalize($propertyName, string $class = null, string $format = null, array $context = []): string
     {
@@ -57,7 +56,6 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
 
     /**
      * {@inheritdoc}
-     * @return string
      */
     public function denormalize($propertyName, string $class = null, string $format = null, array $context = []): string
     {

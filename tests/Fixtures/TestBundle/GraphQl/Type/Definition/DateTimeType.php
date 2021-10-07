@@ -42,7 +42,6 @@ final class DateTimeType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     * @return mixed
      */
     public function serialize($value)
     {
@@ -61,7 +60,6 @@ final class DateTimeType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     * @return mixed
      */
     public function parseValue($value)
     {
@@ -79,7 +77,6 @@ final class DateTimeType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
-     * @return mixed
      */
     public function parseLiteral(Node $valueNode, ?array $variables = null)
     {

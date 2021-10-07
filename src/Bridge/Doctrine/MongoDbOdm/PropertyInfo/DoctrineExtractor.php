@@ -43,6 +43,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
     /**
      * {@inheritdoc}
+     *
      * @return string[]|null
      */
     public function getProperties($class, array $context = []): ?array
@@ -56,6 +57,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
     /**
      * {@inheritdoc}
+     *
      * @return Type[]|null
      */
     public function getTypes($class, $property, array $context = []): ?array

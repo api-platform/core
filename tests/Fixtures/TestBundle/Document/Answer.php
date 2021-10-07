@@ -61,8 +61,6 @@ class Answer
 
     /**
      * Get id.
-     *
-     * @return string
      */
     public function getId(): string
     {
@@ -73,10 +71,8 @@ class Answer
      * Set content.
      *
      * @param string $content
-     *
-     * @return Answer
      */
-    public function setContent($content): Answer
+    public function setContent($content): self
     {
         $this->content = $content;
 
@@ -85,8 +81,6 @@ class Answer
 
     /**
      * Get content.
-     *
-     * @return string
      */
     public function getContent(): string
     {
@@ -97,10 +91,8 @@ class Answer
      * Set question.
      *
      * @param Question $question
-     *
-     * @return Answer
      */
-    public function setQuestion(Question $question = null): Answer
+    public function setQuestion(Question $question = null): self
     {
         $this->question = $question;
 
@@ -109,8 +101,6 @@ class Answer
 
     /**
      * Get question.
-     *
-     * @return Question
      */
     public function getQuestion(): Question
     {
@@ -119,8 +109,6 @@ class Answer
 
     /**
      * Get related question.
-     *
-     * @return ArrayCollection
      */
     public function getRelatedQuestions(): ArrayCollection
     {

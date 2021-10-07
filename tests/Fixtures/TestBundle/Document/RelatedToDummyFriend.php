@@ -83,9 +83,6 @@ class RelatedToDummyFriend
         return $this->name;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDescription(): ?string
     {
         return $this->description;
@@ -101,8 +98,6 @@ class RelatedToDummyFriend
 
     /**
      * Gets dummyFriend.
-     *
-     * @return DummyFriend
      */
     public function getDummyFriend(): DummyFriend
     {
@@ -121,8 +116,6 @@ class RelatedToDummyFriend
 
     /**
      * Gets relatedDummy.
-     *
-     * @return RelatedDummy
      */
     public function getRelatedDummy(): RelatedDummy
     {

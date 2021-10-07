@@ -38,17 +38,11 @@ class CustomIdentifierDummy
      */
     private $name;
 
-    /**
-     * @return int
-     */
     public function getCustomId(): int
     {
         return $this->customId;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;

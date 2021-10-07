@@ -51,7 +51,6 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supportsNormalization($data, $format = null): bool
     {

@@ -71,8 +71,6 @@ class RelatedOwningDummy
 
     /**
      * Get owned dummy.
-     *
-     * @return Dummy
      */
     public function getOwnedDummy(): Dummy
     {

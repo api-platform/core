@@ -78,7 +78,6 @@ final class SwaggerCommand extends Command
 
     /**
      * {@inheritdoc}
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

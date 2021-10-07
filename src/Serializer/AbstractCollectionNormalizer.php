@@ -52,6 +52,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
 
     /**
      * {@inheritdoc}
+     *
      * @return bool
      */
     public function supportsNormalization($data, $format = null)

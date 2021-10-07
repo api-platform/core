@@ -35,6 +35,7 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
      * @return \Traversable
      */
     #[\ReturnTypeWillChange]
@@ -45,6 +46,7 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
 
     /**
      * {@inheritdoc}
+     *
      * @return int
      */
     #[\ReturnTypeWillChange]

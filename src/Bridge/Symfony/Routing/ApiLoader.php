@@ -156,7 +156,6 @@ final class ApiLoader extends Loader
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supports($resource, $type = null): bool
     {

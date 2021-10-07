@@ -94,9 +94,6 @@ class DummyGroup
      */
     public $qux;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;

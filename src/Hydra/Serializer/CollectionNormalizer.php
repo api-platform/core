@@ -58,7 +58,6 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supportsNormalization($data, $format = null): bool
     {

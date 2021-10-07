@@ -151,6 +151,7 @@ class Content implements \JsonSerializable
 
     /**
      * {@inheritdoc}
+     *
      * @return mixed
      */
     #[\ReturnTypeWillChange]

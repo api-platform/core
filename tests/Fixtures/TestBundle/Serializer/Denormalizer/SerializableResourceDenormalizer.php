@@ -23,7 +23,6 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
 {
     /**
      * {@inheritdoc}
-     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -37,7 +36,6 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supportsDenormalization($data, $type, $format = null): bool
     {

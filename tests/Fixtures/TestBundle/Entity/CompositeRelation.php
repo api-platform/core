@@ -49,8 +49,6 @@ class CompositeRelation
 
     /**
      * Gets value.
-     *
-     * @return string|null
      */
     public function getValue(): ?string
     {
@@ -69,8 +67,6 @@ class CompositeRelation
 
     /**
      * Gets compositeItem.
-     *
-     * @return CompositeItem
      */
     public function getCompositeItem(): CompositeItem
     {
@@ -89,8 +85,6 @@ class CompositeRelation
 
     /**
      * Gets compositeLabel.
-     *
-     * @return CompositeLabel
      */
     public function getCompositeLabel(): CompositeLabel
     {

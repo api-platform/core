@@ -48,7 +48,6 @@ class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
-     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {

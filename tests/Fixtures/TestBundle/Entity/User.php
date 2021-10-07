@@ -136,9 +136,6 @@ class User extends AbstractSecurityUser
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFullname(): ?string
     {
         return $this->fullname;
@@ -164,9 +161,6 @@ class User extends AbstractSecurityUser
         return null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSalt(): ?string
     {
         return null;

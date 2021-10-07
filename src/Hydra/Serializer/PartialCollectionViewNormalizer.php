@@ -102,7 +102,6 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
     /**
      * {@inheritdoc}
-     * @return bool
      */
     public function supportsNormalization($data, $format = null): bool
     {
