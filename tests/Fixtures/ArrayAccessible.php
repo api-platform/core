@@ -22,9 +22,6 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         $this->array = $array;
     }
 
-    /**
-     * @return bool
-     */
     #[\ReturnTypeWillChange]
     public function offsetExists($offset): bool
     {
@@ -54,9 +51,6 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         unset($this->array[$offset]);
     }
 
-    /**
-     * @return \Traversable
-     */
     #[\ReturnTypeWillChange]
     public function getIterator(): \Traversable
     {
