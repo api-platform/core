@@ -75,7 +75,7 @@ class RelatedOwnedDummy
      *
      * @return Dummy
      */
-    public function getOwningDummy()
+    public function getOwningDummy(): Dummy
     {
         return $this->owningDummy;
     }

@@ -49,7 +49,7 @@ trait OperationDataProviderTrait
      *
      * @return iterable
      */
-    private function getCollectionData(array $attributes, array $context)
+    private function getCollectionData(array $attributes, array $context): iterable
     {
         return $this->collectionDataProvider->getCollection($attributes['resource_class'], $attributes['collection_operation_name'], $context);
     }

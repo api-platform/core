@@ -46,7 +46,7 @@ class Question
      *
      * @return Question
      */
-    public function setContent($content)
+    public function setContent($content): Question
     {
         $this->content = $content;
 
@@ -58,7 +58,7 @@ class Question
      *
      * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -68,7 +68,7 @@ class Question
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -80,7 +80,7 @@ class Question
      *
      * @return Question
      */
-    public function setAnswer(Answer $answer = null)
+    public function setAnswer(Answer $answer = null): Question
     {
         $this->answer = $answer;
 
@@ -92,7 +92,7 @@ class Question
      *
      * @return Answer
      */
-    public function getAnswer()
+    public function getAnswer(): Answer
     {
         return $this->answer;
     }

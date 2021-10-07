@@ -52,7 +52,7 @@ class CompositePrimitiveItem
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -62,7 +62,7 @@ class CompositePrimitiveItem
      *
      * @return int
      */
-    public function getYear()
+    public function getYear(): int
     {
         return $this->year;
     }
@@ -80,7 +80,7 @@ class CompositePrimitiveItem
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }

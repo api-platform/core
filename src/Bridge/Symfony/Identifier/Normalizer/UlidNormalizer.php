@@ -24,6 +24,7 @@ final class UlidNormalizer implements DenormalizerInterface
 {
     /**
      * {@inheritdoc}
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -36,8 +37,9 @@ final class UlidNormalizer implements DenormalizerInterface
 
     /**
      * {@inheritdoc}
+     * @return bool
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return \is_string($data) && is_a($type, Ulid::class, true);
     }

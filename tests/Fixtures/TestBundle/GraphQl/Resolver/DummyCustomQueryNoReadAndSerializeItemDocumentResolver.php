@@ -29,7 +29,7 @@ class DummyCustomQueryNoReadAndSerializeItemDocumentResolver implements QueryIte
      *
      * @return DummyCustomQueryDocument
      */
-    public function __invoke($item, array $context)
+    public function __invoke($item, array $context): DummyCustomQueryDocument
     {
         if (null !== $item) {
             throw new RuntimeException('Item should be null');

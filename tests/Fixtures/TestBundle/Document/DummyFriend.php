@@ -52,7 +52,7 @@ class DummyFriend
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -72,7 +72,7 @@ class DummyFriend
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

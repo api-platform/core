@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
+use Symfony\Component\Routing\RouteCollection;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,24 +54,27 @@ final class Router implements RouterInterface, UrlGeneratorInterface
 
     /**
      * {@inheritdoc}
+     * @return RequestContext
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->router->getContext();
     }
 
     /**
      * {@inheritdoc}
+     * @return RouteCollection
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         return $this->router->getRouteCollection();
     }
 
     /**
      * {@inheritdoc}
+     * @return array
      */
-    public function match($pathInfo)
+    public function match($pathInfo): array
     {
         $baseContext = $this->router->getContext();
         $baseUrl = $baseContext->getBaseUrl();
@@ -101,7 +105,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = null)
+    public function generate($name, $parameters = [], $referenceType = null): string
     {
         return $this->router->generate($name, $parameters, self::CONST_MAP[$referenceType ?? $this->urlGenerationStrategy]);
     }

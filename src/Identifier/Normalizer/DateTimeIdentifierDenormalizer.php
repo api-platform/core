@@ -19,7 +19,10 @@ use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 
 final class DateTimeIdentifierDenormalizer extends DateTimeNormalizer
 {
-    public function denormalize($data, $class, $format = null, array $context = [])
+    /**
+     * @return \DateTimeInterface
+     */
+    public function denormalize($data, $class, $format = null, array $context = []): \DateTimeInterface
     {
         try {
             return parent::denormalize($data, $class, $format, $context);

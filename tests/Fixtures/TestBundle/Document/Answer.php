@@ -64,7 +64,7 @@ class Answer
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -76,7 +76,7 @@ class Answer
      *
      * @return Answer
      */
-    public function setContent($content)
+    public function setContent($content): Answer
     {
         $this->content = $content;
 
@@ -88,7 +88,7 @@ class Answer
      *
      * @return string
      */
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -100,7 +100,7 @@ class Answer
      *
      * @return Answer
      */
-    public function setQuestion(Question $question = null)
+    public function setQuestion(Question $question = null): Answer
     {
         $this->question = $question;
 
@@ -112,7 +112,7 @@ class Answer
      *
      * @return Question
      */
-    public function getQuestion()
+    public function getQuestion(): Question
     {
         return $this->question;
     }
@@ -122,7 +122,7 @@ class Answer
      *
      * @return ArrayCollection
      */
-    public function getRelatedQuestions()
+    public function getRelatedQuestions(): ArrayCollection
     {
         return $this->relatedQuestions;
     }

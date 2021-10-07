@@ -72,8 +72,9 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
     /**
      * {@inheritdoc}
+     * @return bool
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }

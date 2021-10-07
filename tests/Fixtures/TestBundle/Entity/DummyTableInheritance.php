@@ -77,7 +77,7 @@ class DummyTableInheritance
     /**
      * @return DummyTableInheritanceRelated
      */
-    public function getParent()
+    public function getParent(): DummyTableInheritanceRelated
     {
         return $this->parent;
     }

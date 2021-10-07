@@ -45,7 +45,7 @@ final class TraceableChainCollectionDataProvider implements ContextAwareCollecti
         return $this->context;
     }
 
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         $this->context = $context;
         $results = null;

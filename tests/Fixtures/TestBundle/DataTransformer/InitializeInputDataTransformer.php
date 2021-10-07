@@ -23,6 +23,7 @@ final class InitializeInputDataTransformer implements DataTransformerInitializer
 {
     /**
      * {@inheritdoc}
+     * @return object
      */
     public function transform($object, string $to, array $context = [])
     {

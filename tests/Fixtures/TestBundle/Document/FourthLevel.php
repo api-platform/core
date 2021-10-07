@@ -50,7 +50,7 @@ class FourthLevel
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -58,7 +58,7 @@ class FourthLevel
     /**
      * @return int
      */
-    public function getLevel()
+    public function getLevel(): int
     {
         return $this->level;
     }

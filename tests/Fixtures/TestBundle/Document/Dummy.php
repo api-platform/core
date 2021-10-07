@@ -315,7 +315,7 @@ class Dummy
     /**
      * @return bool
      */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): bool
     {
         return $this->dummyBoolean;
     }

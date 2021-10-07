@@ -55,8 +55,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
 
     /**
      * {@inheritdoc}
+     * @return bool
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }

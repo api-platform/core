@@ -22,11 +22,19 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         $this->array = $array;
     }
 
-    public function offsetExists($offset)
+    /**
+     * @return bool
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset): bool
     {
         return \array_key_exists($offset, $this->array);
     }
 
+    /**
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->array[$offset];
@@ -46,7 +54,11 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         unset($this->array[$offset]);
     }
 
-    public function getIterator()
+    /**
+     * @return \Traversable
+     */
+    #[\ReturnTypeWillChange]
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->array);
     }

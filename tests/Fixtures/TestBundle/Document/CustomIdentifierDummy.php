@@ -41,7 +41,7 @@ class CustomIdentifierDummy
     /**
      * @return int
      */
-    public function getCustomId()
+    public function getCustomId(): int
     {
         return $this->customId;
     }
@@ -49,7 +49,7 @@ class CustomIdentifierDummy
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

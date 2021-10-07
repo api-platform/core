@@ -22,6 +22,7 @@ final class RecoverPasswordOutputDataTransformer implements DataTransformerInter
 {
     /**
      * {@inheritdoc}
+     * @return object
      */
     public function transform($object, string $to, array $context = [])
     {

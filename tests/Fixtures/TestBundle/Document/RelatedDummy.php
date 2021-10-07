@@ -142,7 +142,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @return bool
      */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): bool
     {
         return $this->dummyBoolean;
     }
@@ -158,7 +158,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @return ThirdLevel|null
      */
-    public function getThirdLevel()
+    public function getThirdLevel(): ?ThirdLevel
     {
         return $this->thirdLevel;
     }
@@ -173,7 +173,7 @@ class RelatedDummy extends ParentDummy
      *
      * @return RelatedToDummyFriend
      */
-    public function getRelatedToDummyFriend()
+    public function getRelatedToDummyFriend(): RelatedToDummyFriend
     {
         return $this->relatedToDummyFriend;
     }
@@ -191,7 +191,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @return EmbeddableDummy
      */
-    public function getEmbeddedDummy()
+    public function getEmbeddedDummy(): EmbeddableDummy
     {
         return $this->embeddedDummy;
     }

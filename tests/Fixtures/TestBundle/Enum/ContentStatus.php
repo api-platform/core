@@ -68,7 +68,9 @@ final class ContentStatus implements \JsonSerializable
 
     /**
      * {@inheritdoc}
+     * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

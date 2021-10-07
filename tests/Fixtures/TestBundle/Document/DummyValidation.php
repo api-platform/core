@@ -62,7 +62,7 @@ class DummyValidation
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -70,7 +70,7 @@ class DummyValidation
     /**
      * @return DummyValidation
      */
-    public function setId(int $id)
+    public function setId(int $id): DummyValidation
     {
         $this->id = $id;
 
@@ -80,7 +80,7 @@ class DummyValidation
     /**
      * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -90,7 +90,7 @@ class DummyValidation
      *
      * @return DummyValidation
      */
-    public function setName($name)
+    public function setName($name): DummyValidation
     {
         $this->name = $name;
 
@@ -100,7 +100,7 @@ class DummyValidation
     /**
      * @return string|null
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -110,7 +110,7 @@ class DummyValidation
      *
      * @return DummyValidation
      */
-    public function setTitle($title)
+    public function setTitle($title): DummyValidation
     {
         $this->title = $title;
 
@@ -120,7 +120,7 @@ class DummyValidation
     /**
      * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -130,7 +130,7 @@ class DummyValidation
      *
      * @return DummyValidation
      */
-    public function setCode($code)
+    public function setCode($code): DummyValidation
     {
         $this->code = $code;
 

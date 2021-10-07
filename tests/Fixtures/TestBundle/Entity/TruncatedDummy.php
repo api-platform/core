@@ -39,7 +39,7 @@ class TruncatedDummy
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }

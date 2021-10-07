@@ -47,8 +47,9 @@ final class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritdoc}
+     * @return TreeBuilder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         if (method_exists(TreeBuilder::class, 'getRootNode')) {
             $treeBuilder = new TreeBuilder('api_platform');

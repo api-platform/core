@@ -53,7 +53,7 @@ class CompositeRelation
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -63,7 +63,7 @@ class CompositeRelation
      *
      * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -83,7 +83,7 @@ class CompositeRelation
      *
      * @return CompositeItem
      */
-    public function getCompositeItem()
+    public function getCompositeItem(): CompositeItem
     {
         return $this->compositeItem;
     }
@@ -103,7 +103,7 @@ class CompositeRelation
      *
      * @return CompositeLabel
      */
-    public function getCompositeLabel()
+    public function getCompositeLabel(): CompositeLabel
     {
         return $this->compositeLabel;
     }

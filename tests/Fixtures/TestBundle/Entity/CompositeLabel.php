@@ -43,7 +43,7 @@ class CompositeLabel
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -53,7 +53,7 @@ class CompositeLabel
      *
      * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }

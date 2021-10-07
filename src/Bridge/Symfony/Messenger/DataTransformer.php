@@ -33,6 +33,7 @@ final class DataTransformer implements DataTransformerInterface
 
     /**
      * {@inheritdoc}
+     * @return object
      */
     public function transform($object, string $to, array $context = [])
     {

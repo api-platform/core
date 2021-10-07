@@ -62,8 +62,9 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     /**
      * {@inheritdoc}
+     * @return bool
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException || $data instanceof LegacyFlattenException);
     }

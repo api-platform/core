@@ -85,7 +85,9 @@ class Field implements \JsonSerializable
 
     /**
      * {@inheritdoc}
+     * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

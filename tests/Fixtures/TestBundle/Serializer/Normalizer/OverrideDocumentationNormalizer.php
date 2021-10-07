@@ -44,7 +44,10 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
         return $data;
     }
 
-    public function supportsNormalization($data, $format = null)
+    /**
+     * @return bool
+     */
+    public function supportsNormalization($data, $format = null): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }

@@ -87,7 +87,7 @@ class RelatedNormalizedDummy
     /**
      * @return ArrayCollection
      */
-    public function getCustomNormalizedDummy()
+    public function getCustomNormalizedDummy(): ArrayCollection
     {
         return $this->customNormalizedDummy;
     }

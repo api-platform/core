@@ -61,7 +61,7 @@ class SlugParentDummy
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -69,7 +69,7 @@ class SlugParentDummy
     /**
      * @return string
      */
-    public function getSlug()
+    public function getSlug(): string
     {
         return $this->slug;
     }

@@ -60,7 +60,7 @@ class DummyCarColor
     /**
      * @return DummyCar|null
      */
-    public function getCar()
+    public function getCar(): ?DummyCar
     {
         return $this->car;
     }
@@ -78,7 +78,7 @@ class DummyCarColor
     /**
      * @return string
      */
-    public function getProp()
+    public function getProp(): string
     {
         return $this->prop;
     }

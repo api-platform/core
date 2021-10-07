@@ -62,7 +62,7 @@ class CustomNormalizedDummy
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -78,7 +78,7 @@ class CustomNormalizedDummy
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -86,7 +86,7 @@ class CustomNormalizedDummy
     /**
      * @return string
      */
-    public function getAlias()
+    public function getAlias(): string
     {
         return $this->alias;
     }
@@ -102,7 +102,7 @@ class CustomNormalizedDummy
     /**
      * @return string
      */
-    public function getPersonalizedAlias()
+    public function getPersonalizedAlias(): string
     {
         return $this->alias;
     }

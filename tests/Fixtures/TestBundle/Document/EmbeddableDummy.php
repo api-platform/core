@@ -81,7 +81,7 @@ class EmbeddableDummy
     /**
      * @return string
      */
-    public function getDummyName()
+    public function getDummyName(): string
     {
         return $this->dummyName;
     }
@@ -94,7 +94,7 @@ class EmbeddableDummy
     /**
      * @return bool
      */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): bool
     {
         return $this->dummyBoolean;
     }
@@ -107,7 +107,7 @@ class EmbeddableDummy
     /**
      * @return \DateTime
      */
-    public function getDummyDate()
+    public function getDummyDate(): \DateTime
     {
         return $this->dummyDate;
     }
@@ -120,7 +120,7 @@ class EmbeddableDummy
     /**
      * @return string
      */
-    public function getDummyFloat()
+    public function getDummyFloat(): string
     {
         return $this->dummyFloat;
     }
@@ -133,7 +133,7 @@ class EmbeddableDummy
     /**
      * @return string
      */
-    public function getDummyPrice()
+    public function getDummyPrice(): string
     {
         return $this->dummyPrice;
     }
