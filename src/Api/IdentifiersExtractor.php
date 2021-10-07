@@ -15,10 +15,10 @@ namespace ApiPlatform\Api;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -36,7 +36,13 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     private $propertyMetadataFactory;
     private $propertyAccessor;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(
+        ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        PropertyAccessorInterface $propertyAccessor = null
+    )
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -115,7 +121,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
         // TODO: php 8 remove method_exists
         if (is_scalar($identifierValue) || method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
-            return (string) $identifierValue;
+            return (string)$identifierValue;
         }
 
         // TODO: remove this in 3.0
@@ -129,7 +135,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)->getIdentifiers()[0], $parameterName);
 
                 if ($identifierValue instanceof \Stringable || is_scalar($identifierValue) || method_exists($identifierValue, '__toString')) {
-                    return (string) $identifierValue;
+                    return (string)$identifierValue;
                 }
             }
         }
