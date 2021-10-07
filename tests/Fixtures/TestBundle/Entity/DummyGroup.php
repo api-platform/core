@@ -49,7 +49,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyGroup
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -60,7 +60,7 @@ class DummyGroup
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      *
@@ -69,7 +69,7 @@ class DummyGroup
     public $foo;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      *
@@ -78,7 +78,7 @@ class DummyGroup
     public $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      *
@@ -87,7 +87,7 @@ class DummyGroup
     public $baz;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      *
@@ -95,7 +95,7 @@ class DummyGroup
      */
     public $qux;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

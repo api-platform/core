@@ -86,7 +86,7 @@ class DummyGroup
     public $baz;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -94,7 +94,7 @@ class DummyGroup
      */
     public $qux;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

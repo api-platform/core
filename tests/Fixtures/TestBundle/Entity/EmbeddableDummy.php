@@ -35,14 +35,14 @@ class EmbeddableDummy
     private $dummyName;
 
     /**
-     * @var bool A dummy boolean
+     * @var bool|null A dummy boolean
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
     public $dummyBoolean;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
@@ -50,14 +50,14 @@ class EmbeddableDummy
     public $dummyDate;
 
     /**
-     * @var string A dummy float
+     * @var float|null A dummy float
      *
      * @ORM\Column(type="float", nullable=true)
      */
     public $dummyFloat;
 
     /**
-     * @var string A dummy price
+     * @var string|null A dummy price
      *
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
@@ -77,7 +77,7 @@ class EmbeddableDummy
     {
     }
 
-    public function getDummyName(): string
+    public function getDummyName(): ?string
     {
         return $this->dummyName;
     }
@@ -87,7 +87,7 @@ class EmbeddableDummy
         $this->dummyName = $dummyName;
     }
 
-    public function isDummyBoolean(): bool
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
@@ -97,7 +97,7 @@ class EmbeddableDummy
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    public function getDummyDate(): \DateTime
+    public function getDummyDate(): ?\DateTime
     {
         return $this->dummyDate;
     }
@@ -107,17 +107,17 @@ class EmbeddableDummy
         $this->dummyDate = $dummyDate;
     }
 
-    public function getDummyFloat(): string
+    public function getDummyFloat(): ?float
     {
         return $this->dummyFloat;
     }
 
-    public function setDummyFloat(string $dummyFloat)
+    public function setDummyFloat(float $dummyFloat)
     {
         $this->dummyFloat = $dummyFloat;
     }
 
-    public function getDummyPrice(): string
+    public function getDummyPrice(): ?string
     {
         return $this->dummyPrice;
     }

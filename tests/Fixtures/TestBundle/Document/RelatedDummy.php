@@ -17,6 +17,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -139,7 +140,7 @@ class RelatedDummy extends ParentDummy
         return $this->dummyDate;
     }
 
-    public function isDummyBoolean(): bool
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
@@ -165,7 +166,7 @@ class RelatedDummy extends ParentDummy
     /**
      * Get relatedToDummyFriend.
      */
-    public function getRelatedToDummyFriend(): RelatedToDummyFriend
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }

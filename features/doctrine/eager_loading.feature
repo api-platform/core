@@ -4,7 +4,7 @@ Feature: Eager Loading
   As a client software developer
   The eager loading should be enabled
 
-  @createSchema
+  @createSchema @wip
   Scenario: Eager loading for a relation
     Given there is a RelatedDummy with 2 friends
     When I send a "GET" request to "/related_dummies/1"

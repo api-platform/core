@@ -73,7 +73,7 @@ class CompositeItem
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): CompositeRelation
+    public function getCompositeValues(): ?CompositeRelation
     {
         return $this->compositeValues;
     }
