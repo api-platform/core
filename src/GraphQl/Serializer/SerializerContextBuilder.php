@@ -23,8 +23,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Builds the context used by the Symfony Serializer.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface

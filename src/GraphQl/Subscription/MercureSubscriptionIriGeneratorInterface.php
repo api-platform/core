@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Subscription;
 /**
  * Generates Mercure-related IRIs from a subscription ID.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface MercureSubscriptionIriGeneratorInterface

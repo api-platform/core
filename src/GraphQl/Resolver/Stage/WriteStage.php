@@ -21,8 +21,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 /**
  * Write stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class WriteStage implements WriteStageInterface

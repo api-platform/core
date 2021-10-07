@@ -67,8 +67,6 @@ if (\PHP_VERSION_ID >= 70200) {
 /**
  * Represents an iterable type.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class IterableType extends ScalarType implements TypeInterface

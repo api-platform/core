@@ -26,8 +26,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 /**
  * Creates a function resolving a GraphQL subscription of an item.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface

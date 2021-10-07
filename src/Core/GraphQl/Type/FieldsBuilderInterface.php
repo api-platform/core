@@ -18,8 +18,6 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 /**
  * Interface implemented to build GraphQL fields.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface FieldsBuilderInterface

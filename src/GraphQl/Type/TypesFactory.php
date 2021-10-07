@@ -19,8 +19,6 @@ use Psr\Container\ContainerInterface;
 /**
  * Get the registered services corresponding to GraphQL types.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class TypesFactory implements TypesFactoryInterface

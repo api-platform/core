@@ -30,8 +30,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * GraphQL API entrypoint.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class EntrypointAction

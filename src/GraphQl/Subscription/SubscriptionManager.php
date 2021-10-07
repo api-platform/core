@@ -25,8 +25,6 @@ use Psr\Cache\CacheItemPoolInterface;
  * Manages all the queried subscriptions by creating their ID
  * and saving to a cache the information needed to publish updated data.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class SubscriptionManager implements SubscriptionManagerInterface

@@ -19,8 +19,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 /**
  * Validate stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ValidateStage implements ValidateStageInterface

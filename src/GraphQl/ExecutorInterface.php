@@ -19,8 +19,6 @@ use GraphQL\Type\Schema;
 /**
  * Wrapper for the GraphQL facade.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface ExecutorInterface

@@ -18,8 +18,6 @@ use GraphQL\Type\Schema;
 /**
  * Builds a GraphQL schema.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface SchemaBuilderInterface

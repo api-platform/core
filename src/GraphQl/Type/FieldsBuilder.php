@@ -38,8 +38,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Builds the GraphQL fields.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class FieldsBuilder implements FieldsBuilderInterface

@@ -22,8 +22,6 @@ use Twig\Environment as TwigEnvironment;
 /**
  * GraphiQL entrypoint.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class GraphiQlAction

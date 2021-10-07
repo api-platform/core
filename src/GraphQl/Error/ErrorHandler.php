@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Error;
 /**
  * Handles the errors thrown by the GraphQL library by applying the formatter to them (default behavior).
  *
- * @experimental
- *
  * @author Ollie Harridge <code@oll.ie>
  */
 final class ErrorHandler implements ErrorHandlerInterface

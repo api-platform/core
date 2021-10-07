@@ -28,8 +28,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Creates a function retrieving a collection to resolve a GraphQL query or a field returned by a mutation.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>

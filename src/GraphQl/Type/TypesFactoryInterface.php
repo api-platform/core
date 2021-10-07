@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Type;
 /**
  * Get the GraphQL types.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface TypesFactoryInterface

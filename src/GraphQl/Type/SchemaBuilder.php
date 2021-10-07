@@ -24,8 +24,6 @@ use GraphQL\Type\Schema;
 /**
  * Builds the GraphQL schema.
  *
- * @experimental
- *
  * @author Raoul Clais <raoul.clais@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>

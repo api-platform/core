@@ -18,8 +18,6 @@ use GraphQL\Error\Error;
 /**
  * Security post deserialization stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 interface SecurityPostDenormalizeStageInterface

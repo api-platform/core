@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Normalize runtime exceptions to have the right message in production mode.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class RuntimeExceptionNormalizer implements NormalizerInterface

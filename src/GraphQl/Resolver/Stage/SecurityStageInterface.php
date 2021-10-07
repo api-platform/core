@@ -18,8 +18,6 @@ use GraphQL\Error\Error;
 /**
  * Security stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
