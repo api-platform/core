@@ -115,7 +115,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                 $shouldStop = true;
             }
 
-            $index++;
+            ++$index;
         } while (!$shouldStop);
 
         // No stage was sort, and we iterated through all stages

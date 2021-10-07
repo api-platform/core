@@ -24,8 +24,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use OutOfRangeException;
 use PHPUnit\Framework\TestCase;
-use \OutOfRangeException;
 
 /**
  * @group mongodb
