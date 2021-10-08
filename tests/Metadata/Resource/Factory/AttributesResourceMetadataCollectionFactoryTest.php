@@ -68,17 +68,20 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
                             shortName: 'AttributeResource',
                             inputFormats: ['json' => ['application/merge-patch+json']],
-                            priority: 4
+                            priority: 4,
+                            status: 301
                         ),
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_patch' => new Patch(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
                             shortName: 'AttributeResource',
                             inputFormats: ['json' => ['application/merge-patch+json']],
-                            priority: 5
+                            priority: 5,
+                            status: 301
                         ),
                     ],
-                    inputFormats: ['json' => ['application/merge-patch+json']]
+                    inputFormats: ['json' => ['application/merge-patch+json']],
+                    status: 301
                 ),
             ]),
             $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)

@@ -139,7 +139,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            $identifiers = $operation->getUriVariables();
+            $uriVariables = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
 
             $path = $this->getPath($operation->getRouteName() ? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
@@ -181,8 +181,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             // Set up parameters
-            foreach (array_keys($identifiers ?? []) as $parameterName) {
-                $parameter = new Model\Parameter($parameterName, 'path', $operation->getShortName().' identifier', true, false, false, ['type' => 'string']);
+            foreach ($uriVariables ?? [] as $parameterName => $uriVariable) {
+                $parameter = new Model\Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getTargetClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
                 if ($this->hasParameter($parameter, $parameters)) {
                     continue;
                 }

@@ -25,14 +25,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ApiResource]
 #[Post]
-#[ApiResource('/companies/{companyId}/employees/{id}', openapiContext: ['parameters' => [
-    ['description' => 'The id of the company', 'name' => 'companyId', 'in' => 'path', 'required' => true],
-    ['description' => 'The id of the employee', 'name' => 'id', 'in' => 'path', 'required' => true],
-]])]
+#[ApiResource('/companies/{companyId}/employees/{id}')]
 #[Get]
-#[ApiResource('/companies/{companyId}/employees', openapiContext: ['parameters' => [
-    ['description' => 'The id of the company', 'name' => 'companyId', 'in' => 'path', 'required' => true],
-]])]
+#[ApiResource('/companies/{companyId}/employees')]
 #[GetCollection]
 class Employee
 {
