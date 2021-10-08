@@ -20,9 +20,7 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 
 /**
  * Item state provider using the Doctrine ORM.
@@ -32,6 +30,8 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
  */
 final class ItemProvider implements ProviderInterface
 {
+    use UriVariablesHandlerTrait;
+
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
     private $itemExtensions;
@@ -63,9 +63,8 @@ final class ItemProvider implements ProviderInterface
 
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
-        $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
 
-        $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata);
+        $this->handleUriVariables($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
@@ -87,24 +86,5 @@ final class ItemProvider implements ProviderInterface
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
 
         return !($operation->isCollection() ?? false);
-    }
-
-    /**
-     * Add WHERE conditions to the query for one or more identifiers (simple or composite).
-     */
-    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
-    {
-        $alias = $queryBuilder->getRootAliases()[0];
-        foreach ($identifiers as $identifier => $value) {
-            $placeholder = ':id_'.$identifier;
-            $expression = $queryBuilder->expr()->eq(
-                "{$alias}.{$identifier}",
-                $placeholder
-            );
-
-            $queryBuilder->andWhere($expression);
-
-            $queryBuilder->setParameter($placeholder, $value, $classMetadata->getTypeOfField($identifier));
-        }
     }
 }

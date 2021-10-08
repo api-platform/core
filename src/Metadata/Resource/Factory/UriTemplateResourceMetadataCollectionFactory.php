@@ -142,18 +142,20 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         });
 
         if (\count($variables) < \count($uriVariables)) {
-            $uriVariables = [];
-        }
+            $newUriVariables = [];
+            foreach ($variables as $variable) {
+                if (isset($uriVariables[$variable])) {
+                    $newUriVariables[$variable] = $uriVariables[$variable];
+                    continue;
+                }
 
-        foreach ($variables as $variable) {
-            if (isset($uriVariables[$variable])) {
-                continue;
+                $newUriVariables[$variable] = (new UriVariable())->withTargetClass($operation->getClass())->withIdentifiers([$variable]);
             }
 
-            $uriVariables[$variable] = (new UriVariable())->withTargetClass($operation->getClass())->withIdentifiers([$variable]);
+            return $operation->withUriVariables($newUriVariables);
         }
 
-        return $operation->withUriVariables($uriVariables);
+        return $operation;
     }
 
     /**
@@ -251,9 +253,13 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
                 foreach ($reflectionProperty->getAttributes(UriVariable::class) ?? [] as $attributeUriVariable) {
                     $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+
                     $attributeUriVariable = $attributeUriVariable->newInstance()
-                                                                     ->withProperty($property)
-                                                                      ->withTargetClass($this->getPropertyClassType($metadata->getBuiltinTypes()) ?? $resourceClass);
+                        ->withProperty($property);
+
+                    if (!$attributeUriVariable->getTargetClass()) {
+                        $attributeUriVariable = $attributeUriVariable->withTargetClass($this->getPropertyClassType($metadata->getBuiltinTypes()) ?? $resourceClass);
+                    }
 
                     if (isset($uriVariables[$parameterName = $attributeUriVariable->getParameterName()])) {
                         $uriVariables[$parameterName] = $uriVariables[$parameterName]->withUriVariable($attributeUriVariable);

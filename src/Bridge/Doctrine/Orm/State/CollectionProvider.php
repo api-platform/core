@@ -30,6 +30,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class CollectionProvider implements ProviderInterface
 {
+    use UriVariablesHandlerTrait;
+
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
     private $collectionExtensions;
@@ -56,6 +58,9 @@ final class CollectionProvider implements ProviderInterface
 
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
+
+        $this->handleUriVariables($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
+
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 

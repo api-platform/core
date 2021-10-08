@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -145,7 +146,7 @@ class AddTagsListenerTest extends TestCase
     public function testAddCollectionIri()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $response = new Response();
         $response->setPublic();
@@ -167,7 +168,7 @@ class AddTagsListenerTest extends TestCase
     public function testAddCollectionIriWhenCollectionIsEmpty()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $response = new Response();
         $response->setPublic();
@@ -189,7 +190,7 @@ class AddTagsListenerTest extends TestCase
     public function testAddSubResourceCollectionIri()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $response = new Response();
         $response->setPublic();
@@ -211,7 +212,7 @@ class AddTagsListenerTest extends TestCase
     public function testAddTagsWithXKey()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, 'get', 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => new GetCollection()]))]);
