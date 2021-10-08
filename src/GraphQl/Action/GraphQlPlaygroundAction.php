@@ -22,8 +22,6 @@ use Twig\Environment as TwigEnvironment;
 /**
  * GraphQL Playground entrypoint.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class GraphQlPlaygroundAction

@@ -18,8 +18,6 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * Exception thrown when a type has not been found in the types container.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class TypeNotFoundException extends \InvalidArgumentException implements NotFoundExceptionInterface

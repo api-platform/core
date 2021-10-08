@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Subscription;
 /**
  * Generates an identifier used to identify a subscription.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface SubscriptionIdentifierGeneratorInterface

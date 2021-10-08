@@ -18,8 +18,6 @@ use GraphQL\Error\Error;
 /**
  * Validate stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface ValidateStageInterface

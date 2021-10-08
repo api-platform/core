@@ -31,8 +31,6 @@ use Psr\Container\ContainerInterface;
 /**
  * Creates a function resolving a GraphQL mutation of an item.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */

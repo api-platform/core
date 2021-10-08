@@ -18,8 +18,6 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 /**
  * Interface implemented to build GraphQL fields.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface FieldsBuilderInterface

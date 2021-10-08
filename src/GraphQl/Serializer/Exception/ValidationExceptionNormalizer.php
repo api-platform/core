@@ -23,8 +23,6 @@ use Symfony\Component\Validator\ConstraintViolation;
 /**
  * Normalize validation exceptions.
  *
- * @experimental
- *
  * @author Mahmood Bazdar <mahmood@bazdar.me>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

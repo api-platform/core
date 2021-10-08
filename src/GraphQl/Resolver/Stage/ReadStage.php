@@ -30,8 +30,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Read stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ReadStage implements ReadStageInterface

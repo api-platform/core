@@ -25,8 +25,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Export the GraphQL schema in Schema Definition Language (SDL).
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class GraphQlExportCommand extends Command

@@ -22,8 +22,6 @@ use GraphQL\Type\Definition\ResolveInfo;
 /**
  * A field resolver that resolves IDs to IRIs and allow to access to the raw ID using the "#id" field.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class ResourceFieldResolver

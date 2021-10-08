@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Normalize HTTP exceptions.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class HttpExceptionNormalizer implements NormalizerInterface

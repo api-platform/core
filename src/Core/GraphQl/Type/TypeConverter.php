@@ -32,8 +32,6 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Converts a type to its GraphQL equivalent.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class TypeConverter implements TypeConverterInterface

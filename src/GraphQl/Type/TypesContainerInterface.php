@@ -19,8 +19,6 @@ use Psr\Container\ContainerInterface;
 /**
  * Interface implemented to contain the GraphQL types.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface TypesContainerInterface extends ContainerInterface

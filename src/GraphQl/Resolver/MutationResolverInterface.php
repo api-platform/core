@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Resolver;
 /**
  * A function resolving a GraphQL mutation.
  *
- * @experimental
- *
  * @author Raoul Clais <raoul.clais@gmail.com>
  */
 interface MutationResolverInterface

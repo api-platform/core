@@ -29,8 +29,6 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Builds the GraphQL types.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class TypeBuilder implements TypeBuilderInterface

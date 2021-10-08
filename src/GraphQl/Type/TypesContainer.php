@@ -18,8 +18,6 @@ use GraphQL\Type\Definition\Type as GraphQLType;
 /**
  * Container having the built GraphQL types.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class TypesContainer implements TypesContainerInterface

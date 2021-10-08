@@ -27,8 +27,6 @@ use Psr\Container\ContainerInterface;
 /**
  * Creates a function retrieving an item to resolve a GraphQL query.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>

@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Resolver;
 /**
  * A function resolving a GraphQL query of an item.
  *
- * @experimental
- *
  * @author Lukas Lücke <lukas@luecke.me>
  */
 interface QueryItemResolverInterface

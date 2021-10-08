@@ -19,8 +19,6 @@ use GraphQL\Error\Error;
  * Handles the errors thrown by the GraphQL library.
  * It is responsible for applying the formatter to the errors and can be used for filtering or logging them.
  *
- * @experimental
- *
  * @author Ollie Harridge <code@oll.ie>
  */
 interface ErrorHandlerInterface

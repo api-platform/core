@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Resolver\Factory;
 /**
  * Builds a GraphQL resolver.
  *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface ResolverFactoryInterface

@@ -20,8 +20,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /**
  * Normalize GraphQL error (fallback).
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ErrorNormalizer implements NormalizerInterface

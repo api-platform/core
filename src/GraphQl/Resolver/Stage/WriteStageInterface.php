@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Resolver\Stage;
 /**
  * Write stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface WriteStageInterface

@@ -19,8 +19,6 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * Generates Mercure-related IRIs from a subscription ID.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class MercureSubscriptionIriGenerator implements MercureSubscriptionIriGeneratorInterface

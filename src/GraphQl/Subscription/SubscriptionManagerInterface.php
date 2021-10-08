@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Subscription;
 /**
  * Manages all the queried subscriptions and creates their ID.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface SubscriptionManagerInterface

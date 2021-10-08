@@ -16,8 +16,6 @@ namespace ApiPlatform\GraphQl\Serializer;
 /**
  * Builds the context used by the Symfony Serializer.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface SerializerContextBuilderInterface
