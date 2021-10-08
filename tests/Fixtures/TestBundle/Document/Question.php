@@ -62,15 +62,13 @@ class Question
     /**
      * Get id.
      */
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Set answer.
-     *
-     * @param Answer $answer
      */
     public function setAnswer(Answer $answer = null): self
     {
@@ -82,7 +80,7 @@ class Question
     /**
      * Get answer.
      */
-    public function getAnswer(): Answer
+    public function getAnswer(): ?Answer
     {
         return $this->answer;
     }
