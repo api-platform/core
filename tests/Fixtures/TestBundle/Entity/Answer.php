@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -64,7 +65,7 @@ class Answer
     /**
      * Get id.
      */
-    public function getId(): string
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -84,7 +85,7 @@ class Answer
     /**
      * Get content.
      */
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -104,7 +105,7 @@ class Answer
     /**
      * Get question.
      */
-    public function getQuestion(): Question
+    public function getQuestion(): ?Question
     {
         return $this->question;
     }
@@ -112,7 +113,7 @@ class Answer
     /**
      * Get related question.
      */
-    public function getRelatedQuestions(): ArrayCollection
+    public function getRelatedQuestions(): Collection
     {
         return $this->relatedQuestions;
     }

@@ -51,7 +51,7 @@ class CompositeRelation
     /**
      * Gets id.
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -77,7 +77,7 @@ class CompositeRelation
     /**
      * Gets compositeItem.
      */
-    public function getCompositeItem(): CompositeItem
+    public function getCompositeItem(): ?CompositeItem
     {
         return $this->compositeItem;
     }
@@ -95,7 +95,7 @@ class CompositeRelation
     /**
      * Gets compositeLabel.
      */
-    public function getCompositeLabel(): CompositeLabel
+    public function getCompositeLabel(): ?CompositeLabel
     {
         return $this->compositeLabel;
     }

@@ -50,7 +50,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyGroup
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      *
@@ -59,7 +59,7 @@ class DummyGroup
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -68,7 +68,7 @@ class DummyGroup
     public $foo;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -77,7 +77,7 @@ class DummyGroup
     public $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *

@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -62,7 +63,7 @@ class Answer
     /**
      * Get id.
      */
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -82,7 +83,7 @@ class Answer
     /**
      * Get content.
      */
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -102,7 +103,7 @@ class Answer
     /**
      * Get question.
      */
-    public function getQuestion(): Question
+    public function getQuestion(): ?Question
     {
         return $this->question;
     }
@@ -110,7 +111,7 @@ class Answer
     /**
      * Get related question.
      */
-    public function getRelatedQuestions(): ArrayCollection
+    public function getRelatedQuestions(): Collection
     {
         return $this->relatedQuestions;
     }

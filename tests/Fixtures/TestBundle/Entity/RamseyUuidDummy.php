@@ -54,7 +54,7 @@ class RamseyUuidDummy
         return $this->other;
     }
 
-    public function setOther(UuidInterface $other)
+    public function setOther(UuidInterface $other): void
     {
         $this->other = $other;
     }

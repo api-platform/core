@@ -31,14 +31,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DummyFriend
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
      * @Assert\NotBlank
@@ -50,7 +50,7 @@ class DummyFriend
     /**
      * Get id.
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -68,7 +68,7 @@ class DummyFriend
     /**
      * Get name.
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -78,7 +78,7 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }

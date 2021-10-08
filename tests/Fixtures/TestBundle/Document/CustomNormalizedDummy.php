@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CustomNormalizedDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"input", "output"})
@@ -41,7 +41,7 @@ class CustomNormalizedDummy
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field
      * @Assert\NotBlank
@@ -51,7 +51,7 @@ class CustomNormalizedDummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ODM\Field(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -59,7 +59,7 @@ class CustomNormalizedDummy
      */
     private $alias;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -72,12 +72,12 @@ class CustomNormalizedDummy
         $this->name = $name;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getAlias(): string
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -90,7 +90,7 @@ class CustomNormalizedDummy
         $this->alias = $alias;
     }
 
-    public function getPersonalizedAlias(): string
+    public function getPersonalizedAlias(): ?string
     {
         return $this->alias;
     }

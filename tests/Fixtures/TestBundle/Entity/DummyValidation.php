@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DummyValidation
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -56,12 +56,12 @@ class DummyValidation
     private $title;
 
     /**
-     * @var string The dummy code
+     * @var string|null The dummy code
      * @ORM\Column
      */
     private $code;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -78,10 +78,7 @@ class DummyValidation
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     */
-    public function setName($name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -93,25 +90,19 @@ class DummyValidation
         return $this->title;
     }
 
-    /**
-     * @param string|null $title
-     */
-    public function setTitle($title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getCode(): string
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     */
-    public function setCode($code): self
+    public function setCode(string $code): self
     {
         $this->code = $code;
 

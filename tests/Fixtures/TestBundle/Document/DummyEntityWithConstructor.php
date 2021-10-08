@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyEntityWithConstructor
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
@@ -56,7 +56,7 @@ class DummyEntityWithConstructor
     private $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      * @Groups({"put"})
@@ -78,7 +78,7 @@ class DummyEntityWithConstructor
         $this->items = $items;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -101,7 +101,7 @@ class DummyEntityWithConstructor
         return $this->items;
     }
 
-    public function getBaz(): string
+    public function getBaz(): ?string
     {
         return $this->baz;
     }

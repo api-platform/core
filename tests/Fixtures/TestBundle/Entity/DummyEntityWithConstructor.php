@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyEntityWithConstructor
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -58,7 +58,7 @@ class DummyEntityWithConstructor
     private $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      * @Groups({"put"})
@@ -80,7 +80,7 @@ class DummyEntityWithConstructor
         $this->items = $items;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -103,12 +103,12 @@ class DummyEntityWithConstructor
         return $this->items;
     }
 
-    public function getBaz(): string
+    public function getBaz(): ?string
     {
         return $this->baz;
     }
 
-    public function setBaz(string $baz)
+    public function setBaz(string $baz): void
     {
         $this->baz = $baz;
     }

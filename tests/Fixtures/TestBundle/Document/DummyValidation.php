@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DummyValidation
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
@@ -54,12 +54,12 @@ class DummyValidation
     private $title;
 
     /**
-     * @var string The dummy code
+     * @var string|null The dummy code
      * @ODM\Field
      */
     private $code;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -101,7 +101,7 @@ class DummyValidation
         return $this;
     }
 
-    public function getCode(): string
+    public function getCode(): ?string
     {
         return $this->code;
     }

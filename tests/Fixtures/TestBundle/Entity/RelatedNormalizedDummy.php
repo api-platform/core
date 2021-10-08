@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -34,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedNormalizedDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -44,7 +45,7 @@ class RelatedNormalizedDummy
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -54,7 +55,7 @@ class RelatedNormalizedDummy
     private $name;
 
     /**
-     * @var ArrayCollection Several Normalized dummies
+     * @var Collection Several Normalized dummies
      *
      * @ORM\ManyToMany(targetEntity="CustomNormalizedDummy")
      * @Groups({"related_output", "related_input"})
@@ -66,33 +67,30 @@ class RelatedNormalizedDummy
         $this->customNormalizedDummy = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getCustomNormalizedDummy(): ArrayCollection
+    public function getCustomNormalizedDummy(): Collection
     {
         return $this->customNormalizedDummy;
     }
 
     /**
-     * @param ArrayCollection $customNormalizedDummy
+     * @param Collection|array $customNormalizedDummy
      */
-    public function setCustomNormalizedDummy($customNormalizedDummy)
+    public function setCustomNormalizedDummy($customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

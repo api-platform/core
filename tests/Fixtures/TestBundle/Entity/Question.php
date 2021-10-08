@@ -57,7 +57,7 @@ class Question
     /**
      * Get content.
      */
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -65,7 +65,7 @@ class Question
     /**
      * Get id.
      */
-    public function getId(): string
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -85,7 +85,7 @@ class Question
     /**
      * Get answer.
      */
-    public function getAnswer(): Answer
+    public function getAnswer(): ?Answer
     {
         return $this->answer;
     }

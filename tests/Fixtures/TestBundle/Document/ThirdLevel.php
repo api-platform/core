@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ThirdLevel
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
@@ -63,7 +63,7 @@ class ThirdLevel
      */
     public $badFourthLevel;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -73,10 +73,7 @@ class ThirdLevel
         return $this->level;
     }
 
-    /**
-     * @param int $level
-     */
-    public function setLevel($level)
+    public function setLevel(int $level)
     {
         $this->level = $level;
     }
@@ -86,10 +83,7 @@ class ThirdLevel
         return $this->test;
     }
 
-    /**
-     * @param bool $test
-     */
-    public function setTest($test)
+    public function setTest(bool $test)
     {
         $this->test = $test;
     }

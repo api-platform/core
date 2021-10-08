@@ -28,14 +28,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class FourthLevel
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      *
      * @ODM\Field(type="int")
      * @Groups({"barcelona", "chicago"})
@@ -47,20 +47,17 @@ class FourthLevel
      */
     public $badThirdLevel;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLevel(): int
+    public function getLevel(): ?int
     {
         return $this->level;
     }
 
-    /**
-     * @param int $level
-     */
-    public function setLevel($level)
+    public function setLevel(int $level)
     {
         $this->level = $level;
     }

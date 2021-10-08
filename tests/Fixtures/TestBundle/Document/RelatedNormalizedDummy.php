@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -34,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedNormalizedDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"related_output", "related_input"})
@@ -42,7 +43,7 @@ class RelatedNormalizedDummy
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field
      * @Assert\NotBlank
@@ -64,7 +65,7 @@ class RelatedNormalizedDummy
         $this->customNormalizedDummy = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -77,20 +78,17 @@ class RelatedNormalizedDummy
         $this->name = $name;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function getCustomNormalizedDummy(): ArrayCollection
+    public function getCustomNormalizedDummy(): Collection
     {
         return $this->customNormalizedDummy;
     }
 
-    /**
-     * @param ArrayCollection $customNormalizedDummy
-     */
-    public function setCustomNormalizedDummy($customNormalizedDummy)
+    public function setCustomNormalizedDummy(Collection $customNormalizedDummy)
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

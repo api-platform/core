@@ -53,7 +53,7 @@ class CompositePrimitiveItem
     /**
      * Gets id.
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -61,7 +61,7 @@ class CompositePrimitiveItem
     /**
      * Gets name.
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -69,7 +69,7 @@ class CompositePrimitiveItem
     /**
      * Gets year.
      */
-    public function getYear(): int
+    public function getYear(): ?int
     {
         return $this->year;
     }
@@ -85,7 +85,7 @@ class CompositePrimitiveItem
     /**
      * Gets description.
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
