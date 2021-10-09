@@ -696,7 +696,7 @@ class OpenApiFactoryTest extends TestCase
             [],
             ['get' => ['method' => 'GET'] + self::OPERATION_FORMATS],
             [],
-            ['get' => ['method' => 'GET', 'input_formats' => ['xml' => ['text/xml']], 'output_formats' => ['xml' => ['text/xml']]]]
+            ['get' => ['method' => 'GET', 'filters' => ['subf1', 'subf2', 'subf3', 'subf4', 'subf5'], 'input_formats' => ['xml' => ['text/xml']], 'output_formats' => ['xml' => ['text/xml']]]]
         );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Question::class)->shouldBeCalled()->willReturn($questionMetadata);
@@ -734,7 +734,46 @@ class OpenApiFactoryTest extends TestCase
         $typeFactory = new TypeFactory();
         $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
+
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filters = [
+            'subf1' => new DummyFilter(['name' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => true,
+                'strategy' => 'exact',
+                'openapi' => ['example' => 'bar', 'deprecated' => true, 'allowEmptyValue' => true, 'allowReserved' => true, 'explode' => true],
+            ]]),
+            'subf2' => new DummyFilter(['ha' => [
+                'property' => 'foo',
+                'type' => 'int',
+                'required' => false,
+                'strategy' => 'partial',
+            ]]),
+            'subf3' => new DummyFilter(['toto' => [
+                'property' => 'name',
+                'type' => 'array',
+                'is_collection' => true,
+                'required' => true,
+                'strategy' => 'exact',
+            ]]),
+            'subf4' => new DummyFilter(['order[name]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+                'schema' => [
+                    'type' => 'string',
+                    'enum' => ['asc', 'desc'],
+                ],
+            ]]),
+        ];
+
+        foreach ($filters as $filterId => $filter) {
+            $filterLocatorProphecy->has($filterId)->willReturn(true)->shouldBeCalled();
+            $filterLocatorProphecy->get($filterId)->willReturn($filter)->shouldBeCalled();
+        }
+
+        $filterLocatorProphecy->has('subf5')->willReturn(false)->shouldBeCalled();
 
         $factory = new OpenApiFactory(
             $resourceNameCollectionFactoryProphecy->reveal(),
