@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class EmbeddableDummy
 {
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
      * @Groups({"embed"})
@@ -36,14 +36,14 @@ class EmbeddableDummy
     private $dummyName;
 
     /**
-     * @var bool A dummy boolean
+     * @var bool|null A dummy boolean
      *
      * @ODM\Field(type="bool")
      */
     public $dummyBoolean;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date")
      * @Assert\DateTime
@@ -51,14 +51,14 @@ class EmbeddableDummy
     public $dummyDate;
 
     /**
-     * @var string A dummy float
+     * @var float|null A dummy float
      *
      * @ODM\Field(type="float")
      */
     public $dummyFloat;
 
     /**
-     * @var string A dummy price
+     * @var float|null A dummy price
      *
      * @ODM\Field(type="float")
      */
@@ -70,7 +70,7 @@ class EmbeddableDummy
      */
     protected $symfony;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -78,62 +78,62 @@ class EmbeddableDummy
     {
     }
 
-    public function getDummyName(): string
+    public function getDummyName(): ?string
     {
         return $this->dummyName;
     }
 
-    public function setDummyName(string $dummyName)
+    public function setDummyName(string $dummyName): void
     {
         $this->dummyName = $dummyName;
     }
 
-    public function isDummyBoolean(): bool
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
 
-    public function setDummyBoolean(bool $dummyBoolean)
+    public function setDummyBoolean(bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    public function getDummyDate(): \DateTime
+    public function getDummyDate(): ?\DateTime
     {
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
 
-    public function getDummyFloat(): string
+    public function getDummyFloat(): ?float
     {
         return $this->dummyFloat;
     }
 
-    public function setDummyFloat(string $dummyFloat)
+    public function setDummyFloat(float $dummyFloat): void
     {
         $this->dummyFloat = $dummyFloat;
     }
 
-    public function getDummyPrice(): string
+    public function getDummyPrice(): ?float
     {
         return $this->dummyPrice;
     }
 
-    public function setDummyPrice(string $dummyPrice)
+    public function setDummyPrice(float $dummyPrice): void
     {
         $this->dummyPrice = $dummyPrice;
     }
 
-    public function getSymfony()
+    public function getSymfony(): ?string
     {
         return $this->symfony;
     }
 
-    public function setSymfony($symfony)
+    public function setSymfony(string $symfony): void
     {
         $this->symfony = $symfony;
     }

@@ -53,7 +53,7 @@ class RelatedNormalizedDummy
     private $name;
 
     /**
-     * @var Collection Several Normalized dummies
+     * @var iterable Several Normalized dummies
      *
      * @ODM\ReferenceMany(targetDocument=CustomNormalizedDummy::class)
      * @Groups({"related_output", "related_input"})
@@ -88,7 +88,7 @@ class RelatedNormalizedDummy
         return $this->customNormalizedDummy;
     }
 
-    public function setCustomNormalizedDummy(Collection $customNormalizedDummy)
+    public function setCustomNormalizedDummy(iterable $customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

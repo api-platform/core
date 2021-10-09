@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyTableInheritance
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      *
@@ -41,7 +41,7 @@ class DummyTableInheritance
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field
      *
@@ -50,36 +50,33 @@ class DummyTableInheritance
     private $name;
 
     /**
-     * @var DummyTableInheritanceRelated
+     * @var DummyTableInheritanceRelated|null
      *
      * @ODM\ReferenceOne(targetDocument=DummyTableInheritanceRelated::class, inversedBy="children")
      */
     private $parent;
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getParent(): DummyTableInheritanceRelated
+    public function getParent(): ?DummyTableInheritanceRelated
     {
         return $this->parent;
     }
 
-    /**
-     * @return $this
-     */
-    public function setParent(DummyTableInheritanceRelated $parent)
+    public function setParent(DummyTableInheritanceRelated $parent): self
     {
         $this->parent = $parent;
 

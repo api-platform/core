@@ -63,17 +63,15 @@ class Answer
     /**
      * Get id.
      */
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Set content.
-     *
-     * @param string $content
      */
-    public function setContent($content): self
+    public function setContent(string $content): self
     {
         $this->content = $content;
 
@@ -90,8 +88,6 @@ class Answer
 
     /**
      * Set question.
-     *
-     * @param Question $question
      */
     public function setQuestion(Question $question = null): self
     {
@@ -116,7 +112,7 @@ class Answer
         return $this->relatedQuestions;
     }
 
-    public function addRelatedQuestion(Question $question)
+    public function addRelatedQuestion(Question $question): void
     {
         $this->relatedQuestions->add($question);
     }

@@ -7,6 +7,7 @@ Feature: Date filter on collections
   Scenario: Get collection filtered by date
     Given there are 30 dummy objects with dummyDate
     When I send a "GET" request to "/dummies?dummyDate[after]=2015-04-28"
+    Then print last JSON response
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
