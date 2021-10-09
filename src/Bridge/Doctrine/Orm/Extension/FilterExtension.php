@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -55,8 +56,11 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-
+        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
+        } else {
+            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        }
         if (empty($resourceFilters)) {
             return;
         }

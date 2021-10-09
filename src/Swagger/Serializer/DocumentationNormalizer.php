@@ -749,7 +749,13 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         $parameters = [];
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+
+        if (isset($resourceMetadata->getSubresourceOperations()[$operationName])) {
+            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
+        } else {
+            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        }
+
         foreach ($resourceFilters as $filterId) {
             if (!$filter = $this->getFilter($filterId)) {
                 continue;

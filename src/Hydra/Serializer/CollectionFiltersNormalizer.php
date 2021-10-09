@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Hydra\Serializer;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Container\ContainerInterface;
@@ -85,6 +86,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         $operationName = $context['collection_operation_name'] ?? null;
         if (null === $operationName) {
             $resourceFilters = $resourceMetadata->getAttribute('filters', []);
+        } elseif (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
         } else {
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         }

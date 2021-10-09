@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -50,7 +51,11 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
+        } else {
+            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        }
 
         if (empty($resourceFilters)) {
             return;

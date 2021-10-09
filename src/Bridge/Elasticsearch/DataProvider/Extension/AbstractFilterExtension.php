@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension;
 
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Psr\Container\ContainerInterface;
 
@@ -40,7 +41,12 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
     public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+
+        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
+        } else {
+            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        }
 
         if (!$resourceFilters) {
             return $requestBody;
