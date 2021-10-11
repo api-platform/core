@@ -21,6 +21,8 @@ final class DateTimeIdentifierDenormalizer extends DateTimeNormalizer
 {
     /**
      * @param mixed|null $format
+     * @param mixed      $data
+     * @param mixed      $class
      */
     public function denormalize($data, $class, $format = null, array $context = []): \DateTimeInterface
     {

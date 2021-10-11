@@ -372,6 +372,8 @@ final class PropertyMetadata
 
     /**
      * Returns a new instance with the given default value for the property.
+     *
+     * @param mixed $default
      */
     public function withDefault($default): self
     {
@@ -391,6 +393,8 @@ final class PropertyMetadata
 
     /**
      * Returns a new instance with the given example.
+     *
+     * @param mixed $example
      */
     public function withExample($example): self
     {

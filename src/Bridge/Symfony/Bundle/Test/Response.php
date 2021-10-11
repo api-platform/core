@@ -65,6 +65,7 @@ final class Response implements ResponseInterface
 
     /**
      * {@inheritdoc}
+     *
      * @return mixed
      */
     public function getInfo(string $type = null)

@@ -3394,6 +3394,9 @@ class DocumentationNormalizerV2Test extends TestCase
 
     /**
      * @dataProvider propertyWithDefaultProvider
+     *
+     * @param mixed $expectedDefault
+     * @param mixed $expectedExample
      */
     public function testNormalizeWithDefaultProperty($expectedDefault, $expectedExample, PropertyMetadata $propertyMetadata)
     {

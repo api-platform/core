@@ -69,6 +69,7 @@ final class UploadType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
      * @return mixed
      */
     public function serialize($value)

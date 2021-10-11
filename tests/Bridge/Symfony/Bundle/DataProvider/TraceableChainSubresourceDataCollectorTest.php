@@ -47,6 +47,10 @@ class TraceableChainSubresourceDataCollectorTest extends TestCase
     /**
      * @dataProvider deprecatedDataProviderProvider
      * @group legacy
+     *
+     * @param mixed $provider
+     * @param mixed $context
+     * @param mixed $expected
      */
     public function testDeprecatedGetSubResource($provider, $context, $expected)
     {

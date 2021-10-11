@@ -35,6 +35,8 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
 
     /**
      * @dataProvider dependenciesProvider
+     *
+     * @param mixed $decorated
      */
     public function testCreate($decorated, array $results)
     {
@@ -80,6 +82,8 @@ class AnnotationPropertyNameCollectionFactoryTest extends TestCase
 
     /**
      * @dataProvider upperCaseDependenciesProvider
+     *
+     * @param mixed $decorated
      */
     public function testUpperCaseCreate($decorated, array $results)
     {

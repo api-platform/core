@@ -25,6 +25,8 @@ class DummyValidationController
      *     path="/dummy_validation/validation_groups",
      *     defaults={"_api_resource_class"=DummyValidation::class, "_api_collection_operation_name"="post_validation_groups"}
      * )
+     *
+     * @param mixed $data
      */
     public function postValidationGroups($data)
     {
@@ -38,6 +40,8 @@ class DummyValidationController
      *     path="/dummy_validation/validation_sequence",
      *     defaults={"_api_resource_class"=DummyValidation::class, "_api_collection_operation_name"="post_validation_sequence"}
      * )
+     *
+     * @param mixed $data
      */
     public function postValidationSequence($data)
     {
