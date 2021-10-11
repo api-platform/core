@@ -33,6 +33,8 @@ if (\PHP_VERSION_ID >= 70200) {
          * {@inheritdoc}
          *
          * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
+         *
+         * @return mixed
          */
         public function parseLiteral(/*Node */ $valueNode, ?array $variables = null)
         {
@@ -90,6 +92,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function serialize($value)
     {
@@ -102,6 +106,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function parseValue($value)
     {

@@ -27,7 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DummyImmutableDate
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -36,7 +36,7 @@ class DummyImmutableDate
     private $id;
 
     /**
-     * @var \DateTimeImmutable The dummy date
+     * @var \DateTimeImmutable|null The dummy date
      *
      * @ORM\Column(type="date_immutable")
      */
@@ -44,10 +44,8 @@ class DummyImmutableDate
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

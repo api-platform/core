@@ -30,6 +30,7 @@ interface ExecutorInterface
      *
      * @param mixed|null $rootValue
      * @param mixed|null $context
+     * @param mixed      $source
      */
     public function executeQuery(Schema $schema, $source, $rootValue = null, $context = null, array $variableValues = null, string $operationName = null, callable $fieldResolver = null, array $validationRules = null): ExecutionResult;
 }

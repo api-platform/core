@@ -49,20 +49,16 @@ class CompositePrimitiveItem
 
     /**
      * Gets name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Gets year.
-     *
-     * @return int
      */
-    public function getYear()
+    public function getYear(): int
     {
         return $this->year;
     }
@@ -77,10 +73,8 @@ class CompositePrimitiveItem
 
     /**
      * Gets description.
-     *
-     * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }

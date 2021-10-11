@@ -36,7 +36,8 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    #[\ReturnTypeWillChange]
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->properties);
     }
@@ -44,7 +45,8 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function count()
+    #[\ReturnTypeWillChange]
+    public function count(): int
     {
         return \count($this->properties);
     }

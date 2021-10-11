@@ -71,6 +71,8 @@ final class WriteListener
 
     /**
      * Gets the manager if applicable.
+     *
+     * @param mixed $data
      */
     private function getManager(string $resourceClass, $data): ?ObjectManager
     {

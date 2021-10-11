@@ -72,8 +72,6 @@ final class Required implements ValidatorInterface
 
     /**
      * Test if required filter is valid. It validates array notation too like "required[bar]".
-     *
-     * @return ?mixed
      */
     private function requestGetQueryParameter(array $queryParameters, string $name)
     {

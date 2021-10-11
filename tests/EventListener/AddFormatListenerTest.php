@@ -362,6 +362,8 @@ class AddFormatListenerTest extends TestCase
      * @group legacy
      * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 2nd parameter of the constructor of "ApiPlatform\Core\EventListener\AddFormatListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead
      * @dataProvider legacyFormatsProvider
+     *
+     * @param mixed $formatsProvider
      */
     public function testLegacyFormatsParameter($formatsProvider): void
     {

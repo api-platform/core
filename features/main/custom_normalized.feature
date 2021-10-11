@@ -53,7 +53,7 @@ Feature: Using custom normalized entity
     }
     """
 
-  Scenario: Create a resource with a custom normalized dummy and an id
+  Scenario: Update a resource with a custom normalized dummy and an id
     When I add "Content-Type" header equal to "application/json"
     When I add "Accept" header equal to "application/json"
     And I send a "PUT" request to "/related_normalized_dummies/1" with body:

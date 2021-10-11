@@ -44,7 +44,11 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
         return $data;
     }
 
-    public function supportsNormalization($data, $format = null)
+    /**
+     * @param mixed|null $format
+     * @param mixed      $data
+     */
+    public function supportsNormalization($data, $format = null): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }

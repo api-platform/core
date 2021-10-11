@@ -89,7 +89,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     /**
      * {@inheritdoc}
      */
-    public function getCollection(string $resourceClass, ?string $operationName = null, array $context = [])
+    public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []): iterable
     {
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];

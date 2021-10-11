@@ -66,6 +66,15 @@ final class SwaggerUiAction
     /**
      * @param int[]      $swaggerVersions
      * @param mixed|null $assetPackage
+     * @param mixed      $formats
+     * @param mixed      $oauthEnabled
+     * @param mixed      $oauthClientId
+     * @param mixed      $oauthClientSecret
+     * @param mixed      $oauthType
+     * @param mixed      $oauthFlow
+     * @param mixed      $oauthTokenUrl
+     * @param mixed      $oauthAuthorizationUrl
+     * @param mixed      $oauthScopes
      */
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, NormalizerInterface $normalizer, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null)
     {

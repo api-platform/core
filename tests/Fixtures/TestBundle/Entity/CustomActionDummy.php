@@ -36,7 +36,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CustomActionDummy
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -51,7 +51,7 @@ class CustomActionDummy
      */
     private $foo = '';
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -61,7 +61,7 @@ class CustomActionDummy
         return $this->foo;
     }
 
-    public function setFoo(string $foo)
+    public function setFoo(string $foo): void
     {
         $this->foo = $foo;
     }

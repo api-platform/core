@@ -35,14 +35,14 @@ class RelatedOwnedDummy
     private $id;
 
     /**
-     * @var string A name
+     * @var string|null A name
      *
      * @ORM\Column(nullable=true)
      */
     public $name;
 
     /**
-     * @var Dummy
+     * @var Dummy|null
      *
      * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, inversedBy="relatedOwnedDummy")
      * @ORM\JoinColumn(nullable=false)
@@ -50,32 +50,30 @@ class RelatedOwnedDummy
      */
     public $owningDummy;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
      * Get owning dummy.
-     *
-     * @return Dummy
      */
-    public function getOwningDummy()
+    public function getOwningDummy(): ?Dummy
     {
         return $this->owningDummy;
     }
@@ -85,7 +83,7 @@ class RelatedOwnedDummy
      *
      * @param Dummy $owningDummy the value to set
      */
-    public function setOwningDummy(Dummy $owningDummy)
+    public function setOwningDummy(Dummy $owningDummy): void
     {
         $this->owningDummy = $owningDummy;
     }

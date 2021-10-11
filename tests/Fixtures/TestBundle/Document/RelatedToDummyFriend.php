@@ -83,10 +83,7 @@ class RelatedToDummyFriend
         return $this->name;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -101,10 +98,8 @@ class RelatedToDummyFriend
 
     /**
      * Gets dummyFriend.
-     *
-     * @return DummyFriend
      */
-    public function getDummyFriend()
+    public function getDummyFriend(): DummyFriend
     {
         return $this->dummyFriend;
     }
@@ -121,10 +116,8 @@ class RelatedToDummyFriend
 
     /**
      * Gets relatedDummy.
-     *
-     * @return RelatedDummy
      */
-    public function getRelatedDummy()
+    public function getRelatedDummy(): RelatedDummy
     {
         return $this->relatedDummy;
     }

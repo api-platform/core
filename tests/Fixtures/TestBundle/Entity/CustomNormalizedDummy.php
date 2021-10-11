@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CustomNormalizedDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -43,7 +43,7 @@ class CustomNormalizedDummy
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -53,7 +53,7 @@ class CustomNormalizedDummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -61,58 +61,37 @@ class CustomNormalizedDummy
      */
     private $alias;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
 
-    /**
-     * @param string $alias
-     */
-    public function setAlias($alias)
+    public function setAlias(string $alias): void
     {
         $this->alias = $alias;
     }
 
-    /**
-     * @return string
-     */
-    public function getPersonalizedAlias()
+    public function getPersonalizedAlias(): string
     {
         return $this->alias;
     }
 
-    /**
-     * @param string $value
-     */
-    public function setPersonalizedAlias($value)
+    public function setPersonalizedAlias(string $value): void
     {
         $this->alias = $value;
     }

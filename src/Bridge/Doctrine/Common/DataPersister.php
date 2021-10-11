@@ -78,6 +78,8 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
     /**
      * Gets the Doctrine object manager associated with given data.
+     *
+     * @param mixed $data
      */
     private function getManager($data): ?DoctrineObjectManager
     {
@@ -86,6 +88,8 @@ final class DataPersister implements ContextAwareDataPersisterInterface
 
     /**
      * Checks if doctrine does not manage data automatically.
+     *
+     * @param mixed $data
      */
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {

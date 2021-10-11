@@ -154,6 +154,8 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     /**
      * Adds where clause according to the strategy.
      *
+     * @param mixed $values
+     *
      * @throws InvalidArgumentException If strategy does not exist
      */
     protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive)

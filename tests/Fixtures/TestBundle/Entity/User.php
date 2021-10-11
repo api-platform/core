@@ -62,7 +62,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class User extends AbstractSecurityUser
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -93,18 +93,18 @@ class User extends AbstractSecurityUser
     private $plainPassword;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @Groups({"user"})
      */
     private $username;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -124,22 +124,14 @@ class User extends AbstractSecurityUser
         $this->plainPassword = $plainPassword;
     }
 
-    /**
-     * @param string|null $fullname
-     *
-     * @return $this
-     */
-    public function setFullname($fullname)
+    public function setFullname(?string $fullname): self
     {
         $this->fullname = $fullname;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getFullname()
+    public function getFullname(): ?string
     {
         return $this->fullname;
     }
@@ -164,12 +156,12 @@ class User extends AbstractSecurityUser
         return null;
     }
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return null;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 }

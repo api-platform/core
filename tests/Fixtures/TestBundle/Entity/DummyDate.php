@@ -39,7 +39,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DummyDate
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -48,28 +48,28 @@ class DummyDate
     private $id;
 
     /**
-     * @var \DateTime The dummy date
+     * @var \DateTime|null The dummy date
      *
      * @ORM\Column(type="date")
      */
     public $dummyDate;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="date", nullable=true)
      */
     public $dateIncludeNullAfter;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="date", nullable=true)
      */
     public $dateIncludeNullBefore;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="date", nullable=true)
      */
@@ -77,10 +77,8 @@ class DummyDate
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
