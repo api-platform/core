@@ -87,16 +87,14 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     }
 
     /**
-     * Builds resource operations to support:.
-     *
+     * Builds resource operations to support:
      * Resource
      * Get
      * Post
      * Resource
      * Put
      * Get
-     *
-     * In the future, we will be able to use nested attributes (https://wiki.php.net/rfc/new_in_initializers)
+     * In the future, we will be able to use nested attributes (https://wiki.php.net/rfc/new_in_initializers).
      *
      * @return ApiResource[]
      */

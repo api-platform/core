@@ -73,6 +73,30 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                         ),
                     ]
                 ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/by_name/{name}',
+                    uriVariables: 'name',
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/by_name/{name}',
+                    uriVariables: ['name'],
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
+                    uriVariables: ['dummyId' => [Dummy::class, 'id'], 'id' => [AttributeResource::class, 'id']],
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
+                    uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
+                ),
             ]),
         );
 
@@ -105,6 +129,34 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                             extraProperties: ['user_defined_uri_template' => true]
                         ),
                     ]
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/by_name/{name}',
+                    uriVariables: ['name' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['name'])],
+                    operations: [],
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/attribute_resources/by_name/{name}',
+                    uriVariables: ['name' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['name'])],
+                    operations: [],
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
+                    uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    operations: [],
+                ),
+                new ApiResource(
+                    shortName: 'AttributeResource',
+                    class: AttributeResource::class,
+                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
+                    uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    operations: [],
                 ),
             ]),
             $uriTemplateResourceMetadataCollectionFactory->create(AttributeResource::class)

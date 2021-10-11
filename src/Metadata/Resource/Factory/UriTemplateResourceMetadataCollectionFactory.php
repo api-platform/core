@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -58,8 +59,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 $resourceMetadataCollection[$i] = $resource->withExtraProperties($resource->getExtraProperties() + ['user_defined_uri_template' => true]);
             }
 
-            $operations = $resource->getOperations();
-            foreach ($resource->getOperations() as $key => $operation) {
+            $operations = new Operations();
+            foreach ($resource->getOperations() ?? new Operations() as $key => $operation) {
                 $operation = $this->configureUriVariables($operation);
 
                 if ($operation->getUriTemplate()) {
@@ -69,16 +70,14 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 }
 
                 if ($routeName = $operation->getRouteName()) {
-                    $operations->remove($key)->add($routeName, $operation);
+                    $operations->add($routeName, $operation);
                     continue;
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
                 $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation->isCollection() ? '_collection' : '');
 
-                // Change the operation key
-                $operations->remove($key)
-                           ->add($operationName, $operation);
+                $operations->add($operationName, $operation);
             }
 
             $resource = $resource->withOperations($operations->sort());
@@ -163,32 +162,38 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
      */
     private function normalizeUriVariables($operation)
     {
-        $uriVariables = $operation->getUriVariables() ?? [];
+        $uriVariables = (array) ($operation->getUriVariables() ?? []);
+        $normalizedUriVariables = [];
         $resourceClass = $operation->getClass();
 
         foreach ($uriVariables as $parameterName => $uriVariable) {
-            if ($uriVariable instanceof UriVariable) {
-                continue;
-            }
+            $normalizedParameterName = $parameterName;
+            $normalizedUriVariable = $uriVariable;
 
-            if (\is_int($parameterName)) {
-                $uriVariables[$uriVariable] = (new UriVariable())->withIdentifiers([$uriVariable])->withTargetClass($resourceClass);
-            } elseif (\is_string($uriVariable)) {
-                $uriVariables[$parameterName] = (new UriVariable())->withIdentifiers([$uriVariable])->withTargetClass($resourceClass);
-            } elseif (\is_array($uriVariable) && !isset($uriVariable['class'])) {
-                $uriVariables[$parameterName] = (new UriVariable())->withIdentifiers($uriVariable)->withTargetClass($resourceClass);
-            } elseif (\is_array($uriVariable)) {
-                $uriVariables[$parameterName] = new UriVariable(null, $uriVariable['inverse_property'] ?? null, $uriVariable['property'] ?? null, $uriVariable['class'], $uriVariable['identifiers'] ?? null, $uriVariable['composite_identifier'] ?? null);
-            } else {
-                $uriVariables[$parameterName] = $uriVariable;
+            if (\is_int($normalizedParameterName)) {
+                $normalizedParameterName = $normalizedUriVariable;
             }
-
+            if (\is_string($normalizedUriVariable)) {
+                $normalizedUriVariable = (new UriVariable())->withIdentifiers([$normalizedUriVariable])->withTargetClass($resourceClass);
+            }
+            if (\is_array($normalizedUriVariable)) {
+                if (!isset($normalizedUriVariable['class'])) {
+                    if (2 !== \count($normalizedUriVariable)) {
+                        throw new \LogicException("The uriVariables shortcut syntax needs to be the tuple: 'uriVariable' => [targetClass, targetProperty]");
+                    }
+                    $normalizedUriVariable = (new UriVariable())->withIdentifiers([$normalizedUriVariable[1]])->withTargetClass($normalizedUriVariable[0]);
+                } else {
+                    $normalizedUriVariable = new UriVariable(null, $normalizedUriVariable['inverse_property'] ?? null, $normalizedUriVariable['property'] ?? null, $normalizedUriVariable['class'], $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null);
+                }
+            }
             if (null !== ($hasCompositeIdentifier = $operation->getCompositeIdentifier())) {
-                $uriVariables[$parameterName] = $uriVariables[$parameterName]->withCompositeIdentifier($hasCompositeIdentifier);
+                $normalizedUriVariable = $normalizedUriVariable->withCompositeIdentifier($hasCompositeIdentifier);
             }
+
+            $normalizedUriVariables[$normalizedParameterName] = $normalizedUriVariable;
         }
 
-        return $this->mergeUriVariablesAttributes($operation->withUriVariables($uriVariables));
+        return $this->mergeUriVariablesAttributes($operation->withUriVariables($normalizedUriVariables));
     }
 
     /**
