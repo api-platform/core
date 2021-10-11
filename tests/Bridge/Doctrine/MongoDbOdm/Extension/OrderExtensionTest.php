@@ -40,7 +40,7 @@ class OrderExtensionTest extends TestCase
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
-        $aggregationBuilderProphecy->getStage(0)->shouldBeCalled()->willThrow(new OutOfRangeException('message'));
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['name' => 'asc'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -61,7 +61,7 @@ class OrderExtensionTest extends TestCase
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
-        $aggregationBuilderProphecy->getStage(0)->shouldBeCalled()->willThrow(new OutOfRangeException('message'));
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['name' => 'asc'])->shouldNotBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -83,7 +83,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
-        $aggregationBuilderProphecy->getStage(0)->shouldBeCalled()->willThrow(new OutOfRangeException('message'));
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['foo' => 'DESC'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -107,7 +107,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
-        $aggregationBuilderProphecy->getStage(0)->shouldBeCalled()->willThrow(new OutOfRangeException('message'));
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['foo' => 'ASC'])->shouldBeCalled();
         $aggregationBuilderProphecy->sort(['foo' => 'ASC', 'bar' => 'DESC'])->shouldBeCalled();
 
@@ -138,7 +138,7 @@ class OrderExtensionTest extends TestCase
         $lookupProphecy->alias('author_lkup')->shouldBeCalled();
         $aggregationBuilderProphecy->lookup(Dummy::class)->shouldBeCalled()->willReturn($lookupProphecy->reveal());
         $aggregationBuilderProphecy->unwind('$author_lkup')->shouldBeCalled();
-        $aggregationBuilderProphecy->getStage(0)->shouldBeCalled()->willThrow(new OutOfRangeException('message'));
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['author_lkup.name' => 'ASC'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
