@@ -842,12 +842,8 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      - name: Allow unstable project dependencies
-        run: composer config minimum-stability dev
       - name: Require Symfony components and Rector dependencies
-        run: composer require symfony/intl symfony/uid rector/rector-src nikic/php-parser --dev --no-interaction --no-progress --ansi
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: composer require symfony/intl symfony/uid rector/rector --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
