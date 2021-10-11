@@ -129,7 +129,8 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "process-timeout": 600
     },
     "extra": {
         "branch-alias": {
@@ -138,5 +139,15 @@
         "symfony": {
             "require": "^3.4 || ^4.4 || ^5.1"
         }
+    },
+    "scripts": {
+        "docker-mongo": [
+            "Composer\\Config::disableProcessTimeout",
+            "docker run -p 27017:27017 mongo:latest"
+        ],
+        "phpunit": "vendor/bin/simple-phpunit --stop-on-failure -vvv",
+        "phpunit-coverage": "vendor/bin/simple-phpunit --coverage-html coverage -vvv --stop-on-failure",
+        "behat": "php -d memory_limit=-1 ./vendor/bin/behat --profile=default --stop-on-failure --format=progress",
+        "behat-mongo": "MONGODB_URL=mongodb://localhost:27017 APP_ENV=mongodb php -d memory_limit=-1 ./vendor/bin/behat --profile=mongodb --stop-on-failure --format=progress"
     }
 }
