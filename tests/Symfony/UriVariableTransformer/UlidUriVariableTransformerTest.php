@@ -20,10 +20,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @author Piotr Synowiec <psynowiec@gmail.com>
+ * @group legacy
+ */
 class UlidUriVariableTransformerTest extends TestCase
 {
-    /** @var UlidUriVariableTransformer */
-    private $transformer;
+    private UlidUriVariableTransformer $transformer;
 
     public function testTransform(): void
     {

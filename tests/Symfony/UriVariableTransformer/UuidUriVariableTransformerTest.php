@@ -19,6 +19,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @author Piotr Synowiec <psynowiec@gmail.com>
+ * @group legacy
+ */
 class UuidUriVariableTransformerTest extends TestCase
 {
     private const UUID_STRINGS = [
@@ -29,8 +33,7 @@ class UuidUriVariableTransformerTest extends TestCase
         '1ec279fa-18d1-68d6-8f3d-ab1820cba30f', // v6
     ];
 
-    /** @var UuidUriVariableTransformer */
-    private $transformer;
+    private UuidUriVariableTransformer $transformer;
 
     public function testTransform(): void
     {

@@ -80,7 +80,6 @@
         "symfony/security-bundle": "^3.4 || ^4.4 || ^5.1",
         "symfony/security-core": "^4.4 || ^5.1",
         "symfony/twig-bundle": "^3.4 || ^4.4 || ^5.1",
-        "symfony/uid": "^5.3",
         "symfony/validator": "^3.4 || ^4.4 || ^5.1",
         "symfony/web-profiler-bundle": "^4.4 || ^5.1",
         "symfony/yaml": "^3.4 || ^4.4 || ^5.1",
