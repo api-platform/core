@@ -27,7 +27,13 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class UuidNormalizer implements DenormalizerInterface
 {
     /**
-     * {@inheritdoc}
+     * @param mixed  $data
+     * @param string $class
+     * @param null   $format
+     *
+     * @throws InvalidIdentifierException
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -41,7 +47,7 @@ final class UuidNormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return \is_string($data) && is_a($type, UuidInterface::class, true);
     }
