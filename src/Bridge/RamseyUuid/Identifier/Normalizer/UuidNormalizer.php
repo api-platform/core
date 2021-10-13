@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class UuidNormalizer implements DenormalizerInterface
 {
     /**
+     * {@inheritDoc}
+     *
      * @param mixed  $data
      * @param string $class
      * @param null   $format
