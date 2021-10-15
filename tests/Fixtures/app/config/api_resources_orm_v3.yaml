@@ -4,7 +4,7 @@ resources:
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
         -   ~
         -   uriTemplate: /users/{author}/programs.{_format}
-            identifiers: ['author']
+            uriVariables: ['author']
             types: ['someirischema']
             description: User programs
             operations:
@@ -12,7 +12,7 @@ resources:
                 ApiPlatform\Metadata\Get:
                     uriTemplate: /users/{userId}/programs/{id}.{_format}
                     types: ['anotheririschema']
-                    identifiers:
+                    uriVariables:
                         userId: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, 'author']
                         id: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, 'id']
 

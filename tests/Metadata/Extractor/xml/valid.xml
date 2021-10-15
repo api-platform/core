@@ -9,6 +9,7 @@
     <resource
         uriTemplate="/users/{author}/comments.{_format}"
         description="User comments"
+        messenger="input"
         class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment">
 
         <types>
@@ -21,9 +22,9 @@
             <format name="xlsx">application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</format>
         </formats>
 
-        <identifiers>
-            <identifier key="author"/>
-        </identifiers>
+        <uriVariables>
+            <uriVariable parameterName="author"/>
+        </uriVariables>
 
         <inputFormats>
             <format name="json">application/merge-patch+json</format>
@@ -45,33 +46,37 @@
         </cacheHeaders>
 
         <normalizationContext>
-            <attribute name="groups">
-                <values>
-                    <value>comment:read</value>
-                    <value>comment:custom-read</value>
-                </values>
-            </attribute>
+            <values>
+                <value name="groups">
+                    <values>
+                        <value>comment:read</value>
+                        <value>comment:custom-read</value>
+                    </values>
+                </value>
+            </values>
         </normalizationContext>
 
         <denormalizationContext>
-            <attribute name="groups">comment:write</attribute>
+            <values>
+                <value name="groups">comment:write</value>
+            </values>
         </denormalizationContext>
 
         <hydraContext>
-            <attribute name="foo">
-                <attribute name="bar">baz</attribute>
-            </attribute>
+            <values>
+                <value name="foo">
+                    <values>
+                        <value name="bar">baz</value>
+                    </values>
+                </value>
+            </values>
         </hydraContext>
 
         <filters>
             <filter>comment.custom_filter</filter>
         </filters>
 
-        <mercure>
-            <attribute name="private">true</attribute>
-        </mercure>
-
-        <messenger>input</messenger>
+        <mercure private="true"/>
 
         <order>
             <values>
@@ -91,13 +96,15 @@
         <operations>
             <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
             <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}.{_format}">
-                <identifiers>
-                    <identifier key="userId" class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment" propertyName="author" />
-                    <identifier key="id" class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment" propertyName="id" />
-                </identifiers>
+                <uriVariables>
+                    <uriVariable parameterName="userId" class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" property="author"/>
+                    <uriVariable parameterName="id"/>
+                </uriVariables>
 
                 <extraProperties>
-                    <extraProperty name="foo">bar</extraProperty>
+                    <values>
+                        <value name="foo">bar</value>
+                    </values>
                 </extraProperties>
             </operation>
         </operations>

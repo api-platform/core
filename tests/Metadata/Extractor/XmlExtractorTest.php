@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
@@ -61,13 +62,15 @@ class XmlExtractorTest extends TestCase
                     'securityMessage' => null,
                     'securityPostDenormalize' => null,
                     'securityPostDenormalizeMessage' => null,
-                    'compositeIdentifiers' => null,
+                    'securityPostValidation' => null,
+                    'securityPostValidationMessage' => null,
+                    'compositeIdentifier' => null,
                     'queryParameterValidationEnabled' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
                     'formats' => null,
-                    'identifiers' => null,
+                    'uriVariables' => null,
                     'inputFormats' => null,
                     'outputFormats' => null,
                     'defaults' => null,
@@ -91,6 +94,7 @@ class XmlExtractorTest extends TestCase
                     'properties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
+                    'class' => Comment::class,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments.{_format}',
@@ -122,14 +126,16 @@ class XmlExtractorTest extends TestCase
                     'securityMessage' => null,
                     'securityPostDenormalize' => null,
                     'securityPostDenormalizeMessage' => null,
-                    'compositeIdentifiers' => null,
+                    'securityPostValidation' => null,
+                    'securityPostValidationMessage' => null,
+                    'compositeIdentifier' => null,
                     'queryParameterValidationEnabled' => null,
                     'input' => null,
                     'output' => null,
                     'types' => ['someirischema', 'anotheririschema'],
                     'formats' => ['jsonld', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-                    'identifiers' => [
-                        'author' => ['author', Comment::class],
+                    'uriVariables' => [
+                        'author' => 'author',
                     ],
                     'inputFormats' => ['json' => 'application/merge-patch+json'],
                     'outputFormats' => ['json' => 'application/merge-patch+json'],
@@ -155,11 +161,11 @@ class XmlExtractorTest extends TestCase
                     'openapiContext' => null,
                     'validationContext' => null,
                     'filters' => ['comment.custom_filter'],
-                    'mercure' => ['private' => 'true'],
+                    'mercure' => ['private' => true],
                     'messenger' => 'input',
                     'order' => ['foo', 'bar'],
                     'paginationViaCursor' => [
-                        ['field' => 'id', 'direction' => 'DESC'],
+                        'id' => 'DESC',
                     ],
                     'exceptionToStatus' => [
                         ExceptionInterface::class => 400,
@@ -199,14 +205,16 @@ class XmlExtractorTest extends TestCase
                             'securityMessage' => null,
                             'securityPostDenormalize' => null,
                             'securityPostDenormalizeMessage' => null,
-                            'compositeIdentifiers' => null,
+                            'securityPostValidation' => null,
+                            'securityPostValidationMessage' => null,
+                            'compositeIdentifier' => null,
                             'queryParameterValidationEnabled' => null,
                             'input' => null,
                             'output' => null,
                             'types' => ['someirischema', 'anotheririschema'],
                             'formats' => ['jsonld', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-                            'identifiers' => [
-                                'author' => ['author', Comment::class],
+                            'uriVariables' => [
+                                'author' => 'author',
                             ],
                             'inputFormats' => ['json' => 'application/merge-patch+json'],
                             'outputFormats' => ['json' => 'application/merge-patch+json'],
@@ -232,23 +240,24 @@ class XmlExtractorTest extends TestCase
                             'openapiContext' => null,
                             'validationContext' => null,
                             'filters' => ['comment.custom_filter'],
-                            'mercure' => ['private' => 'true'],
+                            'mercure' => ['private' => true],
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                ['field' => 'id', 'direction' => 'DESC'],
+                                'id' => 'DESC',
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
                             ],
                             'extraProperties' => null,
-                            'properties' => null,
                             'read' => null,
                             'deserialize' => null,
                             'validate' => null,
                             'write' => null,
                             'serialize' => null,
                             'queryParameterValidate' => null,
+                            'collection' => null,
+                            'method' => null,
                             'priority' => null,
                         ],
                         [
@@ -283,15 +292,20 @@ class XmlExtractorTest extends TestCase
                             'securityMessage' => null,
                             'securityPostDenormalize' => null,
                             'securityPostDenormalizeMessage' => null,
-                            'compositeIdentifiers' => null,
+                            'securityPostValidation' => null,
+                            'securityPostValidationMessage' => null,
+                            'compositeIdentifier' => null,
                             'queryParameterValidationEnabled' => null,
                             'input' => null,
                             'output' => null,
                             'types' => ['someirischema', 'anotheririschema'],
                             'formats' => ['jsonld', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-                            'identifiers' => [
-                                'userId' => ['author', Comment::class],
-                                'id' => ['id', Comment::class],
+                            'uriVariables' => [
+                                'userId' => [
+                                    'class' => User::class,
+                                    'property' => 'author',
+                                ],
+                                'id' => 'id',
                             ],
                             'inputFormats' => ['json' => 'application/merge-patch+json'],
                             'outputFormats' => ['json' => 'application/merge-patch+json'],
@@ -317,11 +331,11 @@ class XmlExtractorTest extends TestCase
                             'openapiContext' => null,
                             'validationContext' => null,
                             'filters' => ['comment.custom_filter'],
-                            'mercure' => ['private' => 'true'],
+                            'mercure' => ['private' => true],
                             'messenger' => 'input',
                             'order' => ['foo', 'bar'],
                             'paginationViaCursor' => [
-                                ['field' => 'id', 'direction' => 'DESC'],
+                                'id' => 'DESC',
                             ],
                             'exceptionToStatus' => [
                                 ExceptionInterface::class => 400,
@@ -329,17 +343,19 @@ class XmlExtractorTest extends TestCase
                             'extraProperties' => [
                                 'foo' => 'bar',
                             ],
-                            'properties' => null,
                             'read' => null,
                             'deserialize' => null,
                             'validate' => null,
                             'write' => null,
                             'serialize' => null,
                             'queryParameterValidate' => null,
+                            'collection' => null,
+                            'method' => null,
                             'priority' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
+                    'class' => Comment::class,
                 ],
             ],
         ], $extractor->getResources());
@@ -353,8 +369,7 @@ class XmlExtractorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($error);
 
-        $extractor = new XmlExtractor([$path]);
-        $extractor->getResources();
+        (new XmlExtractor([$path]))->getResources();
     }
 
     public function getInvalidPaths(): array

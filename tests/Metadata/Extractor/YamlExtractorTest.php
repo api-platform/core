@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -62,13 +63,15 @@ class YamlExtractorTest extends TestCase
                     'securityMessage' => null,
                     'securityPostDenormalize' => null,
                     'securityPostDenormalizeMessage' => null,
-                    'compositeIdentifiers' => null,
+                    'securityPostValidation' => null,
+                    'securityPostValidationMessage' => null,
+                    'compositeIdentifier' => null,
                     'queryParameterValidationEnabled' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
                     'formats' => null,
-                    'identifiers' => null,
+                    'uriVariables' => null,
                     'inputFormats' => null,
                     'outputFormats' => null,
                     'defaults' => null,
@@ -125,13 +128,15 @@ class YamlExtractorTest extends TestCase
                     'securityMessage' => null,
                     'securityPostDenormalize' => null,
                     'securityPostDenormalizeMessage' => null,
-                    'compositeIdentifiers' => null,
+                    'securityPostValidation' => null,
+                    'securityPostValidationMessage' => null,
+                    'compositeIdentifier' => null,
                     'queryParameterValidationEnabled' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
                     'formats' => null,
-                    'identifiers' => null,
+                    'uriVariables' => null,
                     'inputFormats' => null,
                     'outputFormats' => null,
                     'defaults' => null,
@@ -186,13 +191,15 @@ class YamlExtractorTest extends TestCase
                     'securityMessage' => null,
                     'securityPostDenormalize' => null,
                     'securityPostDenormalizeMessage' => null,
-                    'compositeIdentifiers' => null,
+                    'securityPostValidation' => null,
+                    'securityPostValidationMessage' => null,
+                    'compositeIdentifier' => null,
                     'queryParameterValidationEnabled' => null,
                     'input' => null,
                     'output' => null,
                     'types' => ['someirischema'],
                     'formats' => null,
-                    'identifiers' => ['author'],
+                    'uriVariables' => ['author' => 'author'],
                     'inputFormats' => null,
                     'outputFormats' => null,
                     'defaults' => null,
@@ -247,13 +254,15 @@ class YamlExtractorTest extends TestCase
                             'securityMessage' => null,
                             'securityPostDenormalize' => null,
                             'securityPostDenormalizeMessage' => null,
-                            'compositeIdentifiers' => null,
+                            'securityPostValidation' => null,
+                            'securityPostValidationMessage' => null,
+                            'compositeIdentifier' => null,
                             'queryParameterValidationEnabled' => null,
                             'input' => null,
                             'output' => null,
                             'types' => ['someirischema'],
                             'formats' => null,
-                            'identifiers' => ['author'],
+                            'uriVariables' => ['author' => 'author'],
                             'inputFormats' => null,
                             'outputFormats' => null,
                             'defaults' => null,
@@ -315,15 +324,17 @@ class YamlExtractorTest extends TestCase
                             'securityMessage' => null,
                             'securityPostDenormalize' => null,
                             'securityPostDenormalizeMessage' => null,
-                            'compositeIdentifiers' => null,
+                            'securityPostValidation' => null,
+                            'securityPostValidationMessage' => null,
+                            'compositeIdentifier' => null,
                             'queryParameterValidationEnabled' => null,
                             'input' => null,
                             'output' => null,
                             'types' => ['anotheririschema'],
                             'formats' => null,
-                            'identifiers' => [
-                                'userId' => ['author', Program::class],
-                                'id' => ['id', Program::class],
+                            'uriVariables' => [
+                                'userId' => ['class' => User::class, 'property' => 'author'],
+                                'id' => 'id',
                             ],
                             'inputFormats' => null,
                             'outputFormats' => null,
@@ -389,13 +400,15 @@ class YamlExtractorTest extends TestCase
                     'securityMessage' => null,
                     'securityPostDenormalize' => null,
                     'securityPostDenormalizeMessage' => null,
-                    'compositeIdentifiers' => null,
+                    'securityPostValidation' => null,
+                    'securityPostValidationMessage' => null,
+                    'compositeIdentifier' => null,
                     'queryParameterValidationEnabled' => null,
                     'input' => null,
                     'output' => null,
                     'types' => null,
                     'formats' => null,
-                    'identifiers' => null,
+                    'uriVariables' => null,
                     'inputFormats' => null,
                     'outputFormats' => null,
                     'defaults' => null,
@@ -432,8 +445,7 @@ class YamlExtractorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($error);
 
-        $extractor = new YamlExtractor([$path]);
-        $extractor->getResources();
+        (new YamlExtractor([$path]))->getResources();
     }
 
     public function getInvalidPaths(): array

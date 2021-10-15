@@ -45,7 +45,7 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
 
     public function supports(string $resourceClass, string $operationName = null, array $context = []): bool
     {
-        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface && 'collection' === ($context['operation_type'] ?? '');
+        return $this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface;
     }
 
     /**

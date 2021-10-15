@@ -160,7 +160,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     {
         foreach ($this->defaults['attributes'] as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);
-            if (method_exists($operation, 'get'.ucfirst($key)) && !$operation->{'get'.ucfirst($key)}()) {
+            if (method_exists($operation, 'get'.ucfirst($key)) && null !== $operation->{'get'.ucfirst($key)}()) {
                 $operation = $operation->{'with'.ucfirst($key)}($value);
             }
         }
@@ -170,7 +170,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 continue;
             }
 
-            if (!method_exists($operation, $methodName) || $operation->{$methodName}()) {
+            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
                 continue;
             }
 

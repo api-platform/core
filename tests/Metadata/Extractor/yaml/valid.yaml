@@ -4,7 +4,7 @@ resources:
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
         -   ~
         -   uriTemplate: /users/{author}/programs.{_format}
-            identifiers: ['author']
+            uriVariables: ['author']
             types: ['someirischema']
             description: User programs
             operations:
@@ -12,9 +12,9 @@ resources:
                 ApiPlatform\Metadata\Get:
                     uriTemplate: /users/{userId}/programs/{id}.{_format}
                     types: ['anotheririschema']
-                    identifiers:
-                        userId: ['author', ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program]
-                        id: ['id', ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program]
+                    uriVariables:
+                        userId: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\User, 'author']
+                        id: 'id'
 
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy:
         shortName: single_file_config

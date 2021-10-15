@@ -1320,7 +1320,7 @@ final class DoctrineContext implements Context
             $this->manager->flush();
         }
 
-        for ($i = 1; $i <= $nb; ++$i) {
+        for ($i = $this->doctrine->getRepository(Program::class)->count(['author' => $author]) + 1; $i <= $nb; ++$i) {
             $program = new Program();
             $program->name = "Lorem ipsum $i";
             $program->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
@@ -1357,7 +1357,7 @@ final class DoctrineContext implements Context
             $this->manager->flush();
         }
 
-        for ($i = 1; $i <= $nb; ++$i) {
+        for ($i = $this->doctrine->getRepository(Comment::class)->count(['author' => $author]) + 1; $i <= $nb; ++$i) {
             $comment = new Comment();
             $comment->comment = "Lorem ipsum dolor sit amet $i";
             $comment->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));

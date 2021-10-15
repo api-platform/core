@@ -88,10 +88,15 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 ->withClass($resourceClass);
             foreach ($node as $key => $value) {
                 $methodName = 'with'.ucfirst($key);
-                if ('operations' !== $key && isset($value) && method_exists($resource, $methodName)) {
+                if ('operations' !== $key && null !== $value && method_exists($resource, $methodName)) {
                     $resource = $resource->{$methodName}($value);
                 }
             }
+
+            if (isset($node['graphQlOperations'])) {
+                $resource = $resource->withGraphQlOperations($this->buildGraphQlOperations($node['graphQlOperations'], $resource));
+            }
+
             $resources[] = $resource->withOperations(new Operations($this->buildOperations($node['operations'] ?? null, $resource)));
         }
 
@@ -118,26 +123,58 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
             /** @var Operation $operation */
             $operation = (new $attributes['class']())->withShortName($resource->getShortName());
-            if (isset($attributes)) {
-                foreach ($attributes as $key => $value) {
-                    if (null === $value) {
-                        continue;
-                    }
-
-                    [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
-                    $methodName = 'with'.ucfirst($camelCaseKey);
-
-                    if (method_exists($operation, $methodName)) {
-                        $operation = $operation->{$methodName}($value);
-                        continue;
-                    }
-
-                    $operation = $operation->withExtraProperties($operation->getExtraProperties() + [$key => $value]);
+            unset($attributes['class']);
+            foreach ($attributes as $key => $value) {
+                if (null === $value) {
+                    continue;
                 }
+
+                [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
+                $methodName = 'with'.ucfirst($camelCaseKey);
+
+                if (method_exists($operation, $methodName)) {
+                    $operation = $operation->{$methodName}($value);
+                    continue;
+                }
+
+                $operation = $operation->withExtraProperties(array_merge($operation->getExtraProperties(), [$key => $value]));
             }
 
-            $operationName = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
-            $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
+            if (empty($attributes['name'])) {
+                $attributes['name'] = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+            }
+            $operations[$attributes['name']] = $this->getOperationWithDefaults($resource, $operation)->withName($attributes['name']);
+        }
+
+        return $operations;
+    }
+
+    private function buildGraphQlOperations(?array $data, ApiResource $resource): array
+    {
+        $operations = [];
+
+        foreach ($data as $attributes) {
+            /** @var Operation $operation */
+            $operation = (new $attributes['graphql_operation_class']())->withShortName($resource->getShortName());
+            unset($attributes['graphql_operation_class']);
+
+            foreach ($attributes as $key => $value) {
+                if (null === $value) {
+                    continue;
+                }
+
+                [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
+                $methodName = 'with'.ucfirst($camelCaseKey);
+
+                if (method_exists($operation, $methodName)) {
+                    $operation = $operation->{$methodName}($value);
+                    continue;
+                }
+
+                $operation = $operation->withExtraProperties(array_merge($operation->getExtraProperties(), [$key => $value]));
+            }
+
+            $operations[] = $operation;
         }
 
         return $operations;
@@ -145,9 +182,9 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
     private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
     {
-        foreach ($this->defaults['attributes'] as $key => $value) {
+        foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);
-            if (!$operation->{'get'.ucfirst($key)}()) {
+            if (null === $operation->{'get'.ucfirst($key)}()) {
                 $operation = $operation->{'with'.ucfirst($key)}($value);
             }
         }
@@ -157,11 +194,11 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 continue;
             }
 
-            if (!method_exists($operation, $methodName) || $operation->{$methodName}()) {
+            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
                 continue;
             }
 
-            if (null === $value = $resource->{$methodName}()) {
+            if (null === ($value = $resource->{$methodName}())) {
                 continue;
             }
 

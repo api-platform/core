@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -38,31 +41,59 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         foreach ($xml->resource as $resource) {
-            $resourceClass = $this->resolve((string) $resource['class']);
-            $base = $this->getBase($resource);
-            $this->resources[$resourceClass][] = array_merge($base, [
+            $base = $this->getExtendedBase($resource);
+            $this->resources[$this->resolve((string) $resource['class'])][] = array_merge($base, [
+                'class' => $this->phpize($resource, 'class', 'string'),
+                'properties' => $this->getProperties($resource),
                 'operations' => $this->getOperations($resource, $base),
                 'graphQlOperations' => $this->getGraphQlOperations($resource, $base),
             ]);
         }
     }
 
-    private function getBase(\SimpleXMLElement $resource): array
+    private function getExtendedBase(\SimpleXMLElement $resource): array
     {
-        return [
+        return array_merge($this->getBase($resource), [
             'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
-            'shortName' => $this->phpize($resource, 'shortName', 'string'),
-            'description' => $this->phpize($resource, 'description', 'string'),
             'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             'stateless' => $this->phpize($resource, 'stateless', 'bool'),
             'sunset' => $this->phpize($resource, 'sunset', 'string'),
             'acceptPatch' => $this->phpize($resource, 'acceptPatch', 'string'),
+            'status' => $this->phpize($resource, 'status', 'integer'),
             'host' => $this->phpize($resource, 'host', 'string'),
             'condition' => $this->phpize($resource, 'condition', 'string'),
             'controller' => $this->phpize($resource, 'controller', 'string'),
+            'types' => $this->getArrayValue($resource, 'type'),
+            'formats' => $this->getFormats($resource, 'formats'),
+            'inputFormats' => $this->getFormats($resource, 'inputFormats'),
+            'outputFormats' => $this->getFormats($resource, 'outputFormats'),
+            'uriVariables' => $this->getUriVariables($resource),
+            'defaults' => isset($resource->defaults->values) ? $this->getValues($resource->defaults->values) : null,
+            'requirements' => $this->getRequirements($resource),
+            'options' => isset($resource->options->values) ? $this->getValues($resource->options->values) : null,
+            'schemes' => $this->getArrayValue($resource, 'scheme'),
+            'cacheHeaders' => $this->getCacheHeaders($resource),
+            'hydraContext' => isset($resource->hydraContext->values) ? $this->getValues($resource->hydraContext->values) : null,
+            'openapiContext' => isset($resource->openapiContext->values) ? $this->getValues($resource->openapiContext->values) : null,
+            'paginationViaCursor' => $this->getPaginationViaCursor($resource),
+            'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
+            'exceptionToStatus' => $this->getExceptionToStatus($resource),
+            'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
+        ]);
+    }
+
+    private function getBase(\SimpleXMLElement $resource): array
+    {
+        return [
+            'shortName' => $this->phpize($resource, 'shortName', 'string'),
+            'description' => $this->phpize($resource, 'description', 'string'),
             'urlGenerationStrategy' => $this->phpize($resource, 'urlGenerationStrategy', 'integer'),
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
             'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
+            'messenger' => $this->phpize($resource, 'messenger', 'bool|string'),
+            'mercure' => $this->getMercure($resource),
+            'input' => $this->phpize($resource, 'input', 'bool|string'),
+            'output' => $this->phpize($resource, 'output', 'bool|string'),
             'fetchPartial' => $this->phpize($resource, 'fetchPartial', 'bool'),
             'forceEager' => $this->phpize($resource, 'forceEager', 'bool'),
             'paginationClientEnabled' => $this->phpize($resource, 'paginationClientEnabled', 'bool'),
@@ -79,34 +110,14 @@ final class XmlExtractor extends AbstractExtractor
             'securityMessage' => $this->phpize($resource, 'securityMessage', 'string'),
             'securityPostDenormalize' => $this->phpize($resource, 'securityPostDenormalize', 'string'),
             'securityPostDenormalizeMessage' => $this->phpize($resource, 'securityPostDenormalizeMessage', 'string'),
-            'compositeIdentifiers' => $this->phpize($resource, 'compositeIdentifiers', 'bool'),
-            'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
-            'input' => $this->phpize($resource, 'input', 'bool|string'),
-            'output' => $this->phpize($resource, 'output', 'bool|string'),
-            'types' => $this->getArrayValue($resource, 'type'),
-            'formats' => $this->getFormats($resource, 'formats'),
-            'identifiers' => $this->getIdentifiers($resource),
-            'inputFormats' => $this->getFormats($resource, 'inputFormats'),
-            'outputFormats' => $this->getFormats($resource, 'outputFormats'),
-            'defaults' => isset($resource->defaults->values) ? $this->getValues($resource->defaults->values) : null,
-            'requirements' => isset($resource->requirements->values) ? $this->getValues($resource->requirements->values) : null,
-            'options' => isset($resource->options->values) ? $this->getValues($resource->options->values) : null,
-            'status' => $this->phpize($resource, 'status', 'integer'),
-            'schemes' => $this->getAttributes($resource, 'schemes') ?: null,
-            'cacheHeaders' => $this->getCacheHeaders($resource),
-            'normalizationContext' => $this->getAttributes($resource, 'normalizationContext') ?: null,
-            'denormalizationContext' => $this->getAttributes($resource, 'denormalizationContext') ?: null,
-            'hydraContext' => $this->getAttributes($resource, 'hydraContext') ?: null,
-            'openapiContext' => $this->getAttributes($resource, 'openapiContext') ?: null,
-            'validationContext' => $this->getAttributes($resource, 'validationContext') ?: null,
+            'securityPostValidation' => $this->phpize($resource, 'securityPostValidation', 'string'),
+            'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
+            'normalizationContext' => isset($resource->normalizationContext->values) ? $this->getValues($resource->normalizationContext->values) : null,
+            'denormalizationContext' => isset($resource->denormalizationContext->values) ? $this->getValues($resource->denormalizationContext->values) : null,
+            'validationContext' => isset($resource->validationContext->values) ? $this->getValues($resource->validationContext->values) : null,
             'filters' => $this->getArrayValue($resource, 'filter'),
-            'mercure' => $this->getMercure($resource),
-            'messenger' => $this->getMessenger($resource),
-            'order' => $this->getOrder($resource),
-            'paginationViaCursor' => $this->getPaginationViaCursor($resource),
-            'exceptionToStatus' => $this->getExceptionToStatus($resource),
+            'order' => isset($resource->order->values) ? $this->getValues($resource->order->values) : null,
             'extraProperties' => $this->getExtraProperties($resource, 'extraProperties'),
-            'properties' => $this->getProperties($resource),
         ];
     }
 
@@ -129,21 +140,38 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getIdentifiers(\SimpleXMLElement $resource): ?array
+    private function getUriVariables(\SimpleXMLElement $resource): ?array
     {
-        if (!isset($resource->identifiers->identifier)) {
+        if (!isset($resource->uriVariables->uriVariable)) {
             return null;
         }
 
-        $data = [];
-        foreach ($resource->identifiers->identifier as $identifier) {
-            $data[(string) $identifier['key']] = [
-                $this->phpize($identifier, 'propertyName', 'string') ?: (string) $identifier['key'],
-                $this->phpize($identifier, 'class', 'string') ?: $resource['class'],
-            ];
+        $uriVariables = [];
+        foreach ($resource->uriVariables->uriVariable as $data) {
+            $parameterName = (string) $data['parameterName'];
+            if (1 === \count($data->attributes())) {
+                $uriVariables[$parameterName] = $parameterName;
+                continue;
+            }
+
+            if (null !== ($class = $this->phpize($data, 'class', 'string'))) {
+                $uriVariables[$parameterName]['class'] = $class;
+            }
+            if (null !== ($property = $this->phpize($data, 'property', 'string'))) {
+                $uriVariables[$parameterName]['property'] = $property;
+            }
+            if (null !== ($inverseProperty = $this->phpize($data, 'inverseProperty', 'string'))) {
+                $uriVariables[$parameterName]['inverse_property'] = $inverseProperty;
+            }
+            if (isset($data->identifiers->values)) {
+                $uriVariables[$parameterName]['identifiers'] = $this->getValues($data->identifiers->values);
+            }
+            if (null !== ($compositeIdentifier = $this->phpize($data, 'compositeIdentifier', 'bool'))) {
+                $uriVariables[$parameterName]['composite_identifier'] = $compositeIdentifier;
+            }
         }
 
-        return $data;
+        return $uriVariables;
     }
 
     private function getCacheHeaders(\SimpleXMLElement $resource): ?array
@@ -165,56 +193,34 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
+    private function getRequirements(\SimpleXMLElement $resource): ?array
+    {
+        if (!isset($resource->requirements->requirement)) {
+            return null;
+        }
+
+        $data = [];
+        foreach ($resource->requirements->requirement as $requirement) {
+            $data[(string) $requirement->attributes()->property] = (string) $requirement;
+        }
+
+        return $data;
+    }
+
     /**
-     * @return bool|string|string[]|null
+     * @return bool|string[]|null
      */
     private function getMercure(\SimpleXMLElement $resource)
     {
-        if (null !== $resource['mercure']) {
-            return $this->phpize($resource, 'mercure', 'bool');
-        }
-
         if (!isset($resource->mercure)) {
             return null;
         }
 
-        if (isset($resource->mercure->attribute)) {
-            return $this->getAttributes($resource->mercure);
+        if (null !== $resource->mercure->attributes()->private) {
+            return ['private' => $this->phpize($resource->mercure->attributes(), 'private', 'bool')];
         }
 
-        return trim((string) $resource->mercure) ?: null;
-    }
-
-    /**
-     * @return bool|string|null
-     */
-    private function getMessenger(\SimpleXMLElement $resource)
-    {
-        if (null !== $resource['messenger']) {
-            return $this->phpize($resource, 'messenger', 'bool');
-        }
-
-        if (!isset($resource->messenger)) {
-            return null;
-        }
-
-        return trim((string) $resource->messenger) ?: null;
-    }
-
-    /**
-     * @return string[]|string|null
-     */
-    private function getOrder(\SimpleXMLElement $resource)
-    {
-        if (isset($resource->order->attribute)) {
-            return $this->getAttributes($resource->order);
-        }
-
-        if (isset($resource->order->values->value)) {
-            return $this->getValues($resource->order->values);
-        }
-
-        return null;
+        return true;
     }
 
     private function getPaginationViaCursor(\SimpleXMLElement $resource): ?array
@@ -225,10 +231,7 @@ final class XmlExtractor extends AbstractExtractor
 
         $data = [];
         foreach ($resource->paginationViaCursor->paginationField as $paginationField) {
-            $data[] = [
-                'field' => (string) $paginationField['field'],
-                'direction' => (string) $paginationField['direction'],
-            ];
+            $data[(string) $paginationField['field']] = (string) $paginationField['direction'];
         }
 
         return $data;
@@ -258,17 +261,7 @@ final class XmlExtractor extends AbstractExtractor
             $resource = $resource->{$key};
         }
 
-        $data = [];
-        foreach ($resource->extraProperty as $extraProperty) {
-            if (isset($extraProperty->extraProperty)) {
-                $data[(string) $extraProperty['name']] = $this->getExtraProperties($extraProperty);
-                continue;
-            }
-
-            $data[(string) $extraProperty['name']] = (string) $extraProperty;
-        }
-
-        return $data;
+        return $this->getValues($resource->values);
     }
 
     private function getProperties(\SimpleXMLElement $resource): ?array
@@ -287,21 +280,21 @@ final class XmlExtractor extends AbstractExtractor
                 'writableLink' => $this->phpize($property, 'writableLink', 'bool'),
                 'required' => $this->phpize($property, 'required', 'bool'),
                 'identifier' => $this->phpize($property, 'identifier', 'bool'),
+                'default' => $this->phpize($property, 'default', 'string'),
+                'example' => $this->phpize($property, 'example', 'string'),
                 'deprecationReason' => $this->phpize($property, 'deprecationReason', 'string'),
                 'fetchable' => $this->phpize($property, 'fetchable', 'bool'),
                 'fetchEager' => $this->phpize($property, 'fetchEager', 'bool'),
+                'jsonldContext' => isset($property->jsonldContext->values) ? $this->getValues($property->jsonldContext->values) : null,
+                'openapiContext' => isset($property->openapiContext->values) ? $this->getValues($property->openapiContext->values) : null,
                 'push' => $this->phpize($property, 'push', 'bool'),
                 'security' => $this->phpize($property, 'security', 'string'),
                 'securityPostDenormalize' => $this->phpize($property, 'securityPostDenormalize', 'string'),
-                'initializable' => $this->phpize($property, 'initializable', 'bool'),
-                'jsonldContext' => $this->getAttributes($property, 'jsonldContext'),
-                'openapiContext' => $this->getAttributes($property, 'openapiContext'),
                 'types' => $this->getArrayValue($property, 'type'),
-                'extraProperties' => $this->getExtraProperties($property, 'extraProperties'),
-                'defaults' => isset($property->defaults->values) ? $this->getValues($property->defaults->values) : null,
-                'example' => isset($property->example->values) ? $this->getValues($property->example->values) : null,
                 'builtinTypes' => isset($property->builtinTypes->values) ? $this->getValues($property->builtinTypes->values) : null,
                 'schema' => isset($property->schema->values) ? $this->getValues($property->schema->values) : null,
+                'initializable' => $this->phpize($property, 'initializable', 'bool'),
+                'extraProperties' => $this->getExtraProperties($property, 'extraProperties'),
             ];
         }
 
@@ -316,14 +309,17 @@ final class XmlExtractor extends AbstractExtractor
 
         $data = [];
         foreach ($resource->operations->operation as $operation) {
-            $datum = $this->getBase($operation);
+            $datum = $this->getExtendedBase($operation);
             foreach ($datum as $key => $value) {
-                if (empty($value)) {
+                if (null === $value) {
                     $datum[$key] = $root[$key];
                 }
             }
 
             $data[] = array_merge($datum, [
+                'collection' => $this->phpize($operation, 'collection', 'bool'),
+                'class' => (string) $operation['class'],
+                'method' => $this->phpize($operation, 'method', 'string'),
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
                 'validate' => $this->phpize($operation, 'validate', 'bool'),
@@ -332,7 +328,6 @@ final class XmlExtractor extends AbstractExtractor
                 'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
-                'class' => (string) $operation['class'],
             ]);
         }
 
@@ -346,51 +341,43 @@ final class XmlExtractor extends AbstractExtractor
         }
 
         $data = [];
-        foreach (['mutation', 'query', 'subscription'] as $operationType) {
-            foreach ($resource->graphQlOperations->{$operationType} as $operation) {
+        foreach (['mutation' => Mutation::class, 'query' => Query::class, 'subscription' => Subscription::class] as $type => $class) {
+            foreach ($resource->graphQlOperations->{$type} as $operation) {
                 $datum = $this->getBase($operation);
                 foreach ($datum as $key => $value) {
-                    if (empty($value)) {
+                    if (null === $value) {
                         $datum[$key] = $root[$key];
                     }
                 }
 
                 $data[] = array_merge($datum, [
+                    'graphql_operation_class' => $class,
+                    'collection' => $this->phpize($operation, 'collection', 'bool'),
                     'resolver' => $this->phpize($operation, 'resolver', 'string'),
+                    'args' => $this->getArgs($operation),
                     'class' => $this->phpize($operation, 'class', 'string'),
-                    'compositeIdentifier' => $this->phpize($operation, 'compositeIdentifier', 'bool'),
-                    'paginationEnabled' => $this->phpize($operation, 'paginationEnabled', 'bool'),
-                    'paginationType' => $this->phpize($operation, 'paginationType', 'string'),
-                    'paginationItemsPerPage' => $this->phpize($operation, 'paginationItemsPerPage', 'integer'),
-                    'paginationMaximumItemsPerPage' => $this->phpize($operation, 'paginationMaximumItemsPerPage', 'integer'),
-                    'paginationPartial' => $this->phpize($operation, 'paginationPartial', 'bool'),
-                    'paginationClientEnabled' => $this->phpize($operation, 'paginationClientEnabled', 'bool'),
-                    'paginationClientItemsPerPage' => $this->phpize($operation, 'paginationClientItemsPerPage', 'bool'),
-                    'paginationClientPartial' => $this->phpize($operation, 'paginationClientPartial', 'bool'),
-                    'paginationFetchJoinCollection' => $this->phpize($operation, 'paginationFetchJoinCollection', 'bool'),
-                    'paginationUseOutputWalkers' => $this->phpize($operation, 'paginationUseOutputWalkers', 'bool'),
-                    'description' => $this->phpize($operation, 'description', 'string'),
-                    'security' => $this->phpize($operation, 'security', 'string'),
-                    'securityMessage' => $this->phpize($operation, 'securityMessage', 'string'),
-                    'securityPostDenormalize' => $this->phpize($operation, 'securityPostDenormalize', 'string'),
-                    'securityPostDenormalizeMessage' => $this->phpize($operation, 'securityPostDenormalizeMessage', 'string'),
-                    'deprecationReason' => $this->phpize($operation, 'deprecationReason', 'string'),
-                    'input' => $this->phpize($operation, 'input', 'bool|string'),
-                    'output' => $this->phpize($operation, 'output', 'bool|string'),
-                    'mercure' => $this->getMercure($operation),
-                    'messenger' => $this->getMessenger($operation),
-                    'elasticsearch' => $this->phpize($operation, 'elasticsearch', 'bool'),
-                    'urlGenerationStrategy' => $this->phpize($operation, 'urlGenerationStrategy', 'integer'),
                     'read' => $this->phpize($operation, 'read', 'bool'),
                     'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
                     'validate' => $this->phpize($operation, 'validate', 'bool'),
                     'write' => $this->phpize($operation, 'write', 'bool'),
                     'serialize' => $this->phpize($operation, 'serialize', 'bool'),
-                    'fetchPartial' => $this->phpize($operation, 'fetchPartial', 'bool'),
-                    'forceEager' => $this->phpize($operation, 'forceEager', 'bool'),
                     'priority' => $this->phpize($operation, 'priority', 'integer'),
                 ]);
             }
+        }
+
+        return $data;
+    }
+
+    private function getArgs(\SimpleXMLElement $resource): ?array
+    {
+        if (!isset($resource->args->arg)) {
+            return null;
+        }
+
+        $data = [];
+        foreach ($resource->args->arg as $arg) {
+            $data[(string) $arg['id']] = $this->getValues($arg->values);
         }
 
         return $data;
@@ -436,9 +423,17 @@ final class XmlExtractor extends AbstractExtractor
      */
     private function getValues(\SimpleXMLElement $resource): array
     {
-        return array_map(function ($value) {
-            return (string) $value;
-        }, (array) $resource->value);
+        $data = [];
+        foreach ($resource->value as $value) {
+            if (null !== $value->attributes()->name) {
+                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->getValues($value->values) : (string) $value;
+                continue;
+            }
+
+            $data[] = isset($value->values) ? $this->getValues($value->values) : (string) $value;
+        }
+
+        return $data;
     }
 
     private function getArrayValue(?\SimpleXMLElement $resource, string $key, $default = null)
@@ -465,7 +460,7 @@ final class XmlExtractor extends AbstractExtractor
 
         switch ($type) {
             case 'bool|string':
-                return \in_array((string) $resource[$key], ['true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
+                return \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
             case 'string':
                 return (string) $resource[$key];
             case 'integer':

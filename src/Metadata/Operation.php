@@ -162,6 +162,8 @@ class Operation
      * @param string|null       $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string|null       $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string|null       $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
+     * @param string|null       $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param bool|null         $read                           https://api-platform.com/docs/core/events/#the-event-system
      * @param bool|null         $deserialize                    https://api-platform.com/docs/core/events/#the-event-system
      * @param bool|null         $validate                       https://api-platform.com/docs/core/events/#the-event-system
@@ -1114,7 +1116,7 @@ class Operation
         return $this->securityPostValidation;
     }
 
-    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    public function withSecurityPostValidation(string $securityPostValidation): self
     {
         $self = clone $this;
         $self->securityPostValidation = $securityPostValidation;
@@ -1127,7 +1129,7 @@ class Operation
         return $this->securityPostValidationMessage;
     }
 
-    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    public function withSecurityPostValidationMessage(string $securityPostValidationMessage): self
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;

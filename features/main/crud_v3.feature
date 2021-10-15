@@ -38,7 +38,7 @@ Feature: Create-Retrieve-Update-Delete
       "@type": "hydra:Collection",
       "hydra:member": [
         {
-          "@id": "/users/1/programs/1",
+          "@id": "/programs/1",
           "@type": "Program",
           "id": 1,
           "name": "Lorem ipsum 1",
@@ -46,17 +46,17 @@ Feature: Create-Retrieve-Update-Delete
           "author": "/users/1"
         },
         {
-          "@id": "/users/1/programs/2",
+          "@id": "/programs/2",
           "@type": "Program",
-          "id": 1,
+          "id": 2,
           "name": "Lorem ipsum 2",
           "date": "2015-03-02T10:00:00+00:00",
           "author": "/users/1"
         },
         {
-          "@id": "/users/1/programs/3",
+          "@id": "/programs/3",
           "@type": "Program",
-          "id": 1,
+          "id": 3,
           "name": "Lorem ipsum 3",
           "date": "2015-03-03T10:00:00+00:00",
           "author": "/users/1"
@@ -85,22 +85,22 @@ Feature: Create-Retrieve-Update-Delete
     }
     """
 
+  @dropSchema
   Scenario: Get a collection resource in v3 configured in XML
     Given there are 3 Comments
     When I send a "GET" request to "/users/1/comments"
-    And print last response
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
     """
     {
-      "@context": "/contexts/Dummy",
+      "@context": "/contexts/Comment",
       "@id": "/users/1/comments",
       "@type": "hydra:Collection",
       "hydra:member": [
         {
-          "@id": "/users/1/comments/1",
+          "@id": "/comments/1",
           "@type": "Comment",
           "id": 1,
           "comment": "Lorem ipsum dolor sit amet 1",
@@ -108,17 +108,17 @@ Feature: Create-Retrieve-Update-Delete
           "author": "/users/1"
         },
         {
-          "@id": "/users/1/comments/2",
+          "@id": "/comments/2",
           "@type": "Comment",
-          "id": 1,
+          "id": 2,
           "comment": "Lorem ipsum dolor sit amet 2",
           "date": "2015-03-02T10:00:00+00:00",
           "author": "/users/1"
         },
         {
-          "@id": "/users/1/comments/3",
+          "@id": "/comments/3",
           "@type": "Comment",
-          "id": 1,
+          "id": 3,
           "comment": "Lorem ipsum dolor sit amet 3",
           "date": "2015-03-03T10:00:00+00:00",
           "author": "/users/1"

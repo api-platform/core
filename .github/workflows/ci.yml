@@ -8,6 +8,7 @@ env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COVERAGE: '0'
   SYMFONY_DEPRECATIONS_HELPER: disabled=1
+#  SYMFONY_PHPUNIT_DIR: vendor/bin/.phpunit
 
 jobs:
   php-cs-fixer:
