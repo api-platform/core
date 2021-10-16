@@ -68,4 +68,40 @@ class FilterExtensionTest extends TestCase
         $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
         $orderExtensionTest->applyToCollection($this->prophesize(Builder::class)->reveal(), Dummy::class, 'get');
     }
+
+    public function testApplyToSubresourceWithValidFilters()
+    {
+        $aggregationBuilderProphecy = $this->prophesize(Builder::class);
+
+        $dummyMetadata = new ResourceMetadata('subDummy', 'dummy subresource', '#dummy', ['get' => ['method' => 'GET']], [], [], ['parents_dummies_get_subresource' => ['method' => 'GET', 'filters' => ['dummyFilter', 'dummyBadFilter']]]);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $aggregationBuilder = $aggregationBuilderProphecy->reveal();
+
+        $mongoDbOdmFilterProphecy = $this->prophesize(FilterInterface::class);
+        $mongoDbOdmFilterProphecy->apply($aggregationBuilder, Dummy::class, 'parents_dummies_get_subresource', ['filters' => []])->shouldBeCalled();
+
+        $ordinaryFilterProphecy = $this->prophesize(ApiFilterInterface::class);
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('dummyFilter')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->has('dummyBadFilter')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->get('dummyFilter')->willReturn($mongoDbOdmFilterProphecy->reveal())->shouldBeCalled();
+        $filterLocatorProphecy->get('dummyBadFilter')->willReturn($ordinaryFilterProphecy->reveal())->shouldBeCalled();
+
+        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal());
+        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, 'parents_dummies_get_subresource');
+    }
+
+    public function testApplyToSubresourceWithoutFilters()
+    {
+        $dummyMetadata = new ResourceMetadata('subDummy', 'dummy subresource', '#dummy', ['get' => ['method' => 'GET']], [], [], ['parents_dummies_get_subresource' => ['method' => 'GET']]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
+        $orderExtensionTest->applyToCollection($this->prophesize(Builder::class)->reveal(), Dummy::class, 'parents_dummies_get_subresource');
+    }
 }

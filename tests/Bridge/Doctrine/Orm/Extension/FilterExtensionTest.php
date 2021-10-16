@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface as ApiFilterInterface;
+use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
@@ -100,5 +101,42 @@ class FilterExtensionTest extends TestCase
 
         $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
         $orderExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, 'get');
+    }
+
+    public function testApplyToSubresourceWithValidFilters()
+    {
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+
+        $dummyMetadata = new ResourceMetadata('subDummy', 'dummy subresource', '#dummy', ['get' => ['method' => 'GET']], [], [], ['parents_dummies_get_subresource' => ['method' => 'GET', 'filters' => ['dummyFilter', 'dummyBadFilter']]]);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $ormFilterProphecy = $this->prophesize(FilterInterface::class);
+        $ormFilterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'parents_dummies_get_subresource', ['filters' => [], 'operation_type' => OperationType::SUBRESOURCE])->shouldBeCalled();
+
+        $ordinaryFilterProphecy = $this->prophesize(ApiFilterInterface::class);
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('dummyFilter')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->has('dummyBadFilter')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->get('dummyFilter')->willReturn($ormFilterProphecy->reveal())->shouldBeCalled();
+        $filterLocatorProphecy->get('dummyBadFilter')->willReturn($ordinaryFilterProphecy->reveal())->shouldBeCalled();
+
+        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal());
+
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'parents_dummies_get_subresource', ['operation_type' => OperationType::SUBRESOURCE]);
+    }
+
+    public function testApplyToSubresourceWithoutFilters()
+    {
+        $dummyMetadata = new ResourceMetadata('subDummy', 'dummy subresource', '#dummy', ['get' => ['method' => 'GET']], [], [], ['parents_dummies_get_subresource' => ['method' => 'GET']]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+
+        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
+        $orderExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, 'parents_dummies_get_subresource');
     }
 }
