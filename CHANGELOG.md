@@ -13,6 +13,7 @@
 * fix(docs): upgrade Swagger UI to version 3.52.3 (#4477)
 * fix(docs): upgrade ReDoc to version 2.0.0-rc.56 (#4477)
 * fix(docs): upgrade Swagger UI to version 2.0.0-rc.56 (#4477)
+* fix(subresource): fix subresource filters attributes resolving (#4508)
 
 ## 2.6.5
 
