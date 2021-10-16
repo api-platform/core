@@ -130,6 +130,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -361,6 +363,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * Populates included keys.
+     *
+     * @param mixed $object
      */
     private function getRelatedResources($object, ?string $format, array $context, array $relationships): array
     {

@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ThirdLevel
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -38,7 +38,7 @@ class ThirdLevel
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer")
      * @Groups({"barcelona", "chicago"})
@@ -64,18 +64,12 @@ class ThirdLevel
      */
     public $badFourthLevel;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return int
-     */
-    public function getLevel()
+    public function getLevel(): ?int
     {
         return $this->level;
     }
@@ -88,10 +82,7 @@ class ThirdLevel
         $this->level = $level;
     }
 
-    /**
-     * @return bool
-     */
-    public function isTest()
+    public function isTest(): bool
     {
         return $this->test;
     }
@@ -104,10 +95,7 @@ class ThirdLevel
         $this->test = $test;
     }
 
-    /**
-     * @return FourthLevel|null
-     */
-    public function getFourthLevel()
+    public function getFourthLevel(): ?FourthLevel
     {
         return $this->fourthLevel;
     }

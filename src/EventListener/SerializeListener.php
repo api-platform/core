@@ -109,6 +109,8 @@ final class SerializeListener
     /**
      * Tries to serialize data that are not API resources (e.g. the entrypoint or data returned by a custom controller).
      *
+     * @param mixed $controllerResult
+     *
      * @throws RuntimeException
      */
     private function serializeRawData(ViewEvent $event, Request $request, $controllerResult): void

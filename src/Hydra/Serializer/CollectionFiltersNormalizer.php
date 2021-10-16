@@ -53,7 +53,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $this->collectionNormalizer->supportsNormalization($data, $format);
     }

@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
@@ -61,22 +62,16 @@ class Answer
 
     /**
      * Get id.
-     *
-     * @return string
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Set content.
-     *
-     * @param string $content
-     *
-     * @return Answer
      */
-    public function setContent($content)
+    public function setContent(string $content): self
     {
         $this->content = $content;
 
@@ -85,22 +80,16 @@ class Answer
 
     /**
      * Get content.
-     *
-     * @return string
      */
-    public function getContent()
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
     /**
      * Set question.
-     *
-     * @param Question $question
-     *
-     * @return Answer
      */
-    public function setQuestion(Question $question = null)
+    public function setQuestion(Question $question = null): self
     {
         $this->question = $question;
 
@@ -109,25 +98,21 @@ class Answer
 
     /**
      * Get question.
-     *
-     * @return Question
      */
-    public function getQuestion()
+    public function getQuestion(): ?Question
     {
         return $this->question;
     }
 
     /**
      * Get related question.
-     *
-     * @return ArrayCollection
      */
-    public function getRelatedQuestions()
+    public function getRelatedQuestions(): Collection
     {
         return $this->relatedQuestions;
     }
 
-    public function addRelatedQuestion(Question $question)
+    public function addRelatedQuestion(Question $question): void
     {
         $this->relatedQuestions->add($question);
     }

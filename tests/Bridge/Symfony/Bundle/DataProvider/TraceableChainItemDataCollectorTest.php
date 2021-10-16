@@ -48,6 +48,10 @@ class TraceableChainItemDataCollectorTest extends TestCase
     /**
      * @dataProvider deprecatedDataProviderProvider
      * @group legacy
+     *
+     * @param mixed $provider
+     * @param mixed $context
+     * @param mixed $expected
      */
     public function testDeprecatedGetItem($provider, $context, $expected)
     {

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -46,20 +47,16 @@ class CompositeItem
 
     /**
      * Gets id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Gets field1.
-     *
-     * @return string|null
      */
-    public function getField1()
+    public function getField1(): ?string
     {
         return $this->field1;
     }
@@ -76,15 +73,13 @@ class CompositeItem
 
     /**
      * Gets compositeValues.
-     *
-     * @return CompositeRelation
      */
-    public function getCompositeValues()
+    public function getCompositeValues(): ?Collection
     {
         return $this->compositeValues;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

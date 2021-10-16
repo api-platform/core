@@ -24,7 +24,7 @@ class GeneratorDataProvider implements CollectionDataProviderInterface, Restrict
         return SecuredDummy::class === $resourceClass && 'get_from_data_provider_generator' === $operationName;
     }
 
-    public function getCollection(string $resourceClass, string $operationName = null)
+    public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
         yield from [new class() {
         }, new class() {

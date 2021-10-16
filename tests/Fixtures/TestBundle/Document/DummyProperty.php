@@ -48,7 +48,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyProperty
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      *
@@ -57,7 +57,7 @@ class DummyProperty
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -66,7 +66,7 @@ class DummyProperty
     public $foo;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -75,7 +75,7 @@ class DummyProperty
     public $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -84,7 +84,7 @@ class DummyProperty
     public $baz;
 
     /**
-     * @var DummyGroup
+     * @var DummyGroup|null
      *
      * @ODM\ReferenceOne(targetDocument=DummyGroup::class, cascade={"persist"}, nullable=true)
      *
@@ -93,7 +93,7 @@ class DummyProperty
     public $group;
 
     /**
-     * @var DummyGroup[]
+     * @var DummyGroup[]|null
      *
      * @ODM\ReferenceMany(targetDocument=DummyGroup::class, cascade={"persist"})
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
@@ -101,7 +101,7 @@ class DummyProperty
     public $groups;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -109,10 +109,7 @@ class DummyProperty
      */
     public $nameConverted;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

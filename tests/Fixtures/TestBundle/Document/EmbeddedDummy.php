@@ -33,14 +33,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class EmbeddedDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
      * @Groups({"embed"})
@@ -48,7 +48,7 @@ class EmbeddedDummy
     private $name;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date")
      * @Assert\DateTime
@@ -64,13 +64,13 @@ class EmbeddedDummy
     public $embeddedDummy;
 
     /**
-     * @var RelatedDummy A related dummy
+     * @var RelatedDummy|null A related dummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id")
      */
     public $relatedDummy;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -79,17 +79,17 @@ class EmbeddedDummy
         $this->embeddedDummy = new EmbeddableDummy();
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -99,33 +99,27 @@ class EmbeddedDummy
         return $this->embeddedDummy;
     }
 
-    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy)
+    public function setEmbeddedDummy(EmbeddableDummy $embeddedDummy): void
     {
         $this->embeddedDummy = $embeddedDummy;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getDummyDate()
+    public function getDummyDate(): ?\DateTime
     {
         return $this->dummyDate;
     }
 
-    public function setDummyDate(\DateTime $dummyDate)
+    public function setDummyDate(\DateTime $dummyDate): void
     {
         $this->dummyDate = $dummyDate;
     }
 
-    /**
-     * @return RelatedDummy
-     */
-    public function getRelatedDummy()
+    public function getRelatedDummy(): ?RelatedDummy
     {
         return $this->relatedDummy;
     }
 
-    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    public function setRelatedDummy(RelatedDummy $relatedDummy): void
     {
         $this->relatedDummy = $relatedDummy;
     }

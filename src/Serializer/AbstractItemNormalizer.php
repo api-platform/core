@@ -96,6 +96,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function supportsNormalization($data, $format = null)
     {
@@ -173,6 +175,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     public function supportsDenormalization($data, $type, $format = null)
     {
@@ -181,6 +185,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -259,6 +265,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @internal
+     *
+     * @return object
      */
     protected function instantiateObject(array &$data, $class, array &$context, \ReflectionClass $reflectionClass, $allowedAttributes, string $format = null)
     {
@@ -344,6 +352,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * Unused in this context.
+     *
+     * @return string[]
      */
     protected function extractAttributes($object, $format = null, array $context = [])
     {
@@ -378,6 +388,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return bool
      */
     protected function isAllowedAttribute($classOrObject, $attribute, $format = null, array $context = [])
     {
@@ -408,6 +420,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Validates the type of the value. Allows using integers as floats for JSON formats.
      *
+     * @param mixed $value
+     *
      * @throws InvalidArgumentException
      */
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
@@ -426,6 +440,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Denormalizes a collection of objects.
+     *
+     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
@@ -452,6 +468,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * Denormalizes a relation.
+     *
+     * @param mixed $value
      *
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -554,6 +572,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws UnexpectedValueException
      * @throws LogicException
+     *
+     * @return mixed
      */
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
@@ -699,6 +719,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * For a given resource, it returns an output representation if any
      * If not, the resource is returned.
+     *
+     * @param mixed $object
      */
     protected function transformOutput($object, array $context = [], string $outputClass = null)
     {
@@ -841,6 +863,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * Sets a value of the object using the PropertyAccess component.
      *
      * @param object $object
+     * @param mixed  $value
      */
     private function setValue($object, string $attributeName, $value)
     {

@@ -155,7 +155,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * {@inheritdoc}
      */
-    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): iterable
     {
         $query = $queryBuilder->getQuery();
 

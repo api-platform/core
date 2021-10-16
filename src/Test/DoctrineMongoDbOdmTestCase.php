@@ -28,6 +28,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 class DoctrineMongoDbOdmTestCase extends TestCase
 {
     /**
+     * @param mixed $paths
+     *
      * @return DocumentManager
      */
     public static function createTestDocumentManager($paths = [])

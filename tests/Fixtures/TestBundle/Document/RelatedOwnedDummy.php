@@ -34,14 +34,14 @@ class RelatedOwnedDummy
     private $id;
 
     /**
-     * @var string A name
+     * @var string|null A name
      *
      * @ODM\Field(type="string")
      */
     public $name;
 
     /**
-     * @var Dummy
+     * @var Dummy|null
      *
      * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, inversedBy="relatedOwnedDummy", storeAs="id")
      * @ApiSubresource
@@ -70,10 +70,8 @@ class RelatedOwnedDummy
 
     /**
      * Get owning dummy.
-     *
-     * @return Dummy
      */
-    public function getOwningDummy()
+    public function getOwningDummy(): ?Dummy
     {
         return $this->owningDummy;
     }
@@ -83,7 +81,7 @@ class RelatedOwnedDummy
      *
      * @param Dummy $owningDummy the value to set
      */
-    public function setOwningDummy(Dummy $owningDummy)
+    public function setOwningDummy(Dummy $owningDummy): void
     {
         $this->owningDummy = $owningDummy;
     }

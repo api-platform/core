@@ -35,7 +35,7 @@ class ResourceInterfaceImplementationDataProvider implements ItemDataProviderInt
         return null;
     }
 
-    public function getCollection(string $resourceClass, string $operationName = null)
+    public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
         yield (new ResourceInterfaceImplementation())->setFoo('item1');
         yield (new ResourceInterfaceImplementation())->setFoo('item2');

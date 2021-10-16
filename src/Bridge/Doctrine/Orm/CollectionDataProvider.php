@@ -53,7 +53,7 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
      *
      * @throws RuntimeException
      */
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);

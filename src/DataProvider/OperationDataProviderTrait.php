@@ -46,16 +46,16 @@ trait OperationDataProviderTrait
 
     /**
      * Retrieves data for a collection operation.
-     *
-     * @return iterable
      */
-    private function getCollectionData(array $attributes, array $context)
+    private function getCollectionData(array $attributes, array $context): iterable
     {
         return $this->collectionDataProvider->getCollection($attributes['resource_class'], $attributes['collection_operation_name'], $context);
     }
 
     /**
      * Gets data for an item operation.
+     *
+     * @param mixed $identifiers
      *
      * @return object|null
      */
@@ -66,6 +66,8 @@ trait OperationDataProviderTrait
 
     /**
      * Gets data for a nested operation.
+     *
+     * @param mixed $identifiers
      *
      * @throws RuntimeException
      *

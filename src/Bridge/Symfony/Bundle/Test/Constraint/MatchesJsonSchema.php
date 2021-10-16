@@ -89,6 +89,8 @@ final class MatchesJsonSchema extends Constraint
      *
      * Specifically, we should ensure that:
      * 1. a JSON object is represented as a PHP object, not as an associative array.
+     *
+     * @param mixed $document
      */
     private function normalizeJson($document)
     {

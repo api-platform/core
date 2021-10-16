@@ -35,8 +35,6 @@ return (new PhpCsFixer\Config())
         '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
-        'single_line_comment_style' => false, // Temporary fix for compatibility with PHP 8 attributes, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/5284
-        'comment_to_phpdoc' => true, // Temporary fix for compatibility with PHP 8 attributes, see https://github.com/FriendsOfPHP/PHP-CS-Fixer/pull/5284
         'align_multiline_comment' => [
             'comment_type' => 'phpdocs_like',
         ],
@@ -75,9 +73,10 @@ return (new PhpCsFixer\Config())
             ],
         ],
         'no_superfluous_elseif' => true,
-        'no_superfluous_phpdoc_tags' => [
-            'allow_mixed' => false,
-        ],
+        // To re-enable in API Platform 3: https://github.com/symfony/symfony/issues/43021
+        //'no_superfluous_phpdoc_tags' => [
+        //    'allow_mixed' => false,
+        //],
         'no_unset_cast' => true,
         'no_unset_on_property' => true,
         'no_useless_else' => true,

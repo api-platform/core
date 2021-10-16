@@ -59,7 +59,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return self::FORMAT === $format && is_iterable($data);
     }

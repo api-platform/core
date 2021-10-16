@@ -38,20 +38,16 @@ class CompositeLabel
 
     /**
      * Gets id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Gets value.
-     *
-     * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }

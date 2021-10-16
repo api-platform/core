@@ -31,6 +31,9 @@ class RequestParserTest extends TestCase
 
     /**
      * @dataProvider parseRequestParamsProvider
+     *
+     * @param mixed $source
+     * @param mixed $expected
      */
     public function testParseRequestParams($source, $expected)
     {

@@ -157,7 +157,7 @@ final class ApiLoader extends Loader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return 'api_platform' === $type;
     }

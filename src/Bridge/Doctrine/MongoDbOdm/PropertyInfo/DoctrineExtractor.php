@@ -43,8 +43,10 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
     /**
      * {@inheritdoc}
+     *
+     * @return string[]|null
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties($class, array $context = []): ?array
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -55,8 +57,10 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
     /**
      * {@inheritdoc}
+     *
+     * @return Type[]|null
      */
-    public function getTypes($class, $property, array $context = [])
+    public function getTypes($class, $property, array $context = []): ?array
     {
         if (null === $metadata = $this->getMetadata($class)) {
             return null;

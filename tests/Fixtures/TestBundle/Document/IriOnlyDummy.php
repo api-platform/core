@@ -32,25 +32,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class IriOnlyDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(type="string")
      */
     private $foo;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getFoo(): string
+    public function getFoo(): ?string
     {
         return $this->foo;
     }

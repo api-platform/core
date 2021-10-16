@@ -95,6 +95,8 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
      * {@inheritdoc}
      *
      * @throws LogicException
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
