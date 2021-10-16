@@ -51,7 +51,7 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+        if (OperationType::SUBRESOURCE === ($context['operation_type'] ?? null)) {
             $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
         } else {
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);

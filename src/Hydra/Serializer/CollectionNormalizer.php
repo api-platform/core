@@ -79,7 +79,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+        if (OperationType::SUBRESOURCE === ($context['operation_type'] ?? null)) {
             $data['@id'] = $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context);
         } else {
             $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass);

@@ -56,7 +56,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
         }
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+        if (OperationType::SUBRESOURCE === ($context['operation_type'] ?? null)) {
             $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
         } else {
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);

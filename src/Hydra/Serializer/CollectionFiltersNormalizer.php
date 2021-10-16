@@ -86,7 +86,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         $operationName = $context['collection_operation_name'] ?? null;
         if (null === $operationName) {
             $resourceFilters = $resourceMetadata->getAttribute('filters', []);
-        } elseif (isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type']) {
+        } elseif (OperationType::SUBRESOURCE === ($context['operation_type'] ?? null)) {
             $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
         } else {
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
