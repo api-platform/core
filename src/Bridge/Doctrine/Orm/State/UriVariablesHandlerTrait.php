@@ -26,6 +26,8 @@ trait UriVariablesHandlerTrait
         if (null === $uriVariables) {
             return;
         }
+        $manager = $this->managerRegistry->getManagerForClass($resourceClass);
+        $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         $alias = $queryBuilder->getRootAliases()[0];
 
         foreach ($identifiers as $identifier => $value) {
@@ -67,7 +69,7 @@ trait UriVariablesHandlerTrait
                 );
             }
             $queryBuilder->andWhere($expression);
-            $queryBuilder->setParameter($placeholder, $value);
+            $queryBuilder->setParameter($placeholder, $value, $doctrineClassMetadata->getTypeOfField($identifier));
         }
     }
 }
