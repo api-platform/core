@@ -99,7 +99,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             $item = ($this->deserializeStage)($item, $resourceClass, $operationName, $resolverContext);
 
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+            $operation = $resourceMetadataCollection->getOperation($operationName);
 
             $mutationResolverId = $operation->getResolver();
             if (null !== $mutationResolverId) {

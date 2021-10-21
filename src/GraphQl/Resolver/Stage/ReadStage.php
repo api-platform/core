@@ -62,7 +62,7 @@ final class ReadStage implements ReadStageInterface
     {
         $operation = null;
         try {
-            $operation = $resourceClass ? $this->resourceMetadataCollectionFactory->create($resourceClass)->getGraphQlOperation($operationName) : null;
+            $operation = $resourceClass ? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName) : null;
         } catch (OperationNotFoundException $e) {
             // ReadStage may be invoked without an existing operation
         }

@@ -71,7 +71,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
 
             $resourceClass = $this->getResourceClass($item, $resourceClass);
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+            $operation = $resourceMetadataCollection->getOperation($operationName);
 
             $queryResolverId = $operation->getResolver();
             if (null !== $queryResolverId) {

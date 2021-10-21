@@ -57,7 +57,7 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         try {
-            $operation = isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+            $operation = $resourceMetadata->getOperation($operationName);
             $resourceFilters = $operation->getFilters();
         } catch (OperationNotFoundException $e) {
             $resourceFilters = $resourceMetadata->getOperation(null, true)->getFilters();

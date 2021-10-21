@@ -43,7 +43,7 @@ final class DeserializeStage implements DeserializeStageInterface
     public function __invoke($objectToPopulate, string $resourceClass, string $operationName, array $context)
     {
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
         if (!($operation->canDeserialize() ?? true)) {
             return $objectToPopulate;
         }

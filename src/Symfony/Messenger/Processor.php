@@ -89,7 +89,7 @@ final class Processor implements ProcessorInterface
     {
         try {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($context['resource_class'] ?? $this->getObjectClass($data));
-            $operation = isset($context['graphql_operation_name']) ? $resourceMetadataCollection->getGraphQlOperation($context['graphql_operation_name']) : $resourceMetadataCollection->getOperation($operationName ?? null);
+            $operation = $resourceMetadataCollection->getOperation($operationName ?? null);
 
             return false !== ($operation->getMessenger() ?? false);
         } catch (OperationNotFoundException $e) {

@@ -39,7 +39,7 @@ final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStage
     public function __invoke(string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
         $isGranted = $operation->getSecurityPostDenormalize();
 
         if (null !== $isGranted && null === $this->resourceAccessChecker) {

@@ -119,7 +119,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
             try {
-                $operation = isset($context['graphql_operation_name']) ? $resourceMetadataCollection->getGraphQlOperation($operationName) : $resourceMetadataCollection->getOperation($operationName);
+                $operation = $resourceMetadataCollection->getOperation($operationName);
                 $forceEager = $operation->getForceEager() ?? $this->forceEager;
                 $fetchPartial = $operation->getFetchPartial() ?? $this->fetchPartial;
             } catch (OperationNotFoundException $e) {

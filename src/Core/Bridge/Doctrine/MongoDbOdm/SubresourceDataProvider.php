@@ -97,7 +97,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         try {
-            $operation = $context['operation'] ?? (isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName));
+            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
             $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
         } catch (OperationNotFoundException $e) {
             $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
