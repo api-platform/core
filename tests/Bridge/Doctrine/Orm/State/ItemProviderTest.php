@@ -78,7 +78,7 @@ class ItemProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_identifier', 1)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_identifier', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -137,8 +137,8 @@ class ItemProviderTest extends TestCase
                 ]),
         ])]))]));
 
-        $queryBuilderProphecy->setParameter(':id_ida', 1)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter(':id_idb', 2)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_ida', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_idb', 2, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -177,7 +177,7 @@ class ItemProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_identifier', 1)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_identifier', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -375,12 +375,12 @@ class ItemProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_employeeId', 1)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_employeeId', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $managerRegistry = $this->getManagerRegistry(Company::class, [
-            'id' => [
+            'employeeId' => [
                 'type' => Types::INTEGER,
             ],
         ], $queryBuilder);
@@ -422,12 +422,12 @@ class ItemProviderTest extends TestCase
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_companyId', 1)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter(':id_companyId', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $managerRegistry = $this->getManagerRegistry(Employee::class, [
-            'id' => [
+            'companyId' => [
                 'type' => Types::INTEGER,
             ],
         ], $queryBuilder);
