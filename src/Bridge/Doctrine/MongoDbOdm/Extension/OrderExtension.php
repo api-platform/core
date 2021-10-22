@@ -17,7 +17,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
 use Doctrine\Persistence\ManagerRegistry;
+use OutOfRangeException;
 
 /**
  * Applies selected ordering while querying resource collection.
@@ -50,6 +52,11 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
      */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
     {
+        // Do not apply order if already defined on $aggregationBuilder
+        if ($this->hasSortStage($aggregationBuilder)) {
+            return;
+        }
+
         $classMetaData = $this->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
         if (null !== $this->resourceMetadataFactory) {
@@ -90,5 +97,28 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     protected function getManagerRegistry(): ManagerRegistry
     {
         return $this->managerRegistry;
+    }
+
+    private function hasSortStage(Builder $aggregationBuilder): bool
+    {
+        $shouldStop = false;
+        $index = 0;
+
+        do {
+            try {
+                if ($aggregationBuilder->getStage($index) instanceof Sort) {
+                    // If at least one stage is sort, then it has sorting
+                    return true;
+                }
+            } catch (OutOfRangeException $outOfRangeException) {
+                // There is no more stages on the aggregation builder
+                $shouldStop = true;
+            }
+
+            ++$index;
+        } while (!$shouldStop);
+
+        // No stage was sort, and we iterated through all stages
+        return false;
     }
 }
