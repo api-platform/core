@@ -107,7 +107,7 @@ class DummyProduct
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(Collection $relatedProducts)
+    public function setRelatedProducts(iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }

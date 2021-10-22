@@ -167,6 +167,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
 
     /**
      * @param Operation|GraphQlOperation|ApiResource $operation
+     * @param mixed                                  $value
      *
      * @return Operation|GraphQlOperation|ApiResource
      */

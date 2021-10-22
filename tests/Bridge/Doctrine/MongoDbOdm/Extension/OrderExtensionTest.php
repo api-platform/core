@@ -23,9 +23,11 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use OutOfRangeException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -41,6 +43,7 @@ class OrderExtensionTest extends TestCase
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['name' => 'asc'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -61,6 +64,7 @@ class OrderExtensionTest extends TestCase
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['name' => 'asc'])->shouldNotBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -82,6 +86,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['foo' => 'DESC'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -106,6 +111,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['foo' => 'ASC'])->shouldBeCalled();
         $aggregationBuilderProphecy->sort(['foo' => 'ASC', 'bar' => 'DESC'])->shouldBeCalled();
 
@@ -137,6 +143,7 @@ class OrderExtensionTest extends TestCase
         $lookupProphecy->alias('author_lkup')->shouldBeCalled();
         $aggregationBuilderProphecy->lookup(Dummy::class)->shouldBeCalled()->willReturn($lookupProphecy->reveal());
         $aggregationBuilderProphecy->unwind('$author_lkup')->shouldBeCalled();
+        $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
         $aggregationBuilderProphecy->sort(['author_lkup.name' => 'ASC'])->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -159,5 +166,19 @@ class OrderExtensionTest extends TestCase
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal());
         $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, 'get');
+    }
+
+    public function testApplyToCollectionWithExistingSortStage()
+    {
+        $aggregationBuilderProphecy = $this->prophesize(Builder::class);
+
+        $aggregationBuilderProphecy->sort(['name' => 'asc'])->shouldNotBeCalled();
+        $aggregationBuilderProphecy->getStage(0)->shouldBeCalled()->willReturn(new Sort($aggregationBuilder = $aggregationBuilderProphecy->reveal(), 'field'));
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldNotBeCalled();
+
+        $orderExtensionTest = new OrderExtension('asc', null, $managerRegistryProphecy->reveal());
+        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class);
     }
 }

@@ -42,6 +42,8 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider resourceMetadataProvider
+     *
+     * @param mixed $expectedResourceMetadata
      */
     public function testXmlCreateResourceMetadata($expectedResourceMetadata)
     {
@@ -69,6 +71,8 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider optionalResourceMetadataProvider
+     *
+     * @param mixed $expectedResourceMetadata
      */
     public function testXmlOptionalResourceMetadata($expectedResourceMetadata)
     {
@@ -84,6 +88,8 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
      * @expectedDeprecation Configuring "%s" tags without using a parent "%ss" tag is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3
      * @group legacy
      * @dataProvider legacyOperationsResourceMetadataProvider
+     *
+     * @param mixed $expectedResourceMetadata
      */
     public function testLegacyOperationsResourceMetadata($expectedResourceMetadata)
     {
@@ -97,6 +103,8 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider noCollectionOperationsResourceMetadataProvider
+     *
+     * @param mixed $expectedResourceMetadata
      */
     public function testXmlNoCollectionOperationsResourceMetadata($expectedResourceMetadata)
     {
@@ -110,6 +118,8 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider noItemOperationsResourceMetadataProvider
+     *
+     * @param mixed $expectedResourceMetadata
      */
     public function testXmlNoItemOperationsResourceMetadata($expectedResourceMetadata)
     {
@@ -195,6 +205,8 @@ class ExtractorResourceMetadataFactoryTest extends FileConfigurationMetadataFact
 
     /**
      * @dataProvider optionalResourceMetadataProvider
+     *
+     * @param mixed $expectedResourceMetadata
      */
     public function testYamlOptionalResourceMetadata($expectedResourceMetadata)
     {

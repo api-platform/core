@@ -63,7 +63,7 @@ class Field implements \JsonSerializable
         $this->content = $content;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -73,7 +73,7 @@ class Field implements \JsonSerializable
         $this->name = $name;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -85,7 +85,10 @@ class Field implements \JsonSerializable
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [

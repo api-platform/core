@@ -27,6 +27,9 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
 
     /**
      * @dataProvider getAttributes
+     *
+     * @param mixed $input
+     * @param mixed $expected
      */
     public function testInputOutputMetadata($input, $expected)
     {

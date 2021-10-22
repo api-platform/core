@@ -27,7 +27,7 @@ class EntrypointActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetEntrypoint()
+    public function testGetEntrypoint(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));

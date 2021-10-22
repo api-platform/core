@@ -286,6 +286,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeProvider
+     *
+     * @param mixed $invalidHttpStatusCode
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode)
     {
@@ -315,6 +317,8 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider invalidHttpStatusCodeValueProvider
+     *
+     * @param mixed $invalidHttpStatusCodeValue
      */
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue)
     {

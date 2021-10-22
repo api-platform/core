@@ -27,6 +27,9 @@ class Uuid implements \JsonSerializable
         return $this->id;
     }
 
+    /**
+     * @return mixed
+     */
     public function jsonSerialize()
     {
         return $this->id;

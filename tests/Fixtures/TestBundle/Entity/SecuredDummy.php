@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SecuredDummy
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -62,7 +62,7 @@ class SecuredDummy
     private $id;
 
     /**
-     * @var string The title
+     * @var string|null The title
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -96,7 +96,7 @@ class SecuredDummy
     private $ownerOnlyProperty = '';
 
     /**
-     * @var string The owner
+     * @var string|null The owner
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -174,27 +174,27 @@ class SecuredDummy
         $this->publicRelatedSecuredDummies = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -204,7 +204,7 @@ class SecuredDummy
         return $this->adminOnlyProperty;
     }
 
-    public function setAdminOnlyProperty(?string $adminOnlyProperty)
+    public function setAdminOnlyProperty(?string $adminOnlyProperty): void
     {
         $this->adminOnlyProperty = $adminOnlyProperty;
     }
@@ -219,12 +219,12 @@ class SecuredDummy
         $this->ownerOnlyProperty = $ownerOnlyProperty;
     }
 
-    public function getOwner(): string
+    public function getOwner(): ?string
     {
         return $this->owner;
     }
 
-    public function setOwner(string $owner)
+    public function setOwner(string $owner): void
     {
         $this->owner = $owner;
     }

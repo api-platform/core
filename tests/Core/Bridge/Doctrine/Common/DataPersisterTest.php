@@ -130,6 +130,10 @@ class DataPersisterTest extends TestCase
 
     /**
      * @dataProvider getTrackingPolicyParameters
+     *
+     * @param mixed $metadataClass
+     * @param mixed $deferredExplicit
+     * @param mixed $persisted
      */
     public function testTrackingPolicy($metadataClass, $deferredExplicit, $persisted)
     {

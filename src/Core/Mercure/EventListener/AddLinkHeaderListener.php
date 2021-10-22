@@ -41,6 +41,7 @@ final class AddLinkHeaderListener
 
     /**
      * @param Discovery|string $discovery
+     * @param mixed            $resourceMetadataFactory
      */
     public function __construct($resourceMetadataFactory, $discovery)
     {

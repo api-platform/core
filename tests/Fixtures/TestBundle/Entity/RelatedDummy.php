@@ -17,6 +17,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -42,7 +43,7 @@ class RelatedDummy extends ParentDummy
     private $id;
 
     /**
-     * @var string A name
+     * @var string|null A name
      *
      * @ORM\Column(nullable=true)
      * @Groups({"friends"})
@@ -56,7 +57,7 @@ class RelatedDummy extends ParentDummy
     protected $symfony = 'symfony';
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
@@ -79,7 +80,7 @@ class RelatedDummy extends ParentDummy
     public $relatedToDummyFriend;
 
     /**
-     * @var bool A dummy bool
+     * @var bool|null A dummy bool
      *
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups({"friends"})
@@ -140,10 +141,7 @@ class RelatedDummy extends ParentDummy
         return $this->dummyDate;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
@@ -156,10 +154,7 @@ class RelatedDummy extends ParentDummy
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    /**
-     * @return ThirdLevel|null
-     */
-    public function getThirdLevel()
+    public function getThirdLevel(): ?ThirdLevel
     {
         return $this->thirdLevel;
     }
@@ -172,9 +167,9 @@ class RelatedDummy extends ParentDummy
     /**
      * Get relatedToDummyFriend.
      *
-     * @return RelatedToDummyFriend[]
+     * @return Collection<RelatedToDummyFriend>
      */
-    public function getRelatedToDummyFriend()
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }
@@ -189,10 +184,7 @@ class RelatedDummy extends ParentDummy
         $this->relatedToDummyFriend->add($relatedToDummyFriend);
     }
 
-    /**
-     * @return EmbeddableDummy
-     */
-    public function getEmbeddedDummy()
+    public function getEmbeddedDummy(): EmbeddableDummy
     {
         return $this->embeddedDummy;
     }

@@ -430,6 +430,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
 
     /**
      * @param Operation|ApiOperation|null $operation
+     * @param mixed                       $original
      */
     private function mergeFilterArgs(array $args, array $parsed, $operation = null, $original = ''): array
     {

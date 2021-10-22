@@ -23,6 +23,8 @@ final class DummyDtoNoInputToOutputDtoDataTransformer implements DataTransformer
 {
     /**
      * {@inheritdoc}
+     *
+     * @return object
      */
     public function transform($object, string $to, array $context = [])
     {

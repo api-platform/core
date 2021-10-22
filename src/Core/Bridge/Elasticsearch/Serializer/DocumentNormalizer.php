@@ -52,6 +52,8 @@ final class DocumentNormalizer extends ObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {

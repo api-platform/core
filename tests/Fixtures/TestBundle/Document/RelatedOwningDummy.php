@@ -70,10 +70,8 @@ class RelatedOwningDummy
 
     /**
      * Get owned dummy.
-     *
-     * @return Dummy
      */
-    public function getOwnedDummy()
+    public function getOwnedDummy(): Dummy
     {
         return $this->ownedDummy;
     }

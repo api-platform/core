@@ -574,6 +574,18 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     $filterFactory,
                     RelatedDummy::class,
                 ],
+                'related owned one-to-one association' => [
+                    sprintf('SELECT %s FROM %s %1$s INNER JOIN %1$s.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1.id = :id_p1', $this->alias, Dummy::class),
+                    ['id_p1' => 1],
+                    $filterFactory,
+                    Dummy::class,
+                ],
+                'related owning one-to-one association' => [
+                    sprintf('SELECT %s FROM %s %1$s WHERE %1$s.relatedOwningDummy = :relatedOwningDummy_p1', $this->alias, Dummy::class),
+                    ['relatedOwningDummy_p1' => 1],
+                    $filterFactory,
+                    Dummy::class,
+                ],
             ]
         );
     }

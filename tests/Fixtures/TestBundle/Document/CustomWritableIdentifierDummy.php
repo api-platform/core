@@ -46,18 +46,12 @@ class CustomWritableIdentifierDummy
         $this->slug = $slug;
     }
 
-    /**
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug(): string
     {
         return $this->slug;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

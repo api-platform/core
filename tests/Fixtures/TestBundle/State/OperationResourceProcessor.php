@@ -80,6 +80,8 @@ final class OperationResourceProcessor implements ProcessorInterface
 
     /**
      * Gets the Doctrine object manager associated with given data.
+     *
+     * @param mixed $data
      */
     private function getManager($data): ?DoctrineObjectManager
     {
@@ -88,6 +90,8 @@ final class OperationResourceProcessor implements ProcessorInterface
 
     /**
      * Checks if doctrine does not manage data automatically.
+     *
+     * @param mixed $data
      */
     private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
     {

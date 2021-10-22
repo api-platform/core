@@ -114,6 +114,8 @@ CODE_SAMPLE
     }
 
     /**
+     * @param mixed $value
+     *
      * @return bool|float|int|string|array<mixed>|Node\Expr
      */
     private function normalizeNodeValue($value)

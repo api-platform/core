@@ -40,20 +40,16 @@ class CompositeLabel
 
     /**
      * Gets id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Gets value.
-     *
-     * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -63,12 +59,12 @@ class CompositeLabel
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null)
+    public function setValue(?string $value = null)
     {
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

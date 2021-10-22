@@ -364,6 +364,8 @@ class AddFormatListenerTest extends TestCase
     /**
      * @group legacy
      * @dataProvider legacyFormatsProvider
+     *
+     * @param mixed $formatsProvider
      */
     public function testLegacyFormatsParameter($formatsProvider): void
     {

@@ -32,7 +32,7 @@ use Doctrine\ORM\Mapping as ORM;
 class IriOnlyDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -41,18 +41,18 @@ class IriOnlyDummy
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(type="string")
      */
     private $foo;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getFoo(): string
+    public function getFoo(): ?string
     {
         return $this->foo;
     }

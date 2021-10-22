@@ -57,6 +57,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
     /**
      * @TODO move $fetchPartial after $forceEager (@soyuka) in 3.0
+     *
+     * @param mixed $resourceMetadataFactory
      */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {

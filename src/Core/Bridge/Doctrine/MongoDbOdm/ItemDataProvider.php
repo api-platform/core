@@ -46,6 +46,7 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
 
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
+     * @param mixed                               $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
     {

@@ -53,6 +53,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     /**
      * @param AggregationCollectionExtensionInterface[] $collectionExtensions
      * @param AggregationItemExtensionInterface[]       $itemExtensions
+     * @param mixed                                     $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {

@@ -162,6 +162,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
 
     /**
      * @param PropertyMetadata|ApiPropertyMetadata $propertyMetadata
+     * @param mixed                                $value
      */
     private function createWith($propertyMetadata, array $property, $value)
     {

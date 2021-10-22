@@ -17,6 +17,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -48,14 +49,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Dummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
      * @Assert\NotBlank
@@ -64,7 +65,7 @@ class Dummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ODM\Field(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -72,12 +73,12 @@ class Dummy
     private $alias;
 
     /**
-     * @var array foo
+     * @var array|null foo
      */
     private $foo;
 
     /**
-     * @var string A short description of the item
+     * @var string|null A short description of the item
      *
      * @ODM\Field(type="string", nullable=true)
      * @ApiProperty(iri="https://schema.org/description")
@@ -85,21 +86,21 @@ class Dummy
     public $description;
 
     /**
-     * @var string A dummy
+     * @var string|null A dummy
      *
      * @ODM\Field(nullable=true)
      */
     public $dummy;
 
     /**
-     * @var bool A dummy boolean
+     * @var bool|null A dummy boolean
      *
      * @ODM\Field(type="bool", nullable=true)
      */
     public $dummyBoolean;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date", nullable=true)
      * @ApiProperty(iri="http://schema.org/DateTime")
@@ -107,28 +108,28 @@ class Dummy
     public $dummyDate;
 
     /**
-     * @var string A dummy float
+     * @var float|null A dummy float
      *
      * @ODM\Field(type="float", nullable=true)
      */
     public $dummyFloat;
 
     /**
-     * @var string A dummy price
+     * @var float|null A dummy price
      *
      * @ODM\Field(type="float", nullable=true)
      */
     public $dummyPrice;
 
     /**
-     * @var RelatedDummy A related dummy
+     * @var RelatedDummy|null A related dummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
     public $relatedDummy;
 
     /**
-     * @var ArrayCollection Several dummies
+     * @var Collection Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      * @ApiSubresource
@@ -150,27 +151,27 @@ class Dummy
     public $arrayData;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      */
     public $nameConverted;
 
     /**
-     * @var RelatedOwnedDummy
+     * @var RelatedOwnedDummy|null
      *
      * @ODM\ReferenceOne(targetDocument=RelatedOwnedDummy::class, cascade={"persist"}, mappedBy="owningDummy", nullable=true)
      */
     public $relatedOwnedDummy;
 
     /**
-     * @var RelatedOwningDummy
+     * @var RelatedOwningDummy|null
      *
      * @ODM\ReferenceOne(targetDocument=RelatedOwningDummy::class, cascade={"persist"}, inversedBy="ownedDummy", nullable=true, storeAs="id")
      */
     public $relatedOwningDummy;
 
-    public static function staticMethod()
+    public static function staticMethod(): void
     {
     }
 
@@ -312,18 +313,12 @@ class Dummy
         $this->relatedOwningDummy = $relatedOwningDummy;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
 
-    /**
-     * @param bool $dummyBoolean
-     */
-    public function setDummyBoolean($dummyBoolean)
+    public function setDummyBoolean(?bool $dummyBoolean)
     {
         $this->dummyBoolean = $dummyBoolean;
     }

@@ -36,7 +36,7 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($propertyName, string $class = null, string $format = null, array $context = [])
+    public function normalize($propertyName, string $class = null, string $format = null, array $context = []): string
     {
         return $this->convertInnerFields($propertyName, true, $class, $format, $context);
     }
@@ -44,7 +44,7 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($propertyName, string $class = null, string $format = null, array $context = [])
+    public function denormalize($propertyName, string $class = null, string $format = null, array $context = []): string
     {
         return $this->convertInnerFields($propertyName, false, $class, $format, $context);
     }

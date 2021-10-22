@@ -35,6 +35,9 @@ class AnnotationResourceMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider getCreateDependencies
+     *
+     * @param mixed $reader
+     * @param mixed $decorated
      */
     public function testCreate($reader, $decorated, string $expectedShortName, ?string $expectedDescription)
     {

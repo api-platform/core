@@ -48,6 +48,9 @@ class CachedIdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProvider
+     *
+     * @param mixed $item
+     * @param mixed $expected
      */
     public function testFirstPass($item, $expected)
     {
@@ -84,6 +87,9 @@ class CachedIdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProvider
+     *
+     * @param mixed $item
+     * @param mixed $expected
      */
     public function testSecondPass($item, $expected)
     {
@@ -149,6 +155,9 @@ class CachedIdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider identifiersRelatedProvider
+     *
+     * @param mixed $item
+     * @param mixed $expected
      */
     public function testFirstPassWithRelated($item, $expected)
     {
@@ -184,6 +193,9 @@ class CachedIdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider identifiersRelatedProvider
+     *
+     * @param mixed $item
+     * @param mixed $expected
      */
     public function testSecondPassWithRelated($item, $expected)
     {

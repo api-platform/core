@@ -99,6 +99,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * {@inheritdoc}
      *
      * @throws LogicException
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -228,6 +230,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * Gets the IRI of the given relation.
+     *
+     * @param mixed $rel
      *
      * @throws UnexpectedValueException
      */

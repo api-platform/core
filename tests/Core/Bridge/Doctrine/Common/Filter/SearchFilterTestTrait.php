@@ -482,6 +482,24 @@ trait SearchFilterTestTrait
                     'age' => 46,
                 ],
             ],
+            'related owned one-to-one association' => [
+                [
+                    'id' => null,
+                    'relatedOwnedDummy' => null,
+                ],
+                [
+                    'relatedOwnedDummy' => 1,
+                ],
+            ],
+            'related owning one-to-one association' => [
+                [
+                    'id' => null,
+                    'relatedOwningDummy' => null,
+                ],
+                [
+                    'relatedOwningDummy' => 1,
+                ],
+            ],
         ];
     }
 }

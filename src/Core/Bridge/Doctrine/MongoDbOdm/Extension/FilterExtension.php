@@ -37,7 +37,8 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
     private $resourceMetadataFactory;
 
     /**
-     * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
+     * @param ContainerInterface|FilterCollection $filterLocator           The new filter locator or the deprecated filter collection
+     * @param mixed                               $resourceMetadataFactory
      */
     public function __construct($resourceMetadataFactory, $filterLocator)
     {

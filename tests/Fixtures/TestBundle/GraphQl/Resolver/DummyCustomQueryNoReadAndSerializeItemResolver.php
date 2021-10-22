@@ -26,10 +26,8 @@ class DummyCustomQueryNoReadAndSerializeItemResolver implements QueryItemResolve
 {
     /**
      * @param DummyCustomQuery|null $item
-     *
-     * @return DummyCustomQuery
      */
-    public function __invoke($item, array $context)
+    public function __invoke($item, array $context): DummyCustomQuery
     {
         if (null !== $item) {
             throw new RuntimeException('Item should be null');
