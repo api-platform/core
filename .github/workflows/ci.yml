@@ -309,10 +309,10 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-            npx swagger-cli validate build/out/openapi/swagger_v2.json
-            npx swagger-cli validate build/out/openapi/swagger_v2.yaml
-            npx swagger-cli validate build/out/openapi/openapi_v3.json
-            npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -875,10 +875,10 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-          npx swagger-cli validate build/out/openapi/swagger_v2.json
-          npx swagger-cli validate build/out/openapi/swagger_v2.yaml
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -1089,7 +1089,7 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-            npx swagger-cli validate build/out/openapi/swagger_v2.json
-            npx swagger-cli validate build/out/openapi/swagger_v2.yaml
-            npx swagger-cli validate build/out/openapi/openapi_v3.json
-            npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
+            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
