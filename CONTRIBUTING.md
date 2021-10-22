@@ -139,6 +139,23 @@ To get more details about an error, replace `--format=progress` by `-vvv`. You m
 
 	docker run -p 27017:27017 mongo:latest
 
+Start by adding a fixture, usually using Doctrine entities in `tests/Fixtures/TestBundle/Entity`. Note that we often duplicate the fixture 
+in the `tests/Fixtures/TestBundle/Document` directory for MongoDB ODM, if your test doesn't need to be tested with MongoDB use the `@!mongodb` group on the Behat scenario.
+If you need a `Given` step, add it to the doctrine context in `tests/Core/Behat/DoctrineContext.php`, for example:
+
+```
+    /**
+     * @Given there is a payment
+     */
+    public function thereIsAPayment()
+    {
+        $this->manager->persist(new Payment('123.45'));
+        $this->manager->flush();
+    }
+```
+
+The last step is to add you feature inside `features/`. You can add your test in one of our existing features, or create your own.
+
 # License and Copyright Attribution
 
 When you open a Pull Request to the API Platform project, you agree to license your code under the [MIT license](LICENSE)
