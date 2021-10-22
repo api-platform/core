@@ -130,6 +130,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
      * Adds the where clause according to the chosen null management.
      *
      * @param string|DBALType $type
+     * @param mixed           $value
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, $value, string $nullManagement = null, $type = null)
     {

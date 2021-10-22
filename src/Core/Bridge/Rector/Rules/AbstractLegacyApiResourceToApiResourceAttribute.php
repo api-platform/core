@@ -118,6 +118,7 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
 
     /**
      * @param Class_ $node
+     * @param mixed  $items
      */
     protected function resolveOperations($items, Node $node): array
     {

@@ -706,6 +706,34 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     $filterFactory,
                     RelatedDummy::class,
                 ],
+                'related owned one-to-one association' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwnedDummy' => [
+                                    '$in' => [
+                                        1,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+                'related owning one-to-one association' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwningDummy' => [
+                                    '$in' => [
+                                        1,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
             ]
         );
     }

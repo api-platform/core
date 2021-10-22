@@ -69,6 +69,8 @@ final class IriConverter implements IriConverterInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return object
      */
     public function getItemFromIri(string $iri, array $context = [])
     {

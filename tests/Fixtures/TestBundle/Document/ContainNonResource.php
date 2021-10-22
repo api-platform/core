@@ -24,9 +24,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ODM\Document
  *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"={"contain_non_resource"},
+ *     attributes={
+ *         "filters"={"my_dummy.property"}
  *     },
+ *     normalizationContext={
+ *         "groups"={"contain_non_resource"}
+ *     }
  * )
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

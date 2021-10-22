@@ -159,4 +159,69 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['description']);
         $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['description']['type']);
     }
+
+    public function testBuildSchemaForAssociativeArray(): void
+    {
+        if (!method_exists(Type::class, 'getCollectionKeyTypes')) {
+            $this->markTestSkipped();
+        }
+
+        $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
+            Argument::which('isCollection', true),
+            Argument::that(function (Type $type) {
+                $keyTypes = $type->getCollectionKeyTypes();
+
+                return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_INT === $keyTypes[0]->getBuiltinType();
+            })
+        ), Argument::cetera())->willReturn([
+            'type' => 'array',
+        ]);
+        $typeFactoryProphecy->getType(Argument::allOf(
+            Argument::type(Type::class),
+            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
+            Argument::which('isCollection', true),
+            Argument::that(function (Type $type) {
+                $keyTypes = $type->getCollectionKeyTypes();
+
+                return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_STRING === $keyTypes[0]->getBuiltinType();
+            })
+        ), Argument::cetera())->willReturn([
+            'type' => 'object',
+            'additionalProperties' => Type::BUILTIN_TYPE_STRING,
+        ]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING))])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'bar', Argument::cetera())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_STRING))])->withReadable(true));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
+
+        $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
+        $resultSchema = $schemaFactory->buildSchema(NotAResource::class);
+
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $definitions = $resultSchema->getDefinitions();
+
+        $this->assertSame((new \ReflectionClass(NotAResource::class))->getShortName(), $rootDefinitionKey);
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
+        $this->assertArrayHasKey('foo', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['foo']);
+        $this->assertArrayNotHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['foo']);
+        $this->assertSame('array', $definitions[$rootDefinitionKey]['properties']['foo']['type']);
+        $this->assertArrayHasKey('bar', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['bar']);
+        $this->assertArrayHasKey('additionalProperties', $definitions[$rootDefinitionKey]['properties']['bar']);
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['bar']['type']);
+        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['bar']['additionalProperties']);
+    }
 }

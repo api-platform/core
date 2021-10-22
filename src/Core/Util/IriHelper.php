@@ -56,6 +56,7 @@ final class IriHelper
      * Gets a collection IRI for the given parameters.
      *
      * @param float $page
+     * @param mixed $urlGenerationStrategy
      */
     public static function createIri(array $parts, array $parameters, string $pageParameterName = null, float $page = null, $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH): string
     {

@@ -40,35 +40,35 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class DummyDate
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var \DateTime The dummy date
+     * @var \DateTime|null The dummy date
      *
      * @ODM\Field(type="date")
      */
     public $dummyDate;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
     public $dateIncludeNullAfter;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
     public $dateIncludeNullBefore;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
@@ -76,10 +76,8 @@ class DummyDate
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

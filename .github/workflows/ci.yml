@@ -17,10 +17,8 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8'
+          - '8.0'
       fail-fast: false
-    env:
-      PHP_CS_FIXER_FUTURE_MODE: '1'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -42,7 +40,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8'
+          - '8.0'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37

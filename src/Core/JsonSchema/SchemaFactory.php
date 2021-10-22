@@ -251,8 +251,10 @@ final class SchemaFactory implements SchemaFactoryInterface
         $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
         if (null !== $type) {
             if ($isCollection = $type->isCollection()) {
+                $keyType = method_exists(Type::class, 'getCollectionKeyTypes') ? ($type->getCollectionKeyTypes()[0] ?? null) : $type->getCollectionKeyType();
                 $valueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType();
             } else {
+                $keyType = null;
                 $valueType = $type;
             }
 
@@ -264,7 +266,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $className = $valueType->getClassName();
             }
 
-            $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
+            $valueSchema = $this->typeFactory->getType(new Type($builtinType, $type->isNullable(), $className, $isCollection, $keyType, $valueType), $format, $propertyMetadata->isReadableLink(), $serializerContext, $schema);
         }
 
         if (\array_key_exists('type', $propertySchema) && \array_key_exists('$ref', $valueSchema)) {

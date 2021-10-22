@@ -42,7 +42,7 @@ class Payment
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $amount;
 
@@ -61,7 +61,7 @@ class Payment
         return $this->id;
     }
 
-    public function getAmount(): string
+    public function getAmount(): ?string
     {
         return $this->amount;
     }

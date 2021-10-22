@@ -28,11 +28,15 @@ interface ProcessorInterface
 
     /**
      * Whether this state handler supports the class/identifier tuple.
+     *
+     * @param mixed $data
      */
     public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool;
 
     /**
      * Handle the state.
+     *
+     * @param mixed $data
      */
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = []);
 }

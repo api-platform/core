@@ -692,7 +692,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = [])
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && $data instanceof Documentation;
     }

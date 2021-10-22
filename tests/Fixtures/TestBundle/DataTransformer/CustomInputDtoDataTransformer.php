@@ -23,6 +23,8 @@ final class CustomInputDtoDataTransformer implements DataTransformerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @return object
      */
     public function transform($object, string $to, array $context = [])
     {

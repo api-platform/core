@@ -29,7 +29,7 @@ use Doctrine\ORM\Mapping as ORM;
 class SlugParentDummy
 {
     /**
-     * @var int The database identifier
+     * @var int|null The database identifier
      *
      * @ApiProperty(identifier=false)
      *
@@ -40,7 +40,7 @@ class SlugParentDummy
     private $id;
 
     /**
-     * @var string The slug used a API identifier
+     * @var string|null The slug used a API identifier
      *
      * @ApiProperty(identifier=true)
      *
@@ -60,26 +60,17 @@ class SlugParentDummy
         $this->childDummies = new ArrayCollection();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    /**
-     * @param string $slug
-     */
-    public function setSlug($slug)
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }

@@ -107,6 +107,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     /**
      * @var ApiResource|Operation
+     *
+     * @param mixed $operation
      */
     private function configureUriVariables($operation)
     {
@@ -159,6 +161,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     /**
      * @var ApiResource|Operation
+     *
+     * @param mixed $operation
      */
     private function normalizeUriVariables($operation)
     {
@@ -198,6 +202,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     /**
      * @var ApiResource|Operation
+     *
+     * @param mixed $operation
      *
      * @return ApiResource|Operation
      */
@@ -240,6 +246,8 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
      * Merges UriVariables with the PHP attribute UriVariable found on properties.
      *
      * @var ApiResource|Operation
+     *
+     * @param mixed $operation
      *
      * @return ApiResource|Operation
      */

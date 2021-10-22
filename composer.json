@@ -73,6 +73,7 @@
         "symfony/framework-bundle": "^4.4 || ^5.1",
         "symfony/http-client": "^4.4 || ^5.1",
         "symfony/maker-bundle": "^1.24",
+        "symfony/intl": "^4.4 || ^5.3",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.4 || ^5.1",
         "symfony/phpunit-bridge": "^5.1.7",

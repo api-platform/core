@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -54,7 +55,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->router->getContext();
     }
@@ -62,7 +63,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         return $this->router->getRouteCollection();
     }
@@ -70,7 +71,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function match($pathInfo)
+    public function match($pathInfo): array
     {
         $baseContext = $this->router->getContext();
         $baseUrl = $baseContext->getBaseUrl();
@@ -101,7 +102,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($name, $parameters = [], $referenceType = null)
+    public function generate($name, $parameters = [], $referenceType = null): string
     {
         return $this->router->generate($name, $parameters, self::CONST_MAP[$referenceType ?? $this->urlGenerationStrategy]);
     }

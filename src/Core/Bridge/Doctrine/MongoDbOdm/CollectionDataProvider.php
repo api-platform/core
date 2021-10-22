@@ -38,6 +38,7 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
 
     /**
      * @param AggregationCollectionExtensionInterface[] $collectionExtensions
+     * @param mixed                                     $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
@@ -56,7 +57,7 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
      *
      * @throws RuntimeException
      */
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
     {
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);

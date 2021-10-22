@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyPropertyWithDefaultValue
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -50,16 +50,13 @@ class DummyPropertyWithDefaultValue
     public $foo = 'foo';
 
     /**
-     * @var string A dummy with a Doctrine default options
+     * @var string|null A dummy with a Doctrine default options
      *
      * @ORM\Column(options={"default"="default value"})
      */
     public $dummyDefaultOption;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

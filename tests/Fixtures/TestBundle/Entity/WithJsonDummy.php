@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class WithJsonDummy
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -38,7 +38,7 @@ class WithJsonDummy
      */
     public $json;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

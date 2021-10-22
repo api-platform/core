@@ -44,14 +44,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 class LegacySecuredDummy
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var string The title
+     * @var string|null The title
      *
      * @ODM\Field
      * @Assert\NotBlank
@@ -66,19 +66,19 @@ class LegacySecuredDummy
     private $description = '';
 
     /**
-     * @var string The owner
+     * @var string|null The owner
      *
      * @ODM\Field
      * @Assert\NotBlank
      */
     private $owner;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -98,7 +98,7 @@ class LegacySecuredDummy
         $this->description = $description;
     }
 
-    public function getOwner(): string
+    public function getOwner(): ?string
     {
         return $this->owner;
     }

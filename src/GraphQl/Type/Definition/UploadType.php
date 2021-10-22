@@ -24,6 +24,8 @@ if (\PHP_VERSION_ID >= 70200) {
     {
         /**
          * {@inheritdoc}
+         *
+         * @return mixed
          */
         public function parseLiteral(/*Node */ $valueNode, array $variables = null)
         {
@@ -67,6 +69,8 @@ final class UploadType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function serialize($value)
     {

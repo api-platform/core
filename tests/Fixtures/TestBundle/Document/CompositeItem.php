@@ -44,20 +44,16 @@ class CompositeItem
 
     /**
      * Gets id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Gets field1.
-     *
-     * @return string|null
      */
-    public function getField1()
+    public function getField1(): ?string
     {
         return $this->field1;
     }
@@ -74,10 +70,8 @@ class CompositeItem
 
     /**
      * Gets compositeValues.
-     *
-     * @return CompositeRelation
      */
-    public function getCompositeValues()
+    public function getCompositeValues(): ?CompositeRelation
     {
         return $this->compositeValues;
     }

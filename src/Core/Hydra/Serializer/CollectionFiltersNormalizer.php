@@ -39,7 +39,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     private $resourceClassResolver;
 
     /**
-     * @param ContainerInterface|FilterCollection $filterLocator The new filter locator or the deprecated filter collection
+     * @param ContainerInterface|FilterCollection $filterLocator           The new filter locator or the deprecated filter collection
+     * @param mixed                               $resourceMetadataFactory
      */
     public function __construct(NormalizerInterface $collectionNormalizer, $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, $filterLocator)
     {
@@ -57,7 +58,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $this->collectionNormalizer->supportsNormalization($data, $format);
     }
