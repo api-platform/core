@@ -40,7 +40,7 @@ final class SecurityPostValidationStage implements SecurityPostValidationStageIn
     public function __invoke(string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
         $isGranted = $operation->getSecurityPostValidation();
 
         if (null !== $isGranted && null === $this->resourceAccessChecker) {

@@ -38,7 +38,7 @@ final class ValidateStage implements ValidateStageInterface
     public function __invoke($object, string $resourceClass, string $operationName, array $context): void
     {
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
 
         if (!($operation->canValidate() ?? true)) {
             return;

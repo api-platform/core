@@ -33,10 +33,17 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(?string $operationName = null, bool $forceCollection = false): Operation
+    /**
+     * @return Operation|GraphQlOperation
+     */
+    public function getOperation(?string $operationName = null, bool $forceCollection = false)
     {
         if (isset($this->operationCache[$operationName ?? ''])) {
             return $this->operationCache[$operationName ?? ''];
+        }
+
+        if (isset($this->operationCache['graphql_'.($operationName ?? '')])) {
+            return $this->operationCache['graphql_'.($operationName ?? '')];
         }
 
         $it = $this->getIterator();
@@ -56,25 +63,6 @@ final class ResourceMetadataCollection extends \ArrayObject
                     return $this->operationCache[$operationName] = $operation;
                 }
             }
-
-            $it->next();
-        }
-
-        $this->handleNotFound($operationName, $metadata);
-    }
-
-    public function getGraphQlOperation(string $operationName): GraphQlOperation
-    {
-        if (isset($this->operationCache['graphql_'.$operationName])) {
-            return $this->operationCache['graphql_'.$operationName];
-        }
-
-        $it = $this->getIterator();
-        $metadata = null;
-
-        while ($it->valid()) {
-            /** @var ApiResource */
-            $metadata = $it->current();
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
                 if ($name === $operationName) {

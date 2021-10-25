@@ -80,7 +80,7 @@ final class TypeBuilder implements TypeBuilderInterface
         if ('item_query' === $operationName || 'collection_query' === $operationName) {
             // Test if the collection/item operation exists and it has different groups
             try {
-                if ($resourceMetadataCollection->getGraphQlOperation($operation->isCollection() ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
+                if ($resourceMetadataCollection->getOperation($operation->isCollection() ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
                     $shortName .= $operation->isCollection() ? 'Collection' : 'Item';
                 }
             } catch (OperationNotFoundException $e) {
@@ -114,13 +114,13 @@ final class TypeBuilder implements TypeBuilderInterface
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
                     try {
-                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getGraphQlOperation($operationName)->getNormalizationContext() ?? []) : [];
+                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
                     } catch (OperationNotFoundException $e) {
                         $queryNormalizationContext = [];
                     }
 
                     try {
-                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getGraphQlOperation($operationName)->getNormalizationContext() ?? []) : [];
+                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
                     } catch (OperationNotFoundException $e) {
                         $mutationNormalizationContext = [];
                     }
@@ -135,7 +135,7 @@ final class TypeBuilder implements TypeBuilderInterface
                     }
 
                     try {
-                        $wrappedOperation = $resourceMetadataCollection->getGraphQlOperation($wrappedOperationName);
+                        $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
                     } catch (OperationNotFoundException $e) {
                         $wrappedOperation = (new Query())
                             ->withResource($resourceMetadataCollection[0])

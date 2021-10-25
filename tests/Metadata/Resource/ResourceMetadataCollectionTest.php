@@ -34,7 +34,7 @@ final class ResourceMetadataCollectionTest extends TestCase
         $resourceMetadataCollection = new ResourceMetadataCollection('class', [$resource]);
 
         $this->assertEquals($operation, $resourceMetadataCollection->getOperation('name'));
-        $this->assertEquals($query, $resourceMetadataCollection->getGraphQlOperation('query'));
+        $this->assertEquals($query, $resourceMetadataCollection->getOperation('query'));
     }
 
     public function testOperationNotFound()

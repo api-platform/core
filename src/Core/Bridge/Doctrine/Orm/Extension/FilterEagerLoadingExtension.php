@@ -65,7 +65,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
             try {
-                $operation = isset($context['graphql_operation_name']) ? $resourceMetadataCollection->getGraphQlOperation($operationName) : $resourceMetadataCollection->getOperation($operationName);
+                $operation = $resourceMetadataCollection->getOperation($operationName);
                 $forceEager = $operation->getForceEager() ?? $this->forceEager;
             } catch (OperationNotFoundException $e) {
                 // In some cases the operation may not exist

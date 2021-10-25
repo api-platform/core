@@ -56,18 +56,12 @@ final class SerializeStage implements SerializeStageInterface
         $isSubscription = $context['is_subscription'];
 
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $operation = null;
         try {
-            $shortName = $resourceMetadataCollection->getGraphQlOperation($operationName)->getShortName();
+            $operation = $resourceMetadataCollection->getOperation($operationName);
+            $shortName = $operation->getShortName();
         } catch (OperationNotFoundException $e) {
             $shortName = $resourceMetadataCollection->getOperation()->getShortName();
-        }
-
-        $operation = null;
-
-        try {
-            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
-        } catch (OperationNotFoundException $e) {
-            // In some cases the operation may not exist
         }
 
         if ($operation && !($operation->canSerialize() ?? true)) {

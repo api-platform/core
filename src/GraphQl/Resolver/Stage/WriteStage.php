@@ -42,7 +42,7 @@ final class WriteStage implements WriteStageInterface
     public function __invoke($data, string $resourceClass, string $operationName, array $context)
     {
         $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
         if (null === $data || !($operation->canWrite() ?? true)) {
             return $data;
         }

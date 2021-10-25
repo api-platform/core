@@ -242,7 +242,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             }
         } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
             try {
-                $operation = isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+                $operation = $resourceMetadata->getOperation($operationName);
                 $itemsPerPage = $operation->getPaginationItemsPerPage();
                 if ($operation->getPaginationClientItemsPerPage()) {
                     $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->maximumItemPerPage;
@@ -373,7 +373,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 $fetchJoinCollection = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', null, true);
             } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
                 try {
-                    $operation = isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+                    $operation = $resourceMetadata->getOperation($operationName);
                     $fetchJoinCollection = $operation->getPaginationFetchJoinCollection();
                 } catch (OperationNotFoundException $e) {
                     // In some cases the operation may not exist
@@ -427,7 +427,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 $useOutputWalkers = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_use_output_walkers', null, true);
             } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
                 try {
-                    $operation = isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName);
+                    $operation = $resourceMetadata->getOperation($operationName);
                     $useOutputWalkers = $operation->getPaginationUseOutputWalkers();
                 } catch (OperationNotFoundException $e) {
                     // In some cases the operation may not exist

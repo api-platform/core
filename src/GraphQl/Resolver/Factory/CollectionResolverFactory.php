@@ -80,7 +80,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
             try {
-                $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+                $operation = $resourceMetadataCollection->getOperation($operationName);
                 $queryResolverId = $operation->getResolver();
             } catch (OperationNotFoundException $e) {
                 $queryResolverId = null;

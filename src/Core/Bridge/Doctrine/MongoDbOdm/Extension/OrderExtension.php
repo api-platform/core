@@ -72,7 +72,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                 } else {
                     $metadata = $this->resourceMetadataFactory->create($resourceClass);
                     try {
-                        $defaultOrder = isset($context['graphql_operation_name']) ? $metadata->getGraphQlOperation($operationName)->getOrder() : $metadata->getOperation($operationName)->getOrder();
+                        $defaultOrder = $metadata->getOperation($operationName)->getOrder();
                     } catch (OperationNotFoundException $e) {
                         $defaultOrder = $metadata->getOperation(null, true)->getOrder();
                     }

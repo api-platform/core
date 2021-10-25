@@ -297,7 +297,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
             if (!empty($resourceClass)) {
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
                 try {
-                    $operation = $resourceMetadataCollection->getGraphQlOperation($rootOperation->getName());
+                    $operation = $resourceMetadataCollection->getOperation($rootOperation->getName());
                 } catch (OperationNotFoundException $e) {
                 }
             }

@@ -155,7 +155,7 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         try {
-            $operation = $resourceMetadataCollection->getGraphQlOperation($rootOperation->getName());
+            $operation = $resourceMetadataCollection->getOperation($rootOperation->getName());
         } catch (OperationNotFoundException $e) {
             $operation = (new Query())
                 ->withResource($resourceMetadataCollection[0])

@@ -70,7 +70,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
             $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
         } else {
             try {
-                $operation = $context['operation'] ?? (isset($context['graphql_operation_name']) ? $resourceMetadata->getGraphQlOperation($operationName) : $resourceMetadata->getOperation($operationName));
+                $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
                 $resourceFilters = $operation->getFilters();
             } catch (OperationNotFoundException $e) {
                 // In some cases the operation may not exist

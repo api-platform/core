@@ -111,6 +111,7 @@ class SerializerContextBuilderTest extends TestCase
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
@@ -130,6 +131,7 @@ class SerializerContextBuilderTest extends TestCase
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
@@ -150,6 +152,7 @@ class SerializerContextBuilderTest extends TestCase
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
@@ -167,6 +170,7 @@ class SerializerContextBuilderTest extends TestCase
                 false,
                 [
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'attributes' => [
                         'related' => ['id' => 9],
@@ -183,6 +187,7 @@ class SerializerContextBuilderTest extends TestCase
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
@@ -214,6 +219,7 @@ class SerializerContextBuilderTest extends TestCase
                 [
                     'groups' => ['normalization_group'],
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'no_resolver_data' => true,
                     'input' => ['class' => 'inputClass'],
@@ -250,6 +256,7 @@ class SerializerContextBuilderTest extends TestCase
                 [
                     'groups' => ['denormalization_group'],
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
@@ -260,6 +267,7 @@ class SerializerContextBuilderTest extends TestCase
                 $operationName = 'item_query',
                 [
                     'resource_class' => $resourceClass,
+                    'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
                 ],
             ],

@@ -74,7 +74,7 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
             $subscriptionId = $this->subscriptionManager->retrieveSubscriptionId($resolverContext, $result);
 
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $resourceMetadataCollection->getGraphQlOperation($operationName);
+            $operation = $resourceMetadataCollection->getOperation($operationName);
 
             if ($subscriptionId && ($mercure = $operation->getMercure())) {
                 if (!$this->mercureSubscriptionIriGenerator) {
