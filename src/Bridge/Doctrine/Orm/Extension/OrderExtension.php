@@ -46,6 +46,12 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
         }
 
+        // Do not apply order if already defined on queryBuilder
+        $orderByDqlPart = $queryBuilder->getDQLPart('orderBy');
+        if (\is_array($orderByDqlPart) && \count($orderByDqlPart) > 0) {
+            return;
+        }
+
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);

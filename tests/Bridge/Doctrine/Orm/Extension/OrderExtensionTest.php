@@ -22,6 +22,7 @@ use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -36,6 +37,7 @@ class OrderExtensionTest extends TestCase
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->addOrderBy('o.name', 'asc')->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -56,6 +58,7 @@ class OrderExtensionTest extends TestCase
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->addOrderBy('o.name', 'asc')->shouldNotBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -77,6 +80,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->addOrderBy('o.foo', 'DESC')->shouldBeCalled();
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
@@ -100,6 +104,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->addOrderBy('o.foo', 'ASC')->shouldBeCalled();
         $queryBuilderProphecy->addOrderBy('o.bar', 'DESC')->shouldBeCalled();
 
@@ -124,6 +129,7 @@ class OrderExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->getDQLPart('join')->willReturn(['o' => []])->shouldBeCalled();
         $queryBuilderProphecy->innerJoin('o.author', 'author_a1', null, null)->shouldBeCalled();
         $queryBuilderProphecy->addOrderBy('author_a1.name', 'ASC')->shouldBeCalled();
@@ -148,6 +154,7 @@ class OrderExtensionTest extends TestCase
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([]);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
         $queryBuilderProphecy->addOrderBy('o.embeddedDummy.dummyName', 'DESC')->shouldBeCalled();
 
@@ -165,5 +172,18 @@ class OrderExtensionTest extends TestCase
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal());
         $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), EmbeddedDummy::class);
+    }
+
+    public function testApplyToCollectionWithExistingOrderByDql()
+    {
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+
+        $queryBuilderProphecy->getDQLPart('orderBy')->shouldBeCalled()->willReturn([new OrderBy('o.name')]);
+        $queryBuilderProphecy->getEntityManager()->shouldNotBeCalled();
+        $queryBuilderProphecy->getRootAliases()->shouldNotBeCalled();
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+        $orderExtensionTest = new OrderExtension();
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class);
     }
 }
