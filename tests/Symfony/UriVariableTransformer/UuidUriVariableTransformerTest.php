@@ -21,7 +21,7 @@ use Symfony\Component\Uid\Uuid;
 
 /**
  * @author Piotr Synowiec <psynowiec@gmail.com>
- * @group legacy
+ * @requires PHP >= 7.4
  */
 class UuidUriVariableTransformerTest extends TestCase
 {
