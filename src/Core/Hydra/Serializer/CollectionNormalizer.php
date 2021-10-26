@@ -75,7 +75,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      *
      * @param iterable $object
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $this->normalizeRawCollection($object, $format, $context);

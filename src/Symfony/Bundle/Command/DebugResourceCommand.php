@@ -50,7 +50,7 @@ final class DebugResourceCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $resourceClass = $input->getArgument('class');
 

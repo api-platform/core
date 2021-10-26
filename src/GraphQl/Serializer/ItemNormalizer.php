@@ -67,6 +67,8 @@ final class ItemNormalizer extends BaseItemNormalizer
      * {@inheritdoc}
      *
      * @throws UnexpectedValueException
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
     public function normalize($object, $format = null, array $context = [])
     {
@@ -110,6 +112,8 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|bool
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {

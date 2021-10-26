@@ -74,7 +74,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {

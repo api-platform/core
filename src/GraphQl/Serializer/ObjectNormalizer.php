@@ -68,7 +68,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
      *
      * @throws UnexpectedValueException
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];

@@ -86,7 +86,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         $classes = [];
         $entrypointProperties = [];
