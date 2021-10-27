@@ -25,7 +25,12 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource]
 #[Get]
 #[Post]
-#[ApiResource('/employees/{employeeId}/company')]
+#[ApiResource(
+    uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
+    uriVariables: [
+        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
+    ],
+)]
 #[Get]
 class Company
 {
@@ -45,9 +50,9 @@ class Company
      */
     public string $name;
 
-    // TODO 3.0: Set the uri variable directly in the api resource and remove this property
-    #[Link(parameterName: 'employeeId', fromProperty: 'company', toProperty: null, fromClass: Employee::class)]
-    public $employees; // only used to set metadata
+    /** @var Employee[] */
+    #[Link(toProperty: 'company')]
+    public $employees = []; // only used to set metadata
 
     public function getId()
     {

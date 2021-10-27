@@ -11,18 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Util\ArrayTrait;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -39,15 +41,17 @@ final class ReadStage implements ReadStageInterface
 
     private $resourceMetadataCollectionFactory;
     private $iriConverter;
-    private $provider;
+    private $collectionDataProvider;
+    private $subresourceDataProvider;
     private $serializerContextBuilder;
     private $nestingSeparator;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, IriConverterInterface $iriConverter, ProviderInterface $provider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->iriConverter = $iriConverter;
-        $this->provider = $provider;
+        $this->collectionDataProvider = $collectionDataProvider;
+        $this->subresourceDataProvider = $subresourceDataProvider;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->nestingSeparator = $nestingSeparator;
     }
@@ -92,18 +96,23 @@ final class ReadStage implements ReadStageInterface
             return [];
         }
 
-        $identifiers = [];
         $normalizationContext['filters'] = $this->getNormalizedFilters($args);
 
         $source = $context['source'];
         /** @var ResolveInfo $info */
         $info = $context['info'];
-        if (isset($source[$info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
-            $identifiers = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
-            $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
+        if (isset($source[$rootProperty = $info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
+            $rootResolvedFields = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
+            $rootResolvedClass = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
+            $subresourceCollection = $this->getSubresource($rootResolvedClass, $rootResolvedFields, $rootProperty, $resourceClass, $normalizationContext, $operationName);
+            if (!is_iterable($subresourceCollection)) {
+                throw new \UnexpectedValueException('Expected subresource collection to be iterable.');
+            }
+
+            return $subresourceCollection;
         }
 
-        return $this->provider->provide($resourceClass, $identifiers, $operationName, $normalizationContext);
+        return $this->collectionDataProvider->getCollection($resourceClass, $operationName, $normalizationContext);
     }
 
     /**
@@ -163,5 +172,23 @@ final class ReadStage implements ReadStageInterface
         }
 
         return $filters;
+    }
+
+    /**
+     * @return iterable|object|null
+     */
+    private function getSubresource(string $rootResolvedClass, array $rootResolvedFields, string $rootProperty, string $subresourceClass, array $normalizationContext, string $operationName)
+    {
+        $resolvedIdentifiers = [];
+        $rootIdentifiers = array_keys($rootResolvedFields);
+        foreach ($rootIdentifiers as $rootIdentifier) {
+            $resolvedIdentifiers[$rootIdentifier] = [$rootResolvedClass, $rootIdentifier];
+        }
+
+        return $this->subresourceDataProvider->getSubresource($subresourceClass, $rootResolvedFields, $normalizationContext + [
+            'property' => $rootProperty,
+            'identifiers' => $resolvedIdentifiers,
+            'collection' => true,
+        ], $operationName);
     }
 }

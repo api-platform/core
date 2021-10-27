@@ -16,7 +16,6 @@ namespace ApiPlatform\Tests\Metadata\Resource\Factory;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -34,7 +33,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Component\PropertyInfo\Type;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -103,7 +101,7 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    uriVariables: ['dummyId' => ['class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['class' => AttributeResource::class, 'identifiers' => ['id']]],
+                    uriVariables: ['dummyId' => ['from_class' => Dummy::class, 'identifiers' => ['id']], 'id' => ['from_class' => AttributeResource::class, 'identifiers' => ['id']]],
                 ),
             ]),
         );
@@ -165,63 +163,6 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                     uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                     operations: [],
-                ),
-            ]),
-            $uriTemplateResourceMetadataCollectionFactory->create(AttributeResource::class)
-        );
-    }
-
-    public function testCreateWithUriVariableAttribute()
-    {
-        $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
-        $pathSegmentNameGeneratorProphecy->getSegmentName('AttributeResource')->willReturn('attribute_resources');
-        $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    class: AttributeResource::class,
-                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
-                    uriVariables: ['identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'])],
-                    operations: [
-                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}_get' => new Get(
-                            class: AttributeResource::class,
-                            uriVariables: ['identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'])],
-                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
-                            shortName: 'AttributeResource'
-                        ),
-                    ]
-                ),
-            ]),
-        );
-
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(AttributeResource::class)->willReturn(new PropertyNameCollection(['identifier', 'dummy']));
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']));
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'identifier')->willReturn(new ApiProperty())->shouldNotBeCalled();
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withBuiltinTypes([new Type('object', true, Dummy::class)]));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn(new ApiProperty());
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
-        $uriTemplateResourceMetadataCollectionFactory = new UriTemplateResourceMetadataCollectionFactory($linkFactory, $pathSegmentNameGeneratorProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
-
-        $this->assertEquals(
-            new ResourceMetadataCollection(AttributeResource::class, [
-                new ApiResource(
-                    shortName: 'AttributeResource',
-                    class: AttributeResource::class,
-                    uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
-                    uriVariables: ['identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'], parameterName: 'identifier'), 'dummyId' => new Link(parameterName: 'dummyId', fromClass: Dummy::class, identifiers: ['id'], toProperty: 'dummy')],
-                    operations: [
-                        '_api_/dummy/{dummyId}/attribute_resources/{identifier}_get' => new Get(
-                            class: AttributeResource::class,
-                            uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
-                            shortName: 'AttributeResource',
-                            uriVariables: ['dummyId' => new Link(parameterName: 'dummyId', fromClass: Dummy::class, identifiers: ['id'], toProperty: 'dummy'), 'identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'], parameterName: 'identifier')],
-                            extraProperties: ['user_defined_uri_template' => true]
-                        ),
-                    ]
                 ),
             ]),
             $uriTemplateResourceMetadataCollectionFactory->create(AttributeResource::class)

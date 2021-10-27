@@ -124,9 +124,6 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             return $operation;
         }
 
-        $attributeUriVariables = $this->transformLinksToUriVariables($this->linkFactory->createLinksFromAttributes($operation));
-        $operation = $operation->withUriVariables($this->mergeUriVariables($operation->getUriVariables(), $attributeUriVariables));
-
         foreach ($uriVariables = $operation->getUriVariables() as $parameterName => $link) {
             $uriVariables[$parameterName] = $this->linkFactory->completeLink($link);
         }
@@ -194,26 +191,6 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
 
         return $operation->withUriVariables($normalizedUriVariables);
-    }
-
-    /**
-     * @param array<string, Link> $uriVariables
-     * @param array<string, Link> $toMergeUriVariables
-     *
-     * @return array<string, Link>
-     */
-    private function mergeUriVariables(array $uriVariables, array $toMergeUriVariables): array
-    {
-        foreach ($toMergeUriVariables as $parameterName => $link) {
-            if (isset($uriVariables[$parameterName])) {
-                $uriVariables[$parameterName] = $uriVariables[$parameterName]->withLink($link);
-
-                continue;
-            }
-            $uriVariables[$parameterName] = $link;
-        }
-
-        return $uriVariables;
     }
 
     /**
