@@ -103,15 +103,15 @@ final class LinkFactoryTest extends TestCase
     {
         yield 'no builtin types' => [
             [],
-            [(new Link())->withFromClass(AttributeResource::class)->withToProperty('dummy')->withParameterName('dummyId')],
+            [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(AttributeResource::class)->withParameterName('dummyId')],
         ];
         yield 'with builtin types' => [
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
-            [(new Link())->withFromClass(Dummy::class)->withToProperty('dummy')->withParameterName('dummyId')],
+            [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(Dummy::class)->withParameterName('dummyId')],
         ];
         yield 'with collection builtin types' => [
             [new Type(Type::BUILTIN_TYPE_ARRAY, false, Dummy::class, true, null, [new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])],
-            [(new Link())->withFromClass(RelatedDummy::class)->withToProperty('dummy')->withParameterName('dummyId')],
+            [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(RelatedDummy::class)->withParameterName('dummyId')],
         ];
     }
 

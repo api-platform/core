@@ -28,19 +28,35 @@ trait LinksHandlerTrait
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         $alias = $queryBuilder->getRootAliases()[0];
 
+        if (!$identifiers) {
+            return;
+        }
+
         $links = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
 
-        // if ($linkClass = $context['linkClass'] ?? false) {
-        //     foreach ($links as $link) {
-        //         if ($linkClass === $link->getTargetClass()) {
-        //             foreach ($identifiers as $identifier => $value) {
-        //                 $this->applyLink($queryBuilder, $queryNameGenerator, $doctrineClassMetadata, $alias, $link, $identifier, $value);
-        //             }
-        //
-        //             return;
-        //         }
-        //     }
-        // }
+        if ($linkClass = $context['linkClass'] ?? false) {
+            $newLinks = [];
+
+            foreach ($links as $link) {
+                if ($linkClass === $link->getFromClass()) {
+                    $newLinks[] = $link;
+                }
+            }
+
+            $operation = $this->resourceMetadataCollectionFactory->create($linkClass)->getOperation($operationName);
+            $links = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
+            foreach ($links as $link) {
+                if ($resourceClass === $link->getToClass()) {
+                    $newLinks[] = $link;
+                }
+            }
+
+            if (!$newLinks) {
+                throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
+            }
+
+            $links = $newLinks;
+        }
 
         if (!$links) {
             return;
@@ -85,7 +101,7 @@ trait LinksHandlerTrait
             $identifierProperty = $identifierProperties[0];
             $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
 
-            if ($link->getFromProperty()) {
+            if ($link->getFromProperty() && !$link->getToProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
                 $joinAlias = $queryNameGenerator->generateJoinAlias('m');
                 $assocationMapping = $doctrineClassMetadata->getAssociationMappings()[$link->getFromProperty()];

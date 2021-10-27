@@ -43,8 +43,6 @@ final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCol
         foreach ($resourceMetadataCollection as $i => $resource) {
             $graphQlOperations = [];
             foreach ($resource->getGraphQlOperations() ?? [] as $graphQlOperation) {
-                // @TODO See if it's really useful.
-                //$identifierLinks = $this->linkFactory->createLinksFromIdentifiers($graphQlOperation);
                 $relationLinks = $this->linkFactory->createLinksFromRelations($graphQlOperation);
                 $attributeLinks = $this->linkFactory->createLinksFromAttributes($graphQlOperation);
                 $links = [];

@@ -85,9 +85,9 @@ final class LinkFactory implements LinkFactoryInterface
                 continue;
             }
 
-            $identifiers = $this->getIdentifiersFromResourceClass($relationClass);
+            $identifiers = $this->getIdentifiersFromResourceClass($resourceClass);
 
-            $links[] = (new Link())->withToProperty($property)->withFromClass($relationClass)->withIdentifiers($identifiers);
+            $links[] = (new Link())->withFromProperty($property)->withFromClass($resourceClass)->withToClass($relationClass)->withIdentifiers($identifiers);
         }
 
         return $links;
@@ -112,10 +112,10 @@ final class LinkFactory implements LinkFactoryInterface
                     $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
                     $attributeLink = $attributeLink->newInstance()
-                        ->withToProperty($property);
+                        ->withFromProperty($property);
 
                     if (!$attributeLink->getFromClass()) {
-                        $attributeLink = $attributeLink->withFromClass($this->getPropertyClassType($metadata->getBuiltinTypes()) ?? $resourceClass);
+                        $attributeLink = $attributeLink->withFromClass($resourceClass)->withToClass($this->getPropertyClassType($metadata->getBuiltinTypes()) ?? $resourceClass);
                     }
 
                     $links[] = $attributeLink;

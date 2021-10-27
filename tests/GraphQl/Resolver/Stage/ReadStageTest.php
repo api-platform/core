@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
@@ -25,6 +23,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -43,8 +42,7 @@ class ReadStageTest extends TestCase
     private $readStage;
     private $resourceMetadataCollectionFactoryProphecy;
     private $iriConverterProphecy;
-    private $collectionDataProviderProphecy;
-    private $subresourceDataProviderProphecy;
+    private $providerProphecy;
     private $serializerContextBuilderProphecy;
 
     /**
@@ -54,15 +52,13 @@ class ReadStageTest extends TestCase
     {
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $this->collectionDataProviderProphecy = $this->prophesize(ContextAwareCollectionDataProviderInterface::class);
-        $this->subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
+        $this->providerProphecy = $this->prophesize(ProviderInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $this->readStage = new ReadStage(
             $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->iriConverterProphecy->reveal(),
-            $this->collectionDataProviderProphecy->reveal(),
-            $this->subresourceDataProviderProphecy->reveal(),
+            $this->providerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
             '_'
         );
@@ -215,9 +211,8 @@ class ReadStageTest extends TestCase
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->subresourceDataProviderProphecy->getSubresource($resourceClass, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'property' => $fieldName, 'identifiers' => ['id' => [$resourceClass, 'id']], 'collection' => true], $operationName)->willReturn(['subresource']);
-
-        $this->collectionDataProviderProphecy->getCollection($resourceClass, $operationName, $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
+        $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
+        $this->providerProphecy->provide($resourceClass, ['id' => 3], $operationName, $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['subresource']);
 
         $result = ($this->readStage)($resourceClass, $rootClass, $operationName, $context);
 
@@ -251,7 +246,7 @@ class ReadStageTest extends TestCase
 
         ($this->readStage)($resourceClass, $resourceClass, $operationName, $context);
 
-        $this->collectionDataProviderProphecy->getCollection($resourceClass, $operationName, Argument::that(function ($args) {
+        $this->providerProphecy->provide($resourceClass, [], $operationName, Argument::that(function ($args) {
             // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
             return
             array_search('some.field', array_keys($args['filters']['order']), true) <
@@ -310,7 +305,7 @@ class ReadStageTest extends TestCase
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->collectionDataProviderProphecy->getCollection($resourceClass, $operationName, $normalizationContext + ['filters' => ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']]])->willReturn([]);
+        $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']]])->willReturn([]);
 
         $this->expectDeprecation('The filter syntax "filter: {filterArg1: "filterValue1", filterArg2: "filterValue2"}" is deprecated since API Platform 2.6, use the following syntax instead: "filter: [{filterArg1: "filterValue1"}, {filterArg2: "filterValue2"}]".');
 

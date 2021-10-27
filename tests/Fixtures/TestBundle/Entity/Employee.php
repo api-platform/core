@@ -25,9 +25,20 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ApiResource]
 #[Post]
-#[ApiResource('/companies/{companyId}/employees/{id}')]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/employees/{id}',
+    uriVariables: [
+        'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
+        'id' => ['from_class' => Employee::class],
+    ]
+)]
 #[Get]
-#[ApiResource('/companies/{companyId}/employees')]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/employees',
+    uriVariables: [
+        'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
+    ]
+)]
 #[GetCollection]
 class Employee
 {
@@ -50,7 +61,6 @@ class Employee
     /**
      * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
      */
-    #[Link('companyId')]
     public Company $company;
 
     public function getId()
