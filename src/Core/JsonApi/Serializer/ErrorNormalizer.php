@@ -42,7 +42,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): array
     {
         $data = [
             'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],

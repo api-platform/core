@@ -42,6 +42,8 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {

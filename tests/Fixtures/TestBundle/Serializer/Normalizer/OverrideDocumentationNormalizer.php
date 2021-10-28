@@ -28,6 +28,14 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
         $this->documentationNormalizer = $documentationNormalizer;
     }
 
+    /**
+     * @param mixed $object
+     * @param null  $format
+     *
+     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
+     *
+     * @return array|\ArrayObject|bool|float|int|string|null
+     */
     public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
