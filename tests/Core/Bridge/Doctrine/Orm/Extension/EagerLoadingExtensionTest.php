@@ -236,6 +236,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->addSelect('partial relatedDummy4_a5.{id}')->shouldBeCalledTimes(1);
         $queryBuilderProphecy->addSelect('singleInheritanceRelation_a6')->shouldBeCalledTimes(1);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30, false, null, null, true);
@@ -895,6 +896,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->addSelect('relatedDummy_a1')->shouldBeCalledTimes(1);
         $queryBuilderProphecy->addSelect('relatedDummy2_a2')->shouldBeCalledTimes(1);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30);
@@ -960,6 +962,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->addSelect('relatedDummy_a1')->shouldBeCalledTimes(1);
         $queryBuilderProphecy->addSelect('relatedDummy2_a2')->shouldBeCalledTimes(1);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), 30);
@@ -1004,6 +1007,7 @@ class EagerLoadingExtensionTest extends TestCase
                 new Join($joinType, 'o.relatedDummy', 'existing_join_alias'),
             ],
         ]);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->addSelect('existing_join_alias')->shouldBeCalledTimes(1);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
