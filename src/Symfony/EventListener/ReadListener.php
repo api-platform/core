@@ -19,6 +19,7 @@ use ApiPlatform\Core\Util\CloneTrait;
 use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Util\RequestParser;
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -91,6 +92,8 @@ final class ReadListener
             $identifiers = $this->getOperationIdentifiers($operation, $parameters, $resourceClass);
             $data = $this->provider->provide($resourceClass, $identifiers, $operation->getName(), $context);
         } catch (InvalidIdentifierException $e) {
+            throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
+        } catch (InvalidUriVariableException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
         }
 

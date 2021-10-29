@@ -91,6 +91,5 @@ final class Post extends Operation
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_POST, ...\func_get_args());
-        $this->collection = $collection ?? true;
     }
 }

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\Routing\Route;
 
@@ -110,7 +111,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     private function configureUriVariables($operation)
     {
         // We will generate the collection route, don't initialize variables here
-        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate()) {
+        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate() || ($operation instanceof Post && !$operation->getUriVariables())) {
             return $operation;
         }
 
@@ -175,13 +176,13 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 $normalizedUriVariable = (new Link())->withIdentifiers([$normalizedUriVariable])->withFromClass($resourceClass);
             }
             if (\is_array($normalizedUriVariable)) {
-                if (!isset($normalizedUriVariable['class'])) {
+                if (!isset($normalizedUriVariable['from_class']) && !isset($normalizedUriVariable['expanded_value'])) {
                     if (2 !== \count($normalizedUriVariable)) {
                         throw new \LogicException("The uriVariables shortcut syntax needs to be the tuple: 'uriVariable' => [fromClass, fromProperty]");
                     }
                     $normalizedUriVariable = (new Link())->withIdentifiers([$normalizedUriVariable[1]])->withFromClass($normalizedUriVariable[0]);
                 } else {
-                    $normalizedUriVariable = new Link(null, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['class'], $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
+                    $normalizedUriVariable = new Link($normalizedParameterName, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['from_class'] ?? null, $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
                 }
             }
             if (null !== ($hasCompositeIdentifier = $operation->getCompositeIdentifier())) {
