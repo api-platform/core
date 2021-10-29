@@ -37,7 +37,7 @@ We will use a POPO to define URI variables, for now these options are available:
 uriVariables: [
     'companyId' => new UriVariable(
         targetClass: Company::class,
-        inverseProperty: null,
+        targetProperty: null,
         property: 'company'
         identifiers: ['id'],
         compositeIdentifier: true,
@@ -53,7 +53,7 @@ Where `uriVariables` keys are the URI template's variable names. Its value is a 
 
 - `targetClass` is the PHP FQDN of the class this value belongs to
 - `property` represents the property, the URI Variable is mapped to in the current class
-- `inverseProperty` represents the property, the URI Variable is mapped to in the related class and is not available in the current class
+- `targetProperty` represents the property, the URI Variable is mapped to in the related class and is not available in the current class
 - `identifiers` are the properties of the targetClass to which we map the URI variable
 - `compositeIdentifier` is used to match a single variable to multiple identifiers (`ida=1;idb=2` to `class::ida` and `class::idb`)
 
@@ -122,7 +122,7 @@ class Company {
 }
 ```
 
-Note that the above is a shortcut for: `new UriVariable(targetClass: Employee::class, inverseProperty: 'company')`
+Note that the above is a shortcut for: `new UriVariable(targetClass: Employee::class, targetProperty: 'company')`
 
 Corresponding DQL: 
 
@@ -259,7 +259,7 @@ class Employee {
 #[ApiResource("/employees/{employeeId}/company", uriVariables: [
     'employeeId' => new UriVariable(
         targetClass: Employee::class, 
-        inverseProperty: 'company'
+        targetProperty: 'company'
         property: null,
         identifiers: ['id'],
         compositeIdentifier: true

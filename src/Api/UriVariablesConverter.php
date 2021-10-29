@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Api;
 
 use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -46,10 +47,11 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
     {
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($class)->getOperation();
         $context = $context + ['operation' => $operation];
-        $uriVariablesDefinition = $operation->getUriVariables() ?? [];
+        $uriVariablesDefinitions = $operation->getUriVariables() ?? [];
 
         foreach ($uriVariables as $parameterName => $value) {
-            if ([] === $types = $this->getIdentifierTypes($uriVariablesDefinition[$parameterName]->getFromClass() ?? $class, $uriVariablesDefinition[$parameterName]->getIdentifiers() ?? [$parameterName])) {
+            $uriVariableDefinition = $uriVariablesDefinitions[$parameterName] ?? $uriVariablesDefinitions['id'] ?? new Link();
+            if ([] === $types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $uriVariableDefinition->getIdentifiers() ?? [$parameterName])) {
                 continue;
             }
 

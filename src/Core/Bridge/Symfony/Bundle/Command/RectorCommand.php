@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Bridge\Rector\Parser\TransformApiSubresourceVisitor;
+use ApiPlatform\Core\Bridge\Rector\Service\SubresourceTransformer;
 use ApiPlatform\Core\Bridge\Rector\Set\ApiPlatformSetList;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser\Php7;
@@ -28,6 +30,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Routing\Route;
 
 /**
  * @experimental
@@ -46,13 +49,15 @@ final class RectorCommand extends Command
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
     private $subresourceOperationFactory;
+    private $subresourceTransformer;
     private $localCache = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory, SubresourceTransformer $subresourceTransformer)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
+        $this->subresourceTransformer = $subresourceTransformer;
 
         parent::__construct();
     }
@@ -79,7 +84,7 @@ final class RectorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!file_exists('vendor/bin/rector')) {
-            $output->write('Rector is not installed. Please execute composer require --dev rector/rector-src');
+            $output->write('Rector is not installed. Please execute composer require --dev rector/rector');
 
             return Command::FAILURE;
         }
@@ -119,7 +124,7 @@ final class RectorCommand extends Command
 
         $operationKey = $this->getOperationKeyByChoice($operations, $choice);
 
-        $command = 'vendor/bin/rector process '.$input->getArgument('src');
+        $command = 'vendor/bin/rector process ' . $input->getArgument('src');
 
         if ($output->isDebug()) {
             $command .= ' --debug';
@@ -129,22 +134,22 @@ final class RectorCommand extends Command
 
         switch ($operationKey) {
             case $operationKeys[0]:
-                $command .= ' --config='.ApiPlatformSetList::ANNOTATION_TO_LEGACY_API_RESOURCE_ATTRIBUTE;
+                $command .= ' --config=' . ApiPlatformSetList::ANNOTATION_TO_LEGACY_API_RESOURCE_ATTRIBUTE;
                 break;
             case $operationKeys[1]:
                 if ($askForSubresources && $this->isThereSubresources($io, $output)) {
                     return Command::FAILURE;
                 }
-                $command .= ' --config='.ApiPlatformSetList::ANNOTATION_TO_API_RESOURCE_ATTRIBUTE;
+                $command .= ' --config=' . ApiPlatformSetList::ANNOTATION_TO_API_RESOURCE_ATTRIBUTE;
                 break;
             case $operationKeys[2]:
                 if ($askForSubresources && $this->isThereSubresources($io, $output)) {
                     return Command::FAILURE;
                 }
-                $command .= ' --config='.ApiPlatformSetList::ATTRIBUTE_TO_API_RESOURCE_ATTRIBUTE;
+                $command .= ' --config=' . ApiPlatformSetList::ATTRIBUTE_TO_API_RESOURCE_ATTRIBUTE;
                 break;
             case $operationKeys[3]:
-                $command .= ' --config='.ApiPlatformSetList::TRANSFORM_API_SUBRESOURCE;
+                $command .= ' --config=' . ApiPlatformSetList::TRANSFORM_API_SUBRESOURCE;
                 break;
         }
 
@@ -158,14 +163,14 @@ final class RectorCommand extends Command
             }
         }
 
-        $io->title('Run '.$command);
+        $io->title('Run ' . $command);
 
         if ($operationKey === $operationKeys[3] && !$input->getOption('dry-run')) {
-            $this->transformApiSubresource($input->getArgument('src'));
+            $this->transformApiSubresource($input->getArgument('src'), $output);
         }
 
         if ($input->getOption('silent')) {
-            exec($command.' --no-progress-bar --no-diffs');
+            exec($command . ' --no-progress-bar --no-diffs');
         } else {
             passthru($command);
         }
@@ -184,7 +189,7 @@ final class RectorCommand extends Command
         return array_search($choice, $operations, true);
     }
 
-    private function transformApiSubresource(string $src)
+    private function transformApiSubresource(string $src, OutputInterface $output)
     {
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             try {
@@ -198,20 +203,6 @@ final class RectorCommand extends Command
             }
 
             foreach ($this->subresourceOperationFactory->create($resourceClass) as $subresourceMetadata) {
-                $identifiers = [];
-                // Keep a copy
-                $subresourceMetadata['legacy_identifiers'] = $subresourceMetadata['identifiers'];
-                // Create the new identifiers
-                foreach ($subresourceMetadata['identifiers'] as $parameterName => [$property, $class, $isPresent]) {
-                    if (!$isPresent) {
-                        continue;
-                    }
-
-                    $identifiers[$parameterName] = [$property, $class];
-                }
-
-                $subresourceMetadata['identifiers'] = $identifiers;
-
                 if (!isset($this->localCache[$subresourceMetadata['resource_class']])) {
                     $this->localCache[$subresourceMetadata['resource_class']] = [];
                 }
@@ -222,6 +213,18 @@ final class RectorCommand extends Command
                     }
                 }
                 $this->localCache[$subresourceMetadata['resource_class']][] = $subresourceMetadata;
+            }
+        }
+
+        // Compute URI variables
+        foreach ($this->localCache as $class => $subresources) {
+            if (!$subresources) {
+                unset($this->localCache[$class]);
+                continue;
+            }
+
+            foreach ($subresources as $i => $subresourceMetadata) {
+                $this->localCache[$class][$i]['uri_variables'] = $this->subresourceTransformer->toUriVariables($subresourceMetadata);
             }
         }
 

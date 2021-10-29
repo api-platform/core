@@ -61,6 +61,7 @@ final class CollectionProvider implements ProviderInterface
 
         $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
 
+        // dd($queryBuilder->getQuery());
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 

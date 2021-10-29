@@ -94,12 +94,12 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            if ($type->getClassName() === $class) {
-                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
-            }
-
             if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && $collectionValueType->getClassName() === $class) {
                 return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+            }
+
+            if ($type->getClassName() === $class) {
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
             }
         }
 

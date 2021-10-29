@@ -64,25 +64,45 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
 
         if ($node instanceof Node\Stmt\Class_) {
             $identifiersNodeItems = [];
-            foreach ($this->subresourceMetadata['identifiers'] as $identifier => $resource) {
-                $identifiersNodeItems[] = new Node\Expr\ArrayItem(
-                    new Node\Expr\Array_(
-                        [
+
+            foreach ($this->subresourceMetadata['uri_variables'] as $identifier => $resource) {
+                $identifierNodes = [
                             new Node\Expr\ArrayItem(
                                 new Node\Expr\ClassConstFetch(
                                     new Node\Name(
-                                        ($resource[0] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource[0]
+                                        ($resource['from_class'] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource['from_class']
                                     ),
                                     'class'
                                 ),
-                                new Node\Scalar\String_('class')
+                                new Node\Scalar\String_('from_class')
                             ),
                             new Node\Expr\ArrayItem(
                                 new Node\Expr\Array_(
-                                    [new Node\Expr\ArrayItem(new Node\Scalar\String_($resource[1]))], ['kind' => Node\Expr\Array_::KIND_SHORT]),
+                                    isset($resource['identifiers'][0]) ? [
+                                        new Node\Expr\ArrayItem(new Node\Scalar\String_($resource['identifiers'][0]))
+                                    ] : [], 
+                                    ['kind' => Node\Expr\Array_::KIND_SHORT]),
                                 new Node\Scalar\String_('identifiers')
                             ),
-                        ],
+                        ];
+
+                if (isset($resource['expanded_value'])) {
+                    $identifierNodes[] = new Node\Expr\ArrayItem(
+                        new Node\Scalar\String_('expanded_value'),
+                        new Node\Scalar\String_($resource['expanded_value'])
+                    );
+                }
+
+                if (isset($resource['from_property']) || isset($resource['to_property'])) {
+                    $identifierNodes[] = new Node\Expr\ArrayItem(
+                        new Node\Scalar\String_($resource['to_property'] ?? $resource['from_property']),
+                        new Node\Scalar\String_(isset($resource['to_property']) ? 'to_property' : 'from_property')
+                    );
+                }
+
+                $identifiersNodeItems[] = new Node\Expr\ArrayItem(
+                    new Node\Expr\Array_(
+                        $identifierNodes,
                         [
                             'kind' => Node\Expr\Array_::KIND_SHORT,
                         ]
@@ -115,53 +135,53 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
                     [],
                     new Node\Identifier('status')
                 ),
-                new Node\Arg(
-                    new Node\Expr\ArrayItem(
-                        new Node\Expr\Array_(
-                            [
-                                new Node\Expr\ArrayItem(
-                                    new Node\Expr\ConstFetch(new Node\Name('true')),
-                                    new Node\Scalar\String_('legacy_subresource_behavior')
-                                ),
-                                new Node\Expr\ArrayItem(
-                                    new Node\Scalar\String_($this->subresourceMetadata['property']),
-                                    new Node\Scalar\String_('legacy_subresource_property')
-                                ),
-                                new Node\Expr\ArrayItem(
-                                    new Node\Expr\Array_(
-                                        array_map(function ($key, $value) {
-                                            return new Node\Expr\ArrayItem(
-                                                new Node\Expr\Array_(
-                                                    [
-                                                        new Node\Expr\ClassConstFetch(
-                                                            new Node\Name(
-                                                                ($value[0] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$value[0]
-                                                            ),
-                                                            'class'
-                                                        ),
-                                                        new Node\Scalar\String_($value[1]),
-                                                        new Node\Expr\ConstFetch(new Node\Name($value[2] ? 'true' : 'false')),
-                                                    ],
-                                                    ['kind' => Node\Expr\Array_::KIND_SHORT]
-                                                ),
-                                                new Node\Scalar\String_($key)
-                                            );
-                                        }, array_keys($this->subresourceMetadata['legacy_identifiers']), array_values($this->subresourceMetadata['legacy_identifiers'])),
-                                        ['kind' => Node\Expr\Array_::KIND_SHORT]
-                                    ),
-                                    new Node\Scalar\String_('legacy_subresource_identifiers')
-                                ),
-                            ],
-                            [
-                                'kind' => Node\Expr\Array_::KIND_SHORT,
-                            ]
-                        )
-                    ),
-                    false,
-                    false,
-                    [],
-                    new Node\Identifier('extraProperties')
-                ),
+                // new Node\Arg(
+                //     new Node\Expr\ArrayItem(
+                //         new Node\Expr\Array_(
+                //             [
+                //                 new Node\Expr\ArrayItem(
+                //                     new Node\Expr\ConstFetch(new Node\Name('true')),
+                //                     new Node\Scalar\String_('is_legacy_subresource')
+                //                 ),
+                //                 new Node\Expr\ArrayItem(
+                //                     new Node\Scalar\String_($this->subresourceMetadata['property']),
+                //                     new Node\Scalar\String_('legacy_subresource_property')
+                //                 ),
+                //                 new Node\Expr\ArrayItem(
+                //                     new Node\Expr\Array_(
+                //                         array_map(function ($key, $value) {
+                //                             return new Node\Expr\ArrayItem(
+                //                                 new Node\Expr\Array_(
+                //                                     [
+                //                                         new Node\Expr\ClassConstFetch(
+                //                                             new Node\Name(
+                //                                                 ($value[0] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$value[0]
+                //                                             ),
+                //                                             'class'
+                //                                         ),
+                //                                         new Node\Scalar\String_($value[1]),
+                //                                         new Node\Expr\ConstFetch(new Node\Name($value[2] ? 'true' : 'false')),
+                //                                     ],
+                //                                     ['kind' => Node\Expr\Array_::KIND_SHORT]
+                //                                 ),
+                //                                 new Node\Scalar\String_($key)
+                //                             );
+                //                         }, array_keys($this->subresourceMetadata['legacy_identifiers']), array_values($this->subresourceMetadata['legacy_identifiers'])),
+                //                         ['kind' => Node\Expr\Array_::KIND_SHORT]
+                //                     ),
+                //                     new Node\Scalar\String_('legacy_subresource_identifiers')
+                //                 ),
+                //             ],
+                //             [
+                //                 'kind' => Node\Expr\Array_::KIND_SHORT,
+                //             ]
+                //         )
+                //     ),
+                //     false,
+                //     false,
+                //     [],
+                //     new Node\Identifier('extraProperties')
+                // ),
             ];
 
             if (null !== $this->referenceType) {

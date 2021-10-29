@@ -858,7 +858,6 @@ jobs:
         run: |
           mkdir -p build/logs/behat
           vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
-        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1

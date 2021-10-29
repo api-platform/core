@@ -175,13 +175,13 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 $normalizedUriVariable = (new Link())->withIdentifiers([$normalizedUriVariable])->withFromClass($resourceClass);
             }
             if (\is_array($normalizedUriVariable)) {
-                if (!isset($normalizedUriVariable['class'])) {
+                if (!isset($normalizedUriVariable['from_class']) && !isset($normalizedUriVariable['expanded_value'])) {
                     if (2 !== \count($normalizedUriVariable)) {
                         throw new \LogicException("The uriVariables shortcut syntax needs to be the tuple: 'uriVariable' => [fromClass, fromProperty]");
                     }
                     $normalizedUriVariable = (new Link())->withIdentifiers([$normalizedUriVariable[1]])->withFromClass($normalizedUriVariable[0]);
                 } else {
-                    $normalizedUriVariable = new Link(null, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['class'], $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
+                    $normalizedUriVariable = new Link($normalizedParameterName, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['from_class'] ?? null, $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
                 }
             }
             if (null !== ($hasCompositeIdentifier = $operation->getCompositeIdentifier())) {
