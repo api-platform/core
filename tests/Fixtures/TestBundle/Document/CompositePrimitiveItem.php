@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -25,7 +25,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class CompositePrimitiveItem
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -35,7 +35,7 @@ class CompositePrimitiveItem
     private $name;
 
     /**
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      */
     private $year;
 
@@ -52,30 +52,24 @@ class CompositePrimitiveItem
 
     /**
      * Gets id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Gets name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
      * Gets year.
-     *
-     * @return int
      */
-    public function getYear()
+    public function getYear(): ?int
     {
         return $this->year;
     }
@@ -90,10 +84,8 @@ class CompositePrimitiveItem
 
     /**
      * Gets description.
-     *
-     * @return string
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }

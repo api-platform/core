@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -28,16 +28,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class FourthLevel
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      * @Groups({"barcelona", "chicago"})
      */
     private $level = 4;
@@ -47,26 +47,17 @@ class FourthLevel
      */
     public $badThirdLevel;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return int
-     */
-    public function getLevel()
+    public function getLevel(): ?int
     {
         return $this->level;
     }
 
-    /**
-     * @param int $level
-     */
-    public function setLevel($level)
+    public function setLevel(int $level)
     {
         $this->level = $level;
     }

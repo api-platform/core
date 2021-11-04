@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\BrowserKit;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\BrowserKit;
 
 use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -39,7 +39,7 @@ class DummyCarColor
      * @var DummyCar
      *
      * @ORM\ManyToOne(targetEntity="DummyCar", inversedBy="colors")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", referencedColumnName="id_id")
      * @Assert\NotBlank
      */
     private $car;
@@ -60,10 +60,7 @@ class DummyCarColor
         return $this->id;
     }
 
-    /**
-     * @return DummyCar|null
-     */
-    public function getCar()
+    public function getCar(): ?DummyCar
     {
         return $this->car;
     }
@@ -78,10 +75,7 @@ class DummyCarColor
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getProp()
+    public function getProp(): string
     {
         return $this->prop;
     }

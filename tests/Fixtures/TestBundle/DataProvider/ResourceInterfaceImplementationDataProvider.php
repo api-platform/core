@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 
 class ResourceInterfaceImplementationDataProvider implements ItemDataProviderInterface, CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
@@ -35,7 +35,7 @@ class ResourceInterfaceImplementationDataProvider implements ItemDataProviderInt
         return null;
     }
 
-    public function getCollection(string $resourceClass, string $operationName = null)
+    public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
         yield (new ResourceInterfaceImplementation())->setFoo('item1');
         yield (new ResourceInterfaceImplementation())->setFoo('item2');

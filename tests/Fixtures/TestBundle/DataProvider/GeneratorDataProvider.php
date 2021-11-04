@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 
 class GeneratorDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
@@ -24,7 +24,7 @@ class GeneratorDataProvider implements CollectionDataProviderInterface, Restrict
         return SecuredDummy::class === $resourceClass && 'get_from_data_provider_generator' === $operationName;
     }
 
-    public function getCollection(string $resourceClass, string $operationName = null)
+    public function getCollection(string $resourceClass, string $operationName = null): iterable
     {
         yield from [new class() {
         }, new class() {

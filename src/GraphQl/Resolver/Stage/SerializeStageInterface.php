@@ -11,12 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 /**
  * Serialize stage of GraphQL resolvers.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

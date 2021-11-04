@@ -9,7 +9,7 @@ Feature: GraphQL collection support
         ...dummyFields
       }
     }
-    fragment dummyFields on DummyConnection {
+    fragment dummyFields on DummyCursorConnection {
       edges {
         node {
           id
@@ -482,6 +482,125 @@ Feature: GraphQL collection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges" should have 0 element
 
+  @!mongodb
+  @createSchema
+  Scenario: Paginate through a collection through a GraphQL query with a partial pagination
+    Given there are 4 of these so many objects
+    When I send the following GraphQL request:
+    """
+    {
+      soManies(first: 2) {
+        edges {
+          node {
+            content
+          }
+          cursor
+        }
+        totalCount
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.soManies.pageInfo.startCursor" should be equal to "MA=="
+    And the JSON node "data.soManies.pageInfo.endCursor" should be equal to "MQ=="
+    And the JSON node "data.soManies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.soManies.pageInfo.hasPreviousPage" should be false
+    And the JSON node "data.soManies.totalCount" should be equal to 0
+    And the JSON node "data.soManies.edges[1].node.content" should be equal to "Many #2"
+    And the JSON node "data.soManies.edges[1].cursor" should be equal to "MQ=="
+    When I send the following GraphQL request:
+    """
+    {
+      soManies(first: 2, after: "MQ==") {
+        edges {
+          node {
+            content
+          }
+          cursor
+        }
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.soManies.pageInfo.startCursor" should be equal to "Mg=="
+    And the JSON node "data.soManies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.soManies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.soManies.pageInfo.hasPreviousPage" should be true
+    And the JSON node "data.soManies.edges[0].node.content" should be equal to "Many #3"
+    And the JSON node "data.soManies.edges[0].cursor" should be equal to "Mg=="
+    When I send the following GraphQL request:
+    """
+    {
+      soManies(first: 2, after: "Mg==") {
+        edges {
+          node {
+            content
+          }
+          cursor
+        }
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.soManies.edges" should have 1 element
+    And the JSON node "data.soManies.pageInfo.startCursor" should be equal to "Mw=="
+    And the JSON node "data.soManies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.soManies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.soManies.pageInfo.hasPreviousPage" should be true
+    And the JSON node "data.soManies.edges[0].node.content" should be equal to "Many #4"
+    And the JSON node "data.soManies.edges[0].cursor" should be equal to "Mw=="
+    When I send the following GraphQL request:
+    """
+    {
+      soManies(first: 2, after: "Mw==") {
+        edges {
+          node {
+            content
+          }
+          cursor
+        }
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.soManies.edges" should have 0 element
+    And the JSON node "data.soManies.pageInfo.startCursor" should be equal to "NA=="
+    And the JSON node "data.soManies.pageInfo.endCursor" should be equal to "Mw=="
+    And the JSON node "data.soManies.pageInfo.hasNextPage" should be false
+    And the JSON node "data.soManies.pageInfo.hasPreviousPage" should be true
+
   @createSchema
   Scenario: Retrieve a collection with pagination disabled
     Given there are 4 foo objects with fake names
@@ -680,3 +799,113 @@ Feature: GraphQL collection support
     And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[0].node.title" should not exist
     And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[1].node.title" should not exist
     And the JSON node "data.dummyDifferentGraphQlSerializationGroups.edges[2].node.title" should not exist
+
+  @createSchema
+  Scenario: Retrieve a paginated collection using page-based pagination
+    Given there are 5 fooDummy objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 1) {
+        collection {
+          id
+          name
+        }
+        paginationInfo {
+          itemsPerPage
+          lastPage
+          totalCount
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 3 elements
+    And the JSON node "data.fooDummies.collection[0].id" should exist
+    And the JSON node "data.fooDummies.collection[0].name" should exist
+    And the JSON node "data.fooDummies.collection[1].id" should exist
+    And the JSON node "data.fooDummies.collection[1].name" should exist
+    And the JSON node "data.fooDummies.collection[2].id" should exist
+    And the JSON node "data.fooDummies.collection[2].name" should exist
+    And the JSON node "data.fooDummies.paginationInfo.itemsPerPage" should be equal to the number 3
+    And the JSON node "data.fooDummies.paginationInfo.lastPage" should be equal to the number 2
+    And the JSON node "data.fooDummies.paginationInfo.totalCount" should be equal to the number 5
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 2) {
+        collection {
+          id
+          name
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 2 elements
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 3) {
+        collection {
+          id
+          name
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 0 elements
+
+  @createSchema
+  Scenario: Retrieve a paginated collection using page-based pagination and client-defined limit
+    Given there are 5 fooDummy objects with fake names
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 1, itemsPerPage: 2) {
+        collection {
+          id
+          name
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 2 elements
+    And the JSON node "data.fooDummies.collection[0].id" should exist
+    And the JSON node "data.fooDummies.collection[0].name" should exist
+    And the JSON node "data.fooDummies.collection[1].id" should exist
+    And the JSON node "data.fooDummies.collection[1].name" should exist
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 2, itemsPerPage: 2) {
+        collection {
+          id
+          name
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 2 elements
+    When I send the following GraphQL request:
+    """
+    {
+      fooDummies(page: 3, itemsPerPage: 2) {
+        collection {
+          id
+          name
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "data.fooDummies.collection" should have 1 element

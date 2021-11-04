@@ -11,14 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
 use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * Exception thrown when a type has not been found in the types container.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

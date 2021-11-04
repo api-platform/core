@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,9 +21,14 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
- * @ApiResource(attributes={
- *     "order"={"dummy.name"}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "order"={"dummy.name"}
+ *     },
+ *     graphql={
+ *         "collection_query"={"pagination_type"="page"}
+ *     }
+ * )
  * @ORM\Entity
  */
 class FooDummy

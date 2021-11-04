@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -26,6 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.date"}
  * })
+ * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
  * @ApiFilter(DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
@@ -37,7 +39,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DummyDate
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -46,28 +48,28 @@ class DummyDate
     private $id;
 
     /**
-     * @var \DateTime The dummy date
+     * @var \DateTime|null The dummy date
      *
      * @ORM\Column(type="date")
      */
     public $dummyDate;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="date", nullable=true)
      */
     public $dateIncludeNullAfter;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="date", nullable=true)
      */
     public $dateIncludeNullBefore;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ORM\Column(type="date", nullable=true)
      */
@@ -75,10 +77,8 @@ class DummyDate
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

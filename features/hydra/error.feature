@@ -9,7 +9,7 @@ Feature: Error handling
     """
     {}
     """
-    Then the response status code should be 400
+    Then the response status code should be 422
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be equal to:
@@ -22,7 +22,8 @@ Feature: Error handling
       "violations": [
         {
           "propertyPath": "name",
-          "message": "This value should not be blank."
+          "message": "This value should not be blank.",
+          "code": "c1051bb4-d103-4f74-8988-acbcafc7fdc3"
         }
       ]
     }

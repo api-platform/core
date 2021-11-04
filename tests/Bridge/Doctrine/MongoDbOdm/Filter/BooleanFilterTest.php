@@ -19,6 +19,7 @@ use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\BooleanFilterTestTrait;
 
 /**
  * @group mongodb
+ * @group legacy
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -32,14 +33,14 @@ class DummyTableInheritanceRelated
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      *
      * @Groups({"default"})
      */
     private $id;
 
     /**
-     * @var ArrayCollection Related children
+     * @var Collection Related children
      *
      * @ODM\ReferenceMany(targetDocument=DummyTableInheritance::class, mappedBy="parent")
      *
@@ -57,10 +58,7 @@ class DummyTableInheritanceRelated
         return $this->id;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }

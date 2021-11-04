@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\MessengerInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerInput;
 
 /**
  * @ApiResource(messenger="input", input=MessengerInput::class, graphql={"create"={"input"=MessengerInput::class, "messenger"="input"}})

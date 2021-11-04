@@ -11,15 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
 
 /**
  * Interface implemented to contain the GraphQL types.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

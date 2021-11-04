@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Util;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Util;
 
 use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use Doctrine\Common\Annotations\Reader;
@@ -22,7 +22,7 @@ class AnnotationFilterExtractor
 
     private $reader;
 
-    public function __construct(Reader $reader)
+    public function __construct(?Reader $reader = null)
     {
         $this->reader = $reader;
     }

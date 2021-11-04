@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -27,6 +28,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @ApiResource(attributes={
  *     "filters"={"my_dummy_date.mongodb.date"}
  * })
+ * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
  * @ApiFilter(DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
@@ -38,35 +40,35 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class DummyDate
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var \DateTime The dummy date
+     * @var \DateTime|null The dummy date
      *
      * @ODM\Field(type="date")
      */
     public $dummyDate;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
     public $dateIncludeNullAfter;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
     public $dateIncludeNullBefore;
 
     /**
-     * @var \DateTime
+     * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
@@ -74,10 +76,8 @@ class DummyDate
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

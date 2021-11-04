@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Cache\CachedTrait;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Metadata\ApiProperty;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -39,7 +39,7 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $property, $options]));
 

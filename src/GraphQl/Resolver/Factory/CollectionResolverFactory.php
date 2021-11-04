@@ -11,23 +11,22 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
+namespace ApiPlatform\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\CloneTrait;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Creates a function retrieving a collection to resolve a GraphQL query or a field returned by a mutation.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -43,9 +42,9 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private $serializeStage;
     private $queryResolverLocator;
     private $requestStack;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory, RequestStack $requestStack = null)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, RequestStack $requestStack = null)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
@@ -53,13 +52,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
         $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
         $this->requestStack = $requestStack;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
     {
         return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
-            if (null === $resourceClass || null === $rootClass) {
+            // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
+            if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;
             }
 
@@ -71,33 +71,41 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             $operationName = $operationName ?? 'collection_query';
-            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
             $collection = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (!is_iterable($collection)) {
                 throw new \LogicException('Collection from read stage should be iterable.');
             }
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+            try {
+                $operation = $resourceMetadataCollection->getOperation($operationName);
+                $queryResolverId = $operation->getResolver();
+            } catch (OperationNotFoundException $e) {
+                $queryResolverId = null;
+            }
 
-            $queryResolverId = $resourceMetadata->getGraphqlAttribute($operationName, 'collection_query');
             if (null !== $queryResolverId) {
                 /** @var QueryCollectionResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);
                 $collection = $queryResolver($collection, $resolverContext);
             }
 
-            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
-                'extra_variables' => [
-                    'object' => $collection,
-                ],
-            ]);
-            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
-                'extra_variables' => [
-                    'object' => $collection,
-                    'previous_object' => $this->clone($collection),
-                ],
-            ]);
+            // Only perform security stage on the top-level query
+            if (null === $source) {
+                ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $collection,
+                    ],
+                ]);
+                ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $collection,
+                        'previous_object' => $this->clone($collection),
+                    ],
+                ]);
+            }
 
             return ($this->serializeStage)($collection, $resourceClass, $operationName, $resolverContext);
         };

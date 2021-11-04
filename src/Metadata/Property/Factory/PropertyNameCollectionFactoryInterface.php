@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
 /**
  * Creates a property name collection value object.

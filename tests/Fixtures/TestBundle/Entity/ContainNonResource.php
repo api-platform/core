@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use ApiPlatform\Tests\Fixtures\NotAResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -24,9 +24,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ORM\Entity
  *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
+ *     attributes={
+ *         "filters"={"my_dummy.property"}
  *     },
+ *     normalizationContext={
+ *         "groups"={"contain_non_resource"}
+ *     }
  * )
  *
  * @author Kévin Dunglas <dunglas@gmail.com>

@@ -11,16 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo\DoctrineExtractor;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineDummy;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineEmbeddable;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineFooType;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineRelation;
-use ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineDummy;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineEmbeddable;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineFooType;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineGeneratedValue;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineRelation;
+use ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures\DoctrineWithEmbedded;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -52,12 +52,11 @@ class DoctrineExtractorTest extends TestCase
                 'binUuidRfc4122',
                 'timestamp',
                 'date',
+                'dateImmutable',
                 'float',
                 'bool',
-                'boolean',
                 'customFoo',
                 'int',
-                'integer',
                 'string',
                 'key',
                 'hash',
@@ -76,6 +75,7 @@ class DoctrineExtractorTest extends TestCase
                 'id',
                 'embedOne',
                 'embedMany',
+                'embedManyOmittingTargetDocument',
             ],
             $this->createExtractor()->getProperties(DoctrineWithEmbedded::class)
         );
@@ -141,11 +141,10 @@ class DoctrineExtractorTest extends TestCase
             ['binUuidRfc4122', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['timestamp', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['date', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTime')]],
+            ['dateImmutable', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'DateTimeImmutable')]],
             ['float', [new Type(Type::BUILTIN_TYPE_FLOAT)]],
             ['bool', [new Type(Type::BUILTIN_TYPE_BOOL)]],
-            ['boolean', [new Type(Type::BUILTIN_TYPE_BOOL)]],
             ['int', [new Type(Type::BUILTIN_TYPE_INT)]],
-            ['integer', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['string', [new Type(Type::BUILTIN_TYPE_STRING)]],
             ['key', [new Type(Type::BUILTIN_TYPE_INT)]],
             ['hash', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true)]],
@@ -199,6 +198,16 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'id'));
         $this->assertNull($extractor->isWritable(DoctrineGeneratedValue::class, 'foo'));
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
+    }
+
+    public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
+    {
+        $actualTypes = $this->createExtractor()->getTypes(
+            DoctrineWithEmbedded::class,
+            'embedManyOmittingTargetDocument'
+        );
+
+        self::assertNull($actualTypes);
     }
 
     private function createExtractor(): DoctrineExtractor

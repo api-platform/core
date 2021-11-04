@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures;
+namespace ApiPlatform\Tests\Fixtures;
 
 class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
 {
@@ -22,11 +22,18 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         $this->array = $array;
     }
 
-    public function offsetExists($offset)
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset): bool
     {
         return \array_key_exists($offset, $this->array);
     }
 
+    /**
+     * @param mixed $offset
+     *
+     * @return mixed
+     */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->array[$offset];
@@ -46,7 +53,8 @@ class ArrayAccessible implements \ArrayAccess, \IteratorAggregate
         unset($this->array[$offset]);
     }
 
-    public function getIterator()
+    #[\ReturnTypeWillChange]
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->array);
     }

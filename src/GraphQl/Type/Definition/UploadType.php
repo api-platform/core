@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type\Definition;
+namespace ApiPlatform\GraphQl\Type\Definition;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\Node;
@@ -24,8 +24,10 @@ if (\PHP_VERSION_ID >= 70200) {
     {
         /**
          * {@inheritdoc}
+         *
+         * @return mixed
          */
-        public function parseLiteral(/*Node */$valueNode, array $variables = null)
+        public function parseLiteral(/*Node */ $valueNode, array $variables = null)
         {
             throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
         }
@@ -67,6 +69,8 @@ final class UploadType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function serialize($value)
     {

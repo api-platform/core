@@ -11,12 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Serializer;
+namespace ApiPlatform\GraphQl\Serializer;
 
 /**
  * Builds the context used by the Symfony Serializer.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

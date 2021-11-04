@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Product;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ProductInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Product;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\ProductInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 class ProductItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface

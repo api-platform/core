@@ -11,27 +11,25 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
+namespace ApiPlatform\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Core\Util\CloneTrait;
-use GraphQL\Error\Error;
+use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 
 /**
  * Creates a function resolving a GraphQL mutation of an item.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -49,9 +47,10 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $writeStage;
     private $validateStage;
     private $mutationResolverLocator;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
+    private $securityPostValidationStage;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataFactoryInterface $resourceMetadataFactory)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SecurityPostValidationStageInterface $securityPostValidationStage)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
@@ -61,7 +60,8 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         $this->writeStage = $writeStage;
         $this->validateStage = $validateStage;
         $this->mutationResolverLocator = $mutationResolverLocator;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->securityPostValidationStage = $securityPostValidationStage;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
@@ -71,7 +71,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 return null;
             }
 
-            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true];
+            $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
             $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
             if (null !== $item && !\is_object($item)) {
@@ -98,15 +98,16 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             $item = ($this->deserializeStage)($item, $resourceClass, $operationName, $resolverContext);
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+            $operation = $resourceMetadataCollection->getOperation($operationName);
 
-            $mutationResolverId = $resourceMetadata->getGraphqlAttribute($operationName, 'mutation');
+            $mutationResolverId = $operation->getResolver();
             if (null !== $mutationResolverId) {
                 /** @var MutationResolverInterface $mutationResolver */
                 $mutationResolver = $this->mutationResolverLocator->get($mutationResolverId);
                 $item = $mutationResolver($item, $resolverContext);
                 if (null !== $item && $resourceClass !== $itemClass = $this->getObjectClass($item)) {
-                    throw Error::createLocatedError(sprintf('Custom mutation resolver "%s" has to return an item of class %s but returned an item of class %s.', $mutationResolverId, $resourceMetadata->getShortName(), (new \ReflectionClass($itemClass))->getShortName()), $info->fieldNodes, $info->path);
+                    throw new \LogicException(sprintf('Custom mutation resolver "%s" has to return an item of class %s but returned an item of class %s.', $mutationResolverId, $operation->getShortName(), (new \ReflectionClass($itemClass))->getShortName()));
                 }
             }
 
@@ -119,6 +120,13 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
 
             if (null !== $item) {
                 ($this->validateStage)($item, $resourceClass, $operationName, $resolverContext);
+
+                ($this->securityPostValidationStage)($resourceClass, $operationName, $resolverContext + [
+                    'extra_variables' => [
+                        'object' => $item,
+                        'previous_object' => $previousItem,
+                    ],
+                ]);
 
                 $persistResult = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
             }

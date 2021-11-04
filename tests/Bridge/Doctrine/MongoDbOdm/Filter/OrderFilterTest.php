@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\OrderFilterTestTrait;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\EmbeddedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -436,6 +437,70 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                     ],
                     $orderFilterFactory,
                 ],
+                'nulls_always_first (asc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
+                'nulls_always_first (desc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
+                'nulls_always_last (asc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
+                'nulls_always_last (desc)' => [
+                    [
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                ],
                 'not having order should not throw a deprecation (select unchanged)' => [
                     [],
                     $orderFilterFactory,
@@ -460,6 +525,28 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         ],
                     ],
                     $orderFilterFactory,
+                ],
+                'embedded' => [
+                    [
+                        [
+                            '$sort' => [
+                                'embeddedDummy.dummyName' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                    EmbeddedDummy::class,
+                ],
+                'embedded with nulls_comparison' => [
+                    [
+                        [
+                            '$sort' => [
+                                'embeddedDummy.dummyName' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                    EmbeddedDummy::class,
                 ],
             ]
         );

@@ -1,5 +1,246 @@
 # Changelog
 
+## 2.7.0
+
+* **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
+* GraphQL: Add ability to use different pagination types for the queries of a resource (#4453)
+* Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)
+* Security: `ApiProperty` now supports a `security_post_denormalize` attribute, which provides access to the `object` variable for the object being updated/created and `previous_object` for the object before it was updated (#4184)
+* Maker: Add `make:data-provider` and `make :data-persister` commands to generate a data provider / persister (#3850)
+* JSON Schema: Add support for generating property schema with numeric constraint restrictions (#4225)
+* JSON Schema: Add support for generating property schema with Collection restriction (#4182)
+* JSON Schema: Add support for generating property schema format for Url and Hostname (#4185)
+* JSON Schema: Add support for generating property schema with Count restriction (#4186)
+* JSON Schema: Manage Compound constraint when generating property metadata (#4180)
+* Validator: Add an option to disable query parameter validation (#4165)
+* JSON Schema: Add support for generating property schema with Choice restriction (#4162)
+* JSON Schema: Add support for generating property schema with Range restriction (#4158)
+* JSON Schema: Add support for generating property schema with Unique restriction (#4159)
+* **BC**: Change `api_platform.listener.request.add_format` priority from 7 to 28 to execute it before firewall (priority 8) (#3599)
+* **BC**: Use `@final` annotation in ORM filters (#4109)
+* Allow defining `exception_to_status` per operation (#3519)
+* Doctrine: Better exception to find which resource is linked to an exception (#3965)
+* Doctrine: Allow mixed type value for date filter (notice if invalid) (#3870)
+* Doctrine: Add `nulls_always_first` and `nulls_always_last` to `nulls_comparison` in order filter (#4103)
+* Doctrine: Add a global `order_nulls_comparison` configuration (#3117)
+* MongoDB: `date_immutable` support (#3940)
+* DataProvider: Add `TraversablePaginator` (#3783)
+* JSON:API: Support inclusion of resources from path (#3288)
+* Swagger UI: Add `swagger_ui_extra_configuration` to Swagger / OpenAPI configuration (#3731)
+* Allow controller argument with a name different from `$data` thanks to an argument resolver (#3263)
+* GraphQL: Support `ApiProperty` security (#4143)
+* GraphQL: **BC** Fix security on association collection properties. The collection resource `item_query` security is no longer used. `ApiProperty` security can now be used to secure collection (or any other) properties. (#4143)
+* Deprecate `allow_plain_identifiers` option (#4167)
+* Exception: Add the ability to customize multiple status codes based on the validation exception (#4017)
+* GraphQL: Fix graphql fetching with Elasticsearch (#4217)
+* ApiLoader: Support `_format` resolving (#4292)
+* Metadata: new namespace `ApiPlatform\Metadata` instead of `ApiPlatform\Core\Metadata`, for example `ApiPlatform\Metadata\ApiResource` (#4351)
+* Metadata: deprecation of `ApiPlatform\Core\Annotation` (#4351)
+* Metadata: `ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface` is deprecated in favor of `ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface` (#4351)
+* Metadata: item and collection prefixes for operations are deprecated, as well as the `ApiPlatform\Core\Api\OperationType` class (#4351)
+* Graphql: `ApiPlatform\Metadata\GraphQl` follow the same metadata conventions (a Subscription operation is available and isn't hidden behind an update Mutation anymore), interfaces got simplified (beeing @experimental) (#4351)
+* IriConverter: new interface for `ApiPlatform\Bridge\Symfony\Routing\IriConverter` that adds an operationName, same for `ApiPlatform\Api\IdentifiersExtractor` (#4351)
+* DataProvider: new `ApiPlatform\State\ProviderInterface` that replaces DataProviders (#4351)
+* DataPersister: new `ApiPlatform\State\ProcessorInterface` that replaces DataPersisters (#4351)
+* A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
+* Add support for `security_post_validation` attribute
+* Mark the GraphQL subsystem as stable (#4500)
+
+## 2.6.6
+
+* fix(json-schema): consider `SplFileInfo` class as a binary type (#4332)
+* fix(json-schema): use `collectionKeyType` for building JSON Schema (#4385)
+* fix(openapi): failing recursion on api resources with "paths" key (#4325)
+* fix(graphql): make sure form content type is recognized as a multipart request (#4461)
+* fix(doctrine): handle inverse side of OneToOne association in Doctrine search filter (#4366)
+* fix(doctrine): usage of deprecated DBAL type constants (#4399)
+* fix(test): fix `REMOTE_ADDR` support in `ApiTestCase` (#4446)
+* fix(docs): use `asset_package` for all assets (#4470)
+* fix(docs): upgrade Swagger UI to version 3.52.3 (#4477)
+* fix(docs): upgrade ReDoc to version 2.0.0-rc.56 (#4477)
+* fix(docs): upgrade Swagger UI to version 2.0.0-rc.56 (#4477)
+
+## 2.6.5
+
+* Fix various usage of various deprecated methods
+* JsonSchema: Update Hydra `@context` property possible types (#4223)
+* JsonSchema: Add hydra:previous` to the `hydra:view` schema properties (#4310)
+* Filter validation: Fix issue in Required filter validator with dot notation (#4221)
+* OpenAPI: Fix notice/warning for `response` without `content` in the `openapi_context` (#4210)
+* OpenAPI: Do not use output for request body (#4213)
+* OpenAPI: Do not use JSON-lD schema for all media types (#4247) (BC note: `SchemaFactory::buildSchema()` is now immutable as it no longer modifies the passed `$schema`)
+* OpenAPI: Allow setting extensionProperties with YAML schema definition (#4228)
+* OpenAPI: do not throw error with non-standard HTTP verb (#4304)
+* Serializer: Convert internal error to HTTP 400 in Ramsey uuid denormalization from invalid body string (#4200)
+* GraphQL: Fix `FieldsBuilder` not fully unwrapping nested types before deciding if a resolver is needed (#4251)
+* GraphQL: Do not use a resolver for the nested payload of a mutation or subscription (#4289)
+* GraphQL: Allow search filter to use an int for its value (#4295)
+* Varnish: Improve `BAN` regex performance (#4231)
+* MongoDB: Fix denormalization of properties with embeds many that omit target document directive (#4315)
+* MongoDB: Fix resolving proxy class in class metadata factory (#4322)
+* Test: Add `withOptions()` to our HttpClient implementation (#4282)
+* Metadata: Fix allow using constants in XML configuration (resource attribute) (#4321)
+
+## 2.6.4
+
+* OpenAPI: Using an implicit flow is now valid, changes oauth configuration default values (#4115)
+* OpenAPI: Fix `response` support via the `openapi_context` (#4116)
+* OpenAPI: Fix `Link->requestBody` default value (#4116)
+* OpenAPI: Make sure we do not override defined parameters (#4138)
+* Swagger UI: Remove Google fonts (#4112)
+* Serializer: Fix denormalization of basic property-types in XML and CSV (#4145)
+* Serializer: Fix denormalization of collection with one element in XML (#4154)
+* JSON Schema: Manage Sequentially and AtLeastOneOf constraints when generating property metadata (#4139 and #4147)
+* JSON Schema: properties regex pattern is now correctly anchored (#4176 and #4198)
+* JSON Schema: Fix PropertySchemaLengthRestriction string-only (#4177)
+* Doctrine: Fix purging HTTP cache for unreadable relations (#3441)
+* Doctrine: Revert #3774 support for binary UUID in search filter (#4134)
+* Doctrine: Fix order filter when using embedded and nulls comparison (#4151)
+* Doctrine: Fix duplicated eager loading joins (#3525)
+* Doctrine: Fix joinRelations with multiple associations. (#2791)
+* Doctrine: Revert using `defaults.order` as `collection.order` (#4178)
+* GraphQL: Partial pagination support (#3223)
+* GraphQL: Manage `pagination_use_output_walkers` and `pagination_fetch_join_collection` for operations (#3311)
+* GraphQL: Make sure the order of order filters is preserved if nested resources are used (#4171)
+* Metadata: Sort mapping resources (#3256)
+* UUID: manage Ulid in format property schema restriction (#4148)
+* Symfony: Do not override Vary headers already set in the Response (#4146)
+* Symfony: Make Twig dependency lazy (#4187)
+* Compatibility with `psr/cache` version 2 and 3 (#4117)
+* Docs: Upgrade Swagger UI to version 3.46.0
+* Docs: Upgrade ReDoc to version 2.0.0-rc.51
+* Docs: Upgrade GraphiQL to version 1.4.1
+
+## 2.6.3
+
+* Identifiers: Re-allow `POST` operations even if no identifier is defined (#4052)
+* Hydra: Fix partial pagination which no longer returns the `hydra:next` property (#4015)
+* Security: Use a `NullToken` when using the new authenticator manager in the resource access checker (#4067)
+* Mercure: Do not use data in options when deleting (#4056)
+* Doctrine: Support for foreign identifiers (#4042)
+* Doctrine: Support for binary UUID in search filter (#3774, reverted in 2.6.4)
+* Doctrine: Do not add join or lookup for search filter with empty value (#3703)
+* Doctrine: Reduce code duplication in search filter (#3541)
+* JSON Schema: Allow generating documentation when property and method start from "is" (property `isActive` and method `isActive`) (#4064)
+* OpenAPI: Fix missing 422 responses in the documentation (#4086)
+* OpenAPI: Fix error when schema is empty (#4051)
+* OpenAPI: Do not set scheme to oauth2 when generating securitySchemes (#4073)
+* OpenAPI: Fix missing `$ref` when no `type` is used in context (#4076)
+* GraphQL: Fix "Resource class cannot be determined." error when a null iterable field is returned (#4092)
+* Metadata: Check the output class when calculating serializer groups (#3696)
+
+## 2.6.2
+
+* Validation: properties regex pattern is now compliant with ECMA 262 (#4027)
+* OpenApi: normalizer is now backward compatible (#4016), fix the name converter issue changing OpenApi properties (#4019)
+* Identifiers: Break after transforming the identifier (#3985), use the identifiers context to transform with multiple classes (#4029)
+* JsonSchema: Revert `ALLOW_EXTRA_ATTRIBUTE=false` as it is a BC break and will be done in 3.0 instead see #3881 (#4007)
+* Subresource: fix ApiSubresource maxDepth option (#3986), recursive issue in the profiler (#4023)
+* OpenApi: Allow `requestBody` and `parameters` via the `openapi_context` (#4001), make `openapi_context` work on subresources (#4004), sort paths (#4013)
+* Config: Allow disabling OpenAPI and Swagger UI without loosing the schema (#3968 and #4018), fix pagination defaults (#4011)
+* DataPersister: context propagation fix (#3983)
+
+## 2.6.1
+
+* Fix defaults when using attributes (#3978)
+
+## 2.6.0
+
+* Cache: adds a `max_header_length` configuration (#2865)
+* Cache: support `stale-while-revalidate` and `stale-if-error` cache control headers (#3439)
+* Config: Add an option to set global default values (#3151)
+* DTO: Add `ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface` to pre-hydrate inputs (#3701)
+* DTO: Improve Input/Output support (#3231)
+* Data Persisters: Add `previous_data` to the context passed to persisters when available (#3752)
+* Data Persister: Add a `ResumableDataPersisterInterface` that allows to call multiple persisters (#3912)
+* Debug: Display API Platform's version in the debug bar (#3235)
+* Docs: Make `asset_package` configurable (#3764)
+* Doctrine: Allow searching on multiple values on every strategies (#3786)
+* Elasticsearch: The `Paginator` class constructor now receives the denormalization context to support denormalizing documents using serialization groups. This change may cause potential **BC** breaks for existing applications as denormalization was previously done without serialization groups.
+* GraphQL: **BC** New syntax for the filters' arguments to preserve the order: `order: [{foo: 'asc'}, {bar: 'desc'}]` (#3468)
+* GraphQL: **BC** `operation` is now `operationName` to follow the standard (#3568)
+* GraphQL: **BC** `paginationType` is now `pagination_type` (#3614)
+* GraphQL: Add page-based pagination (#3175, #3517)
+* GraphQL: Allow formatting GraphQL errors based on exceptions (#3063)
+* GraphQL: Errors thrown from the GraphQL library can now be handled (#3632, #3643)
+* GraphQL: Possibility to add a custom description for queries, mutations and subscriptions (#3477, #3514)
+* GraphQL: Subscription support with Mercure (#3321)
+* GraphQL: Support for field name conversion (serialized name) (#3455, #3516)
+* Hydra: Sort entries in the API entrypoint (#3091)
+* Identifiers: Add Symfony Uid support (#3715)
+* IriConverter: **BC** Fix double encoding in IRIs - may cause breaking change as some characters no longer encoded in output (#3552)
+* JSON-LD: Add an `iri_only` attribute to simplify documents structure (useful when using Vulcain) (#3275)
+* Exception: Response error codes can be specified via the `ApiPlatform\Core\Exception\ErrorCodeSerializableInterface` (#2922)
+* Mercure: Add a `normalization_context` option in `mercure` attribute (#3772)
+* Messenger: Add a context stamp containing contextual data (#3157)
+* Metadata: Deprecate `InheritedPropertyMetadataFactory` (#3273)
+* Metadata: Improve and simplify identifiers management (#3825)
+* Metadata: Support the Symfony Serializer's `@Ignore` annotation (#3820)
+* Metadata: Support using annotations as PHP 8 attributes (#3869, #3868, #3851)
+* Metadata: Throw an error when no identifier is defined (#3871)
+* Metadata: Use `id` as default identifier if none provided (#3874)
+* MongoDB: Mercure support (#3290)
+* MongoDB: Possibility to add execute options (aggregate command fields) for a resource, like `allowDiskUse` (#3144)
+* OpenAPI: Add default values of PHP properties to the documentation (#2386)
+* OpenAPI: **BC** Replace all characters other than `[a-zA-Z0-9\.\-_]` to `.` in definition names to be compliant with OpenAPI 3.0 (#3669)
+* OpenAPI: Refactor OpenAPI v3 support, OpenAPI v2 (aka Swagger) is deprecated (#3407)
+* Order: Support default order for a specific custom operation (#3784)
+* PATCH: **BC** Support patching deep objects, previously new objects were created instead of updating current objects (#3847)
+* Router: UrlGenerator strategy configuration via `url_generation_strategy` (#3198)
+* Routing: Add stateless `ApiResource` attribute (#3436)
+* Security: Add support for access control rule on attributes (#3503)
+* Subresources: `resourceClass` can now be defined as a container parameter in XML and YAML definitions
+* Symfony: improved 5.x support with fewer deprecations (#3589)
+* Symfony: Allow using `ItemNormalizer` without Symfony SecurityBundle (#3801)
+* Symfony: Lazy load all commands (#3798)
+* Tests: adds a method to retrieve the CookieJar in the test Client `getCookieJar`
+* Tests: Fix the registration of the `test.api_platform.client` service when the `FrameworkBundle` bundle is registered after the `ApiPlatformBundle` bundle (#3928)
+* Validator: Add the violation code to the violation properties (#3857)
+* Validator: Allow customizing the validation error status code. **BC** Status code for validation errors is now 422, use `exception_to_status` to fallback to 400 if needed (#3808)
+* Validator: Autoconfiguration of validation groups generator via `ApiPlatform\Core\Validator\ValidationGroupsGeneratorInterface`
+* Validator: Deprecate using a validation groups generator service not implementing `ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface` (#3346)
+* Validator: Property validation through OpenAPI (#33329)
+* Validator: Query filters and parameters are validated (#1723)
+* `ExceptionInterface` now extends `\Throwable` (#3217)
+
+## 2.5.10
+
+* Hydra: only display `hydra:next` when the item total is strictly greater than the number of items per page (#3967)
+
+## 2.5.9
+
+* Fix a warning when preloading the `AbstractPaginator` class (#3827)
+* OpenAPI: prevent `additionalProp1` from showing in example values (#3888)
+* Varnish: fix a bug when passing an empty list of tags to the purger (#3827)
+* JSON Schema: mark `hydra:mapping` properties as nullable (#3877)
+
+## 2.5.8
+
+* PHP 8 support (#3791, #3745, #3855)
+* Metadata: Fix merging null values from annotations (#3711)
+* JSON-LD: Add missing `@type` from collection using output DTOs (#3699)
+* Cache: Improve `PurgeHttpCacheListener` performances (#3743)
+* Cache: Fix `VarnishPurger` max header length (#3843)
+* Identifiers: Do not denormalize the same identifier twice (#3762)
+* OpenAPI: Lazy load `SwaggerCommand` (#3802)
+* OpenAPI: Use Output class name instead of the Resource short name when available (#3741)
+* OpenAPI: Allow unset PathItem method (#4107)
+* Router: Replace baseurl only once (#3776)
+* Mercure: Publisher bug fixes (#3790, #3739)
+* Serializer: Catch NotNormalizableValueException to UnexpectedValueEception with inputs (#3697)
+* Doctrine: Do not add JOINs for filters without a value (#3703)
+* MongoDB: Escape search terms in `RegexFilter` (#3755)
+* Tests: Improve JSON Schema assertions (#3807, #3803, #3804, #3806, #3817, #3829, #3830)
+* Tests: Allow passing extra options in ApiTestClient (#3486)
+* Docs: Upgrade Swagger UI to version 3.37.2 (#3867)
+* Docs: Upgrade ReDoc to version 2.0.0-rc.45 (#3867)
+* Docs: Upgrade GraphiQL to version 15.3.0 (#3867)
+* Docs: Upgrade GraphQL Playground to version 1.7.26 (#3867)
+
+For compatibility reasons with Symfony 5.2 and PHP 8, we do not test anymore the integration with these legacy packages:
+- FOSUserBundle
+- NelmioApiDoc 2
+
 ## 2.5.7
 
 * Compatibility with Symfony 5.1 (#3589 and #3688)
@@ -8,16 +249,16 @@
 * Doctrine: Order filter doesn't throw anymore with numeric key (#3673 and #3687)
 * Doctrine: Fix ODM check change tracking deferred (#3629)
 * Doctrine: Allow 2inflector version 2.0 (#3607)
-* OpenAPI: Allow subresources context to be added (#3685) 
+* OpenAPI: Allow subresources context to be added (#3685)
 * OpenAPI: Fix pagination documentation on subresources (#3678)
 * Subresource: Fix query when using a custom identifier (#3529 and #3671)
 * GraphQL: Fix relation types without Doctrine (#3591)
 * GraphQL: Fix DTO relations (#3594)
 * GraphQL: Compatibility with graphql-php version 14 (#3621 and #3654)
 * Docs: Upgrade Swagger UI to version 3.32.5 (#3693)
-* Docs:Upgrade ReDoc to version 2.0.0-rc.40 (#3693)
-* Docs:Upgrade GraphiQL to version 1.0.3 (#3693)
-* Docs:Upgrade GraphQL Playground to version 1.7.23 (#3693)
+* Docs: Upgrade ReDoc to version 2.0.0-rc.40 (#3693)
+* Docs: Upgrade GraphiQL to version 1.0.3 (#3693)
+* Docs: Upgrade GraphQL Playground to version 1.7.23 (#3693)
 
 ## 2.5.6
 
@@ -104,7 +345,7 @@
 
 * Allow to not declare GET item operation
 * Add support for the Accept-Patch header
-* Make the `maximum_items_per_page` attribute consistent with other attributes controlling pagination 
+* Make the `maximum_items_per_page` attribute consistent with other attributes controlling pagination
 * Allow to use a string instead of an array for serializer groups
 * Test: Add a helper method to find the IRI of a resource
 * Test: Add assertions for testing response against JSON Schema from API resource
@@ -115,6 +356,7 @@
 
 * Add an HTTP client dedicated to functional API testing (#2608)
 * Add PATCH support (#2895)
+  Note: with JSON Merge Patch, responses will skip null values. As this may break on some endpoints, you need to manually [add the `merge-patch+json` format](https://api-platform.com/docs/core/content-negotiation/#configuring-patch-formats) to enable PATCH support. This will be the default behavior in API Platform 3.
 * Add a command to generate json schemas `api:json-schema:generate` (#2996)
 * Add infrastructure to generate a JSON Schema from a Resource `ApiPlatform\Core\JsonSchema\SchemaFactoryInterface` (#2983)
 * Replaces `access_control` by `security` and adds a `security_post_denormalize` attribute (#2992)

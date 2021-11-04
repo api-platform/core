@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
 
 use Doctrine\ODM\MongoDB\Types\Type;
 
@@ -23,6 +23,8 @@ class DoctrineFooType extends Type
 {
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function convertToDatabaseValue($value)
     {
@@ -38,6 +40,8 @@ class DoctrineFooType extends Type
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function convertToPHPValue($value)
     {

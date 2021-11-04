@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -50,16 +50,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyGroup
 {
     /**
-     * @var int
+     * @var int|null
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      *
      * @Groups({"dummy", "dummy_read", "dummy_id"})
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -68,7 +68,7 @@ class DummyGroup
     public $foo;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -77,7 +77,7 @@ class DummyGroup
     public $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -86,7 +86,7 @@ class DummyGroup
     public $baz;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      *
@@ -94,10 +94,7 @@ class DummyGroup
      */
     public $qux;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }

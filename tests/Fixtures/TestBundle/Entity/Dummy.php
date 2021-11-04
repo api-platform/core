@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -98,7 +98,7 @@ class Dummy
      * @var \DateTime A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
+     * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;
 
@@ -313,10 +313,7 @@ class Dummy
         $this->relatedOwningDummy = $relatedOwningDummy;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }

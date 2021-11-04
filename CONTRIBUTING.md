@@ -18,11 +18,6 @@ Then, if it appears that it's a real bug, you may report it using GitHub by foll
 
 > _NOTE:_ Don't hesitate giving as much information as you can (OS, PHP version extensions...)
 
-### Security Issues
-
-If you find a security issue, send a mail to Kévin Dunglas <dunglas@gmail.com>. **Please do not report security problems
-publicly**. We will disclose details of the issue and credit you after having released a new version including a fix.
-
 ## Pull Requests
 
 ### Writing a Pull Request
@@ -50,12 +45,26 @@ Alternatively, you can also work with the test application we provide:
 ### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
-But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](http://cs.sensiolabs.org/) tool:
+But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.sensiolabs.org/) tool:
 
     php-cs-fixer.phar fix
 
 And then, add the fixed file to your commit before pushing.
 Be sure to add only **your modified files**. If any other file is fixed by cs tools, just revert it before committing.
+
+### Backward Compatibility Promise
+
+API Platform is following the [Symfony Backward Compatibility Promise](https://symfony.com/doc/current/contributing/code/bc.html).
+
+When you are making a change, make sure no BC break is added.
+
+### Deprecating Code
+
+Adding a deprecation is sometimes necessary in order to follow the backward compatibility promise and to improve an existing implementation.
+
+They can only be introduced in minor or major versions (`main` branch) and exceptionally in patch versions if they are critical.
+
+See also the [related documentation for Symfony](https://symfony.com/doc/current/contributing/code/conventions.html#deprecating-code).
 
 ### Sending a Pull Request
 
@@ -67,9 +76,32 @@ When you send a PR, just make sure that:
 * You make the PR on the same branch you based your changes on. If you see commits
 that you did not make in your PR, you're doing it wrong.
 * Also don't forget to add a comment when you update a PR with a ping to [the maintainers](https://github.com/orgs/api-platform/people), so he/she will get a notification.
-* Squash your commits into one commit (see the next chapter).
 
-All Pull Requests must include [this header](.github/PULL_REQUEST_TEMPLATE.md).
+The commit messages must follow the [Conventional Commits specification](https://www.conventionalcommits.org/).
+The following types are allowed:
+
+* `fix`: bug fix
+* `feat`: new feature
+* `docs`: change in the documentation
+* `spec`: spec change
+* `test`: test-related change
+* `perf`: performance optimization
+* `ci`: CI-related change
+* `chore`: updating dependencies and related changes
+
+Examples:
+
+    fix(metadata): resource identifiers from properties 
+
+    feat(validation): introduce a number constraint
+
+    feat(metadata)!: new resource metadata system, BC break
+
+    docs(doctrine): search filter on uuids
+
+    test(doctrine): mongodb disambiguation
+
+We strongly recommend the use of a scope on API Platform core.
 
 ### Tests
 
@@ -97,35 +129,32 @@ Coverage will be available in `coverage/index.html`.
 
 The command to launch Behat tests is:
 
-    php -d memory_limit=-1 ./vendor/bin/behat --suite=default --stop-on-failure --format=progress
+    php -d memory_limit=-1 ./vendor/bin/behat --profile=default --stop-on-failure --format=progress
 
 If you want to launch Behat tests for MongoDB, the command is:
 
-    APP_ENV=mongodb php -d memory_limit=-1 ./vendor/bin/behat --suite=mongodb --stop-on-failure --format=progress
+    MONGODB_URL=mongodb://localhost:27017 APP_ENV=mongodb php -d memory_limit=-1 ./vendor/bin/behat --profile=mongodb --stop-on-failure --format=progress
 
-To get more details about an error, replace `--format=progress` by `-vvv`.
+To get more details about an error, replace `--format=progress` by `-vvv`. You may run a mongo instance using docker:
 
-## Squash your Commits
+	docker run -p 27017:27017 mongo:latest
 
-If you have 3 commits, start with:
+Start by adding a fixture, usually using Doctrine entities in `tests/Fixtures/TestBundle/Entity`. Note that we often duplicate the fixture 
+in the `tests/Fixtures/TestBundle/Document` directory for MongoDB ODM, if your test doesn't need to be tested with MongoDB use the `@!mongodb` group on the Behat scenario.
+If you need a `Given` step, add it to the doctrine context in `tests/Core/Behat/DoctrineContext.php`, for example:
 
-    git rebase -i HEAD~3
+```
+    /**
+     * @Given there is a payment
+     */
+    public function thereIsAPayment()
+    {
+        $this->manager->persist(new Payment('123.45'));
+        $this->manager->flush();
+    }
+```
 
-An editor will be opened with your 3 commits, all prefixed by `pick`.
-
-Replace all `pick` prefixes by `fixup` (or `f`) **except the first commit** of the list.
-
-Save and quit the editor.
-
-After that, all your commits will be squashed into the first one and the commit message will be the first one.
-
-If you would like to rename your commit message, type:
-
-    git commit --amend
-
-Now force push to update your PR:
-
-    git push --force-with-lease
+The last step is to add you feature inside `features/`. You can add your test in one of our existing features, or create your own.
 
 # License and Copyright Attribution
 

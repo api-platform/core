@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Cache\CachedTrait;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**

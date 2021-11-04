@@ -11,12 +11,15 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
+use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Creates properties's metadata using an extractor.
@@ -25,6 +28,7 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
  */
 final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
+    use DeprecationMetadataTrait;
     private $extractor;
     private $decorated;
 
@@ -37,7 +41,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
         $parentPropertyMetadata = null;
         if ($this->decorated) {
@@ -61,27 +65,43 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return $this->update($parentPropertyMetadata, $propertyMetadata);
         }
 
-        return ($metadata = new PropertyMetadata(
-            null,
-            $propertyMetadata['description'],
-            $propertyMetadata['readable'],
-            $propertyMetadata['writable'],
-            $propertyMetadata['readableLink'],
-            $propertyMetadata['writableLink'],
-            $propertyMetadata['required'],
-            $propertyMetadata['identifier'],
-            $propertyMetadata['iri'],
-            null,
-            $propertyMetadata['attributes']
-        ))->withSubresource($this->createSubresourceMetadata($propertyMetadata['subresource'], $metadata));
+        $apiProperty = new ApiProperty();
+
+        foreach ($propertyMetadata as $key => $value) {
+            if ('subresource' === $key) {
+                continue;
+            }
+            $methodName = 'with'.ucfirst($key);
+
+            if (method_exists($apiProperty, $methodName) && null !== $value) {
+                $apiProperty = $apiProperty->{$methodName}($value);
+            }
+        }
+
+        $metadata = $this->withDeprecatedAttributes($apiProperty, $propertyMetadata['attributes']);
+
+        if (isset($propertyMetadata['iri'])) {
+            trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');
+            $metadata = $metadata->withTypes([$propertyMetadata['iri']]);
+        }
+
+        if ($subresource = $this->createSubresourceMetadata($propertyMetadata['subresource'], $metadata)) {
+            return $metadata->withSubresource($subresource);
+        }
+
+        return $metadata;
     }
 
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
+     * @param ApiProperty|PropertyMetadata|null $parentPropertyMetadata
+     *
      * @throws PropertyNotFoundException
+     *
+     * @return ApiProperty|PropertyMetadata
      */
-    private function handleNotFound(?PropertyMetadata $parentPropertyMetadata, string $resourceClass, string $property): PropertyMetadata
+    private function handleNotFound($parentPropertyMetadata, string $resourceClass, string $property)
     {
         if ($parentPropertyMetadata) {
             return $parentPropertyMetadata;
@@ -92,8 +112,12 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
     /**
      * Creates a new instance of metadata if the property is not already set.
+     *
+     * @param ApiProperty|PropertyMetadata|null $propertyMetadata
+     *
+     * @return ApiProperty|PropertyMetadata
      */
-    private function update(PropertyMetadata $propertyMetadata, array $metadata): PropertyMetadata
+    private function update($propertyMetadata, array $metadata)
     {
         $metadataAccessors = [
             'description' => 'get',
@@ -103,8 +127,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             'readableLink' => 'is',
             'required' => 'is',
             'identifier' => 'is',
-            'iri' => 'get',
-            'attributes' => 'get',
         ];
 
         foreach ($metadataAccessors as $metadataKey => $accessorPrefix) {
@@ -115,31 +137,53 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             $propertyMetadata = $propertyMetadata->{'with'.ucfirst($metadataKey)}($metadata[$metadataKey]);
         }
 
+        if ($propertyMetadata instanceof ApiProperty) {
+            $propertyMetadata = $this->withDeprecatedAttributes($propertyMetadata, $metadata['attributes']);
+
+            if (isset($metadata['iri'])) {
+                trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');
+                $propertyMetadata = $propertyMetadata->withTypes([$metadata['iri']]);
+            }
+        } else {
+            $propertyMetadata = $propertyMetadata->withIri($metadata['iri'])->withAttributes($metadata['attributes']);
+        }
+
         if ($propertyMetadata->hasSubresource()) {
             return $propertyMetadata;
         }
 
-        return $propertyMetadata->withSubresource($this->createSubresourceMetadata($metadata['subresource'], $propertyMetadata));
+        if ($subresource = $this->createSubresourceMetadata($metadata['subresource'], $propertyMetadata)) {
+            return $propertyMetadata->withSubresource($subresource);
+        }
+
+        return $propertyMetadata;
     }
 
     /**
      * Creates a SubresourceMetadata.
      *
-     * @param bool|array|null  $subresource      the subresource metadata coming from XML or YAML
-     * @param PropertyMetadata $propertyMetadata the current property metadata
+     * @param bool|array|null              $subresource      the subresource metadata coming from XML or YAML
+     * @param ApiProperty|PropertyMetadata $propertyMetadata the current property metadata
      */
-    private function createSubresourceMetadata($subresource, PropertyMetadata $propertyMetadata): ?SubresourceMetadata
+    private function createSubresourceMetadata($subresource, $propertyMetadata): ?SubresourceMetadata
     {
         if (!$subresource) {
             return null;
         }
 
-        $type = $propertyMetadata->getType();
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
         $maxDepth = \is_array($subresource) ? $subresource['maxDepth'] ?? null : null;
 
         if (null !== $type) {
             $isCollection = $type->isCollection();
-            $resourceClass = $isCollection && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
+            if (
+                $isCollection &&
+                $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+            ) {
+                $resourceClass = $collectionValueType->getClassName();
+            } else {
+                $resourceClass = $type->getClassName();
+            }
         } elseif (\is_array($subresource) && isset($subresource['resourceClass'])) {
             $resourceClass = $subresource['resourceClass'];
             $isCollection = $subresource['collection'] ?? true;

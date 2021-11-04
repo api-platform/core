@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
-use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
+use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCustomQuery;
 
 /**
  * Resolver for dummy item custom query.

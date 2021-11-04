@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -72,10 +72,7 @@ class RelatedToDummyFriend
         return $this->name;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -90,10 +87,8 @@ class RelatedToDummyFriend
 
     /**
      * Gets dummyFriend.
-     *
-     * @return DummyFriend
      */
-    public function getDummyFriend()
+    public function getDummyFriend(): DummyFriend
     {
         return $this->dummyFriend;
     }
@@ -110,10 +105,8 @@ class RelatedToDummyFriend
 
     /**
      * Gets relatedDummy.
-     *
-     * @return RelatedDummy
      */
-    public function getRelatedDummy()
+    public function getRelatedDummy(): RelatedDummy
     {
         return $this->relatedDummy;
     }

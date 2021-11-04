@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Api;
+namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\ItemNotFoundException;
-use ApiPlatform\Core\Exception\RuntimeException;
+use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Exception\RuntimeException;
 
 /**
  * Converts item and resources to IRI and vice versa.
@@ -42,26 +42,12 @@ interface IriConverterInterface
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromItem($item, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
+    public function getIriFromItem($item, string $operationName = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
 
     /**
      * Gets the IRI associated with the given resource collection.
      *
      * @throws InvalidArgumentException
      */
-    public function getIriFromResourceClass(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
-
-    /**
-     * Gets the item IRI associated with the given resource.
-     *
-     * @throws InvalidArgumentException
-     */
-    public function getItemIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
-
-    /**
-     * Gets the IRI associated with the given resource subresource.
-     *
-     * @throws InvalidArgumentException
-     */
-    public function getSubresourceIriFromResourceClass(string $resourceClass, array $identifiers, int $referenceType = UrlGeneratorInterface::ABS_PATH): string;
+    public function getIriFromResourceClass(string $resourceClass, string $operationName = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
 }

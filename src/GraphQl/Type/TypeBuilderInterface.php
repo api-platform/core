@@ -11,9 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
@@ -22,8 +23,6 @@ use Symfony\Component\PropertyInfo\Type;
 
 /**
  * Interface implemented to build a GraphQL type.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -34,7 +33,7 @@ interface TypeBuilderInterface
      *
      * @return ObjectType|NonNull the object type, possibly wrapped by NonNull
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped, int $depth): GraphQLType;
+    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType;
 
     /**
      * Get the interface type of a node.
@@ -44,7 +43,7 @@ interface TypeBuilderInterface
     /**
      * Gets the type of a paginated collection of the given resource type.
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType): GraphQLType;
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType;
 
     /**
      * Returns true if a type is a collection.

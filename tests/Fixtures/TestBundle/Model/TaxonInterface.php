@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Model;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
+ *     attributes={"identifiers"="code"},
  *     shortName="Taxon",
  *     normalizationContext={
  *         "groups"={"taxon_read"},

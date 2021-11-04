@@ -11,12 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver;
+namespace ApiPlatform\GraphQl\Resolver;
 
 /**
  * A function resolving a GraphQL query of an item.
- *
- * @experimental
  *
  * @author Lukas Lücke <lukas@luecke.me>
  */

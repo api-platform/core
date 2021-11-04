@@ -13,14 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\Factory\CollectionResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Factory\CollectionResolverFactory;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -42,7 +44,7 @@ class CollectionResolverFactoryTest extends TestCase
     private $securityPostDenormalizeStageProphecy;
     private $serializeStageProphecy;
     private $queryResolverLocatorProphecy;
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
     private $requestStackProphecy;
 
     /**
@@ -55,7 +57,7 @@ class CollectionResolverFactoryTest extends TestCase
         $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->requestStackProphecy = $this->prophesize(RequestStack::class);
 
         $this->collectionResolverFactory = new CollectionResolverFactory(
@@ -64,7 +66,7 @@ class CollectionResolverFactoryTest extends TestCase
             $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
             $this->queryResolverLocatorProphecy->reveal(),
-            $this->resourceMetadataFactoryProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->requestStackProphecy->reveal()
         );
     }
@@ -74,10 +76,11 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
-        $source = ['source'];
+        $source = ['testField' => 0];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+        $info->fieldName = 'testField';
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $request = new Request();
         $attributesParameterBagProphecy = $this->prophesize(ParameterBag::class);
@@ -89,7 +92,77 @@ class CollectionResolverFactoryTest extends TestCase
         $readStageCollection = [new \stdClass()];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new QueryCollection()])]));
+
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+                'previous_object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+
+        $serializeStageData = ['serialized'];
+        $this->serializeStageProphecy->__invoke($readStageCollection, $resourceClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($serializeStageData);
+
+        $this->assertSame($serializeStageData, ($this->collectionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
+    }
+
+    public function testResolveFieldNotInSource(): void
+    {
+        $resourceClass = 'stdClass';
+        $rootClass = 'rootClass';
+        $operationName = 'collection_query';
+        $source = ['source'];
+        $args = ['args'];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'testField';
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
+
+        $readStageCollection = [new \stdClass()];
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldNotBeCalled();
+
+        $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+        $this->securityPostDenormalizeStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
+            'extra_variables' => [
+                'object' => $readStageCollection,
+                'previous_object' => $readStageCollection,
+            ],
+        ])->shouldNotBeCalled();
+
+        // Null should be returned if the field isn't in the source - as its lack of presence will be due to @ApiProperty security stripping unauthorized fields
+        $this->assertNull(($this->collectionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info));
+    }
+
+    public function testResolveNullSource(): void
+    {
+        $resourceClass = 'stdClass';
+        $rootClass = 'rootClass';
+        $operationName = 'collection_query';
+        $source = null;
+        $args = ['args'];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
+
+        $request = new Request();
+        $attributesParameterBagProphecy = $this->prophesize(ParameterBag::class);
+        $attributesParameterBagProphecy->get('_graphql_collections_args', [])->willReturn(['collection_args']);
+        $attributesParameterBagProphecy->set('_graphql_collections_args', [$resourceClass => $args, 'collection_args'])->shouldBeCalled();
+        $request->attributes = $attributesParameterBagProphecy->reveal();
+        $this->requestStackProphecy->getCurrentRequest()->willReturn($request);
+
+        $readStageCollection = [new \stdClass()];
+        $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
+
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new QueryCollection()])]));
 
         $this->securityStageProphecy->__invoke($resourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -138,10 +211,10 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
-        $source = ['source'];
+        $source = null;
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
@@ -157,17 +230,15 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
-        $source = ['source'];
+        $source = null;
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageCollection = [new \stdClass()];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageCollection);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['collection_query' => 'query_resolver_id']])
-        );
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new QueryCollection())->withResolver('query_resolver_id')])]));
 
         $customCollection = [new \stdClass()];
         $customCollection[0]->field = 'foo';

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -31,9 +31,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DummyValidation
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -54,83 +54,62 @@ class DummyValidation
     private $title;
 
     /**
-     * @var string The dummy code
+     * @var string|null The dummy code
      * @ODM\Field
      */
     private $code;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return DummyValidation
-     */
-    public function setId(int $id)
+    public function setId(int $id): self
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
      * @param string|null $name
-     *
-     * @return DummyValidation
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
     /**
      * @param string|null $title
-     *
-     * @return DummyValidation
      */
-    public function setTitle($title)
+    public function setTitle($title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
     /**
      * @param string $code
-     *
-     * @return DummyValidation
      */
-    public function setCode($code)
+    public function setCode($code): self
     {
         $this->code = $code;
 

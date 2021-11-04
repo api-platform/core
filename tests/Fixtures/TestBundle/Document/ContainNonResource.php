@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
+use ApiPlatform\Tests\Fixtures\NotAResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -24,9 +24,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ODM\Document
  *
  * @ApiResource(
- *     normalizationContext={
- *         "groups"="contain_non_resource",
+ *     attributes={
+ *         "filters"={"my_dummy.property"}
  *     },
+ *     normalizationContext={
+ *         "groups"={"contain_non_resource"}
+ *     }
  * )
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,7 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ContainNonResource
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      *
      * @Groups("contain_non_resource")
      */

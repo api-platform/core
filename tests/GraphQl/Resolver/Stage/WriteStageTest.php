@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStage;
-use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\GraphQl\Resolver\Stage\WriteStage;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
@@ -31,7 +34,7 @@ class WriteStageTest extends TestCase
 
     /** @var WriteStage */
     private $writeStage;
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
     private $dataPersisterProphecy;
     private $serializerContextBuilderProphecy;
 
@@ -40,12 +43,12 @@ class WriteStageTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->dataPersisterProphecy = $this->prophesize(ContextAwareDataPersisterInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $this->writeStage = new WriteStage(
-            $this->resourceMetadataFactoryProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->dataPersisterProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal()
         );
@@ -54,9 +57,13 @@ class WriteStageTest extends TestCase
     public function testNoData(): void
     {
         $resourceClass = 'myResource';
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $operationName = 'item_query';
+        $resourceMetadata = (new ApiResource())->withGraphQlOperations([
+            $operationName => (new Query()),
+        ]);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [$resourceMetadata]));
 
-        $result = ($this->writeStage)(null, $resourceClass, 'item_query', []);
+        $result = ($this->writeStage)(null, $resourceClass, $operationName, []);
 
         $this->assertNull($result);
     }
@@ -65,10 +72,10 @@ class WriteStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = (new ResourceMetadata())->withGraphql([
-            $operationName => ['write' => false],
-        ]);
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
+            $operationName => (new Query())->withWrite(false),
+        ])]);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $data = new \stdClass();
         $result = ($this->writeStage)($data, $resourceClass, $operationName, []);
@@ -81,7 +88,10 @@ class WriteStageTest extends TestCase
         $operationName = 'delete';
         $resourceClass = 'myResource';
         $context = [];
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
+            $operationName => new Mutation(),
+        ])]);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $denormalizationContext = ['denormalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
@@ -100,7 +110,10 @@ class WriteStageTest extends TestCase
         $operationName = 'create';
         $resourceClass = 'myResource';
         $context = [];
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
+            $operationName => new Mutation(),
+        ])]);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $denormalizationContext = ['denormalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
@@ -124,7 +137,10 @@ class WriteStageTest extends TestCase
         $operationName = 'create';
         $resourceClass = 'myResource';
         $context = [];
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
+            $operationName => new Mutation(),
+        ])]);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $denormalizationContext = ['denormalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -33,15 +33,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyDifferentGraphQlSerializationGroup
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
+     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      * @Groups({"item_query", "collection_query"})
      */
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
      * @Groups({"item_query", "collection_query"})
@@ -49,19 +49,19 @@ class DummyDifferentGraphQlSerializationGroup
     private $name;
 
     /**
-     * @var string The dummy title
+     * @var string|null The dummy title
      *
      * @ODM\Field(nullable=true)
      * @Groups({"item_query"})
      */
     private $title;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -71,7 +71,7 @@ class DummyDifferentGraphQlSerializationGroup
         $this->name = $name;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }

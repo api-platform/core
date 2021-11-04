@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type\Definition;
+namespace ApiPlatform\GraphQl\Type\Definition;
 
 use GraphQL\Error\Error;
 use GraphQL\Language\AST\BooleanValueNode;
@@ -33,8 +33,10 @@ if (\PHP_VERSION_ID >= 70200) {
          * {@inheritdoc}
          *
          * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
+         *
+         * @return mixed
          */
-        public function parseLiteral(/*Node */$valueNode, ?array $variables = null)
+        public function parseLiteral(/*Node */ $valueNode, ?array $variables = null)
         {
             if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
                 return $this->parseIterableLiteral($valueNode);
@@ -67,8 +69,6 @@ if (\PHP_VERSION_ID >= 70200) {
 /**
  * Represents an iterable type.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class IterableType extends ScalarType implements TypeInterface
@@ -90,6 +90,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function serialize($value)
     {
@@ -102,6 +104,8 @@ final class IterableType extends ScalarType implements TypeInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function parseValue($value)
     {

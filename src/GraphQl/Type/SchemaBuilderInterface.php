@@ -11,14 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
 use GraphQL\Type\Schema;
 
 /**
  * Builds a GraphQL schema.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

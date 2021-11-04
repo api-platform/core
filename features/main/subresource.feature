@@ -24,13 +24,16 @@ Feature: Subresource support
     }
     """
 
+  @createSchema
   Scenario: Get a non existent subresource
     Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
     When I send a "GET" request to "/questions/999999/answer"
     Then the response status code should be 404
     And the response should be in JSON
 
+  @createSchema
   Scenario: Get recursive subresource one to many relation
+    Given there is an answer "42" to the question "What's the answer to the Ultimate Question of Life, the Universe and Everything?"
     When I send a "GET" request to "/questions/1/answer/related_questions"
     And the response status code should be 200
     And the response should be in JSON
@@ -53,6 +56,7 @@ Feature: Subresource support
     }
     """
 
+  @createSchema
   Scenario: Get the subresource relation collection
     Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies"
@@ -104,7 +108,7 @@ Feature: Subresource support
       "hydra:totalItems": 2,
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -124,13 +128,27 @@ Feature: Subresource support
             "variable": "name",
             "property": "name",
             "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age",
+            "property": "age",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age[]",
+            "property": "age",
+            "required": false
           }
         ]
       }
     }
     """
 
+  @createSchema
   Scenario: Get filtered embedded relation subresource collection
+    Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies?name=Hello"
     Then the response status code should be 200
     And the response should be in JSON
@@ -167,7 +185,7 @@ Feature: Subresource support
       },
       "hydra:search": {
         "@type": "hydra:IriTemplate",
-        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name}",
+        "hydra:template": "/dummies/1/related_dummies{?relatedToDummyFriend.dummyFriend,relatedToDummyFriend.dummyFriend[],name,age,age[]}",
         "hydra:variableRepresentation": "BasicRepresentation",
         "hydra:mapping": [
           {
@@ -186,6 +204,18 @@ Feature: Subresource support
             "@type": "IriTemplateMapping",
             "variable": "name",
             "property": "name",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age",
+            "property": "age",
+            "required": false
+          },
+          {
+            "@type": "IriTemplateMapping",
+            "variable": "age[]",
+            "property": "age",
             "required": false
           }
         ]
@@ -344,71 +374,6 @@ Feature: Subresource support
     }
     """
 
-
-  Scenario: The OneToOne subresource should be accessible from owned side
-    Given there is a RelatedOwnedDummy object with OneToOne relation
-    When I send a "GET" request to "/related_owned_dummies/1/owning_dummy"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies/3",
-      "@type": "Dummy",
-      "description": null,
-      "dummy": null,
-      "dummyBoolean": null,
-      "dummyDate": null,
-      "dummyFloat": null,
-      "dummyPrice": null,
-      "relatedDummy": null,
-      "relatedDummies": [],
-      "jsonData": [],
-      "arrayData": [],
-      "name_converted": null,
-      "relatedOwnedDummy": "/related_owned_dummies/1",
-      "relatedOwningDummy": null,
-      "id": 3,
-      "name": "plop",
-      "alias": null,
-      "foo": null
-    }
-    """
-
-  Scenario: The OneToOne subresource should be accessible from owning side
-    Given there is a RelatedOwningDummy object with OneToOne relation
-    When I send a "GET" request to "/related_owning_dummies/1/owned_dummy"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Dummy",
-      "@id": "/dummies/4",
-      "@type": "Dummy",
-      "description": null,
-      "dummy": null,
-      "dummyBoolean": null,
-      "dummyDate": null,
-      "dummyFloat": null,
-      "dummyPrice": null,
-      "relatedDummy": null,
-      "relatedDummies": [],
-      "jsonData": [],
-      "arrayData": [],
-      "name_converted": null,
-      "relatedOwnedDummy": null,
-      "relatedOwningDummy": "/related_owning_dummies/1",
-      "id": 4,
-      "name": "plop",
-      "alias": null,
-      "foo": null
-    }
-    """
-
   Scenario: Recursive resource
     When I send a "GET" request to "/dummy_products/2"
     Then the response status code should be 200
@@ -429,5 +394,71 @@ Feature: Subresource support
         "/dummy_products/1"
       ],
       "parent": null
+    }
+    """
+
+  @createSchema
+  Scenario: The OneToOne subresource should be accessible from owned side
+    Given there is a RelatedOwnedDummy object with OneToOne relation
+    When I send a "GET" request to "/related_owned_dummies/1/owning_dummy"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": null,
+      "dummyFloat": null,
+      "dummyPrice": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "jsonData": [],
+      "arrayData": [],
+      "name_converted": null,
+      "relatedOwnedDummy": "/related_owned_dummies/1",
+      "relatedOwningDummy": null,
+      "id": 1,
+      "name": "plop",
+      "alias": null,
+      "foo": null
+    }
+    """
+
+  @createSchema
+  Scenario: The OneToOne subresource should be accessible from owning side
+    Given there is a RelatedOwningDummy object with OneToOne relation
+    When I send a "GET" request to "/related_owning_dummies/1/owned_dummy"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/Dummy",
+      "@id": "/dummies/1",
+      "@type": "Dummy",
+      "description": null,
+      "dummy": null,
+      "dummyBoolean": null,
+      "dummyDate": null,
+      "dummyFloat": null,
+      "dummyPrice": null,
+      "relatedDummy": null,
+      "relatedDummies": [],
+      "jsonData": [],
+      "arrayData": [],
+      "name_converted": null,
+      "relatedOwnedDummy": null,
+      "relatedOwningDummy": "/related_owning_dummies/1",
+      "id": 1,
+      "name": "plop",
+      "alias": null,
+      "foo": null
     }
     """

@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataPersister;
 
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\InputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
 use Doctrine\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputDataPersister implements DataPersisterInterface

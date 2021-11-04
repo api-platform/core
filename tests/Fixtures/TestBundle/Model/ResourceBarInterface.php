@@ -11,9 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Model;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
+
+use ApiPlatform\Core\Annotation\ApiProperty;
 
 interface ResourceBarInterface
 {
+    /**
+     * @ApiProperty(identifier=true)
+     */
     public function getBar(): ?string;
 }

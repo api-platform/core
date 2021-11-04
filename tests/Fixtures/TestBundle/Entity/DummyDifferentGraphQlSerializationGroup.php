@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyDifferentGraphQlSerializationGroup
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -43,7 +43,7 @@ class DummyDifferentGraphQlSerializationGroup
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ORM\Column
      * @Groups({"item_query", "collection_query"})
@@ -51,19 +51,19 @@ class DummyDifferentGraphQlSerializationGroup
     private $name;
 
     /**
-     * @var string The dummy title
+     * @var string|null The dummy title
      *
      * @ORM\Column(nullable=true)
      * @Groups({"item_query"})
      */
     private $title;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -75,7 +75,7 @@ class DummyDifferentGraphQlSerializationGroup
         return $this;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }

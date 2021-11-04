@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Exception;
+namespace ApiPlatform\Exception;
 
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 

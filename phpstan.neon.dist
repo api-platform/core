@@ -6,99 +6,105 @@ parameters:
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
 	symfony:
-		container_xml_path: tests/Fixtures/app/var/cache/test/appAppKernelTestDebugContainer.xml
+		container_xml_path: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
 		constant_hassers: false
 	bootstrapFiles:
-		- vendor/bin/.phpunit/phpunit-9.2-0/vendor/autoload.php
+		- vendor/bin/.phpunit/phpunit/vendor/autoload.php
+		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
+		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludes_analyse:
+		# Symfony cache
 		- tests/Fixtures/app/var/cache
+		# Deprecated integrations (will be removed in API Platform 3)
+		- src/Core/Bridge/NelmioApiDoc/*
+		- tests/Core/Bridge/NelmioApiDoc/*
+		- src/Core/Bridge/FosUser/*
+		# BC layer
+		- tests/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
+		- tests/Core/Annotation/ApiResourceTest.php
+		- tests/Core/Annotation/ApiPropertyTest.php
+		- tests/Core/Metadata/Resource/Factory/AnnotationResourceMetadataFactoryTest.php
+		- tests/Fixtures/TestBundle/BrowserKit/Client.php
 		# The Symfony Configuration API isn't good enough to be analysed
-		- src/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		# Phpstan runs on phpunit > 9, a signature changed in this file
+		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Imported code (temporary)
-		- src/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
-		- tests/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
+		- src/Core/Bridge/Symfony/Bundle/Test/BrowserKitAssertionsTrait.php
+		- tests/Core/Bridge/Symfony/Bundle/Test/WebTestCaseTest.php
+		- tests/Core/ProphecyTrait.php
+		- tests/Core/Behat/CoverageContext.php
+		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
+		# Templates for Maker
+		- src/Core/Bridge/Symfony/Maker/Resources/skeleton
+		- src/Bridge/Symfony/Maker/Resources/skeleton
+		# Rector because new API Platform 3.0 classes don't exist yet
+		- src/Core/Bridge/Rector
+		- src/Core/Bridge/Symfony/Bundle/Command/RectorCommand.php
+		- tests/Core/Bridge/Rector/Rules
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
+		ApiPlatform\Metadata\Resource\ResourceMetadataCollection:
+			- handleNotFound
 	ignoreErrors:
-		# Real problems, hard to fix
-		- '#Parameter \#2 \$dqlPart of method Doctrine\\ORM\\QueryBuilder::add\(\) expects array\|object, string given\.#'
-		-
-			message: '#Return type \(int\) of method ApiPlatform\\Core\\Identifier\\Normalizer\\IntegerDenormalizer::denormalize\(\) should be compatible with return type \(array\|object\) of method Symfony\\Component\\Serializer\\Normalizer\\DenormalizerInterface::denormalize\(\)#'
-			path: src/Identifier/Normalizer/IntegerDenormalizer.php
-
 		# False positives
+		-
+			message: '#Unreachable statement - code above always terminates.#'
+			paths:
+				- tests/GraphQl/Resolver/Stage/SecurityPostDenormalizeStageTest.php
+		-
+			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
+			paths:
+				- tests/Core/Bridge/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
-				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php
-		-
-			message: '#Variable \$iri might not be defined\.#'
-			path: src/JsonApi/Serializer/ItemNormalizer.php
-		-
-			message: '#Variable \$positionPm might not be defined\.#'
-			path: src/Util/ClassInfoTrait.php
+				- src/Core/Bridge/Doctrine/Common/PropertyHelperTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
-			path: src/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
+			path: src/Core/Bridge/Doctrine/Common/Util/IdentifierManagerTrait.php
 		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
 		-
 			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
-			path: src/EventListener/AddFormatListener.php
-		# https://github.com/symfony/symfony/issues/31814#issuecomment-498749590
-		-
-			message: '#Call to an undefined method Symfony\\Component\\Security\\Core\\Role\\RoleHierarchyInterface::getReachableRoles\(\)\.#'
-			path: src/Security/ResourceAccessChecker.php
+			path: src/Core/EventListener/AddFormatListener.php
 		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
 		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
 		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
 		-
 			message: '#Parameter \#[0-9] \$filterLocator of class .+ constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface, ArrayObject<mixed, mixed> given\.#'
 			paths:
-				- tests/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
-				- tests/Bridge/NelmioApiDoc/Extractor/AnnotationsProvider/ApiPlatformProviderTest.php
-				- tests/Hydra/Serializer/CollectionFiltersNormalizerTest.php
-				- tests/Swagger/Serializer/DocumentationNormalizerV2Test.php
-				- tests/Swagger/Serializer/DocumentationNormalizerV3Test.php
+				- tests/Core/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
+				- tests/Core/Hydra/Serializer/CollectionFiltersNormalizerTest.php
+				- tests/Core/Swagger/Serializer/DocumentationNormalizerV2Test.php
+				- tests/Core/Swagger/Serializer/DocumentationNormalizerV3Test.php
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: tests/GraphQl/Type/TypeBuilderTest.php
 		# https://github.com/phpstan/phpstan-doctrine/issues/115
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
-			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			path: src/Core/Test/DoctrineMongoDbOdmFilterTestCase.php
 		-
 			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-			path: tests/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
+			path: tests/Core/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
 		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
-			path: tests/Identifier/Normalizer/IntegerDenormalizerTest.php
+			path: tests/Core/Identifier/Normalizer/IntegerDenormalizerTest.php
 		-
-			message: '#Service "api_platform\.json_schema\.schema_factory" is private\.#'
-			path: src/Bridge/Symfony/Bundle/Test/ApiTestAssertionsTrait.php
-		-
-			message: '#Service "api_platform\.iri_converter" is private\.#'
-			path: src/Bridge/Symfony/Bundle/Test/ApiTestCase.php
+			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
+			path: tests/Core/Util/SortTraitTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
-		-
-			message: '#Service "api_platform\.graphql\.fields_builder" is private\.#'
-			path: src/GraphQl/Type/TypeBuilder.php
 		-
 			message: '#Service "test" is not registered in the container\.#'
 			path: tests/GraphQl/Type/TypesContainerTest.php
-		# https://github.com/phpstan/phpstan/issues/2999
-		-
-			message: '#ArrayObject<string, string> does not accept true\.#'
-			path: src/JsonSchema/SchemaFactory.php
-		-
-			message: '#ArrayObject<string, string> does not accept array<string, mixed>\.#'
-			path: src/JsonSchema/SchemaFactory.php
-		-
-			message: '#Cannot assign new offset to string\.#'
-			path: src/JsonSchema/SchemaFactory.php
+
+		# Expected, due to PHP 8 attributes
+		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiResource has an unused parameter#'
+		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiProperty has an unused parameter#'
 
 		# Expected, due to optional interfaces
 		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
@@ -121,11 +127,4 @@ parameters:
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
-
-		# Waiting to be fixed by https://github.com/Roave/BetterReflection/issues/663
-		-
-			message: '#Call to private method getNestedFieldPath\(\) of class ApiPlatform\\Core\\Bridge\\Elasticsearch\\DataProvider\\Filter\\AbstractFilter\.#'
-			paths:
-				- src/Bridge/Elasticsearch/DataProvider/Filter/OrderFilter.php
-				- src/Bridge/Elasticsearch/DataProvider/Filter/AbstractSearchFilter.php
+			path: tests/Core/JsonApi/Serializer/ItemNormalizerTest.php

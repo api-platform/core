@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -28,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedToDummyFriend
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -83,10 +83,7 @@ class RelatedToDummyFriend
         return $this->name;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -101,10 +98,8 @@ class RelatedToDummyFriend
 
     /**
      * Gets dummyFriend.
-     *
-     * @return DummyFriend
      */
-    public function getDummyFriend()
+    public function getDummyFriend(): DummyFriend
     {
         return $this->dummyFriend;
     }
@@ -121,10 +116,8 @@ class RelatedToDummyFriend
 
     /**
      * Gets relatedDummy.
-     *
-     * @return RelatedDummy
      */
-    public function getRelatedDummy()
+    public function getRelatedDummy(): RelatedDummy
     {
         return $this->relatedDummy;
     }

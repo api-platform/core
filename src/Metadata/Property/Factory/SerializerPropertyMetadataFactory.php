@@ -11,13 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
+use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
 
 /**
@@ -33,9 +36,14 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     private $serializerClassMetadataFactory;
     private $decorated;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(?ResourceMetadataFactoryInterface $resourceMetadataFactory = null, SerializerClassMetadataFactoryInterface $serializerClassMetadataFactory, PropertyMetadataFactoryInterface $decorated, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if ($resourceMetadataFactory) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Injecting a "%s" in the "%s" is deprecated and will not be possible anymore in 3.0.', ResourceMetadataFactoryInterface::class, __CLASS__));
+        }
+
         $this->serializerClassMetadataFactory = $serializerClassMetadataFactory;
         $this->decorated = $decorated;
         $this->resourceClassResolver = $resourceClassResolver;
@@ -44,18 +52,26 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
+    public function create(string $resourceClass, string $property, array $options = [])
     {
+        /** @var PropertyMetadata|ApiProperty */
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        // in case of a property inherited (in a child class), we need it's properties
-        // to be mapped against serialization groups instead of the parent ones.
-        if (null !== ($childResourceClass = $propertyMetadata->getChildInherited())) {
+        // BC to be removed in 3.0
+        if ($propertyMetadata instanceof PropertyMetadata && null !== ($childResourceClass = $propertyMetadata->getChildInherited())) {
             $resourceClass = $childResourceClass;
         }
 
         try {
             [$normalizationGroups, $denormalizationGroups] = $this->getEffectiveSerializerGroups($options, $resourceClass);
+
+            if ($normalizationGroups && !\is_array($normalizationGroups)) {
+                $normalizationGroups = [$normalizationGroups];
+            }
+
+            if ($denormalizationGroups && !\is_array($denormalizationGroups)) {
+                $denormalizationGroups = [$denormalizationGroups];
+            }
         } catch (ResourceClassNotFoundException $e) {
             // TODO: for input/output classes, the serializer groups must be read from the actual resource class
             return $propertyMetadata;
@@ -67,24 +83,29 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     }
 
     /**
-     * Sets readable/writable based on matching normalization/denormalization groups.
+     * Sets readable/writable based on matching normalization/denormalization groups and property's ignorance.
      *
      * A false value is never reset as it could be unreadable/unwritable for other reasons.
-     * If normalization/denormalization groups are not specified, the property is implicitly readable/writable.
+     * If normalization/denormalization groups are not specified and the property is not ignored, the property is implicitly readable/writable.
      *
-     * @param string[]|null $normalizationGroups
-     * @param string[]|null $denormalizationGroups
+     * @param PropertyMetadata|ApiProperty $propertyMetadata
+     * @param string[]|null                $normalizationGroups
+     * @param string[]|null                $denormalizationGroups
+     *
+     * @return PropertyMetadata|ApiProperty $propertyMetadata
      */
-    private function transformReadWrite(PropertyMetadata $propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
+    private function transformReadWrite($propertyMetadata, string $resourceClass, string $propertyName, array $normalizationGroups = null, array $denormalizationGroups = null)
     {
-        $groups = $this->getPropertySerializerGroups($resourceClass, $propertyName);
+        $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
+        $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
+        $ignored = $serializerAttributeMetadata && method_exists($serializerAttributeMetadata, 'isIgnored') ? $serializerAttributeMetadata->isIgnored() : false;
 
         if (false !== $propertyMetadata->isReadable()) {
-            $propertyMetadata = $propertyMetadata->withReadable(null === $normalizationGroups || !empty(array_intersect($normalizationGroups, $groups)));
+            $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)));
         }
 
         if (false !== $propertyMetadata->isWritable()) {
-            $propertyMetadata = $propertyMetadata->withWritable(null === $denormalizationGroups || !empty(array_intersect($denormalizationGroups, $groups)));
+            $propertyMetadata = $propertyMetadata->withWritable(!$ignored && (null === $denormalizationGroups || array_intersect($denormalizationGroups, $groups)));
         }
 
         return $propertyMetadata;
@@ -96,22 +117,32 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * If normalization/denormalization groups are not specified,
      * set link status to false since embedding of resource must be explicitly enabled
      *
-     * @param string[]|null $normalizationGroups
-     * @param string[]|null $denormalizationGroups
+     * @param PropertyMetadata|ApiProperty $propertyMetadata
+     * @param string[]|null                $normalizationGroups
+     * @param string[]|null                $denormalizationGroups
      */
-    private function transformLinkStatus(PropertyMetadata $propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null): PropertyMetadata
+    private function transformLinkStatus($propertyMetadata, array $normalizationGroups = null, array $denormalizationGroups = null)
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
             return $propertyMetadata;
         }
 
-        $type = $propertyMetadata->getType();
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
+
         if (null === $type) {
             return $propertyMetadata;
         }
 
-        $relatedClass = $type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) ? $collectionValueType->getClassName() : $type->getClassName();
+        if (
+            $type->isCollection() &&
+            $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
+        ) {
+            $relatedClass = $collectionValueType->getClassName();
+        } else {
+            $relatedClass = $type->getClassName();
+        }
 
         // if property is not a resource relation, don't set link status (as it would have no meaning)
         if (null === $relatedClass || !$this->isResourceClass($relatedClass)) {
@@ -148,7 +179,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      *
      * @throws ResourceClassNotFoundException
      *
-     * @return (string[]|null)[]
+     * @return (string[]|null|string)[]
      */
     private function getEffectiveSerializerGroups(array $options, string $resourceClass): array
     {
@@ -158,43 +189,53 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             return [$groups, $groups];
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (isset($options['collection_operation_name'])) {
-            $normalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'normalization_context', null, true);
-            $denormalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'denormalization_context', null, true);
-        } elseif (isset($options['item_operation_name'])) {
-            $normalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'normalization_context', null, true);
-            $denormalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'denormalization_context', null, true);
-        } elseif (isset($options['graphql_operation_name'])) {
-            $normalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'normalization_context', null, true);
-            $denormalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'denormalization_context', null, true);
-        } else {
-            $normalizationContext = $resourceMetadata->getAttribute('normalization_context');
-            $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');
+        if (\array_key_exists('normalization_groups', $options) && \array_key_exists('denormalization_groups', $options)) {
+            return [$options['normalization_groups'] ?? null, $options['denormalization_groups'] ?? null];
         }
 
-        return [
-            isset($normalizationContext['groups']) ? (array) $normalizationContext['groups'] : null,
-            isset($denormalizationContext['groups']) ? (array) $denormalizationContext['groups'] : null,
-        ];
+        // To avoid an injection recursion between PropertyMetadataFactory and ResourceMetadataFactory we ask for groups when an operation name is given in the context.
+        // This can be removed in 3.0 it must be an exception instead of a deprecation as `operation_name` means we use the new metadata system which isn't compatible
+        if (isset($options['operation_name'])) {
+            throw new \RuntimeException('You should specify "normalization_groups" and/or "denormalization_groups" when using the SerializerPropertyMetadataFactory.');
+        }
+
+        // TODO: 3.0 remove this code
+        if ($this->resourceMetadataFactory) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            if (isset($options['collection_operation_name'])) {
+                $normalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'normalization_context', null, true);
+                $denormalizationContext = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], 'denormalization_context', null, true);
+            } elseif (isset($options['item_operation_name'])) {
+                $normalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'normalization_context', null, true);
+                $denormalizationContext = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], 'denormalization_context', null, true);
+            } elseif (isset($options['graphql_operation_name'])) {
+                $normalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'normalization_context', null, true);
+                $denormalizationContext = $resourceMetadata->getGraphqlAttribute($options['graphql_operation_name'], 'denormalization_context', null, true);
+            } else {
+                $normalizationContext = $resourceMetadata->getAttribute('normalization_context');
+                $denormalizationContext = $resourceMetadata->getAttribute('denormalization_context');
+            }
+
+            return [
+                isset($normalizationContext['groups']) ? (array) $normalizationContext['groups'] : null,
+                isset($denormalizationContext['groups']) ? (array) $denormalizationContext['groups'] : null,
+            ];
+        }
+
+        return [null, null];
     }
 
-    /**
-     * Gets the serializer groups defined on a property.
-     *
-     * @return string[]
-     */
-    private function getPropertySerializerGroups(string $class, string $property): array
+    private function getSerializerAttributeMetadata(string $class, string $attribute): ?AttributeMetadataInterface
     {
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if ($property === $serializerAttributeMetadata->getName()) {
-                return $serializerAttributeMetadata->getGroups();
+            if ($attribute === $serializerAttributeMetadata->getName()) {
+                return $serializerAttributeMetadata;
             }
         }
 
-        return [];
+        return null;
     }
 
     /**
@@ -204,6 +245,15 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      */
     private function getClassSerializerGroups(string $class): array
     {
+        //TODO: 3.0 remove
+        if ($this->resourceMetadataFactory) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($class);
+            if ($outputClass = $resourceMetadata->getAttribute('output')['class'] ?? null) {
+                trigger_deprecation('api-platform/core', '2.7', 'We found a property class that is a resource with a different output. You should instead use an output at a higher level or type the property to that class directly if you want to keep the behavior.');
+                $class = $outputClass;
+            }
+        }
+
         $serializerClassMetadata = $this->serializerClassMetadataFactory->getMetadataFor($class);
 
         $groups = [];

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
@@ -105,10 +105,7 @@ class EmbeddedDummy
         $this->embeddedDummy = $embeddedDummy;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getDummyDate()
+    public function getDummyDate(): ?\DateTime
     {
         return $this->dummyDate;
     }
@@ -118,10 +115,7 @@ class EmbeddedDummy
         $this->dummyDate = $dummyDate;
     }
 
-    /**
-     * @return RelatedDummy
-     */
-    public function getRelatedDummy()
+    public function getRelatedDummy(): ?RelatedDummy
     {
         return $this->relatedDummy;
     }

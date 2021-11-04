@@ -11,29 +11,24 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Validator\ValidatorInterface;
-use GraphQL\Error\Error;
-use GraphQL\Type\Definition\ResolveInfo;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 /**
  * Validate stage of GraphQL resolvers.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class ValidateStage implements ValidateStageInterface
 {
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $validator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ValidatorInterface $validator)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ValidatorInterface $validator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->validator = $validator;
     }
 
@@ -42,19 +37,13 @@ final class ValidateStage implements ValidateStageInterface
      */
     public function __invoke($object, string $resourceClass, string $operationName, array $context): void
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (!$resourceMetadata->getGraphqlAttribute($operationName, 'validate', true, true)) {
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
+
+        if (!($operation->canValidate() ?? true)) {
             return;
         }
 
-        $validationGroups = $resourceMetadata->getGraphqlAttribute($operationName, 'validation_groups', null, true);
-        try {
-            $this->validator->validate($object, ['groups' => $validationGroups]);
-        } catch (ValidationException $e) {
-            /** @var ResolveInfo $info */
-            $info = $context['info'];
-
-            throw Error::createLocatedError($e->getMessage(), $info->fieldNodes, $info->path);
-        }
+        $this->validator->validate($object, $operation->getValidationContext() ?? []);
     }
 }

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
 
 /**
  * @ApiResource(messenger="input", input=MessengerResponseInput::class)

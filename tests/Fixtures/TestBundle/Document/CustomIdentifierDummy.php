@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -27,7 +27,7 @@ class CustomIdentifierDummy
     /**
      * @var int The custom identifier
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $customId;
 
@@ -38,18 +38,12 @@ class CustomIdentifierDummy
      */
     private $name;
 
-    /**
-     * @return int
-     */
-    public function getCustomId()
+    public function getCustomId(): int
     {
         return $this->customId;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\InputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\Document\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -37,7 +37,7 @@ class DummyDtoInputOutput
 
     /**
      * @var int The id
-     * @ODM\Id(strategy="INCREMENT", type="integer", nullable=true)
+     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     public $id;
 

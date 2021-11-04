@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -58,41 +58,41 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyCustomMutation
 {
     /**
-     * @var int
+     * @var int|null
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @var int
+     * @var int|null
      *
-     * @ODM\Field(type="integer")
+     * @ODM\Field(type="int")
      */
     private $operandA;
 
     /**
-     * @var int
+     * @var int|null
      *
      * @Groups({"sum"})
-     * @ODM\Field(type="integer", nullable=true)
+     * @ODM\Field(type="int", nullable=true)
      */
     private $operandB;
 
     /**
-     * @var int
+     * @var int|null
      *
      * @Groups({"result"})
-     * @ODM\Field(type="integer", nullable=true)
+     * @ODM\Field(type="int", nullable=true)
      */
     private $result;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getOperandA(): int
+    public function getOperandA(): ?int
     {
         return $this->operandA;
     }
@@ -102,7 +102,7 @@ class DummyCustomMutation
         $this->operandA = $operandA;
     }
 
-    public function getOperandB(): int
+    public function getOperandB(): ?int
     {
         return $this->operandB;
     }
@@ -112,7 +112,7 @@ class DummyCustomMutation
         $this->operandB = $operandB;
     }
 
-    public function getResult(): int
+    public function getResult(): ?int
     {
         return $this->result;
     }

@@ -11,12 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Factory;
+namespace ApiPlatform\GraphQl\Resolver\Factory;
 
 /**
  * Builds a GraphQL resolver.
- *
- * @experimental
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

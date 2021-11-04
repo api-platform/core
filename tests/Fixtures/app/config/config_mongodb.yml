@@ -1,5 +1,6 @@
 imports:
     - { resource: config_common.yml }
+    - { resource: config_behat_mongodb.yml }
 
 parameters:
     env(MONGODB_DB): api_platform_test
@@ -21,14 +22,6 @@ api_platform:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
             - '%kernel.project_dir%/config/api_resources_mongodb_odm.yaml'
-
-fos_user:
-    db_driver:       'mongodb'
-    firewall_name:   'api'
-    user_class:      'ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\User'
-    from_email:
-        address:     'no-reply@les-tilleuls.coop'
-        sender_name: 'Kévin Dunglas'
 
 services:
     app.my_dummy_resource.mongodb.boolean_filter:
@@ -61,18 +54,22 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.search' } ]
     app.related_dummy_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
-        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial' } ]
+        arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial', 'age': 'exact' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.mongodb.friends' } ]
     app.my_dummy_date_resource.mongodb.date_filter:
         parent:    'api_platform.doctrine_mongodb.odm.date_filter'
         arguments: [ { 'dummyDate': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy_date.mongodb.date' } ]
+    app.my_dummy_immutable_date_resource.mongodb.date_filter:
+        parent:    'api_platform.doctrine_mongodb.odm.date_filter'
+        arguments: [ { 'dummyDate': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy_immutable_date.mongodb.date' } ]
     app.related_dummy_to_friend_resource.mongodb.search_filter:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.mongodb.name' } ]
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
+    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
         public: false
         arguments:
             $managerRegistry: '@doctrine_mongodb'
@@ -80,7 +77,7 @@ services:
         tags:
             -   name: 'api_platform.item_data_provider'
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
+    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
         public: false
         arguments:
             $managerRegistry: '@doctrine_mongodb'
@@ -89,39 +86,39 @@ services:
             -   name: 'api_platform.item_data_provider'
 
     app.dummy_dto_no_input.data_provider:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
         public: false
         arguments: ['@doctrine_mongodb']
         tags:
             -  { name: 'api_platform.collection_data_provider' }
 
     app.dummy_dto_no_output_data_persister:
-        class: ApiPlatform\Core\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
+        class: ApiPlatform\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
         arguments: ['@doctrine_mongodb']
         public: false
         tags:
             -  { name: 'api_platform.data_persister' }
 
     app.graphql.query_resolver.dummy_custom_not_retrieved_item_document:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemDocumentResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemDocumentResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.query_resolver.dummy_custom_item_no_read_and_serialize_document:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemDocumentResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNoReadAndSerializeItemDocumentResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.query_resolver' }
 
     app.graphql.mutation_resolver.dummy_custom_only_persist_document:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistDocumentMutationResolver'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\SumOnlyPersistDocumentMutationResolver'
         public: false
         tags:
             - { name: 'api_platform.graphql.mutation_resolver' }
 
     app.messenger_handler.messenger_with_inputs:
-        class: 'ApiPlatform\Core\Tests\Fixtures\TestBundle\MessengerHandler\Document\MessengerWithInputHandler'
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Document\MessengerWithInputHandler'
         public: false
         tags:
             -  { name: 'messenger.message_handler' }

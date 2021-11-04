@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\NotAResource;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ContainNonResource as ContainNonResourceDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
+use ApiPlatform\Tests\Fixtures\NotAResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\ContainNonResource as ContainNonResourceDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

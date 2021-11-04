@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\Elasticsearch\Model;
+namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -73,12 +73,12 @@ class Tweet
         $this->author = $author;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): void
+    public function setDate(\DateTimeImmutable $date): void
     {
         $this->date = $date;
     }

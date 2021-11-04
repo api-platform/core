@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Tests\Fixtures\DummyObjectWithoutConstructor;
+use ApiPlatform\Tests\Fixtures\DummyObjectWithoutConstructor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -35,9 +35,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyEntityWithConstructor
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -56,7 +56,7 @@ class DummyEntityWithConstructor
     private $bar;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ODM\Field(nullable=true)
      * @Groups({"put"})
@@ -78,7 +78,7 @@ class DummyEntityWithConstructor
         $this->items = $items;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -101,10 +101,7 @@ class DummyEntityWithConstructor
         return $this->items;
     }
 
-    /**
-     * @return string
-     */
-    public function getBaz()
+    public function getBaz(): ?string
     {
         return $this->baz;
     }

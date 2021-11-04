@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -29,7 +29,7 @@ class ParentDummy
     /**
      * @var int The age
      *
-     * @ODM\Field(type="integer", nullable=true)
+     * @ODM\Field(type="int", nullable=true)
      * @Groups({"friends"})
      */
     private $age;

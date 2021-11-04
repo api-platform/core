@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator;
-use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +31,12 @@ class PaginatorTest extends TestCase
 
     /**
      * @dataProvider initializeProvider
+     *
+     * @param mixed $firstResult
+     * @param mixed $maxResults
+     * @param mixed $totalItems
+     * @param mixed $currentPage
+     * @param mixed $lastPage
      */
     public function testInitialize($firstResult, $maxResults, $totalItems, $currentPage, $lastPage)
     {

@@ -69,11 +69,13 @@ Feature: JSON-LD DTO input and output
       "@type": "hydra:Collection",
       "hydra:member": [
         {
+          "@type": "DummyDtoCustom",
           "@id": "/dummy_dto_customs/1",
           "foo": "test",
           "bar": 1
         },
         {
+          "@type": "DummyDtoCustom",
           "@id": "/dummy_dto_customs/2",
           "foo": "test",
           "bar": 2
@@ -317,3 +319,38 @@ Feature: JSON-LD DTO input and output
       "data": 123
     }
     """
+
+  @createSchema
+  Scenario: Initialize input data with a DataTransformerInitializer 
+    Given there is an InitializeInput object with id 1
+    When I send a "PUT" request to "/initialize_inputs/1" with body:
+    """
+    {
+      "name": "La peste"
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/InitializeInput",
+      "@id": "/initialize_inputs/1",
+      "@type": "InitializeInput",
+      "id": 1,
+      "manager": "Orwell",
+      "name": "La peste"
+    }
+    """
+
+  Scenario: Create a resource with a custom Input
+    When I send a "POST" request to "/dummy_dto_customs" with body:
+    """
+    {
+      "foo": "test",
+      "bar": "test" 
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the JSON node "hydra:description" should be equal to "The input data is misformatted."

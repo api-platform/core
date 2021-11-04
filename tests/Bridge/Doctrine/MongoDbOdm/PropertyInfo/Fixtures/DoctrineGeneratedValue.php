@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Field;
@@ -26,7 +26,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\Id;
 class DoctrineGeneratedValue
 {
     /**
-     * @Id(strategy="INCREMENT", type="integer")
+     * @Id(strategy="INCREMENT", type="int")
      */
     public $id;
 

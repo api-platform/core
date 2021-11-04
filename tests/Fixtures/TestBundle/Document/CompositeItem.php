@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class CompositeItem
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -44,20 +44,16 @@ class CompositeItem
 
     /**
      * Gets id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
      * Gets field1.
-     *
-     * @return string|null
      */
-    public function getField1()
+    public function getField1(): ?string
     {
         return $this->field1;
     }
@@ -74,10 +70,8 @@ class CompositeItem
 
     /**
      * Gets compositeValues.
-     *
-     * @return CompositeRelation
      */
-    public function getCompositeValues()
+    public function getCompositeValues(): ?CompositeRelation
     {
         return $this->compositeValues;
     }

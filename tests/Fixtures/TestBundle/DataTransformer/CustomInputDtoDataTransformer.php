@@ -11,18 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataTransformer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
 use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 
 final class CustomInputDtoDataTransformer implements DataTransformerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @return object
      */
     public function transform($object, string $to, array $context = [])
     {
@@ -31,7 +33,7 @@ final class CustomInputDtoDataTransformer implements DataTransformerInterface
         }
 
         /**
-         * @var \ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom
+         * @var \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom
          */
         $resourceObject = $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] ?? new $context['resource_class']();
         $resourceObject->lorem = $object->foo;

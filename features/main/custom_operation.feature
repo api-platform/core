@@ -71,6 +71,7 @@ Feature: Custom operation
     }
     """
 
+  @createSchema
   Scenario: Create a payment
     When I send a "POST" request to "/payments" with body:
     """
@@ -93,7 +94,9 @@ Feature: Custom operation
     }
     """
 
+  @createSchema
   Scenario: Void a payment
+    Given There is a payment
     When I send a "POST" request to "/payments/1/void"
     Then the response status code should be 201
     And the response should be in JSON

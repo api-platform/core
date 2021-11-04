@@ -425,7 +425,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createFoo.foo.name" should be equal to "Created without mutation id"
     And the JSON node "data.createFoo.foo.bar" should be equal to "works"
 
-  Scenario: Create an item with a subresource
+  Scenario: Create an item with a relation to an existing resource
     Given there are 1 dummy objects with relatedDummy
     When I send the following GraphQL request:
     """
@@ -662,6 +662,57 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummyGroup.dummyGroup.__typename" should be equal to "createDummyGroupPayloadData"
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
+  @createSchema
+  Scenario: Use serialization groups with relations
+    Given there is 1 dummy object with relatedDummy and its thirdLevel
+    And there is a RelatedDummy with 2 friends
+    And there is a dummy object with a fourth level relation
+    When I send the following GraphQL request:
+    """
+    mutation {
+      updateRelatedDummy(input: {
+        id: "/related_dummies/2",
+        symfony: "laravel",
+        thirdLevel: {
+          fourthLevel: "/fourth_levels/1"
+        }
+      }) {
+        relatedDummy {
+          id
+          symfony
+          thirdLevel {
+            id
+            fourthLevel {
+              id
+              __typename
+            }
+            __typename
+          }
+          relatedToDummyFriend {
+            edges {
+              node {
+                name
+              }
+            }
+            __typename
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.id" should be equal to "/related_dummies/2"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.symfony" should be equal to "laravel"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.id" should be equal to "/third_levels/3"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.__typename" should be equal to "updateThirdLevelNestedPayload"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.fourthLevel.id" should be equal to "/fourth_levels/1"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.thirdLevel.fourthLevel.__typename" should be equal to "updateFourthLevelNestedPayload"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.__typename" should be equal to "updateRelatedToDummyFriendNestedPayloadCursorConnection"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.edges[0].node.name" should be equal to "Relation-1"
+    And the JSON node "data.updateRelatedDummy.relatedDummy.relatedToDummyFriend.edges[1].node.name" should be equal to "Relation-2"
+
   Scenario: Trigger a validation error
     When I send the following GraphQL request:
     """
@@ -674,7 +725,11 @@ Feature: GraphQL mutation support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to "422"
     And the JSON node "errors[0].message" should be equal to "name: This value should not be blank."
+    And the JSON node "errors[0].extensions.violations" should exist
+    And the JSON node "errors[0].extensions.violations[0].path" should be equal to "name"
+    And the JSON node "errors[0].extensions.violations[0].message" should be equal to "This value should not be blank."
 
   Scenario: Execute a custom mutation
     Given there are 1 dummyCustomMutation objects

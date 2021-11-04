@@ -1,7 +1,7 @@
 resources:
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy:
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy:
         shortName: fileconfigdummy
         description: Dummy resource
         itemOperations:
@@ -12,6 +12,6 @@ resources:
             foo:
                 description: The dummy foo
 
-    ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy:
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy:
         shortName: single_file_config
         description: File configured resource

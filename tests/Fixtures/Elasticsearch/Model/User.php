@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\Elasticsearch\Model;
+namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
@@ -55,6 +55,11 @@ class User
      * @Groups({"user:read", "tweet:read"})
      */
     private $lastName;
+
+    /**
+     * @Groups({"user:read"})
+     */
+    private $registeredAt;
 
     /**
      * @Groups({"user:read"})
@@ -109,6 +114,16 @@ class User
     public function setLastName(string $lastName): void
     {
         $this->lastName = $lastName;
+    }
+
+    public function getRegisteredAt(): ?\DateTimeInterface
+    {
+        return $this->registeredAt;
+    }
+
+    public function setRegisteredAt(\DateTimeInterface $registeredAt): void
+    {
+        $this->registeredAt = $registeredAt;
     }
 
     public function getTweets(): array

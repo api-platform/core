@@ -11,12 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -27,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  *
- * @ApiResource(iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.mongodb.friends"}})
+ * @ApiResource(graphql={"update"={"normalization_context"={"groups"={"chicago", "fakemanytomany"}}, "denormalization_context"={"groups"={"friends"}}}}, iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.mongodb.friends"}})
  * @ODM\Document
  */
 class RelatedDummy extends ParentDummy
@@ -35,7 +36,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @ApiProperty(writable=false)
      * @ApiSubresource
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"chicago", "friends"})
      */
     private $id;
@@ -57,7 +58,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var \DateTime A dummy date
      *
-     * @ODM\Field(type="date")
+     * @ODM\Field(type="date", nullable=true)
      * @Assert\DateTime
      * @Groups({"friends"})
      */
@@ -80,7 +81,7 @@ class RelatedDummy extends ParentDummy
     /**
      * @var bool A dummy bool
      *
-     * @ODM\Field(type="boolean")
+     * @ODM\Field(type="bool")
      * @Groups({"friends"})
      */
     public $dummyBoolean;
@@ -139,10 +140,7 @@ class RelatedDummy extends ParentDummy
         return $this->dummyDate;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
@@ -155,10 +153,7 @@ class RelatedDummy extends ParentDummy
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    /**
-     * @return ThirdLevel|null
-     */
-    public function getThirdLevel()
+    public function getThirdLevel(): ?ThirdLevel
     {
         return $this->thirdLevel;
     }
@@ -170,10 +165,8 @@ class RelatedDummy extends ParentDummy
 
     /**
      * Get relatedToDummyFriend.
-     *
-     * @return RelatedToDummyFriend
      */
-    public function getRelatedToDummyFriend()
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }
@@ -188,10 +181,7 @@ class RelatedDummy extends ParentDummy
         $this->relatedToDummyFriend->add($relatedToDummyFriend);
     }
 
-    /**
-     * @return EmbeddableDummy
-     */
-    public function getEmbeddedDummy()
+    public function getEmbeddedDummy(): EmbeddableDummy
     {
         return $this->embeddedDummy;
     }

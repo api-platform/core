@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\GraphQl\Resolver\Factory\ItemResolverFactory;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface;
-use ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use GraphQL\Error\Error;
+use ApiPlatform\GraphQl\Resolver\Factory\ItemResolverFactory;
+use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -41,7 +42,7 @@ class ItemResolverFactoryTest extends TestCase
     private $securityPostDenormalizeStageProphecy;
     private $serializeStageProphecy;
     private $queryResolverLocatorProphecy;
-    private $resourceMetadataFactoryProphecy;
+    private $resourceMetadataCollectionFactoryProphecy;
 
     /**
      * {@inheritdoc}
@@ -53,7 +54,7 @@ class ItemResolverFactoryTest extends TestCase
         $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $this->itemResolverFactory = new ItemResolverFactory(
             $this->readStageProphecy->reveal(),
@@ -61,7 +62,7 @@ class ItemResolverFactoryTest extends TestCase
             $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
             $this->queryResolverLocatorProphecy->reveal(),
-            $this->resourceMetadataFactoryProphecy->reveal()
+            $this->resourceMetadataCollectionFactoryProphecy->reveal()
         );
     }
 
@@ -77,11 +78,11 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($determinedResourceClass)->willReturn(new ResourceMetadata());
+        $this->resourceMetadataCollectionFactoryProphecy->create($determinedResourceClass)->willReturn(new ResourceMetadataCollection($determinedResourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Query()])]));
 
         $this->securityStageProphecy->__invoke($determinedResourceClass, $operationName, $resolverContext + [
             'extra_variables' => [
@@ -119,6 +120,15 @@ class ItemResolverFactoryTest extends TestCase
         $this->assertSame(['already_serialized'], ($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
     }
 
+    public function testResolveNestedNullValue(): void
+    {
+        $source = ['nestedNullValue' => null];
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $info->fieldName = 'nestedNullValue';
+
+        $this->assertNull(($this->itemResolverFactory)('resourceClass')($source, [], null, $info));
+    }
+
     public function testResolveBadReadStageItem(): void
     {
         $resourceClass = 'stdClass';
@@ -127,7 +137,7 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = [];
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
@@ -146,12 +156,12 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = null;
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Resource class cannot be determined.');
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);
@@ -165,12 +175,12 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Resolver only handles items of class Dummy but retrieved item is of class stdClass.');
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);
@@ -184,14 +194,12 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['item_query' => 'query_resolver_id']])
-        );
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withResolver('query_resolver_id')])]));
 
         $customItem = new \stdClass();
         $customItem->field = 'foo';
@@ -225,21 +233,19 @@ class ItemResolverFactoryTest extends TestCase
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false];
+        $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
         $readStageItem = new \stdClass();
         $this->readStageProphecy->__invoke($resourceClass, $rootClass, $operationName, $resolverContext)->shouldBeCalled()->willReturn($readStageItem);
 
-        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(
-            (new ResourceMetadata())->withGraphql([$operationName => ['item_query' => 'query_resolver_id']])
-        );
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withResolver('query_resolver_id')])]));
 
         $customItem = new Dummy();
         $this->queryResolverLocatorProphecy->get('query_resolver_id')->shouldBeCalled()->willReturn(function () use ($customItem) {
             return $customItem;
         });
 
-        $this->expectException(Error::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Custom query resolver "query_resolver_id" has to return an item of class stdClass but returned an item of class Dummy.');
 
         ($this->itemResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);

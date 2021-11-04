@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\InvalidArgumentException;
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
 /**
  * Creates a property name collection using an extractor.
@@ -49,7 +49,7 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
             try {
                 $propertyNameCollection = $this->decorated->create($resourceClass, $options);
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
-                // Ignore not found exceptions from parent
+                // Ignore not found exceptions from decorated factory
             }
 
             foreach ($propertyNameCollection as $propertyName) {

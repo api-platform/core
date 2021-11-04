@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -21,9 +21,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
- * @ApiResource(attributes={
- *     "order"={"dummy.name"}
- * })
+ * @ApiResource(
+ *     attributes={
+ *         "order"={"dummy.name"}
+ *     },
+ *     graphql={
+ *         "collection_query"={"pagination_type"="page"}
+ *     }
+ * )
  * @ODM\Document
  */
 class FooDummy
@@ -31,7 +36,7 @@ class FooDummy
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 

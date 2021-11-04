@@ -1,0 +1,6 @@
+# Add custom configuration for PHP > 7.1
+# @TODO in 3.0, merge this configuration in config_common.yml, config_mysql.yml, config_postgres.yml, config_sqlite.yml
+doctrine:
+    dbal:
+        types:
+            symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType

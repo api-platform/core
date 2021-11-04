@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -29,7 +29,7 @@ class DummyCarColor
     /**
      * @var int The entity Id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -57,10 +57,7 @@ class DummyCarColor
         return $this->id;
     }
 
-    /**
-     * @return DummyCar|null
-     */
-    public function getCar()
+    public function getCar(): ?DummyCar
     {
         return $this->car;
     }
@@ -75,10 +72,7 @@ class DummyCarColor
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getProp()
+    public function getProp(): string
     {
         return $this->prop;
     }

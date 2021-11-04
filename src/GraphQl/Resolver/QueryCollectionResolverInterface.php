@@ -11,12 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver;
+namespace ApiPlatform\GraphQl\Resolver;
 
 /**
  * A function resolving a GraphQL query of a collection.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

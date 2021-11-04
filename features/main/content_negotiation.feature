@@ -15,34 +15,37 @@ Feature: Content Negotiation support
     """
     Then the response status code should be 201
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-    And the response should be equal to
+    And the response should be in XML
+    And the XML should be equal to:
     """
     <?xml version="1.0"?>
     <response><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><arrayData/><name_converted/><relatedOwnedDummy/><relatedOwningDummy/><id>1</id><name>XML!</name><alias/><foo/></response>
     """
 
-  Scenario:  Retrieve a collection in XML
+  Scenario: Retrieve a collection in XML
     When I add "Accept" header equal to "text/xml"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-    And the response should be equal to
+    And the response should be in XML
+    And the XML should be equal to:
     """
     <?xml version="1.0"?>
     <response><item key="0"><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><arrayData/><name_converted/><relatedOwnedDummy/><relatedOwningDummy/><id>1</id><name>XML!</name><alias/><foo/></item></response>
     """
 
-  Scenario:  Retrieve a collection in XML using the .xml URL
+  Scenario: Retrieve a collection in XML using the .xml URL
     When I send a "GET" request to "/dummies.xml"
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-    And the response should be equal to
+    And the response should be in XML
+    And the XML should be equal to:
     """
     <?xml version="1.0"?>
     <response><item key="0"><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><arrayData/><name_converted/><relatedOwnedDummy/><relatedOwningDummy/><id>1</id><name>XML!</name><alias/><foo/></item></response>
     """
 
-  Scenario:  Retrieve a collection in JSON
+  Scenario: Retrieve a collection in JSON
     When I add "Accept" header equal to "application/json"
     And I send a "GET" request to "/dummies"
     Then the response status code should be 200
@@ -82,7 +85,8 @@ Feature: Content Negotiation support
     """
     Then the response status code should be 201
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-    And the response should be equal to
+    And the response should be in XML
+    And the XML should be equal to:
     """
     <?xml version="1.0"?>
     <response><description/><dummy/><dummyBoolean/><dummyDate/><dummyFloat/><dummyPrice/><relatedDummy/><relatedDummies/><jsonData/><arrayData/><name_converted/><relatedOwnedDummy/><relatedOwningDummy/><id>2</id><name>Sent in JSON</name><alias/><foo/></response>
@@ -134,7 +138,8 @@ Feature: Content Negotiation support
     """
     Then the response status code should be 201
     And the header "Content-Type" should be equal to "application/xml; charset=utf-8"
-    And the response should be equal to
+    And the response should be in XML
+    And the XML should be equal to:
     """
     <?xml version="1.0"?>
     <response><id>1</id><name>Kevin</name></response>
@@ -149,4 +154,18 @@ Feature: Content Negotiation support
     """
     id,name
     1,Kevin
+    """
+
+  Scenario: Get a security response in JSON
+    Given there are 1 SecuredDummy objects
+    And I add "Accept" header equal to "application/json"
+    When I send a "GET" request to "/secured_dummies"
+    Then the response status code should be 401
+    And the header "Content-Type" should be equal to "application/json"
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "message": "Authentication Required"
+    }
     """

@@ -11,14 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use GraphQL\Error\Error;
 
 /**
  * Security post deserialization stage of GraphQL resolvers.
- *
- * @experimental
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */

@@ -3,9 +3,11 @@ Feature: GraphQL introspection support
   @createSchema
   Scenario: Execute an empty GraphQL query
     When I send a "GET" request to "/graphql"
-    Then the response status code should be 400
+    Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to 400
+    And the JSON node "errors[0].extensions.category" should be equal to user
     And the JSON node "errors[0].message" should be equal to "GraphQL query is not valid."
 
   Scenario: Introspect the GraphQL schema
@@ -35,7 +37,7 @@ Feature: GraphQL introspection support
           }
         }
       }
-      type2: __type(name: "DummyAggregateOfferConnection") {
+      type2: __type(name: "DummyAggregateOfferCursorConnection") {
         description,
         fields {
           name
@@ -69,12 +71,56 @@ Feature: GraphQL introspection support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.type1.description" should be equal to "Dummy Product."
-    And the JSON node "data.type1.fields[1].type.name" should be equal to "DummyAggregateOfferConnection"
-    And the JSON node "data.type2.fields[0].name" should be equal to "edges"
-    And the JSON node "data.type2.fields[0].type.ofType.name" should be equal to "DummyAggregateOfferEdge"
-    And the JSON node "data.type3.fields[0].name" should be equal to "node"
-    And the JSON node "data.type3.fields[1].name" should be equal to "cursor"
-    And the JSON node "data.type3.fields[0].type.name" should be equal to "DummyAggregateOffer"
+    And the JSON node "data.type1.fields" should contain:
+    """
+    {
+      "name":"offers",
+      "type":{
+        "name":"DummyAggregateOfferCursorConnection",
+        "kind":"OBJECT",
+        "ofType":null
+      }
+    }
+    """
+    And the JSON node "data.type2.fields" should contain:
+    """
+    {
+      "name":"edges",
+      "type":{
+        "name":null,
+        "kind":"LIST",
+        "ofType":{
+          "name":"DummyAggregateOfferEdge",
+          "kind":"OBJECT"
+        }
+      }
+    }
+    """
+    And the JSON node "data.type3.fields" should contain:
+    """
+    {
+      "name":"node",
+      "type":{
+        "name":"DummyAggregateOffer",
+        "kind":"OBJECT",
+        "ofType":null
+      }
+    }
+    """
+    And the JSON node "data.type3.fields" should contain:
+    """
+    {
+      "name":"cursor",
+      "type":{
+        "name":null,
+        "kind":"NON_NULL",
+        "ofType":{
+          "name":"String",
+          "kind":"SCALAR"
+        }
+      }
+    }
+    """
 
   Scenario: Introspect types with different serialization groups for item_query and collection_query
     When I send the following GraphQL request:
@@ -199,7 +245,7 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be deep equal to:
+    And the JSON should be equal to:
     """
     {
       "data": {
@@ -284,8 +330,17 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.__type.fields[9].name" should be equal to "jsonData"
-    And the JSON node "data.__type.fields[9].type.name" should be equal to "Iterable"
+    And the JSON node "data.__type.fields" should contain:
+    """
+    {
+      "name":"jsonData",
+      "type":{
+        "name":"Iterable",
+        "kind":"SCALAR",
+        "ofType":null
+      }
+    }
+    """
 
   Scenario: Retrieve entity - using serialization groups - fields
     When I send the following GraphQL request:
@@ -418,13 +473,52 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.typeCreatePayload.fields" should have 2 elements
-    And the JSON node "data.typeCreatePayload.fields[0].name" should be equal to "dummyProperty"
-    And the JSON node "data.typeCreatePayload.fields[0].type.name" should be equal to "createDummyPropertyPayloadData"
-    And the JSON node "data.typeCreatePayload.fields[1].name" should be equal to "clientMutationId"
-    And the JSON node "data.typeCreatePayloadData.fields[3].name" should be equal to "group"
-    And the JSON node "data.typeCreatePayloadData.fields[3].type.name" should be equal to "createDummyGroupNestedPayload"
-    And the JSON node "data.typeCreateNestedPayload.fields[0].name" should be equal to "id"
+    And the JSON node "data.typeCreatePayload.fields" should be equal to:
+    """
+    [
+      {
+        "name":"dummyProperty",
+        "type":{
+          "name":"createDummyPropertyPayloadData",
+          "kind":"OBJECT",
+          "ofType":null
+        }
+      },
+      {
+        "name":"clientMutationId",
+        "type":{
+          "name":"String",
+          "kind":"SCALAR",
+          "ofType":null
+        }
+      }
+    ]
+    """
+    And the JSON node "data.typeCreatePayloadData.fields" should contain:
+    """
+    {
+      "name":"group",
+      "type":{
+        "name":"createDummyGroupNestedPayload",
+        "kind":"OBJECT",
+        "ofType":null
+      }
+    }
+    """
+    And the JSON node "data.typeCreateNestedPayload.fields" should contain:
+    """
+    {
+      "name":"id",
+      "type":{
+        "name":null,
+        "kind":"NON_NULL",
+        "ofType":{
+          "name":"ID",
+          "kind":"SCALAR"
+        }
+      }
+    }
+    """
 
   Scenario: Retrieve a type name through a GraphQL query
     Given there are 4 dummy objects with relatedDummy
@@ -452,7 +546,7 @@ Feature: GraphQL introspection support
     When I send the following GraphQL request:
     """
     {
-      typeNotAvailable: __type(name: "VoDummyInspectionConnection") {
+      typeNotAvailable: __type(name: "VoDummyInspectionCursorConnection") {
         description
       }
       typeOwner: __type(name: "VoDummyCar") {
@@ -469,6 +563,6 @@ Feature: GraphQL introspection support
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionConnection" is not present in the types container'
+    And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionCursorConnection" is not present in the types container'
     And the JSON node "data.typeNotAvailable" should be null
-    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionConnection"
+    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionCursorConnection"

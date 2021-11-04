@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property\Factory;
+namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Metadata\ApiProperty;
 
 /**
  * Creates a property metadata value object.
@@ -27,6 +28,8 @@ interface PropertyMetadataFactoryInterface
      * Creates a property metadata.
      *
      * @throws PropertyNotFoundException
+     *
+     * @return PropertyMetadata|ApiProperty
      */
-    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata;
+    public function create(string $resourceClass, string $property, array $options = []);
 }

@@ -11,11 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type\Definition;
+namespace ApiPlatform\GraphQl\Type\Definition;
 
 /**
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 interface TypeInterface

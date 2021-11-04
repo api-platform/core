@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class DummyFriend
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -39,7 +39,7 @@ class DummyFriend
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -50,10 +50,8 @@ class DummyFriend
 
     /**
      * Get id.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -63,17 +61,15 @@ class DummyFriend
      *
      * @param int $id the value to set
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
     /**
      * Get name.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -83,7 +79,7 @@ class DummyFriend
      *
      * @param string $name the value to set
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
     }

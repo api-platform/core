@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Property;
+namespace ApiPlatform\Metadata\Property;
 
 /**
  * A collection of property names for a given resource.
@@ -36,7 +36,8 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    #[\ReturnTypeWillChange]
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->properties);
     }
@@ -44,7 +45,8 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function count()
+    #[\ReturnTypeWillChange]
+    public function count(): int
     {
         return \count($this->properties);
     }

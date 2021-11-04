@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
+namespace ApiPlatform\Tests\Bridge\Doctrine\MongoDbOdm\PropertyInfo\Fixtures;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Field;
@@ -92,6 +92,11 @@ class DoctrineDummy
     private $date;
 
     /**
+     * @Field(type="date_immutable")
+     */
+    private $dateImmutable;
+
+    /**
      * @Field(type="float")
      */
     private $float;
@@ -102,11 +107,6 @@ class DoctrineDummy
     private $bool;
 
     /**
-     * @Field(type="boolean")
-     */
-    private $boolean;
-
-    /**
      * @Field(type="custom_foo")
      */
     private $customFoo;
@@ -115,11 +115,6 @@ class DoctrineDummy
      * @Field(type="int")
      */
     private $int;
-
-    /**
-     * @Field(type="integer")
-     */
-    private $integer;
 
     /**
      * @Field(type="string")

@@ -19,7 +19,9 @@ Feature: GraphQL query support
     And the JSON node "data.dummy.name" should be equal to "Dummy #1"
     And the JSON node "data.dummy.name_converted" should be equal to "Converted 1"
 
+  @createSchema
   Scenario: Retrieve a Relay Node
+    Given there are 2 dummy objects with relatedDummy
     When I send the following GraphQL request:
     """
     {
@@ -37,7 +39,9 @@ Feature: GraphQL query support
     And the JSON node "data.node.id" should be equal to "/dummies/1"
     And the JSON node "data.node.name" should be equal to "Dummy #1"
 
+  @createSchema
   Scenario: Retrieve an item with an iterable field
+    Given there are 2 dummy objects with relatedDummy
     Given there are 2 dummy objects with JSON and array data
     When I send the following GraphQL request:
     """
@@ -59,7 +63,27 @@ Feature: GraphQL query support
     And the JSON node "data.dummy.jsonData.bar" should be equal to 5
     And the JSON node "data.dummy.arrayData[2]" should be equal to baz
 
+  @createSchema
+  Scenario: Retrieve an item with an iterable null field
+    Given there are 2 dummy with null JSON objects
+    When I send the following GraphQL request:
+    """
+    {
+      withJsonDummy(id: "/with_json_dummies/2") {
+        id
+        json
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.withJsonDummy.id" should be equal to "/with_json_dummies/2"
+    And the JSON node "data.withJsonDummy.json" should be null
+
+  @createSchema
   Scenario: Retrieve an item through a GraphQL query with variables
+    Given there are 2 dummy objects with relatedDummy
     When I have the following GraphQL request:
     """
     query DummyWithId($itemId: ID = "/dummies/1") {
@@ -102,13 +126,13 @@ Feature: GraphQL query support
       }
     }
     """
-    And I send the GraphQL request with operation "DummyWithId2"
+    And I send the GraphQL request with operationName "DummyWithId2"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyItem.id" should be equal to "/dummies/2"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #2"
-    And I send the GraphQL request with operation "DummyWithId1"
+    And I send the GraphQL request with operationName "DummyWithId1"
     And the JSON node "data.dummyItem.name" should be equal to "Dummy #1"
 
   Scenario: Use serialization groups
@@ -125,6 +149,18 @@ Feature: GraphQL query support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyGroup.foo" should be equal to "Foo #1"
+
+  Scenario: Query a serialized name
+    Given there is a DummyCar entity with related colors
+    When I send the following GraphQL request:
+    """
+    {
+      dummyCar(id: "/dummy_cars/1") {
+        carBrand
+      }
+    }
+    """
+    Then the JSON node "data.dummyCar.carBrand" should be equal to "DummyBrand"
 
   Scenario: Fetch only the internal id
     When I send the following GraphQL request:

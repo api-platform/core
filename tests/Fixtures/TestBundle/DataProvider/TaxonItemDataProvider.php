@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\DataProvider;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Taxon;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\TaxonInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 class TaxonItemDataProvider implements ItemDataProviderInterface, RestrictedDataProviderInterface

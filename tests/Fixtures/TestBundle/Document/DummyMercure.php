@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -25,7 +25,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class DummyMercure
 {
     /**
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     public $id;
+
+    /**
+     * @ODM\Field(type="string")
+     */
+    public $name;
+
+    /**
+     * @ODM\Field(type="string")
+     */
+    public $description;
+
+    /**
+     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
+     */
+    public $relatedDummy;
 }

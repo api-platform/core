@@ -396,38 +396,7 @@ Feature: Relations support
     }
     """
 
-  Scenario: Issue #1222
-    Given there are people having pets
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "GET" request to "/people"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/Person",
-      "@id": "/people",
-      "@type": "hydra:Collection",
-      "hydra:member": [
-        {
-          "@id": "/people/1",
-          "@type": "Person",
-          "name": "foo",
-          "pets": [
-            {
-              "pet": {
-                "@id": "/pets/1",
-                "@type": "Pet",
-                "name": "bar"
-              }
-            }
-          ]
-        }
-      ],
-      "hydra:totalItems": 1
-    }
-    """
-
+  @createSchema
   Scenario: Eager load relations should not be duplicated
     Given there is an order with same customer and recipient
     When I add "Content-Type" header equal to "application/ld+json"
@@ -496,13 +465,13 @@ Feature: Relations support
     And I send a "POST" request to "/relation_embedders" with body:
     """
     {
-      "related": "certainly not an iri and not a plain identifier"
+      "related": "certainly not an IRI"
     }
     """
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an iri and not a plain identifier".'
+    And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an IRI".'
 
   Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"
@@ -533,7 +502,7 @@ Feature: Relations support
           "pattern": "^An error occurred$"
         },
         "hydra:description": {
-          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Core\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\", \"integer\" given.$"
+          "pattern": "^Expected IRI or document for resource \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\", \"integer\" given.$"
         }
       },
       "required": [
@@ -544,3 +513,38 @@ Feature: Relations support
       ]
     }
     """
+
+  @createSchema
+  Scenario: Issue #1222
+    Given there are people having pets
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "GET" request to "/people"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be a superset of:
+    """
+    {
+      "@context": "/contexts/Person",
+      "@id": "/people",
+      "@type": "hydra:Collection",
+      "hydra:member": [
+        {
+          "@id": "/people/1",
+          "@type": "Person",
+          "name": "foo",
+          "pets": [
+            {
+              "@type": "PersonToPet",
+              "pet": {
+                "@id": "/pets/1",
+                "@type": "Pet",
+                "name": "bar"
+              }
+            }
+          ]
+        }
+      ],
+      "hydra:totalItems": 1
+    }
+    """
+

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\GraphQl\Resolver;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver;
 
-use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
+use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 
 /**
  * Resolver for dummy item custom query (item not read and no result serialized).
@@ -26,10 +26,8 @@ class DummyCustomQueryNoReadAndSerializeItemDocumentResolver implements QueryIte
 {
     /**
      * @param DummyCustomQueryDocument|null $item
-     *
-     * @return DummyCustomQueryDocument
      */
-    public function __invoke($item, array $context)
+    public function __invoke($item, array $context): DummyCustomQueryDocument
     {
         if (null !== $item) {
             throw new RuntimeException('Item should be null');

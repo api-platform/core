@@ -11,18 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Type\Schema;
 
 /**
  * Builds the GraphQL schema.
- *
- * @experimental
  *
  * @author Raoul Clais <raoul.clais@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -31,15 +31,15 @@ use GraphQL\Type\Schema;
 final class SchemaBuilder implements SchemaBuilderInterface
 {
     private $resourceNameCollectionFactory;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $typesFactory;
     private $typesContainer;
     private $fieldsBuilder;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, TypesFactoryInterface $typesFactory, TypesContainerInterface $typesContainer, FieldsBuilderInterface $fieldsBuilder)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, TypesFactoryInterface $typesFactory, TypesContainerInterface $typesContainer, FieldsBuilderInterface $fieldsBuilder)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->typesFactory = $typesFactory;
         $this->typesContainer = $typesContainer;
         $this->fieldsBuilder = $fieldsBuilder;
@@ -54,37 +54,46 @@ final class SchemaBuilder implements SchemaBuilderInterface
 
         $queryFields = ['node' => $this->fieldsBuilder->getNodeQueryFields()];
         $mutationFields = [];
+        $subscriptionFields = [];
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            /** @var array<string, mixed> $graphqlConfiguration */
-            $graphqlConfiguration = $resourceMetadata->getGraphql() ?? [];
-            foreach ($graphqlConfiguration as $operationName => $value) {
-                if ('item_query' === $operationName) {
-                    $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $resourceMetadata, $operationName, []);
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+            foreach ($resourceMetadataCollection as $resourceMetadata) {
+                foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operationName => $operation) {
+                    $configuration = null !== $operation->getArgs() ? ['args' => $operation->getArgs()] : [];
 
-                    continue;
+                    //TODO: 3.0 remove these
+                    if ('item_query' === $operationName) {
+                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+                        continue;
+                    }
+
+                    if ('collection_query' === $operationName) {
+                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
+
+                        continue;
+                    }
+
+                    if ($operation instanceof Query && !$operation->isCollection()) {
+                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+
+                        continue;
+                    }
+
+                    if ($operation instanceof Query && $operation->isCollection()) {
+                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
+
+                        continue;
+                    }
+
+                    if ($operation instanceof Subscription && $operation->getMercure()) {
+                        $subscriptionFields += $this->fieldsBuilder->getSubscriptionFields($resourceClass, $operation);
+
+                        continue;
+                    }
+
+                    $mutationFields += $this->fieldsBuilder->getMutationFields($resourceClass, $operation);
                 }
-
-                if ('collection_query' === $operationName) {
-                    $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $resourceMetadata, $operationName, []);
-
-                    continue;
-                }
-
-                if ($resourceMetadata->getGraphqlAttribute($operationName, 'item_query')) {
-                    $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $resourceMetadata, $operationName, $value);
-
-                    continue;
-                }
-
-                if ($resourceMetadata->getGraphqlAttribute($operationName, 'collection_query')) {
-                    $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $resourceMetadata, $operationName, $value);
-
-                    continue;
-                }
-
-                $mutationFields += $this->fieldsBuilder->getMutationFields($resourceClass, $resourceMetadata, $operationName);
             }
         }
 
@@ -108,6 +117,13 @@ final class SchemaBuilder implements SchemaBuilderInterface
             $schema['mutation'] = new ObjectType([
                 'name' => 'Mutation',
                 'fields' => $mutationFields,
+            ]);
+        }
+
+        if ($subscriptionFields) {
+            $schema['subscription'] = new ObjectType([
+                'name' => 'Subscription',
+                'fields' => $subscriptionFields,
             ]);
         }
 

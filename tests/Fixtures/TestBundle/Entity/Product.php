@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\ProductInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\TaxonInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\ProductInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

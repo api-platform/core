@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -29,7 +29,7 @@ class SlugChildDummy
      *
      * @ApiProperty(identifier=false)
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -49,18 +49,12 @@ class SlugChildDummy
      */
     private $parentDummy;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug(): string
     {
         return $this->slug;
     }
@@ -70,10 +64,7 @@ class SlugChildDummy
         $this->slug = $slug;
     }
 
-    /**
-     * @return SlugParentDummy
-     */
-    public function getParentDummy()
+    public function getParentDummy(): SlugParentDummy
     {
         return $this->parentDummy;
     }

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -25,7 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
 class SlugChildDummy
 {
     /**
-     * @var int The identifier
+     * @var int|null The identifier
      *
      * @ApiProperty(identifier=false)
      *
@@ -36,7 +36,7 @@ class SlugChildDummy
     private $id;
 
     /**
-     * @var string The slug used as API identifier
+     * @var string|null The slug used as API identifier
      *
      * @ApiProperty(identifier=true)
      *
@@ -45,38 +45,29 @@ class SlugChildDummy
     private $slug;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SlugParentDummy", inversedBy="childDummies")
+     * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy", inversedBy="childDummies")
      * @ORM\JoinColumn(name="parent_dummy_id", referencedColumnName="id")
      *
      * @ApiSubresource
      */
     private $parentDummy;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
 
-    public function setSlug(string $slug)
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }
 
-    /**
-     * @return SlugParentDummy
-     */
-    public function getParentDummy()
+    public function getParentDummy(): ?SlugParentDummy
     {
         return $this->parentDummy;
     }

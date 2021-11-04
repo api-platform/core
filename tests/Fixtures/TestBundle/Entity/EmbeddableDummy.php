@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -35,14 +35,14 @@ class EmbeddableDummy
     private $dummyName;
 
     /**
-     * @var bool A dummy boolean
+     * @var bool|null A dummy boolean
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
     public $dummyBoolean;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
@@ -50,14 +50,14 @@ class EmbeddableDummy
     public $dummyDate;
 
     /**
-     * @var string A dummy float
+     * @var float|null A dummy float
      *
      * @ORM\Column(type="float", nullable=true)
      */
     public $dummyFloat;
 
     /**
-     * @var string A dummy price
+     * @var string|null A dummy price
      *
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
@@ -77,10 +77,7 @@ class EmbeddableDummy
     {
     }
 
-    /**
-     * @return string
-     */
-    public function getDummyName()
+    public function getDummyName(): ?string
     {
         return $this->dummyName;
     }
@@ -90,10 +87,7 @@ class EmbeddableDummy
         $this->dummyName = $dummyName;
     }
 
-    /**
-     * @return bool
-     */
-    public function isDummyBoolean()
+    public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;
     }
@@ -103,10 +97,7 @@ class EmbeddableDummy
         $this->dummyBoolean = $dummyBoolean;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getDummyDate()
+    public function getDummyDate(): ?\DateTime
     {
         return $this->dummyDate;
     }
@@ -116,23 +107,17 @@ class EmbeddableDummy
         $this->dummyDate = $dummyDate;
     }
 
-    /**
-     * @return string
-     */
-    public function getDummyFloat()
+    public function getDummyFloat(): ?float
     {
         return $this->dummyFloat;
     }
 
-    public function setDummyFloat(string $dummyFloat)
+    public function setDummyFloat(float $dummyFloat)
     {
         $this->dummyFloat = $dummyFloat;
     }
 
-    /**
-     * @return string
-     */
-    public function getDummyPrice()
+    public function getDummyPrice(): ?string
     {
         return $this->dummyPrice;
     }

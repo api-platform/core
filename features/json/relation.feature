@@ -120,7 +120,7 @@ Feature: JSON relations support
     }
     """
 
-  Scenario: Update an embedded relation using plain identifiers
+  Scenario: Update an embedded relation
     When I add "Content-Type" header equal to "application/json"
     And I send a "PUT" request to "/relation_embedders/1" with body:
     """
@@ -151,7 +151,8 @@ Feature: JSON relations support
     }
     """
 
-  Scenario: Create a related dummy with a relation
+  # TODO: to remove in 3.0
+  Scenario: Create a related dummy with a relation using plain identifiers
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/related_dummies" with body:
     """
@@ -184,6 +185,7 @@ Feature: JSON relations support
     }
     """
 
+  # TODO: to remove in 3.0
   Scenario: Passing a (valid) plain identifier on a relation
     When I add "Content-Type" header equal to "application/json"
     And I send a "POST" request to "/dummies" with body:

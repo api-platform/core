@@ -1,5 +1,5 @@
 resources:
-    'ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
+    'ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy':
         itemOperations:
             my_op_name:  
                 method: 'POST'

@@ -20,6 +20,7 @@ Feature: Retrieve from Elasticsearch
       "age": 31,
       "firstName": "Kilian",
       "lastName": "Jornet",
+      "registeredAt": "2009-09-01T00:00:00+00:00",
       "tweets": [
         {
           "@id": "/tweets/f36a0026-0635-4865-86a6-5adb21d94d64",

@@ -11,10 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Type;
+namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\DataProvider\Pagination;
+use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
@@ -26,8 +32,6 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Builds the GraphQL types.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class TypeBuilder implements TypeBuilderInterface
@@ -35,87 +39,131 @@ final class TypeBuilder implements TypeBuilderInterface
     private $typesContainer;
     private $defaultFieldResolver;
     private $fieldsBuilderLocator;
+    private $pagination;
 
-    public function __construct(TypesContainerInterface $typesContainer, callable $defaultFieldResolver, ContainerInterface $fieldsBuilderLocator)
+    public function __construct(TypesContainerInterface $typesContainer, callable $defaultFieldResolver, ContainerInterface $fieldsBuilderLocator, Pagination $pagination)
     {
         $this->typesContainer = $typesContainer;
         $this->defaultFieldResolver = $defaultFieldResolver;
         $this->fieldsBuilderLocator = $fieldsBuilderLocator;
+        $this->pagination = $pagination;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResourceObjectType(?string $resourceClass, ResourceMetadata $resourceMetadata, bool $input, ?string $queryName, ?string $mutationName, bool $wrapped = false, int $depth = 0): GraphQLType
+    public function getResourceObjectType(?string $resourceClass, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, bool $input, bool $wrapped = false, int $depth = 0): GraphQLType
     {
-        $shortName = $resourceMetadata->getShortName();
+        $shortName = $operation->getShortName();
+        $operationName = $operation->getName();
 
-        if (null !== $mutationName) {
-            $shortName = $mutationName.ucfirst($shortName);
+        if ($operation instanceof Mutation) {
+            $shortName = $operationName.ucfirst($shortName);
         }
+
+        if ($operation instanceof Subscription) {
+            $shortName = $operationName.ucfirst($shortName).'Subscription';
+        }
+
         if ($input) {
+            if ($depth > 0) {
+                $shortName .= 'Nested';
+            }
             $shortName .= 'Input';
-        } elseif (null !== $mutationName) {
+        } elseif ($operation instanceof Mutation || $operation instanceof Subscription) {
             if ($depth > 0) {
                 $shortName .= 'Nested';
             }
             $shortName .= 'Payload';
         }
-        if (('item_query' === $queryName || 'collection_query' === $queryName)
-            && $resourceMetadata->getGraphqlAttribute('item_query', 'normalization_context', [], true) !== $resourceMetadata->getGraphqlAttribute('collection_query', 'normalization_context', [], true)) {
-            if ('item_query' === $queryName) {
-                $shortName .= 'Item';
-            }
-            if ('collection_query' === $queryName) {
-                $shortName .= 'Collection';
+
+        if ('item_query' === $operationName || 'collection_query' === $operationName) {
+            // Test if the collection/item operation exists and it has different groups
+            try {
+                if ($resourceMetadataCollection->getOperation($operation->isCollection() ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
+                    $shortName .= $operation->isCollection() ? 'Collection' : 'Item';
+                }
+            } catch (OperationNotFoundException $e) {
             }
         }
-        if ($wrapped && null !== $mutationName) {
+
+        if ($wrapped && ($operation instanceof Mutation || $operation instanceof Subscription)) {
             $shortName .= 'Data';
         }
 
         if ($this->typesContainer->has($shortName)) {
             $resourceObjectType = $this->typesContainer->get($shortName);
             if (!($resourceObjectType instanceof ObjectType || $resourceObjectType instanceof NonNull)) {
-                throw new \UnexpectedValueException(sprintf('Expected GraphQL type "%s" to be %s.', $shortName, implode('|', [ObjectType::class, NonNull::class])));
+                throw new \LogicException(sprintf('Expected GraphQL type "%s" to be %s.', $shortName, implode('|', [ObjectType::class, NonNull::class])));
             }
 
             return $resourceObjectType;
         }
 
-        $ioMetadata = $resourceMetadata->getGraphqlAttribute($mutationName ?? $queryName, $input ? 'input' : 'output', null, true);
+        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
         }
 
-        $wrapData = !$wrapped && null !== $mutationName && !$input && $depth < 1;
+        $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;
 
         $configuration = [
             'name' => $shortName,
-            'description' => $resourceMetadata->getDescription(),
+            'description' => $operation->getDescription(),
             'resolveField' => $this->defaultFieldResolver,
-            'fields' => function () use ($resourceClass, $resourceMetadata, $input, $mutationName, $queryName, $wrapData, $depth, $ioMetadata) {
+            'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    $queryNormalizationContext = $resourceMetadata->getGraphqlAttribute($queryName ?? '', 'normalization_context', [], true);
-                    $mutationNormalizationContext = $resourceMetadata->getGraphqlAttribute($mutationName ?? '', 'normalization_context', [], true);
-                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation.
+                    try {
+                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
+                    } catch (OperationNotFoundException $e) {
+                        $queryNormalizationContext = [];
+                    }
+
+                    try {
+                        $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
+                    } catch (OperationNotFoundException $e) {
+                        $mutationNormalizationContext = [];
+                    }
+                    // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
                     // If not, use the query type in order to ensure the client cache could be used.
                     $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
 
-                    return [
-                        lcfirst($resourceMetadata->getShortName()) => $useWrappedType ?
-                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, true, $depth) :
-                            $this->getResourceObjectType($resourceClass, $resourceMetadata, $input, $queryName ?? 'item_query', null, true, $depth),
-                        'clientMutationId' => GraphQLType::string(),
+                    $wrappedOperationName = $operationName;
+
+                    if (!$useWrappedType) {
+                        $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
+                    }
+
+                    try {
+                        $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
+                    } catch (OperationNotFoundException $e) {
+                        $wrappedOperation = (new Query())
+                            ->withResource($resourceMetadataCollection[0])
+                            ->withName($wrappedOperationName)
+                            ->withCollection('collection_query' === $wrappedOperationName);
+                    }
+
+                    $fields = [
+                        lcfirst($wrappedOperation->getShortName()) => $this->getResourceObjectType($resourceClass, $resourceMetadataCollection, $wrappedOperation, $input, true, $depth),
                     ];
+
+                    if ($operation instanceof Subscription) {
+                        $fields['clientSubscriptionId'] = GraphQLType::string();
+                        if ($operation->getMercure()) {
+                            $fields['mercureUrl'] = GraphQLType::string();
+                        }
+
+                        return $fields;
+                    }
+
+                    return $fields + ['clientMutationId' => GraphQLType::string()];
                 }
 
                 $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
+                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $depth, $ioMetadata);
 
-                $fields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $resourceMetadata, $input, $queryName, $mutationName, $depth, $ioMetadata);
-
-                if ($input && null !== $mutationName && null !== $mutationArgs = $resourceMetadata->getGraphql()[$mutationName]['args'] ?? null) {
-                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $mutationName, $resourceMetadata->getShortName()) + ['clientMutationId' => $fields['clientMutationId']];
+                if ($input && $operation instanceof Mutation && null !== $mutationArgs = $operation->getArgs()) {
+                    return $fieldsBuilder->resolveResourceArgs($mutationArgs, $operation) + ['clientMutationId' => $fields['clientMutationId']];
                 }
 
                 return $fields;
@@ -137,7 +185,7 @@ final class TypeBuilder implements TypeBuilderInterface
         if ($this->typesContainer->has('Node')) {
             $nodeInterface = $this->typesContainer->get('Node');
             if (!$nodeInterface instanceof InterfaceType) {
-                throw new \UnexpectedValueException(sprintf('Expected GraphQL type "Node" to be %s.', InterfaceType::class));
+                throw new \LogicException(sprintf('Expected GraphQL type "Node" to be %s.', InterfaceType::class));
             }
 
             return $nodeInterface;
@@ -171,13 +219,43 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType): GraphQLType
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType
     {
         $shortName = $resourceType->name;
+        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $operationName);
 
-        if ($this->typesContainer->has("{$shortName}Connection")) {
-            return $this->typesContainer->get("{$shortName}Connection");
+        $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
+        if ($this->typesContainer->has($connectionTypeKey)) {
+            return $this->typesContainer->get($connectionTypeKey);
         }
+
+        $fields = 'cursor' === $paginationType ?
+            $this->getCursorBasedPaginationFields($resourceType) :
+            $this->getPageBasedPaginationFields($resourceType);
+
+        $configuration = [
+            'name' => $connectionTypeKey,
+            'description' => sprintf("%s connection for $shortName.", ucfirst($paginationType)),
+            'fields' => $fields,
+        ];
+
+        $resourcePaginatedCollectionType = new ObjectType($configuration);
+        $this->typesContainer->set($connectionTypeKey, $resourcePaginatedCollectionType);
+
+        return $resourcePaginatedCollectionType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isCollection(Type $type): bool
+    {
+        return $type->isCollection() && ($collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();
+    }
+
+    private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
+    {
+        $shortName = $resourceType->name;
 
         $edgeObjectTypeConfiguration = [
             'name' => "{$shortName}Edge",
@@ -203,27 +281,32 @@ final class TypeBuilder implements TypeBuilderInterface
         $pageInfoObjectType = new ObjectType($pageInfoObjectTypeConfiguration);
         $this->typesContainer->set("{$shortName}PageInfo", $pageInfoObjectType);
 
-        $configuration = [
-            'name' => "{$shortName}Connection",
-            'description' => "Connection for $shortName.",
+        return [
+            'edges' => GraphQLType::listOf($edgeObjectType),
+            'pageInfo' => GraphQLType::nonNull($pageInfoObjectType),
+            'totalCount' => GraphQLType::nonNull(GraphQLType::int()),
+        ];
+    }
+
+    private function getPageBasedPaginationFields(GraphQLType $resourceType): array
+    {
+        $shortName = $resourceType->name;
+
+        $paginationInfoObjectTypeConfiguration = [
+            'name' => "{$shortName}PaginationInfo",
+            'description' => 'Information about the pagination.',
             'fields' => [
-                'edges' => GraphQLType::listOf($edgeObjectType),
-                'pageInfo' => GraphQLType::nonNull($pageInfoObjectType),
+                'itemsPerPage' => GraphQLType::nonNull(GraphQLType::int()),
+                'lastPage' => GraphQLType::nonNull(GraphQLType::int()),
                 'totalCount' => GraphQLType::nonNull(GraphQLType::int()),
             ],
         ];
+        $paginationInfoObjectType = new ObjectType($paginationInfoObjectTypeConfiguration);
+        $this->typesContainer->set("{$shortName}PaginationInfo", $paginationInfoObjectType);
 
-        $resourcePaginatedCollectionType = new ObjectType($configuration);
-        $this->typesContainer->set("{$shortName}Connection", $resourcePaginatedCollectionType);
-
-        return $resourcePaginatedCollectionType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCollection(Type $type): bool
-    {
-        return $type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && null !== $collectionValueType->getClassName();
+        return [
+            'collection' => GraphQLType::listOf($resourceType),
+            'paginationInfo' => GraphQLType::nonNull($paginationInfoObjectType),
+        ];
     }
 }

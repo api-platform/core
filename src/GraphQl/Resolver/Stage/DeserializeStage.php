@@ -11,30 +11,28 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
+namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Deserialize stage of GraphQL resolvers.
  *
- * @experimental
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 final class DeserializeStage implements DeserializeStageInterface
 {
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $denormalizer;
     private $serializerContextBuilder;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, DenormalizerInterface $denormalizer, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, DenormalizerInterface $denormalizer, SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->denormalizer = $denormalizer;
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
@@ -44,8 +42,9 @@ final class DeserializeStage implements DeserializeStageInterface
      */
     public function __invoke($objectToPopulate, string $resourceClass, string $operationName, array $context)
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (!$resourceMetadata->getGraphqlAttribute($operationName, 'deserialize', true, true)) {
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $operation = $resourceMetadataCollection->getOperation($operationName);
+        if (!($operation->canDeserialize() ?? true)) {
             return $objectToPopulate;
         }
 

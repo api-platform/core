@@ -203,9 +203,13 @@ Feature: Collections support
             "hydra:next": {"pattern": "^/dummies\\?partial=1&page=8$"},
             "hydra:previous": {"pattern": "^/dummies\\?partial=1&page=6$"}
           },
-          "additionalProperties": false
+          "required": ["@id", "@type", "hydra:next", "hydra:previous"],
+          "additionalProperties": false,
+          "maxProperties": 4
         }
-      }
+      },
+      "required": ["@context", "@id", "@type", "hydra:member", "hydra:view", "hydra:search"],
+      "maxProperties": 6
     }
     """
 
@@ -275,16 +279,16 @@ Feature: Collections support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     And the JSON should be valid according to this schema:
-  """
-  {
-    "@id":"/dummies?page=3",
-    "@type":"hydra:PartialCollectionView",
-    "hydra:first":"/dummies?page=1",
-    "hydra:last":"/dummies?page=10",
-    "hydra:previous":"/dummies?page=2",
-    "hydra:next":"/dummies?page=4"
-  }
-  """
+    """
+    {
+      "@id":"/dummies?page=3",
+      "@type":"hydra:PartialCollectionView",
+      "hydra:first":"/dummies?page=1",
+      "hydra:last":"/dummies?page=10",
+      "hydra:previous":"/dummies?page=2",
+      "hydra:next":"/dummies?page=4"
+    }
+    """
   Scenario: Filter with exact match
     When I send a "GET" request to "/dummies?id=8"
     Then the response status code should be 200

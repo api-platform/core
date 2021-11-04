@@ -11,15 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl;
+namespace ApiPlatform\GraphQl;
 
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
 
 /**
  * Wrapper for the GraphQL facade.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -30,6 +28,7 @@ interface ExecutorInterface
      *
      * @param mixed|null $rootValue
      * @param mixed|null $context
+     * @param mixed      $source
      */
     public function executeQuery(Schema $schema, $source, $rootValue = null, $context = null, array $variableValues = null, string $operationName = null, callable $fieldResolver = null, array $validationRules = null): ExecutionResult;
 }

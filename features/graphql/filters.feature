@@ -30,7 +30,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(exists: {relatedDummy: true}) {
+      dummies(exists: [{relatedDummy: true}]) {
         edges {
           node {
             id
@@ -52,7 +52,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(dummyDate: {after: "2015-04-02"}) {
+      dummies(dummyDate: [{after: "2015-04-02"}]) {
         edges {
           node {
             id
@@ -83,6 +83,36 @@ Feature: Collections filtering
     """
     Then the JSON node "data.dummies.edges" should have 1 element
     And the JSON node "data.dummies.edges[0].node.id" should be equal to "/dummies/2"
+
+  @createSchema
+  Scenario: Retrieve a collection filtered using the search filter with an int
+    Given there are 4 dummy objects having each 3 relatedDummies
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(name: "Dummy #1") {
+        totalCount
+        edges {
+          node {
+            name
+            relatedDummies(age: 31) {
+              totalCount
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the JSON node "data.dummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.totalCount" should be equal to 1
+    And the JSON node "data.dummies.edges[0].node.relatedDummies.edges[0].node.age" should be equal to "31"
 
   @createSchema
   Scenario: Retrieve a collection filtered using the search filter and a name converter
@@ -130,7 +160,7 @@ Feature: Collections filtering
     And the JSON node "data.convertedOwners.edges[1].node.name_converted.name_converted" should be equal to "Converted 20"
 
   @createSchema
-  Scenario: Retrieve a collection filtered using the search filter
+  Scenario: Retrieve a nested collection filtered using the search filter
     Given there are 3 dummy objects having each 3 relatedDummies
     When I send the following GraphQL request:
     """
@@ -204,7 +234,7 @@ Feature: Collections filtering
     When I send the following GraphQL request:
     """
     {
-      dummies(order: {relatedDummy__name: "DESC"}) {
+      dummies(order: [{relatedDummy__name: "DESC"}]) {
         edges {
           node {
             name
@@ -221,6 +251,30 @@ Feature: Collections filtering
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummies.edges[0].node.name" should be equal to "Dummy #2"
     And the JSON node "data.dummies.edges[1].node.name" should be equal to "Dummy #1"
+
+  @createSchema
+  Scenario: Retrieve a collection ordered correctly given the order of the argument
+    Given there are dummies with similar properties
+    When I send the following GraphQL request:
+    """
+    {
+      dummies(order: [{description: "ASC"}, {name: "ASC"}]) {
+        edges {
+          node {
+            id
+            name
+            description
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.dummies.edges[0].node.name" should be equal to "baz"
+    And the JSON node "data.dummies.edges[0].node.description" should be equal to "bar"
+    And the JSON node "data.dummies.edges[1].node.name" should be equal to "foo"
+    And the JSON node "data.dummies.edges[1].node.description" should be equal to "bar"
 
   @createSchema
   Scenario: Retrieve a collection filtered using the related search filter with two values and exact strategy

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\GraphQl;
+namespace ApiPlatform\GraphQl;
 
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL;
@@ -19,8 +19,6 @@ use GraphQL\Type\Schema;
 
 /**
  * Wrapper for the GraphQL facade.
- *
- * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

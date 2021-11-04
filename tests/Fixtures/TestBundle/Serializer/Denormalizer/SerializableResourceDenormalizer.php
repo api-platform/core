@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Model\SerializableResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -23,6 +23,8 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
@@ -37,7 +39,7 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return 'json' === $format && SerializableResource::class === $type && \is_array($data);
     }

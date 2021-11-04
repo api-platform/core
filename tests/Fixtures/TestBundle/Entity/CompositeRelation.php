@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
@@ -49,10 +49,8 @@ class CompositeRelation
 
     /**
      * Gets value.
-     *
-     * @return string|null
      */
-    public function getValue()
+    public function getValue(): ?string
     {
         return $this->value;
     }
@@ -69,10 +67,8 @@ class CompositeRelation
 
     /**
      * Gets compositeItem.
-     *
-     * @return CompositeItem
      */
-    public function getCompositeItem()
+    public function getCompositeItem(): CompositeItem
     {
         return $this->compositeItem;
     }
@@ -89,10 +85,8 @@ class CompositeRelation
 
     /**
      * Gets compositeLabel.
-     *
-     * @return CompositeLabel
      */
-    public function getCompositeLabel()
+    public function getCompositeLabel(): CompositeLabel
     {
         return $this->compositeLabel;
     }

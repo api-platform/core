@@ -11,9 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,7 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *     attributes={"security"="is_granted('ROLE_USER')"},
  *     collectionOperations={
- *         "get",
+ *         "get"={"security"="is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"},
  *         "get_from_data_provider_generator"={
  *             "method"="GET",
  *             "path"="custom_data_provider_generator",
@@ -38,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *         "put"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
  *     },
  *     graphql={
- *         "item_query"={"security"="is_granted('ROLE_USER') and object.getOwner() == user"},
+ *         "item_query"={"security"="is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.getOwner() == user)"},
  *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
  *         "delete"={},
  *         "update"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
@@ -50,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SecuredDummy
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -59,7 +62,7 @@ class SecuredDummy
     private $id;
 
     /**
-     * @var string The title
+     * @var string|null The title
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -74,45 +77,215 @@ class SecuredDummy
     private $description = '';
 
     /**
-     * @var string The owner
+     * @var string The dummy secret property, only readable/writable by specific users
+     *
+     * @ORM\Column
+     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
+     */
+    private $adminOnlyProperty = '';
+
+    /**
+     * @var string Secret property, only readable/writable by owners
+     *
+     * @ORM\Column
+     * @ApiProperty(
+     *     security="object == null or object.getOwner() == user",
+     *     securityPostDenormalize="object.getOwner() == user",
+     * )
+     */
+    private $ownerOnlyProperty = '';
+
+    /**
+     * @var string|null The owner
      *
      * @ORM\Column
      * @Assert\NotBlank
      */
     private $owner;
 
-    public function getId(): int
+    /**
+     * A collection of dummies that only admins can access.
+     *
+     * @var Collection<RelatedDummy> Several dummies
+     *
+     * @ORM\ManyToMany(targetEntity="RelatedDummy")
+     * @ORM\JoinTable(name="secured_dummy_related_dummy")
+     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
+     */
+    public $relatedDummies;
+
+    /**
+     * A dummy that only admins can access.
+     *
+     * @var RelatedDummy
+     *
+     * @ORM\ManyToOne(targetEntity="RelatedDummy")
+     * @ORM\JoinColumn(name="related_dummy_id")
+     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
+     */
+    protected $relatedDummy;
+
+    /**
+     * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var Collection<RelatedSecuredDummy> Several dummies
+     *
+     * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinTable(name="secured_dummy_related_secured_dummy")
+     * @ApiProperty(security="is_granted('ROLE_USER')")
+     */
+    public $relatedSecuredDummies;
+
+    /**
+     * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var RelatedSecuredDummy
+     *
+     * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinColumn(name="related_secured_dummy_id")
+     * @ApiProperty(security="is_granted('ROLE_USER')")
+     */
+    protected $relatedSecuredDummy;
+
+    /**
+     * Collection of dummies that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var Collection<RelatedSecuredDummy> Several dummies
+     *
+     * @ORM\ManyToMany(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinTable(name="secured_dummy_public_related_secured_dummy")
+     */
+    public $publicRelatedSecuredDummies;
+
+    /**
+     * A dummy that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var RelatedSecuredDummy
+     *
+     * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
+     * @ORM\JoinColumn(name="public_related_secured_dummy_id")
+     */
+    protected $publicRelatedSecuredDummy;
+
+    public function __construct()
+    {
+        $this->relatedDummies = new ArrayCollection();
+        $this->relatedSecuredDummies = new ArrayCollection();
+        $this->publicRelatedSecuredDummies = new ArrayCollection();
+    }
+
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title)
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setDescription(string $description)
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
 
-    public function getOwner(): string
+    public function getAdminOnlyProperty(): ?string
+    {
+        return $this->adminOnlyProperty;
+    }
+
+    public function setAdminOnlyProperty(?string $adminOnlyProperty): void
+    {
+        $this->adminOnlyProperty = $adminOnlyProperty;
+    }
+
+    public function getOwnerOnlyProperty(): ?string
+    {
+        return $this->ownerOnlyProperty;
+    }
+
+    public function setOwnerOnlyProperty(?string $ownerOnlyProperty)
+    {
+        $this->ownerOnlyProperty = $ownerOnlyProperty;
+    }
+
+    public function getOwner(): ?string
     {
         return $this->owner;
     }
 
-    public function setOwner(string $owner)
+    public function setOwner(string $owner): void
     {
         $this->owner = $owner;
+    }
+
+    public function addRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummies->add($relatedDummy);
+    }
+
+    public function getRelatedDummies()
+    {
+        return $this->relatedDummies;
+    }
+
+    public function getRelatedDummy()
+    {
+        return $this->relatedDummy;
+    }
+
+    public function setRelatedDummy(RelatedDummy $relatedDummy)
+    {
+        $this->relatedDummy = $relatedDummy;
+    }
+
+    public function addRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    {
+        $this->relatedSecuredDummies->add($relatedSecuredDummy);
+    }
+
+    public function getRelatedSecuredDummies()
+    {
+        return $this->relatedSecuredDummies;
+    }
+
+    public function getRelatedSecuredDummy()
+    {
+        return $this->relatedSecuredDummy;
+    }
+
+    public function setRelatedSecuredDummy(RelatedSecuredDummy $relatedSecuredDummy)
+    {
+        $this->relatedSecuredDummy = $relatedSecuredDummy;
+    }
+
+    public function addPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    {
+        $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
+    }
+
+    public function getPublicRelatedSecuredDummies()
+    {
+        return $this->publicRelatedSecuredDummies;
+    }
+
+    public function getPublicRelatedSecuredDummy()
+    {
+        return $this->publicRelatedSecuredDummy;
+    }
+
+    public function setPublicRelatedSecuredDummy(RelatedSecuredDummy $publicRelatedSecuredDummy)
+    {
+        $this->publicRelatedSecuredDummy = $publicRelatedSecuredDummy;
     }
 }

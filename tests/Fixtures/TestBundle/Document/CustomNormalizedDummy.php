@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -33,15 +33,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CustomNormalizedDummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      * @Groups({"input", "output"})
      */
     private $id;
 
     /**
-     * @var string The dummy name
+     * @var string|null The dummy name
      *
      * @ODM\Field
      * @Assert\NotBlank
@@ -51,7 +51,7 @@ class CustomNormalizedDummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ODM\Field(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -59,10 +59,7 @@ class CustomNormalizedDummy
      */
     private $alias;
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -75,18 +72,12 @@ class CustomNormalizedDummy
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -99,10 +90,7 @@ class CustomNormalizedDummy
         $this->alias = $alias;
     }
 
-    /**
-     * @return string
-     */
-    public function getPersonalizedAlias()
+    public function getPersonalizedAlias(): ?string
     {
         return $this->alias;
     }

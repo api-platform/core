@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
@@ -33,7 +33,7 @@ class DummyProduct
     /**
      * @var int The id
      *
-     * @ODM\Id(strategy="INCREMENT", type="integer")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
@@ -107,7 +107,7 @@ class DummyProduct
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(Collection $relatedProducts)
+    public function setRelatedProducts(iterable $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }

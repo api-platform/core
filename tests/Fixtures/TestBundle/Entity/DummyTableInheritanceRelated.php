@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -41,7 +42,7 @@ class DummyTableInheritanceRelated
     private $id;
 
     /**
-     * @var ArrayCollection Related children
+     * @var Collection Related children
      *
      * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
      * @ORM\OrderBy({"id"="ASC"})
@@ -60,10 +61,7 @@ class DummyTableInheritanceRelated
         return $this->id;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }

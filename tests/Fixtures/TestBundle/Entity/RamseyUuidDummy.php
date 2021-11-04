@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
@@ -32,13 +32,30 @@ class RamseyUuidDummy
      */
     private $id;
 
+    /**
+     * @var \Ramsey\Uuid\UuidInterface|null
+     *
+     * @ORM\Column(type="uuid", nullable=true)
+     */
+    private $other;
+
+    public function __construct(?UuidInterface $id = null)
+    {
+        $this->id = $id ?? Uuid::uuid4();
+    }
+
     public function getId(): UuidInterface
     {
         return $this->id;
     }
 
-    public function setId(string $uuid)
+    public function getOther(): ?UuidInterface
     {
-        $this->id = Uuid::fromString($uuid);
+        return $this->other;
+    }
+
+    public function setOther(UuidInterface $other): void
+    {
+        $this->other = $other;
     }
 }
