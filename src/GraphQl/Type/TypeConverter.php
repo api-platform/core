@@ -72,7 +72,7 @@ final class TypeConverter implements TypeConverterInterface
                     return GraphQLType::string();
                 }
 
-                if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
+                if (is_a($type->getClassName(), \DateTimeInterface::class, true) || is_a($type->getClassName(), \DateInterval::class, true)) {
                     return GraphQLType::string();
                 }
 

@@ -81,6 +81,7 @@ class TypeConverterTest extends TestCase
             [new Type(Type::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
             [new Type(Type::BUILTIN_TYPE_OBJECT), true, 1, GraphQLType::string()],
             [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
+            [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateInterval::class), false, 0, GraphQLType::string()],
             [new Type(Type::BUILTIN_TYPE_OBJECT), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_CALLABLE), false, 0, null],
             [new Type(Type::BUILTIN_TYPE_NULL), false, 0, null],
