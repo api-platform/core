@@ -18,7 +18,6 @@ use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\ContextAwareIdentifierConverterInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -32,7 +31,7 @@ trait UriVariablesResolverTrait
     /**
      * Resolves an operation's UriVariables to their identifiers values.
      *
-     * @param Operation|GraphQlOperation|null $operation
+     * @param Operation|null $operation
      */
     private function getOperationIdentifiers($operation, array $parameters, string $resourceClass): array
     {

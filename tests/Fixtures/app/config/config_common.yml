@@ -117,6 +117,24 @@ services:
         tags:
             - { name: 'api_platform.state_processor' }
 
+    contain_non_resource.state_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
+    serializable.state_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
+    resource_interface.state_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider'
+        public: false
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     contain_non_resource.item_data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider'
         public: false

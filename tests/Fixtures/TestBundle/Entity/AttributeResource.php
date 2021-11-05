@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\UriVariable;
 
 #[ApiResource(normalizationContext: ['skip_null_values' => true])]
 #[Get]
@@ -36,7 +35,6 @@ final class AttributeResource
     /**
      * @var ?Dummy
      */
-    #[UriVariable('dummyId')]
     public $dummy = null;
 
     /**

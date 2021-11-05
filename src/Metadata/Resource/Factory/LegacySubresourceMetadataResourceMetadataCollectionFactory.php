@@ -18,11 +18,11 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 
 /**
  * We have to compute a local cache having all the resource => subresource matching.
@@ -109,7 +109,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                         continue;
                     }
 
-                    $identifiers[$parameterName] = (new UriVariable())->withTargetClass($class)->withIdentifiers([$property]);
+                    $identifiers[$parameterName] = (new Link())->withFromClass($class)->withIdentifiers([$property])->withParameterName($parameterName);
                 }
 
                 $extraProperties = ['is_legacy_subresource' => true];

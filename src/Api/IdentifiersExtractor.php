@@ -16,6 +16,7 @@ namespace ApiPlatform\Api;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -56,18 +57,19 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $resourceClass = $this->getResourceClass($item, true);
         $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName);
 
-        foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariableDefinition) {
-            if (1 < \count($uriVariableDefinition->getIdentifiers())) {
+        $links = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
+        foreach ($links ?? [] as $link) {
+            if (1 < \count($link->getIdentifiers())) {
                 $compositeIdentifiers = [];
-                foreach ($uriVariableDefinition->getIdentifiers() as $identifier) {
-                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $uriVariableDefinition->getTargetClass() ?? $resourceClass, $identifier, $parameterName);
+                foreach ($link->getIdentifiers() as $identifier) {
+                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $resourceClass, $identifier, $link->getParameterName());
                 }
 
-                $identifiers[($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) ? 'id' : $parameterName] = CompositeIdentifierParser::stringify($compositeIdentifiers);
+                $identifiers[($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) ? 'id' : $link->getParameterName()] = CompositeIdentifierParser::stringify($compositeIdentifiers);
                 continue;
             }
 
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $uriVariableDefinition->getTargetClass(), $uriVariableDefinition->getIdentifiers()[0], $parameterName);
+            $identifiers[$link->getParameterName()] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $link->getParameterName());
         }
 
         return $identifiers;
@@ -92,12 +94,12 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            if ($type->getClassName() === $class) {
-                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
-            }
-
             if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && $collectionValueType->getClassName() === $class) {
                 return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+            }
+
+            if ($type->getClassName() === $class) {
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
             }
         }
 
@@ -126,9 +128,9 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
             trigger_deprecation('api-platform/core', '2.7', 'Using a resource class as identifier is deprecated, please make this identifier Stringable');
             $relatedOperation = $this->resourceMetadataFactory->create($relatedResourceClass)->getOperation();
-            $relatedIdentifiers = $relatedOperation->getUriVariables();
-            if (1 === \count($relatedIdentifiers)) {
-                $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedIdentifiers)->getIdentifiers()[0], $parameterName);
+            $relatedLinks = $relatedOperation instanceof GraphQlOperation ? $relatedOperation->getLinks() : $relatedOperation->getUriVariables();
+            if (1 === \count($relatedLinks)) {
+                $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedLinks)->getIdentifiers()[0], $parameterName);
 
                 if ($identifierValue instanceof \Stringable || is_scalar($identifierValue) || method_exists($identifierValue, '__toString')) {
                     return (string) $identifierValue;

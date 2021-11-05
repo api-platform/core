@@ -189,7 +189,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         if ($operation instanceof GraphQlOperation) {
             if (!$operation->getName()) {
-                throw new RuntimeException('No graphql operation name.');
+                throw new RuntimeException('No GraphQL operation name.');
             }
 
             if ($operation instanceof Mutation) {

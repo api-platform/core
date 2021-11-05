@@ -25,12 +25,12 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\PathResolver\OperationPathResolver;
 use ApiPlatform\Symfony\Routing\ApiLoader;
@@ -61,7 +61,7 @@ class ApiLoaderTest extends TestCase
         $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
                 // Default operations based on OperationResourceMetadataFactory
-                'api_dummies_get_item' => (new Get())->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
+                'api_dummies_get_item' => (new Get())->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withUriTemplate($path)->withDefaults(['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'])->withRequirements(['id' => '\d+'])->withController('api_platform.action.get_item'),
                 'api_dummies_put_item' => (new Put())->withUriTemplate($path),
                 'api_dummies_delete_item' => (new Delete())->withUriTemplate($path),
                 // Custom operations

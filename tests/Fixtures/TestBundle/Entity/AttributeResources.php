@@ -16,7 +16,9 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ArrayIterator;
 use IteratorAggregate;
+use Traversable;
 
 #[ApiResource('/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true])]
 #[GetCollection]
@@ -33,8 +35,8 @@ final class AttributeResources implements IteratorAggregate
         $this->collection = $collection;
     }
 
-    public function getIterator(): \Traversable
+    public function getIterator(): Traversable
     {
-        return new \ArrayIterator($this->collection);
+        return new ArrayIterator($this->collection);
     }
 }

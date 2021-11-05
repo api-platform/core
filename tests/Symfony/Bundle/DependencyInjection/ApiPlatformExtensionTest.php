@@ -339,6 +339,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_subscription', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.read.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.read', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security_post_denormalize', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1103,6 +1104,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.operation_name',
             'api_platform.metadata.resource.metadata_collection_factory.php_doc',
             'api_platform.metadata.resource.metadata_collection_factory.uri_template',
+            'api_platform.metadata.resource.metadata_collection_factory.link',
+            'api_platform.metadata.resource.link_factory',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.formats',
             'api_platform.metadata.resource.metadata_factory.input_output',
@@ -1447,6 +1450,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.factory.collection',
             'api_platform.graphql.resolver.factory.item_mutation',
             'api_platform.graphql.resolver.factory.item_subscription',
+            'api_platform.graphql.resolver.stage.read.legacy',
             'api_platform.graphql.resolver.stage.read',
             'api_platform.graphql.resolver.stage.security',
             'api_platform.graphql.resolver.stage.security_post_denormalize',
@@ -1530,6 +1534,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
             'api_platform.rector.command',
+            'api_platform.rector.subresource_transformer',
             'api_platform.swagger.action.ui',
             'api_platform.swagger.listener.ui',
             'api_platform.validator',

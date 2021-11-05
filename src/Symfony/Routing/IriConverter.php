@@ -23,6 +23,7 @@ use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -123,7 +124,7 @@ final class IriConverter implements IriConverterInterface
                 ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) ||
                 ($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false) ||
                 // When we want the Iri from an object, we don't want the collection uriTemplate, for this we use getIriFromResourceClass
-                $operation->isCollection()
+                $operation->isCollection() || $operation instanceof Post
             ) {
                 unset($context['operation']);
                 $operationName = null;

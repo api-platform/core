@@ -17,7 +17,7 @@ Feature: Eager Loading
         LEFT JOIN thirdLevel_a1.fourthLevel fourthLevel_a2
         LEFT JOIN o.relatedToDummyFriend relatedToDummyFriend_a3
         LEFT JOIN relatedToDummyFriend_a3.dummyFriend dummyFriend_a4
-    WHERE o.id = :id_id
+    WHERE o.id = :id_p1
     """
 
   Scenario: Eager loading for the search filter
@@ -74,7 +74,7 @@ Feature: Eager Loading
     FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTravel o
         LEFT JOIN o.car car_a1
         LEFT JOIN o.passenger passenger_a2
-    WHERE o.id = :id_id
+    WHERE o.id = :id_p1
     """
 
   Scenario: Eager loading for a relation with complex sub-query filter

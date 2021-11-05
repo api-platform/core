@@ -17,11 +17,11 @@ use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\EventListener\ReadListener;
@@ -101,7 +101,7 @@ class ReadListenerTest extends TestCase
         $event = $this->prophesize(RequestEvent::class);
         $event->getRequest()->willReturn($request);
 
-        $operation = (new Get())->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])]);
+        $operation = (new Get())->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]);
         $provider = $this->prophesize(ProviderInterface::class);
         $provider->provide(Dummy::class, ['id' => 1], 'get', Argument::type('array'))->shouldNotBeCalled();
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

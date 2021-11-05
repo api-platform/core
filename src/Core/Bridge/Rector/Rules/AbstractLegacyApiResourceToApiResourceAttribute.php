@@ -38,7 +38,6 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
         'itemOperations' => [
             'get',
             'put',
-            'patch',
             'delete',
         ],
         'collectionOperations' => [

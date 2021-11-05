@@ -1,0 +1,20 @@
+diff --git a/composer.json b/composer.json
+index d5beb2afc..fca961b12 100644
+--- a/composer.json
++++ b/composer.json
+@@ -47,10 +47,10 @@
+         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.1",
+         "phpdocumentor/type-resolver": "^0.3 || ^0.4 || ^1.4",
+         "phpstan/extension-installer": "^1.0",
+-        "phpstan/phpstan": "^0.12.65",
+-        "phpstan/phpstan-doctrine": "^0.12.7",
+-        "phpstan/phpstan-phpunit": "^0.12.4",
+-        "phpstan/phpstan-symfony": "^0.12.4",
++        "phpstan/phpstan": "*",
++        "phpstan/phpstan-doctrine": "*",
++        "phpstan/phpstan-phpunit": "*",
++        "phpstan/phpstan-symfony": "*",
+         "psr/log": "^1.0",
+         "ramsey/uuid": "^3.7 || ^4.0",
+         "ramsey/uuid-doctrine": "^1.4",
+
