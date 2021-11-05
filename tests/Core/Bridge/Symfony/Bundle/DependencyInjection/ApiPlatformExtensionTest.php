@@ -1104,6 +1104,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.operation_name',
             'api_platform.metadata.resource.metadata_collection_factory.php_doc',
             'api_platform.metadata.resource.metadata_collection_factory.uri_template',
+            'api_platform.metadata.resource.metadata_collection_factory.link',
+            'api_platform.metadata.resource.link_factory',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.formats',
             'api_platform.metadata.resource.metadata_factory.input_output',

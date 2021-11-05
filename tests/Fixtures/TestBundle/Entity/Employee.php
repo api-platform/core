@@ -16,8 +16,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\UriVariable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -50,7 +50,7 @@ class Employee
     /**
      * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
      */
-    #[UriVariable('companyId')]
+    #[Link('companyId')]
     public Company $company;
 
     public function getId()

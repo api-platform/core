@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\UriVariable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -46,7 +46,7 @@ class Company
     public string $name;
 
     // TODO 3.0: Set the uri variable directly in the api resource and remove this property
-    #[UriVariable(parameterName: 'employeeId', inverseProperty: 'company', property: null, targetClass: Employee::class)]
+    #[Link(parameterName: 'employeeId', fromProperty: 'company', toProperty: null, fromClass: Employee::class)]
     public $employees; // only used to set metadata
 
     public function getId()

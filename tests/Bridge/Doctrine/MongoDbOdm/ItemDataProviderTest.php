@@ -26,10 +26,10 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
@@ -255,7 +255,7 @@ class ItemDataProviderTest extends TestCase
             $metadata = $metadata->withIdentifier(true);
             $propertyMetadataFactoryProphecy->create($resourceClass, $identifier)->willReturn($metadata);
 
-            $resourceIdentifiers[$identifier] = (new UriVariable())->withTargetClass($resourceClass)->withIdentifiers([$identifier]);
+            $resourceIdentifiers[$identifier] = (new Link())->withFromClass($resourceClass)->withIdentifiers([$identifier]);
             $nameCollection[] = $identifier;
         }
 

@@ -32,6 +32,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
@@ -41,7 +42,6 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -69,10 +69,10 @@ class OpenApiFactoryTest extends TestCase
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true);
         $dummyResource = (new ApiResource())->withOperations(new Operations([
-            'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])]),
-            'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])]),
-            'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])]),
-            'customDummyItem' => (new Operation())->withMethod(Operation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext([
+            'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+            'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+            'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+            'customDummyItem' => (new Operation())->withMethod(Operation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext([
                 'x-visibility' => 'hide',
                 'description' => 'Custom description',
                 'parameters' => [
@@ -119,7 +119,7 @@ class OpenApiFactoryTest extends TestCase
             ),
             'custom-http-verb' => (new Operation())->withMethod('TEST')->withOperation($baseOperation),
             'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
-            'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
+            'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
             'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([
                 'parameters' => [
                     ['description' => 'Test modified collection page number', 'name' => 'page', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'integer', 'default' => 1], 'allowEmptyValue' => true],

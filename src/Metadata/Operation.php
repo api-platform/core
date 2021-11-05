@@ -42,7 +42,7 @@ class Operation
      */
     protected $outputFormats;
     /**
-     * @var array<string, UriVariable>|array<string, array>|string[]|string|null
+     * @var array<string, Link>|array<string, array>|string[]|string|null
      */
     protected $uriVariables;
     protected $routePrefix;
@@ -444,7 +444,7 @@ class Operation
     }
 
     /**
-     * @return array<string, UriVariable>|array<string, array>|string[]|string|null
+     * @return array<string, Link>|array<string, array>|string[]|string|null
      */
     public function getUriVariables()
     {
@@ -452,7 +452,7 @@ class Operation
     }
 
     /**
-     * @param array<string, UriVariable>|array<string, array>|string[]|string|null $uriVariables
+     * @param array<string, Link>|array<string, array>|string[]|string $uriVariables
      */
     public function withUriVariables($uriVariables): self
     {

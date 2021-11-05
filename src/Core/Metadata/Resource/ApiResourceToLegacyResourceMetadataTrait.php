@@ -97,12 +97,12 @@ trait ApiResourceToLegacyResourceMetadataTrait
         $arrayOperation['identifiers'] = [];
         foreach ($arrayOperation['uri_variables'] as $parameterName => $identifiedBy) {
             if (1 === \count($identifiedBy->getIdentifiers())) {
-                $arrayOperation['identifiers'][$parameterName] = [$identifiedBy->getTargetClass(), $identifiedBy->getIdentifiers()[0]];
+                $arrayOperation['identifiers'][$parameterName] = [$identifiedBy->getFromClass(), $identifiedBy->getIdentifiers()[0]];
                 continue;
             }
 
             foreach ($identifiedBy->getIdentifiers() as $identifier) {
-                $arrayOperation['identifiers'][$identifier] = [$identifiedBy->getTargetClass(), $identifier];
+                $arrayOperation['identifiers'][$identifier] = [$identifiedBy->getFromClass(), $identifier];
             }
         }
 

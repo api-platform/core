@@ -26,13 +26,13 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
@@ -89,7 +89,7 @@ class ItemProviderTest extends TestCase
         ], $queryBuilder);
 
         $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['get' => (new Get())->withUriVariables([
-            'identifier' => (new UriVariable())->withTargetClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource")
+            'identifier' => (new Link())->withFromClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource")
             ->withIdentifiers([
                 0 => 'identifier',
             ]),
@@ -127,11 +127,11 @@ class ItemProviderTest extends TestCase
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
         $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['get' => (new Get())->withUriVariables([
-            'ida' => (new UriVariable())->withTargetClass('ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource')
+            'ida' => (new Link())->withFromClass('ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource')
                 ->withIdentifiers([
                     0 => 'ida',
                 ]),
-            'idb' => (new UriVariable())->withTargetClass('ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource')
+            'idb' => (new Link())->withFromClass('ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource')
                 ->withIdentifiers([
                     0 => 'idb',
                 ]),
@@ -194,7 +194,7 @@ class ItemProviderTest extends TestCase
         $extensionProphecy->getResult($queryBuilder, OperationResource::class, 'get', $context)->willReturn([])->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['get' => (new Get())->withUriVariables([
-            'identifier' => (new UriVariable())->withTargetClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource")->withIdentifiers([
+            'identifier' => (new Link())->withFromClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource")->withIdentifiers([
                 0 => 'identifier',
             ]),
         ])]))]));
@@ -356,7 +356,7 @@ class ItemProviderTest extends TestCase
     /**
      * @requires PHP 8.0
      */
-    public function testGetSubResourceInverseProperty()
+    public function testGetSubResourceFromProperty()
     {
         $queryProphecy = $this->prophesize(AbstractQuery::class);
         $queryProphecy->getOneOrNullResult()->willReturn([])->shouldBeCalled();
@@ -386,10 +386,10 @@ class ItemProviderTest extends TestCase
         ], $queryBuilder);
 
         $resourceMetadataFactoryProphecy->create(Company::class)->willReturn(new ResourceMetadataCollection(Company::class, [(new ApiResource())->withOperations(new Operations(['getCompany' => (new Get())->withUriVariables([
-            'employeeId' => (new UriVariable())->withTargetClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee")
+            'employeeId' => (new Link())->withFromClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee")
                 ->withIdentifiers([
                     0 => 'id',
-                ])->withInverseProperty('company'),
+                ])->withFromProperty('company'),
         ])]))]));
 
         $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);
@@ -433,10 +433,10 @@ class ItemProviderTest extends TestCase
         ], $queryBuilder);
 
         $resourceMetadataFactoryProphecy->create(Employee::class)->willReturn(new ResourceMetadataCollection(Company::class, [(new ApiResource())->withOperations(new Operations(['getEmployees' => (new GetCollection())->withUriVariables([
-            'companyId' => (new UriVariable())->withTargetClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
+            'companyId' => (new Link())->withFromClass("ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
                 ->withIdentifiers([
                     0 => 'id',
-                ])->withProperty('company'),
+                ])->withToProperty('company'),
         ])]))]));
 
         $extensionProphecy = $this->prophesize(QueryItemExtensionInterface::class);

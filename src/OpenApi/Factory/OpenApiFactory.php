@@ -182,7 +182,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Set up parameters
             foreach ($uriVariables ?? [] as $parameterName => $uriVariable) {
-                $parameter = new Model\Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getTargetClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                $parameter = new Model\Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getFromClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
                 if ($this->hasParameter($parameter, $parameters)) {
                     continue;
                 }
@@ -380,7 +380,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if ($operationUriVariables[$parameterName]->getIdentifiers() === $uriVariableDefinition->getIdentifiers() && $operationUriVariables[$parameterName]->getTargetClass() === $uriVariableDefinition->getTargetClass()) {
+                    if ($operationUriVariables[$parameterName]->getIdentifiers() === $uriVariableDefinition->getIdentifiers() && $operationUriVariables[$parameterName]->getFromClass() === $uriVariableDefinition->getFromClass()) {
                         $parameters[$parameterName] = '$request.path.'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }
@@ -390,7 +390,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if (($uriVariableDefinition->getTargetClass() ?? null) === $currentOperation->getClass()) {
+                    if (($uriVariableDefinition->getFromClass() ?? null) === $currentOperation->getClass()) {
                         $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }

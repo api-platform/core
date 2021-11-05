@@ -30,7 +30,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class CollectionProvider implements ProviderInterface
 {
-    use UriVariablesHandlerTrait;
+    use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
@@ -59,7 +59,7 @@ final class CollectionProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleUriVariables($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);

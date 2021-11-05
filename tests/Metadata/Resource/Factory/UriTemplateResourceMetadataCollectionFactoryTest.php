@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
@@ -20,17 +21,19 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Resource\Factory\LinkFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -42,20 +45,25 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
 
     public function testCreate()
     {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection());
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
         $pathSegmentNameGeneratorProphecy->getSegmentName('AttributeResource')->willReturn('attribute_resources');
         $pathSegmentNameGeneratorProphecy->getSegmentName('AttributeDefaultOperations')->willReturn('attribute_default_operations');
-        $resourceCollectionMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceCollectionMetadataFactory->create(AttributeResource::class)->willReturn(
+        $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
             new ResourceMetadataCollection(AttributeResource::class, [
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
-                    uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
                     operations: [
-                        '_api_AttributeResource_get' => new Get(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])]),
-                        '_api_AttributeResource_put' => new Put(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])]),
-                        '_api_AttributeResource_delete' => new Delete(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])]),
+                        '_api_AttributeResource_get' => new Get(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])]),
+                        '_api_AttributeResource_put' => new Put(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])]),
+                        '_api_AttributeResource_delete' => new Delete(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])]),
                         '_api_AttributeResource_get_collection' => new GetCollection(shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder'),
                     ]
                 ),
@@ -63,13 +71,13 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id']), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{id}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                             shortName: 'AttributeResource',
-                            uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                            uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id']), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'])],
                         ),
                     ]
                 ),
@@ -100,18 +108,18 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
             ]),
         );
 
-        $uriTemplateResourceMetadataCollectionFactory = new UriTemplateResourceMetadataCollectionFactory($pathSegmentNameGeneratorProphecy->reveal(), null, null, $resourceCollectionMetadataFactory->reveal());
+        $uriTemplateResourceMetadataCollectionFactory = new UriTemplateResourceMetadataCollectionFactory($linkFactory, $pathSegmentNameGeneratorProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
 
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [
                 new ApiResource(
-                    uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     operations: [
-                        '_api_/attribute_resources/{id}.{_format}_get' => new Get(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])]),
-                        '_api_/attribute_resources/{id}.{_format}_put' => new Put(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])]),
-                        '_api_/attribute_resources/{id}.{_format}_delete' => new Delete(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])]),
+                        '_api_/attribute_resources/{id}.{_format}_get' => new Get(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')]),
+                        '_api_/attribute_resources/{id}.{_format}_put' => new Put(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')]),
+                        '_api_/attribute_resources/{id}.{_format}_delete' => new Delete(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')]),
                         '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(uriTemplate: '/attribute_resources.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder'),
                     ]
                 ),
@@ -119,13 +127,13 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{id}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                             shortName: 'AttributeResource',
-                            uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                            uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                             extraProperties: ['user_defined_uri_template' => true]
                         ),
                     ]
@@ -134,28 +142,28 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/attribute_resources/by_name/{name}',
-                    uriVariables: ['name' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['name'])],
+                    uriVariables: ['name' => new Link(fromClass: AttributeResource::class, identifiers: ['name'], parameterName: 'name')],
                     operations: [],
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/attribute_resources/by_name/{name}',
-                    uriVariables: ['name' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['name'])],
+                    uriVariables: ['name' => new Link(fromClass: AttributeResource::class, identifiers: ['name'], parameterName: 'name')],
                     operations: [],
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                     operations: [],
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    uriVariables: ['dummyId' => new UriVariable(targetClass: Dummy::class, identifiers: ['id']), 'id' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['id'])],
+                    uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
                     operations: [],
                 ),
             ]),
@@ -167,18 +175,18 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
     {
         $pathSegmentNameGeneratorProphecy = $this->prophesize(PathSegmentNameGeneratorInterface::class);
         $pathSegmentNameGeneratorProphecy->getSegmentName('AttributeResource')->willReturn('attribute_resources');
-        $resourceCollectionMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceCollectionMetadataFactory->create(AttributeResource::class)->willReturn(
+        $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
             new ResourceMetadataCollection(AttributeResource::class, [
                 new ApiResource(
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
-                    uriVariables: ['identifier' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['identifier'])],
+                    uriVariables: ['identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'])],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}_get' => new Get(
                             class: AttributeResource::class,
-                            uriVariables: ['identifier' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['identifier'])],
+                            uriVariables: ['identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'])],
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
                             shortName: 'AttributeResource'
                         ),
@@ -187,14 +195,16 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
             ]),
         );
 
-        $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->create(AttributeResource::class)->willReturn(new PropertyNameCollection(['identifier', 'dummy']));
-        $propertyNameCollectionFactory->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']));
-        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->create(AttributeResource::class, 'identifier')->willReturn(new ApiProperty())->shouldNotBeCalled();
-        $propertyMetadataFactory->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withBuiltinTypes([new Type('object', true, Dummy::class)]));
-        $propertyMetadataFactory->create(Dummy::class, 'id')->willReturn(new ApiProperty());
-        $uriTemplateResourceMetadataCollectionFactory = new UriTemplateResourceMetadataCollectionFactory($pathSegmentNameGeneratorProphecy->reveal(), $propertyNameCollectionFactory->reveal(), $propertyMetadataFactory->reveal(), $resourceCollectionMetadataFactory->reveal());
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(AttributeResource::class)->willReturn(new PropertyNameCollection(['identifier', 'dummy']));
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']));
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'identifier')->willReturn(new ApiProperty())->shouldNotBeCalled();
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withBuiltinTypes([new Type('object', true, Dummy::class)]));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn(new ApiProperty());
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+        $uriTemplateResourceMetadataCollectionFactory = new UriTemplateResourceMetadataCollectionFactory($linkFactory, $pathSegmentNameGeneratorProphecy->reveal(), $resourceCollectionMetadataFactoryProphecy->reveal());
 
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [
@@ -202,13 +212,13 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
-                    uriVariables: ['identifier' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['identifier']), 'dummyId' => new UriVariable(parameterName: 'dummyId', targetClass: Dummy::class, identifiers: ['id'], property: 'dummy')],
+                    uriVariables: ['identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'], parameterName: 'identifier'), 'dummyId' => new Link(parameterName: 'dummyId', fromClass: Dummy::class, identifiers: ['id'], toProperty: 'dummy')],
                     operations: [
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}_get' => new Get(
                             class: AttributeResource::class,
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{identifier}',
                             shortName: 'AttributeResource',
-                            uriVariables: ['dummyId' => new UriVariable(parameterName: 'dummyId', targetClass: Dummy::class, identifiers: ['id'], property: 'dummy'), 'identifier' => new UriVariable(targetClass: AttributeResource::class, identifiers: ['identifier'])],
+                            uriVariables: ['dummyId' => new Link(parameterName: 'dummyId', fromClass: Dummy::class, identifiers: ['id'], toProperty: 'dummy'), 'identifier' => new Link(fromClass: AttributeResource::class, identifiers: ['identifier'], parameterName: 'identifier')],
                             extraProperties: ['user_defined_uri_template' => true]
                         ),
                     ]

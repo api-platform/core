@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\WithResourceTrait;
 
 class Operation
@@ -24,6 +25,8 @@ class Operation
     protected $args;
     protected $shortName;
     protected $class;
+    /** @var Link[]|null */
+    protected $links;
     protected $paginationEnabled;
     protected $paginationType;
     protected $paginationItemsPerPage;
@@ -269,6 +272,25 @@ class Operation
     {
         $self = clone $this;
         $self->class = $class;
+
+        return $self;
+    }
+
+    /**
+     * @return Link[]|null
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param Link[] $links
+     */
+    public function withLinks(array $links): self
+    {
+        $self = clone $this;
+        $self->links = $links;
 
         return $self;
     }

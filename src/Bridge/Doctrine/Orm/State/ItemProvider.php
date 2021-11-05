@@ -30,7 +30,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class ItemProvider implements ProviderInterface
 {
-    use UriVariablesHandlerTrait;
+    use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
@@ -64,7 +64,7 @@ final class ItemProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleUriVariables($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
