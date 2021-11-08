@@ -28,6 +28,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -588,6 +589,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw $e;
             }
 
+            $attributeValue = null;
+        } catch (UninitializedPropertyException $e) {
             $attributeValue = null;
         }
 

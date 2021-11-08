@@ -41,6 +41,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -893,7 +894,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(DummyTableInheritance::class, [])->willReturn(
-            new PropertyNameCollection(['name', 'nickname'])
+            new PropertyNameCollection(['name', 'nickname', 'typedName'])
         )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -903,6 +904,9 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'nickname', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
         )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'typedName', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
+        )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
@@ -910,6 +914,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo')->shouldBeCalled();
         $propertyAccessorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
+        $propertyAccessorProphecy->getValue($dummy, 'typedName')->willThrow(new UninitializedPropertyException())->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
@@ -939,6 +944,7 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertEquals([
             'name' => 'foo',
             'nickname' => null,
+            'typedName' => null,
         ], $normalizer->normalize($dummy, null, ['resource_class' => DummyTableInheritance::class, 'resources' => []]));
     }
 
