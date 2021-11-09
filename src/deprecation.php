@@ -106,6 +106,12 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class => ApiPlatform\GraphQl\Type\Definition\UploadType::class,
         ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class => ApiPlatform\GraphQl\Type\Definition\IterableType::class,
         ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
+
+        // Action
+        ApiPlatform\Core\Action\EntrypointAction::class => ApiPlatform\Action\EntrypointAction::class,
+        ApiPlatform\Core\Action\ExceptionAction::class => ApiPlatform\Action\ExceptionAction::class,
+        ApiPlatform\Core\Action\NotfoundAction::class => ApiPlatform\Action\NotfoundAction::class,
+        ApiPlatform\Core\Action\PlaceholderAction::class => ApiPlatform\Action\PlaceholderAction::class,
     ];
 
     $deprecatedInterfaces = include 'deprecated_interfaces.php';
