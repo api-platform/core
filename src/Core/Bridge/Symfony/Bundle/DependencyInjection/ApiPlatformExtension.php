@@ -96,6 +96,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
 
+        $deprecatedInterfaces = include __DIR__.'/../../../../../deprecated_interfaces.php';
+        foreach ($deprecatedInterfaces as $oldInterface => $newInterface) {
+            if ($container->hasAlias($oldInterface)) {
+                throw new \LogicException(sprintf('Alias already exist for interface %s. Update xml first to use the new interface.', $oldInterface));
+            }
+
+            if ($container->hasAlias($newInterface)) {
+                $container->setAlias($oldInterface, $newInterface);
+                $container
+                    ->getDefinition($oldInterface)
+                    ->setDeprecated('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $oldInterface, $newInterface))
+                ;
+            }
+        }
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
