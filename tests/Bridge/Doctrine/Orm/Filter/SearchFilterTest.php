@@ -160,14 +160,14 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
             ],
             'jsonData' => [
                 'property' => 'jsonData',
-                'type' => 'string',
+                'type' => 'array',
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => false,
             ],
             'jsonData[]' => [
                 'property' => 'jsonData',
-                'type' => 'string',
+                'type' => 'array',
                 'required' => false,
                 'strategy' => 'exact',
                 'is_collection' => true,

@@ -135,7 +135,7 @@ class Dummy
     /**
      * @var array serialize data
      *
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(type="array", nullable=true)
      */
     public $jsonData;
 
