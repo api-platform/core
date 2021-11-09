@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
+use ApiPlatform\Bridge\Doctrine\Common\Filter\BooleanFilterTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 

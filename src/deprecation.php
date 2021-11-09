@@ -106,6 +106,15 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class => ApiPlatform\GraphQl\Type\Definition\UploadType::class,
         ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class => ApiPlatform\GraphQl\Type\Definition\IterableType::class,
         ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
+
+        // Bridge
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class,
     ];
 
     $deprecatedInterfaces = include 'deprecated_interfaces.php';
