@@ -16,11 +16,8 @@ namespace ApiPlatform\Bridge\Doctrine\Orm\State;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 
 trait LinksHandlerTrait
 {
@@ -52,17 +49,19 @@ trait LinksHandlerTrait
         $previousAlias = $alias;
         $previousIdentifiers = end($links)->getIdentifiers();
         $expressions = [];
-        $i = 0;
         $identifiers = array_reverse($identifiers);
 
         foreach (array_reverse($links) as $parameterName => $link) {
             if ($link->getExpandedValue() || !$link->getFromClass()) {
-                ++$i;
                 continue;
             }
 
             $identifierProperties = $link->getIdentifiers();
-            $currentAlias = $i === 0 ? $alias : $queryNameGenerator->generateJoinAlias($alias);
+            $currentAlias = $queryNameGenerator->generateJoinAlias($alias);
+
+            if ($link->getFromClass() === $resourceClass) {
+                $currentAlias = $alias;
+            }
 
             if (!$link->getFromProperty() && !$link->getToProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
@@ -75,7 +74,6 @@ trait LinksHandlerTrait
 
                 $previousAlias = $currentAlias;
                 $previousIdentifiers = $identifierProperties;
-                ++$i;
                 continue;
             }
 
@@ -98,10 +96,8 @@ trait LinksHandlerTrait
                     $expressions["$previousAlias.$previousIdentifier"] = "SELECT $joinAlias.{$previousIdentifier} FROM {$link->getFromClass()} $nextAlias INNER JOIN $nextAlias.{$link->getFromProperty()} $joinAlias WHERE $nextAlias.{$identifierProperty} = :$placeholder";
                     $queryBuilder->setParameter($placeholder, array_shift($identifiers), $doctrineClassMetadata->getTypeOfField($identifierProperty));
                     $previousAlias = $nextAlias;
-                    ++$i;
                     continue;
                 }
-
 
                 // A single-valued association path expression to an inverse side is not supported in DQL queries.
                 if ($relationType & ClassMetadataInfo::TO_ONE && !$assocationMapping['isOwningSide']) {
@@ -119,7 +115,6 @@ trait LinksHandlerTrait
                 $queryBuilder->setParameter($placeholder, array_shift($identifiers), $doctrineClassMetadata->getTypeOfField($identifierProperty));
                 $previousAlias = $joinAlias;
                 $previousIdentifier = $identifierProperty;
-                ++$i;
                 continue;
             }
 
@@ -129,24 +124,23 @@ trait LinksHandlerTrait
             $queryBuilder->setParameter($placeholder, array_shift($identifiers), $doctrineClassMetadata->getTypeOfField($identifierProperty));
             $previousAlias = $joinAlias;
             $previousIdentifier = $identifierProperty;
-            ++$i;
         }
 
         if ($expressions) {
             $i = 0;
             $clause = '';
             foreach ($expressions as $alias => $expression) {
-                if ($i === 0) {
-                    $clause .= "$alias IN (" . $expression;
-                    $i++;
+                if (0 === $i) {
+                    $clause .= "$alias IN (".$expression;
+                    ++$i;
                     continue;
                 }
 
-                $clause .= " AND $alias IN (" . $expression;
-                $i++;
+                $clause .= " AND $alias IN (".$expression;
+                ++$i;
             }
 
-            $queryBuilder->andWhere($clause . str_repeat(')', $i)); 
+            $queryBuilder->andWhere($clause.str_repeat(')', $i));
         }
     }
 }

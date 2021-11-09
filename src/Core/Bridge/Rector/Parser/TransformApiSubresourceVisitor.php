@@ -67,24 +67,24 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
 
             foreach ($this->subresourceMetadata['uri_variables'] as $identifier => $resource) {
                 $identifierNodes = [
-                            new Node\Expr\ArrayItem(
-                                new Node\Expr\ClassConstFetch(
-                                    new Node\Name(
-                                        ($resource['from_class'] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource['from_class']
-                                    ),
-                                    'class'
-                                ),
-                                new Node\Scalar\String_('from_class')
+                    new Node\Expr\ArrayItem(
+                        new Node\Expr\ClassConstFetch(
+                            new Node\Name(
+                                ($resource['from_class'] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource['from_class']
                             ),
-                            new Node\Expr\ArrayItem(
-                                new Node\Expr\Array_(
-                                    isset($resource['identifiers'][0]) ? [
-                                        new Node\Expr\ArrayItem(new Node\Scalar\String_($resource['identifiers'][0]))
-                                    ] : [], 
-                                    ['kind' => Node\Expr\Array_::KIND_SHORT]),
-                                new Node\Scalar\String_('identifiers')
-                            ),
-                        ];
+                            'class'
+                        ),
+                        new Node\Scalar\String_('from_class')
+                    ),
+                    new Node\Expr\ArrayItem(
+                        new Node\Expr\Array_(
+                            isset($resource['identifiers'][0]) ? [
+                                new Node\Expr\ArrayItem(new Node\Scalar\String_($resource['identifiers'][0])),
+                            ] : [],
+                            ['kind' => Node\Expr\Array_::KIND_SHORT]),
+                        new Node\Scalar\String_('identifiers')
+                    ),
+                ];
 
                 if (isset($resource['expanded_value'])) {
                     $identifierNodes[] = new Node\Expr\ArrayItem(

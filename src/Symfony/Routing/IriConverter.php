@@ -124,7 +124,7 @@ final class IriConverter implements IriConverterInterface
                 ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) ||
                 ($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false) ||
                 // When we want the Iri from an object, we don't want the collection uriTemplate, for this we use getIriFromResourceClass
-                $operation->isCollection() || $operation instanceof Post 
+                $operation->isCollection() || $operation instanceof Post
             ) {
                 unset($context['operation']);
                 $operationName = null;
@@ -150,6 +150,7 @@ final class IriConverter implements IriConverterInterface
 
         try {
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation->getName(), ['operation' => $operation]);
+
             return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
         } catch (RuntimeException|RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);

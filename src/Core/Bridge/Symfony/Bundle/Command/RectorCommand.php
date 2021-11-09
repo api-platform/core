@@ -19,7 +19,6 @@ use ApiPlatform\Core\Bridge\Rector\Set\ApiPlatformSetList;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PhpParser\Lexer\Emulative;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser\Php7;
@@ -30,7 +29,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Routing\Route;
 
 /**
  * @experimental
@@ -124,7 +122,7 @@ final class RectorCommand extends Command
 
         $operationKey = $this->getOperationKeyByChoice($operations, $choice);
 
-        $command = 'vendor/bin/rector process ' . $input->getArgument('src');
+        $command = 'vendor/bin/rector process '.$input->getArgument('src');
 
         if ($output->isDebug()) {
             $command .= ' --debug';
@@ -134,22 +132,22 @@ final class RectorCommand extends Command
 
         switch ($operationKey) {
             case $operationKeys[0]:
-                $command .= ' --config=' . ApiPlatformSetList::ANNOTATION_TO_LEGACY_API_RESOURCE_ATTRIBUTE;
+                $command .= ' --config='.ApiPlatformSetList::ANNOTATION_TO_LEGACY_API_RESOURCE_ATTRIBUTE;
                 break;
             case $operationKeys[1]:
                 if ($askForSubresources && $this->isThereSubresources($io, $output)) {
                     return Command::FAILURE;
                 }
-                $command .= ' --config=' . ApiPlatformSetList::ANNOTATION_TO_API_RESOURCE_ATTRIBUTE;
+                $command .= ' --config='.ApiPlatformSetList::ANNOTATION_TO_API_RESOURCE_ATTRIBUTE;
                 break;
             case $operationKeys[2]:
                 if ($askForSubresources && $this->isThereSubresources($io, $output)) {
                     return Command::FAILURE;
                 }
-                $command .= ' --config=' . ApiPlatformSetList::ATTRIBUTE_TO_API_RESOURCE_ATTRIBUTE;
+                $command .= ' --config='.ApiPlatformSetList::ATTRIBUTE_TO_API_RESOURCE_ATTRIBUTE;
                 break;
             case $operationKeys[3]:
-                $command .= ' --config=' . ApiPlatformSetList::TRANSFORM_API_SUBRESOURCE;
+                $command .= ' --config='.ApiPlatformSetList::TRANSFORM_API_SUBRESOURCE;
                 break;
         }
 
@@ -163,14 +161,14 @@ final class RectorCommand extends Command
             }
         }
 
-        $io->title('Run ' . $command);
+        $io->title('Run '.$command);
 
         if ($operationKey === $operationKeys[3] && !$input->getOption('dry-run')) {
             $this->transformApiSubresource($input->getArgument('src'), $output);
         }
 
         if ($input->getOption('silent')) {
-            exec($command . ' --no-progress-bar --no-diffs');
+            exec($command.' --no-progress-bar --no-diffs');
         } else {
             passthru($command);
         }

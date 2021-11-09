@@ -54,7 +54,7 @@ final class SubresourceTransformer
                 'expanded_value' => $fromPathVariable ? null : Inflector::tableize($identifier),
             ];
 
-            if ($toClass === $fromClass){
+            if ($toClass === $fromClass) {
                 $fromProperty = $identifier;
                 continue;
             }
@@ -62,7 +62,7 @@ final class SubresourceTransformer
             $toClass = $fromClass;
 
             if (isset($fromProperty, $fromClassMetadataAssociationMappings[$fromProperty])) {
-                if ($fromClassMetadataAssociationMappings[$fromProperty]['type'] & ClassMetadataInfo::TO_MANY && isset($fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'])){
+                if ($fromClassMetadataAssociationMappings[$fromProperty]['type'] & ClassMetadataInfo::TO_MANY && isset($fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'])) {
                     $uriVariables[$identifier]['to_property'] = $fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'];
                     $fromProperty = $identifier;
                     continue;
@@ -71,6 +71,7 @@ final class SubresourceTransformer
                 $fromProperty = $identifier;
             }
         }
+
         return array_reverse($uriVariables);
     }
 
