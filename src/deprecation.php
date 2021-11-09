@@ -112,6 +112,15 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Action\ExceptionAction::class => ApiPlatform\Action\ExceptionAction::class,
         ApiPlatform\Core\Action\NotfoundAction::class => ApiPlatform\Action\NotfoundAction::class,
         ApiPlatform\Core\Action\PlaceholderAction::class => ApiPlatform\Action\PlaceholderAction::class,
+
+        // Bridge
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class,
     ];
 
     $deprecatedInterfaces = include 'deprecated_interfaces.php';

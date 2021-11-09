@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait;
+use ApiPlatform\Bridge\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;

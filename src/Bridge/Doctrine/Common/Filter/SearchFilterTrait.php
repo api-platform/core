@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
+namespace ApiPlatform\Bridge\Doctrine\Common\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;

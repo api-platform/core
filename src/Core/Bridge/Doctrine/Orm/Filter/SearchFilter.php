@@ -17,7 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
+use ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;

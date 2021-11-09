@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait;
+use ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
