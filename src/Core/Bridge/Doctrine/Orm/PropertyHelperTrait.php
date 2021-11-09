@@ -69,8 +69,18 @@ trait PropertyHelperTrait
         $propertyParts = $this->splitPropertyParts($property, $resourceClass);
         $parentAlias = $rootAlias;
         $alias = null;
+        $field = $propertyParts['field'];
+        $associations = $propertyParts['associations'];
 
-        foreach ($propertyParts['associations'] as $association) {
+        if (null !== $resourceClass && \count($associations) > 1) {
+            $nestedMetadata = $this->getNestedMetadata($resourceClass, $associations);
+
+            if ($nestedMetadata->isIdentifier($field)) {
+                $field = array_pop($associations);
+            }
+        }
+
+        foreach ($associations as $association) {
             $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $joinType);
             $parentAlias = $alias;
         }
@@ -79,6 +89,6 @@ trait PropertyHelperTrait
             throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
         }
 
-        return [$alias, $propertyParts['field'], $propertyParts['associations']];
+        return [$alias, $field, $associations];
     }
 }
