@@ -22,6 +22,7 @@ use Doctrine\ORM\QueryBuilder;
  * Filters the collection by range.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
+ * @author Samuel Chiriluta <samuel4x4@gmail.com>
  *
  * @final
  */
@@ -142,6 +143,17 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 
                 $queryBuilder
                     ->andWhere(sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
+                    ->setParameter($valueParameter, $value);
+
+                break;
+            case self::PARAMETER_NOT_EQUAL:
+                $value = $this->normalizeValue($value, $operator);
+                if (null === $value) {
+                    return;
+                }
+
+                $queryBuilder
+                    ->andWhere(sprintf('%s.%s <> :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
 
                 break;
