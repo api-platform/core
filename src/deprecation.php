@@ -108,6 +108,8 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
     ];
 
+    $deprecatedInterfaces = include 'deprecated_interfaces.php';
+
     if (ApiPlatform\Core\Metadata\Property\PropertyMetadata::class === $className) {
         trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, ApiPlatform\Metadata\ApiProperty::class));
     }
@@ -123,6 +125,13 @@ spl_autoload_register(function ($className) {
     if (isset($deprecatedAnnotations[$className])) {
         [$annotationClassName, $attributeClassName] = $deprecatedAnnotations[$className];
         trigger_deprecation('api-platform/core', '2.7', sprintf('The Doctrine annotation %s is deprecated, use the PHP attribute %s instead.', $annotationClassName, $attributeClassName));
+
+        return;
+    }
+
+    if (isset($deprecatedInterfaces[$className])) {
+        class_alias($deprecatedInterfaces[$className], $className);
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $className, $deprecatedClasses[$className]));
 
         return;
     }
