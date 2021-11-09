@@ -24,11 +24,11 @@ use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**
- * Sets the list of resources' IRIs included in this response in the "Cache-Tags" and/or "xkey" HTTP headers.
+ * Sets the list of resources' IRIs included in this response in the configured cache tag HTTP header and/or "xkey" HTTP headers.
  *
- * The "Cache-Tags" is used because it is supported by CloudFlare.
+ * By default the "Cache-Tags" HTTP header is used because it is supported by CloudFlare.
  *
- * @see https://support.cloudflare.com/hc/en-us/articles/206596608-How-to-Purge-Cache-Using-Cache-Tags-Enterprise-only-
+ * @see https://developers.cloudflare.com/cache/how-to/purge-cache#add-cache-tag-http-response-headers
  *
  * The "xkey" is used because it is supported by Varnish.
  * @see https://docs.varnish-software.com/varnish-cache-plus/vmods/ykey/
@@ -46,7 +46,7 @@ final class AddTagsListener
     }
 
     /**
-     * Adds the "Cache-Tags" and "xkey" headers.
+     * Adds the configured HTTP cache tag and "xkey" headers.
      */
     public function onKernelResponse(ResponseEvent $event): void
     {

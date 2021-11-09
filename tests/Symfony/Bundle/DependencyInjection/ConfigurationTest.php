@@ -177,6 +177,7 @@ class ConfigurationTest extends TestCase
                     'max_header_length' => 7500,
                     'purger' => 'api_platform.http_cache.purger.varnish',
                     'xkey' => ['glue' => ' '],
+                    'souin_urls' => [],
                 ],
                 'public' => null,
             ],
@@ -360,5 +361,38 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertTrue($config['elasticsearch']['enabled']);
+    }
+
+    /**
+     * Test config for Souin http cache keys.
+     */
+    public function testSouinHttpCacheKeysConfig(): void
+    {
+        $exampleConfig = [
+            'purger' => 'api_platform.http_cache.purger.souin',
+            'souin_urls' => ['my-dsn/my-path'],
+        ];
+        $expectedConfig = [
+            ...$exampleConfig,
+            'enabled' => true,
+            'varnish_urls' => [],
+            'max_header_length' => 7500,
+            'request_options' => [],
+            'xkey' => [
+                'glue' => ' ',
+            ],
+        ];
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'http_cache' => [
+                    'invalidation' => $exampleConfig,
+                ],
+            ],
+        ]);
+
+        $this->assertArrayHasKey('invalidation', $config['http_cache']);
+        $this->assertSame($expectedConfig, $config['http_cache']['invalidation']);
+        $this->assertSame('api_platform.http_cache.purger.souin', $config['http_cache']['invalidation']['purger']);
     }
 }
