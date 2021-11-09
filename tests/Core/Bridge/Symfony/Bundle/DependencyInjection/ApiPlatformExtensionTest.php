@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;

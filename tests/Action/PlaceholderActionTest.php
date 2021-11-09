@@ -11,22 +11,21 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Action;
+namespace ApiPlatform\Tests\Action;
+
+use ApiPlatform\Action\PlaceholderAction;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Placeholder returning the data passed in parameter.
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class PlaceholderAction
+class PlaceholderActionTest extends TestCase
 {
-    /**
-     * @param object $data
-     *
-     * @return object
-     */
-    public function __invoke($data)
+    public function testAction()
     {
-        return $data;
+        $action = new PlaceholderAction();
+
+        $expected = new \stdClass();
+        $this->assertEquals($expected, $action($expected));
     }
 }
