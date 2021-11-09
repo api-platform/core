@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Action;
+namespace ApiPlatform\Action;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

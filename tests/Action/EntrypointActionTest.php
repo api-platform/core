@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Action;
+namespace ApiPlatform\Tests\Action;
 
-use ApiPlatform\Core\Action\EntrypointAction;
+use ApiPlatform\Action\EntrypointAction;
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;

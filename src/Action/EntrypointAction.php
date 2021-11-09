@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Action;
+namespace ApiPlatform\Action;
 
 use ApiPlatform\Core\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
