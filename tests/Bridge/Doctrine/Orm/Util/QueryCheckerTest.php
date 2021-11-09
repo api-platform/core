@@ -122,7 +122,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d']);
+        $queryBuilder->select('d');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->orderBy('d.name', 'ASC');
 
@@ -136,7 +136,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->select('d', 'a_1');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
 
@@ -164,7 +164,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d', 'a_2']);
+        $queryBuilder->select('d', 'a_2');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
         $queryBuilder->leftJoin('d.relatedDummy', 'a_2');
@@ -192,7 +192,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->select('d', 'a_1');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
         $queryBuilder->orderBy('a_1.name', 'ASC');
@@ -213,7 +213,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d']);
+        $queryBuilder->select('d');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->orderBy('d.name', 'ASC');
 
@@ -231,7 +231,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->select('d', 'a_1');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
 
@@ -263,7 +263,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d', 'a_2']);
+        $queryBuilder->select('d', 'a_2');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
         $queryBuilder->leftJoin('d.relatedDummy', 'a_2');
@@ -295,7 +295,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d', 'a_1']);
+        $queryBuilder->select('d', 'a_1');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
         $queryBuilder->orderBy('a_1.name', 'ASC');
@@ -312,7 +312,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d']);
+        $queryBuilder->select('d');
         $queryBuilder->from(Dummy::class, 'd');
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -335,7 +335,7 @@ class QueryCheckerTest extends TestCase
         $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['d']);
+        $queryBuilder->select('d');
         $queryBuilder->from(Dummy::class, 'd');
         $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
 

@@ -937,7 +937,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -972,7 +972,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1014,7 +1014,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1055,7 +1055,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1111,7 +1111,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1158,7 +1158,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1214,7 +1214,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1258,7 +1258,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1298,7 +1298,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1336,7 +1336,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
@@ -1375,7 +1375,7 @@ class PaginationExtensionTest extends TestCase
         $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
 
         $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select(['o']);
+        $queryBuilder->select('o');
         $queryBuilder->from(Dummy::class, 'o');
         $queryBuilder->setFirstResult(0);
         $queryBuilder->setMaxResults(42);
