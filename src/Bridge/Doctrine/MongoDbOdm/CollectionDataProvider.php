@@ -61,11 +61,8 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
+        /** @var DocumentRepository $repository */
         $repository = $manager->getRepository($resourceClass);
-        if (!$repository instanceof DocumentRepository) {
-            throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
-        }
-
         $aggregationBuilder = $repository->createAggregationBuilder();
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
@@ -79,6 +76,6 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
         $attribute = $resourceMetadata->getCollectionOperationAttribute($operationName, 'doctrine_mongodb', [], true);
         $executeOptions = $attribute['execute_options'] ?? [];
 
-        return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);
+        return $aggregationBuilder->hydrate($resourceClass)->getAggregation($executeOptions)->getIterator();
     }
 }
