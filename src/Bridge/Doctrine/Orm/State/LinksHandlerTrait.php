@@ -69,7 +69,7 @@ trait LinksHandlerTrait
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
                     $queryBuilder->andWhere("{$currentAlias}.$identifierProperty = :$placeholder");
-                    $queryBuilder->setParameter($placeholder, $identifiers[$identifierProperty], $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                    $queryBuilder->setParameter($placeholder, $identifiers[$parameterName], $doctrineClassMetadata->getTypeOfField($identifierProperty));
                 }
 
                 $previousAlias = $currentAlias;
@@ -78,11 +78,13 @@ trait LinksHandlerTrait
                 continue;
             }
 
-            if (1 < \count($previousIdentifiers)) {
+            if (1 < \count($previousIdentifiers) || 1 < \count($identifierProperties)) {
                 throw new RuntimeException('Composite identifiers on a relation can not be handled automatically, implement your own query.');
             }
 
             $previousIdentifier = $previousIdentifiers[0];
+            $identifierProperty = $identifierProperties[0];
+            $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
 
             if ($link->getFromProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
@@ -93,7 +95,7 @@ trait LinksHandlerTrait
                 if ($relationType & ClassMetadataInfo::TO_MANY) {
                     $nextAlias = $queryNameGenerator->generateJoinAlias($alias);
                     $expressions["$previousAlias.$previousIdentifier"] = "SELECT $joinAlias.{$previousIdentifier} FROM {$link->getFromClass()} $nextAlias INNER JOIN $nextAlias.{$link->getFromProperty()} $joinAlias WHERE $nextAlias.{$identifierProperty} = :$placeholder";
-                    $queryBuilder->setParameter($placeholder, $identifiers[$previousIdentifier], $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                    $queryBuilder->setParameter($placeholder, $identifiers[$parameterName], $doctrineClassMetadata->getTypeOfField($identifierProperty));
                     $previousAlias = $nextAlias;
                     ++$i;
                     continue;
@@ -113,7 +115,7 @@ trait LinksHandlerTrait
                 }
 
                 $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
-                $queryBuilder->setParameter($placeholder, $identifiers[$identifierProperty], $doctrineClassMetadata->getTypeOfField($identifierProperty));
+                $queryBuilder->setParameter($placeholder, $identifiers[$parameterName], $doctrineClassMetadata->getTypeOfField($identifierProperty));
                 $previousAlias = $joinAlias;
                 $previousIdentifier = $identifierProperty;
                 ++$i;
@@ -123,7 +125,7 @@ trait LinksHandlerTrait
             $joinAlias = $queryNameGenerator->generateJoinAlias($alias);
             $queryBuilder->join("{$previousAlias}.{$link->getToProperty()}", $joinAlias);
             $queryBuilder->andWhere("$joinAlias.$identifierProperty = :$placeholder");
-            $queryBuilder->setParameter($placeholder, $identifiers[$identifierProperty], $doctrineClassMetadata->getTypeOfField($identifierProperty));
+            $queryBuilder->setParameter($placeholder, $identifiers[$parameterName], $doctrineClassMetadata->getTypeOfField($identifierProperty));
             $previousAlias = $joinAlias;
             $previousIdentifier = $identifierProperty;
             ++$i;
@@ -145,5 +147,10 @@ trait LinksHandlerTrait
 
             $queryBuilder->andWhere($clause . str_repeat(')', $i)); 
         }
+
+        // dump($identifiers);
+        // dd($links);
+        // dump($queryBuilder->getParameters());
+        // dd($queryBuilder->getDQL());
     }
 }
