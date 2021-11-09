@@ -30,7 +30,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Type as DBALType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -130,7 +130,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $identifiers = ['id'];
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->setParameter('id_p1', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
         $funcProphecy = $this->prophesize(Func::class);
         $func = $funcProphecy->reveal();
 
@@ -148,7 +148,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
         $classMetadataProphecy->getAssociationMapping('relatedDummies')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
-        $classMetadataProphecy->getTypeOfField('id')->willReturn(DBALType::INTEGER)->shouldBeCalled();
+        $classMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER)->shouldBeCalled();
 
         $managerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
@@ -207,7 +207,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
         $classMetadataProphecy->getAssociationMapping('relatedDummies')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
-        $classMetadataProphecy->getTypeOfField('id')->willReturn(DBALType::INTEGER)->shouldBeCalled();
+        $classMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER)->shouldBeCalled();
 
         $dummyManagerProphecy = $this->prophesize(EntityManager::class);
         $dummyManagerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($qb->reveal());
@@ -234,7 +234,7 @@ class SubresourceDataProviderTest extends TestCase
         $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $rClassMetadataProphecy->hasAssociation('thirdLevel')->shouldBeCalled()->willReturn(true);
         $rClassMetadataProphecy->getAssociationMapping('thirdLevel')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_ONE]);
-        $rClassMetadataProphecy->getTypeOfField('id')->willReturn(DBALType::INTEGER)->shouldBeCalled();
+        $rClassMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER)->shouldBeCalled();
 
         $rDummyManagerProphecy = $this->prophesize(EntityManager::class);
         $rDummyManagerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($rqb->reveal());
@@ -253,8 +253,8 @@ class SubresourceDataProviderTest extends TestCase
         $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
 
         $queryBuilder->getQuery()->shouldBeCalled()->willReturn($queryProphecy->reveal());
-        $queryBuilder->setParameter('id_p1', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
-        $queryBuilder->setParameter('id_p2', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p2', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
         $repositoryProphecy->createQueryBuilder('o')->shouldBeCalled()->willReturn($queryBuilder->reveal());
@@ -283,7 +283,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $identifiers = ['id'];
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->setParameter('id_p1', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
         $funcProphecy = $this->prophesize(Func::class);
         $func = $funcProphecy->reveal();
         $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
@@ -299,7 +299,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('ownedDummy')->willReturn(true)->shouldBeCalled();
         $classMetadataProphecy->getAssociationMapping('ownedDummy')->shouldBeCalled()->willReturn(['type' => ClassMetadata::ONE_TO_ONE]);
-        $classMetadataProphecy->getTypeOfField('id')->willReturn(DBALType::INTEGER)->shouldBeCalled();
+        $classMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER)->shouldBeCalled();
 
         $managerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
@@ -335,7 +335,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $identifiers = ['id'];
         $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->setParameter('id_p1', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
         $funcProphecy = $this->prophesize(Func::class);
         $func = $funcProphecy->reveal();
 
@@ -351,7 +351,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
         $classMetadataProphecy->getAssociationMapping('relatedDummies')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
-        $classMetadataProphecy->getTypeOfField('id')->willReturn(DBALType::INTEGER)->shouldBeCalled();
+        $classMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER)->shouldBeCalled();
 
         $managerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $this->assertIdentifierManagerMethodCalls($managerProphecy);
@@ -456,7 +456,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn($identifiers);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
         $classMetadataProphecy->getAssociationMapping('relatedDummies')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
-        $classMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(DBALType::INTEGER);
+        $classMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(Types::INTEGER);
 
         $dummyManagerProphecy = $this->prophesize(EntityManager::class);
         $dummyManagerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($qb->reveal());
@@ -482,7 +482,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $rClassMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn($identifiers);
-        $rClassMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(DBALType::INTEGER);
+        $rClassMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(Types::INTEGER);
         $rClassMetadataProphecy->hasAssociation('thirdLevel')->shouldBeCalled()->willReturn(true);
         $rClassMetadataProphecy->getAssociationMapping('thirdLevel')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_ONE]);
 
@@ -503,8 +503,8 @@ class SubresourceDataProviderTest extends TestCase
         $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
 
         $queryBuilder->getQuery()->shouldBeCalled()->willReturn($queryProphecy->reveal());
-        $queryBuilder->setParameter('id_p1', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
-        $queryBuilder->setParameter('id_p2', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p2', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
         $repositoryProphecy->createQueryBuilder('o')->shouldBeCalled()->willReturn($queryBuilder->reveal());
@@ -551,7 +551,7 @@ class SubresourceDataProviderTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->hasAssociation('relatedDummies')->willReturn(true)->shouldBeCalled();
         $classMetadataProphecy->getAssociationMapping('relatedDummies')->shouldBeCalled()->willReturn(['type' => ClassMetadata::MANY_TO_MANY]);
-        $classMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(DBALType::INTEGER);
+        $classMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(Types::INTEGER);
 
         $dummyManagerProphecy = $this->prophesize(EntityManager::class);
         $dummyManagerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($qb->reveal());
@@ -578,7 +578,7 @@ class SubresourceDataProviderTest extends TestCase
         $rClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $rClassMetadataProphecy->hasAssociation('id')->shouldBeCalled()->willReturn(false);
         $rClassMetadataProphecy->isIdentifier('id')->shouldBeCalled()->willReturn(true);
-        $rClassMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(DBALType::INTEGER);
+        $rClassMetadataProphecy->getTypeOfField('id')->shouldBeCalled()->willReturn(Types::INTEGER);
 
         $rDummyManagerProphecy = $this->prophesize(EntityManager::class);
         $rDummyManagerProphecy->createQueryBuilder()->shouldBeCalled()->willReturn($rqb->reveal());
@@ -596,8 +596,8 @@ class SubresourceDataProviderTest extends TestCase
         $queryBuilder->andWhere($func)->shouldBeCalled()->willReturn($queryBuilder);
 
         $queryBuilder->getQuery()->shouldBeCalled()->willReturn($queryProphecy->reveal());
-        $queryBuilder->setParameter('id_p1', 2, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
-        $queryBuilder->setParameter('id_p2', 1, DBALType::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p1', 2, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
+        $queryBuilder->setParameter('id_p2', 1, Types::INTEGER)->shouldBeCalled()->willReturn($queryBuilder);
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
         $repositoryProphecy->createQueryBuilder('o')->shouldBeCalled()->willReturn($queryBuilder->reveal());
