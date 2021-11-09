@@ -24,8 +24,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use PHPUnit\Framework\TestCase;
 
@@ -58,8 +58,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/questions/{id}/answer/related_questions' => [
@@ -90,7 +90,7 @@ class SubresourceTransformerTest extends TestCase
                     'composite_identifier' => false,
                     'expanded_value' => 'answer',
                 ],
-            ]
+            ],
         ];
 
         yield '/dummies/{id}/related_dummies' => [
@@ -109,8 +109,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/dummies/{id}/related_dummies/{relatedDummies}' => [
@@ -120,7 +120,7 @@ class SubresourceTransformerTest extends TestCase
                 'resource_class' => RelatedDummy::class,
                 'identifiers' => [
                     'id' => [Dummy::class, 'id', true],
-                    'relatedDummies' => [RelatedDummy::class, 'id', true]
+                    'relatedDummies' => [RelatedDummy::class, 'id', true],
                 ],
                 'path' => '/dummies/{id}/related_dummies/{relatedDummies}.{_format}',
             ],
@@ -139,9 +139,9 @@ class SubresourceTransformerTest extends TestCase
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
-                    'expanded_value' => null
-                ]
-            ]
+                    'expanded_value' => null,
+                ],
+            ],
         ];
 
         yield '/dummies/{id}/related_dummies/{relatedDummies}/third_level' => [
@@ -151,9 +151,9 @@ class SubresourceTransformerTest extends TestCase
                 'resource_class' => ThirdLevel::class,
                 'identifiers' => [
                     'id' => [Dummy::class, 'id', true],
-                    'relatedDummies' => [RelatedDummy::class, 'id', true]
+                    'relatedDummies' => [RelatedDummy::class, 'id', true],
                 ],
-                'path' => '/dummies/{id}/related_dummies/{relatedDummies}/third_level.{_format}'
+                'path' => '/dummies/{id}/related_dummies/{relatedDummies}/third_level.{_format}',
             ],
             [
                 'id' => [
@@ -171,8 +171,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level' => [
@@ -185,7 +185,7 @@ class SubresourceTransformerTest extends TestCase
                     'relatedDummies' => [RelatedDummy::class, 'id', true],
                     'thirdLevel' => [ThirdLevel::class, 'id', false],
                 ],
-                'path' => '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}'
+                'path' => '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}',
             ],
             [
                 'id' => [
@@ -211,8 +211,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => [],
                     'composite_identifier' => false,
                     'expanded_value' => 'third_level',
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/dummy_products/{id}/offers/{offers}/offers' => [
@@ -242,8 +242,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/dummy_aggregate_offers/{id}/offers' => [
@@ -252,9 +252,9 @@ class SubresourceTransformerTest extends TestCase
                 'collection' => true,
                 'resource_class' => DummyOffer::class,
                 'identifiers' => [
-                    'id' => [DummyAggregateOffer::class, 'id', true]
+                    'id' => [DummyAggregateOffer::class, 'id', true],
                 ],
-                'path' => '/dummy_aggregate_offers/{id}/offers.{_format}'
+                'path' => '/dummy_aggregate_offers/{id}/offers.{_format}',
             ],
             [
                 'id' => [
@@ -264,8 +264,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/people/{id}/sent_greetings' => [
@@ -274,9 +274,9 @@ class SubresourceTransformerTest extends TestCase
                 'collection' => true,
                 'resource_class' => Greeting::class,
                 'identifiers' => [
-                    'id' => [Person::class, 'id', true]
+                    'id' => [Person::class, 'id', true],
                 ],
-                'path' => '/people/{id}/sent_greetings.{_format}'
+                'path' => '/people/{id}/sent_greetings.{_format}',
             ],
             [
                 'id' => [
@@ -286,8 +286,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/related_owned_dummies/{id}/owning_dummy' => [
@@ -296,9 +296,9 @@ class SubresourceTransformerTest extends TestCase
                 'collection' => false,
                 'resource_class' => Dummy::class,
                 'identifiers' => [
-                    'id' => [RelatedOwnedDummy::class, 'id', true]
+                    'id' => [RelatedOwnedDummy::class, 'id', true],
                 ],
-                'path' => '/related_owned_dummies/{id}/owned_dummy.{_format}'
+                'path' => '/related_owned_dummies/{id}/owned_dummy.{_format}',
             ],
             [
                 'id' => [
@@ -308,8 +308,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
 
         yield '/related_owning_dummies/{id}/owned_dummy' => [
@@ -318,9 +318,9 @@ class SubresourceTransformerTest extends TestCase
                 'collection' => false,
                 'resource_class' => Dummy::class,
                 'identifiers' => [
-                    'id' => [RelatedOwningDummy::class, 'id', true]
+                    'id' => [RelatedOwningDummy::class, 'id', true],
                 ],
-                'path' => '/related_owning_dummies/{id}/owned_dummy.{_format}'
+                'path' => '/related_owning_dummies/{id}/owned_dummy.{_format}',
             ],
             [
                 'id' => [
@@ -330,8 +330,8 @@ class SubresourceTransformerTest extends TestCase
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }
