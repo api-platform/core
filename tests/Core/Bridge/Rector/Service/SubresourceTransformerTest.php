@@ -54,7 +54,6 @@ class SubresourceTransformerTest extends TestCase
                 'id' => [
                     'from_class' => Question::class,
                     'from_property' => 'answer',
-                    'to_class' => Answer::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -64,22 +63,13 @@ class SubresourceTransformerTest extends TestCase
         ];
 
         yield '/questions/{id}/answer/related_questions' => [
-            //api_questions_answer_related_questions_get_subresource
             [
                 'property' => 'relatedQuestions',
                 'collection' => true,
                 'resource_class' => Question::class,
                 'identifiers' => [
-                    'id' => [
-                        Question::class,
-                        'id',
-                        true,
-                    ],
-                    'answer' => [
-                        Answer::class,
-                        'id',
-                        false,
-                    ],
+                    'id' => [Question::class, 'id', true],
+                    'answer' => [Answer::class, 'id', false],
                 ],
                 'path' => '/questions/{id}/answer/related_questions.{_format}',
             ],
@@ -87,7 +77,6 @@ class SubresourceTransformerTest extends TestCase
                 'id' => [
                     'from_class' => Question::class,
                     'from_property' => 'answer',
-                    'to_class' => Answer::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -95,9 +84,8 @@ class SubresourceTransformerTest extends TestCase
                 ],
                 'answer' => [
                     'from_class' => Answer::class,
-                    'from_property' => 'relatedQuestions',
-                    'to_class' => Question::class,
-                    'to_property' => null,
+                    'from_property' => null,
+                    'to_property' => 'answer',
                     'identifiers' => [],
                     'composite_identifier' => false,
                     'expanded_value' => 'answer',
@@ -106,7 +94,6 @@ class SubresourceTransformerTest extends TestCase
         ];
 
         yield '/dummies/{id}/related_dummies' => [
-            //'api_dummies_related_dummies_get_subresource'
             [
                 'property' => 'relatedDummies',
                 'collection' => true,
@@ -118,7 +105,6 @@ class SubresourceTransformerTest extends TestCase
                 'id' => [
                     'from_class' => Dummy::class,
                     'from_property' => 'relatedDummies',
-                    'to_class' => RelatedDummy::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -128,7 +114,6 @@ class SubresourceTransformerTest extends TestCase
         ];
 
         yield '/dummies/{id}/related_dummies/{relatedDummies}' => [
-            //'api_dummies_related_dummies_item_get_subresource'
             [
                 'property' => 'id',
                 'collection' => false,
@@ -143,7 +128,6 @@ class SubresourceTransformerTest extends TestCase
                 'id' => [
                     'from_class' => Dummy::class,
                     'from_property' => 'relatedDummies',
-                    'to_class' => RelatedDummy::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -152,7 +136,6 @@ class SubresourceTransformerTest extends TestCase
                 'relatedDummies' => [
                     'from_class' => RelatedDummy::class,
                     'from_property' => null,
-                    'to_class' => RelatedDummy::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -162,7 +145,6 @@ class SubresourceTransformerTest extends TestCase
         ];
 
         yield '/dummies/{id}/related_dummies/{relatedDummies}/third_level' => [
-            //api_dummies_related_dummies_item_third_level_get_subresource
             [
                 'property' => 'thirdLevel',
                 'collection' => false,
@@ -177,7 +159,6 @@ class SubresourceTransformerTest extends TestCase
                 'id' => [
                     'from_class' => Dummy::class,
                     'from_property' => 'relatedDummies',
-                    'to_class' => RelatedDummy::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -186,7 +167,6 @@ class SubresourceTransformerTest extends TestCase
                 'relatedDummies' => [
                     'from_class' => RelatedDummy::class,
                     'from_property' => 'thirdLevel',
-                    'to_class' => ThirdLevel::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
@@ -195,79 +175,70 @@ class SubresourceTransformerTest extends TestCase
             ]
         ];
 
-         yield '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level' => [
-             //api_dummies_related_dummies_third_level_fourth_level_get_subresource
-             [
-                 'property' => 'fourthLevel',
-                 'collection' => false,
-                 'resource_class' => FourthLevel::class,
-                 'identifiers' => [
-                     'id' => [Dummy::class, 'id', true],
-                     'relatedDummies' => [RelatedDummy::class, 'id', true],
-                     'thirdLevel' => [ThirdLevel::class, 'id', false],
-                 ],
-                 'path' => '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}'
-             ],
-             [
-                 'id' => [
-                     'from_class' => Dummy::class,
-                     'from_property' => 'relatedDummies',
-                     'to_class' => RelatedDummy::class,
-                     'to_property' => null,
-                     'identifiers' => ['id'],
-                     'composite_identifier' => false,
-                     'expanded_value' => null,
-                 ],
-                 'relatedDummies' => [
-                     'from_class' => RelatedDummy::class,
-                     'from_property' => 'thirdLevel',
-                     'to_class' => ThirdLevel::class,
-                     'to_property' => null,
-                     'identifiers' => ['id'],
-                     'composite_identifier' => false,
-                     'expanded_value' => null,
-                 ],
-                 'thirdLevel' => [
-                     'from_class' => ThirdLevel::class,
-                     'from_property' => 'fourthLevel',
-                     'to_class' => FourthLevel::class,
-                     'to_property' => null,
-                     'identifiers' => [],
-                     'composite_identifier' => false,
-                     'expanded_value' => 'third_level',
-                 ]
-             ]
-         ];
+        yield '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level' => [
+            [
+                'property' => 'fourthLevel',
+                'collection' => false,
+                'resource_class' => FourthLevel::class,
+                'identifiers' => [
+                    'id' => [Dummy::class, 'id', true],
+                    'relatedDummies' => [RelatedDummy::class, 'id', true],
+                    'thirdLevel' => [ThirdLevel::class, 'id', false],
+                ],
+                'path' => '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}'
+            ],
+            [
+                'id' => [
+                    'from_class' => Dummy::class,
+                    'from_property' => 'relatedDummies',
+                    'to_property' => null,
+                    'identifiers' => ['id'],
+                    'composite_identifier' => false,
+                    'expanded_value' => null,
+                ],
+                'relatedDummies' => [
+                    'from_class' => RelatedDummy::class,
+                    'from_property' => 'thirdLevel',
+                    'to_property' => null,
+                    'identifiers' => ['id'],
+                    'composite_identifier' => false,
+                    'expanded_value' => null,
+                ],
+                'thirdLevel' => [
+                    'from_class' => ThirdLevel::class,
+                    'from_property' => 'fourthLevel',
+                    'to_property' => null,
+                    'identifiers' => [],
+                    'composite_identifier' => false,
+                    'expanded_value' => 'third_level',
+                ]
+            ]
+        ];
 
         yield '/dummy_products/{id}/offers/{offers}/offers' => [
             [
                 'property' => 'offers',
                 'collection' => true,
-                'resource_class' => DummyAggregateOffer::class,
+                'resource_class' => DummyOffer::class,
                 'identifiers' => [
-                    'id' => [
-                        DummyProduct::class,
-                        'id',
-                        true
-                    ]
+                    'id' => [DummyProduct::class, 'id', true],
+                    'offers' => [DummyAggregateOffer::class, 'id', true],
                 ],
-                'path' => '/dummy_products/{id}/offers/{offers}/offers.{_format}'
+                'path' => '/dummy_products/{id}/offers/{offers}/offers.{_format}',
             ],
             [
                 'id' => [
                     'from_class' => DummyProduct::class,
+                    'from_property' => null,
                     'to_property' => 'product',
-                    'to_class' => null,
-                    'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
                 ],
                 'offers' => [
                     'from_class' => DummyAggregateOffer::class,
+                    'from_property' => null,
                     'to_property' => 'aggregate',
-                    'to_class' => null,
-                    'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
@@ -288,9 +259,8 @@ class SubresourceTransformerTest extends TestCase
             [
                 'id' => [
                     'from_class' => DummyAggregateOffer::class,
-                    'from_property' => 'offers',
-                    'to_class' => DummyOffer::class,
-                    'to_property' => null,
+                    'from_property' => null,
+                    'to_property' => 'aggregate',
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
@@ -311,9 +281,8 @@ class SubresourceTransformerTest extends TestCase
             [
                 'id' => [
                     'from_class' => Person::class,
-                    'from_property' => 'sentGreetings',
-                    'to_class' => Greeting::class,
-                    'to_property' => null,
+                    'from_property' => null,
+                    'to_property' => 'sender',
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
@@ -334,9 +303,8 @@ class SubresourceTransformerTest extends TestCase
             [
                 'id' => [
                     'from_class' => RelatedOwnedDummy::class,
-                    'from_property' => null,
-                    'to_class' => Dummy::class,
-                    'to_property' => 'owningDummy',
+                    'from_property' => 'owningDummy',
+                    'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,
                     'expanded_value' => null,
@@ -358,7 +326,6 @@ class SubresourceTransformerTest extends TestCase
                 'id' => [
                     'from_class' => RelatedOwningDummy::class,
                     'from_property' => 'ownedDummy',
-                    'to_class' => Dummy::class,
                     'to_property' => null,
                     'identifiers' => ['id'],
                     'composite_identifier' => false,

@@ -18,6 +18,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver as ODMAnnotationDriver;
 use Doctrine\ODM\MongoDB\Mapping\MappingException as ODMMappingException;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\Mapping\RuntimeReflectionService;
@@ -46,10 +47,7 @@ final class SubresourceTransformer
 
             $uriVariables[$identifier] = [
                 'from_class' => $fromClass,
-                'inverse_property' => null,
                 'from_property' => null,
-                'to_class' => $toClass,
-                'property' => null,
                 'to_property' => null,
                 'identifiers' => $fromPathVariable ? [$fromIdentifier] : [],
                 'composite_identifier' => false,
@@ -64,13 +62,15 @@ final class SubresourceTransformer
             $toClass = $fromClass;
 
             if (isset($fromProperty, $fromClassMetadataAssociationMappings[$fromProperty])) {
-                $uriVariables[$identifier]['inverse_property'] = $fromProperty;
+                if ($fromClassMetadataAssociationMappings[$fromProperty]['type'] & ClassMetadataInfo::TO_MANY && isset($fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'])){
+                    $uriVariables[$identifier]['to_property'] = $fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'];
+                    $fromProperty = $identifier;
+                    continue;
+                }
                 $uriVariables[$identifier]['from_property'] = $fromProperty;
                 $fromProperty = $identifier;
-                continue;
             }
         }
-
         return array_reverse($uriVariables);
     }
 
@@ -84,10 +84,10 @@ final class SubresourceTransformer
         } catch (MappingException $e) {
         }
 
-//        try {
-//            $this->odmMetadataFactory->loadMetadataForClass($class, $metadata);
-//        } catch (ODMMappingException $e) {
-//        }
+        try {
+            $this->odmMetadataFactory->loadMetadataForClass($class, $metadata);
+        } catch (ODMMappingException $e) {
+        }
 
         return $metadata;
     }
