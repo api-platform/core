@@ -18,7 +18,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -110,7 +112,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     private function configureUriVariables($operation)
     {
         // We will generate the collection route, don't initialize variables here
-        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate()) {
+        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate() || ($operation instanceof Post && !$operation->getUriVariables())) {
             return $operation;
         }
 
