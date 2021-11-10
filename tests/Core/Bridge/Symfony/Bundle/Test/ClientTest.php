@@ -149,7 +149,8 @@ class ClientTest extends ApiTestCase
   "additionalProperties": true,
   "required": ["@context", "@id", "@type", "hydra:member"]
 }
-JSON);
+JSON
+        );
     }
 
     public function testStream(): void

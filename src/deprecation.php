@@ -110,7 +110,7 @@ spl_autoload_register(function ($className) {
         // Action
         ApiPlatform\Core\Action\EntrypointAction::class => ApiPlatform\Action\EntrypointAction::class,
         ApiPlatform\Core\Action\ExceptionAction::class => ApiPlatform\Action\ExceptionAction::class,
-        ApiPlatform\Core\Action\NotfoundAction::class => ApiPlatform\Action\NotFoundAction::class,
+        ApiPlatform\Core\Action\NotFoundAction::class => ApiPlatform\Action\NotFoundAction::class,
         ApiPlatform\Core\Action\PlaceholderAction::class => ApiPlatform\Action\PlaceholderAction::class,
 
         // Bridge

@@ -262,7 +262,7 @@
 
         <!-- Action -->
 
-        <service id="api_platform.action.placeholder" class="ApiPlatform\Core\Action\PlaceholderAction" public="true" />
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Action\PlaceholderAction" public="true" />
         <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
@@ -270,10 +270,10 @@
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.not_found" class="ApiPlatform\Core\Action\NotFoundAction" public="true" />
-        <service id="ApiPlatform\Core\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="api_platform.action.not_found" class="ApiPlatform\Action\NotFoundAction" public="true" />
+        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
 
-        <service id="api_platform.action.entrypoint" class="ApiPlatform\Core\Action\EntrypointAction" public="true">
+        <service id="api_platform.action.entrypoint" class="ApiPlatform\Action\EntrypointAction" public="true">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
 
@@ -287,7 +287,7 @@
             <argument type="service" id="api_platform.openapi.factory.next" on-invalid="null"></argument>
         </service>
 
-        <service id="api_platform.action.exception" class="ApiPlatform\Core\Action\ExceptionAction" public="true">
+        <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.error_formats%</argument>
             <argument>%api_platform.exception_to_status%</argument>

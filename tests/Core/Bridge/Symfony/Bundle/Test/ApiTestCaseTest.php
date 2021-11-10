@@ -49,7 +49,8 @@ class ApiTestCaseTest extends ApiTestCase
 {
     "@context": "/contexts/Entrypoint"
 }
-JSON);
+JSON
+        );
     }
 
     public function testAssertJsonContainsWithJsonScalarString(): void
@@ -64,7 +65,8 @@ JSON);
         self::createClient()->request('GET', '/');
         $this->assertJsonContains(<<<JSON
 "/contexts/Entrypoint"
-JSON);
+JSON
+        );
     }
 
     public function testAssertJsonEquals(): void
@@ -90,7 +92,8 @@ JSON);
         "name": "Address/name"
     }
 }
-JSON);
+JSON
+        );
     }
 
     public function testAssertJsonEqualsWithJsonScalarString(): void
@@ -101,7 +104,8 @@ JSON);
         self::createClient()->request('GET', '/contexts/Address');
         $this->assertJsonEquals(<<<JSON
 "Address/name"
-JSON);
+JSON
+        );
     }
 
     public function testAssertMatchesJsonSchema(): void

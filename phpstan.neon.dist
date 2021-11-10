@@ -96,7 +96,7 @@ parameters:
 			path: tests/Core/Identifier/Normalizer/IntegerDenormalizerTest.php
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
-			path: tests/Core/Util/SortTraitTest.php
+			path: tests/Util/SortTraitTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'

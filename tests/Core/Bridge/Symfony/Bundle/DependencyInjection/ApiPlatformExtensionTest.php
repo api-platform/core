@@ -1210,7 +1210,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         // Find missing aliases
         // $containerBuilderProphecy->setAlias(Argument::type('string'), Argument::type(Alias::class))->will(function ($args) {
-        //     echo "Alias: '{$args[0]}' => '{$args[1]}',".\PHP_EOL;
+        //      echo "Alias: '{$args[0]}' => '{$args[1]}',".\PHP_EOL;
         // });
 
         $containerBuilderProphecy->getParameter('kernel.project_dir')->willReturn(__DIR__.'/../../../../../Fixtures/app');
@@ -1227,6 +1227,17 @@ class ApiPlatformExtensionTest extends TestCase
             ->willReturn($this->prophesize(Definition::class)->reveal());
         $containerBuilderProphecy->getAlias(Argument::type('string'))
             ->willReturn($this->prophesize(Alias::class)->reveal());
+
+        $deprecatedInterfaces = include __DIR__.'/../../../../../../src/deprecated_interfaces.php';
+        foreach ($deprecatedInterfaces as $oldInterface => $newInterface) {
+            $containerBuilderProphecy->hasAlias($oldInterface)->shouldBeCalled()->willReturn(false);
+            $containerBuilderProphecy->hasAlias($newInterface)->shouldBeCalled()->willReturn(true);
+            $containerBuilderProphecy->setAlias($oldInterface, $newInterface)->shouldBeCalled();
+
+            $definitionProphecy = $this->prophesize(Definition::class);
+            $definitionProphecy->setDeprecated('api-platform/core', '2.7', Argument::type('string'))->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition($oldInterface)->shouldBeCalled()->willReturn($definitionProphecy->reveal());
+        }
 
         return $containerBuilderProphecy;
     }

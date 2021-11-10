@@ -38,6 +38,7 @@ class ValidationExceptionTest extends TestCase
         $this->assertEquals(str_replace(\PHP_EOL, "\n", <<<TXT
 message 1
 foo: message 2
-TXT), $e->__toString());
+TXT
+        ), $e->__toString());
     }
 }
