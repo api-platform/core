@@ -79,7 +79,6 @@ use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Core\Validator\ValidatorInterface;
 use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\FilterValidationException;
@@ -95,6 +94,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Symfony\EventListener\ValidatorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
@@ -457,10 +457,7 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['mapping']['paths'] = [__FILE__];
 
-        $this->extension->load(
-            $config,
-            $this->getPartialContainerBuilderProphecy()->reveal()
-        );
+        $this->extension->load($config, $this->getPartialContainerBuilderProphecy()->reveal());
     }
 
     public function testResourcesToWatchWithNonExistentFile()
@@ -471,10 +468,7 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['mapping']['paths'] = ['fake_file.xml'];
 
-        $this->extension->load(
-            $config,
-            $this->getPartialContainerBuilderProphecy()->reveal()
-        );
+        $this->extension->load($config, $this->getPartialContainerBuilderProphecy()->reveal());
     }
 
     public function testDisableEagerLoadingExtension()
@@ -887,32 +881,26 @@ class ApiPlatformExtensionTest extends TestCase
             self::assertContainsOnly('string', $paths);
 
             $normalizePaths = static function (array $paths): array {
-                return array_map(
-                    static function (string $path): string {
-                        return str_replace(\DIRECTORY_SEPARATOR, '/', $path);
-                    },
-                    $paths
-                );
+                return array_map(static function (string $path): string {
+                    return str_replace(\DIRECTORY_SEPARATOR, '/', $path);
+                }, $paths);
             };
 
             $testsDirectory = \dirname(__DIR__, 4);
             $fixturesDirectory = \dirname($testsDirectory);
 
-            self::assertSame(
-                $normalizePaths([
-                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
-                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
-                    "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/B.yaml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/Bb.yaml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a.yaml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a/a.yaml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/b/a.yaml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c.yaml",
-                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c/a.yaml",
-                ]),
-                $normalizePaths($paths)
-            );
+            self::assertSame($normalizePaths([
+                "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
+                "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
+                "{$fixturesDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/B.yaml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/Bb.yaml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a.yaml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a/a.yaml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/b/a.yaml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c.yaml",
+                "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c/a.yaml",
+            ]), $normalizePaths($paths));
 
             return true;
         }))->shouldBeCalled();
@@ -1243,10 +1231,8 @@ class ApiPlatformExtensionTest extends TestCase
         return $containerBuilderProphecy;
     }
 
-    private function getBaseContainerBuilderProphecy(
-        array $doctrineIntegrationsToLoad = ['orm'],
-        $configuration = null
-    ) {
+    private function getBaseContainerBuilderProphecy(array $doctrineIntegrationsToLoad = ['orm'], $configuration = null)
+    {
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecyWithoutDefaultMetadataLoading($doctrineIntegrationsToLoad, $configuration);
 
         foreach (['yaml', 'xml'] as $format) {

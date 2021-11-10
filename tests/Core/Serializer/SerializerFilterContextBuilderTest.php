@@ -43,13 +43,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'collection_operation_name' => 'get',
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]
-        );
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, true, $attributes)->willReturn([])->shouldBeCalled();
@@ -82,13 +76,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'item_operation_name' => 'put',
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            ['put' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]],
-            null
-        );
+        $resourceMetadata = new ResourceMetadata(null, null, null, ['put' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]], null);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, true, $attributes)->willReturn([])->shouldBeCalled();
@@ -121,13 +109,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'collection_operation_name' => 'get',
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            ['get' => []]
-        );
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, ['get' => []]);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, false, $attributes)->willReturn([])->shouldBeCalled();
@@ -160,13 +142,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'persist' => true,
         ];
 
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            null,
-            ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]
-        );
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, ['get' => ['filters' => ['dummy_group.group', 'dummy_group.search', 'dummy_group.nonexistent']]]);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, true, $attributes)->willReturn([])->shouldBeCalled();

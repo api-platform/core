@@ -46,12 +46,7 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $baseSchemaFactory = new BaseSchemaFactory(
-            $typeFactory->reveal(),
-            $resourceMetadataFactory->reveal(),
-            $propertyNameCollectionFactory->reveal(),
-            $propertyMetadataFactory->reveal()
-        );
+        $baseSchemaFactory = new BaseSchemaFactory($typeFactory->reveal(), $resourceMetadataFactory->reveal(), $propertyNameCollectionFactory->reveal(), $propertyMetadataFactory->reveal());
 
         $hydraSchemaFactory = new HydraSchemaFactory($baseSchemaFactory);
 
@@ -84,23 +79,20 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
         $this->assertArrayHasKey('_links', $properties);
-        $this->assertSame(
-            [
-                'type' => 'object',
-                'properties' => [
-                    'self' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'href' => [
-                                'type' => 'string',
-                                'format' => 'iri-reference',
-                            ],
+        $this->assertSame([
+            'type' => 'object',
+            'properties' => [
+                'self' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'href' => [
+                            'type' => 'string',
+                            'format' => 'iri-reference',
                         ],
                     ],
                 ],
             ],
-            $properties['_links']
-        );
+        ], $properties['_links']);
     }
 
     public function testSchemaTypeBuildSchema(): void

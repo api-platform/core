@@ -47,11 +47,7 @@ class WriteStageTest extends TestCase
         $this->dataPersisterProphecy = $this->prophesize(ContextAwareDataPersisterInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        $this->writeStage = new WriteStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
-            $this->dataPersisterProphecy->reveal(),
-            $this->serializerContextBuilderProphecy->reveal()
-        );
+        $this->writeStage = new WriteStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->dataPersisterProphecy->reveal(), $this->serializerContextBuilderProphecy->reveal());
     }
 
     public function testNoData(): void

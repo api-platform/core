@@ -61,61 +61,55 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizePaginator()
     {
-        $this->assertEquals(
-            [
-                '_links' => [
-                    'self' => ['href' => '/?page=3'],
-                    'first' => ['href' => '/?page=1'],
-                    'last' => ['href' => '/?page=7'],
-                    'prev' => ['href' => '/?page=2'],
-                    'next' => ['href' => '/?page=4'],
-                    'item' => [
-                        '/me',
-                    ],
+        $this->assertEquals([
+            '_links' => [
+                'self' => ['href' => '/?page=3'],
+                'first' => ['href' => '/?page=1'],
+                'last' => ['href' => '/?page=7'],
+                'prev' => ['href' => '/?page=2'],
+                'next' => ['href' => '/?page=4'],
+                'item' => [
+                    '/me',
                 ],
-                '_embedded' => [
-                    'item' => [
-                        [
-                            '_links' => [
-                                'self' => '/me',
-                            ],
-                            'name' => 'Kévin',
-                        ],
-                    ],
-                ],
-                'totalItems' => 1312,
-                'itemsPerPage' => 12,
             ],
-            $this->normalizePaginator()
-        );
+            '_embedded' => [
+                'item' => [
+                    [
+                        '_links' => [
+                            'self' => '/me',
+                        ],
+                        'name' => 'Kévin',
+                    ],
+                ],
+            ],
+            'totalItems' => 1312,
+            'itemsPerPage' => 12,
+        ], $this->normalizePaginator());
     }
 
     public function testNormalizePartialPaginator()
     {
-        $this->assertEquals(
-            [
-                '_links' => [
-                    'self' => ['href' => '/?page=3'],
-                    'prev' => ['href' => '/?page=2'],
-                    'next' => ['href' => '/?page=4'],
-                    'item' => [
-                        '/me',
-                    ],
+        $this->assertEquals([
+            '_links' => [
+                'self' => ['href' => '/?page=3'],
+                'prev' => ['href' => '/?page=2'],
+                'next' => ['href' => '/?page=4'],
+                'item' => [
+                    '/me',
                 ],
-                '_embedded' => [
-                    'item' => [
-                        [
-                            '_links' => [
-                                'self' => '/me',
-                            ],
-                            'name' => 'Kévin',
-                        ],
-                    ],
-                ],
-                'itemsPerPage' => 12,
             ],
-            $this->normalizePaginator(true)
-        );
+            '_embedded' => [
+                'item' => [
+                    [
+                        '_links' => [
+                            'self' => '/me',
+                        ],
+                        'name' => 'Kévin',
+                    ],
+                ],
+            ],
+            'itemsPerPage' => 12,
+        ], $this->normalizePaginator(true));
     }
 
     private function normalizePaginator($partial = false)

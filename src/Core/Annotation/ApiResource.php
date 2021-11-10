@@ -181,58 +181,9 @@ final class ApiResource
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(
-        $description = null,
-        ?array $collectionOperations = null,
-        ?array $graphql = null,
-        ?string $iri = null,
-        ?array $itemOperations = null,
-        ?string $shortName = null,
-        ?array $subresourceOperations = null,
-
-        // attributes
-        ?array $attributes = null,
-        ?array $cacheHeaders = null,
-        ?array $denormalizationContext = null,
-        ?string $deprecationReason = null,
-        ?bool $elasticsearch = null,
-        ?bool $fetchPartial = null,
-        ?bool $forceEager = null,
-        ?array $formats = null,
-        ?array $filters = null,
-        ?array $hydraContext = null,
-        $input = null,
-        $mercure = null,
-        $messenger = null,
-        ?array $normalizationContext = null,
-        ?array $openapiContext = null,
-        ?array $order = null,
-        $output = null,
-        ?bool $paginationClientEnabled = null,
-        ?bool $paginationClientItemsPerPage = null,
-        ?bool $paginationClientPartial = null,
-        ?array $paginationViaCursor = null,
-        ?bool $paginationEnabled = null,
-        ?bool $paginationFetchJoinCollection = null,
-        ?int $paginationItemsPerPage = null,
-        ?int $paginationMaximumItemsPerPage = null,
-        ?bool $paginationPartial = null,
-        ?string $routePrefix = null,
-        ?string $security = null,
-        ?string $securityMessage = null,
-        ?string $securityPostDenormalize = null,
-        ?string $securityPostDenormalizeMessage = null,
-        ?string $securityPostValidation = null,
-        ?string $securityPostValidationMessage = null,
-        ?bool $stateless = null,
-        ?string $sunset = null,
-        ?array $swaggerContext = null,
-        ?array $validationGroups = null,
-        ?int $urlGenerationStrategy = null,
-        ?bool $compositeIdentifier = null,
-        ?array $exceptionToStatus = null,
-        ?bool $queryParameterValidationEnabled = null
-    ) {
+    public function __construct($description = null, ?array $collectionOperations = null, ?array $graphql = null, ?string $iri = null, ?array $itemOperations = null, ?string $shortName = null, ?array $subresourceOperations = null,        // attributes
+        ?array $attributes = null, ?array $cacheHeaders = null, ?array $denormalizationContext = null, ?string $deprecationReason = null, ?bool $elasticsearch = null, ?bool $fetchPartial = null, ?bool $forceEager = null, ?array $formats = null, ?array $filters = null, ?array $hydraContext = null, $input = null, $mercure = null, $messenger = null, ?array $normalizationContext = null, ?array $openapiContext = null, ?array $order = null, $output = null, ?bool $paginationClientEnabled = null, ?bool $paginationClientItemsPerPage = null, ?bool $paginationClientPartial = null, ?array $paginationViaCursor = null, ?bool $paginationEnabled = null, ?bool $paginationFetchJoinCollection = null, ?int $paginationItemsPerPage = null, ?int $paginationMaximumItemsPerPage = null, ?bool $paginationPartial = null, ?string $routePrefix = null, ?string $security = null, ?string $securityMessage = null, ?string $securityPostDenormalize = null, ?string $securityPostDenormalizeMessage = null, ?string $securityPostValidation = null, ?string $securityPostValidationMessage = null, ?bool $stateless = null, ?string $sunset = null, ?array $swaggerContext = null, ?array $validationGroups = null, ?int $urlGenerationStrategy = null, ?bool $compositeIdentifier = null, ?array $exceptionToStatus = null, ?bool $queryParameterValidationEnabled = null)
+    {
         if (!\is_array($description)) { // @phpstan-ignore-line Doctrine annotations support
             [$publicProperties, $configurableAttributes] = self::getConfigMetadata();
 

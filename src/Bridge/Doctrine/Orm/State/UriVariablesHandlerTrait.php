@@ -38,35 +38,19 @@ trait UriVariablesHandlerTrait
                 $propertyIdentifier = $uriVariable->getIdentifiers()[0];
                 $joinAlias = $queryNameGenerator->generateJoinAlias($inverseProperty);
 
-                $queryBuilder->join(
-                    $uriVariable->getTargetClass(),
-                    $joinAlias,
-                    'with',
-                    "$alias.$propertyIdentifier = $joinAlias.$inverseProperty"
-                );
+                $queryBuilder->join($uriVariable->getTargetClass(), $joinAlias, 'with', "$alias.$propertyIdentifier = $joinAlias.$inverseProperty");
 
-                $expression = $queryBuilder->expr()->eq(
-                    "{$joinAlias}.{$propertyIdentifier}",
-                    $placeholder
-                );
+                $expression = $queryBuilder->expr()->eq("{$joinAlias}.{$propertyIdentifier}", $placeholder);
             } elseif ($property = $uriVariable->getProperty()) {
                 $propertyIdentifier = $uriVariable->getIdentifiers()[0];
                 $joinAlias = $queryNameGenerator->generateJoinAlias($property);
 
-                $queryBuilder->join(
-                    "$alias.$property",
-                    $joinAlias,
-                );
+                $queryBuilder->join("$alias.$property", $joinAlias, );
 
-                $expression = $queryBuilder->expr()->eq(
-                    "{$joinAlias}.{$propertyIdentifier}",
-                    $placeholder
-                );
+                $expression = $queryBuilder->expr()->eq("{$joinAlias}.{$propertyIdentifier}", $placeholder);
             } else {
                 $propertyIdentifier = $uriVariable->getIdentifiers()[0];
-                $expression = $queryBuilder->expr()->eq(
-                    "{$alias}.{$propertyIdentifier}", $placeholder
-                );
+                $expression = $queryBuilder->expr()->eq("{$alias}.{$propertyIdentifier}", $placeholder);
             }
             $queryBuilder->andWhere($expression);
             $queryBuilder->setParameter($placeholder, $value, $doctrineClassMetadata->getTypeOfField($identifier));

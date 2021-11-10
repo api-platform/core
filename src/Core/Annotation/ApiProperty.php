@@ -120,33 +120,9 @@ final class ApiProperty
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(
-        $description = null,
-        ?bool $readable = null,
-        ?bool $writable = null,
-        ?bool $readableLink = null,
-        ?bool $writableLink = null,
-        ?bool $required = null,
-        ?string $iri = null,
-        ?bool $identifier = null,
-        $default = null,
-        $example = null,
-
-        // attributes
-        ?array $attributes = null,
-        ?string $deprecationReason = null,
-        ?bool $fetchable = null,
-        ?bool $fetchEager = null,
-        ?array $jsonldContext = null,
-        ?array $openapiContext = null,
-        ?bool $push = null,
-        ?string $security = null,
-        ?array $swaggerContext = null,
-        ?string $securityPostDenormalize = null,
-
-        ?array $types = [],
-        ?array $builtinTypes = []
-    ) {
+    public function __construct($description = null, ?bool $readable = null, ?bool $writable = null, ?bool $readableLink = null, ?bool $writableLink = null, ?bool $required = null, ?string $iri = null, ?bool $identifier = null, $default = null, $example = null,        // attributes
+        ?array $attributes = null, ?string $deprecationReason = null, ?bool $fetchable = null, ?bool $fetchEager = null, ?array $jsonldContext = null, ?array $openapiContext = null, ?bool $push = null, ?string $security = null, ?array $swaggerContext = null, ?string $securityPostDenormalize = null, ?array $types = [], ?array $builtinTypes = [])
+    {
         if (!\is_array($description)) { // @phpstan-ignore-line Doctrine annotations support
             [$publicProperties, $configurableAttributes] = self::getConfigMetadata();
 

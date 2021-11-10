@@ -74,104 +74,101 @@ class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive(
-            $this->provideApplyTestArguments(),
-            [
-                'numeric string (positive integer)' => [
+        return array_merge_recursive($this->provideApplyTestArguments(), [
+            'numeric string (positive integer)' => [
+                [
                     [
-                        [
-                            '$match' => [
-                                'dummyPrice' => 21,
+                        '$match' => [
+                            'dummyPrice' => 21,
+                        ],
+                    ],
+                ],
+            ],
+            'multiple numeric string (positive integer)' => [
+                [
+                    [
+                        '$match' => [
+                            'dummyPrice' => [
+                                '$in' => [21, 22],
                             ],
                         ],
                     ],
                 ],
-                'multiple numeric string (positive integer)' => [
+            ],
+            'multiple numeric string with one invalid property key' => [
+                [
                     [
-                        [
-                            '$match' => [
-                                'dummyPrice' => [
-                                    '$in' => [21, 22],
-                                ],
-                            ],
+                        '$match' => [
+                            'dummyPrice' => 22,
                         ],
                     ],
                 ],
-                'multiple numeric string with one invalid property key' => [
+            ],
+            'multiple numeric string with invalid value keys' => [
+                [],
+            ],
+            'multiple non-numeric' => [
+                [],
+            ],
+            'numeric string (negative integer)' => [
+                [
                     [
-                        [
-                            '$match' => [
-                                'dummyPrice' => 22,
-                            ],
+                        '$match' => [
+                            'dummyPrice' => -21,
                         ],
                     ],
                 ],
-                'multiple numeric string with invalid value keys' => [
-                    [],
-                ],
-                'multiple non-numeric' => [
-                    [],
-                ],
-                'numeric string (negative integer)' => [
+            ],
+            'non-numeric' => [
+                [],
+            ],
+            'numeric string ("0")' => [
+                [
                     [
-                        [
-                            '$match' => [
-                                'dummyPrice' => -21,
-                            ],
+                        '$match' => [
+                            'dummyPrice' => 0,
                         ],
                     ],
                 ],
-                'non-numeric' => [
-                    [],
-                ],
-                'numeric string ("0")' => [
+            ],
+            'nested property' => [
+                [
                     [
-                        [
-                            '$match' => [
-                                'dummyPrice' => 0,
-                            ],
+                        '$lookup' => [
+                            'from' => 'RelatedDummy',
+                            'localField' => 'relatedDummy',
+                            'foreignField' => '_id',
+                            'as' => 'relatedDummy_lkup',
+                        ],
+                    ],
+                    [
+                        '$unwind' => '$relatedDummy_lkup',
+                    ],
+                    [
+                        '$match' => [
+                            'relatedDummy_lkup.id' => 0,
                         ],
                     ],
                 ],
-                'nested property' => [
+            ],
+            'mixed numeric and non-numeric' => [
+                [
                     [
-                        [
-                            '$lookup' => [
-                                'from' => 'RelatedDummy',
-                                'localField' => 'relatedDummy',
-                                'foreignField' => '_id',
-                                'as' => 'relatedDummy_lkup',
-                            ],
-                        ],
-                        [
-                            '$unwind' => '$relatedDummy_lkup',
-                        ],
-                        [
-                            '$match' => [
-                                'relatedDummy_lkup.id' => 0,
-                            ],
+                        '$match' => [
+                            'dummyPrice' => 10,
                         ],
                     ],
                 ],
-                'mixed numeric and non-numeric' => [
+            ],
+            'mixed numeric, non-numeric and invalid property' => [
+                [
                     [
-                        [
-                            '$match' => [
-                                'dummyPrice' => 10,
-                            ],
+                        '$match' => [
+                            'dummyPrice' => 0,
                         ],
                     ],
                 ],
-                'mixed numeric, non-numeric and invalid property' => [
-                    [
-                        [
-                            '$match' => [
-                                'dummyPrice' => 0,
-                            ],
-                        ],
-                    ],
-                ],
-            ]
-        );
+            ],
+        ]);
     }
 }

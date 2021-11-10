@@ -58,10 +58,7 @@ class ChainCollectionDataProviderTest extends TestCase
             $thirdDataProvider->reveal(),
         ]);
 
-        $this->assertEquals(
-            [$dummy, $dummy2],
-            $chainItemDataProvider->getCollection(Dummy::class)
-        );
+        $this->assertEquals([$dummy, $dummy2], $chainItemDataProvider->getCollection(Dummy::class));
     }
 
     public function testGetCollectionNotSupported()

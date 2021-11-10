@@ -112,8 +112,7 @@ class ValidateListenerTest extends TestCase
             {
                 return $data instanceof DummyEntity ? ['a', 'b', 'c'] : [];
             }
-        }
-        )->shouldBeCalled();
+        })->shouldBeCalled();
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $containerProphecy->reveal());
         $validationViewListener->onKernelView($event);

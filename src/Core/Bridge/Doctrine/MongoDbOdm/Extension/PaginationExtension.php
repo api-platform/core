@@ -90,13 +90,9 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
         $aggregationBuilder
             ->facet()
-            ->field('results')->pipeline(
-                $resultsAggregationBuilder
-            )
-            ->field('count')->pipeline(
-                $repository->createAggregationBuilder()
-                    ->count('count')
-            );
+            ->field('results')->pipeline($resultsAggregationBuilder)
+            ->field('count')->pipeline($repository->createAggregationBuilder()
+                    ->count('count'));
     }
 
     /**

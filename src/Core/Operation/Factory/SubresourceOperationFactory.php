@@ -120,35 +120,18 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $rootShortname = $rootResourceMetadata->getShortName();
                 $identifier = \is_string($key = array_key_first($identifiers)) ? $key : $identifiers[0];
                 $operation['identifiers'][$identifier] = [$rootResourceClass, $identifiers[$identifier][1] ?? $identifier, true];
-                $operation['operation_name'] = sprintf(
-                    '%s_%s%s',
-                    RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
-                    $operationName,
-                    self::SUBRESOURCE_SUFFIX
-                );
+                $operation['operation_name'] = sprintf('%s_%s%s', RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false), $operationName, self::SUBRESOURCE_SUFFIX);
 
                 $subresourceOperation = $rootResourceMetadata->getSubresourceOperations()[$operation['operation_name']] ?? [];
 
-                $operation['route_name'] = sprintf(
-                    '%s%s_%s',
-                    RouteNameGenerator::ROUTE_NAME_PREFIX,
-                    RouteNameGenerator::inflector($rootShortname),
-                    $operation['operation_name']
-                );
+                $operation['route_name'] = sprintf('%s%s_%s', RouteNameGenerator::ROUTE_NAME_PREFIX, RouteNameGenerator::inflector($rootShortname), $operation['operation_name']);
 
                 $prefix = trim(trim($rootResourceMetadata->getAttribute('route_prefix', '')), '/');
                 if ('' !== $prefix) {
                     $prefix .= '/';
                 }
 
-                $operation['path'] = $subresourceOperation['path'] ?? sprintf(
-                    '/%s%s/{%s}/%s%s',
-                    $prefix,
-                    $this->pathSegmentNameGenerator->getSegmentName($rootShortname),
-                    $identifier,
-                    $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']),
-                    self::FORMAT_SUFFIX
-                );
+                $operation['path'] = $subresourceOperation['path'] ?? sprintf('/%s%s/{%s}/%s%s', $prefix, $this->pathSegmentNameGenerator->getSegmentName($rootShortname), $identifier, $this->pathSegmentNameGenerator->getSegmentName($operation['property'], $operation['collection']), self::FORMAT_SUFFIX);
 
                 if (!\in_array($rootShortname, $operation['shortNames'], true)) {
                     $operation['shortNames'][] = $rootShortname;
@@ -163,11 +146,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                     $operation['identifiers'][$parentOperation['property']] = [$resourceClass, $identifiers[$identifier][1] ?? $identifier, $isLastItem ? true : $parentOperation['collection']];
                 }
 
-                $operation['operation_name'] = str_replace(
-                    'get'.self::SUBRESOURCE_SUFFIX,
-                    RouteNameGenerator::inflector($isLastItem ? 'item' : $property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX,
-                    $parentOperation['operation_name']
-                );
+                $operation['operation_name'] = str_replace('get'.self::SUBRESOURCE_SUFFIX, RouteNameGenerator::inflector($isLastItem ? 'item' : $property, $operation['collection']).'_get'.self::SUBRESOURCE_SUFFIX, $parentOperation['operation_name']);
                 $operation['route_name'] = str_replace($parentOperation['operation_name'], $operation['operation_name'], $parentOperation['route_name']);
 
                 if (!\in_array($resourceMetadata->getShortName(), $operation['shortNames'], true)) {

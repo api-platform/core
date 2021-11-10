@@ -73,12 +73,7 @@ class TypeBuilderTest extends TestCase
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $this->typeBuilder = new TypeBuilder(
-            $this->typesContainerProphecy->reveal(),
-            $this->defaultFieldResolver,
-            $this->fieldsBuilderLocatorProphecy->reveal(),
-            new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal())
-        );
+        $this->typeBuilder = new TypeBuilder($this->typesContainerProphecy->reveal(), $this->defaultFieldResolver, $this->fieldsBuilderLocatorProphecy->reveal(), new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal()));
     }
 
     public function testGetResourceObjectType(): void

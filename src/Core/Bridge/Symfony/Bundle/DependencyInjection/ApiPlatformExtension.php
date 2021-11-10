@@ -294,9 +294,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
 
         if (!empty($config['resource_class_directories'])) {
-            $container->setParameter('api_platform.resource_class_directories', array_merge(
-                $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
-            ));
+            $container->setParameter('api_platform.resource_class_directories', array_merge($config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')));
         }
 
         $container->getDefinition('api_platform.metadata.extractor.xml')->replaceArgument(0, $xmlResources);

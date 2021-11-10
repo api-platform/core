@@ -149,8 +149,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             Schema::VERSION_SWAGGER !== $version
         ) {
             if (($resourceMetadata instanceof ResourceMetadata &&
-                    ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
-                ) || ($operation && $operation->getDeprecationReason())
+                    ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))) || ($operation && $operation->getDeprecationReason())
             ) {
                 $definition['deprecated'] = true;
             }
@@ -206,10 +205,7 @@ final class SchemaFactory implements SchemaFactoryInterface
             $additionalPropertySchema = $propertyMetadata->getAttributes()[$basePropertySchemaAttribute] ?? [];
         }
 
-        $propertySchema = array_merge(
-            $propertySchema,
-            $additionalPropertySchema
-        );
+        $propertySchema = array_merge($propertySchema, $additionalPropertySchema);
 
         if (false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) {
             $propertySchema['readOnly'] = true;

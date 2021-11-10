@@ -29,14 +29,7 @@ final class ReflectionClassRecursiveIterator
     public static function getReflectionClassesFromDirectories(array $directories): \Iterator
     {
         foreach ($directories as $path) {
-            $iterator = new \RegexIterator(
-                new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
-                    \RecursiveIteratorIterator::LEAVES_ONLY
-                ),
-                '/^.+\.php$/i',
-                \RecursiveRegexIterator::GET_MATCH
-            );
+            $iterator = new \RegexIterator(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY), '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
 
             foreach ($iterator as $file) {
                 $sourceFile = $file[0];

@@ -16,10 +16,10 @@ namespace ApiPlatform\Core\Tests\Validator\EventListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Core\Validator\EventListener\ValidateListener;
-use ApiPlatform\Core\Validator\Exception\ValidationException;
+use ApiPlatform\Symfony\EventListener\Exception\ValidationException;
+use ApiPlatform\Symfony\EventListener\ValidateListener;
+use ApiPlatform\Symfony\EventListener\ValidatorInterface;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
-use ApiPlatform\Validator\ValidatorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,12 +79,7 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $event = new ViewEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            HttpKernelInterface::MASTER_REQUEST,
-            $dummy
-        );
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $validationViewListener->onKernelView($event);
@@ -102,12 +97,7 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $event = new ViewEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            HttpKernelInterface::MASTER_REQUEST,
-            $dummy
-        );
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $validationViewListener->onKernelView($event);
@@ -132,12 +122,7 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $event = new ViewEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            HttpKernelInterface::MASTER_REQUEST,
-            $dummy
-        );
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $validationViewListener->onKernelView($event);

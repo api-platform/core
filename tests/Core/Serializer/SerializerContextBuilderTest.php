@@ -37,25 +37,12 @@ class SerializerContextBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        $resourceMetadata = new ResourceMetadata(
-            null,
-            null,
-            null,
-            [],
-            [],
-            [
-                'normalization_context' => ['foo' => 'bar', DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'MyDefinition'],
-                'denormalization_context' => ['bar' => 'baz'],
-            ]
-        );
+        $resourceMetadata = new ResourceMetadata(null, null, null, [], [], [
+            'normalization_context' => ['foo' => 'bar', DocumentationNormalizer::SWAGGER_DEFINITION_NAME => 'MyDefinition'],
+            'denormalization_context' => ['bar' => 'baz'],
+        ]);
 
-        $resourceMetadataWithPatch = new ResourceMetadata(
-            null,
-            null,
-            null,
-            ['patch' => ['method' => 'PATCH', 'input_formats' => ['json' => ['application/merge-patch+json']]]],
-            []
-        );
+        $resourceMetadataWithPatch = new ResourceMetadata(null, null, null, ['patch' => ['method' => 'PATCH', 'input_formats' => ['json' => ['application/merge-patch+json']]]], []);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata);

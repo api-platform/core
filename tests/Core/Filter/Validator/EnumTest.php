@@ -25,18 +25,14 @@ class EnumTest extends TestCase
     {
         $filter = new Enum();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], [])
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], []));
     }
 
     public function testEmptyQueryParameter()
     {
         $filter = new Enum();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], ['some_filter' => ''])
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], ['some_filter' => '']));
     }
 
     public function testNonMatchingParameter()
@@ -49,10 +45,7 @@ class EnumTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" must be one of "foo, bar"'],
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foobar'])
-        );
+        $this->assertEquals(['Query parameter "some_filter" must be one of "foo, bar"'], $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foobar']));
     }
 
     public function testMatchingParameter()
@@ -65,8 +58,6 @@ class EnumTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foo'])
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foo']));
     }
 }

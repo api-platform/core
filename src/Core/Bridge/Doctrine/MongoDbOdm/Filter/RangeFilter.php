@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
+use ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -54,13 +54,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
         }
 
         foreach ($values as $operator => $value) {
-            $this->addMatch(
-                $aggregationBuilder,
-                $field,
-                $matchField,
-                $operator,
-                $value
-            );
+            $this->addMatch($aggregationBuilder, $field, $matchField, $operator, $value);
         }
     }
 

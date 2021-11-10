@@ -74,13 +74,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
         }
 
         if (null !== $operationName = $context['collection_operation_name'] ?? $context['item_operation_name'] ?? null) {
-            return false !== $resourceMetadata->getTypedOperationAttribute(
-                $context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM,
-                $operationName,
-                'messenger',
-                false,
-                true
-            );
+            return false !== $resourceMetadata->getTypedOperationAttribute($context['collection_operation_name'] ?? false ? OperationType::COLLECTION : OperationType::ITEM, $operationName, 'messenger', false, true);
         }
 
         if (isset($context['graphql_operation_name'])) {
@@ -95,10 +89,8 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function persist($data, array $context = [])
     {
-        $envelope = $this->dispatch(
-            (new Envelope($data))
-                ->with(new ContextStamp($context))
-        );
+        $envelope = $this->dispatch((new Envelope($data))
+                ->with(new ContextStamp($context)));
 
         $handledStamp = $envelope->last(HandledStamp::class);
         if (!$handledStamp instanceof HandledStamp) {
@@ -113,9 +105,7 @@ final class DataPersister implements ContextAwareDataPersisterInterface
      */
     public function remove($data, array $context = [])
     {
-        $this->dispatch(
-            (new Envelope($data))
-                ->with(new RemoveStamp())
-        );
+        $this->dispatch((new Envelope($data))
+                ->with(new RemoveStamp()));
     }
 }

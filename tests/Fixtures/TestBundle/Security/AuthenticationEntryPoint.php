@@ -37,11 +37,7 @@ final class AuthenticationEntryPoint implements AuthenticationEntryPointInterfac
             return new RedirectResponse($this->router->generate('api_doc', [], UrlGeneratorInterface::ABSOLUTE_URL));
         }
         if ('json' === $request->getRequestFormat()) {
-            return new JsonResponse(
-                ['message' => 'Authentication Required'],
-                Response::HTTP_UNAUTHORIZED,
-                ['WWW-Authenticate' => 'Bearer realm="example"']
-            );
+            return new JsonResponse(['message' => 'Authentication Required'], Response::HTTP_UNAUTHORIZED, ['WWW-Authenticate' => 'Bearer realm="example"']);
         }
 
         return new Response('', Response::HTTP_UNAUTHORIZED);

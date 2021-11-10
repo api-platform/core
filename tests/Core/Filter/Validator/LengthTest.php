@@ -25,18 +25,14 @@ class LengthTest extends TestCase
     {
         $filter = new Length();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], [])
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], []));
     }
 
     public function testEmptyQueryParameter()
     {
         $filter = new Length();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], ['some_filter' => ''])
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], ['some_filter' => '']));
     }
 
     public function testNonMatchingParameter()
@@ -50,15 +46,9 @@ class LengthTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" length must be greater than or equal to 3'],
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab'])
-        );
+        $this->assertEquals(['Query parameter "some_filter" length must be greater than or equal to 3'], $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab']));
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" length must be lower than or equal to 5'],
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef'])
-        );
+        $this->assertEquals(['Query parameter "some_filter" length must be lower than or equal to 5'], $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef']));
     }
 
     public function testNonMatchingParameterWithOnlyOneDefinition()
@@ -71,10 +61,7 @@ class LengthTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" length must be greater than or equal to 3'],
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab'])
-        );
+        $this->assertEquals(['Query parameter "some_filter" length must be greater than or equal to 3'], $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'ab']));
 
         $filterDefinition = [
             'swagger' => [
@@ -82,10 +69,7 @@ class LengthTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" length must be lower than or equal to 5'],
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef'])
-        );
+        $this->assertEquals(['Query parameter "some_filter" length must be lower than or equal to 5'], $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcdef']));
     }
 
     public function testMatchingParameter()
@@ -99,17 +83,11 @@ class LengthTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc'])
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc']));
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcd'])
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcd']));
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde'])
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde']));
     }
 
     public function testMatchingParameterWithOneDefinition()
@@ -122,9 +100,7 @@ class LengthTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc'])
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abc']));
 
         $filterDefinition = [
             'swagger' => [
@@ -132,8 +108,6 @@ class LengthTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde'])
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, ['some_filter' => 'abcde']));
     }
 }

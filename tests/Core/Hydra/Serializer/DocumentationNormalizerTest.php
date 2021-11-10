@@ -104,15 +104,9 @@ class DocumentationNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'nameConverted', 'relatedDummy']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
-        );
-        $propertyMetadataFactoryProphecy->create('dummy', 'description', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id'])
-        );
-        $propertyMetadataFactoryProphecy->create('dummy', 'nameConverted', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
-        );
+        $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('dummy', 'description', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id']));
+        $propertyMetadataFactoryProphecy->create('dummy', 'nameConverted', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
         $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy'))])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
 
         $subresourceOperationFactoryProphecy = null;
@@ -144,16 +138,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
 
-        $documentationNormalizer = new DocumentationNormalizer(
-            $resourceMetadataFactory,
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $operationMethodResolver,
-            $urlGenerator->reveal(),
-            $subresourceOperationFactoryProphecy ? $subresourceOperationFactoryProphecy->reveal() : null,
-            new CustomConverter()
-        );
+        $documentationNormalizer = new DocumentationNormalizer($resourceMetadataFactory, $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $operationMethodResolver, $urlGenerator->reveal(), $subresourceOperationFactoryProphecy ? $subresourceOperationFactoryProphecy->reveal() : null, new CustomConverter());
 
         $expected = [
             '@context' => [
@@ -422,22 +407,16 @@ class DocumentationNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create('inputClass', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['a', 'b']));
         $propertyNameCollectionFactoryProphecy->create('outputClass', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['c', 'd']));
 
-        $dummyMetadata = new ResourceMetadata(
-            'dummy',
-            'dummy',
-            '#dummy',
-            [
-                'get' => ['method' => 'GET'],
-                'put' => ['method' => 'PUT', 'input' => ['class' => null]],
-            ],
-            [
-                'get' => ['method' => 'GET'],
-                'post' => ['method' => 'POST', 'output' => ['class' => null]],
-            ],
-            [
-                'input' => ['class' => 'inputClass'],
-                'output' => ['class' => 'outputClass'],
-            ]);
+        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', [
+            'get' => ['method' => 'GET'],
+            'put' => ['method' => 'PUT', 'input' => ['class' => null]],
+        ], [
+            'get' => ['method' => 'GET'],
+            'post' => ['method' => 'POST', 'output' => ['class' => null]],
+        ], [
+            'input' => ['class' => 'inputClass'],
+            'output' => ['class' => 'outputClass'],
+        ]);
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
 
@@ -455,14 +434,7 @@ class DocumentationNormalizerTest extends TestCase
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalledTimes(1);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
 
-        $documentationNormalizer = new DocumentationNormalizer(
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            null,
-            $urlGenerator->reveal()
-        );
+        $documentationNormalizer = new DocumentationNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, $urlGenerator->reveal());
 
         $expected = [
             '@context' => [

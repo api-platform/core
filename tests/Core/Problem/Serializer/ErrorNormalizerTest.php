@@ -41,22 +41,16 @@ class ErrorNormalizerTest extends TestCase
     {
         $normalizer = new ErrorNormalizer();
 
-        $this->assertEquals(
-            [
-                'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-                'title' => 'An error occurred',
-                'detail' => 'Hello',
-            ],
-            $normalizer->normalize(new \Exception('Hello'))
-        );
-        $this->assertEquals(
-            [
-                'type' => 'https://dunglas.fr',
-                'title' => 'Hi',
-                'detail' => 'Hello',
-            ],
-            $normalizer->normalize(new \Exception('Hello'), null, ['type' => 'https://dunglas.fr', 'title' => 'Hi'])
-        );
+        $this->assertEquals([
+            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
+            'title' => 'An error occurred',
+            'detail' => 'Hello',
+        ], $normalizer->normalize(new \Exception('Hello')));
+        $this->assertEquals([
+            'type' => 'https://dunglas.fr',
+            'title' => 'Hi',
+            'detail' => 'Hello',
+        ], $normalizer->normalize(new \Exception('Hello'), null, ['type' => 'https://dunglas.fr', 'title' => 'Hi']));
     }
 
     /**

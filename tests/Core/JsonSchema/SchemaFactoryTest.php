@@ -42,16 +42,10 @@ class SchemaFactoryTest extends TestCase
     public function testBuildSchemaForNonResourceClass(): void
     {
         $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
-        ), Argument::cetera())->willReturn([
+        $typeFactoryProphecy->getType(Argument::allOf(Argument::type(Type::class), Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)), Argument::cetera())->willReturn([
             'type' => 'string',
         ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_INT)
-        ), Argument::cetera())->willReturn([
+        $typeFactoryProphecy->getType(Argument::allOf(Argument::type(Type::class), Argument::which('getBuiltinType', Type::BUILTIN_TYPE_INT)), Argument::cetera())->willReturn([
             'type' => 'integer',
         ]);
 
@@ -96,10 +90,7 @@ class SchemaFactoryTest extends TestCase
     public function testBuildSchemaForOperationWithOverriddenSerializerGroups(): void
     {
         $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)
-        ), Argument::cetera())->willReturn([
+        $typeFactoryProphecy->getType(Argument::allOf(Argument::type(Type::class), Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING)), Argument::cetera())->willReturn([
             'type' => 'string',
         ]);
 
@@ -122,20 +113,11 @@ class SchemaFactoryTest extends TestCase
         $validationGroups = 'validation_groups_dummy_put';
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::allOf(
-            Argument::type('array'),
-            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn(new PropertyNameCollection(['alias', 'description']));
+        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::allOf(Argument::type('array'), Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))))->willReturn(new PropertyNameCollection(['alias', 'description']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::allOf(
-            Argument::type('array'),
-            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::allOf(
-            Argument::type('array'),
-            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::allOf(Argument::type('array'), Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::allOf(Argument::type('array'), Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
@@ -167,28 +149,18 @@ class SchemaFactoryTest extends TestCase
         }
 
         $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
-            Argument::which('isCollection', true),
-            Argument::that(function (Type $type) {
-                $keyTypes = $type->getCollectionKeyTypes();
+        $typeFactoryProphecy->getType(Argument::allOf(Argument::type(Type::class), Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING), Argument::which('isCollection', true), Argument::that(function (Type $type) {
+            $keyTypes = $type->getCollectionKeyTypes();
 
-                return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_INT === $keyTypes[0]->getBuiltinType();
-            })
-        ), Argument::cetera())->willReturn([
+            return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_INT === $keyTypes[0]->getBuiltinType();
+        })), Argument::cetera())->willReturn([
             'type' => 'array',
         ]);
-        $typeFactoryProphecy->getType(Argument::allOf(
-            Argument::type(Type::class),
-            Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING),
-            Argument::which('isCollection', true),
-            Argument::that(function (Type $type) {
-                $keyTypes = $type->getCollectionKeyTypes();
+        $typeFactoryProphecy->getType(Argument::allOf(Argument::type(Type::class), Argument::which('getBuiltinType', Type::BUILTIN_TYPE_STRING), Argument::which('isCollection', true), Argument::that(function (Type $type) {
+            $keyTypes = $type->getCollectionKeyTypes();
 
-                return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_STRING === $keyTypes[0]->getBuiltinType();
-            })
-        ), Argument::cetera())->willReturn([
+            return 1 === \count($keyTypes) && $keyTypes[0] instanceof Type && Type::BUILTIN_TYPE_STRING === $keyTypes[0]->getBuiltinType();
+        })), Argument::cetera())->willReturn([
             'type' => 'object',
             'additionalProperties' => Type::BUILTIN_TYPE_STRING,
         ]);

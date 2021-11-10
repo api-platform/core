@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Doctrine\DBAL\Types\Type as DBALType;
@@ -74,55 +74,19 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         }
 
         if (isset($values[self::PARAMETER_BEFORE])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
-                $field,
-                self::PARAMETER_BEFORE,
-                $values[self::PARAMETER_BEFORE],
-                $nullManagement,
-                $type
-            );
+            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, self::PARAMETER_BEFORE, $values[self::PARAMETER_BEFORE], $nullManagement, $type);
         }
 
         if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
-                $field,
-                self::PARAMETER_STRICTLY_BEFORE,
-                $values[self::PARAMETER_STRICTLY_BEFORE],
-                $nullManagement,
-                $type
-            );
+            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, self::PARAMETER_STRICTLY_BEFORE, $values[self::PARAMETER_STRICTLY_BEFORE], $nullManagement, $type);
         }
 
         if (isset($values[self::PARAMETER_AFTER])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
-                $field,
-                self::PARAMETER_AFTER,
-                $values[self::PARAMETER_AFTER],
-                $nullManagement,
-                $type
-            );
+            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, self::PARAMETER_AFTER, $values[self::PARAMETER_AFTER], $nullManagement, $type);
         }
 
         if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
-                $field,
-                self::PARAMETER_STRICTLY_AFTER,
-                $values[self::PARAMETER_STRICTLY_AFTER],
-                $nullManagement,
-                $type
-            );
+            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, self::PARAMETER_STRICTLY_AFTER, $values[self::PARAMETER_STRICTLY_AFTER], $nullManagement, $type);
         }
     }
 
@@ -168,15 +132,9 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
             (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
             (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $baseWhere,
-                $queryBuilder->expr()->isNull(sprintf('%s.%s', $alias, $field))
-            ));
+            $queryBuilder->andWhere($queryBuilder->expr()->orX($baseWhere, $queryBuilder->expr()->isNull(sprintf('%s.%s', $alias, $field))));
         } else {
-            $queryBuilder->andWhere($queryBuilder->expr()->andX(
-                $baseWhere,
-                $queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field))
-            ));
+            $queryBuilder->andWhere($queryBuilder->expr()->andX($baseWhere, $queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field))));
         }
 
         $queryBuilder->setParameter($valueParameter, $value, $type);

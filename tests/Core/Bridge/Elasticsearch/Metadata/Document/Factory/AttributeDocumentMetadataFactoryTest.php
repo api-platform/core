@@ -32,13 +32,7 @@ class AttributeDocumentMetadataFactoryTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(
-            DocumentMetadataFactoryInterface::class,
-            new AttributeDocumentMetadataFactory(
-                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()
-            )
-        );
+        self::assertInstanceOf(DocumentMetadataFactoryInterface::class, new AttributeDocumentMetadataFactory($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()));
     }
 
     public function testCreate()

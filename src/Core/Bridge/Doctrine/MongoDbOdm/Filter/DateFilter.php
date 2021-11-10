@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
+use ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -65,43 +65,19 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
         }
 
         if (isset($values[self::PARAMETER_BEFORE])) {
-            $this->addMatch(
-                $aggregationBuilder,
-                $matchField,
-                self::PARAMETER_BEFORE,
-                $values[self::PARAMETER_BEFORE],
-                $nullManagement
-            );
+            $this->addMatch($aggregationBuilder, $matchField, self::PARAMETER_BEFORE, $values[self::PARAMETER_BEFORE], $nullManagement);
         }
 
         if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
-            $this->addMatch(
-                $aggregationBuilder,
-                $matchField,
-                self::PARAMETER_STRICTLY_BEFORE,
-                $values[self::PARAMETER_STRICTLY_BEFORE],
-                $nullManagement
-            );
+            $this->addMatch($aggregationBuilder, $matchField, self::PARAMETER_STRICTLY_BEFORE, $values[self::PARAMETER_STRICTLY_BEFORE], $nullManagement);
         }
 
         if (isset($values[self::PARAMETER_AFTER])) {
-            $this->addMatch(
-                $aggregationBuilder,
-                $matchField,
-                self::PARAMETER_AFTER,
-                $values[self::PARAMETER_AFTER],
-                $nullManagement
-            );
+            $this->addMatch($aggregationBuilder, $matchField, self::PARAMETER_AFTER, $values[self::PARAMETER_AFTER], $nullManagement);
         }
 
         if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
-            $this->addMatch(
-                $aggregationBuilder,
-                $matchField,
-                self::PARAMETER_STRICTLY_AFTER,
-                $values[self::PARAMETER_STRICTLY_AFTER],
-                $nullManagement
-            );
+            $this->addMatch($aggregationBuilder, $matchField, self::PARAMETER_STRICTLY_AFTER, $values[self::PARAMETER_STRICTLY_AFTER], $nullManagement);
         }
     }
 
@@ -140,10 +116,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
             (self::INCLUDE_NULL_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER], true)) ||
             (self::INCLUDE_NULL_BEFORE_AND_AFTER === $nullManagement && \in_array($operator, [self::PARAMETER_AFTER, self::PARAMETER_STRICTLY_AFTER, self::PARAMETER_BEFORE, self::PARAMETER_STRICTLY_BEFORE], true))
         ) {
-            $aggregationBuilder->match()->addOr(
-                $aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value),
-                $aggregationBuilder->matchExpr()->field($field)->equals(null)
-            );
+            $aggregationBuilder->match()->addOr($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value), $aggregationBuilder->matchExpr()->field($field)->equals(null));
 
             return;
         }

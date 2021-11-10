@@ -118,35 +118,9 @@ final class ApiProperty
      * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param array|null  $types                   the RDF types of this property
      */
-    public function __construct(
-        ?string $description = null,
-        ?bool $readable = null,
-        ?bool $writable = null,
-        ?bool $readableLink = null,
-        ?bool $writableLink = null,
-        ?bool $required = null,
-        ?bool $identifier = null,
-
-        $default = null,
-        $example = null,
-
-        ?string $deprecationReason = null,
-        ?bool $fetchable = null,
-        ?bool $fetchEager = null,
-        ?array $jsonldContext = null,
-        ?array $openapiContext = null,
-        ?bool $push = null,
-        ?string $security = null,
-        ?string $securityPostDenormalize = null,
-
-        ?array $types = null,
-        ?array $builtinTypes = null,
-        ?array $schema = null,
-        ?bool $initializable = null,
-
-        // attributes
-        array $extraProperties = []
-    ) {
+    public function __construct(?string $description = null, ?bool $readable = null, ?bool $writable = null, ?bool $readableLink = null, ?bool $writableLink = null, ?bool $required = null, ?bool $identifier = null, $default = null, $example = null, ?string $deprecationReason = null, ?bool $fetchable = null, ?bool $fetchEager = null, ?array $jsonldContext = null, ?array $openapiContext = null, ?bool $push = null, ?string $security = null, ?string $securityPostDenormalize = null, ?array $types = null, ?array $builtinTypes = null, ?array $schema = null, ?bool $initializable = null,        // attributes
+        array $extraProperties = [])
+    {
         $this->description = $description;
         $this->readable = $readable;
         $this->writable = $writable;

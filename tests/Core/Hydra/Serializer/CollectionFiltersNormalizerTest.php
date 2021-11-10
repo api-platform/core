@@ -47,12 +47,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $decoratedProphecy->supportsNormalization('foo', 'abc')->willReturn(true)->shouldBeCalled();
         $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
-        $normalizer = new CollectionFiltersNormalizer(
-            $decoratedProphecy->reveal(),
-            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
-        );
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
 
         $this->assertTrue($normalizer->supportsNormalization('foo', 'abc'));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
@@ -124,10 +119,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         ];
 
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
-        $decoratedProphecy->normalize($data, CollectionNormalizer::FORMAT, Argument::allOf(
-            Argument::withEntry('resource_class', Foo::class),
-            Argument::withEntry('api_sub_level', true)
-        ))->willReturn([
+        $decoratedProphecy->normalize($data, CollectionNormalizer::FORMAT, Argument::allOf(Argument::withEntry('resource_class', Foo::class), Argument::withEntry('api_sub_level', true)))->willReturn([
             $normalizedFooOne,
             $normalizedFooThree,
         ]);
@@ -211,12 +203,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
-        $normalizer = new CollectionFiltersNormalizer(
-            $decoratedProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
-        );
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
 
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
             'collection_operation_name' => 'get',
@@ -239,12 +226,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
-        $normalizer = new CollectionFiltersNormalizer(
-            $decoratedProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
-        );
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
 
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
             'resource_class' => Dummy::class,
@@ -283,12 +265,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
 
-        new CollectionFiltersNormalizer(
-            $this->prophesize(NormalizerInterface::class)->reveal(),
-            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            new \ArrayObject()
-        );
+        new CollectionFiltersNormalizer($this->prophesize(NormalizerInterface::class)->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), new \ArrayObject());
     }
 
     private function normalize($filterLocator)
@@ -307,12 +284,7 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
-        $normalizer = new CollectionFiltersNormalizer(
-            $decoratedProphecy->reveal(),
-            $resourceMetadataFactoryProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $filterLocator
-        );
+        $normalizer = new CollectionFiltersNormalizer($decoratedProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $filterLocator);
 
         $this->assertEquals([
             'name' => 'foo',

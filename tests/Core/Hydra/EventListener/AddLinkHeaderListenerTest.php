@@ -40,12 +40,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/docs')->shouldBeCalled();
 
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            HttpKernelInterface::MASTER_REQUEST,
-            new Response()
-        );
+        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
 
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());
         $listener->onKernelResponse($event);
@@ -66,12 +61,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $request->setMethod('OPTIONS');
         $request->headers->set('Access-Control-Request-Method', 'POST');
 
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            HttpKernelInterface::MASTER_REQUEST,
-            new Response()
-        );
+        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
 
         $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
         $listener = new AddLinkHeaderListener($urlGenerator->reveal());

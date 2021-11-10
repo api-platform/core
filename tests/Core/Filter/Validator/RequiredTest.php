@@ -28,13 +28,9 @@ class RequiredTest extends TestCase
         $request = [];
         $filter = new Required();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], [])
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], []));
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', ['required' => false], $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', ['required' => false], $request));
     }
 
     public function testRequiredFilterNotInQuery()
@@ -42,10 +38,7 @@ class RequiredTest extends TestCase
         $request = [];
         $filter = new Required();
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" is required'],
-            $filter->validate('some_filter', ['required' => true], $request)
-        );
+        $this->assertEquals(['Query parameter "some_filter" is required'], $filter->validate('some_filter', ['required' => true], $request));
     }
 
     public function testRequiredFilterIsPresent()
@@ -53,9 +46,7 @@ class RequiredTest extends TestCase
         $request = ['some_filter' => 'some_value'];
         $filter = new Required();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', ['required' => true], $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', ['required' => true], $request));
     }
 
     public function testEmptyValueNotAllowed()
@@ -70,19 +61,13 @@ class RequiredTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" does not allow empty value'],
-            $filter->validate('some_filter', $explicitFilterDefinition, $request)
-        );
+        $this->assertEquals(['Query parameter "some_filter" does not allow empty value'], $filter->validate('some_filter', $explicitFilterDefinition, $request));
 
         $implicitFilterDefinition = [
             'required' => true,
         ];
 
-        $this->assertEquals(
-            ['Query parameter "some_filter" does not allow empty value'],
-            $filter->validate('some_filter', $implicitFilterDefinition, $request)
-        );
+        $this->assertEquals(['Query parameter "some_filter" does not allow empty value'], $filter->validate('some_filter', $implicitFilterDefinition, $request));
     }
 
     public function testEmptyValueAllowed()
@@ -97,9 +82,7 @@ class RequiredTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', $explicitFilterDefinition, $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', $explicitFilterDefinition, $request));
     }
 
     public function testBracketNotation()
@@ -112,9 +95,7 @@ class RequiredTest extends TestCase
             'required' => true,
         ];
 
-        $this->assertEmpty(
-            $filter->validate('foo[bar]', $requiredFilter, $request)
-        );
+        $this->assertEmpty($filter->validate('foo[bar]', $requiredFilter, $request));
     }
 
     public function testDotNotation()
@@ -126,8 +107,6 @@ class RequiredTest extends TestCase
             'required' => true,
         ];
 
-        $this->assertEmpty(
-            $filter->validate('foo.bar', $requiredFilter, $request)
-        );
+        $this->assertEmpty($filter->validate('foo.bar', $requiredFilter, $request));
     }
 }

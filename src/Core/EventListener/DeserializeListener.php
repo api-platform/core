@@ -100,10 +100,8 @@ final class DeserializeListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (
-            !$attributes['receive']
-            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
-        )) {
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (!$attributes['receive']
+            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))) {
             return;
         }
 
@@ -131,10 +129,7 @@ final class DeserializeListener
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
-        $request->attributes->set(
-            'data',
-            $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context)
-        );
+        $request->attributes->set('data', $this->serializer->deserialize($request->getContent(), $context['resource_class'], $format, $context));
     }
 
     /**

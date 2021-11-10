@@ -87,10 +87,8 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
 
             if (
                 null !== $propertyName &&
-                (
-                    (\PHP_VERSION_ID >= 80000 && $reflectionMethod->getAttributes(ApiProperty::class)) ||
-                    (null !== $this->reader && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class))
-                )
+                ((\PHP_VERSION_ID >= 80000 && $reflectionMethod->getAttributes(ApiProperty::class)) ||
+                    (null !== $this->reader && null !== $this->reader->getMethodAnnotation($reflectionMethod, ApiProperty::class)))
             ) {
                 $propertyNames[$propertyName] = $propertyName;
             }

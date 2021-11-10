@@ -38,13 +38,7 @@ class SwaggerCommandUnitTest extends KernelTestCase
     {
         $this->normalizer = $this->createMock(NormalizerInterface::class);
         $this->resources = $this->createMock(ResourceNameCollectionFactoryInterface::class);
-        $this->command = new SwaggerCommand(
-            $this->normalizer,
-            $this->resources,
-            'My API',
-            'I told you already: it is my API',
-            'one-zero-zero'
-        );
+        $this->command = new SwaggerCommand($this->normalizer, $this->resources, 'My API', 'I told you already: it is my API', 'one-zero-zero');
 
         $this->resources->method('create')
             ->willReturn(new ResourceNameCollection());

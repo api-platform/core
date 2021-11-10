@@ -83,14 +83,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
             $collectionKeyType = Type::BUILTIN_TYPE_INT;
 
             return [
-                new Type(
-                    Type::BUILTIN_TYPE_OBJECT,
-                    false,
-                    Collection::class,
-                    true,
-                    new Type($collectionKeyType),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)
-                ),
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type($collectionKeyType), new Type(Type::BUILTIN_TYPE_OBJECT, false, $class)),
             ];
         }
 

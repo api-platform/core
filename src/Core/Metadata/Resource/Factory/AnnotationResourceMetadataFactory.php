@@ -99,16 +99,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         }
 
         if (!$parentResourceMetadata) {
-            return new ResourceMetadata(
-                $annotation->shortName,
-                $annotation->description ?? $this->defaults['description'] ?? null,
-                $annotation->iri ?? $this->defaults['iri'] ?? null,
-                $annotation->itemOperations ?? $this->defaults['item_operations'] ?? null,
-                $annotation->collectionOperations ?? $this->defaults['collection_operations'] ?? null,
-                $attributes,
-                $annotation->subresourceOperations,
-                $annotation->graphql ?? $this->defaults['graphql'] ?? null
-            );
+            return new ResourceMetadata($annotation->shortName, $annotation->description ?? $this->defaults['description'] ?? null, $annotation->iri ?? $this->defaults['iri'] ?? null, $annotation->itemOperations ?? $this->defaults['item_operations'] ?? null, $annotation->collectionOperations ?? $this->defaults['collection_operations'] ?? null, $attributes, $annotation->subresourceOperations, $annotation->graphql ?? $this->defaults['graphql'] ?? null);
         }
 
         $resourceMetadata = $parentResourceMetadata;

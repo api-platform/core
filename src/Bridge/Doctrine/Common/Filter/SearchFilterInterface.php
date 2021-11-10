@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
+namespace ApiPlatform\Bridge\Doctrine\Common\Filter;
 
 /**
  * Interface for filtering the collection by given properties.

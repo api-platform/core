@@ -46,16 +46,7 @@ class ItemDataProviderTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(
-            ItemDataProviderInterface::class,
-            new ItemDataProvider(
-                $this->prophesize(Client::class)->reveal(),
-                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
-                $this->prophesize(DenormalizerInterface::class)->reveal(),
-                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
-            )
-        );
+        self::assertInstanceOf(ItemDataProviderInterface::class, new ItemDataProvider($this->prophesize(Client::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()));
     }
 
     public function testSupports()
@@ -76,13 +67,7 @@ class ItemDataProviderTest extends TestCase
         $resourceMetadataFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn((new ResourceMetadata())->withAttributes(['elasticsearch' => false]));
         $resourceMetadataFactoryProphecy->create(DummyCarColor::class)->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
 
-        $itemDataProvider = new ItemDataProvider(
-            $this->prophesize(Client::class)->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
-            $identifierExtractorProphecy->reveal(),
-            $this->prophesize(DenormalizerInterface::class)->reveal(),
-            $resourceMetadataFactoryProphecy->reveal()
-        );
+        $itemDataProvider = new ItemDataProvider($this->prophesize(Client::class)->reveal(), $documentMetadataFactoryProphecy->reveal(), $identifierExtractorProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), $resourceMetadataFactoryProphecy->reveal());
 
         self::assertTrue($itemDataProvider->supports(Foo::class));
         self::assertFalse($itemDataProvider->supports(Dummy::class));

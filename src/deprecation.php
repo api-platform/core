@@ -121,6 +121,27 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class,
         ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class,
         ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class,
+
+        // Util
+        ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
+        ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,
+        ApiPlatform\Core\Util\AttributesExtractor::class => ApiPlatform\Util\AttributesExtractor::class,
+        ApiPlatform\Core\Util\ClassInfoTrait::class => ApiPlatform\Util\ClassInfoTrait::class,
+        ApiPlatform\Core\Util\CloneTrait::class => ApiPlatform\Util\CloneTrait::class,
+        ApiPlatform\Core\Util\CorsTrait::class => ApiPlatform\Util\CorsTrait::class,
+        ApiPlatform\Core\Util\ErrorFormatGuesser::class => ApiPlatform\Util\ErrorFormatGuesser::class,
+        ApiPlatform\Core\Util\Inflector::class => ApiPlatform\Util\Inflector::class,
+        ApiPlatform\Core\Util\IriHelper::class => ApiPlatform\Util\IriHelper::class,
+        ApiPlatform\Core\Util\Reflection::class => ApiPlatform\Util\Reflection::class,
+        ApiPlatform\Core\Util\ReflectionClassRecursiveIterator::class => ApiPlatform\Util\ReflectionClassRecursiveIterator::class,
+        ApiPlatform\Core\Util\RequestAttributesExtractor::class => ApiPlatform\Util\RequestAttributesExtractor::class,
+        ApiPlatform\Core\Util\RequestParser::class => ApiPlatform\Util\RequestParser::class,
+        ApiPlatform\Core\Util\ResourceClassInfoTrait::class => ApiPlatform\Util\ResourceClassInfoTrait::class,
+        ApiPlatform\Core\Util\SortTrait::class => ApiPlatform\Util\SortTrait::class,
+
+        // Validator
+        ApiPlatform\Core\Validator\EventListener\ValidateListener::class => ApiPlatform\Symfony\EventListener\ValidateListener::class,
+        ApiPlatform\Core\Validator\Exception\ValidationException::class => \ApiPlatform\Symfony\EventListener\Exception\ValidationException::class,
     ];
 
     $deprecatedInterfaces = include 'deprecated_interfaces.php';

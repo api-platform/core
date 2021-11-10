@@ -179,11 +179,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $shortName = (new \ReflectionClass($outputClass))->getShortName();
 
         $jsonLdContext = [
-            '@context' => $this->getResourceContextWithShortname(
-                $outputClass,
-                $referenceType,
-                $shortName
-            ),
+            '@context' => $this->getResourceContextWithShortname($outputClass, $referenceType, $shortName),
             '@type' => $shortName,
             '@id' => $context['iri'] ?? '_:'.(\function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object)),
         ];

@@ -122,10 +122,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
         $alias = $queryBuilder->getRootAliases()[0];
         foreach ($identifiers as $identifier => $value) {
             $placeholder = ':id_'.$identifier;
-            $expression = $queryBuilder->expr()->eq(
-                "{$alias}.{$identifier}",
-                $placeholder
-            );
+            $expression = $queryBuilder->expr()->eq("{$alias}.{$identifier}", $placeholder);
 
             $queryBuilder->andWhere($expression);
 

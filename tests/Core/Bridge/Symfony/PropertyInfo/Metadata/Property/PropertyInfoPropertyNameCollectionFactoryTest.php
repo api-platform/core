@@ -84,17 +84,9 @@ class PropertyInfoPropertyNameCollectionFactoryTest extends TestCase
             self::markTestSkipped();
         }
 
-        $factory = new PropertyInfoPropertyNameCollectionFactory(
-            new PropertyInfoExtractor([
-                new SerializerExtractor(
-                    new ClassMetadataFactory(
-                        new AnnotationLoader(
-                            new AnnotationReader()
-                        )
-                    )
-                ),
-            ])
-        );
+        $factory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([
+            new SerializerExtractor(new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()))),
+        ]));
 
         self::assertObjectHasAttribute('ignored', new DummyIgnoreProperty());
 

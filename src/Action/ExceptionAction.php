@@ -72,10 +72,7 @@ final class ExceptionAction
         $exceptionClass = $exception->getClass();
         $statusCode = $exception->getStatusCode();
 
-        $exceptionToStatus = array_merge(
-            $this->exceptionToStatus,
-            $operation ? $operation->getExceptionToStatus() ?? [] : $this->getOperationExceptionToStatus($request)
-        );
+        $exceptionToStatus = array_merge($this->exceptionToStatus, $operation ? $operation->getExceptionToStatus() ?? [] : $this->getOperationExceptionToStatus($request));
 
         foreach ($exceptionToStatus as $class => $status) {
             if (is_a($exceptionClass, $class, true)) {
@@ -110,9 +107,6 @@ final class ExceptionAction
             throw new \LogicException('"exception_to_status" attribute should be an array.');
         }
 
-        return array_merge(
-            $resourceExceptionToStatus,
-            $operationExceptionToStatus
-        );
+        return array_merge($resourceExceptionToStatus, $operationExceptionToStatus);
     }
 }

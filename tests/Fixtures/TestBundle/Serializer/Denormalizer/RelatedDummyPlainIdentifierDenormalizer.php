@@ -52,12 +52,7 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
     {
         $iriConverterContext = ['identifiers_values' => ['id' => $data['thirdLevel']], 'force_collection' => false, 'operation' => null] + $context;
 
-        $data['thirdLevel'] = $this->iriConverter->getIriFromResourceClass(
-            RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class,
-            null,
-            UrlGeneratorInterface::ABS_PATH,
-            $iriConverterContext
-        );
+        $data['thirdLevel'] = $this->iriConverter->getIriFromResourceClass(RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class, null, UrlGeneratorInterface::ABS_PATH, $iriConverterContext);
 
         return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
     }

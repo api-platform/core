@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Core\Validator\Exception\ValidationException;
-use ApiPlatform\Core\Validator\ValidatorInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ValidateStage;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Symfony\EventListener\Exception\ValidationException;
+use ApiPlatform\Symfony\EventListener\ValidatorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -45,10 +45,7 @@ class ValidateStageTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->validatorProphecy = $this->prophesize(ValidatorInterface::class);
 
-        $this->validateStage = new ValidateStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
-            $this->validatorProphecy->reveal()
-        );
+        $this->validateStage = new ValidateStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->validatorProphecy->reveal());
     }
 
     public function testApplyDisabled(): void

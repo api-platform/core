@@ -143,12 +143,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedProphecy->create(DummyIgnoreProperty::class, 'ignored', $options)->willReturn($ignoredPropertyMetadata);
 
-        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(
-            null,
-            $serializerClassMetadataFactoryProphecy->reveal(),
-            $decoratedProphecy->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal()
-        );
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(null, $serializerClassMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
         $result = $serializerPropertyMetadataFactory->create(DummyIgnoreProperty::class, 'ignored', $options);
 

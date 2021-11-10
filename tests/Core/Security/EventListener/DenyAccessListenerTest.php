@@ -311,13 +311,6 @@ class DenyAccessListenerTest extends TestCase
 
         $authorizationCheckerInterface = $this->prophesize(AuthorizationCheckerInterface::class);
 
-        return new DenyAccessListener(
-            $resourceMetadataFactory,
-            $expressionLanguage,
-            $authenticationTrustResolverProphecy->reveal(),
-            $roleHierarchyInterfaceProphecy->reveal(),
-            $tokenStorageProphecy->reveal(),
-            $authorizationCheckerInterface->reveal()
-        );
+        return new DenyAccessListener($resourceMetadataFactory, $expressionLanguage, $authenticationTrustResolverProphecy->reveal(), $roleHierarchyInterfaceProphecy->reveal(), $tokenStorageProphecy->reveal(), $authorizationCheckerInterface->reveal());
     }
 }

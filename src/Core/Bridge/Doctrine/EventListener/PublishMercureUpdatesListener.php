@@ -96,13 +96,11 @@ final class PublishMercureUpdatesListener
             $rawurlencode = ExpressionFunction::fromPhp('rawurlencode', 'escape');
             $this->expressionLanguage->addFunction($rawurlencode);
 
-            $this->expressionLanguage->addFunction(
-                new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
-                    return sprintf('iri(%s, %d)', $apiResource, $referenceType);
-                }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
-                    return $iriConverter->getIriFromItem($apiResource, null, $referenceType);
-                })
-            );
+            $this->expressionLanguage->addFunction(new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
+                return sprintf('iri(%s, %d)', $apiResource, $referenceType);
+            }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
+                return $iriConverter->getIriFromItem($apiResource, null, $referenceType);
+            }));
         }
     }
 
@@ -302,11 +300,7 @@ final class PublishMercureUpdatesListener
 
         $updates = [];
         foreach ($payloads as [$subscriptionId, $data]) {
-            $updates[] = $this->buildUpdate(
-                $this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($subscriptionId),
-                (string) (new JsonResponse($data))->getContent(),
-                $options
-            );
+            $updates[] = $this->buildUpdate($this->graphQlMercureSubscriptionIriGenerator->generateTopicIri($subscriptionId), (string) (new JsonResponse($data))->getContent(), $options);
         }
 
         return $updates;

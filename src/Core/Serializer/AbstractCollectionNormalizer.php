@@ -88,11 +88,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         $context = $this->initContext($resourceClass, $context);
         $data = [];
 
-        return array_merge_recursive(
-            $data,
-            $this->getPaginationData($object, $context),
-            $this->getItemsData($object, $format, $context)
-        );
+        return array_merge_recursive($data, $this->getPaginationData($object, $context), $this->getItemsData($object, $format, $context));
     }
 
     /**

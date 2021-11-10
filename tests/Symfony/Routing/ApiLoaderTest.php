@@ -76,117 +76,19 @@ class ApiLoaderTest extends TestCase
 
         $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
 
-        $this->assertEquals(
-            $this->getRoute(
-                $path,
-                'api_platform.action.get_item',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_get_item',
-                ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
-                ['GET'],
-                ['id' => '\d+']
-            ),
-            $routeCollection->get('api_dummies_get_item')
-        );
+        $this->assertEquals($this->getRoute($path, 'api_platform.action.get_item', null, RelatedDummyEntity::class, [], 'api_dummies_get_item', ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], ['GET'], ['id' => '\d+']), $routeCollection->get('api_dummies_get_item'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $path,
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_delete_item',
-                [],
-                ['DELETE'],
-                []
-            ),
-            $routeCollection->get('api_dummies_delete_item')
-        );
+        $this->assertEquals($this->getRoute($path, 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_delete_item', [], ['DELETE'], []), $routeCollection->get('api_dummies_delete_item'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $path,
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_put_item',
-                [],
-                ['PUT'],
-                []
-            ),
-            $routeCollection->get('api_dummies_put_item')
-        );
+        $this->assertEquals($this->getRoute($path, 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_put_item', [], ['PUT'], []), $routeCollection->get('api_dummies_put_item'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/dummies.{_format}',
-                'some.service.name',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_my_op_collection',
-                ['my_default' => 'default_value', '_format' => 'a valid format'],
-                ['GET'],
-                ['_format' => 'a valid format'],
-                [],
-                '',
-                [],
-                "request.headers.get('User-Agent') matches '/firefox/i'"
-            ),
-            $routeCollection->get('api_dummies_my_op_collection')
-        );
+        $this->assertEquals($this->getRoute('/dummies.{_format}', 'some.service.name', null, RelatedDummyEntity::class, [], 'api_dummies_my_op_collection', ['my_default' => 'default_value', '_format' => 'a valid format'], ['GET'], ['_format' => 'a valid format'], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"), $routeCollection->get('api_dummies_my_op_collection'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/dummies.{_format}',
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_my_second_op_collection',
-                [],
-                ['POST'],
-                [],
-                ['option' => 'option_value'],
-                '{subdomain}.api-platform.com',
-                ['https']
-            ),
-            $routeCollection->get('api_dummies_my_second_op_collection')
-        );
+        $this->assertEquals($this->getRoute('/dummies.{_format}', 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_my_second_op_collection', [], ['POST'], [], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']), $routeCollection->get('api_dummies_my_second_op_collection'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                'some/custom/path',
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_my_path_op_collection',
-                [],
-                ['GET'],
-                []
-            ),
-            $routeCollection->get('api_dummies_my_path_op_collection')
-        );
+        $this->assertEquals($this->getRoute('some/custom/path', 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_my_path_op_collection', [], ['GET'], []), $routeCollection->get('api_dummies_my_path_op_collection'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                '/dummies.{_format}',
-                'api_platform.action.placeholder',
-                true,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_my_stateless_op_collection',
-                [],
-                ['GET'],
-                []
-            ),
-            $routeCollection->get('api_dummies_my_stateless_op_collection')
-        );
+        $this->assertEquals($this->getRoute('/dummies.{_format}', 'api_platform.action.placeholder', true, RelatedDummyEntity::class, [], 'api_dummies_my_stateless_op_collection', [], ['GET'], []), $routeCollection->get('api_dummies_my_stateless_op_collection'));
     }
 
     public function testApiLoaderWithPrefix()
@@ -204,48 +106,11 @@ class ApiLoaderTest extends TestCase
 
         $prefixedPath = $prefix.$path;
 
-        $this->assertEquals(
-            $this->getRoute(
-                $prefixedPath,
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_get_item',
-                ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
-                ['GET'],
-                ['id' => '\d+']
-            ),
-            $routeCollection->get('api_dummies_get_item')
-        );
+        $this->assertEquals($this->getRoute($prefixedPath, 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_get_item', ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], ['GET'], ['id' => '\d+']), $routeCollection->get('api_dummies_get_item'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $prefixedPath,
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_delete_item',
-                [],
-                ['DELETE']
-            ),
-            $routeCollection->get('api_dummies_delete_item')
-        );
+        $this->assertEquals($this->getRoute($prefixedPath, 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_delete_item', [], ['DELETE']), $routeCollection->get('api_dummies_delete_item'));
 
-        $this->assertEquals(
-            $this->getRoute(
-                $prefixedPath,
-                'api_platform.action.placeholder',
-                null,
-                RelatedDummyEntity::class,
-                [],
-                'api_dummies_put_item',
-                [],
-                ['PUT']
-            ),
-            $routeCollection->get('api_dummies_put_item')
-        );
+        $this->assertEquals($this->getRoute($prefixedPath, 'api_platform.action.placeholder', null, RelatedDummyEntity::class, [], 'api_dummies_put_item', [], ['PUT']), $routeCollection->get('api_dummies_put_item'));
     }
 
     private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
@@ -299,21 +164,12 @@ class ApiLoaderTest extends TestCase
     {
         $isCollection = false !== strpos($operationName, 'collection');
 
-        return new Route(
-            $path,
-            [
-                '_controller' => $controller,
-                '_format' => null,
-                '_stateless' => $stateless,
-                '_api_resource_class' => $resourceClass,
-                '_api_operation_name' => $operationName,
-            ] + $extraDefaults,
-            $requirements,
-            $options,
-            $host,
-            $schemes,
-            $methods,
-            $condition
-        );
+        return new Route($path, [
+            '_controller' => $controller,
+            '_format' => null,
+            '_stateless' => $stateless,
+            '_api_resource_class' => $resourceClass,
+            '_api_operation_name' => $operationName,
+        ] + $extraDefaults, $requirements, $options, $host, $schemes, $methods, $condition);
     }
 }

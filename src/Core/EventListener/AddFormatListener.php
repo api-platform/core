@@ -77,11 +77,9 @@ final class AddFormatListener
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
-        if (!(
-            $request->attributes->has('_api_resource_class')
+        if (!($request->attributes->has('_api_resource_class')
             || $request->attributes->getBoolean('_api_respond', false)
-            || $request->attributes->getBoolean('_graphql', false)
-        )) {
+            || $request->attributes->getBoolean('_graphql', false))) {
             return;
         }
 
@@ -181,10 +179,6 @@ final class AddFormatListener
      */
     private function getNotAcceptableHttpException(string $accept, array $mimeTypes): NotAcceptableHttpException
     {
-        return new NotAcceptableHttpException(sprintf(
-            'Requested format "%s" is not supported. Supported MIME types are "%s".',
-            $accept,
-            implode('", "', array_keys($mimeTypes))
-        ));
+        return new NotAcceptableHttpException(sprintf('Requested format "%s" is not supported. Supported MIME types are "%s".', $accept, implode('", "', array_keys($mimeTypes))));
     }
 }

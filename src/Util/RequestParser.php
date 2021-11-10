@@ -53,13 +53,9 @@ final class RequestParser
         // to find it when replacing names with the regexp below.
         $source = str_replace('%5B', '[', $source);
 
-        $source = preg_replace_callback(
-            '/(^|(?<=&))[^=[&]+/',
-            static function ($key) {
-                return bin2hex(urldecode($key[0]));
-            },
-            $source
-        );
+        $source = preg_replace_callback('/(^|(?<=&))[^=[&]+/', static function ($key) {
+            return bin2hex(urldecode($key[0]));
+        }, $source);
 
         // parse_str urldecodes both keys and values in resulting array.
         parse_str($source, $params);

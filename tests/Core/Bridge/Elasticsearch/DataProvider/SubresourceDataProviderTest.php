@@ -52,19 +52,7 @@ class SubresourceDataProviderTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(
-            SubresourceDataProviderInterface::class,
-            new SubresourceDataProvider(
-                $this->prophesize(Client::class)->reveal(),
-                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
-                $this->prophesize(DenormalizerInterface::class)->reveal(),
-                new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
-                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
-                $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal()
-            )
-        );
+        self::assertInstanceOf(SubresourceDataProviderInterface::class, new SubresourceDataProvider($this->prophesize(Client::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal()));
     }
 
     public function testSupports()
@@ -85,16 +73,7 @@ class SubresourceDataProviderTest extends TestCase
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(DummyCarColor::class)->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
 
-        $subresourceDataProvider = new SubresourceDataProvider(
-            $this->prophesize(Client::class)->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
-            $identifierExtractorProphecy->reveal(),
-            $this->prophesize(DenormalizerInterface::class)->reveal(),
-            new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
-            $resourceMetadataFactoryProphecy->reveal(),
-            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
-            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal()
-        );
+        $subresourceDataProvider = new SubresourceDataProvider($this->prophesize(Client::class)->reveal(), $documentMetadataFactoryProphecy->reveal(), $identifierExtractorProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()), $resourceMetadataFactoryProphecy->reveal(), $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal());
 
         self::assertTrue($subresourceDataProvider->supports(Foo::class, null, ['collection' => true]));
         self::assertFalse($subresourceDataProvider->supports(Dummy::class, null, ['collection' => true]));
@@ -166,43 +145,15 @@ class SubresourceDataProviderTest extends TestCase
 
         $clientProphecy = $this->prophesize(Client::class);
         $clientProphecy
-            ->search(
-                Argument::allOf(
-                    Argument::withEntry('index', 'foo'),
-                    Argument::withEntry('type', DocumentMetadata::DEFAULT_TYPE),
-                    Argument::withEntry('body', Argument::allOf(
-                        Argument::withEntry('size', 2),
-                        Argument::withEntry('from', 0),
-                        Argument::withEntry('query', Argument::allOf(
-                            Argument::withEntry('match', Argument::allOf(Argument::withEntry('bar.barId', 1))),
-                            Argument::size(1)
-                        )),
-                        Argument::size(3)
-                    )),
-                    Argument::size(3)
-                )
-            )
+            ->search(Argument::allOf(Argument::withEntry('index', 'foo'), Argument::withEntry('type', DocumentMetadata::DEFAULT_TYPE), Argument::withEntry('body', Argument::allOf(Argument::withEntry('size', 2), Argument::withEntry('from', 0), Argument::withEntry('query', Argument::allOf(Argument::withEntry('match', Argument::allOf(Argument::withEntry('bar.barId', 1))), Argument::size(1))), Argument::size(3))), Argument::size(3)))
             ->willReturn($documents)
             ->shouldBeCalled();
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, 'get', $context)->willReturn([])->shouldBeCalled();
 
-        $subresourceDataProvider = new SubresourceDataProvider(
-            $clientProphecy->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
-            $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
-            $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
-            new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
-            $resourceMetadataFactoryProphecy->reveal(),
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            [$requestBodySearchCollectionExtensionProphecy->reveal()]
-        );
+        $subresourceDataProvider = new SubresourceDataProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(), new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), [$requestBodySearchCollectionExtensionProphecy->reveal()]);
 
-        self::assertEquals(
-            new Paginator($denormalizer, $documents, Foo::class, 2, 0, $context),
-            $subresourceDataProvider->getSubresource(Foo::class, ['id' => 1], $context, 'get')
-        );
+        self::assertEquals(new Paginator($denormalizer, $documents, Foo::class, 2, 0, $context), $subresourceDataProvider->getSubresource(Foo::class, ['id' => 1], $context, 'get'));
     }
 }

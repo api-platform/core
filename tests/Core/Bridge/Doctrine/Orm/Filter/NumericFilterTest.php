@@ -73,43 +73,40 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive(
-            $this->provideApplyTestArguments(),
-            [
-                'numeric string (positive integer)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-                ],
-                'multiple numeric string (positive integer)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
-                ],
-                'multiple numeric string with one invalid property key' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-                ],
-                'multiple numeric string with invalid value keys' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                ],
-                'multiple non-numeric' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                ],
-                'numeric string (negative integer)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-                ],
-                'non-numeric' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                ],
-                'numeric string ("0")' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-                ],
-                'nested property' => [
-                    sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
-                ],
-                'mixed numeric and non-numeric' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-                ],
-                'mixed numeric, non-numeric and invalid property' => [
-                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-                ],
-            ]
-        );
+        return array_merge_recursive($this->provideApplyTestArguments(), [
+            'numeric string (positive integer)' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'multiple numeric string (positive integer)' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
+            ],
+            'multiple numeric string with one invalid property key' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'multiple numeric string with invalid value keys' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'multiple non-numeric' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'numeric string (negative integer)' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'non-numeric' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+            ],
+            'numeric string ("0")' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'nested property' => [
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.id = :id_p1', Dummy::class),
+            ],
+            'mixed numeric and non-numeric' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+            'mixed numeric, non-numeric and invalid property' => [
+                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+            ],
+        ]);
     }
 }

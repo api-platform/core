@@ -43,10 +43,8 @@ final class LegacyDataProviderState implements ProviderInterface
     public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
         $operation = $context['operation'] ?? null;
-        if ($operation && (
-                ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
-                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
-            )) {
+        if ($operation && (($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
+                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false))) {
             $subresourceContext = ['filters' => $context['filters'] ?? [], 'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'] ?? [], 'property' => $operation->getExtraProperties()['legacy_subresource_property'] ?? null, 'collection' => $operation->isCollection()] + $context;
             $subresourceIdentifiers = [];
             foreach ($operation->getUriVariables() as $parameterName => $uriTemplateDefinition) {

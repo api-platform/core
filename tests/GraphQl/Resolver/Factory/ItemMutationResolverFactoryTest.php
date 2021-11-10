@@ -68,18 +68,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->securityPostValidationStageProphecy = $this->prophesize(SecurityPostValidationStageInterface::class);
 
-        $this->itemMutationResolverFactory = new ItemMutationResolverFactory(
-            $this->readStageProphecy->reveal(),
-            $this->securityStageProphecy->reveal(),
-            $this->securityPostDenormalizeStageProphecy->reveal(),
-            $this->serializeStageProphecy->reveal(),
-            $this->deserializeStageProphecy->reveal(),
-            $this->writeStageProphecy->reveal(),
-            $this->validateStageProphecy->reveal(),
-            $this->mutationResolverLocatorProphecy->reveal(),
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
-            $this->securityPostValidationStageProphecy->reveal()
-        );
+        $this->itemMutationResolverFactory = new ItemMutationResolverFactory($this->readStageProphecy->reveal(), $this->securityStageProphecy->reveal(), $this->securityPostDenormalizeStageProphecy->reveal(), $this->serializeStageProphecy->reveal(), $this->deserializeStageProphecy->reveal(), $this->writeStageProphecy->reveal(), $this->validateStageProphecy->reveal(), $this->mutationResolverLocatorProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->securityPostValidationStageProphecy->reveal());
     }
 
     public function testResolve(): void

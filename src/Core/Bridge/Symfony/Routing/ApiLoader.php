@@ -132,22 +132,13 @@ final class ApiLoader extends Loader
                         }
                     }
 
-                    $route = new Route(
-                        ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
-                        $legacyDefaults + [
-                            '_controller' => $operation->getController() ?? 'api_platform.action.placeholder',
-                            '_format' => null,
-                            '_stateless' => $operation->getStateless(),
-                            '_api_resource_class' => $resourceClass,
-                            '_api_operation_name' => $operationName,
-                        ] + ($operation->getDefaults() ?? []),
-                        $operation->getRequirements() ?? [],
-                        $operation->getOptions() ?? [],
-                        $operation->getHost() ?? '',
-                        $operation->getSchemes() ?? [],
-                        [$operation->getMethod() ?? Operation::METHOD_GET],
-                        $operation->getCondition() ?? ''
-                    );
+                    $route = new Route(($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(), $legacyDefaults + [
+                        '_controller' => $operation->getController() ?? 'api_platform.action.placeholder',
+                        '_format' => null,
+                        '_stateless' => $operation->getStateless(),
+                        '_api_resource_class' => $resourceClass,
+                        '_api_operation_name' => $operationName,
+                    ] + ($operation->getDefaults() ?? []), $operation->getRequirements() ?? [], $operation->getOptions() ?? [], $operation->getHost() ?? '', $operation->getSchemes() ?? [], [$operation->getMethod() ?? Operation::METHOD_GET], $operation->getCondition() ?? '');
 
                     $routeCollection->add($operationName, $route);
                 }
@@ -244,30 +235,21 @@ final class ApiLoader extends Loader
                 }
             }
 
-            $routeCollection->add($operation['route_name'], new Route(
-                $operation['path'],
-                [
-                    '_controller' => $controller,
-                    '_format' => $operation['defaults']['_format'] ?? null,
-                    '_stateless' => $operation['stateless'] ?? null,
-                    '_api_resource_class' => $operation['resource_class'],
-                    '_api_identifiers' => $operation['identifiers'],
-                    '_api_has_composite_identifier' => false,
-                    '_api_subresource_operation_name' => $operation['route_name'],
-                    '_api_subresource_context' => [
-                        'property' => $operation['property'],
-                        'identifiers' => $operation['identifiers'],
-                        'collection' => $operation['collection'],
-                        'operationId' => $operationId,
-                    ],
-                ] + ($operation['defaults'] ?? []),
-                $operation['requirements'] ?? [],
-                $operation['options'] ?? [],
-                $operation['host'] ?? '',
-                $operation['schemes'] ?? [],
-                ['GET'],
-                $operation['condition'] ?? ''
-            ));
+            $routeCollection->add($operation['route_name'], new Route($operation['path'], [
+                '_controller' => $controller,
+                '_format' => $operation['defaults']['_format'] ?? null,
+                '_stateless' => $operation['stateless'] ?? null,
+                '_api_resource_class' => $operation['resource_class'],
+                '_api_identifiers' => $operation['identifiers'],
+                '_api_has_composite_identifier' => false,
+                '_api_subresource_operation_name' => $operation['route_name'],
+                '_api_subresource_context' => [
+                    'property' => $operation['property'],
+                    'identifiers' => $operation['identifiers'],
+                    'collection' => $operation['collection'],
+                    'operationId' => $operationId,
+                ],
+            ] + ($operation['defaults'] ?? []), $operation['requirements'] ?? [], $operation['options'] ?? [], $operation['host'] ?? '', $operation['schemes'] ?? [], ['GET'], $operation['condition'] ?? ''));
         }
     }
 
@@ -308,24 +290,15 @@ final class ApiLoader extends Loader
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
-        $route = new Route(
-            $path,
-            [
-                '_controller' => $controller,
-                '_format' => $operation['defaults']['_format'] ?? null,
-                '_stateless' => $operation['stateless'] ?? null,
-                '_api_resource_class' => $resourceClass,
-                '_api_identifiers' => $operation['identifiers'] ?? [],
-                '_api_has_composite_identifier' => $operation['has_composite_identifier'] ?? true,
-                sprintf('_api_%s_operation_name', $operationType) => $operationName,
-            ] + ($operation['defaults'] ?? []),
-            $operation['requirements'] ?? [],
-            $operation['options'] ?? [],
-            $operation['host'] ?? '',
-            $operation['schemes'] ?? [],
-            [$operation['method']],
-            $operation['condition'] ?? ''
-        );
+        $route = new Route($path, [
+            '_controller' => $controller,
+            '_format' => $operation['defaults']['_format'] ?? null,
+            '_stateless' => $operation['stateless'] ?? null,
+            '_api_resource_class' => $resourceClass,
+            '_api_identifiers' => $operation['identifiers'] ?? [],
+            '_api_has_composite_identifier' => $operation['has_composite_identifier'] ?? true,
+            sprintf('_api_%s_operation_name', $operationType) => $operationName,
+        ] + ($operation['defaults'] ?? []), $operation['requirements'] ?? [], $operation['options'] ?? [], $operation['host'] ?? '', $operation['schemes'] ?? [], [$operation['method']], $operation['condition'] ?? '');
 
         $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);
     }

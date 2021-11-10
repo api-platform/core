@@ -68,11 +68,7 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
                 $orders[] = $this->getOrder($resourceClass, $property, $direction);
             }
         } elseif (null !== $this->defaultDirection) {
-            $orders[] = $this->getOrder(
-                $resourceClass,
-                $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass),
-                $this->defaultDirection
-            );
+            $orders[] = $this->getOrder($resourceClass, $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass), $this->defaultDirection);
         }
 
         if (!$orders) {

@@ -102,130 +102,127 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
             return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'customExists');
         };
 
-        return array_merge_recursive(
-            $this->provideApplyTestArguments(),
-            [
-                'valid values' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+        return array_merge_recursive($this->provideApplyTestArguments(), [
+            'valid values' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'valid values (empty for true)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'valid values (empty for true)' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'valid values (1 for true)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'valid values (1 for true)' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'invalid values' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'invalid values' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'negative values' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'negative values' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'negative values (0)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'negative values (0)' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'multiple values (true and true)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.alias IS NOT NULL AND o.description IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'multiple values (true and true)' => [
+                sprintf('SELECT o FROM %s o WHERE o.alias IS NOT NULL AND o.description IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'multiple values (1 and 0)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.alias IS NOT NULL AND o.description IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'multiple values (1 and 0)' => [
+                sprintf('SELECT o FROM %s o WHERE o.alias IS NOT NULL AND o.description IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'multiple values (false and 0)' => [
-                    sprintf('SELECT o FROM %s o WHERE o.alias IS NULL AND o.description IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'multiple values (false and 0)' => [
+                sprintf('SELECT o FROM %s o WHERE o.alias IS NULL AND o.description IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'custom exists parameter name' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-                    null,
-                    $customExistsFilterFactory,
-                ],
+            'custom exists parameter name' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                null,
+                $customExistsFilterFactory,
+            ],
 
-                'related values' => [
-                    sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.description IS NOT NULL AND relatedDummy_a1.name IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related values' => [
+                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE o.description IS NOT NULL AND relatedDummy_a1.name IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'not nullable values' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'not nullable values' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related collection not empty' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS NOT EMPTY', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related collection not empty' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS NOT EMPTY', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related collection empty' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS EMPTY', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related collection empty' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummies IS EMPTY', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related association exists' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related association exists' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related association does not exist' => [
-                    sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related association does not exist' => [
+                sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL AND o.relatedDummy IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related owned association does not exist' => [
-                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related owned association does not exist' => [
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related owned association exists' => [
-                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related owned association exists' => [
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedOwnedDummy relatedOwnedDummy_a1 WHERE relatedOwnedDummy_a1 IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related owning association does not exist' => [
-                    sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
+            'related owning association does not exist' => [
+                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
 
-                'related owning association exists' => [
-                    sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
-                    null,
-                    $existsFilterFactory,
-                ],
-            ]
-        );
+            'related owning association exists' => [
+                sprintf('SELECT o FROM %s o WHERE o.relatedOwningDummy IS NOT NULL', Dummy::class),
+                null,
+                $existsFilterFactory,
+            ],
+        ]);
     }
 
     /**

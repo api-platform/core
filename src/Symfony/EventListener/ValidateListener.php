@@ -15,9 +15,8 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
-use ApiPlatform\Core\Validator\Exception\ValidationException;
-use ApiPlatform\Core\Validator\ValidatorInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Symfony\EventListener\Exception\ValidationException;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Response;
@@ -78,10 +77,8 @@ final class ValidateListener
 
         // TODO: 3.0 remove condition
         if (
-            $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (
-                !$attributes['receive']
-                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
-            )
+            $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (!$attributes['receive']
+                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
         ) {
             return;
         }

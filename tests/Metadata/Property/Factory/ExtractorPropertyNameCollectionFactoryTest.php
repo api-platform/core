@@ -35,10 +35,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.xml';
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['foo', 'name'])
-        );
+        $this->assertEquals((new ExtractorPropertyNameCollectionFactory(new XmlExtractor([$configPath])))->create(FileConfigDummy::class), new PropertyNameCollection(['foo', 'name']));
     }
 
     public function testCreateWithParentPropertyNameCollectionFactoryXml()
@@ -51,10 +48,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
             ->willReturn(new PropertyNameCollection(['id']))
             ->shouldBeCalled();
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new XmlExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['id', 'foo', 'name'])
-        );
+        $this->assertEquals((new ExtractorPropertyNameCollectionFactory(new XmlExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class), new PropertyNameCollection(['id', 'foo', 'name']));
     }
 
     public function testCreateWithNonexistentResourceXml()
@@ -81,10 +75,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
     {
         $configPath = __DIR__.'/../../../Fixtures/FileConfigurations/resources.yml';
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['foo', 'name'])
-        );
+        $this->assertEquals((new ExtractorPropertyNameCollectionFactory(new YamlExtractor([$configPath])))->create(FileConfigDummy::class), new PropertyNameCollection(['foo', 'name']));
     }
 
     public function testCreateWithParentPropertyMetadataFactoryYaml()
@@ -97,10 +88,7 @@ class ExtractorPropertyNameCollectionFactoryTest extends TestCase
             ->willReturn(new PropertyNameCollection(['id']))
             ->shouldBeCalled();
 
-        $this->assertEquals(
-            (new ExtractorPropertyNameCollectionFactory(new YamlExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class),
-            new PropertyNameCollection(['id', 'foo', 'name'])
-        );
+        $this->assertEquals((new ExtractorPropertyNameCollectionFactory(new YamlExtractor([$configPath]), $decorated->reveal()))->create(FileConfigDummy::class), new PropertyNameCollection(['id', 'foo', 'name']));
     }
 
     public function testCreateWithNonexistentResourceYaml()

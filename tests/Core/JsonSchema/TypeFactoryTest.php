@@ -72,13 +72,7 @@ class TypeFactoryTest extends TestCase
 
         yield 'map with string keys becomes an object' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false)),
         ];
 
         yield 'nullable map with string keys becomes a nullable object' => [
@@ -87,26 +81,12 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'string'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
-                true,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_STRING, true, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_STRING, false, null, false)),
         ];
 
         yield 'map value type will be considered' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, false, null, false)),
         ];
 
         yield 'map value type nullability will be considered' => [
@@ -117,14 +97,7 @@ class TypeFactoryTest extends TestCase
                     'type' => 'integer',
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, true, null, false)),
         ];
 
         yield 'nullable map can contain nullable values' => [
@@ -136,14 +109,7 @@ class TypeFactoryTest extends TestCase
                     'type' => 'integer',
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                true,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, true, null, false)),
         ];
     }
 
@@ -192,13 +158,7 @@ class TypeFactoryTest extends TestCase
 
         yield 'map with string keys becomes an object' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false)),
         ];
 
         yield 'nullable map with string keys becomes a nullable object' => [
@@ -206,26 +166,12 @@ class TypeFactoryTest extends TestCase
                 'type' => ['object', 'null'],
                 'additionalProperties' => ['type' => 'string'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
-                true,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_STRING, true, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_STRING, false, null, false)),
         ];
 
         yield 'map value type will be considered' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, false, null, false)),
         ];
 
         yield 'map value type nullability will be considered' => [
@@ -235,14 +181,7 @@ class TypeFactoryTest extends TestCase
                     'type' => ['integer', 'null'],
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, true, null, false)),
         ];
 
         yield 'nullable map can contain nullable values' => [
@@ -252,14 +191,7 @@ class TypeFactoryTest extends TestCase
                     'type' => ['integer', 'null'],
                 ],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                true,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, true, null, false)),
         ];
     }
 
@@ -304,13 +236,7 @@ class TypeFactoryTest extends TestCase
 
         yield 'map with string keys becomes an object' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'string']],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_STRING, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false)),
         ];
 
         yield 'nullable map with string keys becomes a nullable object, but ignored in OpenAPI V2' => [
@@ -318,26 +244,12 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'string'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_STRING,
-                true,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_STRING, true, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_STRING, false, null, false)),
         ];
 
         yield 'map value type will be considered' => [
             ['type' => 'object', 'additionalProperties' => ['type' => 'integer']],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, false, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, false, null, false)),
         ];
 
         yield 'map value type nullability will be considered, but ignored in OpenAPI V2' => [
@@ -345,14 +257,7 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'integer'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                false,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, true, null, false)),
         ];
 
         yield 'nullable map can contain nullable values, but ignored in OpenAPI V2' => [
@@ -360,14 +265,7 @@ class TypeFactoryTest extends TestCase
                 'type' => 'object',
                 'additionalProperties' => ['type' => 'integer'],
             ],
-            new Type(
-                Type::BUILTIN_TYPE_ARRAY,
-                true,
-                null,
-                true,
-                new Type(Type::BUILTIN_TYPE_STRING, false, null, false),
-                new Type(Type::BUILTIN_TYPE_INT, true, null, false)
-            ),
+            new Type(Type::BUILTIN_TYPE_ARRAY, true, null, true, new Type(Type::BUILTIN_TYPE_STRING, false, null, false), new Type(Type::BUILTIN_TYPE_INT, true, null, false)),
         ];
     }
 

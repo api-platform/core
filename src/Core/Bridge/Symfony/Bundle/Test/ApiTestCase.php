@@ -80,14 +80,10 @@ abstract class ApiTestCase extends KernelTestCase
         }
 
         if (
-            (
-                !static::$container->has('doctrine') ||
-                null === $objectManager = static::$container->get('doctrine')->getManagerForClass($resourceClass)
-            ) &&
-            (
-                !static::$container->has('doctrine_mongodb') ||
-                null === $objectManager = static::$container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
-            )
+            (!static::$container->has('doctrine') ||
+                null === $objectManager = static::$container->get('doctrine')->getManagerForClass($resourceClass)) &&
+            (!static::$container->has('doctrine_mongodb') ||
+                null === $objectManager = static::$container->get('doctrine_mongodb')->getManagerForClass($resourceClass))
         ) {
             throw new \RuntimeException(sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
         }

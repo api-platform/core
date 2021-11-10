@@ -304,123 +304,120 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
             return new OrderFilter($managerRegistry, $requestStack, 'customOrder', null, $properties);
         };
 
-        return array_merge_recursive(
-            $this->provideApplyTestArguments(),
-            [
-                'valid values' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'invalid values' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.id ASC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'valid values (properties not enabled)' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.id ASC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'invalid values (properties not enabled)' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.name ASC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'invalid property (property not enabled)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'invalid property (property enabled)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'custom order parameter name' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.name DESC', Dummy::class),
-                    null,
-                    $customOrderFilterFactory,
-                ],
-                'valid values (all properties enabled)' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name ASC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nested property' => [
-                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY o.id ASC, o.name DESC, relatedDummy_a1.symfony DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'empty values with default sort direction' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_smallest (asc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate ASC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_smallest (desc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate DESC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_largest (asc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate ASC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_largest (desc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_always_first (asc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate ASC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_always_first (desc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_always_last (asc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate ASC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'nulls_always_last (desc)' => [
-                    sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate DESC, o.name DESC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'not having order should not throw a deprecation (select unchanged)' => [
-                    sprintf('SELECT o FROM %s o', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'not nullable relation will be a LEFT JOIN' => [
-                    sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY relatedDummy_a1.name ASC', Dummy::class),
-                    null,
-                    $orderFilterFactory,
-                ],
-                'embedded' => [
-                    sprintf('SELECT o FROM %s o ORDER BY o.embeddedDummy.dummyName ASC', EmbeddedDummy::class),
-                    null,
-                    $orderFilterFactory,
-                    EmbeddedDummy::class,
-                ],
-                'embedded with nulls_comparison' => [
-                    sprintf('SELECT o, CASE WHEN o.embeddedDummy.dummyName IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_embeddedDummy_dummyName_null_rank FROM %s o ORDER BY _o_embeddedDummy_dummyName_null_rank DESC, o.embeddedDummy.dummyName ASC', EmbeddedDummy::class),
-                    null,
-                    $orderFilterFactory,
-                    EmbeddedDummy::class,
-                ],
-            ]
-        );
+        return array_merge_recursive($this->provideApplyTestArguments(), [
+            'valid values' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'invalid values' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'valid values (properties not enabled)' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'invalid values (properties not enabled)' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.name ASC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'invalid property (property not enabled)' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'invalid property (property enabled)' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'custom order parameter name' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.name DESC', Dummy::class),
+                null,
+                $customOrderFilterFactory,
+            ],
+            'valid values (all properties enabled)' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name ASC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nested property' => [
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY o.id ASC, o.name DESC, relatedDummy_a1.symfony DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'empty values with default sort direction' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.id ASC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_smallest (asc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate ASC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_smallest (desc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_largest (asc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate ASC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_largest (desc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_always_first (asc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate ASC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_always_first (desc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank ASC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_always_last (asc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate ASC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'nulls_always_last (desc)' => [
+                sprintf('SELECT o, CASE WHEN o.dummyDate IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dummyDate_null_rank FROM %s o ORDER BY _o_dummyDate_null_rank DESC, o.dummyDate DESC, o.name DESC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'not having order should not throw a deprecation (select unchanged)' => [
+                sprintf('SELECT o FROM %s o', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'not nullable relation will be a LEFT JOIN' => [
+                sprintf('SELECT o FROM %s o LEFT JOIN o.relatedDummy relatedDummy_a1 ORDER BY relatedDummy_a1.name ASC', Dummy::class),
+                null,
+                $orderFilterFactory,
+            ],
+            'embedded' => [
+                sprintf('SELECT o FROM %s o ORDER BY o.embeddedDummy.dummyName ASC', EmbeddedDummy::class),
+                null,
+                $orderFilterFactory,
+                EmbeddedDummy::class,
+            ],
+            'embedded with nulls_comparison' => [
+                sprintf('SELECT o, CASE WHEN o.embeddedDummy.dummyName IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_embeddedDummy_dummyName_null_rank FROM %s o ORDER BY _o_embeddedDummy_dummyName_null_rank DESC, o.embeddedDummy.dummyName ASC', EmbeddedDummy::class),
+                null,
+                $orderFilterFactory,
+                EmbeddedDummy::class,
+            ],
+        ]);
     }
 
     protected function buildFilter(?array $properties = null)

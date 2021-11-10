@@ -46,10 +46,7 @@ class SecurityStageTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
 
-        $this->securityStage = new SecurityStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
-            $this->resourceAccessCheckerProphecy->reveal()
-        );
+        $this->securityStage = new SecurityStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceAccessCheckerProphecy->reveal());
     }
 
     public function testNoSecurity(): void

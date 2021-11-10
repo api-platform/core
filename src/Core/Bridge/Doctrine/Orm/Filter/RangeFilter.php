@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
+use ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 
@@ -55,14 +55,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
         }
 
         foreach ($values as $operator => $value) {
-            $this->addWhere(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
-                $field,
-                $operator,
-                $value
-            );
+            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, $operator, $value);
         }
     }
 

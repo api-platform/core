@@ -26,10 +26,8 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
     use OperationRequestInitiatorTrait;
     private $serializationContextBuilder;
 
-    public function __construct(
-        ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        SerializerContextBuilderInterface $serializationContextBuilder
-    ) {
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SerializerContextBuilderInterface $serializationContextBuilder)
+    {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->serializationContextBuilder = $serializationContextBuilder;
     }

@@ -40,9 +40,7 @@ class QueryParameterValidatorTest extends TestCase
     {
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
-        $this->testedInstance = new QueryParameterValidator(
-            $this->filterLocatorProphecy->reveal()
-        );
+        $this->testedInstance = new QueryParameterValidator($this->filterLocatorProphecy->reveal());
     }
 
     /**
@@ -52,9 +50,7 @@ class QueryParameterValidatorTest extends TestCase
     {
         $request = [];
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, [], $request)
-        );
+        $this->assertNull($this->testedInstance->validateFilters(Dummy::class, [], $request));
     }
 
     /**
@@ -64,9 +60,7 @@ class QueryParameterValidatorTest extends TestCase
     {
         $request = [];
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)
-        );
+        $this->assertNull($this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request));
     }
 
     /**
@@ -124,8 +118,6 @@ class QueryParameterValidatorTest extends TestCase
             ->shouldBeCalled()
             ->willReturn($filterProphecy->reveal());
 
-        $this->assertNull(
-            $this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request)
-        );
+        $this->assertNull($this->testedInstance->validateFilters(Dummy::class, ['some_filter'], $request));
     }
 }

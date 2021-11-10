@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Core\Validator\Exception\ValidationException;
+use ApiPlatform\Symfony\EventListener\Exception\ValidationException;
 
 /**
  * Validates an item.

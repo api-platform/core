@@ -37,48 +37,42 @@ class DoctrineExtractorTest extends TestCase
 {
     public function testGetProperties(): void
     {
-        $this->assertEquals(
-            [
-                'id',
-                'foo',
-                'bar',
-                'indexedFoo',
-                'bin',
-                'binByteArray',
-                'binCustom',
-                'binFunc',
-                'binMd5',
-                'binUuid',
-                'binUuidRfc4122',
-                'timestamp',
-                'date',
-                'dateImmutable',
-                'float',
-                'bool',
-                'customFoo',
-                'int',
-                'string',
-                'key',
-                'hash',
-                'collection',
-                'objectId',
-                'raw',
-            ],
-            $this->createExtractor()->getProperties(DoctrineDummy::class)
-        );
+        $this->assertEquals([
+            'id',
+            'foo',
+            'bar',
+            'indexedFoo',
+            'bin',
+            'binByteArray',
+            'binCustom',
+            'binFunc',
+            'binMd5',
+            'binUuid',
+            'binUuidRfc4122',
+            'timestamp',
+            'date',
+            'dateImmutable',
+            'float',
+            'bool',
+            'customFoo',
+            'int',
+            'string',
+            'key',
+            'hash',
+            'collection',
+            'objectId',
+            'raw',
+        ], $this->createExtractor()->getProperties(DoctrineDummy::class));
     }
 
     public function testTestGetPropertiesWithEmbedded(): void
     {
-        $this->assertEquals(
-            [
-                'id',
-                'embedOne',
-                'embedMany',
-                'embedManyOmittingTargetDocument',
-            ],
-            $this->createExtractor()->getProperties(DoctrineWithEmbedded::class)
-        );
+        $this->assertEquals([
+            'id',
+            'embedOne',
+            'embedMany',
+            'embedManyOmittingTargetDocument',
+        ], $this->createExtractor()->getProperties(DoctrineWithEmbedded::class));
     }
 
     /**
@@ -92,17 +86,10 @@ class DoctrineExtractorTest extends TestCase
     public function testExtractWithEmbedOne(): void
     {
         $expectedTypes = [
-            new Type(
-                Type::BUILTIN_TYPE_OBJECT,
-                false,
-                DoctrineEmbeddable::class
-            ),
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineEmbeddable::class),
         ];
 
-        $actualTypes = $this->createExtractor()->getTypes(
-            DoctrineWithEmbedded::class,
-            'embedOne'
-        );
+        $actualTypes = $this->createExtractor()->getTypes(DoctrineWithEmbedded::class, 'embedOne');
 
         $this->assertEquals($expectedTypes, $actualTypes);
     }
@@ -110,20 +97,10 @@ class DoctrineExtractorTest extends TestCase
     public function testExtractWithEmbedMany(): void
     {
         $expectedTypes = [
-            new Type(
-                Type::BUILTIN_TYPE_OBJECT,
-                false,
-                Collection::class,
-                true,
-                new Type(Type::BUILTIN_TYPE_INT),
-                new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineEmbeddable::class)
-            ),
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineEmbeddable::class)),
         ];
 
-        $actualTypes = $this->createExtractor()->getTypes(
-            DoctrineWithEmbedded::class,
-            'embedMany'
-        );
+        $actualTypes = $this->createExtractor()->getTypes(DoctrineWithEmbedded::class, 'embedMany');
 
         $this->assertEquals($expectedTypes, $actualTypes);
     }
@@ -154,26 +131,12 @@ class DoctrineExtractorTest extends TestCase
             ['foo', [new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)]],
             ['bar',
                 [
-                    new Type(
-                        Type::BUILTIN_TYPE_OBJECT,
-                        false,
-                        Collection::class,
-                        true,
-                        new Type(Type::BUILTIN_TYPE_INT),
-                        new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
-                    ),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)),
                 ],
             ],
             ['indexedFoo',
                 [
-                    new Type(
-                        Type::BUILTIN_TYPE_OBJECT,
-                        false,
-                        Collection::class,
-                        true,
-                        new Type(Type::BUILTIN_TYPE_INT),
-                        new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)
-                    ),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)),
                 ],
             ],
             ['customFoo', null],
@@ -202,10 +165,7 @@ class DoctrineExtractorTest extends TestCase
 
     public function testGetTypesWithEmbedManyOmittingTargetDocument(): void
     {
-        $actualTypes = $this->createExtractor()->getTypes(
-            DoctrineWithEmbedded::class,
-            'embedManyOmittingTargetDocument'
-        );
+        $actualTypes = $this->createExtractor()->getTypes(DoctrineWithEmbedded::class, 'embedManyOmittingTargetDocument');
 
         self::assertNull($actualTypes);
     }

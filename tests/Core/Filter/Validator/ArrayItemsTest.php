@@ -26,9 +26,7 @@ class ArrayItemsTest extends TestCase
         $request = [];
         $filter = new ArrayItems();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], $request));
     }
 
     public function testEmptyQueryParameter()
@@ -36,9 +34,7 @@ class ArrayItemsTest extends TestCase
         $request = ['some_filter' => ''];
         $filter = new ArrayItems();
 
-        $this->assertEmpty(
-            $filter->validate('some_filter', [], $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', [], $request));
     }
 
     public function testNonMatchingParameter()
@@ -53,16 +49,10 @@ class ArrayItemsTest extends TestCase
         ];
 
         $request = ['some_filter' => ['foo', 'bar', 'bar', 'foo']];
-        $this->assertEquals(
-            ['Query parameter "some_filter" must contain less than 3 values'],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals(['Query parameter "some_filter" must contain less than 3 values'], $filter->validate('some_filter', $filterDefinition, $request));
 
         $request = ['some_filter' => ['foo']];
-        $this->assertEquals(
-            ['Query parameter "some_filter" must contain more than 2 values'],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals(['Query parameter "some_filter" must contain more than 2 values'], $filter->validate('some_filter', $filterDefinition, $request));
     }
 
     public function testMatchingParameter()
@@ -77,14 +67,10 @@ class ArrayItemsTest extends TestCase
         ];
 
         $request = ['some_filter' => ['foo', 'bar']];
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
 
         $request = ['some_filter' => ['foo', 'bar', 'baz']];
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
     }
 
     public function testNonMatchingUniqueItems()
@@ -98,10 +84,7 @@ class ArrayItemsTest extends TestCase
         ];
 
         $request = ['some_filter' => ['foo', 'bar', 'bar', 'foo']];
-        $this->assertEquals(
-            ['Query parameter "some_filter" must contain unique values'],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals(['Query parameter "some_filter" must contain unique values'], $filter->validate('some_filter', $filterDefinition, $request));
     }
 
     public function testMatchingUniqueItems()
@@ -115,9 +98,7 @@ class ArrayItemsTest extends TestCase
         ];
 
         $request = ['some_filter' => ['foo', 'bar', 'baz']];
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
     }
 
     public function testSeparators()
@@ -133,48 +114,34 @@ class ArrayItemsTest extends TestCase
         ];
 
         $request = ['some_filter' => 'foo,bar,bar'];
-        $this->assertEquals(
-            [
-                'Query parameter "some_filter" must contain less than 2 values',
-                'Query parameter "some_filter" must contain unique values',
-            ],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals([
+            'Query parameter "some_filter" must contain less than 2 values',
+            'Query parameter "some_filter" must contain unique values',
+        ], $filter->validate('some_filter', $filterDefinition, $request));
 
         $filterDefinition['swagger']['collectionFormat'] = 'ssv';
-        $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
 
         $filterDefinition['swagger']['collectionFormat'] = 'ssv';
         $request = ['some_filter' => 'foo bar bar'];
-        $this->assertEquals(
-            [
-                'Query parameter "some_filter" must contain less than 2 values',
-                'Query parameter "some_filter" must contain unique values',
-            ],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals([
+            'Query parameter "some_filter" must contain less than 2 values',
+            'Query parameter "some_filter" must contain unique values',
+        ], $filter->validate('some_filter', $filterDefinition, $request));
 
         $filterDefinition['swagger']['collectionFormat'] = 'tsv';
         $request = ['some_filter' => 'foo\tbar\tbar'];
-        $this->assertEquals(
-            [
-                'Query parameter "some_filter" must contain less than 2 values',
-                'Query parameter "some_filter" must contain unique values',
-            ],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals([
+            'Query parameter "some_filter" must contain less than 2 values',
+            'Query parameter "some_filter" must contain unique values',
+        ], $filter->validate('some_filter', $filterDefinition, $request));
 
         $filterDefinition['swagger']['collectionFormat'] = 'pipes';
         $request = ['some_filter' => 'foo|bar|bar'];
-        $this->assertEquals(
-            [
-                'Query parameter "some_filter" must contain less than 2 values',
-                'Query parameter "some_filter" must contain unique values',
-            ],
-            $filter->validate('some_filter', $filterDefinition, $request)
-        );
+        $this->assertEquals([
+            'Query parameter "some_filter" must contain less than 2 values',
+            'Query parameter "some_filter" must contain unique values',
+        ], $filter->validate('some_filter', $filterDefinition, $request));
     }
 
     public function testSeparatorsUnknownSeparator()

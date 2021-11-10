@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
+use ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterTrait;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -100,8 +100,6 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->sort(
-            $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $direction]
-        );
+        $aggregationBuilder->sort($context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $direction]);
     }
 }

@@ -58,12 +58,7 @@ trait ArraySubsetTrait
             return null;
         }
 
-        $f = new ComparisonFailure(
-            $patched,
-            $other,
-            var_export($patched, true),
-            var_export($other, true)
-        );
+        $f = new ComparisonFailure($patched, $other, var_export($patched, true), var_export($other, true));
         $this->fail($other, $description, $f);
     }
 

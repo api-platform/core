@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -199,28 +199,16 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
             switch ($strategy) {
                 case self::STRATEGY_PARTIAL:
-                    $ors[] = $queryBuilder->expr()->like(
-                        $wrapCase($aliasedField),
-                        $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter, "'%'"))
-                    );
+                    $ors[] = $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter, "'%'")));
                     break;
                 case self::STRATEGY_START:
-                    $ors[] = $queryBuilder->expr()->like(
-                        $wrapCase($aliasedField),
-                        $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'"))
-                    );
+                    $ors[] = $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'")));
                     break;
                 case self::STRATEGY_END:
-                    $ors[] = $queryBuilder->expr()->like(
-                        $wrapCase($aliasedField),
-                        $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter))
-                    );
+                    $ors[] = $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter)));
                     break;
                 case self::STRATEGY_WORD_START:
-                    $ors[] = $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'"))),
-                        $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'")))
-                    );
+                    $ors[] = $queryBuilder->expr()->orX($queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'"))), $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'"))));
                     break;
                 default:
                     throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));

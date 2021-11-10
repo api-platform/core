@@ -52,18 +52,12 @@ final class TestClientPassTest extends TestCase
     {
         $this->containerBuilderProphecy->hasParameter('test.client.parameters')->willReturn(true)->shouldBeCalledOnce();
         $this->containerBuilderProphecy
-            ->setDefinition(
-                'test.api_platform.client',
-                Argument::allOf(
-                    Argument::type(Definition::class),
-                    Argument::that(function (Definition $testClientDefinition) {
-                        return
+            ->setDefinition('test.api_platform.client', Argument::allOf(Argument::type(Definition::class), Argument::that(function (Definition $testClientDefinition) {
+                return
                             Client::class === $testClientDefinition->getClass() &&
                             !$testClientDefinition->isShared() &&
                             $testClientDefinition->isPublic();
-                    })
-                )
-            )
+            })))
             ->shouldBeCalledOnce();
 
         $this->testClientPass->process($this->containerBuilderProphecy->reveal());

@@ -22,14 +22,8 @@ use Doctrine\ORM\QueryBuilder;
 
 final class ComplexSubQueryFilter extends AbstractContextAwareFilter
 {
-    protected function filterProperty(
-        string $property,
-        $value,
-        QueryBuilder $queryBuilder,
-        QueryNameGeneratorInterface $queryNameGenerator,
-        string $resourceClass,
-        ?string $operationName = null
-    ): void {
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?string $operationName = null): void
+    {
         if ('complex_sub_query_filter' !== $property) {
             return;
         }
@@ -47,12 +41,7 @@ final class ComplexSubQueryFilter extends AbstractContextAwareFilter
         $subQueryBuilder = $entityManager->createQueryBuilder()
             ->select("{$relatedDummyAlias}.id")
             ->from(RelatedDummy::class, $relatedDummyAlias)
-            ->innerJoin(
-                "{$relatedDummyAlias}.relatedToDummyFriend",
-                $relatedToDummyFriendAlias,
-                Join::WITH,
-                "{$relatedToDummyFriendAlias}.name = :{$nameParameterName}"
-            );
+            ->innerJoin("{$relatedDummyAlias}.relatedToDummyFriend", $relatedToDummyFriendAlias, Join::WITH, "{$relatedToDummyFriendAlias}.name = :{$nameParameterName}");
 
         $queryBuilder
             ->andWhere("{$rootAlias}.id IN ({$subQueryBuilder->getDQL()})")

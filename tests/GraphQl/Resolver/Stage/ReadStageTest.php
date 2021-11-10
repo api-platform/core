@@ -58,14 +58,7 @@ class ReadStageTest extends TestCase
         $this->subresourceDataProviderProphecy = $this->prophesize(SubresourceDataProviderInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        $this->readStage = new ReadStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
-            $this->iriConverterProphecy->reveal(),
-            $this->collectionDataProviderProphecy->reveal(),
-            $this->subresourceDataProviderProphecy->reveal(),
-            $this->serializerContextBuilderProphecy->reveal(),
-            '_'
-        );
+        $this->readStage = new ReadStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->collectionDataProviderProphecy->reveal(), $this->subresourceDataProviderProphecy->reveal(), $this->serializerContextBuilderProphecy->reveal(), '_');
     }
 
     /**

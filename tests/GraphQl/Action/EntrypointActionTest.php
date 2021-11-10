@@ -115,12 +115,7 @@ class EntrypointActionTest extends TestCase
 
     public function multipartRequestProvider(): array
     {
-        $file = new UploadedFile(
-            __DIR__.'/Fixtures/test.gif',
-            'original.gif',
-            null,
-            \UPLOAD_ERR_OK
-        );
+        $file = new UploadedFile(__DIR__.'/Fixtures/test.gif', 'original.gif', null, \UPLOAD_ERR_OK);
 
         return [
             'upload a single file' => [

@@ -129,11 +129,7 @@ final class RespondListener
             }
         }
 
-        $event->setResponse(new Response(
-            $controllerResult,
-            $status,
-            $headers
-        ));
+        $event->setResponse(new Response($controllerResult, $status, $headers));
     }
 
     private function addAcceptPatchHeader(array $headers, array $attributes, ResourceMetadata $resourceMetadata): array

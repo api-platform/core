@@ -24,10 +24,7 @@ class InnerFieldsNameConverterTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(
-            AdvancedNameConverterInterface::class,
-            new InnerFieldsNameConverter($this->prophesize(AdvancedNameConverterInterface::class)->reveal())
-        );
+        self::assertInstanceOf(AdvancedNameConverterInterface::class, new InnerFieldsNameConverter($this->prophesize(AdvancedNameConverterInterface::class)->reveal()));
     }
 
     public function testNormalize()
