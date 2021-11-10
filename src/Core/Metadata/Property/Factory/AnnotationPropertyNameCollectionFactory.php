@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Util\Reflection;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**

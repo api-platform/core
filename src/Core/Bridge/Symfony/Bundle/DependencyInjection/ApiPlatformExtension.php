@@ -31,10 +31,10 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
+use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
+use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
@@ -106,8 +106,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 $container->setAlias($oldInterface, $newInterface);
                 $container
                     ->getDefinition($oldInterface)
-                    ->setDeprecated('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $oldInterface, $newInterface))
-                ;
+                    ->setDeprecated('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $oldInterface, $newInterface));
             }
         }
 

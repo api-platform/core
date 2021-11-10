@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Util;
+namespace ApiPlatform\Util;
 
 use Doctrine\Common\Inflector\Inflector as LegacyInflector;
 use Doctrine\Inflector\Inflector as InflectorObject;

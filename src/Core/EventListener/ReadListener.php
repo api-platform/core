@@ -21,14 +21,14 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Util\CloneTrait;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use ApiPlatform\Core\Util\RequestParser;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\EventListener\ReadListener as SymfonyReadListener;
+use ApiPlatform\Util\CloneTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\RequestParser;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Util;
+namespace ApiPlatform\Tests\Util;
 
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 

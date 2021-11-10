@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\JsonApi\Serializer;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
-use ApiPlatform\Core\Util\IriHelper;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**

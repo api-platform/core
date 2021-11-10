@@ -19,10 +19,10 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 

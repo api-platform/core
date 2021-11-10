@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;

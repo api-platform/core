@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**

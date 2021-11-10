@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
+use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;

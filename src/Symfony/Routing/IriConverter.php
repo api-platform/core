@@ -18,8 +18,6 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Util\AttributesExtractor;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
@@ -28,6 +26,8 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
+use ApiPlatform\Util\AttributesExtractor;
+use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 

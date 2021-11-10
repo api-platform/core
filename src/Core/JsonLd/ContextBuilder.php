@@ -19,12 +19,12 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**

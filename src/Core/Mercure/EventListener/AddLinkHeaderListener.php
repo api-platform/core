@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Mercure\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\CorsTrait;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\CorsTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;

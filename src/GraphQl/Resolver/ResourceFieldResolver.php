@@ -15,8 +15,8 @@ namespace ApiPlatform\GraphQl\Resolver;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
 /**

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Action;
 
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

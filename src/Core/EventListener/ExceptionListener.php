@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\EventListener;
 
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;

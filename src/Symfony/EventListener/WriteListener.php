@@ -15,13 +15,13 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

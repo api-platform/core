@@ -24,7 +24,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Core\Serializer\ContextTrait;
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;

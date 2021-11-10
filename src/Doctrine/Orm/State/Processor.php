@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\State;
 
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;

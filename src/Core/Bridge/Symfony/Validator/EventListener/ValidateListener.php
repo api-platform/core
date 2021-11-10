@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Core\Validator\EventListener\ValidateListener as MainValidateListener;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

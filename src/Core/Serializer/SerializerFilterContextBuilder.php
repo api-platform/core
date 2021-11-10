@@ -15,9 +15,9 @@ namespace ApiPlatform\Core\Serializer;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\Filter\FilterInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -16,7 +16,7 @@ namespace ApiPlatform\GraphQl\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

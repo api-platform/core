@@ -16,7 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Core\Util\RequestParser;
+use ApiPlatform\Util\RequestParser;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Util;
+namespace ApiPlatform\Util;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Annotations\Reader;

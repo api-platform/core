@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
-use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
+use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\ClassInfoTrait;
 
 /**
  * Transforms an Input to itself. This gives the ability to send the Input to a

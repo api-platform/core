@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Filter\Validator;
 
-use ApiPlatform\Core\Util\RequestParser;
+use ApiPlatform\Util\RequestParser;
 
 final class Required implements ValidatorInterface
 {

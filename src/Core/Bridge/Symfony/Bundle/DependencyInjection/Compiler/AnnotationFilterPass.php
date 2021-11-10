@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
-use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\Util\AnnotationFilterExtractorTrait;
+use ApiPlatform\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

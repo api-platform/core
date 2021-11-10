@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Api;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Util\ClassInfoTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Util\ClassInfoTrait;
 
 /**
  * {@inheritdoc}

@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Util\Reflection;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
 use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
+use ApiPlatform\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 
 /**

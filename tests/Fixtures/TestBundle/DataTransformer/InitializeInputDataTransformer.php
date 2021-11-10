@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
-use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
+use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\InitializeInput as InitializeInputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InitializeInput;

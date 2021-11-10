@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Util\Reflection;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Util\Reflection;
 
 /**
  * Creates a property metadata from {@see ApiProperty} attribute.

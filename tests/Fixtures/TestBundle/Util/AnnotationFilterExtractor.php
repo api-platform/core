@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Util;
 
-use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
+use ApiPlatform\Util\AnnotationFilterExtractorTrait;
 use Doctrine\Common\Annotations\Reader;
 
 class AnnotationFilterExtractor

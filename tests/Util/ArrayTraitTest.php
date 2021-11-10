@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Util;
+namespace ApiPlatform\Tests\Util;
 
-use ApiPlatform\Core\Util\ArrayTrait;
+use ApiPlatform\Util\ArrayTrait;
 use PHPUnit\Framework\TestCase;
 
 class ArrayTraitTest extends TestCase

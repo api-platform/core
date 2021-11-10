@@ -18,7 +18,7 @@ use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Documentation\DocumentationInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

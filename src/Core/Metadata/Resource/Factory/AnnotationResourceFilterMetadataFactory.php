@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Util\AnnotationFilterExtractorTrait;
 use Doctrine\Common\Annotations\Reader;
 
 /**

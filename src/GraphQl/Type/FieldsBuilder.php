@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Core\DataProvider\Pagination;
-use ApiPlatform\Core\Util\Inflector;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\Operation as ApiOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;

@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver;
 
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

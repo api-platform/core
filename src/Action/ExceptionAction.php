@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Action;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\ErrorFormatGuesser;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\ErrorFormatGuesser;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Request;

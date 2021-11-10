@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Util;
+namespace ApiPlatform\Tests\Util;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Util\IriHelper;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Util\IriHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,7 +42,7 @@ class IriHelperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a bool as 5th parameter to "ApiPlatform\Core\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Core\Api\UrlGeneratorInterface" constant (int) instead.
+     * @expectedDeprecation Passing a bool as 5th parameter to "ApiPlatform\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Core\Api\UrlGeneratorInterface" constant (int) instead.
      */
     public function testLegacyHelpers()
     {
@@ -63,7 +63,7 @@ class IriHelperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a bool as 5th parameter to "ApiPlatform\Core\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Core\Api\UrlGeneratorInterface" constant (int) instead.
+     * @expectedDeprecation Passing a bool as 5th parameter to "ApiPlatform\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Core\Api\UrlGeneratorInterface" constant (int) instead.
      */
     public function testLegacyHelpersWithAbsoluteUrl()
     {

@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Subscription;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
-use ApiPlatform\Core\Util\SortTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\Util\ResourceClassInfoTrait;
+use ApiPlatform\Util\SortTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Cache\CacheItemPoolInterface;
 

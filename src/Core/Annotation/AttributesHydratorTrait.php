@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Annotation;
 
-use ApiPlatform\Core\Util\Inflector;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Util\Inflector;
 
 /**
  * Hydrates attributes from annotation's parameters.

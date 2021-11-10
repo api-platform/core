@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Util\ClassInfoTrait;
-use ApiPlatform\Core\Util\CloneTrait;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
@@ -25,6 +23,8 @@ use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
 

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\HttpCache\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**

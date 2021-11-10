@@ -21,7 +21,6 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -29,6 +28,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
+use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
