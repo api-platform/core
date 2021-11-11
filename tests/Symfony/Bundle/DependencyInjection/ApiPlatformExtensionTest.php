@@ -925,11 +925,19 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecyWithoutDefaultMetadataLoading();
         $containerBuilderProphecy->getDefinition(Argument::type('string'))->willReturn(new Definition());
         $containerBuilderProphecy
-            ->getDefinition('api_platform.metadata.extractor.xml')
-            ->willReturn($dummyDefinition->reveal())
+            ->getDefinition('api_platform.metadata.resource_extractor.xml')
+            ->willReturn($this->prophesize(Definition::class))
             ->shouldBeCalled();
         $containerBuilderProphecy
-            ->getDefinition('api_platform.metadata.extractor.yaml')
+            ->getDefinition('api_platform.metadata.property_extractor.xml')
+            ->willReturn($this->prophesize(Definition::class))
+            ->shouldBeCalled();
+        $containerBuilderProphecy
+            ->getDefinition('api_platform.metadata.resource_extractor.yaml')
+            ->willReturn($yamlExtractorDefinition)
+            ->shouldBeCalled();
+        $containerBuilderProphecy
+            ->getDefinition('api_platform.metadata.property_extractor.yaml')
             ->willReturn($yamlExtractorDefinition)
             ->shouldBeCalled();
 
@@ -1085,12 +1093,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.respond',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.write',
-            'api_platform.metadata.extractor.xml',
+            'api_platform.metadata.resource_extractor.xml',
+            'api_platform.metadata.property_extractor.xml',
             'api_platform.metadata.property.identifier_metadata_factory.attribute',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.metadata.property.identifier_metadata_factory.property_info',
             'api_platform.metadata.property.identifier_metadata_factory.xml',
-            'api_platform.metadata.property.identifier_metadata_factory.yaml',
             'api_platform.metadata.property.metadata_factory.attribute',
             'api_platform.metadata.property.metadata_factory.cached',
             'api_platform.metadata.property.metadata_factory.default_property',
@@ -1157,7 +1165,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.uri_variables.converter',
             'api_platform.uri_variables.transformer.date_time',
             'api_platform.uri_variables.transformer.integer',
-            'api_platform.metadata.resource.metadata_collection_factory.extractor.xml',
+            'api_platform.metadata.resource.metadata_collection_factory.xml',
         ];
 
         if (class_exists(AbstractUid::class)) {
@@ -1266,7 +1274,7 @@ class ApiPlatformExtensionTest extends TestCase
         foreach (['yaml', 'xml'] as $format) {
             $definitionProphecy = $this->prophesize(Definition::class);
             $definitionProphecy->replaceArgument(0, Argument::type('array'))->willReturn($definitionProphecy->reveal())->shouldBeCalled();
-            $containerBuilderProphecy->getDefinition('api_platform.metadata.extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.resource_extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
 
         return $containerBuilderProphecy;
@@ -1511,7 +1519,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.messenger.data_persister',
             'api_platform.messenger.data_transformer',
             'api_platform.messenger.processor',
-            'api_platform.metadata.extractor.yaml',
+            'api_platform.metadata.resource_extractor.yaml',
+            'api_platform.metadata.property_extractor.yaml',
             'api_platform.metadata.property.metadata_factory.annotation',
             'api_platform.metadata.property.metadata_factory.validator',
             'api_platform.metadata.property_schema.choice_restriction',
@@ -1527,7 +1536,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property_schema.regex_restriction',
             'api_platform.metadata.property_schema.format_restriction',
             'api_platform.metadata.property_schema.unique_restriction',
-            'api_platform.metadata.property.metadata_factory.yaml',
+            'api_platform.metadata.property.identifier_metadata_factory.yaml',
             'api_platform.metadata.property.name_collection_factory.yaml',
             'api_platform.metadata.resource.filter_metadata_factory.annotation',
             'api_platform.metadata.resource.metadata_factory.annotation',
@@ -1550,8 +1559,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.validator.query_parameter_validator',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.doctrine.orm.state.processor',
-            'api_platform.metadata.resource.metadata_collection_factory.extractor.xml',
-            'api_platform.metadata.resource.metadata_collection_factory.extractor.yaml',
+            'api_platform.metadata.resource.metadata_collection_factory.xml',
+            'api_platform.metadata.resource.metadata_collection_factory.yaml',
         ];
 
         if (\in_array('odm', $doctrineIntegrationsToLoad, true)) {

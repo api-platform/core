@@ -1,6 +1,4 @@
 resources:
-    ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~
-
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
         -   ~
         -   uriTemplate: /users/{author}/programs.{_format}
@@ -15,7 +13,3 @@ resources:
                     uriVariables:
                         userId: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, 'author']
                         id: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, 'id']
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Entity\SingleFileConfigDummy:
-        shortName: single_file_config
-        description: File configured resource

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <xsd:schema
-    xmlns="https://api-platform.com/schema/metadata-3.0"
+    xmlns="https://api-platform.com/schema/metadata/resources"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="https://api-platform.com/schema/metadata-3.0"
+    targetNamespace="https://api-platform.com/schema/metadata/resources"
     elementFormDefault="qualified">
 
     <xsd:element name="resources">
@@ -17,7 +17,6 @@
     <xsd:complexType name="resource">
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="extendedBase"/>
-            <xsd:element name="properties" minOccurs="0" type="properties"/>
             <xsd:element name="operations" minOccurs="0" type="operations"/>
             <xsd:element name="graphQlOperations" minOccurs="0" type="graphQlOperations"/>
         </xsd:sequence>
@@ -242,40 +241,6 @@
                 </xsd:restriction>
             </xsd:simpleType>
         </xsd:attribute>
-    </xsd:complexType>
-
-    <xsd:complexType name="properties">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="property" maxOccurs="unbounded" type="property"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:complexType name="property">
-        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
-            <xsd:element name="default" minOccurs="0" type="sequenceWithValues"/>
-            <xsd:element name="example" minOccurs="0" type="sequenceWithValues"/>
-            <xsd:element name="jsonldContext" minOccurs="0" type="sequenceWithValues"/>
-            <xsd:element name="openapiContext" minOccurs="0" type="sequenceWithValues"/>
-            <xsd:element name="types" minOccurs="0" type="types"/>
-            <xsd:element name="builtinTypes" minOccurs="0" type="sequenceWithValues"/>
-            <xsd:element name="schema" minOccurs="0" type="sequenceWithValues"/>
-            <xsd:element name="extraProperties" minOccurs="0" type="sequenceWithValues"/>
-        </xsd:sequence>
-        <xsd:attribute type="xsd:string" name="name" use="required"/>
-        <xsd:attribute type="xsd:token" name="description"/>
-        <xsd:attribute type="xsd:boolean" name="readable"/>
-        <xsd:attribute type="xsd:boolean" name="writable"/>
-        <xsd:attribute type="xsd:boolean" name="readableLink"/>
-        <xsd:attribute type="xsd:boolean" name="writableLink"/>
-        <xsd:attribute type="xsd:boolean" name="required"/>
-        <xsd:attribute type="xsd:boolean" name="identifier"/>
-        <xsd:attribute type="xsd:string" name="deprecationReason"/>
-        <xsd:attribute type="xsd:boolean" name="fetchable"/>
-        <xsd:attribute type="xsd:boolean" name="fetchEager"/>
-        <xsd:attribute type="xsd:boolean" name="push"/>
-        <xsd:attribute type="xsd:string" name="security"/>
-        <xsd:attribute type="xsd:string" name="securityPostDenormalize"/>
-        <xsd:attribute type="xsd:boolean" name="initializable"/>
     </xsd:complexType>
 
     <xsd:complexType name="values">

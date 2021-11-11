@@ -3,7 +3,6 @@ resources:
         itemOperations:
             get:
                 method: 'GET'
-
         collectionOperations:
             get:
                 method: 'GET'

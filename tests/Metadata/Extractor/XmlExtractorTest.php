@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\Extractor\XmlExtractor;
+use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
@@ -29,7 +29,7 @@ class XmlExtractorTest extends TestCase
 {
     public function testValidXML(): void
     {
-        $extractor = new XmlExtractor([__DIR__.'/xml/valid.xml']);
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/valid.xml']);
         $this->assertEquals([
             Comment::class => [
                 [
@@ -91,7 +91,6 @@ class XmlExtractorTest extends TestCase
                     'paginationViaCursor' => null,
                     'exceptionToStatus' => null,
                     'extraProperties' => null,
-                    'properties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
                     'class' => Comment::class,
@@ -171,7 +170,6 @@ class XmlExtractorTest extends TestCase
                         ExceptionInterface::class => 400,
                     ],
                     'extraProperties' => null,
-                    'properties' => null,
                     'operations' => [
                         [
                             'name' => 'custom_operation_name',
@@ -369,13 +367,13 @@ class XmlExtractorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($error);
 
-        (new XmlExtractor([$path]))->getResources();
+        (new XmlResourceExtractor([$path]))->getResources();
     }
 
     public function getInvalidPaths(): array
     {
         return [
-            [__DIR__.'/xml/invalid/required_class.xml', "[ERROR 1868] Element '{https://api-platform.com/schema/metadata-3.0}resource': The attribute 'class' is required but missing. (in ".realpath(__DIR__.'/../../../').'/ - line 7, column 0)'],
+            [__DIR__.'/xml/invalid/required_class.xml', "[ERROR 1868] Element '{https://api-platform.com/schema/metadata/resources}resource': The attribute 'class' is required but missing. (in ".realpath(__DIR__.'/../../../').'/ - line 7, column 0)'],
         ];
     }
 }

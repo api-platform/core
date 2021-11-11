@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Metadata\Extractor;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Extractor\XmlExtractor;
-use ApiPlatform\Metadata\Extractor\YamlExtractor;
+use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
+use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -31,19 +31,19 @@ use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
-use ApiPlatform\Tests\Metadata\Extractor\Adapter\AdapterInterface;
-use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlAdapter;
-use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlAdapter;
+use ApiPlatform\Tests\Metadata\Extractor\Adapter\ResourceAdapterInterface;
+use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlResourceAdapter;
+use ApiPlatform\Tests\Metadata\Extractor\Adapter\YamlResourceAdapter;
 use Exception;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Ensures XML and YAML mappings are fully compatible with ApiPlatform\Metadata\ApiResource.
+ * Ensures XML and YAML mappings are fully compatible with ApiResource.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class MetadataCompatibilityTest extends TestCase
+final class ResourceMetadataCompatibilityTest extends TestCase
 {
     use DeprecationMetadataTrait;
 
@@ -420,7 +420,7 @@ final class MetadataCompatibilityTest extends TestCase
     /**
      * @dataProvider getExtractors
      */
-    public function testValidMetadata(string $extractorClass, AdapterInterface $adapter): void
+    public function testValidMetadata(string $extractorClass, ResourceAdapterInterface $adapter): void
     {
         $reflClass = new \ReflectionClass(ApiResource::class);
         $parameters = $reflClass->getConstructor()->getParameters();
@@ -430,7 +430,7 @@ final class MetadataCompatibilityTest extends TestCase
             $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
             $collection = $factory->create(self::RESOURCE_CLASS);
         } catch (Exception $exception) {
-            throw new AssertionFailedError('Failed asserting that the schema is valid according to ApiPlatform\Metadata\ApiResource', 0, $exception);
+            throw new AssertionFailedError('Failed asserting that the schema is valid according to '.ApiResource::class, 0, $exception);
         }
 
         $this->assertEquals(new ResourceMetadataCollection(self::RESOURCE_CLASS, $this->buildApiResources()), $collection);
@@ -439,8 +439,8 @@ final class MetadataCompatibilityTest extends TestCase
     public function getExtractors(): array
     {
         return [
-            [XmlExtractor::class, new XmlAdapter()],
-            [YamlExtractor::class, new YamlAdapter()],
+            [XmlResourceExtractor::class, new XmlResourceAdapter()],
+            [YamlResourceExtractor::class, new YamlResourceAdapter()],
         ];
     }
 
@@ -477,7 +477,7 @@ final class MetadataCompatibilityTest extends TestCase
                     continue;
                 }
 
-                throw new \RuntimeException(sprintf('Unknown parameter "%s".', $parameter));
+                throw new \RuntimeException(sprintf('Unknown ApiResource parameter "%s".', $parameter));
             }
 
             $resources[] = $resource;

@@ -15,7 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
@@ -39,7 +39,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
     private $decorated;
     private $defaults;
 
-    public function __construct(ExtractorInterface $extractor, ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [])
+    public function __construct(ResourceExtractorInterface $extractor, ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [])
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;

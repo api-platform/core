@@ -45,7 +45,7 @@ final class DummyDtoNoInputCollectionDataProvider implements ContextAwareCollect
     /**
      * {@inheritdoc}
      */
-    public function getCollection(string $resourceClass, string $operationName = null, array $context = []): iterable
+    public function getCollection(string $resourceClass, string $operationName = null, array $context = [])
     {
         /** @var DummyDtoNoInput[]|DummyDtoNoInputDocument[] $dummyDtos */
         $dummyDtos = $this->registry->getManagerForClass($resourceClass)->getRepository($resourceClass)->findAll();

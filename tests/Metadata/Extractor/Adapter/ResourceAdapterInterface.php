@@ -16,11 +16,11 @@ namespace ApiPlatform\Tests\Metadata\Extractor\Adapter;
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-interface AdapterInterface
+interface ResourceAdapterInterface
 {
     /**
      * @param string                 $resourceClass Resource class
-     * @param \ReflectionParameter[] $parameters    ApiResource constructor parameters
+     * @param \ReflectionParameter[] $parameters    Constructor parameters
      * @param array                  $fixtures      Some fixtures
      *
      * @return string[] A list of files to load in the extractor

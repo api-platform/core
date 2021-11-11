@@ -16,7 +16,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Check Resource configuration at tests/Fixtures/TestBundle/Resources/config/api_resources/comment.xml.
+ * Check ApiResource configuration at tests/Fixtures/TestBundle/Resources/config/api_resources/resources.xml.
+ * Check ApiProperty configuration at tests/Fixtures/TestBundle/Resources/config/api_resources/properties.xml.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *

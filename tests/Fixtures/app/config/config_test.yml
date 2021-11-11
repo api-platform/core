@@ -2,15 +2,12 @@ imports:
     - { resource: config_common.yml }
     - { resource: config_behat_orm.yml }
 
-parameters:
-    api_platform.test.mapping.paths:
-        - '%kernel.project_dir%/../TestBundle/Model'
-        - '%kernel.project_dir%/config/api_resources_orm.yaml'
-
 api_platform:
     doctrine_mongodb_odm: false
     mapping:
-        paths: '%api_platform.test.mapping.paths%'
+        paths:
+            - '%kernel.project_dir%/../TestBundle/Model'
+            - '%kernel.project_dir%/config/api_resources_orm.yaml'
 
 services:
     ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager:

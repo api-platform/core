@@ -20,12 +20,12 @@ use ApiPlatform\Exception\InvalidArgumentException;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-interface ExtractorInterface
+interface PropertyExtractorInterface
 {
     /**
      * Parses all metadata files and convert them in an array.
      *
      * @throws InvalidArgumentException
      */
-    public function getResources(): array;
+    public function getProperties(): array;
 }

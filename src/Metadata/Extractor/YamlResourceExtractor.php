@@ -28,10 +28,8 @@ use Symfony\Component\Yaml\Yaml;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class YamlExtractor extends AbstractExtractor
+final class YamlResourceExtractor extends AbstractResourceExtractor
 {
-    private $resourceClass;
-
     /**
      * {@inheritdoc}
      */
@@ -53,10 +51,10 @@ final class YamlExtractor extends AbstractExtractor
             throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', \gettype($resourcesYaml), $path));
         }
 
-        $this->extractResources($resourcesYaml, $path);
+        $this->buildResources($resourcesYaml, $path);
     }
 
-    private function extractResources(array $resourcesYaml, string $path): void
+    private function buildResources(array $resourcesYaml, string $path): void
     {
         foreach ($resourcesYaml as $resourceName => $resourceYaml) {
             $resourceName = $this->resolve($resourceName);
@@ -69,17 +67,16 @@ final class YamlExtractor extends AbstractExtractor
                 $resourceYaml = [$resourceYaml];
             }
 
-            $this->resourceClass = $resourceName;
             foreach ($resourceYaml as $key => $resourceYamlDatum) {
                 if (null === $resourceYamlDatum) {
                     $resourceYamlDatum = [];
                 }
 
                 try {
-                    $base = $this->getExtendedBase($resourceYamlDatum);
+                    $base = $this->buildExtendedBase($resourceYamlDatum);
                     $this->resources[$resourceName][$key] = array_merge($base, [
-                        'operations' => $this->getOperations($resourceYamlDatum, $base),
-                        'graphQlOperations' => $this->getGraphQlOperations($resourceYamlDatum, $base),
+                        'operations' => $this->buildOperations($resourceYamlDatum, $base),
+                        'graphQlOperations' => $this->buildGraphQlOperations($resourceYamlDatum, $base),
                     ]);
                 } catch (InvalidArgumentException $exception) {
                     throw new InvalidArgumentException(sprintf('%s in "%s" (%s).', $exception->getMessage(), $resourceName, $path));
@@ -88,55 +85,9 @@ final class YamlExtractor extends AbstractExtractor
         }
     }
 
-    private function getProperties(array $resource): ?array
+    private function buildExtendedBase(array $resource): array
     {
-        if (!\array_key_exists('properties', $resource)) {
-            return null;
-        }
-
-        $properties = [];
-        foreach ($resource['properties'] as $propertyName => $propertyValues) {
-            if (null === $propertyValues) {
-                $properties[$propertyName] = null;
-                continue;
-            }
-
-            if (!\is_array($propertyValues)) {
-                throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given.', $propertyName, \gettype($propertyValues)));
-            }
-
-            $properties[$propertyName] = [
-                'description' => $this->phpize($propertyValues, 'description', 'string'),
-                'readable' => $this->phpize($propertyValues, 'readable', 'bool'),
-                'writable' => $this->phpize($propertyValues, 'writable', 'bool'),
-                'readableLink' => $this->phpize($propertyValues, 'readableLink', 'bool'),
-                'writableLink' => $this->phpize($propertyValues, 'writableLink', 'bool'),
-                'required' => $this->phpize($propertyValues, 'required', 'bool'),
-                'identifier' => $this->phpize($propertyValues, 'identifier', 'bool'),
-                'deprecationReason' => $this->phpize($propertyValues, 'deprecationReason', 'string'),
-                'fetchable' => $this->phpize($propertyValues, 'fetchable', 'bool'),
-                'fetchEager' => $this->phpize($propertyValues, 'fetchEager', 'bool'),
-                'push' => $this->phpize($propertyValues, 'push', 'bool'),
-                'security' => $this->phpize($propertyValues, 'security', 'string'),
-                'securityPostDenormalize' => $this->phpize($propertyValues, 'securityPostDenormalize', 'string'),
-                'initializable' => $this->phpize($propertyValues, 'initializable', 'bool'),
-                'jsonldContext' => $this->getAttribute($propertyValues, 'jsonldContext'),
-                'openapiContext' => $this->getAttribute($propertyValues, 'openapiContext'),
-                'types' => $this->getAttribute($propertyValues, 'types'),
-                'extraProperties' => $this->getAttribute($propertyValues, 'extraProperties'),
-                'defaults' => $this->getAttribute($propertyValues, 'defaults'),
-                'example' => $this->getAttribute($propertyValues, 'example'),
-                'builtinTypes' => $this->getAttribute($propertyValues, 'builtinTypes'),
-                'schema' => $this->getAttribute($propertyValues, 'schema'),
-            ];
-        }
-
-        return $properties;
-    }
-
-    private function getExtendedBase(array $resource): array
-    {
-        return array_merge($this->getBase($resource), [
+        return array_merge($this->buildBase($resource), [
             'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
             'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             'stateless' => $this->phpize($resource, 'stateless', 'bool'),
@@ -147,25 +98,25 @@ final class YamlExtractor extends AbstractExtractor
             'controller' => $this->phpize($resource, 'controller', 'string'),
             'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
-            'types' => $this->getAttribute($resource, 'types'),
-            'cacheHeaders' => $this->getAttribute($resource, 'cacheHeaders'),
-            'hydraContext' => $this->getAttribute($resource, 'hydraContext'),
-            'openapiContext' => $this->getAttribute($resource, 'openapiContext'),
-            'paginationViaCursor' => $this->getAttribute($resource, 'paginationViaCursor'),
-            'exceptionToStatus' => $this->getAttribute($resource, 'exceptionToStatus'),
-            'defaults' => $this->getAttribute($resource, 'defaults'),
-            'requirements' => $this->getAttribute($resource, 'requirements'),
-            'options' => $this->getAttribute($resource, 'options'),
+            'types' => $this->buildAttribute($resource, 'types'),
+            'cacheHeaders' => $this->buildAttribute($resource, 'cacheHeaders'),
+            'hydraContext' => $this->buildAttribute($resource, 'hydraContext'),
+            'openapiContext' => $this->buildAttribute($resource, 'openapiContext'),
+            'paginationViaCursor' => $this->buildAttribute($resource, 'paginationViaCursor'),
+            'exceptionToStatus' => $this->buildAttribute($resource, 'exceptionToStatus'),
+            'defaults' => $this->buildAttribute($resource, 'defaults'),
+            'requirements' => $this->buildAttribute($resource, 'requirements'),
+            'options' => $this->buildAttribute($resource, 'options'),
             'status' => $this->phpize($resource, 'status', 'integer'),
-            'schemes' => $this->getAttribute($resource, 'schemes'),
-            'formats' => $this->getAttribute($resource, 'formats'),
-            'uriVariables' => $this->getUriVariables($resource),
-            'inputFormats' => $this->getAttribute($resource, 'inputFormats'),
-            'outputFormats' => $this->getAttribute($resource, 'outputFormats'),
+            'schemes' => $this->buildAttribute($resource, 'schemes'),
+            'formats' => $this->buildAttribute($resource, 'formats'),
+            'uriVariables' => $this->buildUriVariables($resource),
+            'inputFormats' => $this->buildAttribute($resource, 'inputFormats'),
+            'outputFormats' => $this->buildAttribute($resource, 'outputFormats'),
         ]);
     }
 
-    private function getBase(array $resource): array
+    private function buildBase(array $resource): array
     {
         return [
             'shortName' => $this->phpize($resource, 'shortName', 'string'),
@@ -193,19 +144,18 @@ final class YamlExtractor extends AbstractExtractor
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
             'input' => $this->phpize($resource, 'input', 'string'),
             'output' => $this->phpize($resource, 'output', 'string'),
-            'normalizationContext' => $this->getAttribute($resource, 'normalizationContext'),
-            'denormalizationContext' => $this->getAttribute($resource, 'denormalizationContext'),
-            'validationContext' => $this->getAttribute($resource, 'validationContext'),
-            'filters' => $this->getAttribute($resource, 'filters'),
-            'order' => $this->getAttribute($resource, 'order'),
-            'extraProperties' => $this->getAttribute($resource, 'extraProperties'),
-            'properties' => $this->getProperties($resource),
-            'mercure' => $this->getMercure($resource),
-            'messenger' => $this->getMessenger($resource),
+            'normalizationContext' => $this->buildAttribute($resource, 'normalizationContext'),
+            'denormalizationContext' => $this->buildAttribute($resource, 'denormalizationContext'),
+            'validationContext' => $this->buildAttribute($resource, 'validationContext'),
+            'filters' => $this->buildAttribute($resource, 'filters'),
+            'order' => $this->buildAttribute($resource, 'order'),
+            'extraProperties' => $this->buildAttribute($resource, 'extraProperties'),
+            'mercure' => $this->buildMercure($resource),
+            'messenger' => $this->buildMessenger($resource),
         ];
     }
 
-    private function getUriVariables(array $resource): ?array
+    private function buildUriVariables(array $resource): ?array
     {
         if (!\array_key_exists('uriVariables', $resource)) {
             return null;
@@ -241,7 +191,7 @@ final class YamlExtractor extends AbstractExtractor
     /**
      * @return bool|string|string[]|null
      */
-    private function getMercure(array $resource)
+    private function buildMercure(array $resource)
     {
         if (!\array_key_exists('mercure', $resource)) {
             return null;
@@ -257,7 +207,7 @@ final class YamlExtractor extends AbstractExtractor
     /**
      * @return array|bool|string|null
      */
-    private function getMessenger(array $resource)
+    private function buildMessenger(array $resource)
     {
         if (!\array_key_exists('messenger', $resource)) {
             return null;
@@ -266,7 +216,7 @@ final class YamlExtractor extends AbstractExtractor
         return $this->phpize($resource, 'messenger', 'bool|string');
     }
 
-    private function getOperations(array $resource, array $root): ?array
+    private function buildOperations(array $resource, array $root): ?array
     {
         if (!\array_key_exists('operations', $resource)) {
             return null;
@@ -293,7 +243,7 @@ final class YamlExtractor extends AbstractExtractor
                 throw new InvalidArgumentException(sprintf('Operation class "%s" does not exist', $class));
             }
 
-            $datum = $this->getExtendedBase($operation);
+            $datum = $this->buildExtendedBase($operation);
             foreach ($datum as $key => $value) {
                 if (null === $value) {
                     $datum[$key] = $root[$key];
@@ -316,7 +266,7 @@ final class YamlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getGraphQlOperations(array $resource, array $root): ?array
+    private function buildGraphQlOperations(array $resource, array $root): ?array
     {
         if (!\array_key_exists('graphQlOperations', $resource)) {
             return null;
@@ -325,7 +275,7 @@ final class YamlExtractor extends AbstractExtractor
         $data = [];
         foreach (['mutations' => Mutation::class, 'queries' => Query::class, 'subscriptions' => Subscription::class] as $type => $class) {
             foreach ($resource['graphQlOperations'][$type] as $operation) {
-                $datum = $this->getBase($operation);
+                $datum = $this->buildBase($operation);
                 foreach ($datum as $key => $value) {
                     if (null === $value) {
                         $datum[$key] = $root[$key];
@@ -351,9 +301,9 @@ final class YamlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getAttribute(array $resource, string $key, $default = null)
+    private function buildAttribute(array $resource, string $key, $default = null)
     {
-        if (!\array_key_exists($key, $resource)) {
+        if (empty($resource[$key])) {
             return $default;
         }
 

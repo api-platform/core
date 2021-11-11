@@ -16,11 +16,11 @@ namespace ApiPlatform\Tests\Metadata\Extractor\Adapter;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * YAML adapter for MetadataCompatibilityTest.
+ * YAML adapter for ResourceMetadataCompatibilityTest.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class YamlAdapter implements AdapterInterface
+final class YamlResourceAdapter implements ResourceAdapterInterface
 {
     /**
      * {@inheritdoc}
@@ -43,7 +43,7 @@ final class YamlAdapter implements AdapterInterface
             $yaml['resources'][$resourceClass][] = $resource;
         }
 
-        $filename = __DIR__.'/metadata.yaml';
+        $filename = __DIR__.'/resources.yaml';
         file_put_contents($filename, Yaml::dump($yaml, 8, 4));
 
         return [$filename];

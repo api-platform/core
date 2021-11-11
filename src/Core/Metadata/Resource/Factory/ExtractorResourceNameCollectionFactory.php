@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 
 /**
  * Creates a resource name collection from {@see ApiResource} configuration files.
@@ -28,7 +28,7 @@ final class ExtractorResourceNameCollectionFactory implements ResourceNameCollec
     private $extractor;
     private $decorated;
 
-    public function __construct(ExtractorInterface $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
+    public function __construct(ResourceExtractorInterface $extractor, ResourceNameCollectionFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;

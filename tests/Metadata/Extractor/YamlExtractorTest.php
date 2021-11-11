@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Metadata\Extractor\YamlExtractor;
+use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig;
@@ -30,7 +30,7 @@ class YamlExtractorTest extends TestCase
 {
     public function testValidYaml(): void
     {
-        $extractor = new YamlExtractor([__DIR__.'/yaml/valid.yaml']);
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/valid.yaml']);
         $this->assertEquals([
             FlexConfig::class => [
                 [
@@ -92,7 +92,6 @@ class YamlExtractorTest extends TestCase
                     'paginationViaCursor' => null,
                     'exceptionToStatus' => null,
                     'extraProperties' => null,
-                    'properties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
                 ],
@@ -157,7 +156,6 @@ class YamlExtractorTest extends TestCase
                     'paginationViaCursor' => null,
                     'exceptionToStatus' => null,
                     'extraProperties' => null,
-                    'properties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
                 ],
@@ -220,7 +218,6 @@ class YamlExtractorTest extends TestCase
                     'paginationViaCursor' => null,
                     'exceptionToStatus' => null,
                     'extraProperties' => null,
-                    'properties' => null,
                     'operations' => [
                         [
                             'name' => null,
@@ -283,7 +280,6 @@ class YamlExtractorTest extends TestCase
                             'paginationViaCursor' => null,
                             'exceptionToStatus' => null,
                             'extraProperties' => null,
-                            'properties' => null,
                             'read' => null,
                             'deserialize' => null,
                             'validate' => null,
@@ -356,7 +352,6 @@ class YamlExtractorTest extends TestCase
                             'paginationViaCursor' => null,
                             'exceptionToStatus' => null,
                             'extraProperties' => null,
-                            'properties' => null,
                             'read' => null,
                             'deserialize' => null,
                             'validate' => null,
@@ -429,7 +424,6 @@ class YamlExtractorTest extends TestCase
                     'paginationViaCursor' => null,
                     'exceptionToStatus' => null,
                     'extraProperties' => null,
-                    'properties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
                 ],
@@ -445,7 +439,7 @@ class YamlExtractorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($error);
 
-        (new YamlExtractor([$path]))->getResources();
+        (new YamlResourceExtractor([$path]))->getResources();
     }
 
     public function getInvalidPaths(): array

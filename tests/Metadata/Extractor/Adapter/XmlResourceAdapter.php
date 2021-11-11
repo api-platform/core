@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Extractor\Adapter;
 
+use ApiPlatform\Tests\Metadata\Extractor\ResourceMetadataCompatibilityTest;
+
 /**
- * XML adapter for MetadataCompatibilityTest.
+ * XML adapter for ResourceMetadataCompatibilityTest.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class XmlAdapter implements AdapterInterface
+final class XmlResourceAdapter implements ResourceAdapterInterface
 {
     private const ATTRIBUTES = [
         'uriTemplate',
@@ -69,10 +71,10 @@ final class XmlAdapter implements AdapterInterface
     {
         $xml = new \SimpleXMLElement(<<<XML
 <?xml version="1.0" encoding="UTF-8" ?>
-<resources xmlns="https://api-platform.com/schema/metadata-3.0"
+<resources xmlns="https://api-platform.com/schema/metadata/resources"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="https://api-platform.com/schema/metadata-3.0
-           https://api-platform.com/schema/metadata/metadata-3.0.xsd">
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources
+           https://api-platform.com/schema/metadata/resources.xsd">
 </resources>
 XML
         );
@@ -90,27 +92,27 @@ XML
                 $parameterName = $parameter->getName();
                 $value = \array_key_exists($parameterName, $fixture) ? $fixture[$parameterName] : null;
 
-                if (method_exists($this, 'add'.ucfirst($parameterName))) {
-                    $this->{'add'.ucfirst($parameterName)}($resource, $value);
+                if (method_exists($this, 'build'.ucfirst($parameterName))) {
+                    $this->{'build'.ucfirst($parameterName)}($resource, $value);
                     continue;
                 }
 
-                if (\in_array($parameterName, self::ATTRIBUTES, true) || is_scalar($value)) {
+                if (\in_array($parameterName, self::ATTRIBUTES, true) && is_scalar($value)) {
                     $resource->addAttribute($parameterName, $this->parse($value));
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt attribute or child "%s". Please create a "%s" method in %s.', $parameterName, 'add'.ucfirst($parameterName), __CLASS__));
+                throw new \LogicException(sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.ResourceMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), __CLASS__));
             }
         }
 
-        $filename = __DIR__.'/metadata.xml';
+        $filename = __DIR__.'/resources.xml';
         $xml->asXML($filename);
 
         return [$filename];
     }
 
-    private function addTypes(\SimpleXMLElement $resource, array $values): void
+    private function buildTypes(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('types');
         foreach ($values as $value) {
@@ -118,17 +120,17 @@ XML
         }
     }
 
-    private function addInputFormats(\SimpleXMLElement $resource, array $values): void
+    private function buildInputFormats(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addFormats($resource, $values, 'inputFormats');
+        $this->buildFormats($resource, $values, 'inputFormats');
     }
 
-    private function addOutputFormats(\SimpleXMLElement $resource, array $values): void
+    private function buildOutputFormats(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addFormats($resource, $values, 'outputFormats');
+        $this->buildFormats($resource, $values, 'outputFormats');
     }
 
-    private function addUriVariables(\SimpleXMLElement $resource, array $values): void
+    private function buildUriVariables(\SimpleXMLElement $resource, array $values): void
     {
         $child = $resource->addChild('uriVariables');
         foreach ($values as $parameterName => $value) {
@@ -145,12 +147,12 @@ XML
         }
     }
 
-    private function addDefaults(\SimpleXMLElement $resource, array $values): void
+    private function buildDefaults(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('defaults'), $values);
+        $this->buildValues($resource->addChild('defaults'), $values);
     }
 
-    private function addMercure(\SimpleXMLElement $resource, $values): void
+    private function buildMercure(\SimpleXMLElement $resource, $values): void
     {
         $child = $resource->addChild('mercure');
         if (\is_array($values)) {
@@ -162,7 +164,7 @@ XML
         }
     }
 
-    private function addRequirements(\SimpleXMLElement $resource, array $values): void
+    private function buildRequirements(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('requirements');
         foreach ($values as $key => $value) {
@@ -170,12 +172,12 @@ XML
         }
     }
 
-    private function addOptions(\SimpleXMLElement $resource, array $values): void
+    private function buildOptions(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('options'), $values);
+        $this->buildValues($resource->addChild('options'), $values);
     }
 
-    private function addSchemes(\SimpleXMLElement $resource, array $values): void
+    private function buildSchemes(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('schemes');
         foreach ($values as $value) {
@@ -183,13 +185,13 @@ XML
         }
     }
 
-    private function addCacheHeaders(\SimpleXMLElement $resource, array $values): void
+    private function buildCacheHeaders(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('cacheHeaders');
         foreach ($values as $key => $value) {
             if (\is_array($value)) {
                 $child = $node->addChild('cacheHeader');
-                $this->addValues($child, $value);
+                $this->buildValues($child, $value);
             } else {
                 $child = $node->addChild('cacheHeader', $this->parse($value));
             }
@@ -197,32 +199,32 @@ XML
         }
     }
 
-    private function addNormalizationContext(\SimpleXMLElement $resource, array $values): void
+    private function buildNormalizationContext(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('normalizationContext'), $values);
+        $this->buildValues($resource->addChild('normalizationContext'), $values);
     }
 
-    private function addDenormalizationContext(\SimpleXMLElement $resource, array $values): void
+    private function buildDenormalizationContext(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('denormalizationContext'), $values);
+        $this->buildValues($resource->addChild('denormalizationContext'), $values);
     }
 
-    private function addHydraContext(\SimpleXMLElement $resource, array $values): void
+    private function buildHydraContext(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('hydraContext'), $values);
+        $this->buildValues($resource->addChild('hydraContext'), $values);
     }
 
-    private function addOpenApiContext(\SimpleXMLElement $resource, array $values): void
+    private function buildOpenapiContext(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('openapiContext'), $values);
+        $this->buildValues($resource->addChild('openapiContext'), $values);
     }
 
-    private function addValidationContext(\SimpleXMLElement $resource, array $values): void
+    private function buildValidationContext(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('validationContext'), $values);
+        $this->buildValues($resource->addChild('validationContext'), $values);
     }
 
-    private function addFilters(\SimpleXMLElement $resource, array $values): void
+    private function buildFilters(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('filters');
         foreach ($values as $value) {
@@ -230,12 +232,12 @@ XML
         }
     }
 
-    private function addOrder(\SimpleXMLElement $resource, array $values): void
+    private function buildOrder(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('order'), $values);
+        $this->buildValues($resource->addChild('order'), $values);
     }
 
-    private function addPaginationViaCursor(\SimpleXMLElement $resource, array $values): void
+    private function buildPaginationViaCursor(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('paginationViaCursor');
         foreach ($values as $key => $value) {
@@ -245,7 +247,7 @@ XML
         }
     }
 
-    private function addExceptionToStatus(\SimpleXMLElement $resource, array $values): void
+    private function buildExceptionToStatus(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('exceptionToStatus');
         foreach ($values as $key => $value) {
@@ -255,22 +257,22 @@ XML
         }
     }
 
-    private function addExtraProperties(\SimpleXMLElement $resource, array $values): void
+    private function buildExtraProperties(\SimpleXMLElement $resource, array $values): void
     {
-        $this->addValues($resource->addChild('extraProperties'), $values);
+        $this->buildValues($resource->addChild('extraProperties'), $values);
     }
 
-    private function addArgs(\SimpleXMLElement $resource, array $args): void
+    private function buildArgs(\SimpleXMLElement $resource, array $args): void
     {
         $child = $resource->addChild('args');
         foreach ($args as $id => $values) {
             $grandChild = $child->addChild('arg');
             $grandChild->addAttribute('id', $id);
-            $this->addValues($grandChild, $values);
+            $this->buildValues($grandChild, $values);
         }
     }
 
-    private function addGraphQlOperations(\SimpleXMLElement $resource, array $values): void
+    private function buildGraphQlOperations(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('graphQlOperations');
         foreach ($values as $type => $operations) {
@@ -289,8 +291,8 @@ XML
                     $child->addAttribute('name', $key);
                 }
                 foreach ($value as $index => $data) {
-                    if (method_exists($this, 'add'.ucfirst($index))) {
-                        $this->{'add'.ucfirst($index)}($child, $data);
+                    if (method_exists($this, 'build'.ucfirst($index))) {
+                        $this->{'build'.ucfirst($index)}($child, $data);
                         continue;
                     }
 
@@ -299,20 +301,20 @@ XML
                         continue;
                     }
 
-                    throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'add'.ucfirst($index), __CLASS__));
+                    throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), __CLASS__));
                 }
             }
         }
     }
 
-    private function addOperations(\SimpleXMLElement $resource, array $values): void
+    private function buildOperations(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('operations');
         foreach ($values as $value) {
             $child = $node->addChild('operation');
             foreach ($value as $index => $data) {
-                if (method_exists($this, 'add'.ucfirst($index))) {
-                    $this->{'add'.ucfirst($index)}($child, $data);
+                if (method_exists($this, 'build'.ucfirst($index))) {
+                    $this->{'build'.ucfirst($index)}($child, $data);
                     continue;
                 }
 
@@ -321,12 +323,12 @@ XML
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt operation attribute or child "%s". Please create a "%s" method in %s.', $index, 'add'.ucfirst($index), __CLASS__));
+                throw new \LogicException(sprintf('Cannot adapt operation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), __CLASS__));
             }
         }
     }
 
-    private function addFormats(\SimpleXMLElement $resource, array $values, string $name = 'formats'): void
+    private function buildFormats(\SimpleXMLElement $resource, array $values, string $name = 'formats'): void
     {
         $node = $resource->addChild($name);
         foreach ($values as $key => $value) {
@@ -334,13 +336,13 @@ XML
         }
     }
 
-    private function addValues(\SimpleXMLElement $resource, array $values): void
+    private function buildValues(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('values');
         foreach ($values as $key => $value) {
             if (\is_array($value)) {
                 $child = $node->addChild('value');
-                $this->addValues($child, $value);
+                $this->buildValues($child, $value);
             } else {
                 $child = $node->addChild('value', $value);
             }

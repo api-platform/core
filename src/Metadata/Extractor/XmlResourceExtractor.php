@@ -24,9 +24,9 @@ use Symfony\Component\Config\Util\XmlUtils;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class XmlExtractor extends AbstractExtractor
+final class XmlResourceExtractor extends AbstractResourceExtractor
 {
-    public const RESOURCE_SCHEMA = __DIR__.'/schema/metadata.xsd';
+    public const SCHEMA = __DIR__.'/schema/resources.xsd';
 
     /**
      * {@inheritdoc}
@@ -35,25 +35,32 @@ final class XmlExtractor extends AbstractExtractor
     {
         try {
             /** @var \SimpleXMLElement $xml */
-            $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::RESOURCE_SCHEMA));
+            $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::SCHEMA));
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            // Ensure it's not a resource
+            try {
+                simplexml_import_dom(XmlUtils::loadFile($path, XmlPropertyExtractor::SCHEMA));
+            } catch (\InvalidArgumentException $error) {
+                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            }
+
+            // It's a property: ignore error
+            return;
         }
 
         foreach ($xml->resource as $resource) {
-            $base = $this->getExtendedBase($resource);
+            $base = $this->buildExtendedBase($resource);
             $this->resources[$this->resolve((string) $resource['class'])][] = array_merge($base, [
                 'class' => $this->phpize($resource, 'class', 'string'),
-                'properties' => $this->getProperties($resource),
-                'operations' => $this->getOperations($resource, $base),
-                'graphQlOperations' => $this->getGraphQlOperations($resource, $base),
+                'operations' => $this->buildOperations($resource, $base),
+                'graphQlOperations' => $this->buildGraphQlOperations($resource, $base),
             ]);
         }
     }
 
-    private function getExtendedBase(\SimpleXMLElement $resource): array
+    private function buildExtendedBase(\SimpleXMLElement $resource): array
     {
-        return array_merge($this->getBase($resource), [
+        return array_merge($this->buildBase($resource), [
             'uriTemplate' => $this->phpize($resource, 'uriTemplate', 'string'),
             'routePrefix' => $this->phpize($resource, 'routePrefix', 'string'),
             'stateless' => $this->phpize($resource, 'stateless', 'bool'),
@@ -63,26 +70,26 @@ final class XmlExtractor extends AbstractExtractor
             'host' => $this->phpize($resource, 'host', 'string'),
             'condition' => $this->phpize($resource, 'condition', 'string'),
             'controller' => $this->phpize($resource, 'controller', 'string'),
-            'types' => $this->getArrayValue($resource, 'type'),
-            'formats' => $this->getFormats($resource, 'formats'),
-            'inputFormats' => $this->getFormats($resource, 'inputFormats'),
-            'outputFormats' => $this->getFormats($resource, 'outputFormats'),
-            'uriVariables' => $this->getUriVariables($resource),
-            'defaults' => isset($resource->defaults->values) ? $this->getValues($resource->defaults->values) : null,
-            'requirements' => $this->getRequirements($resource),
-            'options' => isset($resource->options->values) ? $this->getValues($resource->options->values) : null,
-            'schemes' => $this->getArrayValue($resource, 'scheme'),
-            'cacheHeaders' => $this->getCacheHeaders($resource),
-            'hydraContext' => isset($resource->hydraContext->values) ? $this->getValues($resource->hydraContext->values) : null,
-            'openapiContext' => isset($resource->openapiContext->values) ? $this->getValues($resource->openapiContext->values) : null,
-            'paginationViaCursor' => $this->getPaginationViaCursor($resource),
+            'types' => $this->buildArrayValue($resource, 'type'),
+            'formats' => $this->buildFormats($resource, 'formats'),
+            'inputFormats' => $this->buildFormats($resource, 'inputFormats'),
+            'outputFormats' => $this->buildFormats($resource, 'outputFormats'),
+            'uriVariables' => $this->buildUriVariables($resource),
+            'defaults' => isset($resource->defaults->values) ? $this->buildValues($resource->defaults->values) : null,
+            'requirements' => $this->buildRequirements($resource),
+            'options' => isset($resource->options->values) ? $this->buildValues($resource->options->values) : null,
+            'schemes' => $this->buildArrayValue($resource, 'scheme'),
+            'cacheHeaders' => $this->buildCacheHeaders($resource),
+            'hydraContext' => isset($resource->hydraContext->values) ? $this->buildValues($resource->hydraContext->values) : null,
+            'openapiContext' => isset($resource->openapiContext->values) ? $this->buildValues($resource->openapiContext->values) : null,
+            'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
             'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
-            'exceptionToStatus' => $this->getExceptionToStatus($resource),
+            'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
         ]);
     }
 
-    private function getBase(\SimpleXMLElement $resource): array
+    private function buildBase(\SimpleXMLElement $resource): array
     {
         return [
             'shortName' => $this->phpize($resource, 'shortName', 'string'),
@@ -91,7 +98,7 @@ final class XmlExtractor extends AbstractExtractor
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
             'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
             'messenger' => $this->phpize($resource, 'messenger', 'bool|string'),
-            'mercure' => $this->getMercure($resource),
+            'mercure' => $this->buildMercure($resource),
             'input' => $this->phpize($resource, 'input', 'bool|string'),
             'output' => $this->phpize($resource, 'output', 'bool|string'),
             'fetchPartial' => $this->phpize($resource, 'fetchPartial', 'bool'),
@@ -112,16 +119,16 @@ final class XmlExtractor extends AbstractExtractor
             'securityPostDenormalizeMessage' => $this->phpize($resource, 'securityPostDenormalizeMessage', 'string'),
             'securityPostValidation' => $this->phpize($resource, 'securityPostValidation', 'string'),
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
-            'normalizationContext' => isset($resource->normalizationContext->values) ? $this->getValues($resource->normalizationContext->values) : null,
-            'denormalizationContext' => isset($resource->denormalizationContext->values) ? $this->getValues($resource->denormalizationContext->values) : null,
-            'validationContext' => isset($resource->validationContext->values) ? $this->getValues($resource->validationContext->values) : null,
-            'filters' => $this->getArrayValue($resource, 'filter'),
-            'order' => isset($resource->order->values) ? $this->getValues($resource->order->values) : null,
-            'extraProperties' => $this->getExtraProperties($resource, 'extraProperties'),
+            'normalizationContext' => isset($resource->normalizationContext->values) ? $this->buildValues($resource->normalizationContext->values) : null,
+            'denormalizationContext' => isset($resource->denormalizationContext->values) ? $this->buildValues($resource->denormalizationContext->values) : null,
+            'validationContext' => isset($resource->validationContext->values) ? $this->buildValues($resource->validationContext->values) : null,
+            'filters' => $this->buildArrayValue($resource, 'filter'),
+            'order' => isset($resource->order->values) ? $this->buildValues($resource->order->values) : null,
+            'extraProperties' => $this->buildExtraProperties($resource, 'extraProperties'),
         ];
     }
 
-    private function getFormats(\SimpleXMLElement $resource, string $key): ?array
+    private function buildFormats(\SimpleXMLElement $resource, string $key): ?array
     {
         if (!isset($resource->{$key}->format)) {
             return null;
@@ -140,7 +147,7 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getUriVariables(\SimpleXMLElement $resource): ?array
+    private function buildUriVariables(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->uriVariables->uriVariable)) {
             return null;
@@ -164,7 +171,7 @@ final class XmlExtractor extends AbstractExtractor
                 $uriVariables[$parameterName]['inverse_property'] = $inverseProperty;
             }
             if (isset($data->identifiers->values)) {
-                $uriVariables[$parameterName]['identifiers'] = $this->getValues($data->identifiers->values);
+                $uriVariables[$parameterName]['identifiers'] = $this->buildValues($data->identifiers->values);
             }
             if (null !== ($compositeIdentifier = $this->phpize($data, 'compositeIdentifier', 'bool'))) {
                 $uriVariables[$parameterName]['composite_identifier'] = $compositeIdentifier;
@@ -174,7 +181,7 @@ final class XmlExtractor extends AbstractExtractor
         return $uriVariables;
     }
 
-    private function getCacheHeaders(\SimpleXMLElement $resource): ?array
+    private function buildCacheHeaders(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->cacheHeaders->cacheHeader)) {
             return null;
@@ -183,7 +190,7 @@ final class XmlExtractor extends AbstractExtractor
         $data = [];
         foreach ($resource->cacheHeaders->cacheHeader as $cacheHeader) {
             if (isset($cacheHeader->values->value)) {
-                $data[(string) $cacheHeader['name']] = $this->getValues($cacheHeader->values);
+                $data[(string) $cacheHeader['name']] = $this->buildValues($cacheHeader->values);
                 continue;
             }
 
@@ -193,7 +200,7 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getRequirements(\SimpleXMLElement $resource): ?array
+    private function buildRequirements(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->requirements->requirement)) {
             return null;
@@ -210,7 +217,7 @@ final class XmlExtractor extends AbstractExtractor
     /**
      * @return bool|string[]|null
      */
-    private function getMercure(\SimpleXMLElement $resource)
+    private function buildMercure(\SimpleXMLElement $resource)
     {
         if (!isset($resource->mercure)) {
             return null;
@@ -223,7 +230,7 @@ final class XmlExtractor extends AbstractExtractor
         return true;
     }
 
-    private function getPaginationViaCursor(\SimpleXMLElement $resource): ?array
+    private function buildPaginationViaCursor(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->paginationViaCursor->paginationField)) {
             return null;
@@ -237,7 +244,7 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getExceptionToStatus(\SimpleXMLElement $resource): ?array
+    private function buildExceptionToStatus(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->exceptionToStatus->exception)) {
             return null;
@@ -251,7 +258,7 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getExtraProperties(\SimpleXMLElement $resource, string $key = null): ?array
+    private function buildExtraProperties(\SimpleXMLElement $resource, string $key = null): ?array
     {
         if (null !== $key) {
             if (!isset($resource->{$key})) {
@@ -261,47 +268,10 @@ final class XmlExtractor extends AbstractExtractor
             $resource = $resource->{$key};
         }
 
-        return $this->getValues($resource->values);
+        return $this->buildValues($resource->values);
     }
 
-    private function getProperties(\SimpleXMLElement $resource): ?array
-    {
-        if (!isset($resource->properties->property)) {
-            return null;
-        }
-
-        $data = [];
-        foreach ($resource->properties->property as $property) {
-            $data[(string) $property['name']] = [
-                'description' => $this->phpize($property, 'description', 'string'),
-                'readable' => $this->phpize($property, 'readable', 'bool'),
-                'writable' => $this->phpize($property, 'writable', 'bool'),
-                'readableLink' => $this->phpize($property, 'readableLink', 'bool'),
-                'writableLink' => $this->phpize($property, 'writableLink', 'bool'),
-                'required' => $this->phpize($property, 'required', 'bool'),
-                'identifier' => $this->phpize($property, 'identifier', 'bool'),
-                'default' => $this->phpize($property, 'default', 'string'),
-                'example' => $this->phpize($property, 'example', 'string'),
-                'deprecationReason' => $this->phpize($property, 'deprecationReason', 'string'),
-                'fetchable' => $this->phpize($property, 'fetchable', 'bool'),
-                'fetchEager' => $this->phpize($property, 'fetchEager', 'bool'),
-                'jsonldContext' => isset($property->jsonldContext->values) ? $this->getValues($property->jsonldContext->values) : null,
-                'openapiContext' => isset($property->openapiContext->values) ? $this->getValues($property->openapiContext->values) : null,
-                'push' => $this->phpize($property, 'push', 'bool'),
-                'security' => $this->phpize($property, 'security', 'string'),
-                'securityPostDenormalize' => $this->phpize($property, 'securityPostDenormalize', 'string'),
-                'types' => $this->getArrayValue($property, 'type'),
-                'builtinTypes' => isset($property->builtinTypes->values) ? $this->getValues($property->builtinTypes->values) : null,
-                'schema' => isset($property->schema->values) ? $this->getValues($property->schema->values) : null,
-                'initializable' => $this->phpize($property, 'initializable', 'bool'),
-                'extraProperties' => $this->getExtraProperties($property, 'extraProperties'),
-            ];
-        }
-
-        return $data;
-    }
-
-    private function getOperations(\SimpleXMLElement $resource, array $root): ?array
+    private function buildOperations(\SimpleXMLElement $resource, array $root): ?array
     {
         if (!isset($resource->operations->operation)) {
             return null;
@@ -309,7 +279,7 @@ final class XmlExtractor extends AbstractExtractor
 
         $data = [];
         foreach ($resource->operations->operation as $operation) {
-            $datum = $this->getExtendedBase($operation);
+            $datum = $this->buildExtendedBase($operation);
             foreach ($datum as $key => $value) {
                 if (null === $value) {
                     $datum[$key] = $root[$key];
@@ -334,7 +304,7 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getGraphQlOperations(\SimpleXMLElement $resource, array $root): ?array
+    private function buildGraphQlOperations(\SimpleXMLElement $resource, array $root): ?array
     {
         if (!isset($resource->graphQlOperations->mutation) && !isset($resource->graphQlOperations->query) && !isset($resource->graphQlOperations->subscription)) {
             return null;
@@ -343,7 +313,7 @@ final class XmlExtractor extends AbstractExtractor
         $data = [];
         foreach (['mutation' => Mutation::class, 'query' => Query::class, 'subscription' => Subscription::class] as $type => $class) {
             foreach ($resource->graphQlOperations->{$type} as $operation) {
-                $datum = $this->getBase($operation);
+                $datum = $this->buildBase($operation);
                 foreach ($datum as $key => $value) {
                     if (null === $value) {
                         $datum[$key] = $root[$key];
@@ -354,7 +324,7 @@ final class XmlExtractor extends AbstractExtractor
                     'graphql_operation_class' => $class,
                     'collection' => $this->phpize($operation, 'collection', 'bool'),
                     'resolver' => $this->phpize($operation, 'resolver', 'string'),
-                    'args' => $this->getArgs($operation),
+                    'args' => $this->buildArgs($operation),
                     'class' => $this->phpize($operation, 'class', 'string'),
                     'read' => $this->phpize($operation, 'read', 'bool'),
                     'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
@@ -369,7 +339,7 @@ final class XmlExtractor extends AbstractExtractor
         return $data;
     }
 
-    private function getArgs(\SimpleXMLElement $resource): ?array
+    private function buildArgs(\SimpleXMLElement $resource): ?array
     {
         if (!isset($resource->args->arg)) {
             return null;
@@ -377,42 +347,7 @@ final class XmlExtractor extends AbstractExtractor
 
         $data = [];
         foreach ($resource->args->arg as $arg) {
-            $data[(string) $arg['id']] = $this->getValues($arg->values);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @return bool|string|string[]|null
-     */
-    private function getAttributes(\SimpleXMLElement $resource, string $key = null, bool $canBeDisabled = false)
-    {
-        if (null !== $key) {
-            if ($canBeDisabled && null !== $resource[$key]) {
-                return $this->phpize($resource, $key, 'bool');
-            }
-
-            if (!isset($resource->{$key})) {
-                return null;
-            }
-
-            $resource = $resource->{$key};
-        }
-
-        $data = [];
-        foreach ($resource->attribute as $attribute) {
-            if (isset($attribute->attribute)) {
-                $data[(string) $attribute['name']] = $this->getAttributes($attribute);
-                continue;
-            }
-
-            if (isset($attribute->values->value)) {
-                $data[(string) $attribute['name']] = $this->getValues($attribute->values);
-                continue;
-            }
-
-            $data[(string) $attribute['name']] = (string) $attribute;
+            $data[(string) $arg['id']] = $this->buildValues($arg->values);
         }
 
         return $data;
@@ -421,22 +356,22 @@ final class XmlExtractor extends AbstractExtractor
     /**
      * @return string[]
      */
-    private function getValues(\SimpleXMLElement $resource): array
+    private function buildValues(\SimpleXMLElement $resource): array
     {
         $data = [];
         foreach ($resource->value as $value) {
             if (null !== $value->attributes()->name) {
-                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->getValues($value->values) : (string) $value;
+                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->buildValues($value->values) : (string) $value;
                 continue;
             }
 
-            $data[] = isset($value->values) ? $this->getValues($value->values) : (string) $value;
+            $data[] = isset($value->values) ? $this->buildValues($value->values) : (string) $value;
         }
 
         return $data;
     }
 
-    private function getArrayValue(?\SimpleXMLElement $resource, string $key, $default = null)
+    private function buildArrayValue(?\SimpleXMLElement $resource, string $key, $default = null)
     {
         if (!isset($resource->{$key.'s'}->{$key})) {
             return $default;

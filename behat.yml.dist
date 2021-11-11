@@ -16,7 +16,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@orm_v3'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -32,12 +32,6 @@ default:
         default:
           symfony: ~
     'Behatch\Extension': ~
-
-orm_v3:
-  suites:
-    default:
-      filters:
-        tags: '@orm_v3'
 
 postgres:
   suites:
@@ -58,7 +52,7 @@ postgres:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@orm_v3'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch'
 
 mongodb:
   suites:
@@ -79,7 +73,7 @@ mongodb:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@orm_v3'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb'
 
 elasticsearch:
   suites:
@@ -94,7 +88,7 @@ elasticsearch:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '@elasticsearch&&~@orm_v3'
+        tags: '@elasticsearch'
 
 default-coverage:
   suites:

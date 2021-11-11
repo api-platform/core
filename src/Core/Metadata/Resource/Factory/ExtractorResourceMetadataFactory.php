@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 
 /**
  * Creates resource's metadata using an extractor.
@@ -29,7 +29,7 @@ final class ExtractorResourceMetadataFactory implements ResourceMetadataFactoryI
     private $decorated;
     private $defaults;
 
-    public function __construct(ExtractorInterface $extractor, ResourceMetadataFactoryInterface $decorated = null, array $defaults = [])
+    public function __construct(ResourceExtractorInterface $extractor, ResourceMetadataFactoryInterface $decorated = null, array $defaults = [])
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;

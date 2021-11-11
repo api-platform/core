@@ -17,7 +17,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\Extractor\ExtractorInterface;
+use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
 use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -25,6 +25,7 @@ use Symfony\Component\PropertyInfo\Type;
  * Creates properties's metadata using an extractor.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
@@ -32,7 +33,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     private $extractor;
     private $decorated;
 
-    public function __construct(ExtractorInterface $extractor, PropertyMetadataFactoryInterface $decorated = null)
+    public function __construct(PropertyExtractorInterface $extractor, PropertyMetadataFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
@@ -56,7 +57,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         if (
             !property_exists($resourceClass, $property) && !$isInterface ||
-            null === ($propertyMetadata = $this->extractor->getResources()[$resourceClass]['properties'][$property] ?? null)
+            null === ($propertyMetadata = $this->extractor->getProperties()[$resourceClass][$property] ?? null)
         ) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
         }
@@ -71,6 +72,13 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             if ('subresource' === $key) {
                 continue;
             }
+
+            if ('builtinTypes' === $key && null !== $value) {
+                $value = array_map(function (string $builtinType): Type {
+                    return new Type($builtinType);
+                }, $value);
+            }
+
             $methodName = 'with'.ucfirst($key);
 
             if (method_exists($apiProperty, $methodName) && null !== $value) {
@@ -78,18 +86,20 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
-        $metadata = $this->withDeprecatedAttributes($apiProperty, $propertyMetadata['attributes']);
+        if (isset($propertyMetadata['attributes'])) {
+            $apiProperty = $this->withDeprecatedAttributes($apiProperty, $propertyMetadata['attributes']);
+        }
 
         if (isset($propertyMetadata['iri'])) {
             trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');
-            $metadata = $metadata->withTypes([$propertyMetadata['iri']]);
+            $apiProperty = $apiProperty->withTypes([$propertyMetadata['iri']]);
         }
 
-        if ($subresource = $this->createSubresourceMetadata($propertyMetadata['subresource'], $metadata)) {
-            return $metadata->withSubresource($subresource);
+        if (isset($propertyMetadata['subresource']) && $subresource = $this->createSubresourceMetadata($propertyMetadata['subresource'], $apiProperty)) {
+            return $apiProperty->withSubresource($subresource);
         }
 
-        return $metadata;
+        return $apiProperty;
     }
 
     /**
@@ -138,7 +148,9 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         if ($propertyMetadata instanceof ApiProperty) {
-            $propertyMetadata = $this->withDeprecatedAttributes($propertyMetadata, $metadata['attributes']);
+            if (isset($metadata['attributes'])) {
+                $propertyMetadata = $this->withDeprecatedAttributes($propertyMetadata, $metadata['attributes']);
+            }
 
             if (isset($metadata['iri'])) {
                 trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');
@@ -152,7 +164,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return $propertyMetadata;
         }
 
-        if ($subresource = $this->createSubresourceMetadata($metadata['subresource'], $propertyMetadata)) {
+        if (isset($metadata['subresource']) && $subresource = $this->createSubresourceMetadata($metadata['subresource'], $propertyMetadata)) {
             return $propertyMetadata->withSubresource($subresource);
         }
 
