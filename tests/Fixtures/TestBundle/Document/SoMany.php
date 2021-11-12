@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**

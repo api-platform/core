@@ -57,11 +57,11 @@ parameters:
 		-
 			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
 			paths:
-				- tests/Core/Bridge/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
+				- tests/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
-				- src/Core/Bridge/Doctrine/Common/PropertyHelperTrait.php
+				- src/Doctrine/Common/PropertyHelperTrait.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		-
 			message: '#Call to an undefined method Doctrine\\Persistence\\ObjectManager::getConnection\(\)#'
@@ -72,11 +72,11 @@ parameters:
 			path: src/Core/EventListener/AddFormatListener.php
 		- '#Parameter \#1 \$vars of class GraphQL\\Language\\AST\\(IntValue|ObjectField|ObjectValue|BooleanValue|ListValue|StringValue)Node constructor expects array<bool\|float\|GraphQL\\Language\\AST\\Location\|GraphQL\\Language\\AST\\NameNode\|GraphQL\\Language\\AST\\NodeList\|GraphQL\\Language\\AST\\SelectionSetNode\|int\|string\|null>, array<string, .+> given\.#'
 		- '#Parameter \#1 \$defaultContext of class Symfony\\Component\\Serializer\\Encoder\\Json(De|En)code constructor expects array, (int|true) given\.#'
-		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
+		- '#Parameter \#(2|3) \$(resourceMetadataFactory|pagination) of class ApiPlatform\\Doctrine\\Orm\\Extension\\PaginationExtension constructor expects (ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface\|Symfony\\Component\\HttpFoundation\\RequestStack|ApiPlatform\\Core\\DataProvider\\Pagination\|ApiPlatform\\Core\\Metadata\\Resource\\Factory\\ResourceMetadataFactoryInterface), stdClass given\.#'
 		-
 			message: '#Parameter \#[0-9] \$filterLocator of class .+ constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface, ArrayObject<mixed, mixed> given\.#'
 			paths:
-				- tests/Core/Bridge/Doctrine/Orm/Extension/FilterExtensionTest.php
+				- tests/Doctrine/Orm/Extension/FilterExtensionTest.php
 				- tests/Core/Hydra/Serializer/CollectionFiltersNormalizerTest.php
 				- tests/Core/Swagger/Serializer/DocumentationNormalizerV2Test.php
 				- tests/Core/Swagger/Serializer/DocumentationNormalizerV3Test.php
@@ -107,9 +107,9 @@ parameters:
 		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiProperty has an unused parameter#'
 
 		# Expected, due to optional interfaces
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
+		- '#Method ApiPlatform\\Doctrine\\Orm\\Extension\\QueryCollectionExtensionInterface::applyToCollection\(\) invoked with 5 parameters, 3-4 required\.#'
+		- '#Method ApiPlatform\\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::getResult\(\) invoked with 4 parameters, 1 required\.#'
+		- '#Method ApiPlatform\\Doctrine\\Orm\\Extension\\QueryResult(Item|Collection)ExtensionInterface::supportsResult\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method ApiPlatform\\Core\\Bridge\\Symfony\\Routing\\RouteNameResolverInterface::getRouteName\(\) invoked with 3 parameters, 2 required\.#'
 		- '#Method ApiPlatform\\Core\\DataPersister\\DataPersisterInterface::persist\(\) invoked with 2 parameters, 1 required\.#'
 		- '#Method ApiPlatform\\Core\\DataPersister\\DataPersisterInterface::remove\(\) invoked with 2 parameters, 1 required\.#'
@@ -120,8 +120,8 @@ parameters:
 		- '#Method Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface::supportsNormalization\(\) invoked with 3 parameters, 1-2 required\.#'
 
 		# Expected, due to deprecations
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(Abstract|Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
-		- '#Method ApiPlatform\\Core\\Bridge\\Doctrine\\Orm\\Filter\\(AbstractFilter|FilterInterface)::apply\(\) invoked with 5 parameters, 3-4 required\.#'
+		- '#Method ApiPlatform\\Doctrine\\Orm\\Filter\\(Abstract|Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
+		- '#Method ApiPlatform\\Doctrine\\Orm\\Filter\\(AbstractFilter|FilterInterface)::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\Core\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
 
 		# Expected, due to backward compatibility

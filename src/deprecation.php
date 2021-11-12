@@ -113,14 +113,71 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Action\NotFoundAction::class => ApiPlatform\Action\NotFoundAction::class,
         ApiPlatform\Core\Action\PlaceholderAction::class => ApiPlatform\Action\PlaceholderAction::class,
 
-        // Bridge
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class,
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\DateFilterTrait::class,
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class,
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class,
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class,
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class,
-        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class => ApiPlatform\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class,
+        // Bridge\Doctrine
+        ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait::class => ApiPlatform\Doctrine\Common\PropertyHelperTrait::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\DateFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class => ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait::class,
+
+        // Bridge\Doctrine\EventListener
+        ApiPlatform\Core\Bridge\Doctrine\EventListener\PublishMercureUpdatesListener::class => ApiPlatform\Doctrine\EventListener\PublishMercureUpdatesListener::class,
+        ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener::class => ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener::class,
+        ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener::class => ApiPlatform\Doctrine\EventListener\WriteListener::class,
+
+        // Bridge\Doctrine\MongoDbOdm
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension::class => ApiPlatform\Doctrine\Odm\Extension\FilterExtension::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension::class => ApiPlatform\Doctrine\Orm\Extension\OrderExtension::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension::class => ApiPlatform\Doctrine\Orm\Extension\PaginationExtension::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\AbstractFilter::class => ApiPlatform\Doctrine\Odm\Filter\AbstractFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter::class => ApiPlatform\Doctrine\Odm\Filter\BooleanFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter::class => ApiPlatform\Doctrine\Odm\Filter\DateFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter::class => ApiPlatform\Doctrine\Odm\Filter\ExistsFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter::class => ApiPlatform\Doctrine\Odm\Filter\NumericFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter::class => ApiPlatform\Doctrine\Odm\Filter\OrderFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter::class => ApiPlatform\Doctrine\Odm\Filter\RangeFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Odm\Filter\SearchFilter::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory::class => ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo\DoctrineExtractor::class => ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator::class => ApiPlatform\Doctrine\Odm\Paginator::class,
+        ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait::class => ApiPlatform\Doctrine\Odm\PropertyHelperTrait::class,
+
+        // Bridge\Doctrine\Orm
+        ApiPlatform\Core\Bridge\Doctrine\Orm\AbstractPaginator::class => ApiPlatform\Doctrine\Orm\AbstractPaginator::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator::class => ApiPlatform\Doctrine\Orm\Paginator::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait::class => ApiPlatform\Doctrine\Orm\PropertyHelperTrait::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension::class => ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension::class => ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension::class => ApiPlatform\Doctrine\Orm\Extension\FilterExtension::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension::class => ApiPlatform\Doctrine\Orm\Extension\OrderExtension::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension::class => ApiPlatform\Doctrine\Orm\Extension\PaginationExtension::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter::class => ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractFilter::class => ApiPlatform\Doctrine\Orm\Filter\AbstractFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter::class => ApiPlatform\Doctrine\Orm\Filter\BooleanFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter::class => ApiPlatform\Doctrine\Orm\Filter\DateFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter::class => ApiPlatform\Doctrine\Orm\Filter\ExistsFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter::class => ApiPlatform\Doctrine\Orm\Filter\NumericFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter::class => ApiPlatform\Doctrine\Orm\Filter\OrderFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter::class => ApiPlatform\Doctrine\Orm\Filter\RangeFilter::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Orm\Filter\SearchFilter::class,
+
+        ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait::class => ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait::class,
+        ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::class => ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::class,
+        ApiPlatform\Doctrine\Orm\Util\QueryChecker::class => ApiPlatform\Doctrine\Orm\Util\QueryChecker::class,
+        ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::class => ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::class,
+        ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator::class => ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator::class,
+
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory::class => ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory::class,
 
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
@@ -141,7 +198,7 @@ spl_autoload_register(function ($className) {
 
         // Validator
         ApiPlatform\Core\Validator\EventListener\ValidateListener::class => ApiPlatform\Symfony\EventListener\ValidateListener::class,
-        ApiPlatform\Core\Validator\Exception\ValidationException::class => \ApiPlatform\Symfony\EventListener\Exception\ValidationException::class,
+        ApiPlatform\Core\Validator\Exception\ValidationException::class => ApiPlatform\Symfony\EventListener\Exception\ValidationException::class,
     ];
 
     $deprecatedInterfaces = include 'deprecated_interfaces.php';

@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
