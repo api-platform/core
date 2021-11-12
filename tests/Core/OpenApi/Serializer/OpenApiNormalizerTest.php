@@ -80,20 +80,34 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'paths']));
         $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
 
-        $dummyMetadata = new ResourceMetadata('Dummy', 'This is a dummy.', 'http://schema.example.com/Dummy', [
-            'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-            'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
-            'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
-        ], [
-            'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-            'post' => ['method' => 'POST', 'openapi_context' => ['security' => [], 'servers' => ['url' => '/test']]] + self::OPERATION_FORMATS,
-        ], []);
+        $dummyMetadata = new ResourceMetadata(
+            'Dummy',
+            'This is a dummy.',
+            'http://schema.example.com/Dummy',
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'put' => ['method' => 'PUT'] + self::OPERATION_FORMATS,
+                'delete' => ['method' => 'DELETE'] + self::OPERATION_FORMATS,
+            ],
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+                'post' => ['method' => 'POST', 'openapi_context' => ['security' => [], 'servers' => ['url' => '/test']]] + self::OPERATION_FORMATS,
+            ],
+            []
+        );
 
-        $zorroMetadata = new ResourceMetadata('Zorro', 'This is zorro.', 'http://schema.example.com/Zorro', [
-            'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-        ], [
-            'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
-        ], []);
+        $zorroMetadata = new ResourceMetadata(
+            'Zorro',
+            'This is zorro.',
+            'http://schema.example.com/Zorro',
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+            ],
+            [
+                'get' => ['method' => 'GET'] + self::OPERATION_FORMATS,
+            ],
+            []
+        );
 
         $subresourceOperationFactoryProphecy = $this->prophesize(SubresourceOperationFactoryInterface::class);
         $subresourceOperationFactoryProphecy->create(Argument::any(), Argument::any(), Argument::any())->willReturn([]);
@@ -125,23 +139,42 @@ class OpenApiNormalizerTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $factory = new LegacyOpenApiFactory($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $schemaFactory, $typeFactory, $operationPathResolver, $filterLocatorProphecy->reveal(), $subresourceOperationFactoryProphecy->reveal(), $identifiersExtractorProphecy->reveal(), [], new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
-            'header' => [
-                'type' => 'header',
-                'name' => 'Authorization',
-            ],
-            'query' => [
-                'type' => 'query',
-                'name' => 'key',
-            ],
-        ]), new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination'));
+        $factory = new LegacyOpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $typeFactory,
+            $operationPathResolver,
+            $filterLocatorProphecy->reveal(),
+            $subresourceOperationFactoryProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal(),
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
+                'header' => [
+                    'type' => 'header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'query',
+                    'name' => 'key',
+                ],
+            ]),
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+        );
 
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
         $operation = $pathItem->getGet();
 
-        $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet($operation->withParameters(array_merge($operation->getParameters(), [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]))));
+        $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet(
+            $operation->withParameters(array_merge(
+                $operation->getParameters(),
+                [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]
+            ))
+        ));
 
         $openApi = $openApi->withInfo((new Model\Info('New Title', 'v2', 'Description of my custom API'))->withExtensionProperty('info-key', 'Info value'));
         $openApi = $openApi->withExtensionProperty('key', 'Custom x-key value');
@@ -227,23 +260,27 @@ class OpenApiNormalizerTest extends TestCase
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
 
         $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withOperations(new Operations([
-                'get' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
-                'put' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
-                'delete' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
-                'get_collection' => (new GetCollection())->withUriTemplate('/dummies')->withOperation($baseOperation),
-                'post' => (new Post())->withUriTemplate('/dummies')->withOpenapiContext(['security' => [], 'servers' => ['url' => '/test']])->withOperation($baseOperation),
-            ])),
+            (new ApiResource())->withOperations(new Operations(
+                [
+                    'get' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
+                    'put' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
+                    'delete' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation),
+                    'get_collection' => (new GetCollection())->withUriTemplate('/dummies')->withOperation($baseOperation),
+                    'post' => (new Post())->withUriTemplate('/dummies')->withOpenapiContext(['security' => [], 'servers' => ['url' => '/test']])->withOperation($baseOperation),
+                ]
+            )),
         ]);
 
         $zorroBaseOperation = (new Operation())->withClass('Zorro')->withShortName('Zorro')->withDescription('This is zorro.')->withTypes(['http://schema.example.com/Zorro'])
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
 
         $zorroMetadata = new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withOperations(new Operations([
-                'get' => (new Get())->withUriTemplate('/zorros/{id}')->withOperation($zorroBaseOperation),
-                'get_collection' => (new GetCollection())->withUriTemplate('/zorros')->withOperation($zorroBaseOperation),
-            ])),
+            (new ApiResource())->withOperations(new Operations(
+                [
+                    'get' => (new Get())->withUriTemplate('/zorros/{id}')->withOperation($zorroBaseOperation),
+                    'get_collection' => (new GetCollection())->withUriTemplate('/zorros')->withOperation($zorroBaseOperation),
+                ]
+            )),
         ]);
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -268,23 +305,40 @@ class OpenApiNormalizerTest extends TestCase
         $schemaFactory = new SchemaFactory($typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
 
-        $factory = new OpenApiFactory($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $schemaFactory, $typeFactory, $operationPathResolver, $filterLocatorProphecy->reveal(), [], new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
-            'header' => [
-                'type' => 'header',
-                'name' => 'Authorization',
-            ],
-            'query' => [
-                'type' => 'query',
-                'name' => 'key',
-            ],
-        ]), new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination'));
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $typeFactory,
+            $operationPathResolver,
+            $filterLocatorProphecy->reveal(),
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
+                'header' => [
+                    'type' => 'header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'query',
+                    'name' => 'key',
+                ],
+            ]),
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+        );
 
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
         $pathItem = $openApi->getPaths()->getPath('/dummies/{id}');
         $operation = $pathItem->getGet();
 
-        $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet($operation->withParameters(array_merge($operation->getParameters(), [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]))));
+        $openApi->getPaths()->addPath('/dummies/{id}', $pathItem->withGet(
+            $operation->withParameters(array_merge(
+                $operation->getParameters(),
+                [new Model\Parameter('fields', 'query', 'Fields to remove of the output')]
+            ))
+        ));
 
         $openApi = $openApi->withInfo((new Model\Info('New Title', 'v2', 'Description of my custom API'))->withExtensionProperty('info-key', 'Info value'));
         $openApi = $openApi->withExtensionProperty('key', 'Custom x-key value');

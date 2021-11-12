@@ -69,7 +69,11 @@ final class Pagination
      */
     public function getPage(array $context = []): int
     {
-        $page = (int) $this->getParameterFromContext($context, $this->options['page_parameter_name'], $this->options['page_default']);
+        $page = (int) $this->getParameterFromContext(
+            $context,
+            $this->options['page_parameter_name'],
+            $this->options['page_default']
+        );
 
         if (1 > $page) {
             throw new InvalidArgumentException('Page should not be less than 1');

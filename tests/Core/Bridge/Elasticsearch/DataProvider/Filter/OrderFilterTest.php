@@ -33,7 +33,15 @@ class OrderFilterTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(SortFilterInterface::class, new OrderFilter($this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal()));
+        self::assertInstanceOf(
+            SortFilterInterface::class,
+            new OrderFilter(
+                $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+                $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+                $this->prophesize(NameConverterInterface::class)->reveal()
+            )
+        );
     }
 
     public function testApply()
@@ -44,9 +52,19 @@ class OrderFilterTest extends TestCase
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $nameConverterProphecy->normalize('name', Foo::class, null, Argument::type('array'))->willReturn('name')->shouldBeCalled();
 
-        $orderFilter = new OrderFilter($this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'order', ['name' => 'asc']);
+        $orderFilter = new OrderFilter(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $nameConverterProphecy->reveal(),
+            'order',
+            ['name' => 'asc']
+        );
 
-        self::assertSame([['name' => ['order' => 'asc']]], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => null]]]));
+        self::assertSame(
+            [['name' => ['order' => 'asc']]],
+            $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => null]]])
+        );
     }
 
     public function testApplyWithNestedProperty()
@@ -65,14 +83,30 @@ class OrderFilterTest extends TestCase
         $nameConverterProphecy->normalize('foo.bar', Foo::class, null, Argument::type('array'))->willReturn('foo.bar')->shouldBeCalled();
         $nameConverterProphecy->normalize('foo', Foo::class, null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
 
-        $orderFilter = new OrderFilter($this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $nameConverterProphecy->reveal(), 'order', ['foo.bar' => null]);
+        $orderFilter = new OrderFilter(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $nameConverterProphecy->reveal(),
+            'order',
+            ['foo.bar' => null]
+        );
 
-        self::assertSame([['foo.bar' => ['order' => 'asc', 'nested' => ['path' => 'foo']]]], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['foo.bar' => 'asc']]]));
+        self::assertSame(
+            [['foo.bar' => ['order' => 'asc', 'nested' => ['path' => 'foo']]]],
+            $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['foo.bar' => 'asc']]])
+        );
     }
 
     public function testApplyWithInvalidOrderFilter()
     {
-        $orderFilter = new OrderFilter($this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal(), 'order');
+        $orderFilter = new OrderFilter(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(NameConverterInterface::class)->reveal(),
+            'order'
+        );
 
         self::assertSame([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => 'error']]));
     }
@@ -86,9 +120,18 @@ class OrderFilterTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['name', 'bar']))->shouldBeCalled();
 
-        $orderFilter = new OrderFilter($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal(), 'order');
+        $orderFilter = new OrderFilter(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(NameConverterInterface::class)->reveal(),
+            'order'
+        );
 
-        self::assertSame([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => 'error', 'bar' => 'asc']]]));
+        self::assertSame(
+            [],
+            $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => ['name' => 'error', 'bar' => 'asc']]])
+        );
     }
 
     public function testDescription()
@@ -97,7 +140,14 @@ class OrderFilterTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new ApiProperty())->shouldBeCalled();
 
-        $orderFilter = new OrderFilter($this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(), $propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal(), 'order', ['name' => 'asc', 'bar' => null]);
+        $orderFilter = new OrderFilter(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->prophesize(NameConverterInterface::class)->reveal(),
+            'order',
+            ['name' => 'asc', 'bar' => null]
+        );
 
         self::assertSame(['order[name]' => ['property' => 'name', 'type' => 'string', 'required' => false]], $orderFilter->getDescription(Foo::class));
     }

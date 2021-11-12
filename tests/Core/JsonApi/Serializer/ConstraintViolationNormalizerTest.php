@@ -63,27 +63,30 @@ class ConstraintViolationNormalizerTest extends TestCase
             new ConstraintViolation('Unknown violation.', 'Unknown violation.', [], $dummy, '', ''),
         ]);
 
-        $this->assertEquals([
-            'errors' => [
-                [
-                    'detail' => 'This value should not be null.',
-                    'source' => [
-                        'pointer' => 'data/relationships/relatedDummy',
+        $this->assertEquals(
+            [
+                'errors' => [
+                    [
+                        'detail' => 'This value should not be null.',
+                        'source' => [
+                            'pointer' => 'data/relationships/relatedDummy',
+                        ],
                     ],
-                ],
-                [
-                    'detail' => 'This value should not be null.',
-                    'source' => [
-                        'pointer' => 'data/attributes/name',
+                    [
+                        'detail' => 'This value should not be null.',
+                        'source' => [
+                            'pointer' => 'data/attributes/name',
+                        ],
                     ],
-                ],
-                [
-                    'detail' => 'Unknown violation.',
-                    'source' => [
-                        'pointer' => 'data',
+                    [
+                        'detail' => 'Unknown violation.',
+                        'source' => [
+                            'pointer' => 'data',
+                        ],
                     ],
                 ],
             ],
-        ], (new ConstraintViolationListNormalizer($propertyMetadataFactoryProphecy->reveal(), $nameConverterProphecy->reveal()))->normalize($constraintViolationList));
+            (new ConstraintViolationListNormalizer($propertyMetadataFactoryProphecy->reveal(), $nameConverterProphecy->reveal()))->normalize($constraintViolationList)
+        );
     }
 }

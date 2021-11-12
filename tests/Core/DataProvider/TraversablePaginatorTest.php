@@ -22,8 +22,14 @@ class TraversablePaginatorTest extends TestCase
     /**
      * @dataProvider initializeProvider
      */
-    public function testInitialize(array $results, float $currentPage, float $perPage, float $totalItems, float $lastPage, float $currentItems): void
-    {
+    public function testInitialize(
+        array $results,
+        float $currentPage,
+        float $perPage,
+        float $totalItems,
+        float $lastPage,
+        float $currentItems
+    ): void {
         $traversable = new ArrayIterator($results);
 
         $paginator = new TraversablePaginator($traversable, $currentPage, $perPage, $totalItems);

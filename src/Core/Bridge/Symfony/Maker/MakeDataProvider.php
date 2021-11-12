@@ -95,15 +95,22 @@ class MakeDataProvider extends AbstractMaker
      */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
-        $dataProviderClassNameDetails = $generator->createClassNameDetails($input->getArgument('name'), 'DataProvider\\');
+        $dataProviderClassNameDetails = $generator->createClassNameDetails(
+            $input->getArgument('name'),
+            'DataProvider\\'
+        );
         $resourceClass = $input->getArgument('resource-class');
 
-        $generator->generateClass($dataProviderClassNameDetails->getFullName(), __DIR__.'/Resources/skeleton/DataProvider.tpl.php', [
-            'resource_class' => null !== $resourceClass ? Str::getShortClassName($resourceClass) : null,
-            'resource_full_class_name' => $resourceClass,
-            'generate_collection' => !$input->getOption('item-only'),
-            'generate_item' => !$input->getOption('collection-only'),
-        ]);
+        $generator->generateClass(
+            $dataProviderClassNameDetails->getFullName(),
+            __DIR__.'/Resources/skeleton/DataProvider.tpl.php',
+            [
+                'resource_class' => null !== $resourceClass ? Str::getShortClassName($resourceClass) : null,
+                'resource_full_class_name' => $resourceClass,
+                'generate_collection' => !$input->getOption('item-only'),
+                'generate_item' => !$input->getOption('collection-only'),
+            ]
+        );
         $generator->writeChanges();
 
         $this->writeSuccessMessage($io);

@@ -48,7 +48,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -62,7 +67,12 @@ class AddTagsListenerTest extends TestCase
 
         $request = new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response();
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -78,7 +88,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => ['/foo', '/bar']]), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => ['/foo', '/bar']]),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -94,7 +109,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -110,7 +130,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -127,7 +152,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -144,7 +174,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -161,7 +196,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_subresource_operation_name' => 'api_dummies_relatedDummies_get_subresource', '_api_subresource_context' => ['collection' => true]]), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_subresource_operation_name' => 'api_dummies_relatedDummies_get_subresource', '_api_subresource_context' => ['collection' => true]]),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -182,7 +222,12 @@ class AddTagsListenerTest extends TestCase
         $response->setPublic();
         $response->setEtag('foo');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), true);
         $listener->onKernelResponse($event);

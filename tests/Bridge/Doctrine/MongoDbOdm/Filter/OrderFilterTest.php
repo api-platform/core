@@ -240,313 +240,316 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
             return new OrderFilter($managerRegistry, 'customOrder', null, $properties);
         };
 
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'valid values' => [
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'valid values' => [
                     [
-                        '$sort' => [
-                            '_id' => 1,
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            '_id' => 1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'invalid values' => [
-                [
+                'invalid values' => [
                     [
-                        '$sort' => [
-                            '_id' => 1,
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                            ],
                         ],
                     ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'valid values (properties not enabled)' => [
-                [
+                'valid values (properties not enabled)' => [
                     [
-                        '$sort' => [
-                            '_id' => 1,
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                            ],
                         ],
                     ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'invalid values (properties not enabled)' => [
-                [
+                'invalid values (properties not enabled)' => [
                     [
-                        '$sort' => [
-                            'name' => 1,
+                        [
+                            '$sort' => [
+                                'name' => 1,
+                            ],
                         ],
                     ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'invalid property (property not enabled)' => [
-                [],
-                $orderFilterFactory,
-            ],
-            'invalid property (property enabled)' => [
-                [],
-                $orderFilterFactory,
-            ],
-            'custom order parameter name' => [
-                [
-                    [
-                        '$sort' => [
-                            'name' => -1,
-                        ],
-                    ],
+                'invalid property (property not enabled)' => [
+                    [],
+                    $orderFilterFactory,
                 ],
-                $customOrderFilterFactory,
-            ],
-            'valid values (all properties enabled)' => [
-                [
-                    [
-                        '$sort' => [
-                            '_id' => 1,
-                        ],
-                    ],
-                    [
-                        '$sort' => [
-                            '_id' => 1,
-                            'name' => 1,
-                        ],
-                    ],
+                'invalid property (property enabled)' => [
+                    [],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nested property' => [
-                [
+                'custom order parameter name' => [
                     [
-                        '$sort' => [
-                            '_id' => 1,
+                        [
+                            '$sort' => [
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            '_id' => 1,
-                            'name' => -1,
-                        ],
-                    ],
-                    [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
-                        ],
-                    ],
-                    [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$sort' => [
-                            '_id' => 1,
-                            'name' => -1,
-                            'relatedDummy_lkup.symfony' => -1,
-                        ],
-                    ],
+                    $customOrderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'empty values with default sort direction' => [
-                [
+                'valid values (all properties enabled)' => [
                     [
-                        '$sort' => [
-                            '_id' => 1,
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                                'name' => 1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            '_id' => 1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_smallest (asc)' => [
-                [
+                'nested property' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => 1,
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                                'name' => -1,
+                            ],
+                        ],
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                                'name' => -1,
+                                'relatedDummy_lkup.symfony' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => 1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_smallest (desc)' => [
-                [
+                'empty values with default sort direction' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => -1,
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                '_id' => 1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => -1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_largest (asc)' => [
-                [
+                'nulls_smallest (asc)' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => 1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => 1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_largest (desc)' => [
-                [
+                'nulls_smallest (desc)' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => -1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => -1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_always_first (asc)' => [
-                [
+                'nulls_largest (asc)' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => 1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => 1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_always_first (desc)' => [
-                [
+                'nulls_largest (desc)' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => -1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => -1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_always_last (asc)' => [
-                [
+                'nulls_always_first (asc)' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => 1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => 1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'nulls_always_last (desc)' => [
-                [
+                'nulls_always_first (desc)' => [
                     [
-                        '$sort' => [
-                            'dummyDate' => -1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$sort' => [
-                            'dummyDate' => -1,
-                            'name' => -1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'not having order should not throw a deprecation (select unchanged)' => [
-                [],
-                $orderFilterFactory,
-            ],
-            'not nullable relation will be a LEFT JOIN' => [
-                [
+                'nulls_always_last (asc)' => [
                     [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => 1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
-                    [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$sort' => [
-                            'relatedDummy_lkup.name' => 1,
-                        ],
-                    ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-            ],
-            'embedded' => [
-                [
+                'nulls_always_last (desc)' => [
                     [
-                        '$sort' => [
-                            'embeddedDummy.dummyName' => 1,
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                            ],
+                        ],
+                        [
+                            '$sort' => [
+                                'dummyDate' => -1,
+                                'name' => -1,
+                            ],
                         ],
                     ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-                EmbeddedDummy::class,
-            ],
-            'embedded with nulls_comparison' => [
-                [
+                'not having order should not throw a deprecation (select unchanged)' => [
+                    [],
+                    $orderFilterFactory,
+                ],
+                'not nullable relation will be a LEFT JOIN' => [
                     [
-                        '$sort' => [
-                            'embeddedDummy.dummyName' => 1,
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$sort' => [
+                                'relatedDummy_lkup.name' => 1,
+                            ],
                         ],
                     ],
+                    $orderFilterFactory,
                 ],
-                $orderFilterFactory,
-                EmbeddedDummy::class,
-            ],
-        ]);
+                'embedded' => [
+                    [
+                        [
+                            '$sort' => [
+                                'embeddedDummy.dummyName' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                    EmbeddedDummy::class,
+                ],
+                'embedded with nulls_comparison' => [
+                    [
+                        [
+                            '$sort' => [
+                                'embeddedDummy.dummyName' => 1,
+                            ],
+                        ],
+                    ],
+                    $orderFilterFactory,
+                    EmbeddedDummy::class,
+                ],
+            ]
+        );
     }
 
     protected function buildFilter(?array $properties = null)

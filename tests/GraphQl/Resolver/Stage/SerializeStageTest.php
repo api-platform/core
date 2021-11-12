@@ -197,6 +197,11 @@ class SerializeStageTest extends TestCase
     {
         $pagination = new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
 
-        return new SerializeStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->normalizerProphecy->reveal(), $this->serializerContextBuilderProphecy->reveal(), $pagination);
+        return new SerializeStage(
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->normalizerProphecy->reveal(),
+            $this->serializerContextBuilderProphecy->reveal(),
+            $pagination
+        );
     }
 }

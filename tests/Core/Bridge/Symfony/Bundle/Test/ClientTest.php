@@ -132,10 +132,12 @@ class ClientTest extends ApiTestCase
             'hydra:totalItems' => 0,
         ]);
 
-        $this->assertJsonContains([
-            '@context' => '/contexts/SecuredDummy',
-            '@id' => '/secured_dummies',
-        ]);
+        $this->assertJsonContains(
+            [
+                '@context' => '/contexts/SecuredDummy',
+                '@id' => '/secured_dummies',
+            ]
+        );
 
         $this->assertMatchesJsonSchema(<<<JSON
 {

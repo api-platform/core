@@ -757,7 +757,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             $securityDefinitions['oauth'] = [
                 'type' => $this->oauthType,
-                'description' => sprintf('OAuth 2.0 %s Grant', strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->oauthFlow)))),
+                'description' => sprintf(
+                    'OAuth 2.0 %s Grant',
+                    strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->oauthFlow)))
+                ),
             ];
 
             if ($v3) {

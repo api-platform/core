@@ -29,7 +29,10 @@ class ElasticsearchOperationResourceMetadataFactoryTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(ResourceMetadataFactoryInterface::class, new ElasticsearchOperationResourceMetadataFactory($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()));
+        self::assertInstanceOf(
+            ResourceMetadataFactoryInterface::class,
+            new ElasticsearchOperationResourceMetadataFactory($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal())
+        );
     }
 
     public function testCreate()

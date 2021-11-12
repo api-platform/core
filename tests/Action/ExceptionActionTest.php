@@ -72,8 +72,12 @@ class ExceptionActionTest extends TestCase
      * @dataProvider provideOperationExceptionToStatusCases
      * @group legacy
      */
-    public function testLegacyActionWithOperationExceptionToStatus(array $globalExceptionToStatus, ?array $resourceExceptionToStatus, ?array $operationExceptionToStatus, int $expectedStatusCode)
-    {
+    public function testLegacyActionWithOperationExceptionToStatus(
+        array $globalExceptionToStatus,
+        ?array $resourceExceptionToStatus,
+        ?array $operationExceptionToStatus,
+        int $expectedStatusCode
+    ) {
         $this->expectDeprecation('Since api-platform/core 2.7: Use "ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface" instead of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface".');
 
         $exception = new DomainException();
@@ -83,14 +87,26 @@ class ExceptionActionTest extends TestCase
         $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn();
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata('Foo', null, null, [
-            'operation' => null !== $operationExceptionToStatus ? ['exception_to_status' => $operationExceptionToStatus] : [],
-        ], null, null !== $resourceExceptionToStatus ? ['exception_to_status' => $resourceExceptionToStatus] : []));
+        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
+            'Foo',
+            null,
+            null,
+            [
+                'operation' => null !== $operationExceptionToStatus ? ['exception_to_status' => $operationExceptionToStatus] : [],
+            ],
+            null,
+            null !== $resourceExceptionToStatus ? ['exception_to_status' => $resourceExceptionToStatus] : []
+        ));
 
-        $exceptionAction = new ExceptionAction($serializer->reveal(), [
-            'jsonproblem' => ['application/problem+json'],
-            'jsonld' => ['application/ld+json'],
-        ], $globalExceptionToStatus, $resourceMetadataFactory->reveal());
+        $exceptionAction = new ExceptionAction(
+            $serializer->reveal(),
+            [
+                'jsonproblem' => ['application/problem+json'],
+                'jsonld' => ['application/ld+json'],
+            ],
+            $globalExceptionToStatus,
+            $resourceMetadataFactory->reveal()
+        );
 
         $request = new Request();
         $request->setFormat('jsonproblem', 'application/problem+json');
@@ -111,8 +127,12 @@ class ExceptionActionTest extends TestCase
     /**
      * @dataProvider provideOperationExceptionToStatusCases
      */
-    public function testActionWithOperationExceptionToStatus(array $globalExceptionToStatus, ?array $resourceExceptionToStatus, ?array $operationExceptionToStatus, int $expectedStatusCode)
-    {
+    public function testActionWithOperationExceptionToStatus(
+        array $globalExceptionToStatus,
+        ?array $resourceExceptionToStatus,
+        ?array $operationExceptionToStatus,
+        int $expectedStatusCode
+    ) {
         $exception = new DomainException();
         $flattenException = FlattenException::create($exception);
 
@@ -137,10 +157,15 @@ class ExceptionActionTest extends TestCase
             $resource,
         ]));
 
-        $exceptionAction = new ExceptionAction($serializer->reveal(), [
-            'jsonproblem' => ['application/problem+json'],
-            'jsonld' => ['application/ld+json'],
-        ], $globalExceptionToStatus, $resourceMetadataFactory->reveal());
+        $exceptionAction = new ExceptionAction(
+            $serializer->reveal(),
+            [
+                'jsonproblem' => ['application/problem+json'],
+                'jsonld' => ['application/ld+json'],
+            ],
+            $globalExceptionToStatus,
+            $resourceMetadataFactory->reveal()
+        );
 
         $request = new Request();
         $request->setFormat('jsonproblem', 'application/problem+json');

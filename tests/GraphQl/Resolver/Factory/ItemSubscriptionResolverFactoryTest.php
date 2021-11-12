@@ -55,7 +55,14 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $this->subscriptionManagerProphecy = $this->prophesize(SubscriptionManagerInterface::class);
         $this->mercureSubscriptionIriGeneratorProphecy = $this->prophesize(MercureSubscriptionIriGeneratorInterface::class);
 
-        $this->itemSubscriptionResolverFactory = new ItemSubscriptionResolverFactory($this->readStageProphecy->reveal(), $this->securityStageProphecy->reveal(), $this->serializeStageProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->subscriptionManagerProphecy->reveal(), $this->mercureSubscriptionIriGeneratorProphecy->reveal());
+        $this->itemSubscriptionResolverFactory = new ItemSubscriptionResolverFactory(
+            $this->readStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->serializeStageProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->subscriptionManagerProphecy->reveal(),
+            $this->mercureSubscriptionIriGeneratorProphecy->reveal()
+        );
     }
 
     public function testResolve(): void
@@ -183,7 +190,14 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot use Mercure for subscriptions when MercureBundle is not installed. Try running "composer require mercure".');
 
-        $itemSubscriptionResolverFactory = new ItemSubscriptionResolverFactory($this->readStageProphecy->reveal(), $this->securityStageProphecy->reveal(), $this->serializeStageProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->subscriptionManagerProphecy->reveal(), null);
+        $itemSubscriptionResolverFactory = new ItemSubscriptionResolverFactory(
+            $this->readStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->serializeStageProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->subscriptionManagerProphecy->reveal(),
+            null
+        );
 
         ($itemSubscriptionResolverFactory)($resourceClass, $rootClass, $operationName)($source, $args, null, $info);
     }

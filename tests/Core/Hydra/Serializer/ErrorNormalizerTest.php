@@ -91,17 +91,23 @@ class ErrorNormalizerTest extends TestCase
 
         $normalizer = new ErrorNormalizer($urlGeneratorProphecy->reveal());
 
-        $this->assertEquals([
-            '@context' => '/context/foo',
-            '@type' => 'hydra:Error',
-            'hydra:title' => 'An error occurred',
-            'hydra:description' => 'Hello',
-        ], $normalizer->normalize(new \Exception('Hello')));
-        $this->assertEquals([
-            '@context' => '/context/foo',
-            '@type' => 'hydra:Error',
-            'hydra:title' => 'Hi',
-            'hydra:description' => 'Hello',
-        ], $normalizer->normalize(new \Exception('Hello'), null, ['title' => 'Hi']));
+        $this->assertEquals(
+            [
+                '@context' => '/context/foo',
+                '@type' => 'hydra:Error',
+                'hydra:title' => 'An error occurred',
+                'hydra:description' => 'Hello',
+            ],
+            $normalizer->normalize(new \Exception('Hello'))
+        );
+        $this->assertEquals(
+            [
+                '@context' => '/context/foo',
+                '@type' => 'hydra:Error',
+                'hydra:title' => 'Hi',
+                'hydra:description' => 'Hello',
+            ],
+            $normalizer->normalize(new \Exception('Hello'), null, ['title' => 'Hi'])
+        );
     }
 }

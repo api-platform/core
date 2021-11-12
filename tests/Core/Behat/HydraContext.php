@@ -91,7 +91,10 @@ final class HydraContext implements Context
      */
     public function assertNodeValueIs(string $nodeName, string $className, string $value)
     {
-        Assert::assertEquals($this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName), $value);
+        Assert::assertEquals(
+            $this->propertyAccessor->getValue($this->getClassInfo($className), $nodeName),
+            $value
+        );
     }
 
     /**
@@ -107,7 +110,10 @@ final class HydraContext implements Context
      */
     public function assertPropertyNodeValueIs(string $nodeName, string $propertyName, string $className, string $value)
     {
-        Assert::assertEquals($this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName), $value);
+        Assert::assertEquals(
+            $this->propertyAccessor->getValue($this->getPropertyInfo($propertyName, $className), $nodeName),
+            $value
+        );
     }
 
     /**
@@ -123,7 +129,10 @@ final class HydraContext implements Context
      */
     public function assertOperationNodeValueIs(string $nodeName, string $operationMethod, string $className, string $value)
     {
-        Assert::assertEquals($this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName), $value);
+        Assert::assertEquals(
+            $this->propertyAccessor->getValue($this->getOperation($operationMethod, $className), $nodeName),
+            $value
+        );
     }
 
     /**

@@ -34,6 +34,10 @@ final class XmlContext extends BaseXmlContext
         $expected = $this->xmlEncoder->decode((string) $content, 'xml');
         $actual = $this->xmlEncoder->decode($actualXml = $this->getSession()->getPage()->getContent(), 'xml');
 
-        $this->assertEquals($expected, $actual, "The XML is equal to:\n{$actualXml}");
+        $this->assertEquals(
+            $expected,
+            $actual,
+            "The XML is equal to:\n{$actualXml}"
+        );
     }
 }

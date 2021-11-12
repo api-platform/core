@@ -115,13 +115,25 @@ class ArraySubsetTest extends TestCase
     {
         $reflection = new \ReflectionClass(ArraySubset::class);
 
-        $this->assertTrue($reflection->implementsInterface(\Countable::class), sprintf('Failed to assert that ArraySubset implements "%s".', \Countable::class));
+        $this->assertTrue(
+            $reflection->implementsInterface(\Countable::class),
+            sprintf(
+                'Failed to assert that ArraySubset implements "%s".',
+                \Countable::class
+            )
+        );
     }
 
     public function testIsSelfDescribing(): void
     {
         $reflection = new \ReflectionClass(ArraySubset::class);
 
-        $this->assertTrue($reflection->implementsInterface(SelfDescribing::class), sprintf('Failed to assert that Array implements "%s".', SelfDescribing::class));
+        $this->assertTrue(
+            $reflection->implementsInterface(SelfDescribing::class),
+            sprintf(
+                'Failed to assert that Array implements "%s".',
+                SelfDescribing::class
+            )
+        );
     }
 }

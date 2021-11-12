@@ -45,7 +45,10 @@ class ValidateStageTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->validatorProphecy = $this->prophesize(ValidatorInterface::class);
 
-        $this->validateStage = new ValidateStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->validatorProphecy->reveal());
+        $this->validateStage = new ValidateStage(
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->validatorProphecy->reveal()
+        );
     }
 
     public function testApplyDisabled(): void

@@ -82,7 +82,10 @@ final class DebugResourceCommand extends Command
         }
 
         if (\count($resourceCollection) > 1) {
-            $questionResource = new ChoiceQuestion(sprintf('There are %d resources declared on the class %s, which one do you want to debug ? ', \count($resourceCollection), $shortName).\PHP_EOL, $resources);
+            $questionResource = new ChoiceQuestion(
+                sprintf('There are %d resources declared on the class %s, which one do you want to debug ? ', \count($resourceCollection), $shortName).\PHP_EOL,
+                $resources
+            );
 
             $answerResource = $helper->ask($input, $output, $questionResource);
             $resourceIndex = array_search($answerResource, $resources, true);
@@ -97,7 +100,10 @@ final class DebugResourceCommand extends Command
             $operations[] = $operationName;
         }
 
-        $questionOperation = new ChoiceQuestion(sprintf('There are %d operation%s declared on the resource, which one do you want to debug ? ', $selectedResource->getOperations()->count(), $selectedResource->getOperations()->count() > 1 ? 's' : '').\PHP_EOL, $operations);
+        $questionOperation = new ChoiceQuestion(
+            sprintf('There are %d operation%s declared on the resource, which one do you want to debug ? ', $selectedResource->getOperations()->count(), $selectedResource->getOperations()->count() > 1 ? 's' : '').\PHP_EOL,
+            $operations
+        );
 
         $answerOperation = $helper->ask($input, $output, $questionOperation);
         if ('Debug the resource itself' === $answerOperation) {

@@ -57,8 +57,13 @@ final class ApiFilter
      * @param string $id
      * @param string $strategy
      */
-    public function __construct($filterClass, ?string $id = null, ?string $strategy = null, array $properties = [], array $arguments = [])
-    {
+    public function __construct(
+        $filterClass,
+        ?string $id = null,
+        ?string $strategy = null,
+        array $properties = [],
+        array $arguments = []
+    ) {
         if (\is_array($filterClass)) { /** @phpstan-ignore-line Doctrine annotations */
             $options = $filterClass;
             $this->filterClass = $options['value'] ?? null;

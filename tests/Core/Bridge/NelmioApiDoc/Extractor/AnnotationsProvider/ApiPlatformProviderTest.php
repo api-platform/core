@@ -55,7 +55,13 @@ class ApiPlatformProviderTest extends TestCase
      */
     public function testConstruct()
     {
-        $apiPlatformProvider = new ApiPlatformProvider($this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(), $this->prophesize(NormalizerInterface::class)->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $this->prophesize(OperationMethodResolverInterface::class)->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(NormalizerInterface::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
 
         $this->assertInstanceOf(AnnotationsProviderInterface::class, $apiPlatformProvider);
     }
@@ -109,7 +115,13 @@ class ApiPlatformProviderTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
 
-        new ApiPlatformProvider($this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(), $this->prophesize(NormalizerInterface::class)->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), new \ArrayObject(), $this->prophesize(OperationMethodResolverInterface::class)->reveal());
+        new ApiPlatformProvider(
+            $this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(NormalizerInterface::class)->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            new \ArrayObject(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
     }
 
     private function extractAnnotations($filterLocator)
@@ -166,7 +178,13 @@ class ApiPlatformProviderTest extends TestCase
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'put')->willReturn((new Route('/dummies/{id}'))->setMethods(['PUT']))->shouldBeCalled();
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'delete')->willReturn((new Route('/dummies/{id}'))->setMethods(['DELETE']))->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $apiDocumentationBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $filterLocator, $operationMethodResolverProphecy->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $apiDocumentationBuilderProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $filterLocator,
+            $operationMethodResolverProphecy->reveal()
+        );
 
         $annotations = $apiPlatformProvider->getAnnotations();
 
@@ -320,7 +338,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $this->prophesize(OperationMethodResolverInterface::class)->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
 
         $this->assertEquals([], $apiPlatformProvider->getAnnotations());
     }
@@ -335,7 +359,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $this->prophesize(OperationMethodResolverInterface::class)->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
 
         $this->assertEquals([], $apiPlatformProvider->getAnnotations());
     }
@@ -350,7 +380,13 @@ JSON;
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $this->prophesize(OperationMethodResolverInterface::class)->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $this->prophesize(OperationMethodResolverInterface::class)->reveal()
+        );
 
         $this->assertEquals([], $apiPlatformProvider->getAnnotations());
     }
@@ -385,7 +421,13 @@ JSON;
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $operationMethodResolverProphecy->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $operationMethodResolverProphecy->reveal()
+        );
 
         $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '']);
         $apiDoc->setRoute($route);
@@ -423,7 +465,13 @@ JSON;
         $operationMethodResolverProphecy->getItemOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
         $operationMethodResolverProphecy->getItemOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $operationMethodResolverProphecy->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $operationMethodResolverProphecy->reveal()
+        );
 
         $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '']);
         $apiDoc->setRoute($route);
@@ -461,7 +509,13 @@ JSON;
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
         $operationMethodResolverProphecy->getCollectionOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $operationMethodResolverProphecy->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $operationMethodResolverProphecy->reveal()
+        );
 
         $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '', 'filters' => []]);
         $apiDoc->setRoute($route);
@@ -499,7 +553,13 @@ JSON;
         $operationMethodResolverProphecy->getCollectionOperationMethod(Dummy::class, 'get')->willReturn('GET')->shouldBeCalled();
         $operationMethodResolverProphecy->getCollectionOperationRoute(Dummy::class, 'get')->willReturn($route)->shouldBeCalled();
 
-        $apiPlatformProvider = new ApiPlatformProvider($resourceNameCollectionFactoryProphecy->reveal(), $documentationNormalizerProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal(), $operationMethodResolverProphecy->reveal());
+        $apiPlatformProvider = new ApiPlatformProvider(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $documentationNormalizerProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ContainerInterface::class)->reveal(),
+            $operationMethodResolverProphecy->reveal()
+        );
 
         $apiDoc = new ApiDoc(['resource' => $route->getPath(), 'description' => '', 'resourceDescription' => '', 'section' => '', 'filters' => []]);
         $apiDoc->setRoute($route);

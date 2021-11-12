@@ -64,7 +64,10 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             }
 
             if ($this->requestStack && null !== $request = $this->requestStack->getCurrentRequest()) {
-                $request->attributes->set('_graphql_collections_args', [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', []));
+                $request->attributes->set(
+                    '_graphql_collections_args',
+                    [$resourceClass => $args] + $request->attributes->get('_graphql_collections_args', [])
+                );
             }
 
             $operationName = $operationName ?? 'collection_query';

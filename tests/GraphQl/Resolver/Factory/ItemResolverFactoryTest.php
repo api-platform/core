@@ -56,7 +56,14 @@ class ItemResolverFactoryTest extends TestCase
         $this->queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
-        $this->itemResolverFactory = new ItemResolverFactory($this->readStageProphecy->reveal(), $this->securityStageProphecy->reveal(), $this->securityPostDenormalizeStageProphecy->reveal(), $this->serializeStageProphecy->reveal(), $this->queryResolverLocatorProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal());
+        $this->itemResolverFactory = new ItemResolverFactory(
+            $this->readStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->securityPostDenormalizeStageProphecy->reveal(),
+            $this->serializeStageProphecy->reveal(),
+            $this->queryResolverLocatorProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal()
+        );
     }
 
     /**

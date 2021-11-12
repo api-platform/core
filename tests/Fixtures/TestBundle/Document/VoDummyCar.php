@@ -52,8 +52,13 @@ class VoDummyCar extends VoDummyVehicle
      */
     private $inspections;
 
-    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, int $mileage, string $bodyType = 'coupe')
-    {
+    public function __construct(
+        string $make,
+        VoDummyInsuranceCompany $insuranceCompany,
+        array $drivers,
+        int $mileage,
+        string $bodyType = 'coupe'
+    ) {
         parent::__construct($make, $insuranceCompany, $drivers);
         $this->mileage = $mileage;
         $this->bodyType = $bodyType;

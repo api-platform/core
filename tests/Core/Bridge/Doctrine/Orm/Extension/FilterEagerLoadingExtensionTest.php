@@ -415,7 +415,14 @@ SQL;
 
         $qb = new QueryBuilder($em->reveal());
 
-        $carJoin = new Expr\Join(Expr\Join::LEFT_JOIN, DummyCar::class, 'car', 'WITH', 'car.id = o.car', null);
+        $carJoin = new Expr\Join(
+            Expr\Join::LEFT_JOIN,
+            DummyCar::class,
+            'car',
+            'WITH',
+            'car.id = o.car',
+            null
+        );
 
         $qb->select('o')
             ->from(CompositeRelation::class, 'o')

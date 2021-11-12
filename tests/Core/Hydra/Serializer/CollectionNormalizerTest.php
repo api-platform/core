@@ -90,8 +90,14 @@ class CollectionNormalizerTest extends TestCase
         $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(Argument::withEntry('resource_class', Foo::class), Argument::withEntry('api_sub_level', true)))->willReturn($normalizedFooOne);
-        $delegateNormalizerProphecy->normalize($fooThree, CollectionNormalizer::FORMAT, Argument::allOf(Argument::withEntry('resource_class', Foo::class), Argument::withEntry('api_sub_level', true)))->willReturn($normalizedFooThree);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+        $delegateNormalizerProphecy->normalize($fooThree, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooThree);
 
         $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
@@ -185,8 +191,14 @@ class CollectionNormalizerTest extends TestCase
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(Argument::withEntry('resource_class', Foo::class), Argument::withEntry('api_sub_level', true)))->willReturn($normalizedFooOne);
-        $delegateNormalizerProphecy->normalize($fooThree, CollectionNormalizer::FORMAT, Argument::allOf(Argument::withEntry('resource_class', Foo::class), Argument::withEntry('api_sub_level', true)))->willReturn($normalizedFooThree);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+        $delegateNormalizerProphecy->normalize($fooThree, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooThree);
 
         $normalizer = new CollectionNormalizer($contextBuilderProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal());
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
@@ -246,33 +258,39 @@ class CollectionNormalizerTest extends TestCase
 
     public function testNormalizePaginator()
     {
-        $this->assertEquals([
-            '@context' => '/contexts/Foo',
-            '@id' => '/foo/1',
-            '@type' => 'hydra:Collection',
-            'hydra:member' => [
-                [
-                    'name' => 'Kévin',
-                    'friend' => 'Smail',
+        $this->assertEquals(
+            [
+                '@context' => '/contexts/Foo',
+                '@id' => '/foo/1',
+                '@type' => 'hydra:Collection',
+                'hydra:member' => [
+                    [
+                        'name' => 'Kévin',
+                        'friend' => 'Smail',
+                    ],
                 ],
+                'hydra:totalItems' => 1312.,
             ],
-            'hydra:totalItems' => 1312.,
-        ], $this->normalizePaginator());
+            $this->normalizePaginator()
+        );
     }
 
     public function testNormalizePartialPaginator()
     {
-        $this->assertEquals([
-            '@context' => '/contexts/Foo',
-            '@id' => '/foo/1',
-            '@type' => 'hydra:Collection',
-            'hydra:member' => [
-                0 => [
-                    'name' => 'Kévin',
-                    'friend' => 'Smail',
+        $this->assertEquals(
+            [
+                '@context' => '/contexts/Foo',
+                '@id' => '/foo/1',
+                '@type' => 'hydra:Collection',
+                'hydra:member' => [
+                    0 => [
+                        'name' => 'Kévin',
+                        'friend' => 'Smail',
+                    ],
                 ],
             ],
-        ], $this->normalizePaginator(true));
+            $this->normalizePaginator(true)
+        );
     }
 
     private function normalizePaginator($partial = false)

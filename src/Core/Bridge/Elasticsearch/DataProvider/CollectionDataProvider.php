@@ -130,7 +130,14 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             'body' => $body,
         ]);
 
-        return new Paginator($this->denormalizer, $documents, $resourceClass, $limit, $offset, $context);
+        return new Paginator(
+            $this->denormalizer,
+            $documents,
+            $resourceClass,
+            $limit,
+            $offset,
+            $context
+        );
     }
 
     private $collectionExtensions;

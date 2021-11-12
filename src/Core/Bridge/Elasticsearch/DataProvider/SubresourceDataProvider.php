@@ -140,6 +140,13 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface,
             'body' => $body,
         ]);
 
-        return new Paginator($this->denormalizer, $documents, $resourceClass, $limit, $offset, $context);
+        return new Paginator(
+            $this->denormalizer,
+            $documents,
+            $resourceClass,
+            $limit,
+            $offset,
+            $context
+        );
     }
 }

@@ -145,13 +145,24 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($data['data']['id'], $context + ['fetch_data' => false]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
+                $data['data']['id'],
+                $context + ['fetch_data' => false]
+            );
         }
 
         // Merge attributes and relationships, into format expected by the parent normalizer
-        $dataToDenormalize = array_merge($data['data']['attributes'] ?? [], $data['data']['relationships'] ?? []);
+        $dataToDenormalize = array_merge(
+            $data['data']['attributes'] ?? [],
+            $data['data']['relationships'] ?? []
+        );
 
-        return parent::denormalize($dataToDenormalize, $class, $format, $context);
+        return parent::denormalize(
+            $dataToDenormalize,
+            $class,
+            $format,
+            $context
+        );
     }
 
     /**

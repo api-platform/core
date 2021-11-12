@@ -72,7 +72,9 @@ final class PropertyFilter implements FilterInterface
      */
     public function getDescription(string $resourceClass): array
     {
-        $example = sprintf('%1$s[]={propertyName}&%1$s[]={anotherPropertyName}&%1$s[{nestedPropertyParent}][]={nestedProperty}', $this->parameterName);
+        $example = sprintf('%1$s[]={propertyName}&%1$s[]={anotherPropertyName}&%1$s[{nestedPropertyParent}][]={nestedProperty}',
+            $this->parameterName
+        );
 
         return [
             "$this->parameterName[]" => [

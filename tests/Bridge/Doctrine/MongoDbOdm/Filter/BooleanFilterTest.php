@@ -31,75 +31,78 @@ class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'string ("true")' => [
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'string ("true")' => [
                     [
-                        '$match' => ['dummyBoolean' => true],
-                    ],
-                ],
-            ],
-            'string ("false")' => [
-                [
-                    [
-                        '$match' => ['dummyBoolean' => false],
-                    ],
-                ],
-            ],
-            'non-boolean' => [
-                [],
-            ],
-            'numeric string ("0")' => [
-                [
-                    [
-                        '$match' => ['dummyBoolean' => false],
-                    ],
-                ],
-            ],
-            'numeric string ("1")' => [
-                [
-                    [
-                        '$match' => ['dummyBoolean' => true],
-                    ],
-                ],
-            ],
-            'nested properties' => [
-                [
-                    [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
+                        [
+                            '$match' => ['dummyBoolean' => true],
                         ],
                     ],
+                ],
+                'string ("false")' => [
                     [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$match' => ['relatedDummy_lkup.dummyBoolean' => true],
+                        [
+                            '$match' => ['dummyBoolean' => false],
+                        ],
                     ],
                 ],
-            ],
-            'numeric string ("1") on non-boolean property' => [
-                [],
-            ],
-            'numeric string ("0") on non-boolean property' => [
-                [],
-            ],
-            'string ("true") on non-boolean property' => [
-                [],
-            ],
-            'string ("false") on non-boolean property' => [
-                [],
-            ],
-            'mixed boolean, non-boolean and invalid property' => [
-                [
+                'non-boolean' => [
+                    [],
+                ],
+                'numeric string ("0")' => [
                     [
-                        '$match' => ['dummyBoolean' => false],
+                        [
+                            '$match' => ['dummyBoolean' => false],
+                        ],
                     ],
                 ],
-            ],
-        ]);
+                'numeric string ("1")' => [
+                    [
+                        [
+                            '$match' => ['dummyBoolean' => true],
+                        ],
+                    ],
+                ],
+                'nested properties' => [
+                    [
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$match' => ['relatedDummy_lkup.dummyBoolean' => true],
+                        ],
+                    ],
+                ],
+                'numeric string ("1") on non-boolean property' => [
+                    [],
+                ],
+                'numeric string ("0") on non-boolean property' => [
+                    [],
+                ],
+                'string ("true") on non-boolean property' => [
+                    [],
+                ],
+                'string ("false") on non-boolean property' => [
+                    [],
+                ],
+                'mixed boolean, non-boolean and invalid property' => [
+                    [
+                        [
+                            '$match' => ['dummyBoolean' => false],
+                        ],
+                    ],
+                ],
+            ]
+        );
     }
 }

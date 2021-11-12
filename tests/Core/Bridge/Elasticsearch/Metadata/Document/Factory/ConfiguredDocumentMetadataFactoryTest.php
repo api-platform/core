@@ -27,7 +27,10 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(DocumentMetadataFactoryInterface::class, new ConfiguredDocumentMetadataFactory([], $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()));
+        self::assertInstanceOf(
+            DocumentMetadataFactoryInterface::class,
+            new ConfiguredDocumentMetadataFactory([], $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal())
+        );
     }
 
     public function testCreate()

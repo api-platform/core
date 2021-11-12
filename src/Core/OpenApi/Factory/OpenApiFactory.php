@@ -106,7 +106,21 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $securityRequirements[] = [$key => []];
         }
 
-        return new OpenApi($info, $servers, $paths, new Model\Components($schemas, new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject(), new \ArrayObject($securitySchemes)), $securityRequirements);
+        return new OpenApi(
+            $info,
+            $servers,
+            $paths,
+            new Model\Components(
+                $schemas,
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject(),
+                new \ArrayObject($securitySchemes)
+            ),
+            $securityRequirements
+        );
     }
 
     private function collectPaths(ResourceMetadata $resourceMetadata, string $resourceClass, string $operationType, array $context, Model\Paths $paths, array &$links, \ArrayObject $schemas): void
@@ -261,9 +275,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $requestBody = new Model\RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
             }
 
-            $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation($operationId, $operation['openapi_context']['tags'] ?? (OperationType::SUBRESOURCE === $operationType ? $operation['shortNames'] : [$resourceShortName]), $responses, $operation['openapi_context']['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operationType), $operation['openapi_context']['description'] ?? $this->getPathDescription($resourceShortName, $method, $operationType), isset($operation['openapi_context']['externalDocs']) ? new ExternalDocumentation($operation['openapi_context']['externalDocs']['description'] ?? null, $operation['openapi_context']['externalDocs']['url']) : null, $parameters, $requestBody, isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null, $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true), $operation['openapi_context']['security'] ?? null, $operation['openapi_context']['servers'] ?? null, array_filter($operation['openapi_context'] ?? [], static function ($item) {
-                return preg_match('/^x-.*$/i', $item);
-            }, \ARRAY_FILTER_USE_KEY)));
+            $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
+                $operationId,
+                $operation['openapi_context']['tags'] ?? (OperationType::SUBRESOURCE === $operationType ? $operation['shortNames'] : [$resourceShortName]),
+                $responses,
+                $operation['openapi_context']['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operationType),
+                $operation['openapi_context']['description'] ?? $this->getPathDescription($resourceShortName, $method, $operationType),
+                isset($operation['openapi_context']['externalDocs']) ? new ExternalDocumentation($operation['openapi_context']['externalDocs']['description'] ?? null, $operation['openapi_context']['externalDocs']['url']) : null,
+                $parameters,
+                $requestBody,
+                isset($operation['openapi_context']['callbacks']) ? new \ArrayObject($operation['openapi_context']['callbacks']) : null,
+                $operation['openapi_context']['deprecated'] ?? (bool) $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', false, true),
+                $operation['openapi_context']['security'] ?? null,
+                $operation['openapi_context']['servers'] ?? null,
+                array_filter($operation['openapi_context'] ?? [], static function ($item) {
+                    return preg_match('/^x-.*$/i', $item);
+                }, \ARRAY_FILTER_USE_KEY)
+            ));
 
             $paths->addPath($path, $pathItem);
         }
@@ -362,7 +390,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $parameters[$propertyName] = sprintf('$response.body#/%s', $propertyName);
         }
 
-        return new Model\Link($operationId, new \ArrayObject($parameters), null, 1 === \count($parameters) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', key($parameters), $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path));
+        return new Model\Link(
+            $operationId,
+            new \ArrayObject($parameters),
+            null,
+            1 === \count($parameters) ? sprintf('The `%1$s` value returned in the response can be used as the `%1$s` parameter in `GET %2$s`.', key($parameters), $path) : sprintf('The values returned in the response can be used in `GET %s`.', $path)
+        );
     }
 
     /**
@@ -380,7 +413,20 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             foreach ($filter->getDescription($resourceClass) as $name => $data) {
                 $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string']);
 
-                $parameters[] = new Model\Parameter($name, 'query', $data['description'] ?? '', $data['required'] ?? false, $data['openapi']['deprecated'] ?? false, $data['openapi']['allowEmptyValue'] ?? true, $schema, 'array' === $schema['type'] && \in_array($data['type'], [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form', $data['openapi']['explode'] ?? ('array' === $schema['type']), $data['openapi']['allowReserved'] ?? false, $data['openapi']['example'] ?? null, isset($data['openapi']['examples']
+                $parameters[] = new Model\Parameter(
+                    $name,
+                    'query',
+                    $data['description'] ?? '',
+                    $data['required'] ?? false,
+                    $data['openapi']['deprecated'] ?? false,
+                    $data['openapi']['allowEmptyValue'] ?? true,
+                    $schema,
+                    'array' === $schema['type'] && \in_array($data['type'],
+                    [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
+                    $data['openapi']['explode'] ?? ('array' === $schema['type']),
+                    $data['openapi']['allowReserved'] ?? false,
+                    $data['openapi']['example'] ?? null,
+                    isset($data['openapi']['examples']
                 ) ? new \ArrayObject($data['openapi']['examples']) : null);
             }
         }
@@ -424,7 +470,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private function getOauthSecurityScheme(): Model\SecurityScheme
     {
         $oauthFlow = new Model\OAuthFlow($this->openApiOptions->getOAuthAuthorizationUrl(), $this->openApiOptions->getOAuthTokenUrl(), $this->openApiOptions->getOAuthRefreshUrl(), new \ArrayObject($this->openApiOptions->getOAuthScopes()));
-        $description = sprintf('OAuth 2.0 %s Grant', strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->openApiOptions->getOAuthFlow()))));
+        $description = sprintf(
+            'OAuth 2.0 %s Grant',
+            strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->openApiOptions->getOAuthFlow())))
+        );
         $implicit = $password = $clientCredentials = $authorizationCode = null;
 
         switch ($this->openApiOptions->getOAuthFlow()) {

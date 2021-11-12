@@ -75,7 +75,11 @@ final class JsonContext extends BaseJsonContext
 
         $actualContent = $this->inspector->evaluate($actual, $node);
 
-        $this->assertEquals($expected->getContent(), $actualContent, sprintf("The JSON node \"%s\" is equal to:\n%s", $node, json_encode($actualContent, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRETTY_PRINT)));
+        $this->assertEquals(
+            $expected->getContent(),
+            $actualContent,
+            sprintf("The JSON node \"%s\" is equal to:\n%s", $node, json_encode($actualContent, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRETTY_PRINT))
+        );
     }
 
     public function theJsonShouldBeEqualTo(PyStringNode $content): void
@@ -88,7 +92,11 @@ final class JsonContext extends BaseJsonContext
             throw new ExpectationException('The expected JSON is not valid.', $this->getSession()->getDriver());
         }
 
-        $this->assertEquals($expected->getContent(), $actual->getContent(), "The JSON is equal to:\n{$actual->encode()}");
+        $this->assertEquals(
+            $expected->getContent(),
+            $actual->getContent(),
+            "The JSON is equal to:\n{$actual->encode()}"
+        );
     }
 
     /**

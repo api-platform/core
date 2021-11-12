@@ -37,7 +37,12 @@ class AddHeadersListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $request->setMethod('PUT');
         $response = new Response();
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event);
@@ -49,7 +54,12 @@ class AddHeadersListenerTest extends TestCase
     {
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
         $response = new Response('{}', Response::HTTP_BAD_REQUEST);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event);
@@ -60,7 +70,12 @@ class AddHeadersListenerTest extends TestCase
     public function testDoNotSetHeaderWhenNotAnApiOperation()
     {
         $response = new Response();
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event);
@@ -71,7 +86,12 @@ class AddHeadersListenerTest extends TestCase
     public function testDoNotSetHeaderWhenNoContent()
     {
         $response = new Response();
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
         $listener = new AddHeadersListener(true);
         $listener->onKernelResponse($event);
 
@@ -81,7 +101,12 @@ class AddHeadersListenerTest extends TestCase
     public function testAddHeaders()
     {
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
@@ -102,7 +127,12 @@ class AddHeadersListenerTest extends TestCase
         // This also calls setPublic
         $response->setSharedMaxAge(400);
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
@@ -118,7 +148,12 @@ class AddHeadersListenerTest extends TestCase
     public function testSetHeadersFromResourceMetadata()
     {
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]]);
         $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
@@ -134,7 +169,12 @@ class AddHeadersListenerTest extends TestCase
     public function testSetHeadersFromResourceMetadataMarkedAsPrivate()
     {
         $response = new Response('some content', 200);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -158,7 +198,12 @@ class AddHeadersListenerTest extends TestCase
     public function testSetHeadersFromResourceMetadataMarkedAsPublic()
     {
         $response = new Response('some content', 200);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -179,7 +224,12 @@ class AddHeadersListenerTest extends TestCase
     public function testSetHeadersFromResourceMetadataWithNoPrivacy()
     {
         $response = new Response('some content', 200);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [
@@ -199,7 +249,12 @@ class AddHeadersListenerTest extends TestCase
     public function testSetHeadersFromResourceMetadataWithNoPrivacyDefaultsPrivate()
     {
         $response = new Response('some content', 200);
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']), HttpKernelInterface::MASTER_REQUEST, $response);
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
 
         $metadata = new ResourceMetadata(null, null, null, null, null, [
             'cache_headers' => [

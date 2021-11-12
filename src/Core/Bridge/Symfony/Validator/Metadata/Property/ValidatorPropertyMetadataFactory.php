@@ -132,7 +132,9 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         if ($iri) {
-            $propertyMetadata = ($propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->withIri($iri) : $propertyMetadata->withTypes([$iri]));
+            $propertyMetadata = (
+                $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->withIri($iri) : $propertyMetadata->withTypes([$iri])
+            );
         }
 
         $propertyMetadata = $propertyMetadata->withRequired($required ?? false);
@@ -168,8 +170,10 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * Tests if the property is required because of its validation groups.
      */
-    private function getPropertyConstraints(ValidatorPropertyMetadataInterface $validatorPropertyMetadata, array $groups): array
-    {
+    private function getPropertyConstraints(
+        ValidatorPropertyMetadataInterface $validatorPropertyMetadata,
+        array $groups
+    ): array {
         $constraints = [];
 
         foreach ($groups as $validationGroup) {

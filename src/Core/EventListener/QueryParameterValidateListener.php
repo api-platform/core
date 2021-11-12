@@ -75,8 +75,10 @@ final class QueryParameterValidateListener
         // TODO: remove in 3.0
         $operationName = $attributes['collection_operation_name'] ?? null;
         if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (null === $operationName
-                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled))
+            (
+                null === $operationName
+                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled)
+            )
         ) {
             return;
         }

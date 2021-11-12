@@ -65,7 +65,13 @@ class SwaggerUiActionTest extends TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
-        $action = new SwaggerUiAction($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $normalizerProphecy->reveal(), $twigProphecy->reveal(), $urlGeneratorProphecy->reveal());
+        $action = new SwaggerUiAction(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $normalizerProphecy->reveal(),
+            $twigProphecy->reveal(),
+            $urlGeneratorProphecy->reveal()
+        );
         $action($request);
     }
 
@@ -196,7 +202,13 @@ class SwaggerUiActionTest extends TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGenerator::class);
         $urlGeneratorProphecy->generate('api_doc', ['format' => 'json'])->willReturn('/url')->shouldBeCalled();
 
-        $action = new SwaggerUiAction($resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $normalizerProphecy->reveal(), $twigProphecy->reveal(), $urlGeneratorProphecy->reveal());
+        $action = new SwaggerUiAction(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $normalizerProphecy->reveal(),
+            $twigProphecy->reveal(),
+            $urlGeneratorProphecy->reveal()
+        );
         $action($request);
     }
 

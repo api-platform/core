@@ -44,7 +44,12 @@ class SerializeListenerTest extends TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::cetera());
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, null);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            null
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
@@ -64,7 +69,12 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post', '_api_respond' => false]);
         $request->setMethod('POST');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
@@ -92,7 +102,12 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -106,9 +121,18 @@ class SerializeListenerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $serializerProphecy
-            ->serialize(Argument::any(), 'xml', Argument::allOf(Argument::that(function (array $context) {
-                return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
-            }), Argument::withEntry('request_uri', ''), Argument::withEntry('resource_class', 'Foo'), Argument::withEntry('collection_operation_name', 'get')))
+            ->serialize(
+                Argument::any(),
+                'xml',
+                Argument::allOf(
+                    Argument::that(function (array $context) {
+                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
+                    }),
+                    Argument::withEntry('request_uri', ''),
+                    Argument::withEntry('resource_class', 'Foo'),
+                    Argument::withEntry('collection_operation_name', 'get')
+                )
+            )
             ->willReturn('bar')
             ->shouldBeCalled();
 
@@ -117,7 +141,12 @@ class SerializeListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
         $request->setRequestFormat('xml');
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new \stdClass());
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new \stdClass()
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
@@ -136,7 +165,12 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', '_api_output_class' => false]);
         $request->setRequestFormat('xml');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new \stdClass());
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new \stdClass()
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
@@ -149,9 +183,18 @@ class SerializeListenerTest extends TestCase
         $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'item_operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy
-            ->serialize(Argument::any(), 'xml', Argument::allOf(Argument::that(function (array $context) {
-                return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
-            }), Argument::withEntry('request_uri', ''), Argument::withEntry('resource_class', 'Foo'), Argument::withEntry('item_operation_name', 'get')))
+            ->serialize(
+                Argument::any(),
+                'xml',
+                Argument::allOf(
+                    Argument::that(function (array $context) {
+                        return $context['resources'] instanceof ResourceList && $context['resources_to_push'] instanceof ResourceList;
+                    }),
+                    Argument::withEntry('request_uri', ''),
+                    Argument::withEntry('resource_class', 'Foo'),
+                    Argument::withEntry('item_operation_name', 'get')
+                )
+            )
             ->willReturn('bar')
             ->shouldBeCalled();
 
@@ -160,7 +203,12 @@ class SerializeListenerTest extends TestCase
 
         $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']);
         $request->setRequestFormat('xml');
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new \stdClass());
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new \stdClass()
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);
@@ -180,7 +228,12 @@ class SerializeListenerTest extends TestCase
         $request = new Request([], [], ['_api_respond' => true]);
         $request->setRequestFormat('xml');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, []);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            []
+        );
 
         $listener = new SerializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal());
         $listener->onKernelView($event);

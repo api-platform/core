@@ -56,45 +56,54 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
     public function testNormalizePaginator()
     {
-        $this->assertEquals([
-            'hydra:totalItems' => 40,
-            'foo' => 'bar',
-            'hydra:view' => [
-                '@id' => '/?_page=3',
-                '@type' => 'hydra:PartialCollectionView',
-                'hydra:first' => '/?_page=1',
-                'hydra:last' => '/?_page=20',
-                'hydra:previous' => '/?_page=2',
-                'hydra:next' => '/?_page=4',
+        $this->assertEquals(
+            [
+                'hydra:totalItems' => 40,
+                'foo' => 'bar',
+                'hydra:view' => [
+                    '@id' => '/?_page=3',
+                    '@type' => 'hydra:PartialCollectionView',
+                    'hydra:first' => '/?_page=1',
+                    'hydra:last' => '/?_page=20',
+                    'hydra:previous' => '/?_page=2',
+                    'hydra:next' => '/?_page=4',
+                ],
             ],
-        ], $this->normalizePaginator());
+            $this->normalizePaginator()
+        );
     }
 
     public function testNormalizePartialPaginator()
     {
-        $this->assertEquals([
-            'foo' => 'bar',
-            'hydra:view' => [
-                '@id' => '/?_page=3',
-                '@type' => 'hydra:PartialCollectionView',
-                'hydra:previous' => '/?_page=2',
-                'hydra:next' => '/?_page=4',
+        $this->assertEquals(
+            [
+                'foo' => 'bar',
+                'hydra:view' => [
+                    '@id' => '/?_page=3',
+                    '@type' => 'hydra:PartialCollectionView',
+                    'hydra:previous' => '/?_page=2',
+                    'hydra:next' => '/?_page=4',
+                ],
             ],
-        ], $this->normalizePaginator(true));
+            $this->normalizePaginator(true)
+        );
     }
 
     public function testNormalizeWithCursorBasedPagination(): void
     {
-        self::assertEquals([
-            'foo' => 'bar',
-            'hydra:totalItems' => 40,
-            'hydra:view' => [
-                '@id' => '/',
-                '@type' => 'hydra:PartialCollectionView',
-                'hydra:previous' => '/?id%5Bgt%5D=1',
-                'hydra:next' => '/?id%5Blt%5D=2',
+        self::assertEquals(
+            [
+                'foo' => 'bar',
+                'hydra:totalItems' => 40,
+                'hydra:view' => [
+                    '@id' => '/',
+                    '@type' => 'hydra:PartialCollectionView',
+                    'hydra:previous' => '/?id%5Bgt%5D=1',
+                    'hydra:next' => '/?id%5Blt%5D=2',
+                ],
             ],
-        ], $this->normalizePaginator(false, true));
+            $this->normalizePaginator(false, true)
+        );
     }
 
     private function normalizePaginator(bool $partial = false, bool $cursor = false)

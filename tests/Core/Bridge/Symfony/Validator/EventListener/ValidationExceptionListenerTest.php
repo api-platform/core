@@ -37,7 +37,9 @@ class ValidationExceptionListenerTest extends TestCase
 
     public function testNotValidationException()
     {
-        $listener = new ValidationExceptionListener($this->prophesize(SerializerInterface::class)->reveal(), ['hydra' => ['application/ld+json']]);
+        $listener = new ValidationExceptionListener(
+            $this->prophesize(SerializerInterface::class)->reveal(),
+            ['hydra' => ['application/ld+json']]);
 
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
@@ -88,9 +90,18 @@ class ValidationExceptionListenerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->serialize($constraintViolationList, 'hydra')->willReturn($serializedConstraintViolationList)->shouldBeCalledOnce();
 
-        $exceptionEvent = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, $exception);
+        $exceptionEvent = new ExceptionEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request(),
+            HttpKernelInterface::MASTER_REQUEST,
+            $exception
+        );
 
-        (new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']], [\get_class($exception) => Response::HTTP_BAD_REQUEST]))->onKernelException($exceptionEvent);
+        (new ValidationExceptionListener(
+            $serializerProphecy->reveal(),
+            ['hydra' => ['application/ld+json']],
+            [\get_class($exception) => Response::HTTP_BAD_REQUEST]
+        ))->onKernelException($exceptionEvent);
 
         $response = $exceptionEvent->getResponse();
 

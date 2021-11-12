@@ -33,8 +33,11 @@ final class TestClientPass implements CompilerPassInterface
             return;
         }
 
-        $container->setDefinition('test.api_platform.client', (new Definition(Client::class, [new Reference('test.client')]))
+        $container->setDefinition(
+            'test.api_platform.client',
+            (new Definition(Client::class, [new Reference('test.client')]))
                 ->setShared(false)
-                ->setPublic(true));
+                ->setPublic(true)
+        );
     }
 }

@@ -25,7 +25,9 @@ class PatternTest extends TestCase
     {
         $filter = new Pattern();
 
-        $this->assertEmpty($filter->validate('some_filter', [], []));
+        $this->assertEmpty(
+            $filter->validate('some_filter', [], [])
+        );
     }
 
     public function testFilterWithEmptyValue()
@@ -38,11 +40,15 @@ class PatternTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => '']));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => ''])
+        );
 
         $weirdParameter = new \stdClass();
         $weirdParameter->foo = 'non string value should not exists';
-        $this->assertEmpty($filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => $weirdParameter]));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => $weirdParameter])
+        );
     }
 
     public function testFilterWithZeroAsParameter()
@@ -55,7 +61,10 @@ class PatternTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must match pattern /foo/'], $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => '0']));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must match pattern /foo/'],
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => '0'])
+        );
     }
 
     public function testFilterWithNonMatchingValue()
@@ -68,7 +77,10 @@ class PatternTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must match pattern /foo/'], $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'bar']));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must match pattern /foo/'],
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'bar'])
+        );
     }
 
     public function testFilterWithNonchingValue()
@@ -81,6 +93,8 @@ class PatternTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'this is a foo '.random_int(0, 10).' and it should match']));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $explicitFilterDefinition, ['some_filter' => 'this is a foo '.random_int(0, 10).' and it should match'])
+        );
     }
 }

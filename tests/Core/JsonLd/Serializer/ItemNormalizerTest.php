@@ -77,7 +77,14 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true)->shouldBeCalled();
         $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false)->shouldBeCalled();
 
-        $normalizer = new ItemNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $contextBuilderProphecy->reveal());
+        $normalizer = new ItemNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $contextBuilderProphecy->reveal()
+        );
 
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonld'));
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
@@ -113,7 +120,19 @@ class ItemNormalizerTest extends TestCase
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilderProphecy->getResourceContextUri(Dummy::class)->willReturn('/contexts/Dummy');
 
-        $normalizer = new ItemNormalizer($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $contextBuilderProphecy->reveal(), null, null, null, [], []);
+        $normalizer = new ItemNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $contextBuilderProphecy->reveal(),
+            null,
+            null,
+            null,
+            [],
+            []
+        );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $expected = [

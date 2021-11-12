@@ -387,7 +387,14 @@ class IriConverterTest extends TestCase
         $routeNameResolverProphecy = $this->prophesize(RouteNameResolverInterface::class);
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
 
-        new IriConverter($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $itemDataProviderProphecy->reveal(), $routeNameResolverProphecy->reveal(), $routerProphecy->reveal(), null);
+        new IriConverter(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $itemDataProviderProphecy->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null
+        );
     }
 
     private function getResourceClassResolver()
@@ -429,6 +436,18 @@ class IriConverterTest extends TestCase
             });
         }
 
-        return new IriConverter($propertyNameCollectionFactory, $propertyMetadataFactory, $itemDataProvider->reveal(), $routeNameResolverProphecy->reveal(), $routerProphecy->reveal(), null, new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()), $subresourceDataProviderProphecy ? $subresourceDataProviderProphecy->reveal() : null, $identifierConverterProphecy->reveal(), null, $resourceMetadataFactory);
+        return new IriConverter(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $itemDataProvider->reveal(),
+            $routeNameResolverProphecy->reveal(),
+            $routerProphecy->reveal(),
+            null,
+            new IdentifiersExtractor($propertyNameCollectionFactory, $propertyMetadataFactory, null, $this->getResourceClassResolver()),
+            $subresourceDataProviderProphecy ? $subresourceDataProviderProphecy->reveal() : null,
+            $identifierConverterProphecy->reveal(),
+            null,
+            $resourceMetadataFactory
+        );
     }
 }

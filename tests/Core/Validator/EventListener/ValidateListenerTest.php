@@ -79,7 +79,12 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $validationViewListener->onKernelView($event);
@@ -97,7 +102,12 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post', '_api_receive' => false]);
         $request->setMethod('POST');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $validationViewListener->onKernelView($event);
@@ -122,7 +132,12 @@ class ValidateListenerTest extends TestCase
         $request = new Request([], [], ['data' => $dummy, '_api_resource_class' => DummyEntity::class, '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            $dummy
+        );
 
         $validationViewListener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
         $validationViewListener->onKernelView($event);

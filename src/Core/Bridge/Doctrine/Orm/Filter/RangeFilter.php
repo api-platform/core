@@ -55,7 +55,14 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
         }
 
         foreach ($values as $operator => $value) {
-            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, $operator, $value);
+            $this->addWhere(
+                $queryBuilder,
+                $queryNameGenerator,
+                $alias,
+                $field,
+                $operator,
+                $value
+            );
         }
     }
 

@@ -52,6 +52,10 @@ trait ClassInfoTrait
 
         $className = ltrim($className, '\\');
 
-        return substr($className, 8 + $positionPm, strrpos($className, '\\') - ($positionPm + 8));
+        return substr(
+            $className,
+            8 + $positionPm,
+            strrpos($className, '\\') - ($positionPm + 8)
+        );
     }
 }

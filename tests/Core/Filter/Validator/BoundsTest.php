@@ -25,14 +25,18 @@ class BoundsTest extends TestCase
     {
         $filter = new Bounds();
 
-        $this->assertEmpty($filter->validate('some_filter', [], []));
+        $this->assertEmpty(
+            $filter->validate('some_filter', [], [])
+        );
     }
 
     public function testEmptyQueryParameter()
     {
         $filter = new Bounds();
 
-        $this->assertEmpty($filter->validate('some_filter', [], ['some_filter' => '']));
+        $this->assertEmpty(
+            $filter->validate('some_filter', [], ['some_filter' => ''])
+        );
     }
 
     public function testNonMatchingMinimum()
@@ -46,7 +50,10 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must be greater than or equal to 10'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be greater than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
 
         $filterDefinition = [
             'swagger' => [
@@ -55,7 +62,10 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must be greater than or equal to 10'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be greater than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
 
         $filterDefinition = [
             'swagger' => [
@@ -64,7 +74,10 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must be greater than 9'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be greater than 9'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
     }
 
     public function testMatchingMinimum()
@@ -78,7 +91,9 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
 
         $filterDefinition = [
             'swagger' => [
@@ -87,7 +102,9 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
     }
 
     public function testNonMatchingMaximum()
@@ -101,7 +118,10 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must be less than or equal to 10'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be less than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
 
         $filterDefinition = [
             'swagger' => [
@@ -110,7 +130,10 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must be less than or equal to 10'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be less than or equal to 10'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
 
         $filterDefinition = [
             'swagger' => [
@@ -119,7 +142,10 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must be less than 9'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must be less than 9'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
     }
 
     public function testMatchingMaximum()
@@ -133,7 +159,9 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
 
         $filterDefinition = [
             'swagger' => [
@@ -142,6 +170,8 @@ class BoundsTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
     }
 }

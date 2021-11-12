@@ -31,7 +31,10 @@ class IdentifierExtractorTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(IdentifierExtractorInterface::class, new IdentifierExtractor($this->prophesize(IdentifiersExtractorInterface::class)->reveal()));
+        self::assertInstanceOf(
+            IdentifierExtractorInterface::class,
+            new IdentifierExtractor($this->prophesize(IdentifiersExtractorInterface::class)->reveal())
+        );
     }
 
     public function testGetIdentifierFromResourceClass()

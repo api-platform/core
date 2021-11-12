@@ -115,7 +115,8 @@ class OpenApiFactoryTest extends TestCase
                     ],
                 ],
                 'externalDocs' => ['url' => 'http://schema.example.com/Dummy', 'description' => 'See also'],
-            ]),
+            ]
+            ),
             'custom-http-verb' => (new Operation())->withMethod('TEST')->withOperation($baseOperation),
             'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
             'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new UriVariable())->withTargetClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
@@ -135,7 +136,8 @@ class OpenApiFactoryTest extends TestCase
                                            ->withPaginationItemsPerPage(20)
                                        ->withPaginationMaximumItemsPerPage(80)
                                                ->withOperation($baseOperation),
-        ]));
+        ])
+        );
 
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
@@ -148,16 +150,36 @@ class OpenApiFactoryTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(OutputDto::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('This is an id.')->withReadable(true)->withWritable(false)->withIdentifier(true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$']));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an initializable but not writable property.')->withReadable(true)->withWritable(false)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withInitializable(true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])->withDescription('This is a \DateTimeInterface object.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'enum', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']));
-        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'id', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('This is an id.')->withReadable(true)->withWritable(false)->withIdentifier(true));
-        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'name', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$']));
-        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'description', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an initializable but not writable property.')->withReadable(true)->withWritable(false)->withReadableLink(true)->withWritableLink(true)->withInitializable(true));
-        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])->withDescription('This is a \DateTimeInterface object.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
-        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'enum', Argument::any())->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one']));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('This is an id.')->withReadable(true)->withWritable(false)->withIdentifier(true)
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an initializable but not writable property.')->withReadable(true)->withWritable(false)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withInitializable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])->withDescription('This is a \DateTimeInterface object.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
+        );
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('This is an id.')->withReadable(true)->withWritable(false)->withIdentifier(true)
+        );
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withRequired(false)->withIdentifier(false)->withSchema(['minLength' => 3, 'maxLength' => 20, 'pattern' => '^dummyPattern$'])
+        );
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an initializable but not writable property.')->withReadable(true)->withWritable(false)->withReadableLink(true)->withWritableLink(true)->withInitializable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])->withDescription('This is a \DateTimeInterface object.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+        );
+        $propertyMetadataFactoryProphecy->create(OutputDto::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
+        );
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 
@@ -210,16 +232,28 @@ class OpenApiFactoryTest extends TestCase
         $schemaFactory = new SchemaFactory($typeFactory, $resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
         $typeFactory->setSchemaFactory($schemaFactory);
 
-        $factory = new OpenApiFactory($resourceNameCollectionFactoryProphecy->reveal(), $resourceCollectionMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $schemaFactory, $typeFactory, $operationPathResolver, $filterLocatorProphecy->reveal(), [], new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
-            'header' => [
-                'type' => 'header',
-                'name' => 'Authorization',
-            ],
-            'query' => [
-                'type' => 'query',
-                'name' => 'key',
-            ],
-        ]), new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination'));
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            $typeFactory,
+            $operationPathResolver,
+            $filterLocatorProphecy->reveal(),
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
+                'header' => [
+                    'type' => 'header',
+                    'name' => 'Authorization',
+                ],
+                'query' => [
+                    'type' => 'query',
+                    'name' => 'key',
+                ],
+            ]),
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+        );
 
         $dummySchema = new Schema('openapi');
         $dummySchema->setDefinitions(new \ArrayObject([
@@ -288,37 +322,63 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummiesPath->{'get'.$method}());
         }
 
-        $this->assertEquals(new Model\Operation('getDummyCollection', ['Dummy'], [
-            '200' => new Model\Response('Dummy collection', new \ArrayObject([
-                'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject([
-                    'type' => 'array',
-                    'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
-                ]))),
-            ])),
-        ], 'Retrieves the collection of Dummy resources.', 'Retrieves the collection of Dummy resources.', null, [
-            new Model\Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
-                'type' => 'integer',
-                'default' => 1,
-            ]),
-            new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
-                'type' => 'integer',
-                'default' => 30,
-                'minimum' => 0,
-            ]),
-            new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
-                'type' => 'boolean',
-            ]),
-        ]), $dummiesPath->getGet());
+        $this->assertEquals(new Model\Operation(
+            'getDummyCollection',
+            ['Dummy'],
+            [
+                '200' => new Model\Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject([
+                        'type' => 'array',
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                    ]))),
+                ])),
+            ],
+            'Retrieves the collection of Dummy resources.',
+            'Retrieves the collection of Dummy resources.',
+            null,
+            [
+                new Model\Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 1,
+                ]),
+                new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 30,
+                    'minimum' => 0,
+                ]),
+                new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+            ]
+        ), $dummiesPath->getGet());
 
-        $this->assertEquals(new Model\Operation('postDummyCollection', ['Dummy'], [
-            '201' => new Model\Response('Dummy resource created', new \ArrayObject([
-                'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
-            ]), null, new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])),
-            '400' => new Model\Response('Invalid input'),
-            '422' => new Model\Response('Unprocessable entity'),
-        ], 'Creates a Dummy resource.', 'Creates a Dummy resource.', null, [], new Model\RequestBody('The new Dummy resource', new \ArrayObject([
-            'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
-        ]), true)), $dummiesPath->getPost());
+        $this->assertEquals(new Model\Operation(
+            'postDummyCollection',
+            ['Dummy'],
+            [
+                '201' => new Model\Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Model\Response('Invalid input'),
+                '422' => new Model\Response('Unprocessable entity'),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new Model\RequestBody(
+                'The new Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                ]),
+                true
+            )
+        ), $dummiesPath->getPost());
 
         $dummyPath = $paths->getPath('/dummies/{id}');
         $this->assertNotNull($dummyPath);
@@ -326,132 +386,217 @@ class OpenApiFactoryTest extends TestCase
             $this->assertNull($dummyPath->{'get'.$method}());
         }
 
-        $this->assertEquals(new Model\Operation('getDummyItem', ['Dummy'], [
-            '200' => new Model\Response('Dummy resource', new \ArrayObject([
-                'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
-            ])),
-            '404' => new Model\Response('Resource not found'),
-        ], 'Retrieves a Dummy resource.', 'Retrieves a Dummy resource.', null, [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]), $dummyPath->getGet());
+        $this->assertEquals(new Model\Operation(
+            'getDummyItem',
+            ['Dummy'],
+            [
+                '200' => new Model\Response(
+                    'Dummy resource',
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                    ])
+                ),
+                '404' => new Model\Response('Resource not found'),
+            ],
+            'Retrieves a Dummy resource.',
+            'Retrieves a Dummy resource.',
+            null,
+            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+        ), $dummyPath->getGet());
 
-        $this->assertEquals(new Model\Operation('putDummyItem', ['Dummy'], [
-            '200' => new Model\Response('Dummy resource updated', new \ArrayObject([
-                'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
-            ]), null, new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])),
-            '400' => new Model\Response('Invalid input'),
-            '422' => new Model\Response('Unprocessable entity'),
-            '404' => new Model\Response('Resource not found'),
-        ], 'Replaces the Dummy resource.', 'Replaces the Dummy resource.', null, [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])], new Model\RequestBody('The updated Dummy resource', new \ArrayObject([
-            'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
-        ]), true)), $dummyPath->getPut());
+        $this->assertEquals(new Model\Operation(
+            'putDummyItem',
+            ['Dummy'],
+            [
+                '200' => new Model\Response(
+                    'Dummy resource updated',
+                    new \ArrayObject([
+                        'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
+                ),
+                '400' => new Model\Response('Invalid input'),
+                '422' => new Model\Response('Unprocessable entity'),
+                '404' => new Model\Response('Resource not found'),
+            ],
+            'Replaces the Dummy resource.',
+            'Replaces the Dummy resource.',
+            null,
+            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            new Model\RequestBody(
+                'The updated Dummy resource',
+                new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                ]),
+                true
+            )
+        ), $dummyPath->getPut());
 
-        $this->assertEquals(new Model\Operation('deleteDummyItem', ['Dummy'], [
-            '204' => new Model\Response('Dummy resource deleted'),
-            '404' => new Model\Response('Resource not found'),
-        ], 'Removes the Dummy resource.', 'Removes the Dummy resource.', null, [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]), $dummyPath->getDelete());
+        $this->assertEquals(new Model\Operation(
+            'deleteDummyItem',
+            ['Dummy'],
+            [
+                '204' => new Model\Response('Dummy resource deleted'),
+                '404' => new Model\Response('Resource not found'),
+            ],
+            'Removes the Dummy resource.',
+            'Removes the Dummy resource.',
+            null,
+            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])]
+        ), $dummyPath->getDelete());
 
         $customPath = $paths->getPath('/foo/{id}');
-        $this->assertEquals(new Model\Operation('customDummyItem', ['Dummy', 'Profile'], [
-            '202' => new Model\Response('Success', new \ArrayObject([
-                'application/json' => [
-                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                ],
-            ]), new \ArrayObject([
-                'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
-            ]), new \ArrayObject([
-                'Foo' => ['$ref' => '#/components/schemas/Dummy'],
-            ])),
-            '205' => new Model\Response(),
-            '404' => new Model\Response('Resource not found'),
-        ], 'Dummy', 'Custom description', new ExternalDocumentation('See also', 'http://schema.example.com/Dummy'), [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Replace parameter', true, false, false, ['type' => 'string', 'format' => 'uuid'])], new Model\RequestBody('Custom request body', new \ArrayObject([
-            'multipart/form-data' => [
-                'schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'file' => [
-                            'type' => 'string',
-                            'format' => 'binary',
+        $this->assertEquals(new Model\Operation(
+            'customDummyItem',
+            ['Dummy', 'Profile'],
+            [
+                '202' => new Model\Response('Success', new \ArrayObject([
+                    'application/json' => [
+                        'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                    ],
+                ]), new \ArrayObject([
+                    'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                ]), new \ArrayObject([
+                    'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                ])),
+                '205' => new Model\Response(),
+                '404' => new Model\Response('Resource not found'),
+            ],
+            'Dummy',
+            'Custom description',
+            new ExternalDocumentation('See also', 'http://schema.example.com/Dummy'),
+            [new Model\Parameter('param', 'path', 'Test parameter', true), new Model\Parameter('id', 'path', 'Replace parameter', true, false, false, ['type' => 'string', 'format' => 'uuid'])],
+            new Model\RequestBody('Custom request body', new \ArrayObject([
+                'multipart/form-data' => [
+                    'schema' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'file' => [
+                                'type' => 'string',
+                                'format' => 'binary',
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ]), true), null, false, null, null, ['x-visibility' => 'hide']), $customPath->getHead());
+            ]), true),
+            null,
+            false,
+            null,
+            null,
+            ['x-visibility' => 'hide']
+        ), $customPath->getHead());
 
         $prefixPath = $paths->getPath('/prefix/dummies');
         $this->assertNotNull($prefixPath);
 
         $formattedPath = $paths->getPath('/formatted/{id}');
-        $this->assertEquals(new Model\Operation('formatsDummyItem', ['Dummy'], [
-            '200' => new Model\Response('Dummy resource updated', new \ArrayObject([
-                'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
-                'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
-            ]), null, new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])),
-            '400' => new Model\Response('Invalid input'),
-            '422' => new Model\Response('Unprocessable entity'),
-            '404' => new Model\Response('Resource not found'),
-        ], 'Replaces the Dummy resource.', 'Replaces the Dummy resource.', null, [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])], new Model\RequestBody('The updated Dummy resource', new \ArrayObject([
-            'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
-            'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
-        ]), true)), $formattedPath->getPut());
+        $this->assertEquals(new Model\Operation(
+            'formatsDummyItem',
+            ['Dummy'],
+            [
+                '200' => new Model\Response(
+                    'Dummy resource updated',
+                    new \ArrayObject([
+                        'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                        'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
+                ),
+                '400' => new Model\Response('Invalid input'),
+                '422' => new Model\Response('Unprocessable entity'),
+                '404' => new Model\Response('Resource not found'),
+            ],
+            'Replaces the Dummy resource.',
+            'Replaces the Dummy resource.',
+            null,
+            [new Model\Parameter('id', 'path', 'Dummy identifier', true, false, false, ['type' => 'string'])],
+            new Model\RequestBody(
+                'The updated Dummy resource',
+                new \ArrayObject([
+                    'application/json' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'text/csv' => new Model\MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                ]),
+                true
+            )
+        ), $formattedPath->getPut());
 
         $filteredPath = $paths->getPath('/filtered');
-        $this->assertEquals(new Model\Operation('filteredDummyCollection', ['Dummy'], [
-            '200' => new Model\Response('Dummy collection', new \ArrayObject([
-                'application/ld+json' => new Model\MediaType(new \ArrayObject([
-                    'type' => 'array',
-                    'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+        $this->assertEquals(new Model\Operation(
+            'filteredDummyCollection',
+            ['Dummy'],
+            [
+                '200' => new Model\Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject([
+                        'type' => 'array',
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                    ])),
                 ])),
-            ])),
-        ], 'Retrieves the collection of Dummy resources.', 'Retrieves the collection of Dummy resources.', null, [
-            new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
-                'type' => 'integer',
-                'default' => 1,
-            ]),
-            new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
-                'type' => 'integer',
-                'default' => 30,
-                'minimum' => 0,
-            ]),
-            new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
-                'type' => 'boolean',
-            ]),
-            new Model\Parameter('name', 'query', '', true, true, true, [
-                'type' => 'string',
-            ], 'form', true, true, 'bar'),
-            new Model\Parameter('ha', 'query', '', false, false, true, [
-                'type' => 'integer',
-            ]),
-            new Model\Parameter('toto', 'query', '', true, false, true, [
-                'type' => 'array',
-                'items' => ['type' => 'string'],
-            ], 'deepObject', true),
-            new Model\Parameter('order[name]', 'query', '', false, false, true, [
-                'type' => 'string',
-                'enum' => ['asc', 'desc'],
-            ]),
-        ]), $filteredPath->getGet());
+            ],
+            'Retrieves the collection of Dummy resources.',
+            'Retrieves the collection of Dummy resources.',
+            null,
+            [
+                new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 1,
+                ]),
+                new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 30,
+                    'minimum' => 0,
+                ]),
+                new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+                new Model\Parameter('name', 'query', '', true, true, true, [
+                    'type' => 'string',
+                ], 'form', true, true, 'bar'),
+                new Model\Parameter('ha', 'query', '', false, false, true, [
+                    'type' => 'integer',
+                ]),
+                new Model\Parameter('toto', 'query', '', true, false, true, [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ], 'deepObject', true),
+                new Model\Parameter('order[name]', 'query', '', false, false, true, [
+                    'type' => 'string',
+                    'enum' => ['asc', 'desc'],
+                ]),
+            ]
+        ), $filteredPath->getGet());
 
         $paginatedPath = $paths->getPath('/paginated');
-        $this->assertEquals(new Model\Operation('paginatedDummyCollection', ['Dummy'], [
-            '200' => new Model\Response('Dummy collection', new \ArrayObject([
-                'application/ld+json' => new Model\MediaType(new \ArrayObject([
-                    'type' => 'array',
-                    'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+        $this->assertEquals(new Model\Operation(
+            'paginatedDummyCollection',
+            ['Dummy'],
+            [
+                '200' => new Model\Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new Model\MediaType(new \ArrayObject([
+                        'type' => 'array',
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                    ])),
                 ])),
-            ])),
-        ], 'Retrieves the collection of Dummy resources.', 'Retrieves the collection of Dummy resources.', null, [
-            new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
-                'type' => 'integer',
-                'default' => 1,
-            ]),
-            new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
-                'type' => 'integer',
-                'default' => 20,
-                'minimum' => 0,
-                'maximum' => 80,
-            ]),
-            new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
-                'type' => 'boolean',
-            ]),
-        ]), $paginatedPath->getGet());
+            ],
+            'Retrieves the collection of Dummy resources.',
+            'Retrieves the collection of Dummy resources.',
+            null,
+            [
+                new Model\Parameter('page', 'query', 'The collection page number', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 1,
+                ]),
+                new Model\Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 20,
+                    'minimum' => 0,
+                    'maximum' => 80,
+                ]),
+                new Model\Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+            ]
+        ), $paginatedPath->getGet());
     }
 }

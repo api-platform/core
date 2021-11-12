@@ -36,7 +36,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(ApiResourceAnnotationToApiResourceAttributeRector::class)
         ->call('configure', [[
             ApiResourceAnnotationToApiResourceAttributeRector::ANNOTATION_TO_ATTRIBUTE => ValueObjectInliner::inline([
-                new AnnotationToAttribute(\ApiPlatform\Core\Annotation\ApiResource::class, \ApiPlatform\Metadata\ApiResource::class),
+                new AnnotationToAttribute(
+                    \ApiPlatform\Core\Annotation\ApiResource::class,
+                    \ApiPlatform\Metadata\ApiResource::class
+                ),
             ]),
         ]]);
 };

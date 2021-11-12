@@ -100,6 +100,8 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
             [$matchField] = $this->addLookupsForNestedProperty($property, $aggregationBuilder, $resourceClass);
         }
 
-        $aggregationBuilder->sort($context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $direction]);
+        $aggregationBuilder->sort(
+            $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $direction]
+        );
     }
 }

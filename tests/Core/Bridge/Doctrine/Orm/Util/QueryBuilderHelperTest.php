@@ -42,9 +42,19 @@ class QueryBuilderHelperTest extends TestCase
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
-        QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator->reveal(), $originAliasForJoinOnce ?? 'f', 'bar', null, null, null, $originAliasForJoinOnce);
+        QueryBuilderHelper::addJoinOnce(
+            $queryBuilder,
+            $queryNameGenerator->reveal(),
+            $originAliasForJoinOnce ?? 'f',
+            'bar',
+            null,
+            null,
+            null,
+            $originAliasForJoinOnce
+        );
 
-        $this->assertSame($expectedAlias, $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
+        $this->assertSame($expectedAlias,
+            $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
     }
 
     /**
@@ -58,9 +68,20 @@ class QueryBuilderHelperTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias(Argument::any())->shouldNotbeCalled();
 
-        QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator->reveal(), 'f', 'bar', null, null, null, null, 'f_8');
+        QueryBuilderHelper::addJoinOnce(
+            $queryBuilder,
+            $queryNameGenerator->reveal(),
+            'f',
+            'bar',
+            null,
+            null,
+            null,
+            null,
+            'f_8'
+        );
 
-        $this->assertSame('f_8', $queryBuilder->getDQLPart('join')['f'][0]->getAlias());
+        $this->assertSame('f_8',
+            $queryBuilder->getDQLPart('join')['f'][0]->getAlias());
     }
 
     public function testGetEntityClassByAliasWithJoinByAssociation(): void

@@ -113,7 +113,10 @@ class PayloadArgumentResolverTest extends KernelTestCase
             'data' => new ResourceImplementation(),
         ]);
 
-        $this->assertSame([$request->attributes->get('data')], iterator_to_array($resolver->resolve($request, $argument)));
+        $this->assertSame(
+            [$request->attributes->get('data')],
+            iterator_to_array($resolver->resolve($request, $argument))
+        );
     }
 
     public function testItResolvesArgumentFromRequestWithDataOfChildType(): void
@@ -127,7 +130,10 @@ class PayloadArgumentResolverTest extends KernelTestCase
             'data' => new ResourceImplementation(),
         ]);
 
-        $this->assertSame([$request->attributes->get('data')], iterator_to_array($resolver->resolve($request, $argument)));
+        $this->assertSame(
+            [$request->attributes->get('data')],
+            iterator_to_array($resolver->resolve($request, $argument))
+        );
     }
 
     public function provideUnsupportedRequests(): iterable
@@ -232,7 +238,11 @@ class PayloadArgumentResolverTest extends KernelTestCase
 
         $serializerContextBuilder = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilder
-            ->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))
+            ->createFromRequest(
+                Argument::type(Request::class),
+                false,
+                Argument::type('array')
+            )
             ->will(function (array $arguments) {
                 /** @var Request $request */
                 $request = $arguments[0];
@@ -250,7 +260,10 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 return $context;
             });
 
-        return new PayloadArgumentResolver($resourceMetadataFactory->reveal(), $serializerContextBuilder->reveal());
+        return new PayloadArgumentResolver(
+            $resourceMetadataFactory->reveal(),
+            $serializerContextBuilder->reveal()
+        );
     }
 
     private function createRequest(string $method, array $attributes): Request

@@ -90,13 +90,17 @@ class EntrypointNormalizerTest extends TestCase
         $entrypoint = new Entrypoint($collection);
 
         $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
-            (new ApiResource())->withUriTemplate('Dummy')->withShortName('dummy')->withOperations(new Operations(['get' => (new Get())->withCollection(true)])),
-        ]))->shouldBeCalled();
+        $factoryProphecy->create(Dummy::class)->willReturn(
+            new ResourceMetadataCollection(Dummy::class, [
+                (new ApiResource())->withUriTemplate('Dummy')->withShortName('dummy')->withOperations(new Operations(['get' => (new Get())->withCollection(true)])),
+            ])
+        )->shouldBeCalled();
 
-        $factoryProphecy->create(FooDummy::class)->willReturn(new ResourceMetadataCollection(FooDummy::class, [
-            (new ApiResource())->withUriTemplate('FooDummy')->withShortName('fooDummy')->withOperations(new Operations(['get' => (new Get())->withCollection(true)])),
-        ]))->shouldBeCalled();
+        $factoryProphecy->create(FooDummy::class)->willReturn(
+            new ResourceMetadataCollection(FooDummy::class, [
+                (new ApiResource())->withUriTemplate('FooDummy')->withShortName('fooDummy')->withOperations(new Operations(['get' => (new Get())->withCollection(true)])),
+            ])
+        )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResourceClass(Dummy::class)->willReturn('/api/dummies')->shouldBeCalled();

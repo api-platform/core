@@ -36,7 +36,14 @@ class CatDocumentMetadataFactoryTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(DocumentMetadataFactoryInterface::class, new CatDocumentMetadataFactory($this->prophesize(Client::class)->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()));
+        self::assertInstanceOf(
+            DocumentMetadataFactoryInterface::class,
+            new CatDocumentMetadataFactory(
+                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()
+            )
+        );
     }
 
     public function testCreate()

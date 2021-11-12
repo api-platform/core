@@ -120,7 +120,15 @@ class PublishMercureUpdatesListenerTest extends TestCase
             return 'id';
         };
 
-        $listener = new PublishMercureUpdatesListener($resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $serializerProphecy->reveal(), $formats, null, $publisher);
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            $publisher
+        );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
@@ -227,7 +235,15 @@ class PublishMercureUpdatesListenerTest extends TestCase
             return 'id';
         };
 
-        $listener = new PublishMercureUpdatesListener($resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $serializerProphecy->reveal(), $formats, null, $publisher);
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            $publisher
+        );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
@@ -334,9 +350,17 @@ class PublishMercureUpdatesListenerTest extends TestCase
             return 'id';
         });
 
-        $listener = new PublishMercureUpdatesListener($resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $serializerProphecy->reveal(), $formats, null, new HubRegistry($this->createMock(HubInterface::class), [
-            'managed' => $managedHub,
-        ]));
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($this->createMock(HubInterface::class), [
+                'managed' => $managedHub,
+            ])
+        );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert, $toInsertNotResource])->shouldBeCalled();
@@ -404,7 +428,17 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $topicIri = 'subscription-topic-iri';
         $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
 
-        $listener = new PublishMercureUpdatesListener($resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $serializerProphecy->reveal(), $formats, null, new HubRegistry($defaultHub, ['default' => $defaultHub]), $graphQlSubscriptionManagerProphecy->reveal(), $graphQlMercureSubscriptionIriGenerator->reveal());
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal()
+        );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
@@ -448,7 +482,15 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
-        $listener = new PublishMercureUpdatesListener($resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $serializerProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']], null, new HubRegistry($this->createMock(HubInterface::class), []));
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
+            null,
+            new HubRegistry($this->createMock(HubInterface::class), [])
+        );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
@@ -483,9 +525,17 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
-        $listener = new PublishMercureUpdatesListener($resourceClassResolverProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $serializerProphecy->reveal(), ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']], null, function (Update $update): string {
-            return 'will never be called';
-        });
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']],
+            null,
+            function (Update $update): string {
+                return 'will never be called';
+            }
+        );
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();

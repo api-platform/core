@@ -31,7 +31,13 @@ class CachedDocumentMetadataFactoryTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(DocumentMetadataFactoryInterface::class, new CachedDocumentMetadataFactory($this->prophesize(CacheItemPoolInterface::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()));
+        self::assertInstanceOf(
+            DocumentMetadataFactoryInterface::class,
+            new CachedDocumentMetadataFactory(
+                $this->prophesize(CacheItemPoolInterface::class)->reveal(),
+                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()
+            )
+        );
     }
 
     public function testCreate()

@@ -36,7 +36,17 @@ class SortExtensionTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(RequestBodySearchCollectionExtensionInterface::class, new SortExtension($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal(), 'asc'));
+        self::assertInstanceOf(
+            RequestBodySearchCollectionExtensionInterface::class,
+            new SortExtension(
+                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
+                $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+                $this->prophesize(NameConverterInterface::class)->reveal(),
+                'asc'
+            )
+        );
     }
 
     public function testApplyToCollection()

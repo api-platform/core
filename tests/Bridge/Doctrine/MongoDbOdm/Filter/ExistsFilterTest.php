@@ -121,308 +121,311 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
             return new ExistsFilter($managerRegistry, null, $properties, 'customExists');
         };
 
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'valid values' => [
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'valid values' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'valid values (empty for true)' => [
-                [
+                'valid values (empty for true)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'valid values (1 for true)' => [
-                [
+                'valid values (1 for true)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'invalid values' => [
-                [],
-                $existsFilterFactory,
-            ],
-
-            'negative values' => [
-                [
-                    [
-                        '$match' => [
-                            'description' => null,
-                        ],
-                    ],
+                'invalid values' => [
+                    [],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'negative values (0)' => [
-                [
+                'negative values' => [
                     [
-                        '$match' => [
-                            'description' => null,
-                        ],
-                    ],
-                ],
-                $existsFilterFactory,
-            ],
-
-            'multiple values (true and true)' => [
-                [
-                    [
-                        '$match' => [
-                            'alias' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => null,
                             ],
                         ],
                     ],
-                    [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
-                            ],
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'multiple values (1 and 0)' => [
-                [
+                'negative values (0)' => [
                     [
-                        '$match' => [
-                            'alias' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => null,
                             ],
                         ],
                     ],
-                    [
-                        '$match' => [
-                            'description' => null,
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'multiple values (false and 0)' => [
-                [
+                'multiple values (true and true)' => [
                     [
-                        '$match' => [
-                            'alias' => null,
+                        [
+                            '$match' => [
+                                'alias' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
                         ],
                     ],
-                    [
-                        '$match' => [
-                            'description' => null,
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'custom exists parameter name' => [
-                [
+                'multiple values (1 and 0)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'alias' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'description' => null,
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $customExistsFilterFactory,
-            ],
 
-            'related values' => [
-                [
+                'multiple values (false and 0)' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'alias' => null,
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'description' => null,
                             ],
                         ],
                     ],
-                    [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
-                        ],
-                    ],
-                    [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummy_lkup.name' => [
-                                '$ne' => null,
-                            ],
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'not nullable values' => [
-                [
+                'custom exists parameter name' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
+                    $customExistsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'related collection not empty' => [
-                [
+                'related values' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy_lkup.name' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
-                    [
-                        '$match' => [
-                            'relatedDummies' => [
-                                '$ne' => null,
-                            ],
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'related collection empty' => [
-                [
+                'not nullable values' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
-                    [
-                        '$match' => [
-                            'relatedDummies' => null,
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'related association exists' => [
-                [
+                'related collection not empty' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummies' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
+                ],
+
+                'related collection empty' => [
                     [
-                        '$match' => [
-                            'relatedDummy' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummies' => null,
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'related association does not exist' => [
-                [
+                'related association exists' => [
                     [
-                        '$match' => [
-                            'description' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy' => [
+                                    '$ne' => null,
+                                ],
                             ],
                         ],
                     ],
-                    [
-                        '$match' => [
-                            'relatedDummy' => null,
-                        ],
-                    ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'related owned association does not exist' => [
-                [
+                'related association does not exist' => [
                     [
-                        '$match' => [
-                            'relatedOwnedDummy' => null,
+                        [
+                            '$match' => [
+                                'description' => [
+                                    '$ne' => null,
+                                ],
+                            ],
                         ],
-                    ],
-                ],
-                $existsFilterFactory,
-            ],
-
-            'related owned association exists' => [
-                [
-                    [
-                        '$match' => [
-                            'relatedOwnedDummy' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'relatedDummy' => null,
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
 
-            'related owning association does not exist' => [
-                [
+                'related owned association does not exist' => [
                     [
-                        '$match' => [
-                            'relatedOwningDummy' => null,
-                        ],
-                    ],
-                ],
-                $existsFilterFactory,
-            ],
-
-            'related owning association exists' => [
-                [
-                    [
-                        '$match' => [
-                            'relatedOwningDummy' => [
-                                '$ne' => null,
+                        [
+                            '$match' => [
+                                'relatedOwnedDummy' => null,
                             ],
                         ],
                     ],
+                    $existsFilterFactory,
                 ],
-                $existsFilterFactory,
-            ],
-        ]);
+
+                'related owned association exists' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwnedDummy' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                    $existsFilterFactory,
+                ],
+
+                'related owning association does not exist' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwningDummy' => null,
+                            ],
+                        ],
+                    ],
+                    $existsFilterFactory,
+                ],
+
+                'related owning association exists' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwningDummy' => [
+                                    '$ne' => null,
+                                ],
+                            ],
+                        ],
+                    ],
+                    $existsFilterFactory,
+                ],
+            ]
+        );
     }
 
     /**

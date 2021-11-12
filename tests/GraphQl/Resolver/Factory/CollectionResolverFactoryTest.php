@@ -60,7 +60,15 @@ class CollectionResolverFactoryTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->requestStackProphecy = $this->prophesize(RequestStack::class);
 
-        $this->collectionResolverFactory = new CollectionResolverFactory($this->readStageProphecy->reveal(), $this->securityStageProphecy->reveal(), $this->securityPostDenormalizeStageProphecy->reveal(), $this->serializeStageProphecy->reveal(), $this->queryResolverLocatorProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->requestStackProphecy->reveal());
+        $this->collectionResolverFactory = new CollectionResolverFactory(
+            $this->readStageProphecy->reveal(),
+            $this->securityStageProphecy->reveal(),
+            $this->securityPostDenormalizeStageProphecy->reveal(),
+            $this->serializeStageProphecy->reveal(),
+            $this->queryResolverLocatorProphecy->reveal(),
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->requestStackProphecy->reveal()
+        );
     }
 
     public function testResolve(): void

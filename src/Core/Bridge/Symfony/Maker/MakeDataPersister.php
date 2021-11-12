@@ -91,13 +91,20 @@ final class MakeDataPersister extends AbstractMaker
      */
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
-        $dataPersisterClassNameDetails = $generator->createClassNameDetails($input->getArgument('name'), 'DataPersister\\');
+        $dataPersisterClassNameDetails = $generator->createClassNameDetails(
+            $input->getArgument('name'),
+            'DataPersister\\'
+        );
         $resourceClass = $input->getArgument('resource-class');
 
-        $generator->generateClass($dataPersisterClassNameDetails->getFullName(), __DIR__.'/Resources/skeleton/DataPersister.tpl.php', [
-            'resource_class' => null !== $resourceClass ? Str::getShortClassName($resourceClass) : null,
-            'resource_full_class_name' => $resourceClass,
-        ]);
+        $generator->generateClass(
+            $dataPersisterClassNameDetails->getFullName(),
+            __DIR__.'/Resources/skeleton/DataPersister.tpl.php',
+            [
+                'resource_class' => null !== $resourceClass ? Str::getShortClassName($resourceClass) : null,
+                'resource_full_class_name' => $resourceClass,
+            ]
+        );
         $generator->writeChanges();
 
         $this->writeSuccessMessage($io);

@@ -25,7 +25,9 @@ class MultipleOfTest extends TestCase
     {
         $filter = new MultipleOf();
 
-        $this->assertEmpty($filter->validate('some_filter', [], []));
+        $this->assertEmpty(
+            $filter->validate('some_filter', [], [])
+        );
     }
 
     public function testEmptyQueryParameter()
@@ -33,7 +35,9 @@ class MultipleOfTest extends TestCase
         $request = ['some_filter' => ''];
         $filter = new MultipleOf();
 
-        $this->assertEmpty($filter->validate('some_filter', [], $request));
+        $this->assertEmpty(
+            $filter->validate('some_filter', [], $request)
+        );
     }
 
     public function testNonMatchingParameter()
@@ -47,7 +51,10 @@ class MultipleOfTest extends TestCase
             ],
         ];
 
-        $this->assertEquals(['Query parameter "some_filter" must multiple of 3'], $filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEquals(
+            ['Query parameter "some_filter" must multiple of 3'],
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
     }
 
     public function testMatchingParameter()
@@ -61,6 +68,8 @@ class MultipleOfTest extends TestCase
             ],
         ];
 
-        $this->assertEmpty($filter->validate('some_filter', $filterDefinition, $request));
+        $this->assertEmpty(
+            $filter->validate('some_filter', $filterDefinition, $request)
+        );
     }
 }

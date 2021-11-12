@@ -46,7 +46,10 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
 
-        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceAccessCheckerProphecy->reveal());
+        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage(
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->resourceAccessCheckerProphecy->reveal()
+        );
     }
 
     public function testNoSecurity(): void

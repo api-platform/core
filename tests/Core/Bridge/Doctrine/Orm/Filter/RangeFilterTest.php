@@ -337,49 +337,52 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'between' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
-            ],
-            'between (same values)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
-            ],
-            'between (too many operands)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'between (too few operands)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'between (non-numeric operands)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'lt' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_p1', Dummy::class),
-            ],
-            'lt (non-numeric)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'lte' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
-            ],
-            'lte (non-numeric)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'gt' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_p1', Dummy::class),
-            ],
-            'gt (non-numeric)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'gte' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1', Dummy::class),
-            ],
-            'gte (non-numeric)' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'lte + gte' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
-            ],
-        ]);
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'between' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice BETWEEN :dummyPrice_p1_1 AND :dummyPrice_p1_2', Dummy::class),
+                ],
+                'between (same values)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
+                ],
+                'between (too many operands)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'between (too few operands)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'between (non-numeric operands)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'lt' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice < :dummyPrice_p1', Dummy::class),
+                ],
+                'lt (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'lte' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice <= :dummyPrice_p1', Dummy::class),
+                ],
+                'lte (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'gt' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice > :dummyPrice_p1', Dummy::class),
+                ],
+                'gt (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'gte' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1', Dummy::class),
+                ],
+                'gte (non-numeric)' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'lte + gte' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyPrice >= :dummyPrice_p1 AND o.dummyPrice <= :dummyPrice_p2', Dummy::class),
+                ],
+            ]
+        );
     }
 }

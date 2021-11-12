@@ -77,8 +77,10 @@ final class ValidateListener
 
         // TODO: 3.0 remove condition
         if (
-            $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (!$attributes['receive']
-                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
+            $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (
+                !$attributes['receive']
+                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
+            )
         ) {
             return;
         }

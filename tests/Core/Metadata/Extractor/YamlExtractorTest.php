@@ -49,7 +49,10 @@ class YamlExtractorTest extends ExtractorTestCase
 
             $this->fail('Expected exception to be thrown.');
         } catch (\InvalidArgumentException $exception) {
-            $this->assertMatchesRegularExpression($exceptionRegex, $exception->getMessage());
+            $this->assertMatchesRegularExpression(
+                $exceptionRegex,
+                $exception->getMessage()
+            );
         }
     }
 

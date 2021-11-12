@@ -59,7 +59,14 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $nameConverter = $this->prophesize(NameConverterInterface::class);
 
-        $normalizer = new ItemNormalizer($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, $nameConverter->reveal());
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal()
+        );
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', ItemNormalizer::FORMAT));
         $normalizer->denormalize(['foo'], 'Foo');
@@ -84,7 +91,14 @@ class ItemNormalizerTest extends TestCase
 
         $nameConverter = $this->prophesize(NameConverterInterface::class);
 
-        $normalizer = new ItemNormalizer($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, $nameConverter->reveal());
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal()
+        );
 
         $this->assertTrue($normalizer->supportsNormalization($dummy, 'jsonhal'));
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
@@ -104,8 +118,12 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(true)->withWritable(false)->withWritableLink(false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(true)->withWritable(false)->withWritableLink(false)
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
@@ -125,7 +143,20 @@ class ItemNormalizerTest extends TestCase
         $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
         $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->willReturn('related_dummy');
 
-        $normalizer = new ItemNormalizer($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, $nameConverter->reveal(), null, null, false, [], [], null);
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            [],
+            [],
+            null
+        );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $expected = [
@@ -154,8 +185,12 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(false)
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1');
@@ -175,7 +210,20 @@ class ItemNormalizerTest extends TestCase
         $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
         $nameConverter->normalize('relatedDummy', Argument::any(), Argument::any(), Argument::any())->willReturn('related_dummy');
 
-        $normalizer = new ItemNormalizer($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, $nameConverter->reveal(), null, null, false, [], [], null);
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal(),
+            null,
+            null,
+            false,
+            [],
+            [],
+            null
+        );
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $expected = [
@@ -219,9 +267,15 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(MaxDepthDummy::class, [])->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'id', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('')->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'child', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, MaxDepthDummy::class)])->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(true));
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'id', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withDescription('')->withReadable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'name', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)
+        );
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'child', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, MaxDepthDummy::class)])->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(true)
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($level1)->willReturn('/max_depth_dummies/1');
@@ -236,7 +290,20 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, MaxDepthDummy::class)->willReturn(MaxDepthDummy::class);
         $resourceClassResolverProphecy->isResourceClass(MaxDepthDummy::class)->willReturn(true);
 
-        $normalizer = new ItemNormalizer($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())), null, false, [], [], null);
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader())),
+            null,
+            false,
+            [],
+            [],
+            null
+        );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
 

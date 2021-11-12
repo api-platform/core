@@ -39,7 +39,17 @@ class ElasticsearchClientPassTest extends TestCase
     {
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
         $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'fromConfig'])->shouldBeCalled();
-        $clientDefinitionProphecy->setArguments(Argument::allOf(Argument::withEntry(0, Argument::allOf(Argument::withEntry('hosts', ['http://localhost:9200']), Argument::withEntry('logger', Argument::type(Reference::class)), Argument::withEntry('tracer', Argument::type(Reference::class)), Argument::size(3))), Argument::size(1)))->shouldBeCalled();
+        $clientDefinitionProphecy->setArguments(
+            Argument::allOf(
+                Argument::withEntry(0, Argument::allOf(
+                    Argument::withEntry('hosts', ['http://localhost:9200']),
+                    Argument::withEntry('logger', Argument::type(Reference::class)),
+                    Argument::withEntry('tracer', Argument::type(Reference::class)),
+                    Argument::size(3)
+                )),
+                Argument::size(1)
+            )
+        )->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();

@@ -54,7 +54,13 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
         }
 
         foreach ($values as $operator => $value) {
-            $this->addMatch($aggregationBuilder, $field, $matchField, $operator, $value);
+            $this->addMatch(
+                $aggregationBuilder,
+                $field,
+                $matchField,
+                $operator,
+                $value
+            );
         }
     }
 

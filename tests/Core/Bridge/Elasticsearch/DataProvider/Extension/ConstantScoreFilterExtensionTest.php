@@ -33,7 +33,13 @@ class ConstantScoreFilterExtensionTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(RequestBodySearchCollectionExtensionInterface::class, new ConstantScoreFilterExtension($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $this->prophesize(ContainerInterface::class)->reveal()));
+        self::assertInstanceOf(
+            RequestBodySearchCollectionExtensionInterface::class,
+            new ConstantScoreFilterExtension(
+                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(ContainerInterface::class)->reveal()
+            )
+        );
     }
 
     public function testApplyToCollection()

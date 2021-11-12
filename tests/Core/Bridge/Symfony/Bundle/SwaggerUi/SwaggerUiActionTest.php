@@ -65,7 +65,16 @@ class SwaggerUiActionTest extends TestCase
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::type('array'))->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()))->shouldBeCalled();
 
-        $action = new SwaggerUiAction($resourceMetadataFactoryProphecy->reveal(), $twigProphecy->reveal(), $urlGeneratorProphecy->reveal(), $normalizerProphecy->reveal(), $openApiFactoryProphecy->reveal(), new Options('title', '', '1.0.0'), new SwaggerUiContext(), ['jsonld' => ['application/ld+json']]);
+        $action = new SwaggerUiAction(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $twigProphecy->reveal(),
+            $urlGeneratorProphecy->reveal(),
+            $normalizerProphecy->reveal(),
+            $openApiFactoryProphecy->reveal(),
+            new Options('title', '', '1.0.0'),
+            new SwaggerUiContext(),
+            ['jsonld' => ['application/ld+json']]
+        );
         $action($request);
     }
 
@@ -194,7 +203,16 @@ class SwaggerUiActionTest extends TestCase
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::type('array'))->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()))->shouldBeCalled();
 
-        $action = new SwaggerUiAction($resourceMetadataFactoryProphecy->reveal(), $twigProphecy->reveal(), $urlGeneratorProphecy->reveal(), $normalizerProphecy->reveal(), $openApiFactoryProphecy->reveal(), new Options('title', '', '1.0.0'), new SwaggerUiContext(), ['jsonld' => ['application/ld+json']]);
+        $action = new SwaggerUiAction(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $twigProphecy->reveal(),
+            $urlGeneratorProphecy->reveal(),
+            $normalizerProphecy->reveal(),
+            $openApiFactoryProphecy->reveal(),
+            new Options('title', '', '1.0.0'),
+            new SwaggerUiContext(),
+            ['jsonld' => ['application/ld+json']]
+        );
         $action($request);
     }
 

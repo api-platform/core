@@ -438,111 +438,114 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'between' => [
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'between' => [
                     [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$gte' => 9.99,
-                                '$lte' => 15.99,
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gte' => 9.99,
+                                    '$lte' => 15.99,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'between (same values)' => [
-                [
+                'between (same values)' => [
                     [
-                        '$match' => [
-                            'dummyPrice' => 9.99,
-                        ],
-                    ],
-                ],
-            ],
-            'between (too many operands)' => [
-                [],
-            ],
-            'between (too few operands)' => [
-                [],
-            ],
-            'between (non-numeric operands)' => [
-                [],
-            ],
-            'lt' => [
-                [
-                    [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$lt' => 9.99,
+                        [
+                            '$match' => [
+                                'dummyPrice' => 9.99,
                             ],
                         ],
                     ],
                 ],
-            ],
-            'lt (non-numeric)' => [
-                [],
-            ],
-            'lte' => [
-                [
+                'between (too many operands)' => [
+                    [],
+                ],
+                'between (too few operands)' => [
+                    [],
+                ],
+                'between (non-numeric operands)' => [
+                    [],
+                ],
+                'lt' => [
                     [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$lte' => 9.99,
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lt' => 9.99,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'lte (non-numeric)' => [
-                [],
-            ],
-            'gt' => [
-                [
+                'lt (non-numeric)' => [
+                    [],
+                ],
+                'lte' => [
                     [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$gt' => 9.99,
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lte' => 9.99,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'gt (non-numeric)' => [
-                [],
-            ],
-            'gte' => [
-                [
+                'lte (non-numeric)' => [
+                    [],
+                ],
+                'gt' => [
                     [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$gte' => 9.99,
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gt' => 9.99,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'gte (non-numeric)' => [
-                [],
-            ],
-            'lte + gte' => [
-                [
+                'gt (non-numeric)' => [
+                    [],
+                ],
+                'gte' => [
                     [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$gte' => 9.99,
-                            ],
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            'dummyPrice' => [
-                                '$lte' => 19.99,
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gte' => 9.99,
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ],
-        ]);
+                'gte (non-numeric)' => [
+                    [],
+                ],
+                'lte + gte' => [
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$gte' => 9.99,
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$lte' => 19.99,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
     }
 }

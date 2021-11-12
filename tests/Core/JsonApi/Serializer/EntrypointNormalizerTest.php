@@ -69,11 +69,14 @@ class EntrypointNormalizerTest extends TestCase
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)->willReturn('http://localhost/api')->shouldBeCalled();
 
-        $this->assertEquals([
-            'links' => [
-                'self' => 'http://localhost/api',
-                'dummy' => 'http://localhost/api/dummies',
+        $this->assertEquals(
+            [
+                'links' => [
+                    'self' => 'http://localhost/api',
+                    'dummy' => 'http://localhost/api/dummies',
+                ],
             ],
-        ], (new EntrypointNormalizer($resourceMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal()))->normalize($entrypoint, EntrypointNormalizer::FORMAT));
+            (new EntrypointNormalizer($resourceMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal()))->normalize($entrypoint, EntrypointNormalizer::FORMAT)
+        );
     }
 }

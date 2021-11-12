@@ -275,464 +275,467 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
     {
         $filterFactory = [$this, 'buildSearchFilter'];
 
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'exact' => [
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'exact' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    'exact',
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'exact (case insensitive)' => [
-                [
+                'exact (case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^exact$', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^exact$', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'exact (case insensitive, with special characters)' => [
-                [
+                'exact (case insensitive, with special characters)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^exact \(special\)$', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^exact \(special\)$', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'exact (multiple values)' => [
-                [
+                'exact (multiple values)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    'CaSE',
-                                    'SENSitive',
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        'CaSE',
+                                        'SENSitive',
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'exact (multiple values; case insensitive)' => [
-                [
+                'exact (multiple values; case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^CaSE$', 'i'),
-                                    new Regex('^inSENSitive$', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^CaSE$', 'i'),
+                                        new Regex('^inSENSitive$', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'invalid property' => [
-                [],
-                $filterFactory,
-            ],
-            'invalid values for relations' => [
-                [
-                    [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    'foo',
-                                ],
-                            ],
-                        ],
-                    ],
+                'invalid property' => [
+                    [],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'partial' => [
-                [
+                'invalid values for relations' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('partial'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        'foo',
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'partial (case insensitive)' => [
-                [
+                'partial' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('partial', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'partial (multiple values)' => [
-                [
+                'partial (case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('CaSE'),
-                                    new Regex('SENSitive'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'partial (multiple values; case insensitive)' => [
-                [
+                'partial (multiple values)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('CaSE', 'i'),
-                                    new Regex('inSENSitive', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('CaSE'),
+                                        new Regex('SENSitive'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'start' => [
-                [
+                'partial (multiple values; case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^partial'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('CaSE', 'i'),
+                                        new Regex('inSENSitive', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'start (case insensitive)' => [
-                [
+                'start' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^partial', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^partial'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'start (multiple values)' => [
-                [
+                'start (case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^CaSE'),
-                                    new Regex('^SENSitive'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^partial', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'start (multiple values; case insensitive)' => [
-                [
+                'start (multiple values)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('^CaSE', 'i'),
-                                    new Regex('^inSENSitive', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^CaSE'),
+                                        new Regex('^SENSitive'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'end' => [
-                [
+                'start (multiple values; case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('partial$'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('^CaSE', 'i'),
+                                        new Regex('^inSENSitive', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'end (case insensitive)' => [
-                [
+                'end' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('partial$', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial$'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'end (multiple values)' => [
-                [
+                'end (case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('CaSE$'),
-                                    new Regex('SENSitive$'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('partial$', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'end (multiple values; case insensitive)' => [
-                [
+                'end (multiple values)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('CaSE$', 'i'),
-                                    new Regex('inSENSitive$', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('CaSE$'),
+                                        new Regex('SENSitive$'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'word_start' => [
-                [
+                'end (multiple values; case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('(^partial.*|.*\spartial.*)'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('CaSE$', 'i'),
+                                        new Regex('inSENSitive$', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'word_start (case insensitive)' => [
-                [
+                'word_start' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('(^partial.*|.*\spartial.*)', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('(^partial.*|.*\spartial.*)'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'word_start (multiple values)' => [
-                [
+                'word_start (case insensitive)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('(^CaSE.*|.*\sCaSE.*)'),
-                                    new Regex('(^SENSitive.*|.*\sSENSitive.*)'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('(^partial.*|.*\spartial.*)', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'word_start (multiple values; case insensitive)' => [
-                [
+                'word_start (multiple values)' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    new Regex('(^CaSE.*|.*\sCaSE.*)', 'i'),
-                                    new Regex('(^inSENSitive.*|.*\sinSENSitive.*)', 'i'),
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('(^CaSE.*|.*\sCaSE.*)'),
+                                        new Regex('(^SENSitive.*|.*\sSENSitive.*)'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'invalid value for relation' => [
-                [],
-                $filterFactory,
-            ],
-            'IRI value for relation' => [
-                [
+                'word_start (multiple values; case insensitive)' => [
                     [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
-                        ],
-                    ],
-                    [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummy_lkup.id' => [
-                                '$in' => [
-                                    1,
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        new Regex('(^CaSE.*|.*\sCaSE.*)', 'i'),
+                                        new Regex('(^inSENSitive.*|.*\sinSENSitive.*)', 'i'),
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'mixed IRI and entity ID values for relations' => [
-                [
-                    [
-                        '$match' => [
-                            'relatedDummy' => [
-                                '$in' => [
-                                    1,
-                                    '2',
-                                ],
-                            ],
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummies' => [
-                                '$in' => [
-                                    '1',
-                                ],
-                            ],
-                        ],
-                    ],
+                'invalid value for relation' => [
+                    [],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'nested property' => [
-                [
+                'IRI value for relation' => [
                     [
-                        '$match' => [
-                            'name' => [
-                                '$in' => [
-                                    'exact',
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy_lkup.id' => [
+                                    '$in' => [
+                                        1,
+                                    ],
                                 ],
                             ],
                         ],
                     ],
-                    [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
-                        ],
-                    ],
-                    [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$match' => [
-                            'relatedDummy_lkup.symfony' => [
-                                '$in' => [
-                                    'exact',
-                                ],
-                            ],
-                        ],
-                    ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'empty nested property' => [
-                [],
-                $filterFactory,
-            ],
-            'integer value' => [
-                [
+                'mixed IRI and entity ID values for relations' => [
                     [
-                        '$match' => [
-                            'age' => [
-                                '$in' => [
-                                    '46',
+                        [
+                            '$match' => [
+                                'relatedDummy' => [
+                                    '$in' => [
+                                        1,
+                                        '2',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummies' => [
+                                    '$in' => [
+                                        '1',
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-                RelatedDummy::class,
-            ],
-            'related owned one-to-one association' => [
-                [
+                'nested property' => [
                     [
-                        '$match' => [
-                            'relatedOwnedDummy' => [
-                                '$in' => [
-                                    1,
+                        [
+                            '$match' => [
+                                'name' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$match' => [
+                                'relatedDummy_lkup.symfony' => [
+                                    '$in' => [
+                                        'exact',
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
                 ],
-                $filterFactory,
-            ],
-            'related owning one-to-one association' => [
-                [
+                'empty nested property' => [
+                    [],
+                    $filterFactory,
+                ],
+                'integer value' => [
                     [
-                        '$match' => [
-                            'relatedOwningDummy' => [
-                                '$in' => [
-                                    1,
+                        [
+                            '$match' => [
+                                'age' => [
+                                    '$in' => [
+                                        '46',
+                                    ],
                                 ],
                             ],
                         ],
                     ],
+                    $filterFactory,
+                    RelatedDummy::class,
                 ],
-                $filterFactory,
-            ],
-        ]);
+                'related owned one-to-one association' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwnedDummy' => [
+                                    '$in' => [
+                                        1,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+                'related owning one-to-one association' => [
+                    [
+                        [
+                            '$match' => [
+                                'relatedOwningDummy' => [
+                                    '$in' => [
+                                        1,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    $filterFactory,
+                ],
+            ]
+        );
     }
 
     protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)

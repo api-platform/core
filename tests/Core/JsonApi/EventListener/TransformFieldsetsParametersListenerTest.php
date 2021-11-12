@@ -78,7 +78,11 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
     public function testOnKernelRequest()
     {
-        $request = new Request(['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo'], [], ['_api_resource_class' => Dummy::class]);
+        $request = new Request(
+            ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo'],
+            [],
+            ['_api_resource_class' => Dummy::class]
+        );
         $request->setRequestFormat('jsonapi');
 
         $eventProphecy = $this->prophesize(RequestEvent::class);
@@ -86,11 +90,15 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo'], [], [
-            '_api_resource_class' => Dummy::class,
-            '_api_filter_property' => ['id', 'name', 'dummyFloat', 'relatedDummy' => ['id', 'name']],
-            '_api_included' => ['relatedDummy'],
-        ]);
+        $expectedRequest = new Request(
+            ['fields' => ['dummy' => 'id,name,dummyFloat', 'relatedDummy' => 'id,name'], 'include' => 'relatedDummy,foo'],
+            [],
+            [
+                '_api_resource_class' => Dummy::class,
+                '_api_filter_property' => ['id', 'name', 'dummyFloat', 'relatedDummy' => ['id', 'name']],
+                '_api_included' => ['relatedDummy'],
+            ]
+        );
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);
@@ -98,7 +106,11 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
     public function testOnKernelRequestWithIncludeWithoutFields()
     {
-        $request = new Request(['include' => 'relatedDummy,foo'], [], ['_api_resource_class' => Dummy::class]);
+        $request = new Request(
+            ['include' => 'relatedDummy,foo'],
+            [],
+            ['_api_resource_class' => Dummy::class]
+        );
         $request->setRequestFormat('jsonapi');
 
         $eventProphecy = $this->prophesize(RequestEvent::class);
@@ -106,10 +118,14 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['include' => 'relatedDummy,foo'], [], [
-            '_api_resource_class' => Dummy::class,
-            '_api_included' => ['relatedDummy', 'foo'],
-        ]);
+        $expectedRequest = new Request(
+            ['include' => 'relatedDummy,foo'],
+            [],
+            [
+                '_api_resource_class' => Dummy::class,
+                '_api_included' => ['relatedDummy', 'foo'],
+            ]
+        );
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);
@@ -117,7 +133,11 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
     public function testOnKernelRequestWithWrongParametersTypesDoesnTAffectRequestAttributes()
     {
-        $request = new Request(['fields' => 'foo', 'include' => ['relatedDummy,foo']], [], ['_api_resource_class' => Dummy::class]);
+        $request = new Request(
+            ['fields' => 'foo', 'include' => ['relatedDummy,foo']],
+            [],
+            ['_api_resource_class' => Dummy::class]
+        );
         $request->setRequestFormat('jsonapi');
 
         $eventProphecy = $this->prophesize(RequestEvent::class);
@@ -125,7 +145,11 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $expectedRequest = new Request(['fields' => 'foo', 'include' => ['relatedDummy,foo']], [], ['_api_resource_class' => Dummy::class]);
+        $expectedRequest = new Request(
+            ['fields' => 'foo', 'include' => ['relatedDummy,foo']],
+            [],
+            ['_api_resource_class' => Dummy::class]
+        );
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

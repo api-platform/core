@@ -70,9 +70,15 @@ class RequestDataCollectorTest extends TestCase
     {
         $this->apiResourceClassWillReturn(null);
 
-        $dataCollector = new RequestDataCollector($this->metadataFactory->reveal(), $this->filterLocator->reveal());
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal()
+        );
 
-        $dataCollector->collect($this->request->reveal(), $this->response);
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
 
         $this->assertSame([], $dataCollector->getRequestAttributes());
         $this->assertSame([], $dataCollector->getFilters());
@@ -93,7 +99,10 @@ class RequestDataCollectorTest extends TestCase
         $this->request
             ->getAcceptableContentTypes()
             ->shouldNotBeCalled();
-        $dataCollector = new RequestDataCollector($this->metadataFactory->reveal(), $this->filterLocator->reveal());
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal()
+        );
 
         $this->assertSame([], $dataCollector->getRequestAttributes());
         $this->assertSame([], $dataCollector->getAcceptableContentTypes());
@@ -118,9 +127,19 @@ class RequestDataCollectorTest extends TestCase
         $this->filterLocator->has('a_filter')->willReturn(true)->shouldBeCalled();
         $this->filterLocator->get('a_filter')->willReturn(new \stdClass())->shouldBeCalled();
 
-        $dataCollector = new RequestDataCollector($this->metadataFactory->reveal(), $this->filterLocator->reveal(), new ChainCollectionDataProvider([]), new ChainItemDataProvider([]), new ChainSubresourceDataProvider([]), new ChainDataPersister([]));
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            new ChainCollectionDataProvider([]),
+            new ChainItemDataProvider([]),
+            new ChainSubresourceDataProvider([]),
+            new ChainDataPersister([])
+        );
 
-        $dataCollector->collect($this->request->reveal(), $this->response);
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
 
         $this->assertSame([
             'resource_class' => DummyEntity::class,
@@ -148,9 +167,19 @@ class RequestDataCollectorTest extends TestCase
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
 
-        $dataCollector = new RequestDataCollector($this->metadataFactory->reveal(), $this->filterLocator->reveal(), $this->getUsedCollectionDataProvider(), $this->getUsedItemDataProvider(), $this->getUsedSubresourceDataProvider(), $this->getUsedPersister());
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            $this->getUsedCollectionDataProvider(),
+            $this->getUsedItemDataProvider(),
+            $this->getUsedSubresourceDataProvider(),
+            $this->getUsedPersister()
+        );
 
-        $dataCollector->collect($this->request->reveal(), $this->response);
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
 
         $dataProvider = $dataCollector->getCollectionDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
@@ -191,9 +220,19 @@ class RequestDataCollectorTest extends TestCase
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
 
-        $dataCollector = new RequestDataCollector($this->metadataFactory->reveal(), $this->filterLocator->reveal(), $this->getUsedCollectionDataProvider(), $this->getUsedItemDataProvider(), $this->getUsedSubresourceDataProvider(), $this->getUsedPersister());
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            $this->getUsedCollectionDataProvider(),
+            $this->getUsedItemDataProvider(),
+            $this->getUsedSubresourceDataProvider(),
+            $this->getUsedPersister()
+        );
 
-        $dataCollector->collect($this->request->reveal(), $this->response);
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
 
         $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
     }
@@ -210,9 +249,19 @@ class RequestDataCollectorTest extends TestCase
         $this->filterLocator->has('a_filter')->willReturn(true);
         $this->filterLocator->get('a_filter')->willReturn(new \stdClass());
 
-        $dataCollector = new RequestDataCollector($this->metadataFactory->reveal(), $this->filterLocator->reveal(), new ChainCollectionDataProvider([]), new ChainItemDataProvider([]), new ChainSubresourceDataProvider([]), new ChainDataPersister([]));
+        $dataCollector = new RequestDataCollector(
+            $this->metadataFactory->reveal(),
+            $this->filterLocator->reveal(),
+            new ChainCollectionDataProvider([]),
+            new ChainItemDataProvider([]),
+            new ChainSubresourceDataProvider([]),
+            new ChainDataPersister([])
+        );
 
-        $dataCollector->collect($this->request->reveal(), $this->response);
+        $dataCollector->collect(
+            $this->request->reveal(),
+            $this->response
+        );
 
         $this->assertArrayHasKey('previous_data', $requestAttributes = $dataCollector->getRequestAttributes());
         $this->assertNotSame($requestAttributes['previous_data']->data, $requestAttributes['previous_data']);
@@ -234,7 +283,9 @@ class RequestDataCollectorTest extends TestCase
             $this->metadataFactory
                 ->create($data)
                 ->shouldBeCalled()
-                ->willReturn(new ResourceMetadataCollection($data, [(new ApiResource())->withFilters(['foo', 'a_filter'])]));
+                ->willReturn(
+                    new ResourceMetadataCollection($data, [(new ApiResource())->withFilters(['foo', 'a_filter'])])
+                );
         }
     }
 

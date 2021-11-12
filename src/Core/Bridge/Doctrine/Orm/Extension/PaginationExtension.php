@@ -173,7 +173,11 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         if (null === $this->requestStack) {
             $isPartialEnabled = $this->pagination->isPartialEnabled($resourceClass, $operationName, $context);
         } else {
-            $isPartialEnabled = $this->isPartialPaginationEnabled($this->requestStack->getCurrentRequest(), null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass), $operationName);
+            $isPartialEnabled = $this->isPartialPaginationEnabled(
+                $this->requestStack->getCurrentRequest(),
+                null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass),
+                $operationName
+            );
         }
 
         if ($isPartialEnabled) {

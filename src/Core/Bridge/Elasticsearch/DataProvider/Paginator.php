@@ -112,7 +112,12 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
             if ($cacheKey && \array_key_exists($cacheKey, $this->cachedDenormalizedDocuments)) {
                 $object = $this->cachedDenormalizedDocuments[$cacheKey];
             } else {
-                $object = $this->denormalizer->denormalize($document, $this->resourceClass, DocumentNormalizer::FORMAT, $denormalizationContext);
+                $object = $this->denormalizer->denormalize(
+                    $document,
+                    $this->resourceClass,
+                    DocumentNormalizer::FORMAT,
+                    $denormalizationContext
+                );
 
                 if ($cacheKey) {
                     $this->cachedDenormalizedDocuments[$cacheKey] = $object;

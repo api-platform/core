@@ -132,7 +132,13 @@ class DeserializeListenerTest extends TestCase
     public function testDeserialize(string $method, bool $populateObject): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, ['put' => ['input_formats' => self::FORMATS]], ['post' => ['input_formats' => self::FORMATS]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            ['put' => ['input_formats' => self::FORMATS]],
+            ['post' => ['input_formats' => self::FORMATS]]
+        ));
 
         $this->doTestDeserialize($method, $populateObject, $resourceMetadataFactoryProphecy->reveal());
     }
@@ -178,7 +184,13 @@ class DeserializeListenerTest extends TestCase
     public function testDeserializeResourceClassSupportedFormat(string $method, bool $populateObject): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, ['post' => ['input_formats' => self::FORMATS]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['post' => ['input_formats' => self::FORMATS]]
+        ));
 
         $this->doTestDeserializeResourceClassSupportedFormat($method, $populateObject, $resourceMetadataFactoryProphecy->reveal());
     }
@@ -228,7 +240,13 @@ class DeserializeListenerTest extends TestCase
     public function testContentNegotiation(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, ['post' => ['input_formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['post' => ['input_formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]
+        ));
 
         $this->doTestContentNegotiation($resourceMetadataFactoryProphecy->reveal());
     }
@@ -259,7 +277,11 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn($context)->shouldBeCalled();
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactory);
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            $resourceMetadataFactory
+        );
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -283,9 +305,19 @@ class DeserializeListenerTest extends TestCase
         $serializerContextBuilderProphecy->createFromRequest(Argument::type(Request::class), false, Argument::type('array'))->willReturn(['input' => ['class' => 'Foo'], 'output' => ['class' => 'Foo']]);
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, ['post' => ['input_formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]));
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(
+            null,
+            null,
+            null,
+            null,
+            ['post' => ['input_formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]]
+        ));
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal()
+        );
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -310,7 +342,11 @@ class DeserializeListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, null, null, ['formats' => ['jsonld' => ['application/ld+json'], 'xml' => ['text/xml']]]));
 
-        $listener = new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $listener = new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal()
+        );
         $listener->onKernelRequest($eventProphecy->reveal());
     }
 
@@ -324,6 +360,10 @@ class DeserializeListenerTest extends TestCase
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        new DeserializeListener($serializerProphecy->reveal(), $serializerContextBuilderProphecy->reveal(), self::FORMATS);
+        new DeserializeListener(
+            $serializerProphecy->reveal(),
+            $serializerContextBuilderProphecy->reveal(),
+            self::FORMATS
+        );
     }
 }

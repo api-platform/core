@@ -29,7 +29,10 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(AnnotationToAttributeRector::class)
         ->call('configure', [[
             AnnotationToAttributeRector::ANNOTATION_TO_ATTRIBUTE => ValueObjectInliner::inline([
-                new AnnotationToAttribute(\ApiPlatform\Core\Annotation\ApiResource::class, \ApiPlatform\Core\Annotation\ApiResource::class),
+                new AnnotationToAttribute(
+                    \ApiPlatform\Core\Annotation\ApiResource::class,
+                    \ApiPlatform\Core\Annotation\ApiResource::class
+                ),
             ]),
         ]]);
 };

@@ -46,7 +46,11 @@ class DeserializeStageTest extends TestCase
         $this->denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
-        $this->deserializeStage = new DeserializeStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->denormalizerProphecy->reveal(), $this->serializerContextBuilderProphecy->reveal());
+        $this->deserializeStage = new DeserializeStage(
+            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
+            $this->denormalizerProphecy->reveal(),
+            $this->serializerContextBuilderProphecy->reveal()
+        );
     }
 
     /**

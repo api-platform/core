@@ -99,61 +99,64 @@ class DateFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'after (all properties enabled)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
-            ],
-            'after but not equals (all properties enabled)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
-            ],
-            'after' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
-            ],
-            'after but not equals' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
-            ],
-            'before (all properties enabled)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
-            ],
-            'before but not equals (all properties enabled)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
-            ],
-            'before' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
-            ],
-            'before but not equals' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
-            ],
-            'before + after (all properties enabled)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
-            ],
-            'before but not equals + after but not equals (all properties enabled)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
-            ],
-            'before + after' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
-            ],
-            'before but not equals + after but not equals' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
-            ],
-            'property not enabled' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-            'nested property' => [
-                sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyDate >= :dummyDate_p1', Dummy::class),
-            ],
-            'after (exclude_null)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate IS NOT NULL AND o.dummyDate >= :dummyDate_p1', Dummy::class),
-            ],
-            'after (include_null_after)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
-            ],
-            'include null before and after (include_null_before_and_after)' => [
-                sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
-            ],
-            'bad date format' => [
-                sprintf('SELECT o FROM %s o', Dummy::class),
-            ],
-        ]);
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'after (all properties enabled)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
+                ],
+                'after but not equals (all properties enabled)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+                ],
+                'after' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1', Dummy::class),
+                ],
+                'after but not equals' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate > :dummyDate_p1', Dummy::class),
+                ],
+                'before (all properties enabled)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
+                ],
+                'before but not equals (all properties enabled)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
+                ],
+                'before' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1', Dummy::class),
+                ],
+                'before but not equals' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1', Dummy::class),
+                ],
+                'before + after (all properties enabled)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+                ],
+                'before but not equals + after but not equals (all properties enabled)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
+                ],
+                'before + after' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate <= :dummyDate_p1 AND o.dummyDate >= :dummyDate_p2', Dummy::class),
+                ],
+                'before but not equals + after but not equals' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate < :dummyDate_p1 AND o.dummyDate > :dummyDate_p2', Dummy::class),
+                ],
+                'property not enabled' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+                'nested property' => [
+                    sprintf('SELECT o FROM %s o INNER JOIN o.relatedDummy relatedDummy_a1 WHERE relatedDummy_a1.dummyDate >= :dummyDate_p1', Dummy::class),
+                ],
+                'after (exclude_null)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate IS NOT NULL AND o.dummyDate >= :dummyDate_p1', Dummy::class),
+                ],
+                'after (include_null_after)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
+                ],
+                'include null before and after (include_null_before_and_after)' => [
+                    sprintf('SELECT o FROM %s o WHERE o.dummyDate >= :dummyDate_p1 OR o.dummyDate IS NULL', Dummy::class),
+                ],
+                'bad date format' => [
+                    sprintf('SELECT o FROM %s o', Dummy::class),
+                ],
+            ]
+        );
     }
 }

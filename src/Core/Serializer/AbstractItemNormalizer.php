@@ -424,8 +424,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if (
                 $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
-                (isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
-                    isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable()))
+                (
+                    isset($context['api_normalize']) && $propertyMetadata->isReadable() ||
+                    isset($context['api_denormalize']) && ($propertyMetadata->isWritable() || !\is_object($classOrObject) && $propertyMetadata->isInitializable())
+                )
             ) {
                 $allowedAttributes[] = $propertyName;
             }

@@ -79,8 +79,10 @@ final class SerializeListener
         if (
             (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface)
             &&
-            (!($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))
-                || ($attributes && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)))
+            (
+                !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))
+                || ($attributes && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
+            )
         ) {
             return;
         }

@@ -92,7 +92,9 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                     if ($this->isPropertyNested($field, $resourceClass)) {
                         [$field] = $this->addLookupsForNestedProperty($field, $aggregationBuilder, $resourceClass);
                     }
-                    $aggregationBuilder->sort($context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]);
+                    $aggregationBuilder->sort(
+                        $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]
+                    );
                 }
 
                 return;
@@ -101,7 +103,9 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
         if (null !== $this->order) {
             foreach ($identifiers as $identifier) {
-                $aggregationBuilder->sort($context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$identifier => $this->order]);
+                $aggregationBuilder->sort(
+                    $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$identifier => $this->order]
+                );
             }
         }
     }

@@ -51,7 +51,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['hub' => 'managed']]));
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://external/.well-known/mercure');
         $managedHub = new Hub('https://managed.mercure.rocks/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://managed.mercure.rocks/.well-known/mercure');
@@ -74,7 +79,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true]));
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://managed.mercure.rocks/.well-known/mercure');
         $listener->onKernelResponse($event);
@@ -102,7 +112,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://external/.well-known/mercure');
         $registry = new HubRegistry($defaultHub, ['default' => $defaultHub]);
@@ -122,7 +137,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://external/.well-known/mercure');
         $listener->onKernelResponse($event);
@@ -139,7 +159,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
         $listener->onKernelResponse($event);
@@ -165,7 +190,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $request->setMethod('OPTIONS');
         $request->headers->set('Access-Control-Request-Method', 'POST');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
@@ -186,7 +216,12 @@ class AddLinkHeaderListenerTest extends TestCase
         $request->setMethod('OPTIONS');
         $request->headers->set('Access-Control-Request-Method', 'POST');
 
-        $event = new ResponseEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new Response());
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $request,
+            HttpKernelInterface::MASTER_REQUEST,
+            new Response()
+        );
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $listener = new AddLinkHeaderListener($resourceMetadataFactory->reveal(), 'http://example.com/.well-known/mercure');

@@ -31,319 +31,322 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        return array_merge_recursive($this->provideApplyTestArguments(), [
-            'after (all properties enabled)' => [
-                [
+        return array_merge_recursive(
+            $this->provideApplyTestArguments(),
+            [
+                'after (all properties enabled)' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'after but not equals (all properties enabled)' => [
-                [
+                'after but not equals (all properties enabled)' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gt' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'after' => [
-                [
+                'after' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'after but not equals' => [
-                [
+                'after but not equals' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gt' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'before (all properties enabled)' => [
-                [
+                'before (all properties enabled)' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'before but not equals (all properties enabled)' => [
-                [
+                'before but not equals (all properties enabled)' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lt' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'before' => [
-                [
+                'before' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'before but not equals' => [
-                [
+                'before but not equals' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lt' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'before + after (all properties enabled)' => [
-                [
+                'before + after (all properties enabled)' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
-                    ],
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'before but not equals + after but not equals (all properties enabled)' => [
-                [
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lt' => new UTCDateTime(1428192000000),
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gt' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'before + after' => [
-                [
+                'before but not equals + after but not equals (all properties enabled)' => [
                     [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
-                    ],
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'before but not equals + after but not equals' => [
-                [
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$lt' => new UTCDateTime(1428192000000),
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gt' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'property not enabled' => [
-                [],
-            ],
-            'nested property' => [
-                [
+                'before + after' => [
                     [
-                        '$lookup' => [
-                            'from' => 'RelatedDummy',
-                            'localField' => 'relatedDummy',
-                            'foreignField' => '_id',
-                            'as' => 'relatedDummy_lkup',
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lte' => new UTCDateTime(1428192000000),
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
-                    ],
-                    [
-                        '$unwind' => '$relatedDummy_lkup',
-                    ],
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'relatedDummy_lkup.dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'after (exclude_null)' => [
-                [
+                'before but not equals + after but not equals' => [
                     [
-                        '$match' => [
-                            'dummyDate' => ['$ne' => null],
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$lt' => new UTCDateTime(1428192000000),
+                                        ],
+                                    ],
+                                ],
+                            ],
                         ],
-                    ],
-                    [
-                        '$match' => [
-                            '$and' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gt' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'after (include_null_after)' => [
-                [
+                'property not enabled' => [
+                    [],
+                ],
+                'nested property' => [
                     [
-                        '$match' => [
-                            '$or' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
+                        [
+                            '$lookup' => [
+                                'from' => 'RelatedDummy',
+                                'localField' => 'relatedDummy',
+                                'foreignField' => '_id',
+                                'as' => 'relatedDummy_lkup',
+                            ],
+                        ],
+                        [
+                            '$unwind' => '$relatedDummy_lkup',
+                        ],
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'relatedDummy_lkup.dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
-                                ],
-                                [
-                                    'dummyDate' => null,
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'include null before and after (include_null_before_and_after)' => [
-                [
+                'after (exclude_null)' => [
                     [
-                        '$match' => [
-                            '$or' => [
-                                [
-                                    'dummyDate' => [
-                                        '$gte' => new UTCDateTime(1428192000000),
+                        [
+                            '$match' => [
+                                'dummyDate' => ['$ne' => null],
+                            ],
+                        ],
+                        [
+                            '$match' => [
+                                '$and' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
                                     ],
-                                ],
-                                [
-                                    'dummyDate' => null,
                                 ],
                             ],
                         ],
                     ],
                 ],
-            ],
-            'bad date format' => [
-                [],
-            ],
-        ]);
+                'after (include_null_after)' => [
+                    [
+                        [
+                            '$match' => [
+                                '$or' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
+                                    ],
+                                    [
+                                        'dummyDate' => null,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'include null before and after (include_null_before_and_after)' => [
+                    [
+                        [
+                            '$match' => [
+                                '$or' => [
+                                    [
+                                        'dummyDate' => [
+                                            '$gte' => new UTCDateTime(1428192000000),
+                                        ],
+                                    ],
+                                    [
+                                        'dummyDate' => null,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'bad date format' => [
+                    [],
+                ],
+            ]
+        );
     }
 }

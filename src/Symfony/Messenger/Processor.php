@@ -47,8 +47,10 @@ final class Processor implements ProcessorInterface
      */
     private function persist($data, array $context = [])
     {
-        $envelope = $this->dispatch((new Envelope($data))
-                ->with(new ContextStamp($context)));
+        $envelope = $this->dispatch(
+            (new Envelope($data))
+                ->with(new ContextStamp($context))
+        );
 
         $handledStamp = $envelope->last(HandledStamp::class);
         if (!$handledStamp instanceof HandledStamp) {
@@ -63,8 +65,10 @@ final class Processor implements ProcessorInterface
      */
     private function remove($data, array $context = [])
     {
-        $this->dispatch((new Envelope($data))
-                ->with(new RemoveStamp()));
+        $this->dispatch(
+            (new Envelope($data))
+                ->with(new RemoveStamp())
+        );
     }
 
     public function resumable(?string $operationName = null, array $context = []): bool

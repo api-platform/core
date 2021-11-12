@@ -49,8 +49,11 @@ abstract class VoDummyVehicle
      */
     private $drivers;
 
-    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers)
-    {
+    public function __construct(
+        string $make,
+        VoDummyInsuranceCompany $insuranceCompany,
+        array $drivers
+    ) {
         $this->make = $make;
         $this->insuranceCompany = $insuranceCompany;
         $this->drivers = new ArrayCollection($drivers);

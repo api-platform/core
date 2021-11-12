@@ -47,7 +47,17 @@ class CollectionDataProviderTest extends TestCase
 
     public function testConstruct()
     {
-        self::assertInstanceOf(CollectionDataProviderInterface::class, new CollectionDataProvider($this->prophesize(Client::class)->reveal(), $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()));
+        self::assertInstanceOf(
+            CollectionDataProviderInterface::class,
+            new CollectionDataProvider(
+                $this->prophesize(Client::class)->reveal(),
+                $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
+                $this->prophesize(DenormalizerInterface::class)->reveal(),
+                new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
+                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()
+            )
+        );
     }
 
     public function testSupports()
@@ -68,7 +78,14 @@ class CollectionDataProviderTest extends TestCase
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn(new ResourceMetadata());
         $resourceMetadataFactoryProphecy->create(DummyCarColor::class)->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
 
-        $collectionDataProvider = new CollectionDataProvider($this->prophesize(Client::class)->reveal(), $documentMetadataFactoryProphecy->reveal(), $identifierExtractorProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()), $resourceMetadataFactoryProphecy->reveal());
+        $collectionDataProvider = new CollectionDataProvider(
+            $this->prophesize(Client::class)->reveal(),
+            $documentMetadataFactoryProphecy->reveal(),
+            $identifierExtractorProphecy->reveal(),
+            $this->prophesize(DenormalizerInterface::class)->reveal(),
+            new Pagination($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal()),
+            $resourceMetadataFactoryProphecy->reveal()
+        );
 
         self::assertTrue($collectionDataProvider->supports(Foo::class));
         self::assertFalse($collectionDataProvider->supports(Dummy::class));
@@ -130,15 +147,41 @@ class CollectionDataProviderTest extends TestCase
 
         $clientProphecy = $this->prophesize(Client::class);
         $clientProphecy
-            ->search(Argument::allOf(Argument::withEntry('index', 'foo'), Argument::withEntry('type', DocumentMetadata::DEFAULT_TYPE), Argument::withEntry('body', Argument::allOf(Argument::withEntry('size', 2), Argument::withEntry('from', 0), Argument::withEntry('query', Argument::allOf(Argument::withEntry('match_all', Argument::type(\stdClass::class)), Argument::size(1))), Argument::size(3))), Argument::size(3)))
+            ->search(
+                Argument::allOf(
+                    Argument::withEntry('index', 'foo'),
+                    Argument::withEntry('type', DocumentMetadata::DEFAULT_TYPE),
+                    Argument::withEntry('body', Argument::allOf(
+                        Argument::withEntry('size', 2),
+                        Argument::withEntry('from', 0),
+                        Argument::withEntry('query', Argument::allOf(
+                            Argument::withEntry('match_all', Argument::type(\stdClass::class)),
+                            Argument::size(1)
+                        )),
+                        Argument::size(3)
+                    )),
+                    Argument::size(3)
+                )
+            )
             ->willReturn($documents)
             ->shouldBeCalled();
 
         $requestBodySearchCollectionExtensionProphecy = $this->prophesize(RequestBodySearchCollectionExtensionInterface::class);
         $requestBodySearchCollectionExtensionProphecy->applyToCollection([], Foo::class, 'get', $context)->willReturn([])->shouldBeCalled();
 
-        $collectionDataProvider = new CollectionDataProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(IdentifierExtractorInterface::class)->reveal(), $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(), new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]), $resourceMetadataFactoryProphecy->reveal(), [$requestBodySearchCollectionExtensionProphecy->reveal()]);
+        $collectionDataProvider = new CollectionDataProvider(
+            $clientProphecy->reveal(),
+            $documentMetadataFactoryProphecy->reveal(),
+            $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
+            $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
+            new Pagination($resourceMetadataFactoryProphecy->reveal(), ['items_per_page' => 2]),
+            $resourceMetadataFactoryProphecy->reveal(),
+            [$requestBodySearchCollectionExtensionProphecy->reveal()]
+        );
 
-        self::assertEquals(new Paginator($denormalizer, $documents, Foo::class, 2, 0, $context), $collectionDataProvider->getCollection(Foo::class, 'get', $context));
+        self::assertEquals(
+            new Paginator($denormalizer, $documents, Foo::class, 2, 0, $context),
+            $collectionDataProvider->getCollection(Foo::class, 'get', $context)
+        );
     }
 }

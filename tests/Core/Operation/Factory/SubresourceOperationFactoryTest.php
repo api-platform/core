@@ -334,7 +334,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+                $resourceMetadataFactoryProphecy->reveal(),
+                $propertyNameCollectionFactoryProphecy->reveal(),
+                $propertyMetadataFactoryProphecy->reveal(),
+                $pathSegmentNameGeneratorProphecy->reveal(),
+                $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -395,7 +401,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -486,7 +498,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -545,7 +563,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -598,7 +622,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -674,7 +704,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+                $resourceMetadataFactoryProphecy->reveal(),
+                $propertyNameCollectionFactoryProphecy->reveal(),
+                $propertyMetadataFactoryProphecy->reveal(),
+                $pathSegmentNameGeneratorProphecy->reveal(),
+                $identifiersExtractorProphecy->reveal()
+        );
 
         $result = $subresourceOperationFactory->create(DummyEntity::class);
         $this->assertEquals([
@@ -736,7 +772,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+                $resourceMetadataFactoryProphecy->reveal(),
+                $propertyNameCollectionFactoryProphecy->reveal(),
+                $propertyMetadataFactoryProphecy->reveal(),
+                $pathSegmentNameGeneratorProphecy->reveal(),
+                $identifiersExtractorProphecy->reveal()
+        );
 
         $result = $subresourceOperationFactory->create(DummyEntity::class);
         $this->assertEquals([
@@ -783,7 +825,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -833,7 +881,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [
@@ -898,7 +952,13 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
-        $subresourceOperationFactory = new SubresourceOperationFactory($resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $pathSegmentNameGeneratorProphecy->reveal(), $identifiersExtractorProphecy->reveal());
+        $subresourceOperationFactory = new SubresourceOperationFactory(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
+        );
 
         $this->assertEquals([
             'api_dummy_entities_subresource_get_subresource' => [

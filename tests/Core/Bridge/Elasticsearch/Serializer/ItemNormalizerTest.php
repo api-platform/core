@@ -33,11 +33,15 @@ final class ItemNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->itemNormalizer = new ItemNormalizer(($this->normalizerProphecy = $this
+        $this->itemNormalizer = new ItemNormalizer(
+            (
+                $this->normalizerProphecy = $this
                     ->prophesize(NormalizerInterface::class)
                     ->willImplement(DenormalizerInterface::class)
                     ->willImplement(SerializerAwareInterface::class)
-                    ->willImplement(CacheableSupportsMethodInterface::class))->reveal());
+                    ->willImplement(CacheableSupportsMethodInterface::class)
+            )->reveal()
+        );
     }
 
     public function testConstruct(): void

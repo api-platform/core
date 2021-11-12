@@ -230,7 +230,11 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(SecuredDummy::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'is_granted(\'ROLE_ADMIN\')', ['object' => $dummy])->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            ['object' => $dummy]
+        )->willReturn(false);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
@@ -290,7 +294,11 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'is_granted(\'ROLE_ADMIN\')', ['object' => null])->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            ['object' => null]
+        )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -342,7 +350,11 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'false', Argument::any())->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'false',
+            Argument::any()
+        )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -397,8 +409,16 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'true', ['object' => null])->willReturn(true);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'true', ['object' => $dummy])->willReturn(true);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'true',
+            ['object' => null]
+        )->willReturn(true);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'true',
+            ['object' => $dummy]
+        )->willReturn(true);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -454,8 +474,16 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'false', ['object' => null])->willReturn(false);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'false', ['object' => $dummy])->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'false',
+            ['object' => null]
+        )->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'false',
+            ['object' => $dummy]
+        )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -512,7 +540,11 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy->willImplement(NormalizerInterface::class);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->isGranted(SecuredDummy::class, 'false', ['object' => $dummy, 'previous_object' => $dummy])->willReturn(false);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'false',
+            ['object' => $dummy, 'previous_object' => $dummy]
+        )->willReturn(false);
 
         $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
             $propertyNameCollectionFactoryProphecy->reveal(),
@@ -576,7 +608,11 @@ class AbstractItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
-        $relatedDummyChildContext = Argument::allOf(Argument::type('array'), Argument::withEntry('resource_class', RelatedDummy::class), Argument::not(Argument::withKey('iri')));
+        $relatedDummyChildContext = Argument::allOf(
+            Argument::type('array'),
+            Argument::withEntry('resource_class', RelatedDummy::class),
+            Argument::not(Argument::withKey('iri'))
+        );
         $serializerProphecy->normalize($relatedDummy, null, $relatedDummyChildContext)->willReturn(['foo' => 'hello']);
         $serializerProphecy->normalize(['foo' => 'hello'], null, Argument::type('array'))->willReturn(['foo' => 'hello']);
         $serializerProphecy->normalize([['foo' => 'hello']], null, Argument::type('array'))->willReturn([['foo' => 'hello']]);
@@ -800,7 +836,9 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -849,7 +887,9 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -1044,7 +1084,14 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
 
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class));
+        $type = new Type(
+                    Type::BUILTIN_TYPE_OBJECT,
+                    false,
+                    ArrayCollection::class,
+                    true,
+                    new Type(Type::BUILTIN_TYPE_INT),
+                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+                );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$type])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -1134,11 +1181,17 @@ class AbstractItemNormalizerTest extends TestCase
         $dummy->setName('foo');
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(DummyTableInheritance::class, [])->willReturn(new PropertyNameCollection(['name', 'nickname']))->shouldBeCalled();
+        $propertyNameCollectionFactoryProphecy->create(DummyTableInheritance::class, [])->willReturn(
+            new PropertyNameCollection(['name', 'nickname'])
+        )->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'name', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'nickname', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'name', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
+        )->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'nickname', [])->willReturn(
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING, true), '', true, true, false, false, false, false, null, DummyTableInheritanceChild::class)
+        )->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldBeCalled();
@@ -1254,7 +1307,16 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', false, true, false, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
 
@@ -1307,7 +1369,16 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', false, true, false, false));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+            new PropertyMetadata(
+                new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
+                '',
+                false,
+                true,
+                false,
+                false
+            )
+        );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
@@ -1511,20 +1582,24 @@ class AbstractItemNormalizerTest extends TestCase
         ]);
         $normalizer->setSerializer($serializerProphecy->reveal());
 
-        $objectWithBasicProperties = $normalizer->denormalize([
-            'boolTrue1' => 'true',
-            'boolFalse1' => 'false',
-            'boolTrue2' => '1',
-            'boolFalse2' => '0',
-            'int1' => '4711',
-            'int2' => '-4711',
-            'float1' => '123.456',
-            'float2' => '-1.2344e56',
-            'float3' => '45E-6',
-            'floatNaN' => 'NaN',
-            'floatInf' => 'INF',
-            'floatNegInf' => '-INF',
-        ], ObjectWithBasicProperties::class, 'xml');
+        $objectWithBasicProperties = $normalizer->denormalize(
+            [
+                'boolTrue1' => 'true',
+                'boolFalse1' => 'false',
+                'boolTrue2' => '1',
+                'boolFalse2' => '0',
+                'int1' => '4711',
+                'int2' => '-4711',
+                'float1' => '123.456',
+                'float2' => '-1.2344e56',
+                'float3' => '45E-6',
+                'floatNaN' => 'NaN',
+                'floatInf' => 'INF',
+                'floatNegInf' => '-INF',
+            ],
+            ObjectWithBasicProperties::class,
+            'xml'
+        );
 
         $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBasicProperties);
     }

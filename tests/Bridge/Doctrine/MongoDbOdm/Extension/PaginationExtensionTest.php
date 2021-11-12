@@ -75,7 +75,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -94,7 +98,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -117,7 +125,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]];
 
-        $extension = new PaginationExtension($this->prophesize(ManagerRegistry::class)->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -140,7 +152,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -159,7 +175,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -175,7 +195,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query'];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -200,7 +224,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'last' => 5], 'graphql_operation_name' => 'query'];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -216,7 +244,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = [];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -235,7 +267,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = [];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -254,7 +290,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['graphql_operation_name' => 'get'];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -274,7 +314,11 @@ class PaginationExtensionTest extends TestCase
 
         $context = ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]];
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', 'get', $context);
     }
 
@@ -286,7 +330,11 @@ class PaginationExtensionTest extends TestCase
 
         $pagination = new Pagination($resourceMetadataFactory);
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $this->assertTrue($extension->supportsResult('Foo', 'get'));
     }
 
@@ -301,7 +349,11 @@ class PaginationExtensionTest extends TestCase
             'client_enabled' => false,
         ]);
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $this->assertFalse($extension->supportsResult('Foo', 'get', ['filters' => ['pagination' => true]]));
     }
 
@@ -315,7 +367,11 @@ class PaginationExtensionTest extends TestCase
             'enabled' => false,
         ]);
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $this->assertFalse($extension->supportsResult('Foo', 'get', ['filters' => ['enabled' => false]]));
     }
 
@@ -329,7 +385,11 @@ class PaginationExtensionTest extends TestCase
             'enabled' => false,
         ]);
 
-        $extension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
         $this->assertFalse($extension->supportsResult('Foo', 'get', ['filters' => ['enabled' => false], 'graphql_operation_name' => 'query']));
     }
 
@@ -375,7 +435,11 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
-        $paginationExtension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $paginationExtension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
 
         $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class, 'get');
 
@@ -425,7 +489,11 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
-        $paginationExtension = new PaginationExtension($this->managerRegistryProphecy->reveal(), $resourceMetadataFactory, $pagination);
+        $paginationExtension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
 
         $result = $paginationExtension->getResult($aggregationBuilderProphecy->reveal(), Dummy::class, 'get');
 
@@ -454,7 +522,10 @@ class PaginationExtensionTest extends TestCase
         $countAggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
-        $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn($resultsAggregationBuilderProphecy->reveal(), $countAggregationBuilderProphecy->reveal());
+        $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
+            $resultsAggregationBuilderProphecy->reveal(),
+            $countAggregationBuilderProphecy->reveal()
+        );
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getRepository('Foo')->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
