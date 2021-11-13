@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter;
 
 /**
  * @author Lee Siong Chan <ahlee2326@me.com>
+ * @author Samuel Chiriluta <samuel4x4@gmail.com>
  */
 trait RangeFilterTestTrait
 {
@@ -131,6 +132,22 @@ trait RangeFilterTestTrait
                     'dummyPrice' => [
                         'gte' => '9.99',
                         'lte' => '19.99',
+                    ],
+                ],
+            ],
+            'ne' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'ne' => '9.99',
+                    ],
+                ],
+            ],
+            'ne (non-numeric)' => [
+                null,
+                [
+                    'dummyPrice' => [
+                        'ne' => '127.0.0.1',
                     ],
                 ],
             ],
