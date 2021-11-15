@@ -27,14 +27,14 @@
         </service>
         <service id="ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface" alias="api_platform.subresource_data_provider" />
 
-        <service id="api_platform.pagination" class="ApiPlatform\Core\DataProvider\Pagination">
+        <service id="api_platform.pagination" class="ApiPlatform\State\Pagination\Pagination">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument>%api_platform.collection.pagination%</argument>
             <argument>%api_platform.graphql.collection.pagination%</argument>
         </service>
-        <service id="ApiPlatform\Core\DataProvider\Pagination" alias="api_platform.pagination" />
+        <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination" />
 
-        <service id="api_platform.pagination_options" class="ApiPlatform\Core\DataProvider\PaginationOptions">
+        <service id="api_platform.pagination_options" class="ApiPlatform\State\Pagination\PaginationOptions">
             <argument>%api_platform.collection.pagination.enabled%</argument>
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.client_items_per_page%</argument>
@@ -47,7 +47,7 @@
             <argument>%api_platform.collection.pagination.client_partial%</argument>
             <argument>%api_platform.collection.pagination.partial_parameter_name%</argument>
         </service>
-        <service id="ApiPlatform\Core\DataProvider\PaginationOptions" alias="api_platform.pagination_options" />
+        <service id="ApiPlatform\State\Pagination\PaginationOptions" alias="api_platform.pagination_options" />
     </services>
 
 </container>

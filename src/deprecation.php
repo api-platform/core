@@ -210,6 +210,15 @@ spl_autoload_register(function ($className) {
         // Bridge\RamseyUuid
         ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class => ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer::class,
 
+        // Cache
+        ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
+
+        // DataProvider => State/Pagination
+        ApiPlatform\Core\DataProvider\ArrayPaginator::class => ApiPlatform\State\Pagination\ArrayPaginator::class,
+        ApiPlatform\Core\DataProvider\Pagination::class => ApiPlatform\State\Pagination\Pagination::class,
+        ApiPlatform\Core\DataProvider\PaginationOptions::class => ApiPlatform\State\Pagination\PaginationOptions::class,
+        ApiPlatform\Core\DataProvider\TraversablePaginator::class => ApiPlatform\State\Pagination\TraversablePaginator::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

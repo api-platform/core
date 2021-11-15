@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\DataProvider;
+namespace ApiPlatform\Tests\State\Pagination;
 
-use ApiPlatform\Core\DataProvider\TraversablePaginator;
+use ApiPlatform\State\Pagination\TraversablePaginator;
 use ArrayIterator;
 use PHPUnit\Framework\TestCase;
 

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm;
 
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 

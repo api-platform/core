@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch;
 
-use ApiPlatform\Core\DataProvider\PaginatorInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
