@@ -207,6 +207,9 @@ spl_autoload_register(function ($className) {
 
         ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class => ApiPlatform\Elasticsearch\Paginator::class,
 
+        // Bridge\RamseyUuid
+        ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class => ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

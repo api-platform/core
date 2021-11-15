@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\RamseyUuid\Serializer;
+namespace ApiPlatform\Tests\RamseyUuid\Serializer;
 
-use ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer;
+use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
