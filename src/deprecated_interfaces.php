@@ -43,6 +43,15 @@ return [
 
     ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface::class => ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface::class,
 
+    // Bridge\Elasticsearch
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface::class => ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface::class,
+
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\ConstantScoreFilterExtension::class => ApiPlatform\Elasticsearch\Filter\ConstantScoreFilterInterface::class,
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\FilterInterface::class => ApiPlatform\Elasticsearch\Filter\FilterInterface::class,
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\SortFilterInterface::class => ApiPlatform\Elasticsearch\Filter\SortFilterInterface::class,
+
+    ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface::class,
+
     ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface::class => ApiPlatform\DataTransformer\DataTransformerInitializerInterface::class,
     ApiPlatform\Core\DataTransformer\DataTransformerInterface::class => ApiPlatform\DataTransformer\DataTransformerInterface::class,
 

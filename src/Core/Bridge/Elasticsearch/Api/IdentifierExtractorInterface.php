@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Elasticsearch\Api;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
+use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
 
 /**
  * Extracts identifier for a given resource.

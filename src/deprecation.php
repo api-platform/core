@@ -171,13 +171,41 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter::class => ApiPlatform\Doctrine\Orm\Filter\RangeFilter::class,
         ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Orm\Filter\SearchFilter::class,
 
-        ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait::class => ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait::class,
-        ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::class => ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::class,
-        ApiPlatform\Doctrine\Orm\Util\QueryChecker::class => ApiPlatform\Doctrine\Orm\Util\QueryChecker::class,
-        ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::class => ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::class,
-        ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator::class => ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait::class => ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::class => ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::class => ApiPlatform\Doctrine\Orm\Util\QueryChecker::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::class => ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::class,
+        ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator::class => ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator::class,
 
         ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory::class => ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory::class,
+
+        // Bridge\Elasticsearch
+        ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException::class => ApiPlatform\Elasticsearch\Exception\IndexNotFoundException::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException::class => ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException::class,
+
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\AbstractFilterExtension::class => ApiPlatform\Elasticsearch\Extension\AbstractFilterExtension::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\ConstantScoreFilterExtension::class => ApiPlatform\Elasticsearch\Extension\ConstantScoreFilterExtension::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension::class => ApiPlatform\Elasticsearch\Extension\SortExtension::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortFilterExtension::class => ApiPlatform\Elasticsearch\Extension\SortFilterExtension::class,
+
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractFilter::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractSearchFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractSearchFilter::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter::class => ApiPlatform\Elasticsearch\Filter\MatchFilter::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter::class => ApiPlatform\Elasticsearch\Filter\OrderFilter::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter::class => ApiPlatform\Elasticsearch\Filter\TermFilter::class,
+
+        ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class => ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata::class,
+
+        ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class => ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer::class => ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer::class => ApiPlatform\Elasticsearch\Serializer\ItemNormalizer::class,
+        ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait::class => ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait::class,
+
+        ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Paginator::class => ApiPlatform\Elasticsearch\Paginator::class,
 
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,

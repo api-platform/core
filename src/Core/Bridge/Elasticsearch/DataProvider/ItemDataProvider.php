@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Exception\IndexNotFoundException;
-use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
-use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
+use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
+use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;

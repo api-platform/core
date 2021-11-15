@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter;
+use ApiPlatform\Elasticsearch\Filter\TermFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
