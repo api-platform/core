@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\SwaggerUi;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
-use ApiPlatform\Core\Documentation\DocumentationInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
@@ -24,6 +23,7 @@ use ApiPlatform\Core\OpenApi\Model\Paths;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Documentation\DocumentationInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;

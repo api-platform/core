@@ -219,6 +219,10 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\DataProvider\PaginationOptions::class => ApiPlatform\State\Pagination\PaginationOptions::class,
         ApiPlatform\Core\DataProvider\TraversablePaginator::class => ApiPlatform\State\Pagination\TraversablePaginator::class,
 
+        // Documentation
+        ApiPlatform\Core\Documentation\Action\DocumentationAction::class => ApiPlatform\Documentation\Action\DocumentationAction::class,
+        ApiPlatform\Core\Documentation\Documentation::class => ApiPlatform\Documentation\Documentation::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

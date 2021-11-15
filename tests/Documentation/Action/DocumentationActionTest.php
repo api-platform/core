@@ -11,11 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Documentation\Action;
+namespace ApiPlatform\Tests\Documentation\Action;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Documentation\Action\DocumentationAction;
-use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
@@ -23,6 +21,8 @@ use ApiPlatform\Core\OpenApi\Model\Info;
 use ApiPlatform\Core\OpenApi\Model\Paths;
 use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Documentation\Action\DocumentationAction;
+use ApiPlatform\Documentation\Documentation;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,7 +38,7 @@ class DocumentationActionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not passing an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Core\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
+     * @expectedDeprecation Not passing an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
      */
     public function testDocumentationAction(): void
     {
@@ -86,7 +86,7 @@ class DocumentationActionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 5th parameter of the constructor of "ApiPlatform\Core\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.5
+     * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 5th parameter of the constructor of "ApiPlatform\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.5
      */
     public function testDocumentationActionFormatDeprecation()
     {

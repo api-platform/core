@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction;
-use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Documentation\Documentation;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;

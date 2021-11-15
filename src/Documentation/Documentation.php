@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Documentation;
+namespace ApiPlatform\Documentation;
 
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 

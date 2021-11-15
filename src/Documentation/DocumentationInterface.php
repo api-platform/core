@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Documentation;
+namespace ApiPlatform\Documentation;
 
 /**
  * An API documentation.
