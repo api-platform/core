@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Hydra\EventListener;
+namespace ApiPlatform\Hydra\EventListener;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilder;

@@ -245,6 +245,17 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\HttpCache\VarnishPurger::class => ApiPlatform\HttpCache\VarnishPurger::class,
         ApiPlatform\Core\HttpCache\VarnishXKeyPurger::class => ApiPlatform\HttpCache\VarnishXKeyPurger::class,
 
+        // Hydra
+        ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class => ApiPlatform\Hydra\EventListener\AddLinkHeaderListener::class,
+        ApiPlatform\Core\Hydra\JsonSchema\SchemaFactory::class => ApiPlatform\Hydra\JsonSchema\SchemaFactory::class,
+        ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer::class => ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer::class,
+        ApiPlatform\Core\Hydra\Serializer\CollectionNormalizer::class => ApiPlatform\Hydra\Serializer\CollectionNormalizer::class,
+        ApiPlatform\Core\Hydra\Serializer\ConstraintViolationListNormalizer::class => ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer::class,
+        ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer::class => ApiPlatform\Hydra\Serializer\DocumentationNormalizer::class,
+        ApiPlatform\Core\Hydra\Serializer\EntrypointNormalizer::class => ApiPlatform\Hydra\Serializer\EntrypointNormalizer::class,
+        ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class => ApiPlatform\Hydra\Serializer\ErrorNormalizer::class,
+        ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class => ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

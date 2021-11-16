@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Hydra\EventListener;
+namespace ApiPlatform\Tests\Hydra\EventListener;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Hydra\EventListener\AddLinkHeaderListener;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
 use PHPUnit\Framework\TestCase;

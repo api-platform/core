@@ -77,7 +77,7 @@ parameters:
 			message: '#Parameter \#[0-9] \$filterLocator of class .+ constructor expects ApiPlatform\\Core\\Api\\FilterCollection|Psr\\Container\\ContainerInterface, ArrayObject<mixed, mixed> given\.#'
 			paths:
 				- tests/Doctrine/Orm/Extension/FilterExtensionTest.php
-				- tests/Core/Hydra/Serializer/CollectionFiltersNormalizerTest.php
+				- tests/Hydra/Serializer/CollectionFiltersNormalizerTest.php
 				- tests/Core/Swagger/Serializer/DocumentationNormalizerV2Test.php
 				- tests/Core/Swagger/Serializer/DocumentationNormalizerV3Test.php
 		-

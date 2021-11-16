@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Hydra\Serializer;
+namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\Entrypoint;
