@@ -168,7 +168,7 @@
 
         <!-- Event listeners -->
 
-        <service id="api_platform.listener.request.add_format" class="ApiPlatform\Core\EventListener\AddFormatListener">
+        <service id="api_platform.listener.request.add_format" class="ApiPlatform\Symfony\EventListener\AddFormatListener">
             <argument type="service" id="api_platform.negotiator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument>%api_platform.formats%</argument>
@@ -217,7 +217,7 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
         </service>
 
-        <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Core\EventListener\DeserializeListener">
+        <service id="api_platform.listener.request.deserialize" class="ApiPlatform\Symfony\EventListener\DeserializeListener">
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -236,7 +236,7 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
         </service>
 
-        <service id="api_platform.listener.view.respond" class="ApiPlatform\Core\EventListener\RespondListener">
+        <service id="api_platform.listener.view.respond" class="ApiPlatform\Symfony\EventListener\RespondListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
@@ -250,7 +250,7 @@
             <tag name="kernel.event_listener" event="kernel.exception" method="onKernelException" />
         </service>
 
-        <service id="api_platform.listener.exception" class="ApiPlatform\Core\EventListener\ExceptionListener">
+        <service id="api_platform.listener.exception" class="ApiPlatform\Symfony\EventListener\ExceptionListener">
             <argument>api_platform.action.exception</argument>
             <argument type="service" id="logger" on-invalid="null" />
             <argument>false</argument>

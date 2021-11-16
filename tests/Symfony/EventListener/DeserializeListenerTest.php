@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\EventListener\DeserializeListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\DeserializeListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -352,7 +352,7 @@ class DeserializeListenerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 3rd parameter of the constructor of "ApiPlatform\Core\EventListener\DeserializeListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead
+     * @expectedDeprecation Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 3rd parameter of the constructor of "ApiPlatform\Symfony\EventListener\DeserializeListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead
      */
     public function testLegacyFormatsParameter(): void
     {

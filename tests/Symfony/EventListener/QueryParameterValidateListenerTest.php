@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\FilterValidationException;
+use ApiPlatform\Symfony\EventListener\QueryParameterValidateListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

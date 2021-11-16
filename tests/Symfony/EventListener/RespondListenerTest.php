@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\EventListener\RespondListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\RespondListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

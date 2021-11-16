@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\EventListener\EventPriorities;
+use ApiPlatform\Symfony\EventListener\EventPriorities;
 use PHPUnit\Framework\TestCase;
 
 /**

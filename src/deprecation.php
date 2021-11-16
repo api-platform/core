@@ -223,6 +223,15 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Documentation\Action\DocumentationAction::class => ApiPlatform\Documentation\Action\DocumentationAction::class,
         ApiPlatform\Core\Documentation\Documentation::class => ApiPlatform\Documentation\Documentation::class,
 
+        // EventListener => Symfony/EventListener
+        ApiPlatform\Core\EventListener\AddFormatListener::class => ApiPlatform\Symfony\EventListener\AddFormatListener::class,
+        ApiPlatform\Core\EventListener\DeserializeListener::class => ApiPlatform\Symfony\EventListener\DeserializeListener::class,
+        ApiPlatform\Core\EventListener\EventPriorities::class => ApiPlatform\Symfony\EventListener\EventPriorities::class,
+        ApiPlatform\Core\EventListener\ExceptionListener::class => ApiPlatform\Symfony\EventListener\ExceptionListener::class,
+        ApiPlatform\Core\EventListener\QueryParameterValidateListener::class => ApiPlatform\Symfony\EventListener\QueryParameterValidateListener::class,
+        ApiPlatform\Core\EventListener\RespondListener::class => ApiPlatform\Symfony\EventListener\RespondListener::class,
+        ApiPlatform\Core\EventListener\SerializeListener::class => ApiPlatform\Symfony\EventListener\SerializeListener::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

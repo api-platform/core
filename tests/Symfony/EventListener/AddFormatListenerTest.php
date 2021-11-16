@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\EventListener\AddFormatListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\AddFormatListener;
 use Negotiation\Negotiator;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -369,7 +369,7 @@ class AddFormatListenerTest extends TestCase
      */
     public function testLegacyFormatsParameter($formatsProvider): void
     {
-        $this->expectDeprecation('Since api-plaform/core 2.5: Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 2nd parameter of the constructor of "ApiPlatform\Core\EventListener\AddFormatListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead');
+        $this->expectDeprecation('Since api-plaform/core 2.5: Passing an array or an instance of "ApiPlatform\Core\Api\FormatsProviderInterface" as 2nd parameter of the constructor of "ApiPlatform\Symfony\EventListener\AddFormatListener" is deprecated since API Platform 2.5, pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead');
         new AddFormatListener(new Negotiator(), $formatsProvider);
     }
 

@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\EventListener\ExceptionListener;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\ExceptionListener;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;

@@ -82,7 +82,7 @@
             <argument type="service" id="api_platform.filter_locator" />
         </service>
 
-        <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Core\EventListener\QueryParameterValidateListener" public="false">
+        <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Symfony\EventListener\QueryParameterValidateListener" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.validator.query_parameter_validator" />
             <argument>%api_platform.validator.query_parameter_validation%</argument>
