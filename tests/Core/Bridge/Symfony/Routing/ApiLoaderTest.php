@@ -236,7 +236,7 @@ class ApiLoaderTest extends TestCase
 
     private function getApiLoaderWithResourceMetadata(ResourceMetadata $resourceMetadata, $recursiveSubresource = false): ApiLoader
     {
-        $routingConfig = __DIR__.'/../../../../../src/Core/Bridge/Symfony/Bundle/Resources/config/routing';
+        $routingConfig = __DIR__.'/../../../../../src/Symfony/Bundle/Resources/config/routing';
 
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);

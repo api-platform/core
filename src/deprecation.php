@@ -210,6 +210,52 @@ spl_autoload_register(function ($className) {
         // Bridge\RamseyUuid
         ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class => ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer::class,
 
+        // Bridge\Symfony\Bundle
+        ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class => ApiPlatform\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer::class => ApiPlatform\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Command\GraphQlExportCommand::class => ApiPlatform\Symfony\Bundle\Command\GraphQlExportCommand::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand::class => ApiPlatform\Symfony\Bundle\Command\OpenApiCommand::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector\RequestDataCollector::class => ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\FilterPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension::class => ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class => ApiPlatform\Symfony\Bundle\EventListener\SwaggerUiListener::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Processor\TraceableChainProcessor::class => ApiPlatform\Symfony\Bundle\Processor\TraceableChainProcessor::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class => ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class => ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubset::class => ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubsetLegacy::class => ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubsetLegacy::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubsetTrait::class => ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubsetTrait::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\ArraySubsetV9::class => ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubsetV9::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Constraint\MatchesJsonSchema::class => ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class => ApiPlatform\Symfony\Bundle\Test\ApiTestAssertionsTrait::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\BrowserKitAssertionsTrait::class => ApiPlatform\Symfony\Bundle\Test\BrowserKitAssertionsTrait::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class => ApiPlatform\Symfony\Bundle\Test\Client::class,
+        ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class => ApiPlatform\Symfony\Bundle\Test\Response::class,
+
+        ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class => ApiPlatform\Symfony\Bundle\ApiPlatformBundle::class,
+
         // Cache
         ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
 
