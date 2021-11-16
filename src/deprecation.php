@@ -232,6 +232,13 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\EventListener\RespondListener::class => ApiPlatform\Symfony\EventListener\RespondListener::class,
         ApiPlatform\Core\EventListener\SerializeListener::class => ApiPlatform\Symfony\EventListener\SerializeListener::class,
 
+        // Hal
+        ApiPlatform\Core\Hal\JsonSchema\SchemaFactory::class => ApiPlatform\Hal\JsonSchema\SchemaFactory::class,
+        ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class => ApiPlatform\Hal\Serializer\CollectionNormalizer::class,
+        ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer::class => ApiPlatform\Hal\Serializer\EntrypointNormalizer::class,
+        ApiPlatform\Core\Hal\Serializer\ItemNormalizer::class => ApiPlatform\Hal\Serializer\ItemNormalizer::class,
+        ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class => ApiPlatform\Hal\Serializer\ObjectNormalizer::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Hal\Serializer;
+namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
