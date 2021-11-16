@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\HttpCache\EventListener;
+namespace ApiPlatform\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;

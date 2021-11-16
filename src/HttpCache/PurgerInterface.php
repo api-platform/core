@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\HttpCache;
+namespace ApiPlatform\HttpCache;
 
 /**
  * Purges resources from the cache.

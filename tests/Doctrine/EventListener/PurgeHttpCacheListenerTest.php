@@ -15,10 +15,10 @@ namespace ApiPlatform\Tests\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\HttpCache\PurgerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyNoGetOperation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;

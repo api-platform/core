@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\HttpCache;
+namespace ApiPlatform\Tests\HttpCache;
 
-use ApiPlatform\Core\HttpCache\VarnishPurger;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\HttpCache\VarnishPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;

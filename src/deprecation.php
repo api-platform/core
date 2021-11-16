@@ -239,6 +239,12 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Hal\Serializer\ItemNormalizer::class => ApiPlatform\Hal\Serializer\ItemNormalizer::class,
         ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class => ApiPlatform\Hal\Serializer\ObjectNormalizer::class,
 
+        // HttpCache
+        ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::class => ApiPlatform\HttpCache\EventListener\AddHeadersListener::class,
+        ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::class => ApiPlatform\HttpCache\EventListener\AddTagsListener::class,
+        ApiPlatform\Core\HttpCache\VarnishPurger::class => ApiPlatform\HttpCache\VarnishPurger::class,
+        ApiPlatform\Core\HttpCache\VarnishXKeyPurger::class => ApiPlatform\HttpCache\VarnishXKeyPurger::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,
