@@ -44,6 +44,19 @@ parameters:
 	ignoreErrors:
 		# False positives
 		-
+			message: '#is never read, only written.#'
+			paths:
+				- tests/Fixtures/TestBundle/Document/
+				- tests/Fixtures/TestBundle/Entity/
+				- tests/Behat/
+				- src/Identifier/
+				- src/Bridge/Doctrine/MongoDbOdm/
+		-
+			message: '#is never written, only read.#'
+			paths:
+				- tests/Fixtures/TestBundle/Document/
+				- tests/Fixtures/TestBundle/Entity/
+		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
 				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php
