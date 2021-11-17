@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\PropertyInfo;
 
-use ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor;
+use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineDummy;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineEmbeddable;
 use ApiPlatform\Tests\Doctrine\Odm\PropertyInfo\Fixtures\DoctrineFooType;

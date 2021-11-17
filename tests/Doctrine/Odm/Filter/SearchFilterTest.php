@@ -15,10 +15,10 @@ namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;

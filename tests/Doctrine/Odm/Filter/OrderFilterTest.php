@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 
-use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\OrderFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\EmbeddedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;

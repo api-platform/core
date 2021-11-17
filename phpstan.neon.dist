@@ -85,8 +85,8 @@ parameters:
 			path: tests/GraphQl/Type/TypeBuilderTest.php
 		# https://github.com/phpstan/phpstan-doctrine/issues/115
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
-			path: src/Core/Test/DoctrineMongoDbOdmFilterTestCase.php
+			message: '#Property ApiPlatform\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		-
 			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
 			path: tests/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php

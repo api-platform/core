@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;

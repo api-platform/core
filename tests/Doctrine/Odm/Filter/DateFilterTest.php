@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 
-use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\DateFilterTestTrait;
 use MongoDB\BSON\UTCDateTime;
 

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Test;
+namespace ApiPlatform\Test;
 
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;

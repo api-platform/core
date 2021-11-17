@@ -356,6 +356,12 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Serializer\SerializerContextBuilder::class => ApiPlatform\Serializer\SerializerContextBuilder::class,
         ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class => ApiPlatform\Serializer\SerializerFilterContextBuilder::class,
 
+        // Test
+        ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,
+        ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup::class => ApiPlatform\Test\DoctrineMongoDbOdmSetup::class,
+        ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmTestCase::class,
+        ApiPlatform\Core\Test\DoctrineOrmFilterTestCase::class => ApiPlatform\Test\DoctrineOrmFilterTestCase::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,
