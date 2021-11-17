@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer\Exception;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
 use Symfony\Component\HttpFoundation\Response;
