@@ -40,7 +40,6 @@ class SlugParentDummy
     private $id;
 
     /**
-     * @var string|null The slug used a API identifier
      *
      * @ApiProperty(identifier=true)
      *
@@ -49,6 +48,8 @@ class SlugParentDummy
     private $slug;
 
     /**
+     * @var Collection&iterable<SlugChildDummy>
+     *
      * @ORM\OneToMany(targetEntity="ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\SlugChildDummy", mappedBy="parentDummy")
      *
      * @ApiSubresource

@@ -31,7 +31,6 @@ class Taxon implements TaxonInterface
     private $id;
 
     /**
-     * @var string|null
      *
      * @ORM\Column(type="string", unique=true)
      */

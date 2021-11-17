@@ -41,7 +41,6 @@ class EmbeddedDummy
     private $id;
 
     /**
-     * @var string The dummy name
      *
      * @ORM\Column(nullable=true)
      * @Groups({"embed"})
@@ -49,7 +48,7 @@ class EmbeddedDummy
     private $name;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @Assert\DateTime
@@ -65,7 +64,7 @@ class EmbeddedDummy
     public $embeddedDummy;
 
     /**
-     * @var RelatedDummy A related dummy
+     * @var RelatedDummy|null A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */

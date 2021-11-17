@@ -40,7 +40,7 @@ class DummyProduct
     private $id;
 
     /**
-     * @var Collection
+     * @var Collection&iterable<DummyAggregateOffer>
      *
      * @ApiSubresource
      * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
@@ -55,7 +55,7 @@ class DummyProduct
     private $name;
 
     /**
-     * @var Collection
+     * @var Collection&iterable<DummyProduct>
      *
      * @ApiSubresource
      * @ORM\OneToMany(targetEntity="DummyProduct", mappedBy="parent")
@@ -109,7 +109,7 @@ class DummyProduct
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(iterable $relatedProducts)
+    public function setRelatedProducts($relatedProducts)
     {
         $this->relatedProducts = $relatedProducts;
     }

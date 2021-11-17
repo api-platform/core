@@ -48,7 +48,6 @@ class DummyDate
     private $id;
 
     /**
-     * @var \DateTime|null The dummy date
      *
      * @ORM\Column(type="date")
      */

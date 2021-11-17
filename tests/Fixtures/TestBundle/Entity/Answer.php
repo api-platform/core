@@ -51,6 +51,8 @@ class Answer
     private $question;
 
     /**
+     * @var Collection&iterable<Question>
+     *
      * @ORM\OneToMany(targetEntity="Question", mappedBy="answer")
      * @Serializer\Groups({"foobar"})
      * @ApiSubresource

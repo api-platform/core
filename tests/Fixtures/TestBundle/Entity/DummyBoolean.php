@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DummyBoolean
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -32,7 +32,7 @@ class DummyBoolean
     private $id;
 
     /**
-     * @var bool
+     * @var bool|null
      *
      * @ORM\Column(type="boolean", nullable=true)
      */

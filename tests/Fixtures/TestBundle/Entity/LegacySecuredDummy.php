@@ -53,7 +53,6 @@ class LegacySecuredDummy
     private $id;
 
     /**
-     * @var string|null The title
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -68,7 +67,6 @@ class LegacySecuredDummy
     private $description = '';
 
     /**
-     * @var string|null The owner
      *
      * @ORM\Column
      * @Assert\NotBlank

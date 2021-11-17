@@ -43,7 +43,6 @@ class DummyTableInheritance
     private $id;
 
     /**
-     * @var string|null The dummy name
      *
      * @ORM\Column
      *

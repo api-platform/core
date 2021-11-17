@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +32,8 @@ class Relation3
     public $id;
 
     /**
+     * @var Collection&iterable<Relation2>
+     *
      * @ORM\ManyToMany(targetEntity="Relation2", orphanRemoval=true)
      */
     private $relation2s;

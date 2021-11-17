@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -39,7 +40,7 @@ class DummyAggregateOffer
     private $id;
 
     /**
-     * @var ArrayCollection
+     * @var Collection&iterable<DummyOffer>
      *
      * @ApiSubresource
      * @ORM\OneToMany(targetEntity="DummyOffer", mappedBy="aggregate", cascade={"persist"})
@@ -47,7 +48,7 @@ class DummyAggregateOffer
     private $offers;
 
     /**
-     * @var DummyProduct The dummy product
+     * @var DummyProduct|null The dummy product
      *
      * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="offers")
      */

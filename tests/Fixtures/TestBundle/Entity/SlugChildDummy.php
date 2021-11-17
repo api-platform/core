@@ -36,7 +36,6 @@ class SlugChildDummy
     private $id;
 
     /**
-     * @var string|null The slug used as API identifier
      *
      * @ApiProperty(identifier=true)
      *

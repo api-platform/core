@@ -35,7 +35,7 @@ use Doctrine\ORM\Mapping as ORM;
 class DisableItemOperation
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id

@@ -38,7 +38,6 @@ class ThirdLevel
     private $id;
 
     /**
-     * @var int|null
      *
      * @ORM\Column(type="integer")
      * @Groups({"barcelona", "chicago"})

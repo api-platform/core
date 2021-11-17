@@ -26,7 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
 class CustomGeneratedIdentifier
 {
     /**
-     * @var Uuid
+     * @var string
      *
      * @ORM\Id
      * @ORM\Column(type="string")

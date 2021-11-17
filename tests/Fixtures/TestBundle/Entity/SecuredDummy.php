@@ -60,7 +60,6 @@ class SecuredDummy
     private $id;
 
     /**
-     * @var string|null The title
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -83,7 +82,6 @@ class SecuredDummy
     private $adminOnlyProperty = '';
 
     /**
-     * @var string|null The owner
      *
      * @ORM\Column
      * @Assert\NotBlank

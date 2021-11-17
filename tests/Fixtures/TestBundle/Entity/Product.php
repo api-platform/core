@@ -32,7 +32,6 @@ class Product implements ProductInterface
     private $id;
 
     /**
-     * @var string|null
      *
      * @ORM\Column(type="string", unique=true)
      */

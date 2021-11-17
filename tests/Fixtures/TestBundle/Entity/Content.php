@@ -41,7 +41,6 @@ class Content implements \JsonSerializable
     private $id;
 
     /**
-     * @var string|null
      *
      * @ORM\Column(type="string")
      */
