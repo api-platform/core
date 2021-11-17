@@ -64,6 +64,7 @@ trait LinksHandlerTrait
 
         $previousAlias = $alias;
         $previousIdentifiers = end($links)->getIdentifiers();
+        $previousJoinProperty = $doctrineClassMetadata->getIdentifier()[0];
         $expressions = [];
         $identifiers = array_reverse($identifiers);
 
@@ -73,14 +74,10 @@ trait LinksHandlerTrait
             }
 
             $identifierProperties = $link->getIdentifiers();
-            $currentAlias = $queryNameGenerator->generateJoinAlias($alias);
-
-            if ($link->getFromClass() === $resourceClass) {
-                $currentAlias = $alias;
-            }
 
             if (!$link->getFromProperty() && !$link->getToProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
+                $currentAlias = $link->getFromClass() === $resourceClass ? $alias : $queryNameGenerator->generateJoinAlias($alias);
 
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
@@ -90,22 +87,24 @@ trait LinksHandlerTrait
 
                 $previousAlias = $currentAlias;
                 $previousIdentifiers = $identifierProperties;
+                $previousJoinProperty = $doctrineClassMetadata->getIdentifier()[0];
                 continue;
             }
 
             if (1 < \count($previousIdentifiers) || 1 < \count($identifierProperties)) {
-                throw new RuntimeException('Composite identifiers on a relation can not be handled automatically, implement your own query.');
+                throw new RuntimeException('Multiple identifiers on a relation can not be handled automatically, implement your own query.');
             }
 
             $previousIdentifier = $previousIdentifiers[0];
             $identifierProperty = $identifierProperties[0];
+            $joinProperty = $doctrineClassMetadata->getIdentifier()[0];
             $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
 
             if ($link->getFromProperty() && !$link->getToProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
                 $joinAlias = $queryNameGenerator->generateJoinAlias('m');
-                $assocationMapping = $doctrineClassMetadata->getAssociationMappings()[$link->getFromProperty()];
-                $relationType = $assocationMapping['type'];
+                $associationMapping = $doctrineClassMetadata->getAssociationMapping($link->getFromProperty());
+                $relationType = $associationMapping['type'];
 
                 if ($relationType & ClassMetadataInfo::TO_MANY) {
                     $nextAlias = $queryNameGenerator->generateJoinAlias($alias);
@@ -116,14 +115,14 @@ trait LinksHandlerTrait
                 }
 
                 // A single-valued association path expression to an inverse side is not supported in DQL queries.
-                if ($relationType & ClassMetadataInfo::TO_ONE && !$assocationMapping['isOwningSide']) {
-                    $queryBuilder->innerJoin("$previousAlias.".$assocationMapping['mappedBy'], $joinAlias);
+                if ($relationType & ClassMetadataInfo::TO_ONE && !($associationMapping['isOwningSide'] ?? true)) {
+                    $queryBuilder->innerJoin("$previousAlias.".$associationMapping['mappedBy'], $joinAlias);
                 } else {
                     $queryBuilder->join(
                         $link->getFromClass(),
                         $joinAlias,
                         'with',
-                        "{$previousAlias}.{$previousIdentifier} = $joinAlias.{$link->getFromProperty()}"
+                        "{$previousAlias}.{$previousJoinProperty} = $joinAlias.{$link->getFromProperty()}"
                     );
                 }
 
@@ -131,6 +130,7 @@ trait LinksHandlerTrait
                 $queryBuilder->setParameter($placeholder, array_shift($identifiers), $doctrineClassMetadata->getTypeOfField($identifierProperty));
                 $previousAlias = $joinAlias;
                 $previousIdentifier = $identifierProperty;
+                $previousJoinProperty = $joinProperty;
                 continue;
             }
 
@@ -140,6 +140,7 @@ trait LinksHandlerTrait
             $queryBuilder->setParameter($placeholder, array_shift($identifiers), $doctrineClassMetadata->getTypeOfField($identifierProperty));
             $previousAlias = $joinAlias;
             $previousIdentifier = $identifierProperty;
+            $previousJoinProperty = $joinProperty;
         }
 
         if ($expressions) {

@@ -30,8 +30,8 @@ final class SubresourceTransformer
 
     public function __construct()
     {
-        $this->ormMetadataFactory = new AnnotationDriver(new AnnotationReader());
-        $this->odmMetadataFactory = new ODMAnnotationDriver(new AnnotationReader());
+        $this->ormMetadataFactory = class_exists(AnnotationDriver::class) ? new AnnotationDriver(new AnnotationReader()) : null;
+        $this->odmMetadataFactory = class_exists(ODMAnnotationDriver::class) ? new ODMAnnotationDriver(new AnnotationReader()) : null;
     }
 
     public function toUriVariables(array $subresourceMetadata): array
@@ -81,12 +81,16 @@ final class SubresourceTransformer
         $metadata->initializeReflection(new RuntimeReflectionService());
 
         try {
-            $this->ormMetadataFactory->loadMetadataForClass($class, $metadata);
+            if ($this->ormMetadataFactory) {
+                $this->ormMetadataFactory->loadMetadataForClass($class, $metadata);
+            }
         } catch (MappingException $e) {
         }
 
         try {
-            $this->odmMetadataFactory->loadMetadataForClass($class, $metadata);
+            if ($this->odmMetadataFactory) {
+                $this->odmMetadataFactory->loadMetadataForClass($class, $metadata);
+            }
         } catch (ODMMappingException $e) {
         }
 

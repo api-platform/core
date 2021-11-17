@@ -88,8 +88,12 @@ final class Processor implements ProcessorInterface
     public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
         try {
-            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($context['resource_class'] ?? $this->getObjectClass($data));
-            $operation = $resourceMetadataCollection->getOperation($operationName ?? null);
+            if (isset($context['operation'])) {
+                $operation = $context['operation'];
+            } else {
+                $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($context['resource_class'] ?? $this->getObjectClass($data));
+                $operation = $resourceMetadataCollection->getOperation($operationName);
+            }
 
             return false !== ($operation->getMessenger() ?? false);
         } catch (OperationNotFoundException $e) {

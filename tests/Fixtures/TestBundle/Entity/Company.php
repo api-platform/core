@@ -32,6 +32,12 @@ use Doctrine\ORM\Mapping as ORM;
     ],
 )]
 #[Get]
+#[ApiResource(
+    uriTemplate: '/employees/{employeeId}/company',
+    uriVariables: [
+        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
+    ],
+)]
 class Company
 {
     /**

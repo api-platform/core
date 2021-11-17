@@ -101,7 +101,7 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
         $queryNameGenerator = new QueryNameGenerator();
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
 
-        $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata);
+        $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata, $queryNameGenerator);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
@@ -116,19 +116,20 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
 
     /**
      * Add WHERE conditions to the query for one or more identifiers (simple or composite).
+     *
+     * @param mixed $queryNameGenerator
      */
-    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata)
+    private function addWhereForIdentifiers(array $identifiers, QueryBuilder $queryBuilder, ClassMetadata $classMetadata, $queryNameGenerator)
     {
         $alias = $queryBuilder->getRootAliases()[0];
         foreach ($identifiers as $identifier => $value) {
-            $placeholder = ':id_'.$identifier;
+            $placeholder = $queryNameGenerator->generateParameterName($identifier);
             $expression = $queryBuilder->expr()->eq(
                 "{$alias}.{$identifier}",
-                $placeholder
+                ':'.$placeholder
             );
 
             $queryBuilder->andWhere($expression);
-
             $queryBuilder->setParameter($placeholder, $value, $classMetadata->getTypeOfField($identifier));
         }
     }

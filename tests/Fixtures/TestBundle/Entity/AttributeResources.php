@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use Traversable;
-use ArrayIterator;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ArrayIterator;
 use IteratorAggregate;
+use Traversable;
 
 #[ApiResource('/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true])]
 #[GetCollection]

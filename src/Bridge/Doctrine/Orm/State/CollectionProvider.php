@@ -20,6 +20,7 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -51,6 +52,7 @@ final class CollectionProvider implements ProviderInterface
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
+        /** @var EntityRepository */
         $repository = $manager->getRepository($resourceClass);
         if (!method_exists($repository, 'createQueryBuilder')) {
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
@@ -61,7 +63,6 @@ final class CollectionProvider implements ProviderInterface
 
         $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
 
-        // dd($queryBuilder->getQuery());
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 

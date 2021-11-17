@@ -111,16 +111,21 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     private function configureUriVariables($operation)
     {
         // We will generate the collection route, don't initialize variables here
-        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate() || ($operation instanceof Post && !$operation->getUriVariables())) {
+        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate()) {
             return $operation;
         }
 
         if (!$operation->getUriVariables()) {
             $operation = $operation->withUriVariables($this->transformLinksToUriVariables($this->linkFactory->createLinksFromIdentifiers($operation)));
         }
+
         $operation = $this->normalizeUriVariables($operation);
 
         if (!($uriTemplate = $operation->getUriTemplate())) {
+            if ($operation instanceof Post) {
+                return $operation->withUriVariables([]);
+            }
+
             return $operation;
         }
 
@@ -134,7 +139,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             return '_format' !== $v;
         });
 
-        if (\count($variables) < \count($uriVariables)) {
+        if (\count($variables) !== \count($uriVariables)) {
             $newUriVariables = [];
             foreach ($variables as $variable) {
                 if (isset($uriVariables[$variable])) {
@@ -142,7 +147,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     continue;
                 }
 
-                $newUriVariables[$variable] = (new Link())->withFromClass($operation->getClass())->withIdentifiers([$variable])->withParameterName($variable);
+                $newUriVariables[$variable] = (new Link())->withFromClass($operation->getClass())->withIdentifiers(['id'])->withParameterName($variable);
             }
 
             return $operation->withUriVariables($newUriVariables);

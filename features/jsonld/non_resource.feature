@@ -7,6 +7,7 @@ Feature: JSON-LD non-resource handling
     Given I add "Accept" header equal to "application/ld+json"
     And I add "Content-Type" header equal to "application/ld+json"
 
+  @createSchema
   Scenario: Get a resource containing a raw object
     When I send a "GET" request to "/contain_non_resources/1"
     Then the response status code should be 200

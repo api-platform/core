@@ -61,14 +61,14 @@ class ItemDataProviderTest extends TestCase
         $comparison = $comparisonProphecy->reveal();
 
         $exprProphecy = $this->prophesize(Expr::class);
-        $exprProphecy->eq('o.id', ':id_id')->willReturn($comparisonProphecy)->shouldBeCalled();
+        $exprProphecy->eq('o.id', ':id_p1')->willReturn($comparisonProphecy)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_id', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -98,8 +98,8 @@ class ItemDataProviderTest extends TestCase
         $comparison = $comparisonProphecy->reveal();
 
         $exprProphecy = $this->prophesize(Expr::class);
-        $exprProphecy->eq('o.ida', ':id_ida')->willReturn($comparisonProphecy)->shouldBeCalled();
-        $exprProphecy->eq('o.idb', ':id_idb')->willReturn($comparisonProphecy)->shouldBeCalled();
+        $exprProphecy->eq('o.ida', ':ida_p1')->willReturn($comparisonProphecy)->shouldBeCalled();
+        $exprProphecy->eq('o.idb', ':idb_p2')->willReturn($comparisonProphecy)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
@@ -107,8 +107,8 @@ class ItemDataProviderTest extends TestCase
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
 
-        $queryBuilderProphecy->setParameter(':id_ida', 1, Types::INTEGER)->shouldBeCalled();
-        $queryBuilderProphecy->setParameter(':id_idb', 2, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('ida_p1', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('idb_p2', 2, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -164,13 +164,13 @@ class ItemDataProviderTest extends TestCase
         $comparison = $comparisonProphecy->reveal();
 
         $exprProphecy = $this->prophesize(Expr::class);
-        $exprProphecy->eq('o.id', ':id_id')->willReturn($comparisonProphecy)->shouldBeCalled();
+        $exprProphecy->eq('o.id', ':id_p1')->willReturn($comparisonProphecy)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->expr()->willReturn($exprProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->andWhere($comparison)->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
-        $queryBuilderProphecy->setParameter(':id_id', 1, Types::INTEGER)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('id_p1', 1, Types::INTEGER)->shouldBeCalled();
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 

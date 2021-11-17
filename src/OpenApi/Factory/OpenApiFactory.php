@@ -29,6 +29,7 @@ use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -230,7 +231,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     break;
             }
 
-            if (!$operation->isCollection()) {
+            if (!$operation->isCollection() && !$operation instanceof Post) {
                 $responses['404'] = new Model\Response('Resource not found');
             }
 

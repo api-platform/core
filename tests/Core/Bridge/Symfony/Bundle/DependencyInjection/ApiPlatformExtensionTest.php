@@ -1532,6 +1532,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
             'api_platform.rector.command',
+            'api_platform.rector.subresource_transformer',
             'api_platform.swagger.action.ui',
             'api_platform.swagger.listener.ui',
             'api_platform.validator',
