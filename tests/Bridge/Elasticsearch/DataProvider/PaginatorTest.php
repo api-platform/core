@@ -126,7 +126,7 @@ class PaginatorTest extends TestCase
             'relation' => 'eq',
         ];
 
-        $paginator = $this->getPaginator(static::LIMIT, static::OFFSET, $documents);
+        $paginator = $this->getPaginator(self::LIMIT, self::OFFSET, $documents);
 
         self::assertSame(8., $paginator->getTotalItems());
     }
@@ -161,7 +161,7 @@ class PaginatorTest extends TestCase
                 function (array $document): Foo {
                     return $this->denormalizeFoo($document['_source']);
                 },
-                static::DOCUMENTS['hits']['hits']
+                self::DOCUMENTS['hits']['hits']
             ),
             iterator_to_array($this->paginator)
         );
