@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Routing;
+namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
@@ -34,6 +33,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\UriVariable;
+use ApiPlatform\Symfony\Routing\ApiLoader;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\Fixtures\RelatedDummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

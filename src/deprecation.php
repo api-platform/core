@@ -266,6 +266,10 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\PropertyInfoPropertyMetadataFactory::class,
         ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class,
 
+        // Bridge\Symfony\Routing
+        ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader::class => ApiPlatform\Symfony\Routing\ApiLoader::class,
+        ApiPlatform\Core\Bridge\Symfony\Routing\Router::class => ApiPlatform\Symfony\Routing\Router::class,
+
         // Cache
         ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
 

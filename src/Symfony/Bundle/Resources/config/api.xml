@@ -29,7 +29,7 @@
             <argument type="service" id="api_platform.route_name_resolver.cached.inner" />
         </service>
 
-        <service id="api_platform.route_loader" class="ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader" public="false">
+        <service id="api_platform.route_loader" class="ApiPlatform\Symfony\Routing\ApiLoader" public="false">
             <argument type="service" id="kernel" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -50,7 +50,7 @@
 
         <service id="ApiPlatform\Api\UrlGeneratorInterface" alias="api_platform.router" />
 
-        <service id="api_platform.router" class="ApiPlatform\Core\Bridge\Symfony\Routing\Router" public="false">
+        <service id="api_platform.router" class="ApiPlatform\Symfony\Routing\Router" public="false">
             <argument type="service" id="router" />
             <argument>%api_platform.url_generation_strategy%</argument>
         </service>

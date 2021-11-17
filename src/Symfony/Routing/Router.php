@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Symfony\Routing;
+namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
