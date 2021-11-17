@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
+namespace ApiPlatform\Symfony\Messenger;
 
 use Symfony\Component\Messenger\Stamp\StampInterface;
 

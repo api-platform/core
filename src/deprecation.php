@@ -256,6 +256,12 @@ spl_autoload_register(function ($className) {
 
         ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class => ApiPlatform\Symfony\Bundle\ApiPlatformBundle::class,
 
+        // Bridge\Symfony\Messenger
+        ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp::class => ApiPlatform\Symfony\Messenger\ContextStamp::class,
+        ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait::class => ApiPlatform\Symfony\Messenger\DispatchTrait::class,
+        ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer::class => ApiPlatform\Symfony\Messenger\DataTransformer::class,
+        ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class => ApiPlatform\Symfony\Messenger\RemoveStamp::class,
+
         // Cache
         ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
 

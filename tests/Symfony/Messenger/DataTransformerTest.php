@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\Messenger;
+namespace ApiPlatform\Tests\Symfony\Messenger;
 
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\Messenger\DataTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Bridge\Symfony\Bundle\Command;
+namespace ApiPlatform\Tests\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;

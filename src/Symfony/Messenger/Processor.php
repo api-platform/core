@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Messenger;
 
-use ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp;
-use ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait;
-use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Operation;

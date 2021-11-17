@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Messenger;
 
-use ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp;
 use ApiPlatform\Core\Bridge\Symfony\Messenger\DataPersister;
-use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Symfony\Messenger\ContextStamp;
+use ApiPlatform\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use PHPUnit\Framework\TestCase;

@@ -11,10 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Bridge\Symfony\Messenger;
+namespace ApiPlatform\Tests\Symfony\Messenger;
 
-use ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp;
-use ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
@@ -25,7 +23,9 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Symfony\Messenger\ContextStamp;
 use ApiPlatform\Symfony\Messenger\Processor;
+use ApiPlatform\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use PHPUnit\Framework\TestCase;

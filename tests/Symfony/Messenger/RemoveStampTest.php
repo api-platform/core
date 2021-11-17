@@ -11,17 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
+namespace ApiPlatform\Tests\Symfony\Messenger;
 
+use ApiPlatform\Symfony\Messenger\RemoveStamp;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
- * Hints that the resource in the envelope must be removed.
- *
- * @experimental
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class RemoveStamp implements StampInterface
+class RemoveStampTest extends TestCase
 {
+    public function testConstruct()
+    {
+        $this->assertInstanceOf(StampInterface::class, new RemoveStamp());
+    }
 }

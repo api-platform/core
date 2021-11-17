@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\Messenger;
+namespace ApiPlatform\Tests\Symfony\Messenger;
 
-use ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp;
+use ApiPlatform\Symfony\Messenger\ContextStamp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
