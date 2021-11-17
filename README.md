@@ -11,7 +11,6 @@ high performance API-first projects. Extend or override everything you want.
 
 [![GitHub Actions](https://github.com/api-platform/core/workflows/CI/badge.svg?branch=main)](https://github.com/api-platform/core/actions?query=workflow%3ACI+branch%3Amain)
 [![Codecov](https://codecov.io/gh/api-platform/core/branch/main/graph/badge.svg)](https://codecov.io/gh/api-platform/core/branch/main)
-[![SymfonyInsight](https://insight.symfony.com/projects/92d78899-946c-4282-89a3-ac92344f9a93/mini.svg)](https://insight.symfony.com/projects/92d78899-946c-4282-89a3-ac92344f9a93)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/api-platform/core/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/api-platform/core/?branch=main)
 
 ## Documentation
