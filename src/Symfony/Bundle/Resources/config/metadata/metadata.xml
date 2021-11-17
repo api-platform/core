@@ -47,7 +47,7 @@
         <service id="ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface" alias="api_platform.metadata.property.name_collection_factory" />
         <service id="ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface" alias="api_platform.metadata.property.name_collection_factory" />
 
-        <service id="api_platform.metadata.property.name_collection_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory" public="false">
+        <service id="api_platform.metadata.property.name_collection_factory.property_info" class="ApiPlatform\Metadata\Property\PropertyInfoPropertyNameCollectionFactory" public="false">
             <argument type="service" id="api_platform.property_info" />
         </service>
 
@@ -59,7 +59,7 @@
         <!-- Property metadata -->
 
         <!-- The PropertyInfo decorator must always be the first decorator, it will create the metadata if it doesn't exist -->
-        <service id="api_platform.metadata.property.metadata_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.property_info" class="ApiPlatform\Metadata\Property\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.property_info" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.property_info.inner" />
         </service>

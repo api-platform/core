@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Symfony\PropertyInfo\Metadata\Property;
+namespace ApiPlatform\Tests\Metadata\Property;
 
-use ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory;
+use ApiPlatform\Metadata\Property\PropertyInfoPropertyNameCollectionFactory;
 use ApiPlatform\Tests\Fixtures\DummyIgnoreProperty;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithOnlyPrivateProperty;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithOnlyPublicProperty;

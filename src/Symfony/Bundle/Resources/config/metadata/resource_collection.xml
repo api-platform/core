@@ -76,7 +76,7 @@
         <!-- Property metadata used to compute identifiers -->
         <service id="api_platform.metadata.property.identifier_metadata_factory" alias="api_platform.metadata.property.identifier_metadata_factory.property_info" />
 
-        <service id="api_platform.metadata.property.identifier_metadata_factory.property_info" class="ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory" public="false">
+        <service id="api_platform.metadata.property.identifier_metadata_factory.property_info" class="ApiPlatform\Metadata\Property\PropertyInfoPropertyMetadataFactory" public="false">
             <argument type="service" id="api_platform.property_info" />
         </service>
 

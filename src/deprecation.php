@@ -262,6 +262,10 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer::class => ApiPlatform\Symfony\Messenger\DataTransformer::class,
         ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class => ApiPlatform\Symfony\Messenger\RemoveStamp::class,
 
+        // Bridge\Symfony\PropertyInfo\Metadata\Property => Metadata\Property
+        ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\PropertyInfoPropertyMetadataFactory::class,
+        ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class,
+
         // Cache
         ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
 
