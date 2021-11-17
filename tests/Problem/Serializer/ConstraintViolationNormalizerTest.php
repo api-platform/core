@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Problem\Serializer;
+namespace ApiPlatform\Tests\Problem\Serializer;
 
-use ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;

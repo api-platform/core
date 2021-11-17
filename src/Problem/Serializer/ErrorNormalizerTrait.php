@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Problem\Serializer;
+namespace ApiPlatform\Problem\Serializer;
 
 use ApiPlatform\Exception\ErrorCodeSerializableInterface;
 use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;

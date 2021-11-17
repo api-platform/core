@@ -335,6 +335,11 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class => ApiPlatform\Hydra\Serializer\ErrorNormalizer::class,
         ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class => ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer::class,
 
+        // Problem
+        ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer::class => ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer::class,
+        ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class => ApiPlatform\Problem\Serializer\ErrorNormalizer::class,
+        ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class => ApiPlatform\Problem\Serializer\ErrorNormalizerTrait::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,

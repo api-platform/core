@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Problem\Serializer;
+namespace ApiPlatform\Problem\Serializer;
 
 use ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;

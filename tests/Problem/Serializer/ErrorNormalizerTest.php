@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Problem\Serializer;
+namespace ApiPlatform\Tests\Problem\Serializer;
 
-use ApiPlatform\Core\Problem\Serializer\ErrorNormalizer;
+use ApiPlatform\Problem\Serializer\ErrorNormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
