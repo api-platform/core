@@ -71,6 +71,9 @@ return [
     // HttpCache
     ApiPlatform\Core\HttpCache\PurgerInterface::class => ApiPlatform\HttpCache\PurgerInterface::class,
 
+    // OpenApi
+    ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface::class => ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface::class,
+
     // Serializer
     ApiPlatform\Core\Serializer\Filter\FilterInterface::class => ApiPlatform\Serializer\Filter\FilterInterface::class,
     ApiPlatform\Core\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\Serializer\SerializerContextBuilderInterface::class,

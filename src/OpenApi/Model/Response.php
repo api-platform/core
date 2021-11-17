@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\OpenApi\Model;
+namespace ApiPlatform\OpenApi\Model;
 
 final class Response
 {

@@ -16,13 +16,13 @@ namespace ApiPlatform\Tests\Documentation\Action;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Core\OpenApi\Model\Info;
-use ApiPlatform\Core\OpenApi\Model\Paths;
-use ApiPlatform\Core\OpenApi\OpenApi;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Action\DocumentationAction;
 use ApiPlatform\Documentation\Documentation;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\Model\Info;
+use ApiPlatform\OpenApi\Model\Paths;
+use ApiPlatform\OpenApi\OpenApi;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,7 +38,7 @@ class DocumentationActionTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Not passing an instance of "ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
+     * @expectedDeprecation Not passing an instance of "ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface" as 7th parameter of the constructor of "ApiPlatform\Documentation\Action\DocumentationAction" is deprecated since API Platform 2.6
      */
     public function testDocumentationAction(): void
     {

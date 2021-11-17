@@ -335,6 +335,29 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class => ApiPlatform\Hydra\Serializer\ErrorNormalizer::class,
         ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class => ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer::class,
 
+        // OpenApi
+        ApiPlatform\Core\OpenApi\Model\Components::class => ApiPlatform\OpenApi\Model\Components::class,
+        ApiPlatform\Core\OpenApi\Model\Contact::class => ApiPlatform\OpenApi\Model\Contact::class,
+        ApiPlatform\Core\OpenApi\Model\Encoding::class => ApiPlatform\OpenApi\Model\Encoding::class,
+        ApiPlatform\Core\OpenApi\Model\ExtensionTrait::class => ApiPlatform\OpenApi\Model\ExtensionTrait::class,
+        ApiPlatform\Core\OpenApi\Model\ExternalDocumentation::class => ApiPlatform\OpenApi\Model\ExternalDocumentation::class,
+        ApiPlatform\Core\OpenApi\Model\Info::class => ApiPlatform\OpenApi\Model\Info::class,
+        ApiPlatform\Core\OpenApi\Model\License::class => ApiPlatform\OpenApi\Model\License::class,
+        ApiPlatform\Core\OpenApi\Model\Link::class => ApiPlatform\OpenApi\Model\Link::class,
+        ApiPlatform\Core\OpenApi\Model\MediaType::class => ApiPlatform\OpenApi\Model\MediaType::class,
+        ApiPlatform\Core\OpenApi\Model\OAuthFlow::class => ApiPlatform\OpenApi\Model\OAuthFlow::class,
+        ApiPlatform\Core\OpenApi\Model\OAuthFlows::class => ApiPlatform\OpenApi\Model\OAuthFlows::class,
+        ApiPlatform\Core\OpenApi\Model\Parameter::class => ApiPlatform\OpenApi\Model\Parameter::class,
+        ApiPlatform\Core\OpenApi\Model\Paths::class => ApiPlatform\OpenApi\Model\Paths::class,
+        ApiPlatform\Core\OpenApi\Model\RequestBody::class => ApiPlatform\OpenApi\Model\RequestBody::class,
+        ApiPlatform\Core\OpenApi\Model\Response::class => ApiPlatform\OpenApi\Model\Response::class,
+        ApiPlatform\Core\OpenApi\Model\Schema::class => ApiPlatform\OpenApi\Model\Schema::class,
+        ApiPlatform\Core\OpenApi\Model\SecurityScheme::class => ApiPlatform\OpenApi\Model\SecurityScheme::class,
+        ApiPlatform\Core\OpenApi\Model\Server::class => ApiPlatform\OpenApi\Model\Server::class,
+        ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer::class => ApiPlatform\OpenApi\Serializer\OpenApiNormalizer::class,
+        ApiPlatform\Core\OpenApi\OpenApi::class => ApiPlatform\OpenApi\OpenApi::class,
+        ApiPlatform\Core\OpenApi\Options::class => ApiPlatform\OpenApi\Options::class,
+
         // Problem
         ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer::class => ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer::class,
         ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class => ApiPlatform\Problem\Serializer\ErrorNormalizer::class,
@@ -355,6 +378,9 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Serializer\ResourceList::class => ApiPlatform\Serializer\ResourceList::class,
         ApiPlatform\Core\Serializer\SerializerContextBuilder::class => ApiPlatform\Serializer\SerializerContextBuilder::class,
         ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class => ApiPlatform\Serializer\SerializerFilterContextBuilder::class,
+
+        // Swagger/Serializer => OpenApi/Serializer
+        ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer::class => ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer::class,
 
         // Test
         ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,

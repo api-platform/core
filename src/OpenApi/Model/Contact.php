@@ -11,24 +11,24 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\OpenApi\Model;
+namespace ApiPlatform\OpenApi\Model;
 
-final class License
+final class Contact
 {
     use ExtensionTrait;
 
     private $name;
     private $url;
-    private $identifier;
+    private $email;
 
-    public function __construct(string $name, string $url = null, string $identifier = null)
+    public function __construct(string $name = null, string $url = null, string $email = null)
     {
         $this->name = $name;
         $this->url = $url;
-        $this->identifier = $identifier;
+        $this->email = $email;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -38,12 +38,12 @@ final class License
         return $this->url;
     }
 
-    public function getIdentifier(): ?string
+    public function getEmail(): ?string
     {
-        return $this->identifier;
+        return $this->email;
     }
 
-    public function withName(string $name): self
+    public function withName(?string $name): self
     {
         $clone = clone $this;
         $clone->name = $name;
@@ -59,10 +59,10 @@ final class License
         return $clone;
     }
 
-    public function withIdentifier(?string $identifier): self
+    public function withEmail(?string $email): self
     {
         $clone = clone $this;
-        $clone->identifier = $identifier;
+        $clone->email = $email;
 
         return $clone;
     }

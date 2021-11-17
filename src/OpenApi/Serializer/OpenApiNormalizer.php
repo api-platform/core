@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\OpenApi\Serializer;
+namespace ApiPlatform\OpenApi\Serializer;
 
-use ApiPlatform\Core\OpenApi\Model\Paths;
-use ApiPlatform\Core\OpenApi\OpenApi;
+use ApiPlatform\OpenApi\Model\Paths;
+use ApiPlatform\OpenApi\OpenApi;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

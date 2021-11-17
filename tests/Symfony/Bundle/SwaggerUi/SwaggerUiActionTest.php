@@ -15,13 +15,13 @@ namespace ApiPlatform\Tests\Symfony\Bundle\SwaggerUi;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface;
-use ApiPlatform\Core\OpenApi\Model\Info;
-use ApiPlatform\Core\OpenApi\Model\Paths;
-use ApiPlatform\Core\OpenApi\OpenApi;
-use ApiPlatform\Core\OpenApi\Options;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\DocumentationInterface;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\Model\Info;
+use ApiPlatform\OpenApi\Model\Paths;
+use ApiPlatform\OpenApi\OpenApi;
+use ApiPlatform\OpenApi\Options;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
 use PHPUnit\Framework\TestCase;
