@@ -294,7 +294,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy = $this->getBaseContainerBuilderProphecy();
         $containerBuilderProphecy->getParameter('kernel.bundles')->willReturn([
             'DoctrineBundle' => DoctrineBundle::class,
-            'NelmioApiDocBundle' => NelmioApiDocBundle::class, // @phpstan-ignore-line
+            'NelmioApiDocBundle' => NelmioApiDocBundle::class,
         ])->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.annotations_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.nelmio_api_doc.parser', Argument::type(Definition::class))->shouldBeCalled();
