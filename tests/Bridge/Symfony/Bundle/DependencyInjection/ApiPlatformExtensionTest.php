@@ -1113,7 +1113,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     private function getBaseContainerBuilderProphecyWithoutDefaultMetadataLoading(array $doctrineIntegrationsToLoad = ['orm'], $configuration = null)
     {
-        $hasSwagger = null === $configuration || true === $configuration['api_platform']['enable_swagger'] ?? false;
+        $hasSwagger = null === $configuration || true === $configuration['api_platform']['enable_swagger'];
         $hasHydra = null === $configuration || isset($configuration['api_platform']['formats']['jsonld']);
 
         $containerBuilderProphecy = $this->getPartialContainerBuilderProphecy($configuration);

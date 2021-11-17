@@ -120,7 +120,7 @@ final class ElasticsearchContext implements Context
             $bulk = [];
 
             foreach (json_decode($file->getContents(), true) as $document) {
-                if (null === $document['id'] ?? null) {
+                if (null === $document['id']) {
                     $bulk[] = ['index' => ['_index' => $index, '_type' => DocumentMetadata::DEFAULT_TYPE]];
                 } else {
                     $bulk[] = ['create' => ['_index' => $index, '_type' => DocumentMetadata::DEFAULT_TYPE, '_id' => (string) $document['id']]];
