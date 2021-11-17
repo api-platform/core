@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Util;
 
-use ApiPlatform\Core\Serializer\Filter\GroupFilter;
-use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Serializer\Filter\GroupFilter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Tests\Fixtures\DummyEntityFilterAnnotated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Util\AnnotationFilterExtractor;
@@ -50,15 +50,15 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
                 ['properties' => ['name' => 'partial', 'colors.prop' => 'ipartial', 'colors' => 'exact', 'secondColors' => 'exact', 'thirdColors' => 'exact', 'uuid' => 'exact']],
                 SearchFilter::class,
             ],
-            'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_property_filter' => [
+            'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_serializer_filter_property_filter' => [
                 ['parameterName' => 'foobar'],
                 PropertyFilter::class,
             ],
-            'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter' => [
+            'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_serializer_filter_group_filter' => [
                 ['parameterName' => 'foobargroups'],
                 GroupFilter::class,
             ],
-            'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_core_serializer_filter_group_filter_override' => [
+            'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_serializer_filter_group_filter_override' => [
                 ['parameterName' => 'foobargroups_override'],
                 GroupFilter::class,
             ],

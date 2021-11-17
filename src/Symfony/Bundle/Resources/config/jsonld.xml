@@ -42,7 +42,7 @@
             <tag name="serializer.normalizer" priority="-995" />
         </service>
 
-        <service id="api_platform.jsonld.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+        <service id="api_platform.jsonld.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
             <argument>jsonld</argument>
 
             <tag name="serializer.encoder" />

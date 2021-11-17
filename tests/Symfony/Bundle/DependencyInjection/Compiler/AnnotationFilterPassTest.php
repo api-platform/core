@@ -15,11 +15,11 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\DoesNotImplementInterfaceFilter;
@@ -77,7 +77,7 @@ class AnnotationFilterPassTest extends TestCase
         $containerBuilderProphecy->has('annotation_reader')->willReturn(true);
         $containerBuilderProphecy->get('annotation_reader')->willReturn($readerProphecy);
         $containerBuilderProphecy->has('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_doctrine_orm_filter_search_filter')->willReturn(false);
-        $containerBuilderProphecy->has('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_core_serializer_filter_group_filter')->willReturn(false);
+        $containerBuilderProphecy->has('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_serializer_filter_group_filter')->willReturn(false);
         $containerBuilderProphecy->has('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_doctrine_orm_filter_date_filter')->willReturn(false);
         $containerBuilderProphecy->has('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_php8_api_platform_doctrine_orm_filter_search_filter')->willReturn(false);
         $containerBuilderProphecy->has(SearchFilter::class)->willReturn(false);
@@ -93,7 +93,7 @@ class AnnotationFilterPassTest extends TestCase
                 return SearchFilter::class === $definition->getClass() && ['$properties' => ['description' => null, 'relatedDummy.name' => null, 'name' => null]] === $definition->getArguments();
             })
         ))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_core_serializer_filter_group_filter', Argument::allOf(
+        $containerBuilderProphecy->setDefinition('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_serializer_filter_group_filter', Argument::allOf(
             Argument::type(Definition::class),
             Argument::that(function (Definition $definition): bool {
                 return GroupFilter::class === $definition->getClass() && ['$parameterName' => 'foobar'] === $definition->getArguments();

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Serializer\Filter;
+namespace ApiPlatform\Tests\Serializer\Filter;
 
-use ApiPlatform\Core\Serializer\Filter\GroupFilter;
+use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;

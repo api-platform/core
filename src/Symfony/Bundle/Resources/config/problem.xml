@@ -6,7 +6,7 @@
 
     <services>
         <!-- Serializer -->
-        <service id="api_platform.problem.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+        <service id="api_platform.problem.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
             <argument>jsonproblem</argument>
 
             <tag name="serializer.encoder" />

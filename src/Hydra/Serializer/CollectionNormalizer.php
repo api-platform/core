@@ -20,7 +20,7 @@ use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait;
-use ApiPlatform\Core\Serializer\ContextTrait;
+use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;

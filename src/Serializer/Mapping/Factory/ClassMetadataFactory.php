@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Serializer\Mapping\Factory;
+namespace ApiPlatform\Serializer\Mapping\Factory;
 
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;

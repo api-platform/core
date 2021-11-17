@@ -15,8 +15,8 @@ namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 

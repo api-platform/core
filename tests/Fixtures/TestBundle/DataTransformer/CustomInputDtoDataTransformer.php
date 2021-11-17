@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
-use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
 use ApiPlatform\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;

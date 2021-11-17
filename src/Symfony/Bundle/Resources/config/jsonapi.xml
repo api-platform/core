@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.jsonapi.encoder" class="ApiPlatform\Core\Serializer\JsonEncoder" public="false">
+        <service id="api_platform.jsonapi.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
             <argument>jsonapi</argument>
 
             <tag name="serializer.encoder" />

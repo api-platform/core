@@ -11,18 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Serializer;
+namespace ApiPlatform\Tests\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Serializer\ItemNormalizer;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Serializer;
+namespace ApiPlatform\Serializer;
 
 /**
  * Creates and manipulates the Serializer context.

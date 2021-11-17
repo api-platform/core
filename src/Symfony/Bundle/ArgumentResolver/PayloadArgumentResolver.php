@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\ArgumentResolver;
 
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;

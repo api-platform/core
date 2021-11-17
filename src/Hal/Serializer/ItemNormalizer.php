@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Serializer\CacheKeyTrait;
-use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Serializer\CacheKeyTrait;
+use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\LogicException;

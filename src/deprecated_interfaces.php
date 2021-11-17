@@ -71,5 +71,9 @@ return [
     // HttpCache
     ApiPlatform\Core\HttpCache\PurgerInterface::class => ApiPlatform\HttpCache\PurgerInterface::class,
 
+    // Serializer
+    ApiPlatform\Core\Serializer\Filter\FilterInterface::class => ApiPlatform\Serializer\Filter\FilterInterface::class,
+    ApiPlatform\Core\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\Serializer\SerializerContextBuilderInterface::class,
+
     ApiPlatform\Core\Validator\ValidatorInterface::class => ApiPlatform\Symfony\EventListener\ValidatorInterface::class,
 ];

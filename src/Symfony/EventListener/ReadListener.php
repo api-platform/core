@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\UriVariablesConverterInterface;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\CloneTrait;

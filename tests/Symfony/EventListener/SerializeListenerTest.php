@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Serializer\ResourceList;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Serializer\ResourceList;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\EventListener\SerializeListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;

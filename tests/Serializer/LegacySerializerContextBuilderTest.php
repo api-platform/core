@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Serializer;
+namespace ApiPlatform\Tests\Serializer;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Serializer\SerializerContextBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @group legacy
  */
-class SerializerContextBuilderTest extends TestCase
+class LegacySerializerContextBuilderTest extends TestCase
 {
     use ProphecyTrait;
 

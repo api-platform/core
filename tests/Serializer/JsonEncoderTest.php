@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Serializer;
+namespace ApiPlatform\Tests\Serializer;
 
-use ApiPlatform\Core\Serializer\JsonEncoder;
+use ApiPlatform\Serializer\JsonEncoder;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Serializer;
+namespace ApiPlatform\Tests\Serializer;
 
-use ApiPlatform\Core\Serializer\ResourceList;
+use ApiPlatform\Serializer\ResourceList;
 use PHPUnit\Framework\TestCase;
 
 class ResourceListTest extends TestCase

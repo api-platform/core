@@ -18,12 +18,12 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Core\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Core\Serializer\CacheKeyTrait;
-use ApiPlatform\Core\Serializer\ContextTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
+use ApiPlatform\Serializer\CacheKeyTrait;
+use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;

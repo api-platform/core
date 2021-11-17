@@ -15,10 +15,10 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
-use ApiPlatform\Core\Serializer\ResourceList;
-use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Serializer\ResourceList;
+use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Fig\Link\GenericLinkProvider;

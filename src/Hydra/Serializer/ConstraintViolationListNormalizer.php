@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer;
+use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**

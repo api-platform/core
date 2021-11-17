@@ -340,6 +340,22 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class => ApiPlatform\Problem\Serializer\ErrorNormalizer::class,
         ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class => ApiPlatform\Problem\Serializer\ErrorNormalizerTrait::class,
 
+        // Serializer
+        ApiPlatform\Core\Serializer\Filter\GroupFilter::class => ApiPlatform\Serializer\Filter\GroupFilter::class,
+        ApiPlatform\Core\Serializer\Filter\PropertyFilter::class => ApiPlatform\Serializer\Filter\PropertyFilter::class,
+        ApiPlatform\Core\Serializer\Mapping\Factory\ClassMetadataFactory::class => ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory::class,
+        ApiPlatform\Core\Serializer\AbstractCollectionNormalizer::class => ApiPlatform\Serializer\AbstractCollectionNormalizer::class,
+        ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer::class => ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer::class,
+        ApiPlatform\Core\Serializer\AbstractItemNormalizer::class => ApiPlatform\Serializer\AbstractItemNormalizer::class,
+        ApiPlatform\Core\Serializer\CacheKeyTrait::class => ApiPlatform\Serializer\CacheKeyTrait::class,
+        ApiPlatform\Core\Serializer\ContextTrait::class => ApiPlatform\Serializer\ContextTrait::class,
+        ApiPlatform\Core\Serializer\InputOutputMetadataTrait::class => ApiPlatform\Serializer\InputOutputMetadataTrait::class,
+        ApiPlatform\Core\Serializer\ItemNormalizer::class => ApiPlatform\Serializer\ItemNormalizer::class,
+        ApiPlatform\Core\Serializer\JsonEncoder::class => ApiPlatform\Serializer\JsonEncoder::class,
+        ApiPlatform\Core\Serializer\ResourceList::class => ApiPlatform\Serializer\ResourceList::class,
+        ApiPlatform\Core\Serializer\SerializerContextBuilder::class => ApiPlatform\Serializer\SerializerContextBuilder::class,
+        ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class => ApiPlatform\Serializer\SerializerFilterContextBuilder::class,
+
         // Util
         ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,
