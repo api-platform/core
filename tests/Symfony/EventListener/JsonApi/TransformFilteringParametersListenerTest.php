@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\JsonApi\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
-use ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 /**
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-class TransformPaginationParametersListenerTest extends TestCase
+class TransformFilteringParametersListenerTest extends TestCase
 {
     use ProphecyTrait;
 
@@ -30,7 +30,7 @@ class TransformPaginationParametersListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->listener = new TransformPaginationParametersListener();
+        $this->listener = new TransformFilteringParametersListener();
     }
 
     public function testOnKernelRequestWithInvalidFormat()
@@ -48,7 +48,7 @@ class TransformPaginationParametersListenerTest extends TestCase
         $this->assertEquals($expectedRequest, $request);
     }
 
-    public function testOnKernelRequestWithInvalidPage()
+    public function testOnKernelRequestWithInvalidFilter()
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);
 
@@ -61,7 +61,7 @@ class TransformPaginationParametersListenerTest extends TestCase
 
         $this->assertEquals($expectedRequest, $request);
 
-        $expectedRequest = $expectedRequest->duplicate(['page' => 'foo']);
+        $expectedRequest = $expectedRequest->duplicate(['filter' => 'foo']);
 
         $request = $expectedRequest->duplicate();
         $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
@@ -72,7 +72,7 @@ class TransformPaginationParametersListenerTest extends TestCase
 
     public function testOnKernelRequest()
     {
-        $request = new Request(['page' => ['size' => 5, 'number' => 3, 'error' => -1]]);
+        $request = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']]);
         $request->setRequestFormat('jsonapi');
 
         $eventProphecy = $this->prophesize(RequestEvent::class);
@@ -80,9 +80,7 @@ class TransformPaginationParametersListenerTest extends TestCase
 
         $this->listener->onKernelRequest($eventProphecy->reveal());
 
-        $filters = ['size' => 5, 'number' => 3, 'error' => -1];
-
-        $expectedRequest = new Request(['page' => $filters], [], ['_api_pagination' => $filters, '_api_filters' => $filters]);
+        $expectedRequest = new Request(['filter' => ['foo' => 'bar', 'baz' => 'qux']], [], ['_api_filters' => ['foo' => 'bar', 'baz' => 'qux']]);
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

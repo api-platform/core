@@ -11,35 +11,33 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\JsonApi\EventListener;
+namespace ApiPlatform\Symfony\EventListener\JsonApi;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
- * @see http://jsonapi.org/format/#fetching-pagination
- * @see https://api-platform.com/docs/core/pagination
+ * @see http://jsonapi.org/format/#fetching-filtering
+ * @see http://jsonapi.org/recommendations/#filtering
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class TransformPaginationParametersListener
+final class TransformFilteringParametersListener
 {
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        $pageParameter = $request->query->all()['page'] ?? null;
+        $filterParameter = $request->query->all()['filter'] ?? null;
 
         if (
-            !\is_array($pageParameter) ||
+            !$filterParameter ||
+            !\is_array($filterParameter) ||
             'jsonapi' !== $request->getRequestFormat()
         ) {
             return;
         }
 
         $filters = $request->attributes->get('_api_filters', []);
-        $request->attributes->set('_api_filters', array_merge($pageParameter, $filters));
-
-        /* @TODO remove the `_api_pagination` attribute in 3.0 (@meyerbaptiste) */
-        $request->attributes->set('_api_pagination', $pageParameter);
+        $request->attributes->set('_api_filters', array_merge($filterParameter, $filters));
     }
 }

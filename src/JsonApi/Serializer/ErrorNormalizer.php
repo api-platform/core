@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait;
 use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;

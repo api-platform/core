@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\JsonApi\EventListener;
+namespace ApiPlatform\Symfony\EventListener\JsonApi;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 

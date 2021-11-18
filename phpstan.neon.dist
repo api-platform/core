@@ -126,5 +126,5 @@ parameters:
 
 		# Expected, due to backward compatibility
 		-
-			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: tests/Core/JsonApi/Serializer/ItemNormalizerTest.php
+			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
+			path: tests/JsonApi/Serializer/ItemNormalizerTest.php

@@ -11,11 +11,11 @@
             <tag name="serializer.encoder" />
         </service>
 
-        <service id="api_platform.jsonapi.name_converter.reserved_attribute_name" class="ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter" public="false">
+        <service id="api_platform.jsonapi.name_converter.reserved_attribute_name" class="ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter" public="false">
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.entrypoint" class="ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer" public="false">
+        <service id="api_platform.jsonapi.normalizer.entrypoint" class="ApiPlatform\JsonApi\Serializer\EntrypointNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />
@@ -23,7 +23,7 @@
             <tag name="serializer.normalizer" priority="-800" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.collection" class="ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer" public="false">
+        <service id="api_platform.jsonapi.normalizer.collection" class="ApiPlatform\JsonApi\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -32,7 +32,7 @@
             <tag name="serializer.normalizer" priority="-985" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.item" class="ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer" public="false">
+        <service id="api_platform.jsonapi.normalizer.item" class="ApiPlatform\JsonApi\Serializer\ItemNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -48,7 +48,7 @@
             <tag name="serializer.normalizer" priority="-890" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.object" class="ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer" public="false">
+        <service id="api_platform.jsonapi.normalizer.object" class="ApiPlatform\JsonApi\Serializer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.normalizer.object" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
@@ -58,14 +58,14 @@
             <tag name="serializer.normalizer" priority="-995" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.constraint_violation_list" class="ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer" public="false">
+        <service id="api_platform.jsonapi.normalizer.constraint_violation_list" class="ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>
 
-        <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer" public="false">
+        <service id="api_platform.jsonapi.normalizer.error" class="ApiPlatform\JsonApi\Serializer\ErrorNormalizer" public="false">
             <argument>%kernel.debug%</argument>
 
             <tag name="serializer.normalizer" priority="-790"/>
@@ -73,22 +73,22 @@
 
         <!-- Event listener -->
 
-        <service id="api_platform.jsonapi.listener.request.transform_pagination_parameters" class="ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener">
+        <service id="api_platform.jsonapi.listener.request.transform_pagination_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformPaginationParametersListener">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
         </service>
 
-        <service id="api_platform.jsonapi.listener.request.transform_sorting_parameters" class="ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener">
+        <service id="api_platform.jsonapi.listener.request.transform_sorting_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformSortingParametersListener">
             <argument>%api_platform.collection.order_parameter_name%</argument>
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
         </service>
 
-        <service id="api_platform.jsonapi.listener.request.transform_fieldsets_parameters" class="ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener">
+        <service id="api_platform.jsonapi.listener.request.transform_fieldsets_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
         </service>
 
-        <service id="api_platform.jsonapi.listener.request.transform_filtering_parameters" class="ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener">
+        <service id="api_platform.jsonapi.listener.request.transform_filtering_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener">
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
         </service>
     </services>

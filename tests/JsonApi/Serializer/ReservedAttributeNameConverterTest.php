@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
+namespace ApiPlatform\Tests\JsonApi\Serializer;
 
-use ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter;
+use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use PHPUnit\Framework\TestCase;
 

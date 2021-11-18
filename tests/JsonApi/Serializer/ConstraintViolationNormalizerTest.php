@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\JsonApi\Serializer;
+namespace ApiPlatform\Tests\JsonApi\Serializer;
 
-use ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

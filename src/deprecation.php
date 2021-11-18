@@ -335,6 +335,21 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Hydra\Serializer\ErrorNormalizer::class => ApiPlatform\Hydra\Serializer\ErrorNormalizer::class,
         ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class => ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer::class,
 
+        // JsonApi/EventListener => Symfony/EventListener
+        ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener::class => ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener::class,
+        ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener::class => ApiPlatform\Symfony\EventListener\JsonApi\TransformFilteringParametersListener::class,
+        ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener::class => ApiPlatform\Symfony\EventListener\JsonApi\TransformPaginationParametersListener::class,
+        ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener::class => ApiPlatform\Symfony\EventListener\JsonApi\TransformSortingParametersListener::class,
+
+        // JsonApi/Serializer
+        ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer::class => ApiPlatform\JsonApi\Serializer\CollectionNormalizer::class,
+        ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer::class => ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer::class,
+        ApiPlatform\Core\JsonApi\Serializer\EntrypointNormalizer::class => ApiPlatform\JsonApi\Serializer\EntrypointNormalizer::class,
+        ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer::class => ApiPlatform\JsonApi\Serializer\ErrorNormalizer::class,
+        ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer::class => ApiPlatform\JsonApi\Serializer\ItemNormalizer::class,
+        ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer::class => ApiPlatform\JsonApi\Serializer\ObjectNormalizer::class,
+        ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter::class => ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter::class,
+
         // OpenApi
         ApiPlatform\Core\OpenApi\Model\Components::class => ApiPlatform\OpenApi\Model\Components::class,
         ApiPlatform\Core\OpenApi\Model\Contact::class => ApiPlatform\OpenApi\Model\Contact::class,
