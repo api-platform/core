@@ -363,6 +363,9 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\JsonSchema\SchemaFactory::class => ApiPlatform\JsonSchema\SchemaFactory::class,
         ApiPlatform\Core\JsonSchema\TypeFactory::class => ApiPlatform\JsonSchema\TypeFactory::class,
 
+        // Mercure/EventListener => Symfony/EventListener
+        ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::class => ApiPlatform\Symfony\EventListener\AddLinkHeaderListener::class,
+
         // OpenApi
         ApiPlatform\Core\OpenApi\Model\Components::class => ApiPlatform\OpenApi\Model\Components::class,
         ApiPlatform\Core\OpenApi\Model\Contact::class => ApiPlatform\OpenApi\Model\Contact::class,

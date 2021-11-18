@@ -7,7 +7,7 @@
     <services>
         <!-- Event listener -->
 
-        <service id="api_platform.mercure.listener.response.add_link_header" class="ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener">
+        <service id="api_platform.mercure.listener.response.add_link_header" class="ApiPlatform\Symfony\EventListener\AddLinkHeaderListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="Symfony\Component\Mercure\Discovery" on-invalid="ignore"/>
 

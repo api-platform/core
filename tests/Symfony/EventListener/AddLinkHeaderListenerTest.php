@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Mercure\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;
