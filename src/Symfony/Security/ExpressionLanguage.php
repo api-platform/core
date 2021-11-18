@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Security;
+namespace ApiPlatform\Symfony\Security;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage as BaseExpressionLanguage;

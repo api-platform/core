@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Security;
+namespace ApiPlatform\Tests\Symfony\Security;
 
-use ApiPlatform\Core\Security\ExpressionLanguage;
-use ApiPlatform\Core\Security\ResourceAccessChecker;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\Security\ExpressionLanguage;
+use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;

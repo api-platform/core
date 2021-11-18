@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Security\EventListener;
+namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Security\EventListener\DenyAccessListener;
-use ApiPlatform\Core\Security\ExpressionLanguage;
-use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Symfony\EventListener\DenyAccessListener;
+use ApiPlatform\Symfony\Security\ExpressionLanguage;
+use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

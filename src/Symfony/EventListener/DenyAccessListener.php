@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Security\EventListener;
+namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Security\ExpressionLanguage;
-use ApiPlatform\Core\Security\ResourceAccessChecker;
-use ApiPlatform\Core\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Symfony\Security\ExpressionLanguage;
+use ApiPlatform\Symfony\Security\ResourceAccessChecker;
+use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;

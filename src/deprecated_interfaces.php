@@ -82,6 +82,9 @@ return [
     // OpenApi
     ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface::class => ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface::class,
 
+    // Security => Symfony/Security
+    ApiPlatform\Core\Security\ResourceAccessCheckerInterface::class => ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface::class,
+
     // Serializer
     ApiPlatform\Core\Serializer\Filter\FilterInterface::class => ApiPlatform\Serializer\Filter\FilterInterface::class,
     ApiPlatform\Core\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\Serializer\SerializerContextBuilderInterface::class,

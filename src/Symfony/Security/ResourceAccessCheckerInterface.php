@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Security;
+namespace ApiPlatform\Symfony\Security;
 
 /**
  * Checks if the logged user has sufficient permissions to access the given resource.

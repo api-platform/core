@@ -7,16 +7,16 @@
     <services>
         <service id="api_platform.security.expression_language" alias="security.expression_language" />
 
-        <service id="api_platform.security.resource_access_checker" class="ApiPlatform\Core\Security\ResourceAccessChecker" public="false">
+        <service id="api_platform.security.resource_access_checker" class="ApiPlatform\Symfony\Security\ResourceAccessChecker" public="false">
             <argument type="service" id="api_platform.security.expression_language" on-invalid="null" />
             <argument type="service" id="security.authentication.trust_resolver" on-invalid="null" />
             <argument type="service" id="security.role_hierarchy" on-invalid="null" />
             <argument type="service" id="security.token_storage" on-invalid="null" />
             <argument type="service" id="security.authorization_checker" on-invalid="null" />
         </service>
-        <service id="ApiPlatform\Core\Security\ResourceAccessCheckerInterface" alias="api_platform.security.resource_access_checker" />
+        <service id="ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface" alias="api_platform.security.resource_access_checker" />
 
-        <service id="api_platform.security.listener.request.deny_access" class="ApiPlatform\Core\Security\EventListener\DenyAccessListener">
+        <service id="api_platform.security.listener.request.deny_access" class="ApiPlatform\Symfony\EventListener\DenyAccessListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory"></argument>
             <argument type="service" id="api_platform.security.resource_access_checker" />
 
@@ -28,7 +28,7 @@
             <tag name="kernel.event_listener" event="kernel.view" method="onSecurityPostValidation" priority="63" />
         </service>
 
-        <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Core\Security\Core\Authorization\ExpressionLanguageProvider" public="false">
+        <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider" public="false">
             <tag name="security.expression_language_provider" />
         </service>
     </services>

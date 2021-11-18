@@ -391,6 +391,14 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class => ApiPlatform\Problem\Serializer\ErrorNormalizer::class,
         ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class => ApiPlatform\Problem\Serializer\ErrorNormalizerTrait::class,
 
+        // Security => Symfony/Security
+        ApiPlatform\Core\Security\Core\Authorization\ExpressionLanguageProvider::class => ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider::class,
+        ApiPlatform\Core\Security\ExpressionLanguage::class => ApiPlatform\Symfony\Security\ExpressionLanguage::class,
+        ApiPlatform\Core\Security\ResourceAccessChecker::class => ApiPlatform\Symfony\Security\ResourceAccessChecker::class,
+
+        // Security/EventListener => Symfony/EventListener
+        ApiPlatform\Core\Security\EventListener\DenyAccessListener::class => ApiPlatform\Symfony\EventListener\DenyAccessListener::class,
+
         // Serializer
         ApiPlatform\Core\Serializer\Filter\GroupFilter::class => ApiPlatform\Serializer\Filter\GroupFilter::class,
         ApiPlatform\Core\Serializer\Filter\PropertyFilter::class => ApiPlatform\Serializer\Filter\PropertyFilter::class,
