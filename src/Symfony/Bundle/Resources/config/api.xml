@@ -149,11 +149,11 @@
             <argument type="service" id="api_platform.subresource_operation_factory" />
         </service>
 
-        <service id="api_platform.operation_path_resolver.custom" class="ApiPlatform\Core\PathResolver\CustomOperationPathResolver" public="false">
+        <service id="api_platform.operation_path_resolver.custom" class="ApiPlatform\PathResolver\CustomOperationPathResolver" public="false">
             <argument type="service" id="api_platform.operation_path_resolver.generator" />
         </service>
 
-        <service id="api_platform.operation_path_resolver.generator" class="ApiPlatform\Core\PathResolver\OperationPathResolver" public="false">
+        <service id="api_platform.operation_path_resolver.generator" class="ApiPlatform\PathResolver\OperationPathResolver" public="false">
             <argument type="service" id="api_platform.path_segment_name_generator" />
         </service>
 

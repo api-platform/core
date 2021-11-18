@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\PathResolver;
+namespace ApiPlatform\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
-use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\PathResolver\CustomOperationPathResolver;
+use ApiPlatform\PathResolver\OperationPathResolverInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -45,7 +45,7 @@ class CustomOperationPathResolverTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Method ApiPlatform\Core\PathResolver\CustomOperationPathResolver::resolveOperationPath() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.
+     * @expectedDeprecation Method ApiPlatform\PathResolver\CustomOperationPathResolver::resolveOperationPath() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.
      */
     public function testLegacyResolveOperationPath()
     {

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\PathResolver;
+namespace ApiPlatform\PathResolver;
 
 /**
  * Resolves the path of a resource operation.

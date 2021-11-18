@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\PathResolver;
+namespace ApiPlatform\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
-use ApiPlatform\Core\PathResolver\OperationPathResolver;
+use ApiPlatform\PathResolver\OperationPathResolver;
 use PHPUnit\Framework\TestCase;
 
 class OperationPathResolverTest extends TestCase

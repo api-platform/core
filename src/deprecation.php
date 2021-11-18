@@ -389,6 +389,10 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\OpenApi\OpenApi::class => ApiPlatform\OpenApi\OpenApi::class,
         ApiPlatform\Core\OpenApi\Options::class => ApiPlatform\OpenApi\Options::class,
 
+        // PathResolver
+        ApiPlatform\Core\PathResolver\CustomOperationPathResolver::class => ApiPlatform\PathResolver\CustomOperationPathResolver::class,
+        ApiPlatform\Core\PathResolver\OperationPathResolver::class => ApiPlatform\PathResolver\OperationPathResolver::class,
+
         // Problem
         ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer::class => ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer::class,
         ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class => ApiPlatform\Problem\Serializer\ErrorNormalizer::class,

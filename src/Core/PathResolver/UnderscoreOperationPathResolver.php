@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\PathResolver;
 
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
+use ApiPlatform\PathResolver\OperationPathResolverInterface;
 
 /**
  * Generates a path with words separated by underscores.

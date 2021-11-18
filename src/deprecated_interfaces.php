@@ -82,6 +82,9 @@ return [
     // OpenApi
     ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface::class => ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface::class,
 
+    // PathResolver
+    ApiPlatform\Core\PathResolver\OperationPathResolverInterface::class => ApiPlatform\PathResolver\OperationPathResolverInterface::class,
+
     // Security => Symfony/Security
     ApiPlatform\Core\Security\ResourceAccessCheckerInterface::class => ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface::class,
 
