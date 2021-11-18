@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\JsonSchema;
+namespace ApiPlatform\JsonSchema;
 
 /**
  * Represents a JSON Schema document.

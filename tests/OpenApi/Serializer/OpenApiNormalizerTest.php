@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\OpenApi\Serializer;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\JsonSchema\SchemaFactory;
-use ApiPlatform\Core\JsonSchema\TypeFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -30,6 +28,8 @@ use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;

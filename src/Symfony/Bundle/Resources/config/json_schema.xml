@@ -7,15 +7,15 @@
     <services>
         <defaults public="false" />
 
-        <service id="api_platform.json_schema.type_factory" class="ApiPlatform\Core\JsonSchema\TypeFactory">
+        <service id="api_platform.json_schema.type_factory" class="ApiPlatform\JsonSchema\TypeFactory">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <call method="setSchemaFactory">
                 <argument type="service" id="api_platform.json_schema.schema_factory"/>
             </call>
         </service>
-        <service id="ApiPlatform\Core\JsonSchema\TypeFactoryInterface" alias="api_platform.json_schema.type_factory" />
+        <service id="ApiPlatform\JsonSchema\TypeFactoryInterface" alias="api_platform.json_schema.type_factory" />
 
-        <service id="api_platform.json_schema.schema_factory" class="ApiPlatform\Core\JsonSchema\SchemaFactory">
+        <service id="api_platform.json_schema.schema_factory" class="ApiPlatform\JsonSchema\SchemaFactory">
             <argument type="service" id="api_platform.json_schema.type_factory"></argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
@@ -23,9 +23,9 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
-        <service id="ApiPlatform\Core\JsonSchema\SchemaFactoryInterface" alias="api_platform.json_schema.schema_factory" />
+        <service id="ApiPlatform\JsonSchema\SchemaFactoryInterface" alias="api_platform.json_schema.schema_factory" />
 
-        <service id="api_platform.json_schema.json_schema_generate_command" class="ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand">
+        <service id="api_platform.json_schema.json_schema_generate_command" class="ApiPlatform\JsonSchema\Command\JsonSchemaGenerateCommand">
             <argument type="service" id="api_platform.json_schema.schema_factory"/>
             <argument>%api_platform.formats%</argument>
             <tag name="console.command" />

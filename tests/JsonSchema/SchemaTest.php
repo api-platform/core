@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\JsonSchema;
+namespace ApiPlatform\Tests\JsonSchema;
 
-use ApiPlatform\Core\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\Schema;
 use PHPUnit\Framework\TestCase;
 
 class SchemaTest extends TestCase

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\JsonSchema;
 
-use ApiPlatform\Core\JsonSchema\Schema;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 
 /**
  * Decorator factory which adds HAL properties to the JSON Schema document.

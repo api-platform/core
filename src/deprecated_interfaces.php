@@ -75,6 +75,10 @@ return [
     ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface::class => ApiPlatform\JsonLd\AnonymousContextBuilderInterface::class,
     ApiPlatform\Core\JsonLd\ContextBuilderInterface::class => ApiPlatform\JsonLd\ContextBuilderInterface::class,
 
+    // JsonSchema
+    ApiPlatform\Core\JsonSchema\SchemaFactoryInterface::class => ApiPlatform\JsonSchema\SchemaFactoryInterface::class,
+    ApiPlatform\Core\JsonSchema\TypeFactoryInterface::class => ApiPlatform\JsonSchema\TypeFactoryInterface::class,
+
     // OpenApi
     ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface::class => ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface::class,
 

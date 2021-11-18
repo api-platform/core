@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\JsonSchema\Command;
+namespace ApiPlatform\Tests\JsonSchema\Command;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\JsonSchema;
 
-use ApiPlatform\Core\JsonSchema\Schema;
-use ApiPlatform\Core\JsonSchema\SchemaFactory as BaseSchemaFactory;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 
 /**
  * Decorator factory which adds Hydra properties to the JSON Schema document.

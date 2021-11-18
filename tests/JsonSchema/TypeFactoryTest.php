@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\JsonSchema;
+namespace ApiPlatform\Tests\JsonSchema;
 
-use ApiPlatform\Core\JsonSchema\Schema;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
-use ApiPlatform\Core\JsonSchema\TypeFactory;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

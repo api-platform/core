@@ -357,6 +357,12 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class => ApiPlatform\JsonLd\Serializer\ObjectNormalizer::class,
         ApiPlatform\Core\JsonLd\ContextBuilder::class => ApiPlatform\JsonLd\ContextBuilder::class,
 
+        // JsonSchema
+        ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand::class => ApiPlatform\JsonSchema\Command\JsonSchemaGenerateCommand::class,
+        ApiPlatform\Core\JsonSchema\Schema::class => ApiPlatform\JsonSchema\Schema::class,
+        ApiPlatform\Core\JsonSchema\SchemaFactory::class => ApiPlatform\JsonSchema\SchemaFactory::class,
+        ApiPlatform\Core\JsonSchema\TypeFactory::class => ApiPlatform\JsonSchema\TypeFactory::class,
+
         // OpenApi
         ApiPlatform\Core\OpenApi\Model\Components::class => ApiPlatform\OpenApi\Model\Components::class,
         ApiPlatform\Core\OpenApi\Model\Contact::class => ApiPlatform\OpenApi\Model\Contact::class,

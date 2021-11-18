@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\Test;
 
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\JsonSchema\Schema;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\ExpectationFailedException;

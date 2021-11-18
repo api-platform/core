@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Model;
 
-use ApiPlatform\Core\JsonSchema\Schema as JsonSchema;
+use ApiPlatform\JsonSchema\Schema as JsonSchema;
 
 final class Schema extends \ArrayObject
 {
