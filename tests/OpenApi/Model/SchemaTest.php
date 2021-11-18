@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\OpenApi\Model;
+namespace ApiPlatform\Tests\OpenApi\Model;
 
-use ApiPlatform\Core\OpenApi\Model\Schema;
+use ApiPlatform\OpenApi\Model\Schema;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 

@@ -11,18 +11,15 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Routing;
+namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
-use ApiPlatform\Core\PathResolver\CustomOperationPathResolver;
-use ApiPlatform\Core\PathResolver\OperationPathResolver;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -34,6 +31,9 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\UriVariable;
+use ApiPlatform\PathResolver\CustomOperationPathResolver;
+use ApiPlatform\PathResolver\OperationPathResolver;
+use ApiPlatform\Symfony\Routing\ApiLoader;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\Fixtures\RelatedDummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -250,7 +250,7 @@ class ApiLoaderTest extends TestCase
 
     private function getApiLoaderWithResourceMetadataCollection(ResourceMetadataCollection $resourceCollection): ApiLoader
     {
-        $routingConfig = __DIR__.'/../../../src/Core/Bridge/Symfony/Bundle/Resources/config/routing';
+        $routingConfig = __DIR__.'/../../../src/Symfony/Bundle/Resources/config/routing';
 
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);

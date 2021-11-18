@@ -2,7 +2,7 @@
 
 namespace ApiPlatform\Tests\Bridge\Rector\Rules\LegacyApiResourceAttributeToApiResourceAttributeRector\Fixture;
 
-use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
 
 #[ApiResource(collectionOperations: ['get'], itemOperations: ['get' => ['controller' => NotFoundAction::class, 'read' => false, 'output' => false]])]
@@ -18,7 +18,7 @@ namespace ApiPlatform\Tests\Bridge\Rector\Rules\LegacyApiResourceAttributeToApiR
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\ApiResource;
 
 #[ApiResource]

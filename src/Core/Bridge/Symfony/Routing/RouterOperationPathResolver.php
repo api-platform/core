@@ -15,8 +15,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Routing;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use ApiPlatform\Core\PathResolver\OperationPathResolverInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**

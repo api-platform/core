@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Util\ReflectionClassRecursiveIterator;
 use Doctrine\Common\Annotations\Reader;
 
 /**

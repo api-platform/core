@@ -16,8 +16,8 @@ namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter;
-use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter;
+use ApiPlatform\Elasticsearch\Filter\MatchFilter;
+use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Operation\Factory;
 
-use ApiPlatform\Core\Cache\CachedTrait;
+use ApiPlatform\Util\CachedTrait;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**

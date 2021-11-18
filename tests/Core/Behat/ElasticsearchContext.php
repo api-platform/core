@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Behat;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata;
+use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use Behat\Behat\Context\Context;
 use Elasticsearch\Client;
 use Symfony\Component\Finder\Finder;

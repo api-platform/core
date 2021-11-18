@@ -2,7 +2,7 @@
 
 namespace ApiPlatform\Tests\Bridge\Rector\Rules\ApiResourceAnnotationToApiResourceAttributeRector\Fixture;
 
-use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
@@ -31,7 +31,7 @@ namespace ApiPlatform\Tests\Bridge\Rector\Rules\ApiResourceAnnotationToApiResour
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Core\Action\NotFoundAction;
+use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\ApiResource;
 
 #[ApiResource]

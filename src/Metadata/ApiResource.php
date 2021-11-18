@@ -162,7 +162,7 @@ final class ApiResource
                 $formats = null,
                 $inputFormats = null,
                 $outputFormats = null,
-        $uriVariables = null,
+                $uriVariables = null,
         ?string $routePrefix = null,
         ?array $defaults = null,
         ?array $requirements = null,

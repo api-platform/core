@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
+use ApiPlatform\Util\ResourceClassInfoTrait;
 use Psr\Cache\CacheException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;

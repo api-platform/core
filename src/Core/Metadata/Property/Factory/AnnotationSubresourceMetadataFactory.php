@@ -16,9 +16,9 @@ namespace ApiPlatform\Core\Metadata\Property\Factory;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
-use ApiPlatform\Core\Util\Reflection;
 use ApiPlatform\Exception\InvalidResourceException;
 use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
+use ApiPlatform\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\PropertyInfo\Type;
 

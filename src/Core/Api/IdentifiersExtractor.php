@@ -16,8 +16,8 @@ namespace ApiPlatform\Core\Api;
 use ApiPlatform\Api\IdentifiersExtractor as NewIdentifiersExtractor;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Util\ResourceClassInfoTrait;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 

@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction as OpenApiSwaggerUiAction;
-use ApiPlatform\Core\Documentation\Documentation;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Util\RequestAttributesExtractor;
+use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction as OpenApiSwaggerUiAction;
+use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -31,7 +31,7 @@ use Twig\Environment as TwigEnvironment;
 /**
  * Displays the documentation.
  *
- * @deprecated please refer to ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction for further changes
+ * @deprecated please refer to ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction for further changes
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

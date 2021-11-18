@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Validator;
 
-use ApiPlatform\Core\Bridge\Symfony\Validator\ValidationGroupsGeneratorInterface;
+use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 final class DummyValidationGroupsGenerator implements ValidationGroupsGeneratorInterface

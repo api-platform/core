@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Util\AnnotationFilterExtractorTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Util\AnnotationFilterExtractorTrait;
 use Doctrine\Common\Annotations\Reader;
 
 /**
