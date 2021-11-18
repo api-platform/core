@@ -350,6 +350,13 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer::class => ApiPlatform\JsonApi\Serializer\ObjectNormalizer::class,
         ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter::class => ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter::class,
 
+        // JsonLd
+        ApiPlatform\Core\JsonLd\Action\ContextAction::class => ApiPlatform\JsonLd\Action\ContextAction::class,
+        ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer::class => ApiPlatform\JsonLd\Serializer\ItemNormalizer::class,
+        ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait::class => ApiPlatform\JsonLd\Serializer\JsonLdContextTrait::class,
+        ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class => ApiPlatform\JsonLd\Serializer\ObjectNormalizer::class,
+        ApiPlatform\Core\JsonLd\ContextBuilder::class => ApiPlatform\JsonLd\ContextBuilder::class,
+
         // OpenApi
         ApiPlatform\Core\OpenApi\Model\Components::class => ApiPlatform\OpenApi\Model\Components::class,
         ApiPlatform\Core\OpenApi\Model\Contact::class => ApiPlatform\OpenApi\Model\Contact::class,

@@ -71,6 +71,10 @@ return [
     // HttpCache
     ApiPlatform\Core\HttpCache\PurgerInterface::class => ApiPlatform\HttpCache\PurgerInterface::class,
 
+    // JsonLd
+    ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface::class => ApiPlatform\JsonLd\AnonymousContextBuilderInterface::class,
+    ApiPlatform\Core\JsonLd\ContextBuilderInterface::class => ApiPlatform\JsonLd\ContextBuilderInterface::class,
+
     // OpenApi
     ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface::class => ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface::class,
 

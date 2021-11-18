@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\JsonLd\Serializer;
+namespace ApiPlatform\JsonLd\Serializer;
 
-use ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface;
-use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
+use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
+use ApiPlatform\JsonLd\ContextBuilderInterface;
 
 /**
  * Creates and manipulates the Serializer context.

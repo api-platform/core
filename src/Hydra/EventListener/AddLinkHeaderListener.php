@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\EventListener;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\JsonLd\ContextBuilder;
+use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Util\CorsTrait;
 use Fig\Link\GenericLinkProvider;
 use Fig\Link\Link;

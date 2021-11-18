@@ -11,12 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\JsonLd\Serializer;
+namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
