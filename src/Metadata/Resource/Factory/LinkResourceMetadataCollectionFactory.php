@@ -71,16 +71,16 @@ final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCol
     {
         $classLinks = [];
         foreach ($links as $link) {
-            $classLinks[$link->getFromClass()] = $link;
+            $classLinks[$link->getToClass()] = $link;
         }
 
         foreach ($toMergeLinks as $link) {
-            if (isset($classLinks[$link->getFromClass()])) {
-                $classLinks[$link->getFromClass()] = $classLinks[$link->getFromClass()]->withLink($link);
+            if (isset($classLinks[$link->getToClass()])) {
+                $classLinks[$link->getToClass()] = $classLinks[$link->getToClass()]->withLink($link);
 
                 continue;
             }
-            $classLinks[$link->getFromClass()] = $link;
+            $classLinks[$link->getToClass()] = $link;
         }
 
         return array_values($classLinks);

@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -43,14 +44,23 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection([
             'id',
             'foo',
+            'foo2',
+            'bar',
         ]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'id')->willReturn(new ApiProperty());
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([
             new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)),
         ]));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo2')->willReturn((new ApiProperty())->withBuiltinTypes([
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)),
+        ]));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)),
+        ]));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
         $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(AttributeResource::class)->willReturn(
@@ -74,7 +84,8 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
                     class: AttributeResource::class,
                     graphQlOperations: [
                         'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
-                            (new Link())->withFromProperty('foo')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
+                            (new Link())->withFromProperty('foo2')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
+                            (new Link())->withFromProperty('bar')->withFromClass(AttributeResource::class)->withToClass(RelatedDummy::class)->withIdentifiers(['id']),
                         ]),
                     ]
                 ),

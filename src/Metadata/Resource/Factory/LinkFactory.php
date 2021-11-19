@@ -79,7 +79,7 @@ final class LinkFactory implements LinkFactoryInterface
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
             $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
-            if (!($relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes())) || !$this->resourceClassResolver->isResourceClass($resourceClass)) {
+            if (!($relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes())) || !$this->resourceClassResolver->isResourceClass($relationClass)) {
                 continue;
             }
 

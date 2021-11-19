@@ -85,6 +85,10 @@ final class ItemProvider implements ProviderInterface
             return false;
         }
 
+        if (isset($context['provider'])) {
+            return $context['provider'] === 'item';
+        }
+
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
 
         return !($operation->isCollection() ?? false);
