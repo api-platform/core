@@ -841,7 +841,9 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Require Symfony components and Rector dependencies
-        run: git apply rector.patch && composer require symfony/intl symfony/uid rector/rector --dev --no-interaction --no-progress --ansi
+        run: |
+          git apply rector.patch
+          composer require symfony/intl symfony/uid rector/rector --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
