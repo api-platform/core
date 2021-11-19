@@ -36,6 +36,10 @@ final class Response implements ResponseInterface
     private $httpFoundationResponse;
     private $browserKitResponse;
     private $headers;
+
+    /**
+     * @var array
+     */
     private $info;
     private $content;
     private $jsonData;
