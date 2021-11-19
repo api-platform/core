@@ -30,22 +30,6 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function supports($data): bool
-    {
-        return $data instanceof InputDto || $data instanceof InputDtoDocument;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($data)
-    {
-        throw new \RuntimeException('Not implemented');
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function resumable(?string $operationName = null, array $context = []): bool
@@ -73,5 +57,13 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
         $em->flush();
 
         return $output;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    {
+        return $data instanceof InputDto || $data instanceof InputDtoDocument;
     }
 }

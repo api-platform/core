@@ -25,10 +25,9 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class LinkFactory implements LinkFactoryInterface
 {
-    use ResourceClassInfoTrait;
-
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
+    private $resourceClassResolver;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver)
     {
@@ -81,7 +80,7 @@ final class LinkFactory implements LinkFactoryInterface
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
             $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
-            if (!($relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes())) || !$this->isResourceClass($relationClass)) {
+            if (!($relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes())) || !$this->resourceClassResolver->isResourceClass($resourceClass)) {
                 continue;
             }
 

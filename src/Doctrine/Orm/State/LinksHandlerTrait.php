@@ -103,7 +103,7 @@ trait LinksHandlerTrait
             if ($link->getFromProperty() && !$link->getToProperty()) {
                 $doctrineClassMetadata = $manager->getClassMetadata($link->getFromClass());
                 $joinAlias = $queryNameGenerator->generateJoinAlias('m');
-                $associationMapping = $doctrineClassMetadata->getAssociationMapping($link->getFromProperty());
+                $associationMapping = $doctrineClassMetadata->getAssociationMapping($link->getFromProperty()); // @phpstan-ignore-line
                 $relationType = $associationMapping['type'];
 
                 if ($relationType & ClassMetadataInfo::TO_MANY) {
