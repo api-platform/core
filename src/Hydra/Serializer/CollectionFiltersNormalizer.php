@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
