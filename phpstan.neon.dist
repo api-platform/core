@@ -126,3 +126,7 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+		# TODO: remove in v3.0
+		-
+			message: "#Dead catch - JsonException is never thrown in the try block.#"
+			path: src/Bridge/Symfony/Bundle/Test/Response.php
