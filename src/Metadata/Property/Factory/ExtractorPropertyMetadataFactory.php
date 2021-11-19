@@ -53,10 +53,8 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
-        $isInterface = interface_exists($resourceClass);
-
         if (
-            !property_exists($resourceClass, $property) && !$isInterface ||
+            !property_exists($resourceClass, $property) && !interface_exists($resourceClass) ||
             null === ($propertyMetadata = $this->extractor->getProperties()[$resourceClass][$property] ?? null)
         ) {
             return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);

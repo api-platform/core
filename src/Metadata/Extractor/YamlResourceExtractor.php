@@ -168,11 +168,11 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 continue;
             }
 
-            if (isset($data['class']) || isset($data[0])) {
-                $uriVariables[$parameterName]['class'] = $data['class'] ?? $data[0];
+            if (isset($data['fromClass']) || isset($data[0])) {
+                $uriVariables[$parameterName]['from_class'] = $data['fromClass'] ?? $data[0];
             }
-            if (isset($data['property']) || isset($data[1])) {
-                $uriVariables[$parameterName]['property'] = $data['property'] ?? $data[1];
+            if (isset($data['fromProperty']) || isset($data[1])) {
+                $uriVariables[$parameterName]['from_property'] = $data['fromProperty'] ?? $data[1];
             }
             if (isset($data['inverseProperty'])) {
                 $uriVariables[$parameterName]['inverse_property'] = $data['inverseProperty'];

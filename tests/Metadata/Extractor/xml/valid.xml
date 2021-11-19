@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<resources xmlns="https://api-platform.com/schema/metadata/resources"
+<resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources
-           https://api-platform.com/schema/metadata/resources.xsd">
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+           https://api-platform.com/schema/metadata/resources-3.0.xsd">
     <resource class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment"/>
 
     <resource
@@ -97,7 +97,7 @@
             <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
             <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}.{_format}">
                 <uriVariables>
-                    <uriVariable parameterName="userId" class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" property="author"/>
+                    <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" fromProperty="author"/>
                     <uriVariable parameterName="id"/>
                 </uriVariables>
 

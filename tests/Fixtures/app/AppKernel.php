@@ -241,6 +241,11 @@ class AppKernel extends Kernel
         $c->prependExtensionConfig('api_platform', ['metadata_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
         if ($metadataBackwardCompatibilityLayer) {
             $loader->load(__DIR__.'/config/config_metadata_backward_compatibility_layer.yml');
+            $c->prependExtensionConfig('api_platform', [
+                'mapping' => [
+                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy'],
+                ],
+            ]);
 
             return;
         }

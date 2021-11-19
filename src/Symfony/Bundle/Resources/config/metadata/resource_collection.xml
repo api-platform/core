@@ -105,7 +105,7 @@
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.attribute.inner" />
         </service>
 
-        <service id="api_platform.metadata.property.identifier_metadata_factory.xml" decorates="api_platform.metadata.property.metadata_factory" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false" decoration-priority="10">
+        <service id="api_platform.metadata.property.identifier_metadata_factory.xml" decorates="api_platform.metadata.property.identifier_metadata_factory" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false" decoration-priority="10">
             <argument type="service" id="api_platform.metadata.property_extractor.xml" />
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.xml.inner" />
         </service>

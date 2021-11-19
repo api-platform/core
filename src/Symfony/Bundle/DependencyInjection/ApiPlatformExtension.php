@@ -845,6 +845,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->getDefinition('api_platform.route_loader')
                   ->setArgument('$resourceMetadataFactory', new Reference('api_platform.metadata.resource.metadata_factory'));
 
+        $container->getDefinition('api_platform.metadata.property.identifier_metadata_factory.xml')
+                  ->setDecoratedService('api_platform.metadata.property.metadata_factory');
+
+        $container->getDefinition('api_platform.metadata.property.identifier_metadata_factory.yaml')
+                  ->setDecoratedService('api_platform.metadata.property.metadata_factory');
+
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->setClass(XmlExtractor::class);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->setClass(XmlExtractor::class);
         if (class_exists(Yaml::class)) {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <xsd:schema
-    xmlns="https://api-platform.com/schema/metadata/resources"
+    xmlns="https://api-platform.com/schema/metadata/resources-3.0"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="https://api-platform.com/schema/metadata/resources"
+    targetNamespace="https://api-platform.com/schema/metadata/resources-3.0"
     elementFormDefault="qualified">
 
     <xsd:element name="resources">
@@ -114,9 +114,9 @@
             <xsd:element name="identifiers" type="sequenceWithValues"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="parameterName" use="required"/>
-        <xsd:attribute type="xsd:string" name="class"/>
+        <xsd:attribute type="xsd:string" name="fromClass"/>
         <xsd:attribute type="xsd:string" name="inverseProperty"/>
-        <xsd:attribute type="xsd:string" name="property"/>
+        <xsd:attribute type="xsd:string" name="fromProperty"/>
         <xsd:attribute type="xsd:boolean" name="compositeIdentifier"/>
     </xsd:complexType>
 
