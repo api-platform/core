@@ -65,7 +65,8 @@ trait UriVariablesHandlerTrait
             } else {
                 $propertyIdentifier = $uriVariable->getIdentifiers()[0];
                 $expression = $queryBuilder->expr()->eq(
-                    "{$alias}.{$propertyIdentifier}", $placeholder
+                    "{$alias}.{$propertyIdentifier}",
+                    $placeholder
                 );
             }
             $queryBuilder->andWhere($expression);

@@ -437,7 +437,8 @@ class DocumentationNormalizerTest extends TestCase
             [
                 'input' => ['class' => 'inputClass'],
                 'output' => ['class' => 'outputClass'],
-            ]);
+            ]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn($dummyMetadata);
 

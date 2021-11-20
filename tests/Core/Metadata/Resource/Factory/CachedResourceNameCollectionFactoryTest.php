@@ -77,7 +77,8 @@ class CachedResourceNameCollectionFactoryTest extends TestCase
         $decoratedResourceNameCollectionFactory = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $decoratedResourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([Dummy::class]))->shouldBeCalled();
 
-        $cacheException = new class() extends \Exception implements CacheException {};
+        $cacheException = new class() extends \Exception implements CacheException {
+        };
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem(CachedResourceNameCollectionFactory::CACHE_KEY)->willThrow($cacheException)->shouldBeCalled();

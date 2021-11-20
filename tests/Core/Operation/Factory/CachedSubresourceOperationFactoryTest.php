@@ -70,7 +70,8 @@ class CachedSubresourceOperationFactoryTest extends TestCase
 
     public function testCreateWithGetCacheItemThrowsCacheException()
     {
-        $cacheException = new class() extends \Exception implements CacheException {};
+        $cacheException = new class() extends \Exception implements CacheException {
+        };
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException)->shouldBeCalledTimes(1);

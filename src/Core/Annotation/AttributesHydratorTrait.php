@@ -72,7 +72,7 @@ trait AttributesHydratorTrait
         foreach (self::$deprecatedAttributes as $deprecatedAttribute => $options) {
             if (\array_key_exists($deprecatedAttribute, $values)) {
                 $values[$options[0]] = $values[$deprecatedAttribute];
-                @trigger_error(sprintf('Attribute "%s" is deprecated in annotation since API Platform %s, prefer using "%s" attribute instead', $deprecatedAttribute, $options[1], $options[0]), \E_USER_DEPRECATED);
+                @trigger_error(sprintf('Attribute "%s" is deprecated in annotation since API Platform %s, prefer using "%s" attribute instead', $deprecatedAttribute, $options[1], $options[0]), E_USER_DEPRECATED);
                 unset($values[$deprecatedAttribute]);
             }
         }

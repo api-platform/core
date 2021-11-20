@@ -73,7 +73,7 @@ class SwaggerCommandTest extends KernelTestCase
 YAML;
 
         // Windows uses \r\n as PHP_EOL but symfony exports YAML with \n
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
         $expected = <<<YAML
   '/dummy_cars/{id}':
@@ -82,7 +82,7 @@ YAML;
       operationId: api_dummy_cars_get_item
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: 3.0.2', $result);
 
         $expected = <<<YAML
@@ -90,14 +90,14 @@ info:
   title: 'My Dummy API'
   version: 0.0.0
 YAML;
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
 
         $expected = <<<YAML
     This is a test API.
     Made with love
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+        $this->assertStringContainsString(str_replace(PHP_EOL, "\n", $expected), $result);
     }
 
     public function testExecuteWithBadArguments()

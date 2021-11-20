@@ -460,7 +460,8 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class));
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
+            (new ApiProperty())
                 ->withBuiltinTypes([$type])
                 ->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
         );

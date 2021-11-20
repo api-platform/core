@@ -308,7 +308,7 @@ class ConfigurationTest extends TestCase
         return [
             [true],
             [null],
-            [-\INF],
+            [-INF],
             [40.4],
             ['foo'],
             ['HTTP_FOO_BAR'],

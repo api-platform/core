@@ -137,13 +137,14 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
-        $collectionType = new Type(Type::BUILTIN_TYPE_OBJECT,
-                    false,
-                    ArrayCollection::class,
-                    true,
-                    new Type(Type::BUILTIN_TYPE_INT),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
-                );
+        $collectionType = new Type(
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            ArrayCollection::class,
+            true,
+            new Type(Type::BUILTIN_TYPE_INT),
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+        );
 
         $expectedPropertyMetadata = $expectedPropertyMetadata->withBuiltinTypes([$collectionType]);
         $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, true, 1));

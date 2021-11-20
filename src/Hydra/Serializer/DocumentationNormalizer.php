@@ -61,7 +61,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
     {
         if ($operationMethodResolver) {
-            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), E_USER_DEPRECATED);
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;

@@ -76,7 +76,8 @@ class CachedResourceMetadataFactoryTest extends TestCase
         $decoratedResourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $decoratedResourceMetadataFactory->create(Dummy::class)->willReturn(new ResourceMetadata(null, 'Dummy.'))->shouldBeCalled();
 
-        $cacheException = new class() extends \Exception implements CacheException {};
+        $cacheException = new class() extends \Exception implements CacheException {
+        };
 
         $cacheItemPool = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPool->getItem($this->generateCacheKey())->willThrow($cacheException)->shouldBeCalled();

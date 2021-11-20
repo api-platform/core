@@ -272,7 +272,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operation->getOpenapiContext()['servers'] ?? null,
                 array_filter($operation->getOpenapiContext() ?? [], static function ($item) {
                     return preg_match('/^x-.*$/i', $item);
-                }, \ARRAY_FILTER_USE_KEY)
+                }, ARRAY_FILTER_USE_KEY)
             ));
 
             $paths->addPath($path, $pathItem);

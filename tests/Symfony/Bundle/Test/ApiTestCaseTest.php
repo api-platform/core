@@ -45,7 +45,8 @@ class ApiTestCaseTest extends ApiTestCase
         }
 
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
+        $this->assertJsonContains(
+            <<<JSON
 {
     "@context": "/contexts/Entrypoint"
 }
@@ -63,7 +64,8 @@ JSON
         $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
 
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
+        $this->assertJsonContains(
+            <<<JSON
 "/contexts/Entrypoint"
 JSON
         );
@@ -84,7 +86,8 @@ JSON
     public function testAssertJsonEqualsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
+        $this->assertJsonEquals(
+            <<<JSON
 {
     "@context": {
         "@vocab": "http://localhost/docs.jsonld#",
@@ -102,7 +105,8 @@ JSON
         $this->expectExceptionMessage('$json must be array or string (JSON array or JSON object)');
 
         self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
+        $this->assertJsonEquals(
+            <<<JSON
 "Address/name"
 JSON
         );

@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  */
-#[ApiResource(description: "Hey PHP 8")]
+#[ApiResource(description: 'Hey PHP 8')]
 class DummyPhp8
 {
     /**

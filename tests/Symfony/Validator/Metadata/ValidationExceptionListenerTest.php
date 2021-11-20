@@ -39,7 +39,8 @@ class ValidationExceptionListenerTest extends TestCase
     {
         $listener = new ValidationExceptionListener(
             $this->prophesize(SerializerInterface::class)->reveal(),
-            ['hydra' => ['application/ld+json']]);
+            ['hydra' => ['application/ld+json']]
+        );
 
         $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);

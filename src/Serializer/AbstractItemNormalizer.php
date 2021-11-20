@@ -106,7 +106,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->itemDataProvider = $itemDataProvider;
 
         if (true === $allowPlainIdentifiers) {
-            @trigger_error(sprintf('Allowing plain identifiers as argument of "%s" is deprecated since API Platform 2.7 and will not be possible anymore in API Platform 3.', self::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Allowing plain identifiers as argument of "%s" is deprecated since API Platform 2.7 and will not be possible anymore in API Platform 3.', self::class), E_USER_DEPRECATED);
         }
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
 
@@ -657,7 +657,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function createRelationSerializationContext(string $resourceClass, array $context): array
     {
-        @trigger_error(sprintf('The method %s() is deprecated since 2.1 and will be removed in 3.0.', __METHOD__), \E_USER_DEPRECATED);
+        @trigger_error(sprintf('The method %s() is deprecated since 2.1 and will be removed in 3.0.', __METHOD__), E_USER_DEPRECATED);
 
         return $context;
     }
@@ -964,11 +964,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                     switch ($value) {
                         case 'NaN':
-                            return \NAN;
+                            return NAN;
                         case 'INF':
-                            return \INF;
+                            return INF;
                         case '-INF':
-                            return -\INF;
+                            return -INF;
                         default:
                             throw new NotNormalizableValueException(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $className, $value));
                     }

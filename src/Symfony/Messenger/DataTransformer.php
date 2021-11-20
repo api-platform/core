@@ -88,11 +88,11 @@ final class DataTransformer implements DataTransformerInterface
         }
 
         return 'input' === $metadata->getTypedOperationAttribute(
-                                $context['operation_type'],
-                                $context[$context['operation_type'].'_operation_name'] ?? '',
-                                'messenger',
-                                null,
-                                true
-                            );
+            $context['operation_type'],
+            $context[$context['operation_type'].'_operation_name'] ?? '',
+            'messenger',
+            null,
+            true
+        );
     }
 }

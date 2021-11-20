@@ -1085,13 +1085,13 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
 
         $type = new Type(
-                    Type::BUILTIN_TYPE_OBJECT,
-                    false,
-                    ArrayCollection::class,
-                    true,
-                    new Type(Type::BUILTIN_TYPE_INT),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
-                );
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            ArrayCollection::class,
+            true,
+            new Type(Type::BUILTIN_TYPE_INT),
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+        );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$type])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -1556,8 +1556,8 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNaN', Argument::that(static function (float $arg) {
             return is_nan($arg);
         }))->shouldBeCalled();
-        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatInf', \INF)->shouldBeCalled();
-        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNegInf', -\INF)->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatInf', INF)->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNegInf', -INF)->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, ObjectWithBasicProperties::class)->willReturn(ObjectWithBasicProperties::class);

@@ -53,8 +53,10 @@ class QueryBuilderHelperTest extends TestCase
             $originAliasForJoinOnce
         );
 
-        $this->assertSame($expectedAlias,
-            $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
+        $this->assertSame(
+            $expectedAlias,
+            $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias()
+        );
     }
 
     /**
@@ -80,8 +82,10 @@ class QueryBuilderHelperTest extends TestCase
             'f_8'
         );
 
-        $this->assertSame('f_8',
-            $queryBuilder->getDQLPart('join')['f'][0]->getAlias());
+        $this->assertSame(
+            'f_8',
+            $queryBuilder->getDQLPart('join')['f'][0]->getAlias()
+        );
     }
 
     public function testGetEntityClassByAliasWithJoinByAssociation(): void

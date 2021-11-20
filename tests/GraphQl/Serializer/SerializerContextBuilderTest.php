@@ -67,7 +67,7 @@ class SerializerContextBuilderTest extends TestCase
             $resolverContext['fields'] = $fields;
         } else {
             $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
-            $resolveInfoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
+            $resolveInfoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
             $resolverContext['info'] = $resolveInfoProphecy->reveal();
         }
 

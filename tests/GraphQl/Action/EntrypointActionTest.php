@@ -119,7 +119,7 @@ class EntrypointActionTest extends TestCase
             __DIR__.'/Fixtures/test.gif',
             'original.gif',
             null,
-            \UPLOAD_ERR_OK
+            UPLOAD_ERR_OK
         );
 
         return [

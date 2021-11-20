@@ -57,7 +57,7 @@ final class SwaggerCommand extends Command
         $this->swaggerVersions = $swaggerVersions;
 
         if (null !== $apiFormats) {
-            @trigger_error(sprintf('Passing a 6th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Passing a 6th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), E_USER_DEPRECATED);
         }
 
         parent::__construct();
@@ -91,14 +91,14 @@ final class SwaggerCommand extends Command
         }
 
         if (3 === (int) $version) {
-            @trigger_error('The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".', \E_USER_DEPRECATED);
+            @trigger_error('The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".', E_USER_DEPRECATED);
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);
         $data = $this->normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, ['spec_version' => (int) $version, ApiGatewayNormalizer::API_GATEWAY => $input->getOption('api-gateway')]);
         $content = $input->getOption('yaml')
             ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
-            : (json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES) ?: '');
+            : (json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) ?: '');
 
         if (!empty($filename = $input->getOption('output')) && \is_string($filename)) {
             file_put_contents($filename, $content);

@@ -2965,7 +2965,8 @@ class DocumentationNormalizerV2Test extends TestCase
             [
                 'get' => ['method' => 'GET', 'output_formats' => ['xml' => ['application/xml', 'text/xml']]],
                 'post' => ['method' => 'POST', 'output_formats' => ['xml' => ['text/xml'], 'csv' => ['text/csv']], 'input_formats' => ['xml' => ['text/xml'], 'csv' => ['text/csv']]],
-            ]);
+            ]
+        );
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
@@ -2987,7 +2988,8 @@ class DocumentationNormalizerV2Test extends TestCase
             $operationPathResolver,
             null,
             null,
-            null, false,
+            null,
+            false,
             '',
             '',
             '',

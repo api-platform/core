@@ -50,7 +50,7 @@ final class TypeConverter implements TypeConverterInterface
         $this->propertyMetadataFactory = $propertyMetadataFactory;
 
         if (null === $this->propertyMetadataFactory) {
-            @trigger_error(sprintf('Not injecting %s in the TypeConverter is deprecated since 2.7 and will not be supported in 3.0.', PropertyMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(sprintf('Not injecting %s in the TypeConverter is deprecated since 2.7 and will not be supported in 3.0.', PropertyMetadataFactoryInterface::class), E_USER_DEPRECATED);
         }
     }
 

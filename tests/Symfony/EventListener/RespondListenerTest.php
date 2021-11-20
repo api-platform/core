@@ -194,7 +194,7 @@ class RespondListenerTest extends TestCase
         $response = $event->getResponse();
         /** @var string $value */
         $value = $response->headers->get('Sunset');
-        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(\DATE_RFC1123, $value));
+        $this->assertEquals(new \DateTimeImmutable('tomorrow'), \DateTime::createFromFormat(DATE_RFC1123, $value));
     }
 
     public function testSetCustomStatus()
@@ -220,7 +220,7 @@ class RespondListenerTest extends TestCase
 
         $response = new Response();
         $event = new ViewEvent(
-          $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
             HttpKernelInterface::MASTER_REQUEST,
             $response

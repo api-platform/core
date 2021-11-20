@@ -126,10 +126,8 @@ final class ApiProperty
         ?bool $writableLink = null,
         ?bool $required = null,
         ?bool $identifier = null,
-
-                $default = null,
-                $example = null,
-
+        $default = null,
+        $example = null,
         ?string $deprecationReason = null,
         ?bool $fetchable = null,
         ?bool $fetchEager = null,
@@ -138,7 +136,6 @@ final class ApiProperty
         ?bool $push = null,
         ?string $security = null,
         ?string $securityPostDenormalize = null,
-
         ?array $types = null,
         ?array $builtinTypes = null,
         ?array $schema = null,

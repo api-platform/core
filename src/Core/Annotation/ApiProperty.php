@@ -143,7 +143,6 @@ final class ApiProperty
         ?string $security = null,
         ?array $swaggerContext = null,
         ?string $securityPostDenormalize = null,
-
         ?array $types = [],
         ?array $builtinTypes = []
     ) {

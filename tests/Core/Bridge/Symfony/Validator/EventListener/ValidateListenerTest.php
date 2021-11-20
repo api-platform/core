@@ -107,12 +107,13 @@ class ValidateListenerTest extends TestCase
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('groups_builder')->willReturn(true)->shouldBeCalled();
-        $containerProphecy->get('groups_builder')->willReturn(new class() {
-            public function __invoke($data): array
-            {
-                return $data instanceof DummyEntity ? ['a', 'b', 'c'] : [];
+        $containerProphecy->get('groups_builder')->willReturn(
+            new class() {
+                public function __invoke($data): array
+                {
+                    return $data instanceof DummyEntity ? ['a', 'b', 'c'] : [];
+                }
             }
-        }
         )->shouldBeCalled();
 
         $validationViewListener = new ValidateListener($validator, $resourceMetadataFactory, $containerProphecy->reveal());

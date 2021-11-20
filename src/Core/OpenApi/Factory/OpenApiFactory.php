@@ -291,7 +291,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operation['openapi_context']['servers'] ?? null,
                 array_filter($operation['openapi_context'] ?? [], static function ($item) {
                     return preg_match('/^x-.*$/i', $item);
-                }, \ARRAY_FILTER_USE_KEY)
+                }, ARRAY_FILTER_USE_KEY)
             ));
 
             $paths->addPath($path, $pathItem);
@@ -422,13 +422,17 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $data['openapi']['deprecated'] ?? false,
                     $data['openapi']['allowEmptyValue'] ?? true,
                     $schema,
-                    'array' === $schema['type'] && \in_array($data['type'],
-                    [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT], true) ? 'deepObject' : 'form',
+                    'array' === $schema['type'] && \in_array(
+                        $data['type'],
+                        [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
+                        true
+                    ) ? 'deepObject' : 'form',
                     $data['openapi']['explode'] ?? ('array' === $schema['type']),
                     $data['openapi']['allowReserved'] ?? false,
                     $data['openapi']['example'] ?? null,
                     isset($data['openapi']['examples']
-                ) ? new \ArrayObject($data['openapi']['examples']) : null);
+                ) ? new \ArrayObject($data['openapi']['examples']) : null
+                );
             }
         }
 

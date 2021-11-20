@@ -52,7 +52,7 @@ class SubscriptionManagerTest extends TestCase
     public function testRetrieveSubscriptionIdNoIdentifier(): void
     {
         $info = $this->prophesize(ResolveInfo::class);
-        $info->getFieldSelection(\PHP_INT_MAX)->willReturn([]);
+        $info->getFieldSelection(PHP_INT_MAX)->willReturn([]);
 
         $context = ['args' => [], 'info' => $info->reveal(), 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
 
@@ -63,7 +63,7 @@ class SubscriptionManagerTest extends TestCase
     {
         $infoProphecy = $this->prophesize(ResolveInfo::class);
         $fields = ['fields'];
-        $infoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
+        $infoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
 
         $context = ['args' => ['input' => ['id' => '/foos/34']], 'info' => $infoProphecy->reveal(), 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
         $result = ['result', 'clientSubscriptionId' => 'client-subscription-id'];
@@ -83,7 +83,7 @@ class SubscriptionManagerTest extends TestCase
     {
         $infoProphecy = $this->prophesize(ResolveInfo::class);
         $fields = ['fields'];
-        $infoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
+        $infoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
 
         $context = ['args' => ['input' => ['id' => '/foos/34']], 'info' => $infoProphecy->reveal(), 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
         $result = ['result', 'clientSubscriptionId' => 'client-subscription-id'];
@@ -108,7 +108,7 @@ class SubscriptionManagerTest extends TestCase
     {
         $infoProphecy = $this->prophesize(ResolveInfo::class);
         $fields = ['fieldsBar'];
-        $infoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
+        $infoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
 
         $context = ['args' => ['input' => ['id' => '/foos/34']], 'info' => $infoProphecy->reveal(), 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
         $result = ['result'];
@@ -137,7 +137,7 @@ class SubscriptionManagerTest extends TestCase
             ],
             'first' => true,
         ];
-        $infoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
+        $infoProphecy->getFieldSelection(PHP_INT_MAX)->willReturn($fields);
 
         $context = ['args' => ['input' => ['id' => '/foos/34']], 'info' => $infoProphecy->reveal(), 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
         $result = ['result'];

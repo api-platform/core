@@ -146,7 +146,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             $identifierResourceClass = $context['identifiers'][$identifier][0];
             $previousAssociationProperty = $contextIdentifiers[$remainingIdentifiers] ?? $context['property'];
         } else {
-            @trigger_error('Identifiers should match the convention introduced in ADR 0001-resource-identifiers, this behavior will be removed in 3.0.', \E_USER_DEPRECATED);
+            @trigger_error('Identifiers should match the convention introduced in ADR 0001-resource-identifiers, this behavior will be removed in 3.0.', E_USER_DEPRECATED);
             [$identifier, $identifierResourceClass] = $context['identifiers'][$remainingIdentifiers - 1];
             $previousAssociationProperty = $context['identifiers'][$remainingIdentifiers][0] ?? $context['property'];
         }

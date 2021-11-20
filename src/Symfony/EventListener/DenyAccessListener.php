@@ -58,7 +58,7 @@ final class DenyAccessListener
         }
 
         $this->resourceAccessChecker = new ResourceAccessChecker($resourceAccessCheckerOrExpressionLanguage, $authenticationTrustResolver, $roleHierarchy, $tokenStorage, $authorizationChecker);
-        @trigger_error(sprintf('Passing an instance of "%s" or null as second argument of "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Pass an instance of "%s" and no extra argument instead.', ExpressionLanguage::class, self::class, ResourceAccessCheckerInterface::class), \E_USER_DEPRECATED);
+        @trigger_error(sprintf('Passing an instance of "%s" or null as second argument of "%s" is deprecated since API Platform 2.2 and will not be possible anymore in API Platform 3. Pass an instance of "%s" and no extra argument instead.', ExpressionLanguage::class, self::class, ResourceAccessCheckerInterface::class), E_USER_DEPRECATED);
 
         if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
@@ -69,7 +69,7 @@ final class DenyAccessListener
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        @trigger_error(sprintf('Method "%1$s::onKernelRequest" is deprecated since API Platform 2.4 and will not be available anymore in API Platform 3. Prefer calling "%1$s::onSecurity" instead.', self::class), \E_USER_DEPRECATED);
+        @trigger_error(sprintf('Method "%1$s::onKernelRequest" is deprecated since API Platform 2.4 and will not be available anymore in API Platform 3. Prefer calling "%1$s::onSecurity" instead.', self::class), E_USER_DEPRECATED);
         $this->onSecurityPostDenormalize($event);
     }
 
@@ -115,7 +115,7 @@ final class DenyAccessListener
                 // Backward compatibility
                 $isGranted = $resourceMetadata->getOperationAttribute($attributes, 'access_control', null, true);
                 if (null !== $isGranted) {
-                    @trigger_error('Using "access_control" attribute is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use "security" attribute instead.', \E_USER_DEPRECATED);
+                    @trigger_error('Using "access_control" attribute is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Use "security" attribute instead.', E_USER_DEPRECATED);
                 }
             }
 

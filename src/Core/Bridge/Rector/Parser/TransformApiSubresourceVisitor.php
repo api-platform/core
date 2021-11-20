@@ -79,7 +79,9 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
                             ),
                             new Node\Expr\ArrayItem(
                                 new Node\Expr\Array_(
-                                    [new Node\Expr\ArrayItem(new Node\Scalar\String_($resource[1]))], ['kind' => Node\Expr\Array_::KIND_SHORT]),
+                                    [new Node\Expr\ArrayItem(new Node\Scalar\String_($resource[1]))],
+                                    ['kind' => Node\Expr\Array_::KIND_SHORT]
+                                ),
                                 new Node\Scalar\String_('identifiers')
                             ),
                         ],

@@ -139,7 +139,8 @@ class ClientTest extends ApiTestCase
             ]
         );
 
-        $this->assertMatchesJsonSchema(<<<JSON
+        $this->assertMatchesJsonSchema(
+            <<<JSON
 {
   "type": "object",
   "properties": {

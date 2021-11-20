@@ -55,7 +55,7 @@ final class DeserializeListener
 
         if ($resourceMetadataFactory) {
             if (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                @trigger_error(sprintf('Passing an array or an instance of "%s" as 3rd parameter of the constructor of "%s" is deprecated since API Platform 2.5, pass an instance of "%s" instead', FormatsProviderInterface::class, __CLASS__, ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
+                @trigger_error(sprintf('Passing an array or an instance of "%s" as 3rd parameter of the constructor of "%s" is deprecated since API Platform 2.5, pass an instance of "%s" instead', FormatsProviderInterface::class, __CLASS__, ResourceMetadataFactoryInterface::class), E_USER_DEPRECATED);
             }
 
             if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
@@ -114,7 +114,7 @@ final class DeserializeListener
         if (!$formats) {
             // BC check to be removed in 3.0
             if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-                @trigger_error('When using a "route_name", be sure to define the "_api_operation" route defaults as we will not rely on metadata in API Platform 3.0.', \E_USER_DEPRECATED);
+                @trigger_error('When using a "route_name", be sure to define the "_api_operation" route defaults as we will not rely on metadata in API Platform 3.0.', E_USER_DEPRECATED);
                 $formats = $this->resourceMetadataFactory
                     ->create($attributes['resource_class'])
                     ->getOperationAttribute($attributes, 'input_formats', [], true);

@@ -41,7 +41,7 @@ class TraceableChainDataPersisterTest extends TestCase
             }
 
             return 0 !== strpos($key, 'class@anonymous');
-        }, \ARRAY_FILTER_USE_KEY));
+        }, ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
     }
 
@@ -59,7 +59,7 @@ class TraceableChainDataPersisterTest extends TestCase
             }
 
             return 0 !== strpos($key, 'class@anonymous');
-        }, \ARRAY_FILTER_USE_KEY));
+        }, ARRAY_FILTER_USE_KEY));
         $this->assertSame($expected, array_values($result));
     }
 

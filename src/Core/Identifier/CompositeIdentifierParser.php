@@ -35,7 +35,7 @@ final class CompositeIdentifierParser
     {
         $matches = [];
         $identifiers = [];
-        $num = preg_match_all(self::COMPOSITE_IDENTIFIER_REGEXP, $identifier, $matches, \PREG_SET_ORDER);
+        $num = preg_match_all(self::COMPOSITE_IDENTIFIER_REGEXP, $identifier, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $i => $match) {
             if ($i === $num - 1) {
