@@ -10,8 +10,8 @@ env:
   SYMFONY_DEPRECATIONS_HELPER: disabled=1
 
 jobs:
-  php-cs-fixer:
-    name: PHP-cs-fixer (PHP ${{ matrix.php }})
+  ecs:
+    name: Easy Conding Standard (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -28,10 +28,10 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring 
           ini-values: memory_limit=-1
-          tools: pecl, composer, php-cs-fixer
+          tools: pecl, composer
           coverage: none
-      - name: Run PHP-CS-Fixer fix
-        run: php-cs-fixer fix --dry-run --diff --ansi
+      - name: Run ECS fix
+        run: vendor/bin/ecs check --fix
 
   phpstan:
     name: PHPStan (PHP ${{ matrix.php }})

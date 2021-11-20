@@ -73,8 +73,8 @@
         "symfony/form": "^3.4 || ^4.4 || ^5.1",
         "symfony/framework-bundle": "^4.4 || ^5.1",
         "symfony/http-client": "^4.4 || ^5.1",
-        "symfony/maker-bundle": "^1.24",
         "symfony/intl": "^4.4 || ^5.3",
+        "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^4.4 || ^5.1",
         "symfony/phpunit-bridge": "^5.1.7",
@@ -85,6 +85,7 @@
         "symfony/validator": "^3.4 || ^4.4 || ^5.1",
         "symfony/web-profiler-bundle": "^4.4 || ^5.1",
         "symfony/yaml": "^3.4 || ^4.4 || ^5.1",
+        "symplify/easy-coding-standard": "^9.4",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "webonyx/graphql-php": "^14.0"
     },
