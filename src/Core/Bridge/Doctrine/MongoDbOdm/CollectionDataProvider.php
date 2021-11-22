@@ -22,6 +22,7 @@ use ApiPlatform\Exception\RuntimeException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 
 /**
  * Collection data provider for the Doctrine MongoDB ODM.
@@ -62,6 +63,7 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
+        /** @var ObjectRepository $repository */
         $repository = $manager->getRepository($resourceClass);
         if (!$repository instanceof DocumentRepository) {
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
@@ -85,6 +87,11 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
         }
         $executeOptions = $attribute['execute_options'] ?? [];
 
-        return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);
+        $builder = $aggregationBuilder->hydrate($resourceClass);
+        if (method_exists($builder, 'getAggregation')) {
+            return $builder->getAggregation($executeOptions)->getIterator();
+        }
+
+        return $builder->execute($executeOptions);
     }
 }
