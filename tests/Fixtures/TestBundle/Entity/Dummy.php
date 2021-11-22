@@ -122,7 +122,7 @@ class Dummy
     public $relatedDummy;
 
     /**
-     * @var Collection&iterable<RelatedDummy> Several dummies
+     * @var Collection<int, RelatedDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      * @ApiSubresource

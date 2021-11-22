@@ -54,7 +54,7 @@ class RelatedNormalizedDummy
     private $name;
 
     /**
-     * @var Collection&iterable<CustomNormalizedDummy> Several Normalized dummies
+     * @var Collection<int, CustomNormalizedDummy> Several Normalized dummies
      *
      * @ORM\ManyToMany(targetEntity="CustomNormalizedDummy")
      * @Groups({"related_output", "related_input"})

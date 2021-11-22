@@ -40,7 +40,7 @@ class DummyAggregateOffer
     private $id;
 
     /**
-     * @var Collection&iterable<DummyOffer>
+     * @var Collection<int, DummyOffer>
      *
      * @ApiSubresource
      * @ORM\OneToMany(targetEntity="DummyOffer", mappedBy="aggregate", cascade={"persist"})

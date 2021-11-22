@@ -96,7 +96,7 @@ class DummyProperty
     public $group;
 
     /**
-     * @var Collection&iterable<DummyGroup>
+     * @var Collection<int, DummyGroup>
      *
      * @ORM\ManyToMany(targetEntity=DummyGroup::class, cascade={"persist"})
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})

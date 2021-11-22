@@ -40,7 +40,7 @@ class DummyProduct
     private $id;
 
     /**
-     * @var Collection&iterable<DummyAggregateOffer>
+     * @var Collection<int, DummyAggregateOffer>
      *
      * @ApiSubresource
      * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
@@ -55,7 +55,7 @@ class DummyProduct
     private $name;
 
     /**
-     * @var Collection&iterable<DummyProduct>
+     * @var Collection<int, DummyProduct>
      *
      * @ApiSubresource
      * @ORM\OneToMany(targetEntity="DummyProduct", mappedBy="parent")

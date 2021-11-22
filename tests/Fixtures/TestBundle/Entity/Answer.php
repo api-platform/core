@@ -51,7 +51,7 @@ class Answer
     private $question;
 
     /**
-     * @var Collection&iterable<Question>
+     * @var Collection<int, Question>
      *
      * @ORM\OneToMany(targetEntity="Question", mappedBy="answer")
      * @Serializer\Groups({"foobar"})

@@ -47,7 +47,7 @@ class Person
      * @ORM\OneToMany(targetEntity="PersonToPet", mappedBy="person")
      * @Groups({"people.pets"})
      *
-     * @var Collection&iterable<PersonToPet>
+     * @var Collection<int, PersonToPet>
      */
     public $pets;
 

@@ -45,7 +45,7 @@ class Pet
     /**
      * @ORM\OneToMany(targetEntity="PersonToPet", mappedBy="pet")
      *
-     * @var Collection&iterable<PersonToPet>
+     * @var Collection<int, PersonToPet>
      */
     public $people;
 

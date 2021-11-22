@@ -15,4 +15,5 @@ namespace ApiPlatform\Core\Tests\Fixtures;
 
 class DummyObjectWithOnlyPrivateProperty
 {
+    private $foo;
 }
