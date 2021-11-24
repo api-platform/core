@@ -183,7 +183,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
             foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $propertyConstraint) {
                 if ($propertyConstraint instanceof Sequentially || $propertyConstraint instanceof Compound) {
-                    $constraints[] = $propertyConstraint->getNestedContraints();
+                    $constraints[] = $propertyConstraint->getNestedConstraints();
                 } else {
                     $constraints[] = [$propertyConstraint];
                 }
