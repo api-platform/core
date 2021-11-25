@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\SwaggerUi;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
@@ -22,7 +23,9 @@ use ApiPlatform\OpenApi\Options;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncode;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Twig\Environment as TwigEnvironment;
 
 /**
@@ -49,7 +52,7 @@ final class SwaggerUiAction
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
-        $this->normalizer = $normalizer;
+        $this->normalizer = new Serializer([new OpenApiNormalizer($normalizer)], [new JsonEncode()]);;
         $this->openApiFactory = $openApiFactory;
         $this->openApiOptions = $openApiOptions;
         $this->swaggerUiContext = $swaggerUiContext;
