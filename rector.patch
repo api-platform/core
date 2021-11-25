@@ -1,8 +1,14 @@
 diff --git a/composer.json b/composer.json
-index d5beb2afc..fca961b12 100644
+index 92a283f08..ccbff9ba1 100644
 --- a/composer.json
 +++ b/composer.json
-@@ -47,10 +47,10 @@
+@@ -43,15 +43,15 @@
+         "friends-of-behat/mink-extension": "^2.2",
+         "friends-of-behat/symfony-extension": "^2.1",
+         "guzzlehttp/guzzle": "^6.0 || ^7.0",
+-        "jangregor/phpstan-prophecy": "^0.8",
++        "jangregor/phpstan-prophecy": "*",
+         "justinrainbow/json-schema": "^5.2.1",
          "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.1",
          "phpdocumentor/type-resolver": "^0.3 || ^0.4 || ^1.4",
          "phpstan/extension-installer": "^1.0",
@@ -17,4 +23,3 @@ index d5beb2afc..fca961b12 100644
          "psr/log": "^1.0",
          "ramsey/uuid": "^3.7 || ^4.0",
          "ramsey/uuid-doctrine": "^1.4",
-
