@@ -255,7 +255,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
 
-                $requestBody = new Model\RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
+                $requestBody = new Model\RequestBody(sprintf('The %s %s resource', Operation::METHOD_POST === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
             }
 
             $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
