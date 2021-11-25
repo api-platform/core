@@ -38,6 +38,8 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\State\AsStateProcessor;
+use ApiPlatform\State\AsStateProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
@@ -161,6 +163,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)
             ->addTag('api_platform.state_provider');
+
+        if (method_exists($container, 'registerAttributeForAutoconfiguration')) {
+            $container->registerAttributeForAutoconfiguration(AsStateProvider::class, static function (ChildDefinition $definition, AsStateProvider $attribute) {
+                $definition->addTag('api_platform.state_provider', ['priority' => $attribute->priority]);
+            });
+
+            $container->registerAttributeForAutoconfiguration(AsStateProcessor::class, static function (ChildDefinition $definition, AsStateProcessor $attribute) {
+                $definition->addTag('api_platform.state_processor', ['priority' => $attribute->priority]);
+            });
+        }
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
