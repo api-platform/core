@@ -19,6 +19,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\ArrayTrait;
@@ -94,6 +95,7 @@ final class ReadStage implements ReadStageInterface
 
         $identifiers = [];
         $normalizationContext['filters'] = $this->getNormalizedFilters($args);
+        $normalizationContext['operation'] = $operation ?? new QueryCollection();
 
         $source = $context['source'];
         /** @var ResolveInfo $info */

@@ -39,6 +39,7 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
             'get',
             'put',
             'delete',
+            'patch', // TODO: add this only if our API accepts the patch format
         ],
         'collectionOperations' => [
             'get',

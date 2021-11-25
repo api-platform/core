@@ -88,10 +88,6 @@ final class ItemProvider implements ProviderInterface
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
 
-        if ($operation instanceof GraphQlOperation) {
-            return false;
-        }
-
         return !($operation->isCollection() ?? false);
     }
 }
