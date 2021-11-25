@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -80,11 +81,11 @@ final class CollectionProvider implements ProviderInterface
             return false;
         }
 
-        if (isset($context['provider'])) {
-            return $context['provider'] === 'collection';
-        }
-
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+
+        if ($operation instanceof GraphQlOperation) {
+            return true;
+        }
 
         return $operation->isCollection() ?? false;
     }

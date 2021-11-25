@@ -57,7 +57,7 @@ class Company
     public string $name;
 
     /** @var Employee[] */
-    #[Link(toProperty: 'company')]
+    #[link(toProperty: 'company')]
     public $employees = []; // only used to set metadata
 
     public function getId()

@@ -149,6 +149,7 @@ final class LinkFactory implements LinkFactoryInterface
             if (!$hasIdProperty) {
                 $hasIdProperty = 'id' === $property;
             }
+
             if ($this->propertyMetadataFactory->create($resourceClass, $property)->isIdentifier() ?? false) {
                 $identifiers[] = $property;
             }

@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -85,11 +86,11 @@ final class ItemProvider implements ProviderInterface
             return false;
         }
 
-        if (isset($context['provider'])) {
-            return $context['provider'] === 'item';
-        }
-
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+
+        if ($operation instanceof GraphQlOperation) {
+            return false;
+        }
 
         return !($operation->isCollection() ?? false);
     }

@@ -253,7 +253,7 @@ class ItemProviderTest extends TestCase
 
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getIdentifier()->willReturn([
+        $classMetadataProphecy->getIdentifierFieldNames()->willReturn([
             'id',
         ]);
         $classMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER);
@@ -313,7 +313,7 @@ class ItemProviderTest extends TestCase
     private function getManagerRegistry(string $resourceClass, array $identifierFields, QueryBuilder $queryBuilder, $classMetadatas = [])
     {
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
-        $classMetadataProphecy->getIdentifier()->willReturn(array_keys($identifierFields));
+        $classMetadataProphecy->getIdentifierFieldNames()->willReturn(array_keys($identifierFields));
 
         foreach ($identifierFields as $name => $field) {
             $classMetadataProphecy->getTypeOfField($name)->willReturn($field['type']);
@@ -364,6 +364,7 @@ class ItemProviderTest extends TestCase
         $employeeClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $employeeClassMetadataProphecy->getAssociationMapping('company')->willReturn([
             'type' => ClassMetadataInfo::TO_ONE,
+            'fieldName' => 'company',
         ]);
         $employeeClassMetadataProphecy->getTypeOfField('id')->willReturn(Types::INTEGER);
 
