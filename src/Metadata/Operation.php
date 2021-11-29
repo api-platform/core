@@ -309,7 +309,7 @@ class Operation
         $this->extraProperties = $extraProperties;
     }
 
-    public function withOperation(self $operation): self
+    public function withOperation($operation)
     {
         return $this->copyFrom($operation);
     }

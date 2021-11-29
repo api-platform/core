@@ -20,7 +20,10 @@ use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\ProviderInterface;
@@ -206,9 +209,11 @@ class ReadStageTest extends TestCase
             'info' => $info,
             'source' => $source,
         ];
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [new ApiResource()]));
 
-        $normalizationContext = ['normalization' => true];
+        $collectionOperation = (new GetCollection())->withFilters($expectedFilters);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([$collectionOperation]))]));
+
+        $normalizationContext = ['normalization' => true, 'operation' => (new QueryCollection())->withOperation($collectionOperation)];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
@@ -239,7 +244,8 @@ class ReadStageTest extends TestCase
             'info' => $info,
             'source' => null,
         ];
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [new ApiResource()]));
+        $collectionOperation = (new GetCollection());
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([$collectionOperation]))]));
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -300,12 +306,14 @@ class ReadStageTest extends TestCase
             'info' => $info,
             'source' => null,
         ];
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [new ApiResource()]));
+        $filters = ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']];
+        $operation = (new GetCollection())->withFilters($filters);
+        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([$operation]))]));
 
-        $normalizationContext = ['normalization' => true];
+        $normalizationContext = ['normalization' => true, 'operation' => (new QueryCollection())->withOperation($operation)];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']]])->willReturn([]);
+        $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => $filters])->willReturn([]);
 
         $this->expectDeprecation('The filter syntax "filter: {filterArg1: "filterValue1", filterArg2: "filterValue2"}" is deprecated since API Platform 2.6, use the following syntax instead: "filter: [{filterArg1: "filterValue1"}, {filterArg2: "filterValue2"}]".');
 

@@ -176,6 +176,7 @@ trait LinksHandlerTrait
         if (isset($identifiers[$name])) {
             $value = $identifiers[$name];
             unset($identifiers[$name]);
+
             return $value;
         }
 

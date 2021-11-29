@@ -95,6 +95,11 @@ final class ReadStage implements ReadStageInterface
 
         $identifiers = [];
         $normalizationContext['filters'] = $this->getNormalizedFilters($args);
+
+        if (!$operation && $resourceClass) {
+            $operation = (new QueryCollection())->withOperation($this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, true));
+        }
+
         $normalizationContext['operation'] = $operation ?? new QueryCollection();
 
         $source = $context['source'];
