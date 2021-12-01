@@ -11,11 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
+use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
+use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\State\ProcessorInterface;
 
 /**
  * Write stage of GraphQL resolvers.
@@ -25,13 +27,13 @@ use ApiPlatform\State\ProcessorInterface;
 final class WriteStage implements WriteStageInterface
 {
     private $resourceMetadataCollectionFactory;
-    private $processor;
+    private $dataPersister;
     private $serializerContextBuilder;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ProcessorInterface $processor, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ContextAwareDataPersisterInterface $dataPersister, SerializerContextBuilderInterface $serializerContextBuilder)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->processor = $processor;
+        $this->dataPersister = $dataPersister;
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
 
@@ -48,6 +50,19 @@ final class WriteStage implements WriteStageInterface
 
         $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, false);
 
-        return $this->processor->process($data, [], $operation->getName(), ['operation' => $operation] + $denormalizationContext);
+        if ('delete' === $operationName) {
+            $this->dataPersister->remove($data, $denormalizationContext);
+
+            return null;
+        }
+
+        $persistResult = $this->dataPersister->persist($data, $denormalizationContext);
+
+        if (!\is_object($persistResult)) {
+            @trigger_error(sprintf('Not returning an object from %s::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.', DataPersisterInterface::class), \E_USER_DEPRECATED);
+            $persistResult = null;
+        }
+
+        return $persistResult;
     }
 }

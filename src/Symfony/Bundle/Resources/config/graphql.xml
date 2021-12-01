@@ -100,6 +100,13 @@
 
         <service id="api_platform.graphql.resolver.stage.write" class="ApiPlatform\GraphQl\Resolver\Stage\WriteStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.state_processor" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+        </service>
+
+        <!-- TODO: 3.0 change class -->
+        <service id="api_platform.graphql.resolver.stage.write.legacy" class="ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
         </service>
