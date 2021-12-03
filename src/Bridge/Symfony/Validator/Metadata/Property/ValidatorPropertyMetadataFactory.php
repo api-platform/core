@@ -19,6 +19,7 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\CardScheme;
+use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\Currency;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -171,8 +172,8 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
 
             foreach ($validatorPropertyMetadata->findConstraints($validationGroup) as $propertyConstraint) {
-                if ($propertyConstraint instanceof Sequentially) {
-                    $constraints[] = $propertyConstraint->getNestedContraints();
+                if ($propertyConstraint instanceof Sequentially || $propertyConstraint instanceof Compound) {
+                    $constraints[] = method_exists($propertyConstraint, 'getNestedContraints') ? $propertyConstraint->getNestedContraints() : $propertyConstraint->getNestedConstraints();
                 } else {
                     $constraints[] = [$propertyConstraint];
                 }
