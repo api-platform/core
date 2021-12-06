@@ -17,6 +17,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Orm\AbstractPaginator;
 use ApiPlatform\Doctrine\Orm\Paginator;
+use ApiPlatform\Doctrine\Orm\CursorPaginator;
 use ApiPlatform\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -124,15 +125,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
      */
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
-        if (null === $pagination = $this->getPagination($queryBuilder, $resourceClass, $operationName, $context)) {
-            return;
-        }
-
-        [$offset, $limit] = $pagination;
-
-        $queryBuilder
-            ->setFirstResult($offset)
-            ->setMaxResults($limit);
+        $this->applyPagination($queryBuilder, $resourceClass, $operationName, $context);
     }
 
     /**
@@ -181,6 +174,12 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         }
 
         if ($isPartialEnabled) {
+            if ($this->isCursorBasedPagination(
+                null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass),
+                $operationName)
+            ) {
+                return new CursorPaginator($doctrineOrmPaginator);
+            }
             return new class($doctrineOrmPaginator) extends AbstractPaginator {
             };
         }
@@ -191,31 +190,78 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * @throws InvalidArgumentException
      */
-    private function getPagination(QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName, array $context): ?array
+    private function applyPagination(QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName, array $context): void
     {
         $request = null;
         if (null !== $this->requestStack && null === $request = $this->requestStack->getCurrentRequest()) {
-            return null;
-        }
-
-        if (null === $request) {
-            $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context) : $this->pagination->isEnabled($resourceClass, $operationName, $context);
-
-            if (!$enabled) {
-                return null;
-            }
-
-            $context = $this->addCountToContext($queryBuilder, $context);
-
-            return \array_slice($this->pagination->getPagination($resourceClass, $operationName, $context), 1);
+            return;
         }
 
         /**
          * @var ResourceMetadata|ResourceMetadataCollection
          */
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+        if (null === $request) {
+            $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context) : $this->pagination->isEnabled($resourceClass, $operationName, $context);
+
+            if (!$enabled) {
+                return;
+            }
+
+            if ($this->isCursorBasedPagination(
+                $resourceMetadata,
+                $operationName)
+            ) {
+                [$limit, $cursorField, $cursorOperation, $cursorSearchValue] = $this->pagination->getCursorPagination($resourceClass, $operationName, $context);
+
+
+                $cursorSettings = [];
+                if ($resourceMetadata instanceof ResourceMetadata) {
+                    $cursorSettings = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_via_cursor', [], true);
+                } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
+                    $operation = $resourceMetadata->getOperation($operationName);
+                    $cursorSettings = $operation->getPaginationViaCursor();
+                }
+
+                $configuredOrderField = $cursorSettings['field'] ?? null;
+
+                $rootAliases = $queryBuilder->getRootAliases();
+                $rootAlias = null;
+                if (count($rootAliases) > 0) {
+                    $rootAlias = $rootAliases[0];
+                }
+                $queryBuilder
+                    ->setMaxResults($limit)
+                ;
+
+                if ($configuredOrderField) {
+                    $queryBuilder
+                        ->addOrderBy("$rootAlias.$configuredOrderField", $cursorSettings['direction'] ?? 'DESC');
+                }
+
+                if ($cursorField && $cursorOperation && $cursorSearchValue) {
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->$cursorOperation(
+                            "$rootAlias.$cursorField", ':cursorSearchValue'
+                        )
+                    )
+                    ->setParameter('cursorSearchValue', $cursorSearchValue);
+                }
+                return;
+            }
+
+            $context = $this->addCountToContext($queryBuilder, $context);
+
+            [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName, $context);
+            $queryBuilder
+                ->setFirstResult($offset)
+                ->setMaxResults($limit);
+            return;
+        }
+
         if (!$this->isPaginationEnabled($request, $resourceMetadata, $operationName)) {
-            return null;
+            return;
         }
 
         $itemsPerPage = $this->itemsPerPage;
@@ -283,7 +329,25 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             }
         }
 
-        return [$firstResult, $itemsPerPage];
+        $queryBuilder
+            ->setFirstResult($firstResult)
+            ->setMaxResults($itemsPerPage);
+    }
+
+    /**
+     * @param ResourceMetadata|ResourceMetadataCollection $resourceMetadata
+     */
+    private function isCursorBasedPagination($resourceMetadata = null, string $operationName = null): bool
+    {
+        $cursorBased = false;
+        if ($resourceMetadata instanceof ResourceMetadata) {
+            $cursorBased = !empty($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_via_cursor', [], true));
+        } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
+            $operation = $resourceMetadata->getOperation($operationName);
+            $cursorBased = !empty($operation->getPaginationViaCursor());
+        }
+
+        return $cursorBased;
     }
 
     /**

@@ -83,6 +83,20 @@ final class Pagination
     }
 
     /**
+     * Gets the current cursor.
+     *
+     * @throws InvalidArgumentException
+     */
+    public function getCursor(array $context = []): ?string
+    {
+        return $this->getParameterFromContext(
+            $context,
+            $this->options['page_parameter_name'],
+            $this->options['page_default']
+        );
+    }
+
+    /**
      * Gets the current offset.
      */
     public function getOffset(string $resourceClass = null, string $operationName = null, array $context = []): int
@@ -209,6 +223,31 @@ final class Pagination
         }
 
         return [$page, $this->getOffset($resourceClass, $operationName, $context), $limit];
+    }
+
+    public function getCursorPagination(string $resourceClass = null, string $operationName = null, array $context = []): array
+    {
+        $limit = $this->getLimit($resourceClass, $operationName, $context);
+        $cursor = $this->getCursor($context);
+
+        $cursorField = null;
+        $cursorOperation = null;
+        $cursorSearchValue = null;
+        if ($cursor) {
+            [$cursorField, $cursorOperation, $cursorSearchValue] = explode(':', base64_decode($cursor));
+            if ('lte' !== $operationName && 'gte' !== $operationName) {
+                throw new InvalidArgumentException('Invalid cursor comparator, valid values are [lt, gt]');
+            }
+
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+
+            $cursorConfig = $resourceMetadata->getOperation($operationName)->getPaginationViaCursor();
+            if ($cursorConfig['field'] && $cursorConfig['field'] !== $cursorField) {
+                throw new InvalidArgumentException('Invalid cursor field');
+            }
+        }
+
+        return [$limit, $cursorField, $cursorOperation, $cursorSearchValue];
     }
 
     /**

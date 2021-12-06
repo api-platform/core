@@ -143,14 +143,12 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $paginationFilters = [];
 
         foreach ($fields as $field) {
-            $forwardRangeOperator = 'desc' === strtolower($field['direction']) ? 'lt' : 'gt';
-            $backwardRangeOperator = 'gt' === $forwardRangeOperator ? 'lt' : 'gt';
+            $forwardRangeOperator = 'desc' === strtolower($field['direction']) ? 'lte' : 'gte';
+            $backwardRangeOperator = 'gte' === $forwardRangeOperator ? 'lte' : 'gte';
 
             $operator = $direction > 0 ? $forwardRangeOperator : $backwardRangeOperator;
 
-            $paginationFilters[$field['field']] = [
-                $operator => (string) $this->propertyAccessor->getValue($object, $field['field']),
-            ];
+            $paginationFilters[] = sprintf('%s:%s:%s', $field['field'], $operator, $this->propertyAccessor->getValue($object, $field['field']));
         }
 
         return $paginationFilters;
@@ -165,11 +163,11 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
 
         if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)));
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'nextCursor', base64_encode(implode(';',$this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject))));
         }
 
         if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)));
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'],'nextCursor', base64_encode(implode(';',$this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject))));
         }
 
         return $data;
