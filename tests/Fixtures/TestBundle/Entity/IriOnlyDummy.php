@@ -41,7 +41,7 @@ class IriOnlyDummy
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      *
      * @ORM\Column(type="string")
      */
