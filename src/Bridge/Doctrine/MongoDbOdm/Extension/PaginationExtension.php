@@ -68,11 +68,10 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
+        /**
+         * @var DocumentRepository
+         */
         $repository = $manager->getRepository($resourceClass);
-        if (!$repository instanceof DocumentRepository) {
-            throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
-        }
-
         $resultsAggregationBuilder = $repository->createAggregationBuilder()->skip($offset);
         if ($limit > 0) {
             $resultsAggregationBuilder->limit($limit);

@@ -24,7 +24,7 @@ use Doctrine\ORM\Query;
 final class Paginator extends AbstractPaginator implements PaginatorInterface, QueryAwareInterface
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $totalItems;
 

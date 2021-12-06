@@ -101,13 +101,13 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         if (!$parentResourceMetadata) {
             return new ResourceMetadata(
                 $annotation->shortName,
-                $annotation->description ?? $this->defaults['description'] ?? null,
-                $annotation->iri ?? $this->defaults['iri'] ?? null,
-                $annotation->itemOperations ?? $this->defaults['item_operations'] ?? null,
-                $annotation->collectionOperations ?? $this->defaults['collection_operations'] ?? null,
+                $annotation->description ?? $this->defaults['description'] ?? null, // @phpstan-ignore-line
+                $annotation->iri ?? $this->defaults['iri'] ?? null, // @phpstan-ignore-line
+                $annotation->itemOperations ?? $this->defaults['item_operations'] ?? null, // @phpstan-ignore-line
+                $annotation->collectionOperations ?? $this->defaults['collection_operations'] ?? null, // @phpstan-ignore-line
                 $attributes,
                 $annotation->subresourceOperations,
-                $annotation->graphql ?? $this->defaults['graphql'] ?? null
+                $annotation->graphql ?? $this->defaults['graphql'] ?? null // @phpstan-ignore-line
             );
         }
 

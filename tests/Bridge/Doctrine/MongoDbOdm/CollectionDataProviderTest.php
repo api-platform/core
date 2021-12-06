@@ -27,7 +27,9 @@ use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
+use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 /**
  * @group mongodb
@@ -55,9 +57,11 @@ class CollectionDataProviderTest extends TestCase
     public function testGetCollection()
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
-
+        $agg = $this->prophesize(IteratorAggregate::class);
+        $agg->getIterator()->willReturn($iterator);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation(Argument::array())->willReturn($agg->reveal());
+        $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->execute([])->willReturn($iterator)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
@@ -80,10 +84,13 @@ class CollectionDataProviderTest extends TestCase
 
     public function testGetCollectionWithExecuteOptions()
     {
+        $agg = $this->prophesize(IteratorAggregate::class);
         $iterator = $this->prophesize(Iterator::class)->reveal();
+        $agg->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation()->willReturn($agg->reveal());
+        $aggregationBuilderProphecy->hydrate(Dummy::class)->willReturn($aggregationBuilderProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->execute(['allowDiskUse' => true])->willReturn($iterator)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 

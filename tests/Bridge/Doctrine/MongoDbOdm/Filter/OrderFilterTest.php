@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\OrderFilterTestTrait;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\EmbeddedDummy;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,6 +31,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
     use OrderFilterTestTrait;
 
     protected $filterClass = OrderFilter::class;
+    protected $resourceClass = Dummy::class;
 
     public function testGetDescriptionDefaultFields()
     {

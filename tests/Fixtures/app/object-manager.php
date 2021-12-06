@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Fixtures;
+// See https://github.com/phpstan/phpstan-doctrine#configuration
 
-class DummyObjectWithPublicAndPrivateProperty
-{
-    public $foo;
-}
+$kernel = new AppKernel($_SERVER['APP_ENV'] ?? 'test', (bool) ($_SERVER['APP_DEBUG'] ?? false));
+$kernel->boot();
+
+return $kernel->getContainer()->get('doctrine')->getManager();

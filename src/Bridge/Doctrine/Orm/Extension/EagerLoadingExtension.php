@@ -153,6 +153,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             } catch (PropertyNotFoundException $propertyNotFoundException) {
                 //skip properties not found
                 continue;
+                // @phpstan-ignore-next-line indeed this can be thrown by the SerializerPropertyMetadataFactory
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
                 //skip associations that are not resource classes
                 continue;

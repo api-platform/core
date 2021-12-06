@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Test;
 
+use Doctrine\Common\Cache\ApcuCache;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -77,7 +80,10 @@ class DoctrineMongoDbOdmSetup
         return $config;
     }
 
-    private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache): Cache
+    /**
+     * @return Cache|CacheItemPoolInterface
+     */
+    private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache)
     {
         $cache = self::createCacheInstance($isDevMode, $cache);
 
@@ -96,20 +102,20 @@ class DoctrineMongoDbOdmSetup
         return $cache;
     }
 
-    private static function createCacheInstance(bool $isDevMode, ?Cache $cache): Cache
+    private static function createCacheInstance(bool $isDevMode, ?Cache $cache)
     {
         if (null !== $cache) {
             return $cache;
         }
 
         if (true === $isDevMode) {
-            return new ArrayCache();
+            return class_exists(ArrayCache::class) ? new ArrayCache() : new ArrayAdapter();
         }
 
         if (\extension_loaded('apcu')) {
-            return new \Doctrine\Common\Cache\ApcuCache();
+            return class_exists(ApcuCache::class) ? new ApcuCache() : new ApcuAdapter();
         }
 
-        return new ArrayCache();
+        return class_exists(ArrayCache::class) ? new ArrayCache() : new ArrayAdapter();
     }
 }
