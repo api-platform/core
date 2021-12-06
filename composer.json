@@ -52,6 +52,7 @@
         "phpstan/phpstan-doctrine": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
+        "phpspec/prophecy": "dev-fix/527",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^3.7 || ^4.0",
         "ramsey/uuid-doctrine": "^1.4",
@@ -132,5 +133,12 @@
         "symfony": {
             "require": "^3.4 || ^4.4 || ^5.1 || ^6.0"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/denis-rolling-scopes/prophecy"
+        }
+    ],
+    "minimum-stability": "dev"
 }
