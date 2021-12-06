@@ -52,7 +52,7 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
         $resourceMetadata = null;
 
         if (!$documentMetadata || null === $documentMetadata->getIndex()) {
-            $resourceMetadata = $resourceMetadata ?? $this->resourceMetadataFactory->create($resourceClass);
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             if (null !== $index = $resourceMetadata->getAttribute('elasticsearch_index')) {
                 $documentMetadata = $documentMetadata ? $documentMetadata->withIndex($index) : new DocumentMetadata($index);

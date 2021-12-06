@@ -234,6 +234,6 @@ final class ApiResource
             }
         }
 
-        $this->hydrateAttributes($description ?? []);
+        $this->hydrateAttributes($description ?? []); // @phpstan-ignore-line
     }
 }

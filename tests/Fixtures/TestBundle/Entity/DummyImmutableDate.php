@@ -36,7 +36,7 @@ class DummyImmutableDate
     private $id;
 
     /**
-     * @var \DateTimeImmutable|null The dummy date
+     * @var \DateTimeImmutable The dummy date
      *
      * @ORM\Column(type="date_immutable")
      */

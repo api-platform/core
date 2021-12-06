@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Test;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\FilterInterface;
-use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -45,7 +44,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
     /**
      * @var string
      */
-    protected $resourceClass = Dummy::class;
+    protected $resourceClass;
 
     /**
      * @var string
@@ -58,7 +57,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
 
         $this->manager = DoctrineMongoDbOdmTestCase::createTestDocumentManager();
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine_mongodb');
-        $this->repository = $this->manager->getRepository(Dummy::class);
+        $this->repository = $this->manager->getRepository($this->resourceClass);
     }
 
     /**

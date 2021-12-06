@@ -92,13 +92,6 @@ class User extends AbstractSecurityUser
      */
     private $plainPassword;
 
-    /**
-     * @var string|null
-     *
-     * @Groups({"user"})
-     */
-    private $username;
-
     public function getId(): ?int
     {
         return $this->id;

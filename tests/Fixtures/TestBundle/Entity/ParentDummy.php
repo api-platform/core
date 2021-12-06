@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ParentDummy
 {
     /**
-     * @var int The age
+     * @var int|null The age
      *
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"friends"})
