@@ -18,8 +18,8 @@ namespace ApiPlatform\Tests\Fixtures;
  */
 class DummyObjectWithConstructor
 {
-    private $foo;
-    private $bar;
+    private $foo; // @phpstan-ignore-line
+    private $bar; // @phpstan-ignore-line
 
     public function __construct(string $foo, \stdClass $bar)
     {

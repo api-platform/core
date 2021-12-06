@@ -78,7 +78,7 @@ class OverriddenOperationDummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_put", "overridden_operation_dummy_get"})
@@ -87,7 +87,7 @@ class OverriddenOperationDummy
     private $alias;
 
     /**
-     * @var string A short description of the item
+     * @var string|null A short description of the item
      *
      * @ORM\Column(nullable=true)
      * @Groups({"overridden_operation_dummy_read", "overridden_operation_dummy_write", "overridden_operation_dummy_get", "overridden_operation_dummy_put"})

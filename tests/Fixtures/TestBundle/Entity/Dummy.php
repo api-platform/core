@@ -17,6 +17,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -42,7 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Dummy
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -60,7 +61,7 @@ class Dummy
     private $name;
 
     /**
-     * @var string The dummy name alias
+     * @var string|null The dummy name alias
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/alternateName")
@@ -73,7 +74,7 @@ class Dummy
     private $foo;
 
     /**
-     * @var string A short description of the item
+     * @var string|null A short description of the item
      *
      * @ORM\Column(nullable=true)
      * @ApiProperty(iri="https://schema.org/description")
@@ -81,21 +82,21 @@ class Dummy
     public $description;
 
     /**
-     * @var string A dummy
+     * @var string|null A dummy
      *
      * @ORM\Column(nullable=true)
      */
     public $dummy;
 
     /**
-     * @var bool A dummy boolean
+     * @var bool|null A dummy boolean
      *
      * @ORM\Column(type="boolean", nullable=true)
      */
     public $dummyBoolean;
 
     /**
-     * @var \DateTime A dummy date
+     * @var \DateTime|null A dummy date
      *
      * @ORM\Column(type="datetime", nullable=true)
      * @ApiProperty(iri="http://schema.org/DateTime")
@@ -103,21 +104,21 @@ class Dummy
     public $dummyDate;
 
     /**
-     * @var string A dummy float
+     * @var float|null A dummy float
      *
      * @ORM\Column(type="float", nullable=true)
      */
     public $dummyFloat;
 
     /**
-     * @var string A dummy price
+     * @var string|null A dummy price
      *
      * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     public $dummyPrice;
 
     /**
-     * @var RelatedDummy A related dummy
+     * @var RelatedDummy|null A related dummy
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      * @ApiProperty(push=true)
@@ -125,7 +126,7 @@ class Dummy
     public $relatedDummy;
 
     /**
-     * @var ArrayCollection Several dummies
+     * @var Collection<int, RelatedDummy> Several dummies
      *
      * @ORM\ManyToMany(targetEntity="RelatedDummy")
      * @ApiSubresource
@@ -133,35 +134,35 @@ class Dummy
     public $relatedDummies;
 
     /**
-     * @var array serialize data
+     * @var array|null serialize data
      *
      * @ORM\Column(type="json_array", nullable=true)
      */
     public $jsonData;
 
     /**
-     * @var array
+     * @var array|null
      *
      * @ORM\Column(type="simple_array", nullable=true)
      */
     public $arrayData;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      */
     public $nameConverted;
 
     /**
-     * @var RelatedOwnedDummy
+     * @var RelatedOwnedDummy|null
      *
      * @ORM\OneToOne(targetEntity="RelatedOwnedDummy", cascade={"persist"}, mappedBy="owningDummy")
      */
     public $relatedOwnedDummy;
 
     /**
-     * @var RelatedOwningDummy
+     * @var RelatedOwningDummy|null
      *
      * @ORM\OneToOne(targetEntity="RelatedOwningDummy", cascade={"persist"}, inversedBy="ownedDummy")
      */

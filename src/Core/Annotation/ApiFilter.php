@@ -66,7 +66,7 @@ final class ApiFilter
     ) {
         if (\is_array($filterClass)) { /** @phpstan-ignore-line Doctrine annotations */
             $options = $filterClass;
-            $this->filterClass = $options['value'] ?? null;
+            $this->filterClass = $options['value'] ?? null; /** @phpstan-ignore-line Doctrine annotations */
             unset($options['value']);
 
             foreach ($options as $key => $value) {

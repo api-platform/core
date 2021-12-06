@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class ConvertedRelated
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id

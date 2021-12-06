@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\DateFilterTestTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use MongoDB\BSON\UTCDateTime;
 
 /**
@@ -28,6 +29,7 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
     use DateFilterTestTrait;
 
     protected $filterClass = DateFilter::class;
+    protected $resourceClass = Dummy::class;
 
     public function provideApplyTestData(): array
     {

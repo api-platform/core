@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 
 /**
  * Item data provider for the Doctrine MongoDB ODM.
@@ -88,6 +89,7 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
         }
 
         $repository = $manager->getRepository($resourceClass);
+        /** @var ObjectRepository $repository */
         if (!$repository instanceof DocumentRepository) {
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }

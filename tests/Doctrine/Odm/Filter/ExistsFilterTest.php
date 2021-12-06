@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\ExistsFilterTestTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -28,6 +29,7 @@ class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase
     use ExistsFilterTestTrait;
 
     protected $filterClass = ExistsFilter::class;
+    protected $resourceClass = Dummy::class;
 
     public function testGetDescriptionDefaultFields()
     {

@@ -57,6 +57,11 @@ class CollectionDataProviderTest extends TestCase
 
     public function testGetCollection()
     {
+        // No solution for this see https://github.com/doctrine/mongodb-odm/pull/2395
+        if (method_exists(Builder::class, 'getAggregation')) {
+            $this->markTestSkipped('Can not mock Aggregation.');
+        }
+
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
@@ -83,6 +88,10 @@ class CollectionDataProviderTest extends TestCase
 
     public function testGetCollectionWithExecuteOptions()
     {
+        if (method_exists(Builder::class, 'getAggregation')) {
+            $this->markTestSkipped('Can not mock Aggregation.');
+        }
+
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);

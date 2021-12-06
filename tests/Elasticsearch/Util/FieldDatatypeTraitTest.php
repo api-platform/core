@@ -40,7 +40,7 @@ class FieldDatatypeTraitTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willThrow(new PropertyNotFoundException())->shouldBeCalled();
 
-        $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
+        $fieldDatatype = self::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
@@ -50,7 +50,8 @@ class FieldDatatypeTraitTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new ApiProperty())->shouldBeCalled();
 
-        $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
+        $fieldDatatype = self::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
@@ -60,7 +61,8 @@ class FieldDatatypeTraitTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
 
-        $fieldDatatype = static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal());
+        $fieldDatatype = self::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal());
 
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
@@ -85,7 +87,8 @@ class FieldDatatypeTraitTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
 
-        return static::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+        return self::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal());
     }
 
     private static function createFieldDatatypeInstance(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver)
