@@ -48,7 +48,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
      */
     private $resourceClass;
 
-    /** @var \ArrayIterator */
+    /** @var \ArrayIterator|null */
     private $iterator;
 
     /**

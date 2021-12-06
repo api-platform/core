@@ -62,7 +62,7 @@ class SecuredDummy
     private $id;
 
     /**
-     * @var string|null The title
+     * @var string The title
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -96,7 +96,7 @@ class SecuredDummy
     private $ownerOnlyProperty = '';
 
     /**
-     * @var string|null The owner
+     * @var string The owner
      *
      * @ORM\Column
      * @Assert\NotBlank

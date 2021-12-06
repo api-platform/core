@@ -3265,7 +3265,7 @@ class DocumentationNormalizerV3Test extends TestCase
             'page',
             false,
             'itemsPerPage',
-            $formatsProvider ?? [],
+            [],
             false,
             'pagination',
             ['spec_version' => 3],

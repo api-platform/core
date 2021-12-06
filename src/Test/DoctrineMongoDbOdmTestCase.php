@@ -44,7 +44,7 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         if (method_exists($config, 'setMetadataCache')) {
             $config->setMetadataCache(new ArrayCache());
         } else {
-            $config->setMetadataCacheImpl(new ArrayCache());
+            $config->setMetadataCacheImpl(new ArrayCache()); // @phpstan-ignore-line
         }
 
         return DocumentManager::create(null, $config);

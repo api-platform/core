@@ -41,7 +41,7 @@ class VoDummyInspection
     private $accepted;
 
     /**
-     * @var VoDummyCar
+     * @var VoDummyCar|null
      *
      * @ORM\ManyToOne(targetEntity="VoDummyCar", inversedBy="inspections")
      * @Groups({"inspection_read", "inspection_write"})

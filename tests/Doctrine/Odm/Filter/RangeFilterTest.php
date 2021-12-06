@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\RangeFilterTestTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 
 /**
  * @group mongodb
@@ -27,6 +28,7 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
     use RangeFilterTestTrait;
 
     protected $filterClass = RangeFilter::class;
+    protected $resourceClass = Dummy::class;
 
     public function testGetDescriptionDefaultFields()
     {

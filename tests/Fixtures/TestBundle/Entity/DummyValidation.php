@@ -56,7 +56,7 @@ class DummyValidation
     private $title;
 
     /**
-     * @var string|null The dummy code
+     * @var string The dummy code
      * @ORM\Column
      */
     private $code;
