@@ -38,6 +38,12 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
         $this->nameConverter = $nameConverter;
     }
 
+    /**
+     * @param mixed      $object
+     * @param mixed|null $format
+     *
+     * @return array
+     */
     public function normalize($object, $format = null, array $context = [])
     {
         $violations = [];

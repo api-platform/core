@@ -133,3 +133,9 @@ parameters:
 		- 
 			message: '#^Property .+ is unused.$#'
 			path: tests/Bridge/Doctrine/MongoDbOdm/PropertyInfo/Fixtures/DoctrineDummy.php
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionValueType\(\)#'
+			path: src
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
+			path: src

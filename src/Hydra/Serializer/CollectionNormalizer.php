@@ -68,6 +68,8 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
      * {@inheritdoc}
      *
      * @param iterable $object
+     *
+     * @return array
      */
     public function normalize($object, $format = null, array $context = [])
     {

@@ -43,6 +43,8 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
     /**
      * {@inheritdoc}
+     *
+     * @return array
      */
     public function normalize($object, $format = null, array $context = [])
     {

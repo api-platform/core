@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 
+use ApiPlatform\Core\Util\ClientTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -32,7 +33,9 @@ use Symfony\Contracts\HttpClient\ResponseStreamInterface;
  */
 final class Client implements HttpClientInterface
 {
-    use HttpClientTrait;
+    use ClientTrait, HttpClientTrait {
+        ClientTrait::withOptions insteadof HttpClientTrait;
+    }
 
     /**
      * @see HttpClientInterface::OPTIONS_DEFAULTS
@@ -239,16 +242,5 @@ final class Client implements HttpClientInterface
         }
 
         return $headers;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function withOptions(array $options): self
-    {
-        $clone = clone $this;
-        $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
-
-        return $clone;
     }
 }

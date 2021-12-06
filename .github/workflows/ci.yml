@@ -81,7 +81,8 @@ jobs:
         continue-on-error: true
       - name: Clear test app cache
         run: |
-          tests/Fixtures/app/console cache:clear --ansi
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:warmup
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.5'
