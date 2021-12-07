@@ -62,6 +62,8 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Allow unstable project dependencies
+        run: composer config minimum-stability dev
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -86,7 +88,9 @@ jobs:
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.5'
-        run: ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
+        run: |
+            ./vendor/bin/phpstan --version
+            ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -138,7 +142,11 @@ jobs:
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
+        if: (!startsWith(matrix.php, '7.1'))
         run: composer update --no-interaction --no-progress --ansi
+      - name: Update project dependencies ignoring platform
+        if: (startsWith(matrix.php, '7.1'))
+        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
@@ -639,15 +647,13 @@ jobs:
         run: vendor/bin/simple-phpunit
 
   phpunit-symfony-next:
-    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony dev)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
           - '8.0'
-        symfony:
-          - '5.4'
       fail-fast: false
     env:
       # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
@@ -681,20 +687,6 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Flag held back Symfony packages
-        env:
-          symfony_version: ${{ matrix.symfony }}
-        run: |
-          version_pattern=$symfony_version.x-dev
-          if [ "${symfony_version%.4}" != "$symfony_version" ]; then
-            current_major=${symfony_version%.4}
-            next_major=$((current_major + 1))
-            version_pattern=$version_pattern'|'$next_major.0.x-dev'|'dev-master
-          fi
-          version_pattern=$(echo "$version_pattern" | sed -r 's/\./\\./g')
-          symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
-          ! echo "$symfony_packages" | grep -vE "$version_pattern"
-        continue-on-error: true
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -703,15 +695,13 @@ jobs:
         run: vendor/bin/simple-phpunit
 
   behat-symfony-next:
-    name: Behat (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
+    name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
           - '8.0'
-        symfony:
-          - '5.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -743,20 +733,6 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Flag held back Symfony packages
-        env:
-          symfony_version: ${{ matrix.symfony }}
-        run: |
-          version_pattern=$symfony_version.x-dev
-          if [ "${symfony_version%.4}" != "$symfony_version" ]; then
-            current_major=${symfony_version%.4}
-            next_major=$((current_major + 1))
-            version_pattern=$version_pattern'|'$next_major.0.x-dev'|'dev-master
-          fi
-          version_pattern=$(echo "$version_pattern" | sed -r 's/\./\\./g')
-          symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
-          ! echo "$symfony_packages" | grep -vE "$version_pattern"
-        continue-on-error: true
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache

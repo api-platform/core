@@ -90,7 +90,7 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }

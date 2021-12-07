@@ -56,7 +56,7 @@ class HttpExceptionNormalizerTest extends TestCase
 
         return [
             'client error' => [new BadRequestHttpException($exceptionMessage), $exceptionMessage, 400, 'user'],
-            'server error' => [new ServiceUnavailableHttpException(null, $exceptionMessage), $exceptionMessage, 503, Error::CATEGORY_INTERNAL],
+            'server error' => [new ServiceUnavailableHttpException(null, $exceptionMessage), $exceptionMessage, 503, Error::CATEGORY_INTERNAL], // @phpstan-ignore-line
         ];
     }
 
