@@ -750,6 +750,216 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
     }
 
+    public function testApplyToCollectionCursorDescending()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_items_per_page' => 40,
+            'pagination_partial' => true,
+            "pagination_via_cursor" => [
+                ["field" => "id", "direction" => "DESC"],
+            ],
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [
+            'page_parameter_name' => '_page',
+        ]);
+
+        $comparisonProphecy = $this->prophesize(Query\Expr\Comparison::class);
+
+        $expressionProphecy = $this->prophesize(Query\Expr::class);
+        $expressionProphecy->lte('foo.id', ':cursorSearchValue')->willReturn($comparisonProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn([
+            'foo'
+        ])->shouldBeCalled();
+
+        $queryBuilderProphecy->setMaxResults(40)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->addOrderBy('foo.id', 'DESC')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy->andWhere($comparisonProphecy)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->expr()->willReturn($expressionProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('cursorSearchValue', '2')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => base64_encode('2')]]);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.
+     * @expectedDeprecation Passing an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" as third argument of "ApiPlatform\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\State\Pagination\Pagination" instead.
+     */
+    public function testLegacyApplyToCollectionCursorDescending()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 20, '_page' => base64_encode('2')]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_items_per_page' => 40,
+            'pagination_partial' => true,
+            "pagination_via_cursor" => [
+                ["field" => "id", "direction" => "DESC"],
+            ],
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [
+            'page_parameter_name' => '_page',
+        ]);
+
+        $comparisonProphecy = $this->prophesize(Query\Expr\Comparison::class);
+
+        $expressionProphecy = $this->prophesize(Query\Expr::class);
+        $expressionProphecy->lte('foo.id', ':cursorSearchValue')->willReturn($comparisonProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn([
+            'foo'
+        ])->shouldBeCalled();
+
+        $queryBuilderProphecy->setMaxResults(40)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->addOrderBy('foo.id', 'DESC')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy->andWhere($comparisonProphecy)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->expr()->willReturn($expressionProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('cursorSearchValue', '2')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactory,
+            true,
+            false,
+            false,
+            30,
+            '_page'
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
+    }
+
+    public function testApplyToCollectionCursorAscending()
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_items_per_page' => 40,
+            'pagination_partial' => true,
+            "pagination_via_cursor" => [
+                ["field" => "id", "direction" => "ASC"],
+            ],
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [
+            'page_parameter_name' => '_page',
+        ]);
+
+        $comparisonProphecy = $this->prophesize(Query\Expr\Comparison::class);
+
+        $expressionProphecy = $this->prophesize(Query\Expr::class);
+        $expressionProphecy->gte('foo.id', ':cursorSearchValue')->willReturn($comparisonProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn([
+            'foo'
+        ])->shouldBeCalled();
+
+        $queryBuilderProphecy->setMaxResults(40)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->addOrderBy('foo.id', 'ASC')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy->andWhere($comparisonProphecy)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->expr()->willReturn($expressionProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('cursorSearchValue', '2')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $resourceMetadataFactory,
+            $pagination
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op', ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => base64_encode('2')]]);
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" as second argument of "ApiPlatform\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" instead.
+     * @expectedDeprecation Passing an instance of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface" as third argument of "ApiPlatform\Doctrine\Orm\Extension\PaginationExtension" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "ApiPlatform\State\Pagination\Pagination" instead.
+     */
+    public function testLegacyApplyToCollectionCursorAscending()
+    {
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request(['pagination' => true, 'itemsPerPage' => 20, '_page' => base64_encode('2')]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $attributes = [
+            'pagination_enabled' => true,
+            'pagination_client_enabled' => true,
+            'pagination_items_per_page' => 40,
+            'pagination_partial' => true,
+            "pagination_via_cursor" => [
+                ["field" => "id", "direction" => "ASC"],
+            ],
+        ];
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata(null, null, null, [], [], $attributes));
+        $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
+
+        $pagination = new Pagination($resourceMetadataFactory, [
+            'page_parameter_name' => '_page',
+        ]);
+
+        $comparisonProphecy = $this->prophesize(Query\Expr\Comparison::class);
+
+        $expressionProphecy = $this->prophesize(Query\Expr::class);
+        $expressionProphecy->gte('foo.id', ':cursorSearchValue')->willReturn($comparisonProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn([
+            'foo'
+        ])->shouldBeCalled();
+
+        $queryBuilderProphecy->setMaxResults(40)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->addOrderBy('foo.id', 'ASC')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilderProphecy->andWhere($comparisonProphecy)->willReturn($queryBuilderProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->expr()->willReturn($expressionProphecy)->shouldBeCalled();
+        $queryBuilderProphecy->setParameter('cursorSearchValue', '2')->willReturn($queryBuilderProphecy)->shouldBeCalled();
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+
+        $extension = new PaginationExtension(
+            $this->prophesize(ManagerRegistry::class)->reveal(),
+            $requestStack,
+            $resourceMetadataFactory,
+            true,
+            false,
+            false,
+            30,
+            '_page'
+        );
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', 'op');
+    }
+
     public function testSupportsResult()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
