@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -162,12 +163,21 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
         $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters']);
 
+        $field = null;
+        foreach ($cursorPaginationAttribute as $attribute) {
+            $field = $attribute['field'];
+        }
+
+        if (!$field) {
+            throw new InvalidArgumentException('No cursor field was defined');
+        }
+
         if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'nextCursor', base64_encode(implode(';',$this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject))));
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, base64_encode((string)$this->propertyAccessor->getValue($lastObject, $field)));
         }
 
         if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'],'nextCursor', base64_encode(implode(';',$this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject))));
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'],$this->pageParameterName, base64_encode((string)$this->propertyAccessor->getValue($firstObject, $field)));
         }
 
         return $data;

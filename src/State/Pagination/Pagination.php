@@ -225,29 +225,23 @@ final class Pagination
         return [$page, $this->getOffset($resourceClass, $operationName, $context), $limit];
     }
 
+
+    /**
+     * Gets info about the cursor.
+     *
+     * Returns an array with the following info as values:
+     *   - the limit {@see Pagination::getLimit()}
+     *   - the cursor {@see Pagination::getCursor()}
+     *
+     * @throws InvalidArgumentException
+     */
     public function getCursorPagination(string $resourceClass = null, string $operationName = null, array $context = []): array
     {
         $limit = $this->getLimit($resourceClass, $operationName, $context);
         $cursor = $this->getCursor($context);
 
-        $cursorField = null;
-        $cursorOperation = null;
-        $cursorSearchValue = null;
-        if ($cursor) {
-            [$cursorField, $cursorOperation, $cursorSearchValue] = explode(':', base64_decode($cursor));
-            if ('lte' !== $operationName && 'gte' !== $operationName) {
-                throw new InvalidArgumentException('Invalid cursor comparator, valid values are [lt, gt]');
-            }
 
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-            $cursorConfig = $resourceMetadata->getOperation($operationName)->getPaginationViaCursor();
-            if ($cursorConfig['field'] && $cursorConfig['field'] !== $cursorField) {
-                throw new InvalidArgumentException('Invalid cursor field');
-            }
-        }
-
-        return [$limit, $cursorField, $cursorOperation, $cursorSearchValue];
+        return [$limit, $cursor];
     }
 
     /**

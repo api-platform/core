@@ -213,7 +213,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 $resourceMetadata,
                 $operationName)
             ) {
-                [$limit, $cursorField, $cursorOperation, $cursorSearchValue] = $this->pagination->getCursorPagination($resourceClass, $operationName, $context);
+                [$limit, $cursorSearchValue] = $this->pagination->getCursorPagination($resourceClass, $operationName, $context);
 
 
                 $cursorSettings = [];
@@ -224,7 +224,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                     $cursorSettings = $operation->getPaginationViaCursor();
                 }
 
-                $configuredOrderField = $cursorSettings['field'] ?? null;
+                $cursorField = $cursorSettings['field'] ?? null;
+                $cursorDirection = $cursorSettings['direction'] ?? 'DESC';
 
                 $rootAliases = $queryBuilder->getRootAliases();
                 $rootAlias = null;
@@ -233,14 +234,11 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 }
                 $queryBuilder
                     ->setMaxResults($limit)
-                ;
+                    ->addOrderBy("$rootAlias.$cursorField", $cursorDirection);
 
-                if ($configuredOrderField) {
-                    $queryBuilder
-                        ->addOrderBy("$rootAlias.$configuredOrderField", $cursorSettings['direction'] ?? 'DESC');
-                }
+                $cursorOperation = 'desc' === strtolower($cursorDirection) ? 'lte' : 'gte';
 
-                if ($cursorField && $cursorOperation && $cursorSearchValue) {
+                if ($cursorSearchValue) {
                     $queryBuilder->andWhere(
                         $queryBuilder->expr()->$cursorOperation(
                             "$rootAlias.$cursorField", ':cursorSearchValue'
