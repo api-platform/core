@@ -224,8 +224,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                     $cursorSettings = $operation->getPaginationViaCursor();
                 }
 
-                $cursorField = $cursorSettings['field'] ?? null;
-                $cursorDirection = $cursorSettings['direction'] ?? 'DESC';
+                $cursorField = $cursorSettings[0]['field'] ?? null;
+                $cursorDirection = $cursorSettings[0]['direction'] ?? 'DESC';
 
                 $rootAliases = $queryBuilder->getRootAliases();
                 $rootAlias = null;
@@ -267,6 +267,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         $itemsPerPage = $this->itemsPerPage;
         $maxItemsPerPage = $this->maximumItemPerPage;
 
+        $isCursorBasedPagination = false;
+        $cursorPaginationSettings = [];
+
         // TODO: remove in 3.0
         if ($resourceMetadata instanceof ResourceMetadata) {
             $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
@@ -275,6 +278,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
                 $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
             }
 
+            $isCursorBasedPagination = [] !== $cursorPaginationSettings = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_via_cursor', [], true);
             if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
                 $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
 
@@ -290,6 +294,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             try {
                 $operation = $resourceMetadata->getOperation($operationName);
                 $itemsPerPage = $operation->getPaginationItemsPerPage();
+                $isCursorBasedPagination = [] !== $cursorPaginationSettings = $operation->getPaginationViaCursor();
                 if ($operation->getPaginationClientItemsPerPage()) {
                     $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->maximumItemPerPage;
                     $itemsPerPage = (int) $this->getPaginationParameter($request, $this->itemsPerPageParameterName, $itemsPerPage);
@@ -309,29 +314,60 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             throw new InvalidArgumentException('Item per page parameter should not be less than 0');
         }
 
-        $page = (int) $this->getPaginationParameter($request, $this->pageParameterName, 1);
+        if (!$isCursorBasedPagination) {
+            $page = (int) $this->getPaginationParameter($request, $this->pageParameterName, 1);
 
-        if (1 > $page) {
-            throw new InvalidArgumentException('Page should not be less than 1');
-        }
-
-        if (0 === $itemsPerPage && 1 < $page) {
-            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPerPage is equal to 0');
-        }
-
-        $firstResult = ($page - 1) * $itemsPerPage;
-        if ($request->attributes->getBoolean('_graphql', false)) {
-            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
-            if (isset($collectionArgs[$resourceClass]['after'])) {
-                $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
-                $firstResult = (int) $after;
-                $firstResult = false === $after ? $firstResult : ++$firstResult;
+            if (1 > $page) {
+                throw new InvalidArgumentException('Page should not be less than 1');
             }
+
+            if (0 === $itemsPerPage && 1 < $page) {
+                throw new InvalidArgumentException('Page should not be greater than 1 if itemsPerPage is equal to 0');
+            }
+
+            $firstResult = ($page - 1) * $itemsPerPage;
+            if ($request->attributes->getBoolean('_graphql', false)) {
+                $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
+                if (isset($collectionArgs[$resourceClass]['after'])) {
+                    $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
+                    $firstResult = (int) $after;
+                    $firstResult = false === $after ? $firstResult : ++$firstResult;
+                }
+            }
+
+            $queryBuilder
+                ->setFirstResult($firstResult)
+                ->setMaxResults($itemsPerPage);
+
+            return;
         }
 
-        $queryBuilder
-            ->setFirstResult($firstResult)
-            ->setMaxResults($itemsPerPage);
+        $cursor = $this->getPaginationParameter($request, $this->pageParameterName);
+
+        if ($cursor) {
+            $cursorVal = base64_decode($cursor);
+
+            $cursorField = $cursorPaginationSettings[0]['field'] ?? null;
+            $cursorDirection = $cursorPaginationSettings[0]['direction'] ?? 'DESC';
+
+            $rootAliases = $queryBuilder->getRootAliases();
+            $rootAlias = null;
+            if (\count($rootAliases) > 0) {
+                $rootAlias = $rootAliases[0];
+            }
+            $queryBuilder
+                ->setMaxResults($itemsPerPage)
+                ->addOrderBy("$rootAlias.$cursorField", $cursorDirection);
+
+            $cursorOperation = 'desc' === strtolower($cursorDirection) ? 'lte' : 'gte';
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->{$cursorOperation}(
+                    "$rootAlias.$cursorField", ':cursorSearchValue'
+                )
+            )
+            ->setParameter('cursorSearchValue', $cursorVal);
+        }
+
     }
 
     /**
