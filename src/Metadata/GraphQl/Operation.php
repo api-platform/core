@@ -76,6 +76,7 @@ class Operation
     protected $validate;
     protected $write;
     protected $serialize;
+    protected $delete;
     protected $fetchPartial;
     protected $forceEager;
     protected $priority;
@@ -109,6 +110,7 @@ class Operation
      * @param bool|string       $messenger
      * @param bool              $elasticsearch
      * @param int               $urlGenerationStrategy
+     * @param bool              $delete
      * @param bool              $fetchPartial
      * @param bool              $forceEager
      * @param mixed|null        $input
@@ -154,6 +156,7 @@ class Operation
         ?bool $validate = null,
         ?bool $write = null,
         ?bool $serialize = null,
+        ?bool $delete = null,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         ?int $priority = null,
@@ -199,6 +202,7 @@ class Operation
         $this->validate = $validate;
         $this->write = $write;
         $this->serialize = $serialize;
+        $this->delete = $delete;
         $this->fetchPartial = $fetchPartial;
         $this->forceEager = $forceEager;
         $this->priority = $priority;
@@ -749,6 +753,19 @@ class Operation
     {
         $self = clone $this;
         $self->serialize = $serialize;
+
+        return $self;
+    }
+
+    public function isDelete(): ?bool
+    {
+        return $this->delete;
+    }
+
+    public function withDelete(?bool $delete = null): self
+    {
+        $self = clone $this;
+        $self->delete = $delete;
 
         return $self;
     }

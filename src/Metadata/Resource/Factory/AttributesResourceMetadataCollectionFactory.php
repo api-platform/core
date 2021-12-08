@@ -196,6 +196,10 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
             }
 
+            if ('delete' === $operation->getName()) {
+                $operation = $operation->withDelete(true);
+            }
+
             return [$operation->getName(), $operation];
         }
 

@@ -59,6 +59,7 @@ class Mutation extends Operation
         bool $validate = true,
         bool $write = true,
         bool $serialize = true,
+        bool $delete = false,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         int $priority = 0,

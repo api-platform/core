@@ -877,6 +877,11 @@ class Operation
         return $self;
     }
 
+    public function isDelete(): bool
+    {
+        return self::METHOD_DELETE === $this->getMethod();
+    }
+
     public function getFetchPartial(): ?bool
     {
         return $this->fetchPartial;

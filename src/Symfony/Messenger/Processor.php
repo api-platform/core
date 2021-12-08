@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\Messenger;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
@@ -75,9 +74,7 @@ final class Processor implements ProcessorInterface
 
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
-        if (\array_key_exists('operation', $context) &&
-            ((method_exists($context['operation'], 'getMethod') && Operation::METHOD_DELETE === ($context['operation']->getMethod() ?? null))
-                || 'delete' === $context['operation']->getName())) {
+        if (\array_key_exists('operation', $context) && $context['operation']->isDelete()) {
             return $this->remove($data);
         }
 
