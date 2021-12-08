@@ -22,6 +22,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
@@ -379,7 +380,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $cursorBased = !empty($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_via_cursor', [], true));
         } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
             $operation = $resourceMetadata->getOperation($operationName);
-            $cursorBased = !empty($operation->getPaginationViaCursor());
+            if (!$resourceMetadata instanceof Query) {
+                $cursorBased = !empty($operation->getPaginationViaCursor());
+            }
         }
 
         return $cursorBased;

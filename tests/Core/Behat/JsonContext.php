@@ -109,4 +109,12 @@ final class JsonContext extends BaseJsonContext
 
         method_exists(Assert::class, 'assertArraySubset') ? Assert::assertArraySubset($subset, $array) : ApiTestCase::assertArraySubset($subset, $array); // @phpstan-ignore-line Compatibility with PHPUnit 7
     }
+
+    /**
+     * @Then print response
+     */
+    public function printResponse()
+    {
+        var_dump($this->httpCallResultPool->getResult()->getValue());
+    }
 }
