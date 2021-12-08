@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStage;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -22,8 +21,8 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -35,7 +34,7 @@ class WriteStageTest extends TestCase
     /** @var WriteStage */
     private $writeStage;
     private $resourceMetadataCollectionFactoryProphecy;
-    private $dataPersisterProphecy;
+    private $processorProphecy;
     private $serializerContextBuilderProphecy;
 
     /**
@@ -44,12 +43,12 @@ class WriteStageTest extends TestCase
     protected function setUp(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $this->dataPersisterProphecy = $this->prophesize(ContextAwareDataPersisterInterface::class);
+        $this->processorProphecy = $this->prophesize(ProcessorInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $this->writeStage = new WriteStage(
             $this->resourceMetadataCollectionFactoryProphecy->reveal(),
-            $this->dataPersisterProphecy->reveal(),
+            $this->processorProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal()
         );
     }
@@ -83,35 +82,14 @@ class WriteStageTest extends TestCase
         $this->assertSame($data, $result);
     }
 
-    public function testApplyDelete(): void
-    {
-        $operationName = 'delete';
-        $resourceClass = 'myResource';
-        $context = [];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
-            $operationName => new Mutation(),
-        ])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
-
-        $denormalizationContext = ['denormalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
-
-        $data = new \stdClass();
-        $this->dataPersisterProphecy->remove($data, $denormalizationContext)->shouldBeCalled();
-        $this->dataPersisterProphecy->persist(Argument::cetera())->shouldNotBeCalled();
-
-        $result = ($this->writeStage)($data, $resourceClass, $operationName, $context);
-
-        $this->assertNull($result);
-    }
-
     public function testApply(): void
     {
         $operationName = 'create';
         $resourceClass = 'myResource';
         $context = [];
+        $operation = (new Mutation())->withName($operationName);
         $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
-            $operationName => new Mutation(),
+            $operationName => $operation,
         ])]);
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
@@ -119,38 +97,11 @@ class WriteStageTest extends TestCase
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
 
         $data = new \stdClass();
-        $persistedData = new \stdClass();
-        $this->dataPersisterProphecy->remove(Argument::cetera())->shouldNotBeCalled();
-        $this->dataPersisterProphecy->persist($data, $denormalizationContext)->shouldBeCalled()->willReturn($persistedData);
+        $processedData = new \stdClass();
+        $this->processorProphecy->process($data, [], $operationName, ['operation' => $operation] + $denormalizationContext)->shouldBeCalled()->willReturn($processedData);
 
         $result = ($this->writeStage)($data, $resourceClass, $operationName, $context);
 
-        $this->assertSame($persistedData, $result);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not returning an object from ApiPlatform\Core\DataPersister\DataPersisterInterface::persist() is deprecated since API Platform 2.3 and will not be supported in API Platform 3.
-     */
-    public function testLegacyApply(): void
-    {
-        $operationName = 'create';
-        $resourceClass = 'myResource';
-        $context = [];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
-            $operationName => new Mutation(),
-        ])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
-
-        $denormalizationContext = ['denormalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
-
-        $data = new \stdClass();
-        $this->dataPersisterProphecy->remove(Argument::cetera())->shouldNotBeCalled();
-        $this->dataPersisterProphecy->persist($data, $denormalizationContext)->shouldBeCalled();
-
-        $result = ($this->writeStage)($data, $resourceClass, $operationName, $context);
-
-        $this->assertNull($result);
+        $this->assertSame($processedData, $result);
     }
 }

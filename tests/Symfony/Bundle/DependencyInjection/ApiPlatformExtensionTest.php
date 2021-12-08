@@ -346,6 +346,7 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security_post_validation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.serialize', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.deserialize', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.write.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.write', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.validate', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.resource_field', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -1457,6 +1458,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.stage.security_post_validation',
             'api_platform.graphql.resolver.stage.serialize',
             'api_platform.graphql.resolver.stage.deserialize',
+            'api_platform.graphql.resolver.stage.write.legacy',
             'api_platform.graphql.resolver.stage.write',
             'api_platform.graphql.resolver.stage.validate',
             'api_platform.graphql.resolver.resource_field',

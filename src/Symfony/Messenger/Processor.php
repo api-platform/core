@@ -75,7 +75,9 @@ final class Processor implements ProcessorInterface
 
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
-        if (\array_key_exists('operation', $context) && Operation::METHOD_DELETE === ($context['operation']->getMethod() ?? null)) {
+        if (\array_key_exists('operation', $context) &&
+            ((method_exists($context['operation'], 'getMethod') && Operation::METHOD_DELETE === ($context['operation']->getMethod() ?? null))
+                || 'delete' === $context['operation']->getName())) {
             return $this->remove($data);
         }
 
