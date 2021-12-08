@@ -151,7 +151,7 @@ final class IriConverter implements IriConverterInterface
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation->getName(), ['operation' => $operation]);
 
             return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-        } catch (RuntimeException|RoutingExceptionInterface $e) {
+        } catch (RuntimeException | RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
         }
     }
@@ -189,7 +189,7 @@ final class IriConverter implements IriConverterInterface
             $identifiers = $context['identifiers_values'] ?? [];
 
             return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-        } catch (RoutingExceptionInterface|OperationNotFoundException $e) {
+        } catch (RoutingExceptionInterface | OperationNotFoundException $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
     }

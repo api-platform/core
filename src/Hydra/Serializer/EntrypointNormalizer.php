@@ -94,7 +94,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
                     try {
                         $entrypoint[$key] = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass, $operationName) : $this->iriConverter->getIriFromResourceClass($resourceClass);
-                    } catch (InvalidArgumentException|OperationNotFoundException $ex) {
+                    } catch (InvalidArgumentException | OperationNotFoundException $ex) {
                         // Ignore resources without GET operations
                     }
                 }

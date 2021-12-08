@@ -225,7 +225,6 @@ final class Pagination
         return [$page, $this->getOffset($resourceClass, $operationName, $context), $limit];
     }
 
-
     /**
      * Gets info about the cursor.
      *
@@ -239,7 +238,6 @@ final class Pagination
     {
         $limit = $this->getLimit($resourceClass, $operationName, $context);
         $cursor = $this->getCursor($context);
-
 
         return [$limit, $cursor];
     }

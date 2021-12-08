@@ -173,11 +173,11 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
 
         if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, base64_encode((string)$this->propertyAccessor->getValue($lastObject, $field)));
+            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, base64_encode((string) $this->propertyAccessor->getValue($lastObject, $field)));
         }
 
         if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'],$this->pageParameterName, base64_encode((string)$this->propertyAccessor->getValue($firstObject, $field)));
+            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, base64_encode((string) $this->propertyAccessor->getValue($firstObject, $field)));
         }
 
         return $data;

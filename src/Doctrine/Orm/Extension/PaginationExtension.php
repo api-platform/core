@@ -16,8 +16,8 @@ namespace ApiPlatform\Doctrine\Orm\Extension;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Orm\AbstractPaginator;
-use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Doctrine\Orm\CursorPaginator;
+use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -180,6 +180,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             ) {
                 return new CursorPaginator($doctrineOrmPaginator);
             }
+
             return new class($doctrineOrmPaginator) extends AbstractPaginator {
             };
         }
@@ -215,7 +216,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             ) {
                 [$limit, $cursorSearchValue] = $this->pagination->getCursorPagination($resourceClass, $operationName, $context);
 
-
                 $cursorSettings = [];
                 if ($resourceMetadata instanceof ResourceMetadata) {
                     $cursorSettings = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_via_cursor', [], true);
@@ -229,7 +229,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
                 $rootAliases = $queryBuilder->getRootAliases();
                 $rootAlias = null;
-                if (count($rootAliases) > 0) {
+                if (\count($rootAliases) > 0) {
                     $rootAlias = $rootAliases[0];
                 }
                 $queryBuilder
@@ -240,12 +240,13 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
 
                 if ($cursorSearchValue) {
                     $queryBuilder->andWhere(
-                        $queryBuilder->expr()->$cursorOperation(
+                        $queryBuilder->expr()->{$cursorOperation}(
                             "$rootAlias.$cursorField", ':cursorSearchValue'
                         )
                     )
                     ->setParameter('cursorSearchValue', $cursorSearchValue);
                 }
+
                 return;
             }
 
@@ -255,6 +256,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $queryBuilder
                 ->setFirstResult($offset)
                 ->setMaxResults($limit);
+
             return;
         }
 

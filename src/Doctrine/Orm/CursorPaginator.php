@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\Doctrine\Orm;
 
 use Doctrine\ORM\Query;
@@ -15,7 +26,6 @@ final class CursorPaginator extends AbstractPaginator
         try {
             parent::__construct($paginator);
         } catch (InvalidArgumentException $argumentException) {
-
         }
         $query = $paginator->getQuery();
 
@@ -26,6 +36,7 @@ final class CursorPaginator extends AbstractPaginator
         $this->maxResults = $maxResults;
         $this->query = $query;
     }
+
     /**
      * {@inheritdoc}
      */
