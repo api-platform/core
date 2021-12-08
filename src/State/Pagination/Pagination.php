@@ -239,7 +239,7 @@ final class Pagination
         $limit = $this->getLimit($resourceClass, $operationName, $context);
         $cursor = $this->getCursor($context);
 
-        return [$limit, base64_decode($cursor)];
+        return [$limit, base64_decode($cursor, true)];
     }
 
     /**

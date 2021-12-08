@@ -345,7 +345,7 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         $cursor = $this->getPaginationParameter($request, $this->pageParameterName);
 
         if ($cursor) {
-            $cursorVal = base64_decode($cursor);
+            $cursorVal = base64_decode($cursor, true);
 
             $cursorField = $cursorPaginationSettings[0]['field'] ?? null;
             $cursorDirection = $cursorPaginationSettings[0]['direction'] ?? 'DESC';
@@ -367,7 +367,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             )
             ->setParameter('cursorSearchValue', $cursorVal);
         }
-
     }
 
     /**
