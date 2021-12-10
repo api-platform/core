@@ -22,6 +22,7 @@ class MakeDataPersisterTest extends KernelTestCase
     protected function tearDown(): void
     {
         (new Filesystem())->remove(self::tempDir());
+        parent::tearDown();
     }
 
     /** @dataProvider dataPersisterProvider */

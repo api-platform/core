@@ -23,6 +23,7 @@ parameters:
 		- tests/Core/Bridge/NelmioApiDoc/*
 		- src/Core/Bridge/FosUser/*
 		# BC layer
+		- src/deprecated_interfaces.php
 		- tests/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPassTest.php
 		- tests/Core/Annotation/ApiResourceTest.php
 		- tests/Core/Annotation/ApiPropertyTest.php
@@ -57,8 +58,9 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- tests/Fixtures/TestBundle/Entity/
-				- tests/Behat/
-				- src/Identifier/
+				- tests/Core/Behat/
+				- src/Core/Identifier/
+				- src/OpenApi/Factory/OpenApiFactory.php
 		-
 			message: '#is never written, only read.#'
 			paths:
@@ -69,7 +71,7 @@ parameters:
 			paths:
 				- tests/GraphQl/Resolver/Stage/SecurityPostDenormalizeStageTest.php
 		-
-			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\('o' => Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\) given\\.#"
+			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\{o\\: Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\} given\\.#"
 			paths:
 				- tests/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
 		-
@@ -101,9 +103,6 @@ parameters:
 		-
 			message: '#Property ApiPlatform\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<object>\.#'
 			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
-		-
-			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-			path: tests/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
 		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
@@ -145,11 +144,11 @@ parameters:
 		# TODO: remove in v3.0
 		-
 			message: "#Dead catch - JsonException is never thrown in the try block.#"
-			path: src/Bridge/Symfony/Bundle/Test/Response.php
+			path: src/Symfony/Bundle/Test/Response.php
 		# See https://github.com/phpstan/phpstan-symfony/issues/27
 		-
 			message: '#^Service "[^"]+" is private.$#'
 			path: src
 		-
 			message: '#^Property .+ is unused.$#'
-			path: tests/Bridge/Doctrine/MongoDbOdm/PropertyInfo/Fixtures/DoctrineDummy.php
+			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php

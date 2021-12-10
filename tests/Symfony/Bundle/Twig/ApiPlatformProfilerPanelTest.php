@@ -39,7 +39,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $manager;
     private $schemaTool;
     private $env;
-    private $metadataBackwardCompatibilityLayer;
 
     protected function setUp(): void
     {
@@ -58,7 +57,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
         $this->schemaTool->createSchema($classes);
-        $this->metadataBackwardCompatibilityLayer = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
 
         $this->ensureKernelShutdown();
     }

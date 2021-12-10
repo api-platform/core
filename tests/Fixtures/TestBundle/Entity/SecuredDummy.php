@@ -117,7 +117,7 @@ class SecuredDummy
     /**
      * A dummy that only admins can access.
      *
-     * @var RelatedDummy
+     * @var RelatedDummy|null
      *
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      * @ORM\JoinColumn(name="related_dummy_id")
@@ -139,7 +139,7 @@ class SecuredDummy
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
-     * @var RelatedSecuredDummy
+     * @var RelatedSecuredDummy|null
      *
      * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
      * @ORM\JoinColumn(name="related_secured_dummy_id")
@@ -160,7 +160,7 @@ class SecuredDummy
     /**
      * A dummy that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
-     * @var RelatedSecuredDummy
+     * @var RelatedSecuredDummy|null
      *
      * @ORM\ManyToOne(targetEntity="RelatedSecuredDummy")
      * @ORM\JoinColumn(name="public_related_secured_dummy_id")

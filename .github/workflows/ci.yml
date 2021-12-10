@@ -274,6 +274,7 @@ jobs:
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
+          mkdir -p build/coverage
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
         continue-on-error: true
       - name: Upload test artifacts
@@ -309,10 +310,10 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -564,6 +565,7 @@ jobs:
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
+          mkdir -p build/coverage
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
         continue-on-error: true
       - name: Upload test artifacts
