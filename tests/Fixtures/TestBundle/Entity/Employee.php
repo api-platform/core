@@ -32,7 +32,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Employee
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -51,7 +51,7 @@ class Employee
      * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
      */
     #[UriVariable('companyId')]
-    public Company $company;
+    public ?Company $company;
 
     public function getId()
     {

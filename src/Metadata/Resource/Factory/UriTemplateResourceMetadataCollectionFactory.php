@@ -53,6 +53,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         }
 
         foreach ($resourceMetadataCollection as $i => $resource) {
+            /** @var ApiResource $resource */
             $resource = $this->configureUriVariables($resource);
 
             if ($resource->getUriTemplate()) {
@@ -106,9 +107,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     }
 
     /**
-     * @var ApiResource|Operation
-     *
      * @param mixed $operation
+     *
+     * @return ApiResource|Operation
      */
     private function configureUriVariables($operation)
     {
@@ -160,9 +161,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     }
 
     /**
-     * @var ApiResource|Operation
-     *
      * @param mixed $operation
+     *
+     * @return ApiResource|Operation
      */
     private function normalizeUriVariables($operation)
     {
@@ -201,8 +202,6 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     }
 
     /**
-     * @var ApiResource|Operation
-     *
      * @param mixed $operation
      *
      * @return ApiResource|Operation
@@ -245,8 +244,6 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     /**
      * Merges UriVariables with the PHP attribute UriVariable found on properties.
      *
-     * @var ApiResource|Operation
-     *
      * @param mixed $operation
      *
      * @return ApiResource|Operation
@@ -264,7 +261,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
                 $reflectionProperty = $reflectionClass->getProperty($property);
 
-                foreach ($reflectionProperty->getAttributes(UriVariable::class) ?? [] as $attributeUriVariable) {
+                foreach ($reflectionProperty->getAttributes(UriVariable::class) ?: [] as $attributeUriVariable) {
                     $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
                     $attributeUriVariable = $attributeUriVariable->newInstance()

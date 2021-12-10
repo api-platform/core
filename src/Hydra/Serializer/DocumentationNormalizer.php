@@ -372,7 +372,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getHydraOperation(string $resourceClass, $resourceMetadata, string $operationName, $operation, string $prefixedShortName, ?string $operationType = null, SubresourceMetadata $subresourceMetadata = null): array
     {
         if ($operation instanceof Operation) {
-            $method = $operation->getMethod() ?? Operation::METHOD_GET;
+            $method = $operation->getMethod() ?: Operation::METHOD_GET;
         } elseif ($this->operationMethodResolver) {
             if (OperationType::COLLECTION === $operationType) {
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);

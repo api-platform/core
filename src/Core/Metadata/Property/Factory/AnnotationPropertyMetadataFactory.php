@@ -157,7 +157,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
             }
         }
 
-        return $this->withDeprecatedAttributes($propertyMetadata, $annotation->attributes ?? []);
+        return $this->withDeprecatedAttributes($propertyMetadata, $annotation->attributes ?: []);
     }
 
     /**
