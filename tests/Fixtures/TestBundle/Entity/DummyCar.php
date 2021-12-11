@@ -124,6 +124,13 @@ class DummyCar
      */
     private $brand = 'DummyBrand';
 
+    /**
+     * @var EmbeddableDummy
+     *
+     * @ORM\Embedded(class="EmbeddableDummy")
+     */
+    private $embeddableInfo;
+
     public function __construct()
     {
         $this->id = new DummyCarIdentifier();
