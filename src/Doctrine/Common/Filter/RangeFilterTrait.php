@@ -129,7 +129,7 @@ trait RangeFilterTrait
      */
     private function normalizeValue(string $value, string $operator)
     {
-        if (!is_numeric($value) && !UuidV6::isValid($value) && !\Symfony\Component\Uid\Uuid::isValid($value)) {
+        if (!is_numeric($value) && !UuidV6::isValid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
             ]);
