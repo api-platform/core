@@ -16,6 +16,8 @@ namespace ApiPlatform\Doctrine\Common\Filter;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Nonstandard\UuidV6;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Trait for filtering the collection by range.
@@ -124,11 +126,11 @@ trait RangeFilterTrait
     /**
      * Normalize the value.
      *
-     * @return int|float|null
+     * @return int|float|string | null
      */
     private function normalizeValue(string $value, string $operator)
     {
-        if (!is_numeric($value)) {
+        if (!is_numeric($value) && !UuidV6::isValid($value) && !\Symfony\Component\Uid\Uuid::isValid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
             ]);
@@ -136,6 +138,6 @@ trait RangeFilterTrait
             return null;
         }
 
-        return $value + 0; // coerce $value to the right type.
+        return $value;
     }
 }
