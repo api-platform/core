@@ -17,7 +17,6 @@ use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Nonstandard\UuidV6;
-use Ramsey\Uuid\Uuid;
 
 /**
  * Trait for filtering the collection by range.
