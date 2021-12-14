@@ -136,11 +136,15 @@ trait RangeFilterTrait
             return null;
         }
 
+        if (is_numeric($value)) {
+            return $value + 0; // coerce $value to the right type.
+        }
+
         return $value;
     }
 
     private function isValidUid($potentialUid): bool
     {
-        return is_string($potentialUid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $potentialUid);
+        return \is_string($potentialUid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $potentialUid);
     }
 }
