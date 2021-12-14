@@ -307,7 +307,7 @@ final class DoctrineContext implements Context
 
         for ($i = 1; $i <= $nb; ++$i) {
             $ids[] = UuidV6::uuid6()->toString();
-            $dummy = new SoManyUids($ids[$i -1] ?? null);
+            $dummy = new SoManyUids($ids[$i - 1] ?? null);
             $dummy->content = 'Many #'.$i;
 
             $this->manager->persist($dummy);

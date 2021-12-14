@@ -124,7 +124,7 @@ trait RangeFilterTrait
     /**
      * Normalize the value.
      *
-     * @return int|float|string | null
+     * @return int|float|string|null
      */
     private function normalizeValue(string $value, string $operator)
     {
