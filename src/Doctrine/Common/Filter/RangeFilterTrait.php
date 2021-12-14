@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\Common\Filter;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Nonstandard\UuidV6;
 
 /**
  * Trait for filtering the collection by range.
@@ -129,7 +128,7 @@ trait RangeFilterTrait
      */
     private function normalizeValue(string $value, string $operator)
     {
-        if (!is_numeric($value) && !UuidV6::isValid($value)) {
+        if (!is_numeric($value) && !$this->isValidUid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
             ]);
@@ -138,5 +137,10 @@ trait RangeFilterTrait
         }
 
         return $value;
+    }
+
+    private function isValidUid($potentialUid): bool
+    {
+        return is_string($potentialUid) && preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $potentialUid);
     }
 }
