@@ -130,7 +130,7 @@ trait RangeFilterTrait
     {
         if (!is_numeric($value) && !$this->isValidUid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number or uid', $operator)),
             ]);
 
             return null;
