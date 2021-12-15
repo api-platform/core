@@ -18,6 +18,7 @@ use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInte
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
@@ -63,7 +64,8 @@ final class CollectionProvider implements ProviderInterface
         try {
             $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
             $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName, true);
-            if (false === $operation->getElasticsearch() || (null !== ($uriVariables = $operation->getUriVariables()) && \count($uriVariables) > 1)) {
+            $parameters = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
+            if (false === $operation->getElasticsearch() || (null !== $parameters && \count($parameters) > 1)) {
                 return false;
             }
         } catch (OperationNotFoundException $e) {

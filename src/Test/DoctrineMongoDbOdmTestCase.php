@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use function sys_get_temp_dir;
 
 /**
@@ -42,7 +43,7 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), $paths));
         if (method_exists($config, 'setMetadataCache')) {
-            $config->setMetadataCache(new ArrayCache());
+            $config->setMetadataCache(new ArrayAdapter());
         } else {
             $config->setMetadataCacheImpl(new ArrayCache());
         }
