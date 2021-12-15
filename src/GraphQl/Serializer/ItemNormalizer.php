@@ -129,7 +129,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             $attribute = 'id';
         }
 
-        if ($value === '{}') {
+        if ('{}' === $value) {
             $value = [];
         }
 
