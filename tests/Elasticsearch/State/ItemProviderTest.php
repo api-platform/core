@@ -20,7 +20,6 @@ use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryI
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -69,25 +68,25 @@ final class ItemProviderTest extends TestCase
 
         $fooResourceMetadataCollection = new ResourceMetadataCollection(Foo::class);
         $fooResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_foo_get' => (new Operation())->withElasticsearch(true),
+            'api_foo_get' => (new Operation())->withElasticsearch(true)->withCollection(false),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn($fooResourceMetadataCollection);
 
         $dummyCarResourceMetadataCollection = new ResourceMetadataCollection(DummyCar::class);
         $dummyCarResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_car_get' => (new Operation())->withElasticsearch(false),
+            'api_dummy_car_get' => (new Operation())->withElasticsearch(false)->withCollection(false),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn($dummyCarResourceMetadataCollection);
 
         $dummyResourceMetadataCollection = new ResourceMetadataCollection(Dummy::class);
         $dummyResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_get' => (new Operation())->withElasticsearch(true),
+            'api_dummy_get' => (new Operation())->withElasticsearch(true)->withCollection(false),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyResourceMetadataCollection);
 
         $compositeRelationResourceMetadataCollection = new ResourceMetadataCollection(CompositeRelation::class);
         $compositeRelationResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_composite_relation_get' => (new Operation())->withElasticsearch(true)->withUriVariables(['id' => new Link(), 'slug' => new Link()]),
+            'api_composite_relation_get_collection' => (new Operation())->withElasticsearch(true)->withCollection(true),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn($compositeRelationResourceMetadataCollection);
 
@@ -101,7 +100,7 @@ final class ItemProviderTest extends TestCase
         self::assertTrue($provider->supports(Foo::class, [], 'api_foo_get'));
         self::assertFalse($provider->supports(DummyCar::class, [], 'api_dummy_car_get'));
         self::assertFalse($provider->supports(Dummy::class, [], 'api_dummy_get'));
-        self::assertFalse($provider->supports(CompositeRelation::class, [], 'api_composite_relation_get'));
+        self::assertFalse($provider->supports(CompositeRelation::class, [], 'api_composite_relation_get_collection'));
     }
 
     public function testGetItem()
