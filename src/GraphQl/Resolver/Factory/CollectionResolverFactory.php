@@ -74,7 +74,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
             $collection = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
-            if (!is_iterable($collection)) {
+            if (null !== $collection && !is_iterable($collection)) {
                 throw new \LogicException('Collection from read stage should be iterable.');
             }
 

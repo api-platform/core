@@ -17,7 +17,6 @@ use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
@@ -56,8 +55,7 @@ final class ItemProvider implements ProviderInterface
         try {
             $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
             $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
-            $parameters = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
-            if (false === $operation->getElasticsearch() || (null !== $parameters && \count($parameters) > 1)) {
+            if (false === $operation->getElasticsearch() || true === ($operation->isCollection() ?? false)) {
                 return false;
             }
         } catch (OperationNotFoundException $e) {
