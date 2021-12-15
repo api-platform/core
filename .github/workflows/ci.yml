@@ -142,11 +142,7 @@ jobs:
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
-        if: (!startsWith(matrix.php, '7.1'))
         run: composer update --no-interaction --no-progress --ansi
-      - name: Update project dependencies ignoring platform
-        if: (startsWith(matrix.php, '7.1'))
-        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
