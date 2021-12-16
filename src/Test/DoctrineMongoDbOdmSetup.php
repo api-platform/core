@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Test;
 
-use Doctrine\Common\Cache\ApcuCache as DoctrineApcuCache;
+use Doctrine\Common\Cache\ApcuCache;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
@@ -79,9 +79,6 @@ class DoctrineMongoDbOdmSetup
         return $config;
     }
 
-    /**
-     * @return DoctrineApcuCache|ArrayCache|Cache|ApcuAdapter|ArrayAdapter
-     */
     private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache)
     {
         $cache = self::createCacheInstance($isDevMode, $cache);
@@ -101,25 +98,20 @@ class DoctrineMongoDbOdmSetup
         return $cache;
     }
 
-    /**
-     * @return DoctrineApcuCache|ArrayCache|Cache|ApcuAdapter|ArrayAdapter
-     */
     private static function createCacheInstance(bool $isDevMode, ?Cache $cache)
     {
         if (null !== $cache) {
             return $cache;
         }
 
-        $adapter = method_exists(Configuration::class, 'setMetadataCache');
-
         if (true === $isDevMode) {
-            return $adapter ? new ArrayAdapter() : new ArrayCache();
+            return class_exists(ArrayCache::class) ? new ArrayCache() : new ArrayAdapter();
         }
 
         if (\extension_loaded('apcu')) {
-            return $adapter ? new ApcuAdapter() : new DoctrineApcuCache();
+            return class_exists(ApcuCache::class) ? new ApcuCache() : new ApcuAdapter();
         }
 
-        return $adapter ? new ApcuAdapter() : new ArrayCache();
+        return class_exists(ArrayCache::class) ? new ArrayCache() : new ArrayAdapter();
     }
 }

@@ -25,6 +25,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services->set(RemoveAnnotationRector::class)
         ->call('configure', [[
-            RemoveAnnotationRector::ANNOTATIONS_TO_REMOVE => ['ApiSubresource'],
+            RemoveAnnotationRector::ANNOTATIONS_TO_REMOVE => ['ApiPlatform\Core\Annotation\ApiSubresource'],
         ]]);
 };

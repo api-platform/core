@@ -20,6 +20,7 @@ class Mutation extends Operation
      * {@inheritdoc}
      */
     public function __construct(
+        bool $delete = false,
         ?string $resolver = null,
         bool $collection = false,
         ?array $args = null,
@@ -59,7 +60,6 @@ class Mutation extends Operation
         bool $validate = true,
         bool $write = true,
         bool $serialize = true,
-        bool $delete = false,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
         int $priority = 0,
