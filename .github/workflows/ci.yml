@@ -68,7 +68,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
@@ -142,7 +142,7 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -238,7 +238,7 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -358,7 +358,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi --prefer-lowest
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Install PHPUnit
@@ -398,7 +398,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi --prefer-lowest
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -449,7 +449,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -501,7 +501,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -550,7 +550,7 @@ jobs:
         run: |
           composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -640,7 +640,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install Elasticsearch-php # there is a version matrix for this package: https://packagist.org/packages/elasticsearch/elasticsearch
         run: composer require "elasticsearch/elasticsearch:v7.14.0" --no-interaction --no-progress --ansi
       - name: Install PHPUnit
@@ -684,7 +684,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -734,7 +734,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -796,7 +796,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Flag held back Symfony packages
         env:
           symfony_version: ${{ matrix.symfony }}
@@ -846,10 +846,10 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components and Rector dependencies
-        run: |
-          git apply rector.patch
-          composer require symfony/intl symfony/uid rector/rector --dev --no-interaction --no-progress --ansi --ignore-platform-reqs
+        run: composer require symfony/uid rector/rector --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -938,7 +938,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -986,7 +986,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1033,7 +1033,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1077,7 +1077,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
