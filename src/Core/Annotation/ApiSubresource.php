@@ -37,10 +37,12 @@ final class ApiSubresource
      */
     public function __construct($maxDepth = null)
     {
-        if (!\is_array($maxDepth)) { // @phpstan-ignore-line
-            $this->maxDepth = $maxDepth;
-        } else {
-            $this->maxDepth = $maxDepth['maxDepth'] ?? null;
+        if (\is_array($maxDepth)) { // @phpstan-ignore-line
+            $this->maxDepth = $maxDepth['maxDepth'] ?? null; // @phpstan-ignore-line
+
+            return;
         }
+
+        $this->maxDepth = $maxDepth;
     }
 }

@@ -30,7 +30,7 @@ class Field implements \JsonSerializable
     private $id;
 
     /**
-     * @var Content|null
+     * @var Content
      *
      * @ORM\ManyToOne(targetEntity=Content::class, inversedBy="fields")
      * @ORM\JoinColumn(nullable=false)
@@ -38,14 +38,14 @@ class Field implements \JsonSerializable
     private $content;
 
     /**
-     * @var string|null
+     * @var string
      *
      * @ORM\Column(type="string")
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var string
      *
      * @ORM\Column(type="text")
      */

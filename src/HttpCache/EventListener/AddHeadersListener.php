@@ -50,7 +50,12 @@ final class AddHeadersListener
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request->isMethodCacheable() || !RequestAttributesExtractor::extractAttributes($request)) {
+        if (!$request->isMethodCacheable()) {
+            return;
+        }
+
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
+        if (\count($attributes) < 1) {
             return;
         }
 
@@ -61,13 +66,12 @@ final class AddHeadersListener
         }
 
         $resourceCacheHeaders = [];
-        if ($attributes = RequestAttributesExtractor::extractAttributes($request)) {
-            if ($this->resourceMetadataFactory) {
-                $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-                $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
-            } else {
-                $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
-            }
+
+        if ($this->resourceMetadataFactory) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
+        } else {
+            $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
         }
 
         if ($this->etag && !$response->getEtag()) {

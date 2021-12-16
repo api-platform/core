@@ -189,7 +189,7 @@ class RequestDataCollectorTest extends TestCase
         }
         $context = $dataProvider['context'];
         $this->assertInstanceOf(Data::class, $context);
-        $this->assertSame(['collection_context'], $context->getValue(true));
+        $this->assertSame(['collection_context'], $context->getValue(true)); // @phpstan-ignore-line
 
         $dataProvider = $dataCollector->getItemDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
@@ -198,7 +198,7 @@ class RequestDataCollectorTest extends TestCase
         }
         $context = $dataProvider['context'];
         $this->assertInstanceOf(Data::class, $context);
-        $this->assertSame(['item_context'], $context->getValue(true));
+        $this->assertSame(['item_context'], $context->getValue(true)); // @phpstan-ignore-line
 
         $dataProvider = $dataCollector->getSubresourceDataProviders();
         foreach ($dataProvider['responses'] as $class => $response) {
@@ -207,7 +207,7 @@ class RequestDataCollectorTest extends TestCase
         }
         $context = $dataProvider['context'];
         $this->assertInstanceOf(Data::class, $context);
-        $this->assertSame(['subresource_context'], $context->getValue(true));
+        $this->assertSame(['subresource_context'], $context->getValue(true)); // @phpstan-ignore-line
 
         $dataPersister = $dataCollector->getDataPersisters();
         foreach ($dataPersister['responses'] as $class => $response) {

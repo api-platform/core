@@ -42,7 +42,7 @@ class RelatedOwnedDummy
     public $name;
 
     /**
-     * @var Dummy|null
+     * @var Dummy
      *
      * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, inversedBy="relatedOwnedDummy")
      * @ORM\JoinColumn(nullable=false)

@@ -20,6 +20,7 @@ use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
@@ -38,6 +39,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
     use SearchFilterTestTrait;
 
     protected $filterClass = SearchFilter::class;
+    protected $resourceClass = Dummy::class;
 
     public function testGetDescriptionDefaultFields()
     {

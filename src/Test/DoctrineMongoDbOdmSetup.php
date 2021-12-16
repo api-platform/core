@@ -120,6 +120,6 @@ class DoctrineMongoDbOdmSetup
             return $adapter ? new ApcuAdapter() : new DoctrineApcuCache();
         }
 
-        return new ArrayCache();
+        return $adapter ? new ApcuAdapter() : new ArrayCache();
     }
 }

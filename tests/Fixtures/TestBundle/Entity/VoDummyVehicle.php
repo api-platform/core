@@ -34,7 +34,7 @@ abstract class VoDummyVehicle
     private $make;
 
     /**
-     * @var VoDummyInsuranceCompany
+     * @var VoDummyInsuranceCompany|null
      *
      * @ORM\ManyToOne(targetEntity="VoDummyInsuranceCompany", cascade={"persist"})
      * @Groups({"car_read", "car_write"})
