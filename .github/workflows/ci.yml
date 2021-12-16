@@ -849,17 +849,17 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components and Rector dependencies
-        run: composer require symfony/uid rector/rector --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid rector/rector:0.12.5 --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Convert annotations to attributes
         run: |
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --transform-apisubresource -s
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --annotation-to-api-resource -s
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --transform-apisubresource -s 
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --annotation-to-api-resource -s
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --transform-apisubresource -s -n
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --annotation-to-api-resource -s -n
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --transform-apisubresource -s  -n
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --annotation-to-api-resource -s -n
       - name: Clear test app cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests

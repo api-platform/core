@@ -82,7 +82,7 @@ final class RectorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!file_exists('vendor/bin/rector')) {
-            $output->write('Rector is not installed. Please execute composer require --dev rector/rector');
+            $output->write('Rector is not installed. Please execute composer require --dev rector/rector:0.12.5');
 
             return Command::FAILURE;
         }
