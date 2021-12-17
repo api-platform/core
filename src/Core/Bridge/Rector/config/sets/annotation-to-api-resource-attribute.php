@@ -15,6 +15,7 @@ use ApiPlatform\Core\Bridge\Rector\Rules\ApiPropertyAnnotationToApiPropertyAttri
 use ApiPlatform\Core\Bridge\Rector\Rules\ApiResourceAnnotationToApiResourceAttributeRector;
 use Rector\Core\Configuration\Option;
 use Rector\Core\ValueObject\PhpVersion;
+use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
 use Rector\Php80\ValueObject\AnnotationToAttribute;
 use Rector\Renaming\Rector\Namespace_\RenameNamespaceRector;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -31,6 +32,8 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->call('configure', [[
             RenameNamespaceRector::OLD_TO_NEW_NAMESPACES => [
                 'ApiPlatform\Core\Annotation\ApiResource' => 'ApiPlatform\Metadata\ApiResource',
+                'ApiPlatform\Core\Annotation\ApiProperty' => 'ApiPlatform\Metadata\ApiProperty',
+                'ApiPlatform\Core\Annotation\ApiFilter' => 'ApiPlatform\Metadata\ApiFilter',
                 'ApiPlatform\Core\Api\UrlGeneratorInterface' => 'ApiPlatform\Api\UrlGeneratorInterface',
             ],
         ]]);
@@ -53,6 +56,17 @@ return static function (ContainerConfigurator $containerConfigurator): void {
                 new AnnotationToAttribute(
                     \ApiPlatform\Core\Annotation\ApiProperty::class,
                     \ApiPlatform\Metadata\ApiProperty::class
+                ),
+            ]),
+        ]]);
+
+    // ApiFilter annotation to ApiFilter attribute
+    $services->set(AnnotationToAttributeRector::class)
+        ->call('configure', [[
+            AnnotationToAttributeRector::ANNOTATION_TO_ATTRIBUTE => ValueObjectInliner::inline([
+                new AnnotationToAttribute(
+                    \ApiPlatform\Core\Annotation\ApiFilter::class,
+                    \ApiPlatform\Metadata\ApiFilter::class
                 ),
             ]),
         ]]);
