@@ -27,7 +27,7 @@ use Symfony\Component\String\UnicodeString;
 /**
  * @experimental
  */
-abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractRector
+abstract class AbstractAnnotationToAttributeRector extends AbstractRector
 {
     use DeprecationMetadataTrait;
 
@@ -154,6 +154,16 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
                 }
             }
         }
+
+        return $this->resolveAttributes($values);
+    }
+
+    /**
+     * @param mixed $items
+     */
+    protected function resolveAttributes($items): array
+    {
+        $values = $items instanceof DoctrineAnnotationTagValueNode ? $items->getValues() : $items;
 
         $camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
 

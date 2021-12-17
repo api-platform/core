@@ -1082,6 +1082,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.write',
             'api_platform.metadata.extractor.xml',
+            'api_platform.metadata.property.identifier_metadata_factory.attribute',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.metadata.property.identifier_metadata_factory.property_info',
             'api_platform.metadata.property.identifier_metadata_factory.xml',

@@ -28,6 +28,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->call('configure', [[
             RenameNamespaceRector::OLD_TO_NEW_NAMESPACES => [
                 'ApiPlatform\Core\Annotation\ApiResource' => 'ApiPlatform\Metadata\ApiResource',
+                'ApiPlatform\Core\Annotation\ApiProperty' => 'ApiPlatform\Metadata\ApiProperty',
                 'ApiPlatform\Core\Api\UrlGeneratorInterface' => 'ApiPlatform\Api\UrlGeneratorInterface',
             ],
         ]]);

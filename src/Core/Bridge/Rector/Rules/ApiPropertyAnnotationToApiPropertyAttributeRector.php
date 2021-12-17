@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Bridge\Rector\Rules;
 
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\Property;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
 use Rector\BetterPhpDocParser\PhpDoc\DoctrineAnnotationTagValueNode;
@@ -32,14 +32,14 @@ use Webmozart\Assert\Assert;
 /**
  * @experimental
  */
-final class ApiResourceAnnotationToApiResourceAttributeRector extends AbstractAnnotationToAttributeRector implements ConfigurableRectorInterface
+final class ApiPropertyAnnotationToApiPropertyAttributeRector extends AbstractAnnotationToAttributeRector implements ConfigurableRectorInterface
 {
     use DeprecationMetadataTrait;
 
     /**
      * @var string
      */
-    public const ANNOTATION_TO_ATTRIBUTE = 'api_resource_annotation_to_api_resource_attribute';
+    public const ANNOTATION_TO_ATTRIBUTE = 'api_property_annotation_to_api_property_attribute';
     /**
      * @var string
      */
@@ -66,27 +66,21 @@ final class ApiResourceAnnotationToApiResourceAttributeRector extends AbstractAn
     public function getRuleDefinition(): RuleDefinition
     {
         return new RuleDefinition('Change annotation to attribute', [new ConfiguredCodeSample(<<<'CODE_SAMPLE'
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiProperty;
 
 /**
- * @ApiResource(collectionOperations={}, itemOperations={
- *     "get",
- *     "get_by_isbn"={"method"="GET", "path"="/books/by_isbn/{isbn}.{_format}", "requirements"={"isbn"=".+"}, "identifiers"="isbn"}
- * })
+ * @ApiProperty(iri="https://schema.org/alternateName")
  */
-class Book
+private $alias;
 CODE_SAMPLE
             , <<<'CODE_SAMPLE'
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\ApiProperty;
 
-#[ApiResource]
-#[Get]
-#[Get(name: 'get_by_isbn', uriTemplate: '/books/by_isbn/{isbn}.{_format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')]
-class Book
+#[ApiProperty(types: ['https://schema.org/alternateName'])]
+private $alias;
 CODE_SAMPLE
             , [
-                self::ANNOTATION_TO_ATTRIBUTE => [new AnnotationToAttribute(\ApiPlatform\Core\Annotation\ApiResource::class, \ApiPlatform\Metadata\ApiResource::class)],
+                self::ANNOTATION_TO_ATTRIBUTE => [new AnnotationToAttribute(\ApiPlatform\Core\Annotation\ApiProperty::class, \ApiPlatform\Metadata\ApiProperty::class)],
                 self::REMOVE_TAG => true,
             ]),
         ]);
@@ -97,11 +91,11 @@ CODE_SAMPLE
      */
     public function getNodeTypes(): array
     {
-        return [Class_::class];
+        return [Property::class];
     }
 
     /**
-     * @param Class_ $node
+     * @param Property $node
      */
     public function refactor(Node $node): ?Node
     {
@@ -134,7 +128,7 @@ CODE_SAMPLE
 
     /**
      * @param array<PhpDocTagNode> $tags
-     * @param Class_               $node
+     * @param Property             $node
      */
     private function processApplyAttrGroups(array $tags, PhpDocInfo $phpDocInfo, Node $node): bool
     {
@@ -164,7 +158,7 @@ CODE_SAMPLE
                 // 2. add attributes
                 /** @var DoctrineAnnotationTagValueNode $tagValue */
                 $tagValue = clone $tag->value;
-                $tagValue->values = $this->resolveOperations($tagValue, $node);
+                $tagValue->values = $this->resolveAttributes($tagValue);
 
                 $resourceAttributeGroup = $this->phpAttributeGroupFactory->create($tagValue, $annotationToAttribute);
                 array_unshift($node->attrGroups, $resourceAttributeGroup);

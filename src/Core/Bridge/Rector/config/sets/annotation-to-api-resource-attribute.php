@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Core\Bridge\Rector\Rules\ApiPropertyAnnotationToApiPropertyAttributeRector;
 use ApiPlatform\Core\Bridge\Rector\Rules\ApiResourceAnnotationToApiResourceAttributeRector;
 use Rector\Core\Configuration\Option;
 use Rector\Core\ValueObject\PhpVersion;
@@ -41,6 +42,17 @@ return static function (ContainerConfigurator $containerConfigurator): void {
                 new AnnotationToAttribute(
                     \ApiPlatform\Core\Annotation\ApiResource::class,
                     \ApiPlatform\Metadata\ApiResource::class
+                ),
+            ]),
+        ]]);
+
+    // ApiProperty annotation to ApiProperty attribute
+    $services->set(ApiPropertyAnnotationToApiPropertyAttributeRector::class)
+        ->call('configure', [[
+            ApiPropertyAnnotationToApiPropertyAttributeRector::ANNOTATION_TO_ATTRIBUTE => ValueObjectInliner::inline([
+                new AnnotationToAttribute(
+                    \ApiPlatform\Core\Annotation\ApiProperty::class,
+                    \ApiPlatform\Metadata\ApiProperty::class
                 ),
             ]),
         ]]);
