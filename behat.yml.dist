@@ -84,7 +84,6 @@ elasticsearch:
       contexts:
         - 'ApiPlatform\Core\Tests\Behat\CommandContext'
         - 'ApiPlatform\Core\Tests\Behat\ElasticsearchContext'
-        - 'ApiPlatform\Core\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Core\Tests\Behat\JsonContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'

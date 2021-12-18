@@ -19,7 +19,6 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
@@ -80,9 +79,6 @@ class DoctrineMongoDbOdmSetup
         return $config;
     }
 
-    /**
-     * @return Cache|CacheItemPoolInterface
-     */
     private static function createCacheConfiguration(bool $isDevMode, string $proxyDir, string $hydratorDir, ?Cache $cache)
     {
         $cache = self::createCacheInstance($isDevMode, $cache);

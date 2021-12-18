@@ -396,6 +396,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 // Avoid duplicates parameters when there is a filter on a subresource identifier
                 $parametersMemory = [];
                 $pathOperation['parameters'] = [];
+
                 foreach ($resourceMetadata->getAttributes()['identifiers'] as $parameterName => [$class, $identifier]) {
                     $parameter = ['name' => $parameterName, 'in' => 'path', 'required' => true];
                     $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
@@ -575,7 +576,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
 
+        $identifiers = (array) $resourceMetadata
+                ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
+
+        $operationType = $identifiers ? $operationType : OperationType::COLLECTION;
         $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
+
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
         [$successResponse, $defined] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
 

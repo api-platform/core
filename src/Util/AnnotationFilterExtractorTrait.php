@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Util;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Metadata\ApiFilter as ApiFilterMetadata;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -34,7 +35,9 @@ trait AnnotationFilterExtractorTrait
      */
     private function getFilterAnnotations(\Reflector $reflector, ?Reader $reader = null): \Iterator
     {
-        if (\PHP_VERSION_ID >= 80000 && $attributes = $reflector->getAttributes(ApiFilter::class)) {
+        if (\PHP_VERSION_ID >= 80000) {
+            $attributes = $reflector->getAttributes(ApiFilter::class) ?: $reflector->getAttributes(ApiFilterMetadata::class);
+
             foreach ($attributes as $attribute) {
                 yield $attribute->newInstance();
             }
@@ -54,8 +57,10 @@ trait AnnotationFilterExtractorTrait
 
     /**
      * Given a filter annotation and reflection elements, find out the properties where the filter is applied.
+     *
+     * @param ApiFilter|ApiFilterMetadata $filterAnnotation
      */
-    private function getFilterProperties(ApiFilter $filterAnnotation, \ReflectionClass $reflectionClass, \ReflectionProperty $reflectionProperty = null): array
+    private function getFilterProperties($filterAnnotation, \ReflectionClass $reflectionClass, \ReflectionProperty $reflectionProperty = null): array
     {
         $properties = [];
 

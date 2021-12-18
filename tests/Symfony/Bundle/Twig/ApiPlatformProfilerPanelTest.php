@@ -228,7 +228,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('_api_/processor_entities.{_format}_post_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('_api_/processor_entities.{_format}_post', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
         $tabContent = $crawler->filter('.data-provider-tab-content');

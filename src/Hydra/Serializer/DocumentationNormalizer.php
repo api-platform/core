@@ -29,6 +29,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\PropertyInfo\Type;
@@ -342,7 +343,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperations = [];
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if (($operation->isCollection() ?? false) !== $collection) {
+                    if (($operation instanceof Post || ($operation->isCollection() ?? false)) !== $collection) {
                         continue;
                     }
 

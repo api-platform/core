@@ -121,6 +121,35 @@ Feature: Uri Variables
         "hydra:totalItems": 2
     }
     """
+    When I send the following GraphQL request:
+    """
+    {
+      companies {
+        edges {
+          node {
+            name
+            employees {
+              edges {
+                node {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.companies.edges[0].node.name" should be equal to "Foo Company 1"
+    And the JSON node "data.companies.edges[0].node.employees.edges" should have 1 element
+    And the JSON node "data.companies.edges[0].node.employees.edges[0].node.name" should be equal to "foo"
+    And the JSON node "data.companies.edges[1].node.name" should be equal to "Foo Company 2"
+    And the JSON node "data.companies.edges[1].node.employees.edges" should have 2 elements
+    And the JSON node "data.companies.edges[1].node.employees.edges[0].node.name" should be equal to "foo2"
+    And the JSON node "data.companies.edges[1].node.employees.edges[1].node.name" should be equal to "foo3"
 
   @php8
   Scenario: Retrieve the company of an employee

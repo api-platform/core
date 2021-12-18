@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\State;
 
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -70,7 +69,7 @@ final class Processor implements ProcessorInterface
 
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
-        if (\array_key_exists('operation', $context) && Operation::METHOD_DELETE === ($context['operation']->getMethod() ?? null)) {
+        if (\array_key_exists('operation', $context) && $context['operation']->isDelete()) {
             return $this->remove($data);
         }
 

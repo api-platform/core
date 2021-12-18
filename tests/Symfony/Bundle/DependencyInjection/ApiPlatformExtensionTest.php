@@ -339,12 +339,14 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_mutation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item_subscription', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.factory.item', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.read.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.read', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security_post_denormalize', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.security_post_validation', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.serialize', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.deserialize', Argument::type(Definition::class))->shouldNotBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.write.legacy', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.write', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.stage.validate', Argument::type(Definition::class))->shouldNotBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.graphql.resolver.resource_field', Argument::type(Definition::class))->shouldNotBeCalled();
@@ -738,11 +740,12 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.sort_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.request_body_search_extension.sort', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.state.item_provider', Argument::type(Definition::class))->shouldBeCalled();
+        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.state.collection_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.search_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.term_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.order_filter', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.match_filter', Argument::type(Definition::class))->shouldBeCalled();
-        $containerBuilderProphecy->setDefinition('api_platform.elasticsearch.subresource_data_provider', Argument::type(Definition::class))->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.elasticsearch.metadata.document.metadata_factory', 'api_platform.elasticsearch.metadata.document.metadata_factory.configured')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(DocumentMetadataFactoryInterface::class, 'api_platform.elasticsearch.metadata.document.metadata_factory')->shouldBeCalled();
         $containerBuilderProphecy->setAlias(IdentifierExtractorInterface::class, 'api_platform.elasticsearch.identifier_extractor')->shouldBeCalled();
@@ -1079,6 +1082,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.write',
             'api_platform.metadata.extractor.xml',
+            'api_platform.metadata.property.identifier_metadata_factory.attribute',
             'api_platform.metadata.property.identifier_metadata_factory.annotation',
             'api_platform.metadata.property.identifier_metadata_factory.property_info',
             'api_platform.metadata.property.identifier_metadata_factory.xml',
@@ -1103,6 +1107,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.operation_name',
             'api_platform.metadata.resource.metadata_collection_factory.php_doc',
             'api_platform.metadata.resource.metadata_collection_factory.uri_template',
+            'api_platform.metadata.resource.metadata_collection_factory.link',
+            'api_platform.metadata.resource.link_factory',
             'api_platform.metadata.resource.metadata_factory.cached',
             'api_platform.metadata.resource.metadata_factory.formats',
             'api_platform.metadata.resource.metadata_factory.input_output',
@@ -1447,12 +1453,14 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.resolver.factory.collection',
             'api_platform.graphql.resolver.factory.item_mutation',
             'api_platform.graphql.resolver.factory.item_subscription',
+            'api_platform.graphql.resolver.stage.read.legacy',
             'api_platform.graphql.resolver.stage.read',
             'api_platform.graphql.resolver.stage.security',
             'api_platform.graphql.resolver.stage.security_post_denormalize',
             'api_platform.graphql.resolver.stage.security_post_validation',
             'api_platform.graphql.resolver.stage.serialize',
             'api_platform.graphql.resolver.stage.deserialize',
+            'api_platform.graphql.resolver.stage.write.legacy',
             'api_platform.graphql.resolver.stage.write',
             'api_platform.graphql.resolver.stage.validate',
             'api_platform.graphql.resolver.resource_field',
@@ -1530,6 +1538,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.normalizer.constraint_violation_list',
             'api_platform.problem.normalizer.error',
             'api_platform.rector.command',
+            'api_platform.rector.subresource_transformer',
             'api_platform.swagger.action.ui',
             'api_platform.swagger.listener.ui',
             'api_platform.validator',

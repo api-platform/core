@@ -42,11 +42,10 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
         $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), $paths));
-        $cache = class_exists(ArrayCache::class) ? new ArrayCache() : new ArrayAdapter();
         if (method_exists($config, 'setMetadataCache')) {
-            $config->setMetadataCache($cache);
+            $config->setMetadataCache(new ArrayAdapter());
         } else {
-            $config->setMetadataCacheImpl($cache); // @phpstan-ignore-line
+            $config->setMetadataCacheImpl(new ArrayCache()); // @phpstan-ignore-line
         }
 
         return DocumentManager::create(null, $config);

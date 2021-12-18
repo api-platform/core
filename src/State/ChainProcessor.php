@@ -65,6 +65,6 @@ final class ChainProcessor implements ProcessorInterface
             }
         }
 
-        return false;
+        return null;
     }
 }

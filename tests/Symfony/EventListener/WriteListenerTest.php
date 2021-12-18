@@ -19,13 +19,13 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Symfony\EventListener\WriteListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
@@ -141,7 +141,7 @@ class WriteListenerTest extends TestCase
 
         $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => (new UriVariable())->withTargetClass(OperationResource::class)->withIdentifiers(['identifier'])]),
+            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])]),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
@@ -315,7 +315,7 @@ class WriteListenerTest extends TestCase
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => (new UriVariable())->withTargetClass(OperationResource::class)->withIdentifiers(['identifier'])]),
+            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])]),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);

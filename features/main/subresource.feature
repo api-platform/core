@@ -223,7 +223,9 @@ Feature: Subresource support
     }
     """
 
+  @createSchema
   Scenario: Get the subresource relation item
+    Given there is a dummy object with a fourth level relation
     When I send a "GET" request to "/dummies/1/related_dummies/2"
     Then the response status code should be 200
     And the response should be in JSON
@@ -299,6 +301,7 @@ Feature: Subresource support
     }
     """
 
+  @createSchema
   Scenario: Get offers subresource from aggregate offers subresource
     Given I have a product with offers
     When I send a "GET" request to "/dummy_products/2/offers/1/offers"

@@ -139,7 +139,7 @@ class SecuredDummy
     protected $relatedSecuredDummy;
 
     /**
-     * Collection of dummies that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
      * @var Collection<RelatedSecuredDummy> Several dummies
      *
@@ -148,7 +148,7 @@ class SecuredDummy
     public $publicRelatedSecuredDummies;
 
     /**
-     * A dummy that anyone can access. There is no @ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
      * @var RelatedSecuredDummy
      *

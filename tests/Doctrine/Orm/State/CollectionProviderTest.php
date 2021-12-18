@@ -30,6 +30,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -52,6 +53,7 @@ class CollectionProviderTest extends TestCase
         $queryProphecy->getResult()->willReturn([])->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn(['alias']);
         $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
         $queryBuilder = $queryBuilderProphecy->reveal();
 
@@ -59,6 +61,7 @@ class CollectionProviderTest extends TestCase
         $repositoryProphecy->createQueryBuilder('o')->willReturn($queryBuilder)->shouldBeCalled();
 
         $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy->getClassMetadata(OperationResource::class)->willReturn(new ClassMetadata(OperationResource::class));
         $managerProphecy->getRepository(OperationResource::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
@@ -81,12 +84,14 @@ class CollectionProviderTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getRootAliases()->willReturn(['alias']);
         $queryBuilder = $queryBuilderProphecy->reveal();
 
         $repositoryProphecy = $this->prophesize(EntityRepository::class);
         $repositoryProphecy->createQueryBuilder('o')->willReturn($queryBuilder)->shouldBeCalled();
 
         $managerProphecy = $this->prophesize(ObjectManager::class);
+        $managerProphecy->getClassMetadata(OperationResource::class)->willReturn(new ClassMetadata(OperationResource::class));
         $managerProphecy->getRepository(OperationResource::class)->willReturn($repositoryProphecy->reveal())->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
