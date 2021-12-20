@@ -88,9 +88,7 @@ jobs:
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.5'
-        run: |
-            ./vendor/bin/phpstan --version
-            ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
+        run: ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})

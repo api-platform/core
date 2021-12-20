@@ -77,7 +77,7 @@ abstract class ApiTestCase extends KernelTestCase
     {
         $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
 
-        if (!method_exists(static::class, 'getContainer') && null === static::$container) { // @phpstan-ignore-line
+        if (!isset(static::$container) && !method_exists(static::class, 'getContainer')) {
             throw new \RuntimeException(sprintf('The container is not available. You must call "bootKernel()" or "createClient()" before calling "%s".', __METHOD__));
         }
 
