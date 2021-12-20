@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\State;
 
+use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
-use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
 trait LinksHandlerTrait
 {
+    use CommonLinksHandlerTrait;
+
     private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGenerator $queryNameGenerator, array $context, string $resourceClass, ?string $operationName = null): void
     {
         if (!$identifiers) {
@@ -32,30 +33,7 @@ trait LinksHandlerTrait
         $alias = $queryBuilder->getRootAliases()[0];
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-        $links = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
-
-        if ($linkClass = $context['linkClass'] ?? false) {
-            $newLinks = [];
-
-            foreach ($links ?? [] as $link) {
-                if ($linkClass === $link->getFromClass()) {
-                    $newLinks[] = $link;
-                }
-            }
-
-            $operation = $this->resourceMetadataCollectionFactory->create($linkClass)->getOperation($operationName);
-            foreach ($operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables() as $link) {
-                if ($resourceClass === $link->getToClass()) {
-                    $newLinks[] = $link;
-                }
-            }
-
-            if (!$newLinks) {
-                throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
-            }
-
-            $links = $newLinks;
-        }
+        $links = $this->getLinks($resourceClass, $operation, $context);
 
         if (!$links) {
             return;
@@ -63,11 +41,10 @@ trait LinksHandlerTrait
 
         $previousAlias = $alias;
         $previousJoinProperties = $doctrineClassMetadata->getIdentifierFieldNames();
-        $previousIdentifiers = $previousJoinProperties;
         $expressions = [];
         $identifiers = array_reverse($identifiers);
 
-        foreach (array_reverse($links) as $parameterName => $link) {
+        foreach (array_reverse($links) as $link) {
             if ($link->getExpandedValue() || !$link->getFromClass()) {
                 continue;
             }
@@ -86,7 +63,6 @@ trait LinksHandlerTrait
                 }
 
                 $previousAlias = $currentAlias;
-                $previousIdentifiers = $identifierProperties;
                 $previousJoinProperties = $doctrineClassMetadata->getIdentifierFieldNames();
                 continue;
             }
@@ -134,7 +110,6 @@ trait LinksHandlerTrait
                 }
 
                 $previousAlias = $joinAlias;
-                $previousIdentifiers = $identifierProperties;
                 $previousJoinProperties = $joinProperties;
                 continue;
             }
@@ -149,7 +124,6 @@ trait LinksHandlerTrait
             }
 
             $previousAlias = $joinAlias;
-            $previousIdentifiers = $identifierProperties;
             $previousJoinProperties = $joinProperties;
         }
 
@@ -169,17 +143,5 @@ trait LinksHandlerTrait
 
             $queryBuilder->andWhere($clause.str_repeat(')', $i));
         }
-    }
-
-    private function getIdentifierValue(array &$identifiers, string $name = null)
-    {
-        if (isset($identifiers[$name])) {
-            $value = $identifiers[$name];
-            unset($identifiers[$name]);
-
-            return $value;
-        }
-
-        return array_shift($identifiers);
     }
 }

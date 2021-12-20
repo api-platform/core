@@ -181,7 +181,11 @@ abstract class AbstractAnnotationToAttributeRector extends AbstractRector
         foreach ($values as $attribute => $value) {
             [$updatedAttribute, $updatedValue] = $this->getKeyValue(str_replace('"', '', $camelCaseToSnakeCaseNameConverter->normalize($attribute)), $value);
             if ($attribute !== $updatedAttribute) {
-                $values[$updatedAttribute] = $updatedValue;
+                if (\array_key_exists($updatedAttribute, $values) && \is_array($values[$updatedAttribute])) {
+                    $values[$updatedAttribute] = array_merge($values[$updatedAttribute], $updatedValue);
+                } else {
+                    $values[$updatedAttribute] = $updatedValue;
+                }
                 unset($values[$attribute]);
             }
         }

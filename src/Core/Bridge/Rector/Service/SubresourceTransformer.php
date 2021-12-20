@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Rector\Service;
 
 use ApiPlatform\Util\Inflector;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as ODMClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver as ODMAnnotationDriver;
 use Doctrine\ODM\MongoDB\Mapping\MappingException as ODMMappingException;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -43,7 +44,7 @@ final class SubresourceTransformer
         foreach (array_reverse($subresourceMetadata['identifiers']) as $identifier => $identifiedBy) {
             [$fromClass, $fromIdentifier, $fromPathVariable] = $identifiedBy;
             $fromClassMetadata = $this->getDoctrineMetadata($fromClass);
-            $fromClassMetadataAssociationMappings = $fromClassMetadata->getAssociationMappings();
+            $fromClassMetadataAssociationMappings = $fromClassMetadata->associationMappings;
 
             $uriVariables[$identifier] = [
                 'from_class' => $fromClass,
@@ -62,7 +63,8 @@ final class SubresourceTransformer
             $toClass = $fromClass;
 
             if (isset($fromProperty, $fromClassMetadataAssociationMappings[$fromProperty])) {
-                if ($fromClassMetadataAssociationMappings[$fromProperty]['type'] & ClassMetadataInfo::TO_MANY && isset($fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'])) {
+                $type = $fromClassMetadataAssociationMappings[$fromProperty]['type'];
+                if (((class_exists(ODMClassMetadata::class) && ODMClassMetadata::MANY === $type) || (\is_int($type) && $type & ClassMetadataInfo::TO_MANY)) && isset($fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'])) {
                     $uriVariables[$identifier]['to_property'] = $fromClassMetadataAssociationMappings[$fromProperty]['mappedBy'];
                     $fromProperty = $identifier;
                     continue;
@@ -75,8 +77,26 @@ final class SubresourceTransformer
         return array_reverse($uriVariables);
     }
 
-    private function getDoctrineMetadata(string $class): ClassMetadata
+    /**
+     * @return ODMClassMetadata|ClassMetadata
+     */
+    private function getDoctrineMetadata(string $class)
     {
+        if ($this->odmMetadataFactory && class_exists(ODMClassMetadata::class)) {
+            $isDocument = true;
+            $metadata = new ODMClassMetadata($class);
+
+            try {
+                $this->odmMetadataFactory->loadMetadataForClass($class, $metadata);
+            } catch (ODMMappingException $e) {
+                $isDocument = false;
+            }
+
+            if ($isDocument) {
+                return $metadata;
+            }
+        }
+
         $metadata = new ClassMetadata($class);
         $metadata->initializeReflection(new RuntimeReflectionService());
 
@@ -85,13 +105,6 @@ final class SubresourceTransformer
                 $this->ormMetadataFactory->loadMetadataForClass($class, $metadata);
             }
         } catch (MappingException $e) {
-        }
-
-        try {
-            if ($this->odmMetadataFactory) {
-                $this->odmMetadataFactory->loadMetadataForClass($class, $metadata);
-            }
-        } catch (ODMMappingException $e) {
         }
 
         return $metadata;

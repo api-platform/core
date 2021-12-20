@@ -32,6 +32,8 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class ItemProvider implements ProviderInterface
 {
+    use LinksHandlerTrait;
+
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
     private $itemExtensions;
@@ -53,7 +55,7 @@ final class ItemProvider implements ProviderInterface
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData) {
-            return $manager->getReference($resourceClass, $identifiers);
+            return $manager->getReference($resourceClass, reset($identifiers));
         }
 
         /** @var ObjectRepository $repository */
@@ -64,9 +66,7 @@ final class ItemProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        foreach ($identifiers as $propertyName => $value) {
-            $aggregationBuilder->match()->field($propertyName)->equals($value);
-        }
+        $this->handleLinks($aggregationBuilder, $identifiers, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);

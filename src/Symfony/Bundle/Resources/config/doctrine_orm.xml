@@ -15,7 +15,7 @@
             <tag name="api_platform.data_persister" priority="-1000" />
         </service>
 
-        <service id="api_platform.doctrine.orm.state.processor" class="ApiPlatform\Doctrine\Orm\State\Processor">
+        <service id="api_platform.doctrine.orm.state.processor" class="ApiPlatform\Doctrine\Common\State\Processor">
             <argument type="service" id="doctrine" />
 
             <tag name="api_platform.state_processor" priority="-100" />

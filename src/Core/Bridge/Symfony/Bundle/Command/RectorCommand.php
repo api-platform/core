@@ -173,7 +173,7 @@ final class RectorCommand extends Command
             passthru($command);
         }
 
-        $output->write('Migration successful.');
+        $output->writeln('Migration successful.');
 
         return Command::SUCCESS;
     }
@@ -269,7 +269,7 @@ final class RectorCommand extends Command
     private function isThereSubresources($io, $output): bool
     {
         if ($io->confirm('Do you have any @ApiSubresource or #[ApiSubresource] left in your code ?')) {
-            $output->write('You will not be able to convert them afterwards. Please run the command "Transform @ApiSubresource to alternate resources" first.');
+            $output->writeln('You will not be able to convert them afterwards. Please run the command "Transform @ApiSubresource to alternate resources" first.');
 
             return true;
         }
