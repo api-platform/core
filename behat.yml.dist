@@ -13,6 +13,7 @@ default:
         - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
         - 'ApiPlatform\Core\Tests\Behat\MercureContext'
         - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Core\Tests\Behat\SystemContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
@@ -49,6 +50,7 @@ postgres:
         - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
         - 'ApiPlatform\Core\Tests\Behat\MercureContext'
         - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Core\Tests\Behat\SystemContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
@@ -70,6 +72,7 @@ mongodb:
         - 'ApiPlatform\Core\Tests\Behat\JsonHalContext'
         - 'ApiPlatform\Core\Tests\Behat\MercureContext'
         - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Core\Tests\Behat\SystemContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
@@ -107,6 +110,7 @@ default-coverage:
         - 'ApiPlatform\Core\Tests\Behat\MercureContext'
         - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
         - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Core\Tests\Behat\SystemContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
 
@@ -128,6 +132,7 @@ mongodb-coverage:
         - 'ApiPlatform\Core\Tests\Behat\MercureContext'
         - 'ApiPlatform\Core\Tests\Behat\CoverageContext'
         - 'ApiPlatform\Core\Tests\Behat\XmlContext'
+        - 'ApiPlatform\Core\Tests\Behat\SystemContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
 

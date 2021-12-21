@@ -562,6 +562,7 @@ Feature: Collections support
   @createSchema
   Scenario: Cursor-based pagination with ranged items on uids
     Given there are 10 of these so many uid objects
+    And class "Ramsey\Uuid\Nonstandard\UuidV6" exists
     When I send a "GET" request to "/so_many_uids?order%5Bid%5D=desc&id%5Blt%5D=1ec5c128-f3d4-62d0-b528-68fef707f0bd"
     Then the response status code should be 200
     And the response should be in JSON
