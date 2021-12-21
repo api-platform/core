@@ -400,7 +400,7 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         # @TODO remove the tag "@symfony/uid" in 3.0
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@symfony/uid&&~php8'
+        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@symfony/uid&&~php8&&~@uuid/v6'
 
   postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
