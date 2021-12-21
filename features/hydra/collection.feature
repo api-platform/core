@@ -560,6 +560,7 @@ Feature: Collections support
     """
 
   @createSchema
+  @uuid/v6
   Scenario: Cursor-based pagination with ranged items on uids
     Given there are 10 of these so many uid objects
     When I send a "GET" request to "/so_many_uids?order%5Bid%5D=desc&id%5Blt%5D=1ec5c128-f3d4-62d0-b528-68fef707f0bd"

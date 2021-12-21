@@ -255,7 +255,7 @@ jobs:
             vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default-coverage --no-interaction --tags='~@php8'
           else
             if [ "${{ matrix.php }}" = '7.1' ]; then
-              vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@symfony/uid&&~@php8'
+              vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@symfony/uid&&~@php8&&~@uuid/v6'
             else
               vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@php8'
             fi
