@@ -168,7 +168,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 continue;
             }
 
-            if (2 === count($data) && isset($data[0]) && isset($data[1])) {
+            if (2 === \count($data) && isset($data[0]) && isset($data[1])) {
                 $data['fromClass'] = $data[0];
                 $data['fromProperty'] = $data[1];
                 unset($data[0], $data[1]);

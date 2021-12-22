@@ -255,5 +255,13 @@ class AppKernel extends Kernel
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3'],
             ],
         ]);
+
+        if ('mongodb' !== $this->environment) {
+            $c->prependExtensionConfig('api_platform', [
+                'mapping' => [
+                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3_orm'],
+                ],
+            ]);
+        }
     }
 }
