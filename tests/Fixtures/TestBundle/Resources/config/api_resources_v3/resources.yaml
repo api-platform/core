@@ -22,15 +22,17 @@ resources:
 
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
         -   ~
-        -   uriTemplate: /users/{author}/programs.{_format}
-            uriVariables: ['author']
-            types: ['someirischema']
+        -   uriTemplate: /users/{author}/programs
+            uriVariables: [author]
+            types: [someirischema]
             description: User programs
             operations:
                 ApiPlatform\Metadata\GetCollection: ~
                 ApiPlatform\Metadata\Get:
-                    uriTemplate: /users/{userId}/programs/{id}.{_format}
-                    types: ['anotheririschema']
+                    uriTemplate: /users/{userId}/programs/{id}
+                    types: [anotheririschema]
                     uriVariables:
-                        userId: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, 'author']
-                        id: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, 'id']
+                        userId:
+                            fromClass: ApiPlatform\Tests\Fixtures\TestBundle\Entity\User
+                            toProperty: author
+                        id: [id]

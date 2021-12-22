@@ -103,9 +103,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             ],
             'uriVariables' => [
                 'userId' => [
-                    'class' => Comment::class,
-                    'property' => 'author',
-                    'inverseProperty' => 'id',
+                    'fromClass' => Comment::class,
+                    'fromProperty' => 'author',
                     'compositeIdentifier' => true,
                 ],
             ],
@@ -246,9 +245,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     ],
                     'uriVariables' => [
                         'userId' => [
-                            'class' => Comment::class,
-                            'property' => 'author',
-                            'inverseProperty' => 'id',
+                            'fromClass' => Comment::class,
+                            'fromProperty' => 'author',
                             'compositeIdentifier' => true,
                         ],
                     ],
@@ -343,9 +341,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'class' => Get::class,
                     'uriVariables' => [
                         'userId' => [
-                            'class' => Comment::class,
-                            'property' => 'author',
-                            'inverseProperty' => 'id',
+                            'fromClass' => Comment::class,
+                            'fromProperty' => 'author',
                             'compositeIdentifier' => true,
                         ],
                         'commentId' => [Comment::class, 'id'],
@@ -495,14 +492,17 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 continue;
             }
 
-            if (isset($value['class']) || isset($value[0])) {
-                $uriVariables[$parameterName]['class'] = $value['class'] ?? $value[0];
+            if (isset($value['fromClass'])) {
+                $uriVariables[$parameterName]['from_class'] = $value['fromClass'] ?? $value[0];
             }
-            if (isset($value['property']) || isset($value[1])) {
-                $uriVariables[$parameterName]['property'] = $value['property'] ?? $value[1];
+            if (isset($value['fromProperty'])) {
+                $uriVariables[$parameterName]['from_property'] = $value['fromProperty'] ?? $value[1];
             }
-            if (isset($value['inverseProperty'])) {
-                $uriVariables[$parameterName]['inverse_property'] = $value['inverseProperty'];
+            if (isset($value['toClass'])) {
+                $uriVariables[$parameterName]['to_class'] = $value['toClass'] ?? $value[0];
+            }
+            if (isset($value['toProperty'])) {
+                $uriVariables[$parameterName]['to_property'] = $value['toProperty'] ?? $value[1];
             }
             if (isset($value['identifiers'])) {
                 $uriVariables[$parameterName]['identifiers'] = $value['identifiers'];

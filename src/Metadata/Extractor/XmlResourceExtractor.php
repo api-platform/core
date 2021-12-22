@@ -161,14 +161,17 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 continue;
             }
 
-            if (null !== ($class = $this->phpize($data, 'fromClass', 'string'))) {
-                $uriVariables[$parameterName]['from_class'] = $class;
-            }
             if (null !== ($property = $this->phpize($data, 'fromProperty', 'string'))) {
                 $uriVariables[$parameterName]['from_property'] = $property;
             }
-            if (null !== ($inverseProperty = $this->phpize($data, 'inverseProperty', 'string'))) {
-                $uriVariables[$parameterName]['inverse_property'] = $inverseProperty;
+            if (null !== ($property = $this->phpize($data, 'toProperty', 'string'))) {
+                $uriVariables[$parameterName]['to_property'] = $property;
+            }
+            if (null !== ($class = $this->phpize($data, 'fromClass', 'string'))) {
+                $uriVariables[$parameterName]['from_class'] = $class;
+            }
+            if (null !== ($class = $this->phpize($data, 'toClass', 'string'))) {
+                $uriVariables[$parameterName]['to_class'] = $class;
             }
             if (isset($data->identifiers->values)) {
                 $uriVariables[$parameterName]['identifiers'] = $this->buildValues($data->identifiers->values);

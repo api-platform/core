@@ -114,9 +114,10 @@
             <xsd:element name="identifiers" type="sequenceWithValues"/>
         </xsd:sequence>
         <xsd:attribute type="xsd:string" name="parameterName" use="required"/>
-        <xsd:attribute type="xsd:string" name="fromClass"/>
-        <xsd:attribute type="xsd:string" name="inverseProperty"/>
         <xsd:attribute type="xsd:string" name="fromProperty"/>
+        <xsd:attribute type="xsd:string" name="toProperty"/>
+        <xsd:attribute type="xsd:string" name="fromClass"/>
+        <xsd:attribute type="xsd:string" name="toClass"/>
         <xsd:attribute type="xsd:boolean" name="compositeIdentifier"/>
     </xsd:complexType>
 

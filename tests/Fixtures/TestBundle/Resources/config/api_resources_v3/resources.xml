@@ -7,37 +7,19 @@
     <resource class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment"/>
 
     <resource
-        uriTemplate="/users/{userId}/comments.{_format}"
+        uriTemplate="/users/{userId}/comments"
         description="User comments"
         class="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment">
         <uriVariables>
-            <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" fromProperty="author">
-                <identifiers>
-                    <values>
-                        <value>id</value>
-                    </values>
-                </identifiers>
-            </uriVariable>
+            <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" toProperty="author" />
         </uriVariables>
 
         <operations>
             <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
-            <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}.{_format}">
+            <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}">
                 <uriVariables>
-                    <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" fromProperty="author">
-                        <identifiers>
-                            <values>
-                                <value>id</value>
-                            </values>
-                        </identifiers>
-                    </uriVariable>
-                    <uriVariable parameterName="id">
-                        <identifiers>
-                            <values>
-                                <value>id</value>
-                            </values>
-                        </identifiers>
-                    </uriVariable>
+                    <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Entity\User" toProperty="author" />
+                    <uriVariable parameterName="id" />
                 </uriVariables>
             </operation>
         </operations>
