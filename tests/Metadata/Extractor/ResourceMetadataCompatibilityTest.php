@@ -492,17 +492,17 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 continue;
             }
 
-            if (isset($value['fromClass'])) {
+            if (isset($value['fromClass']) || isset($value[0])) {
                 $uriVariables[$parameterName]['from_class'] = $value['fromClass'] ?? $value[0];
             }
-            if (isset($value['fromProperty'])) {
+            if (isset($value['fromProperty']) || isset($value[1])) {
                 $uriVariables[$parameterName]['from_property'] = $value['fromProperty'] ?? $value[1];
             }
             if (isset($value['toClass'])) {
-                $uriVariables[$parameterName]['to_class'] = $value['toClass'] ?? $value[0];
+                $uriVariables[$parameterName]['to_class'] = $value['toClass'];
             }
             if (isset($value['toProperty'])) {
-                $uriVariables[$parameterName]['to_property'] = $value['toProperty'] ?? $value[1];
+                $uriVariables[$parameterName]['to_property'] = $value['toProperty'];
             }
             if (isset($value['identifiers'])) {
                 $uriVariables[$parameterName]['identifiers'] = $value['identifiers'];

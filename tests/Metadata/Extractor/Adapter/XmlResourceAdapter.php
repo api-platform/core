@@ -136,9 +136,9 @@ XML
         foreach ($values as $parameterName => $value) {
             $grandChild = $child->addChild('uriVariable');
             $grandChild->addAttribute('parameterName', $parameterName);
-            if (!isset($value['class'])) {
-                $value['class'] = $value[0];
-                $value['property'] = $value[1];
+            if (!isset($value['fromClass'])) {
+                $value['fromClass'] = $value[0];
+                $value['fromProperty'] = $value[1];
                 unset($value[0], $value[1]);
             }
             foreach ($value as $key => $data) {

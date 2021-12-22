@@ -28,17 +28,13 @@ final class ResourceInterfaceImplementationProvider implements ProviderInterface
         /** @var Operation */
         $operation = $context['operation'];
         if ($operation->isCollection()) {
-            yield (new ResourceInterfaceImplementation())->setFoo('item1');
-            yield (new ResourceInterfaceImplementation())->setFoo('item2');
-
-            return;
+            return (function () {
+                yield (new ResourceInterfaceImplementation())->setFoo('item1');
+                yield (new ResourceInterfaceImplementation())->setFoo('item2');
+            })();
         }
 
-        if ('some-id' === $identifiers['id']) {
-            return (new ResourceInterfaceImplementation())->setFoo('single item');
-        }
-
-        return null;
+        return 'some-id' === $identifiers['foo'] ? (new ResourceInterfaceImplementation())->setFoo('single item') : null;
     }
 
     /**

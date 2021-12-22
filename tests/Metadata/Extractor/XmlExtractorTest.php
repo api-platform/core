@@ -300,8 +300,8 @@ class XmlExtractorTest extends TestCase
                             'formats' => ['jsonld', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
                             'uriVariables' => [
                                 'userId' => [
-                                    'class' => User::class,
-                                    'property' => 'author',
+                                    'from_property' => 'author',
+                                    'from_class' => User::class,
                                 ],
                                 'id' => 'id',
                             ],

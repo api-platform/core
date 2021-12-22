@@ -10,12 +10,12 @@ resources:
                 openapiContext:
                     x-visibility: hide
 
-    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceBarInterface:
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface:
         operations:
             ApiPlatform\Metadata\GetCollection: ~
             ApiPlatform\Metadata\Get: ~
 
-    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface:
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceBarInterface:
         operations:
             ApiPlatform\Metadata\GetCollection: ~
             ApiPlatform\Metadata\Get: ~
@@ -35,4 +35,4 @@ resources:
                         userId:
                             fromClass: ApiPlatform\Tests\Fixtures\TestBundle\Entity\User
                             toProperty: author
-                        id: [id]
+                        id: [ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program, id]

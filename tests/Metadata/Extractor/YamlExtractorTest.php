@@ -329,7 +329,7 @@ class YamlExtractorTest extends TestCase
                             'types' => ['anotheririschema'],
                             'formats' => null,
                             'uriVariables' => [
-                                'userId' => ['class' => User::class, 'property' => 'author'],
+                                'userId' => ['from_class' => User::class, 'from_property' => 'author'],
                                 'id' => 'id',
                             ],
                             'inputFormats' => null,

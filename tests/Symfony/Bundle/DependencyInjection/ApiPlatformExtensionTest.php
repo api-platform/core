@@ -902,9 +902,6 @@ class ApiPlatformExtensionTest extends TestCase
 
             self::assertSame(
                 $normalizePaths([
-                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
-                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
-                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
                     "{$testsDirectory}/Symfony/Bundle/DependencyInjection/Fixtures/resources/B.yaml",
                     "{$testsDirectory}/Symfony/Bundle/DependencyInjection/Fixtures/resources/Bb.yaml",
                     "{$testsDirectory}/Symfony/Bundle/DependencyInjection/Fixtures/resources/a.yaml",
