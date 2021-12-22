@@ -18,7 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider as OdmCol
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider as OdmItemDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
-use ApiPlatform\Doctrine\Orm\State\Processor;
+use ApiPlatform\Doctrine\Common\State\Processor;
 use ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

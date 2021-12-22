@@ -11,50 +11,38 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ORM\Entity
+ * @ODM\Document
  */
 #[ApiResource]
 #[Get]
 #[Post]
-#[ApiResource(
-    uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
-    uriVariables: [
-        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
-    ],
-)]
+#[ApiResource(uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
 #[Get]
-#[ApiResource(
-    uriTemplate: '/employees/{employeeId}/company',
-    uriVariables: [
-        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
-    ],
-)]
+#[ApiResource(uriTemplate: '/employees/{employeeId}/company', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
 class Company
 {
     /**
      * @var int|null The id
      *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
      * @var string The dummy name
      *
-     * @ORM\Column
+     * @ODM\Field
      */
-    public string $name;
+    public $name;
 
     /** @var Employee[] */
     #[Link(toProperty: 'company')]

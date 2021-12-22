@@ -85,6 +85,13 @@ services:
         tags:
             -   name: 'api_platform.item_data_provider'
 
+    related_questions.state_provider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
+        public: false
+        arguments: ['@doctrine_mongodb']
+        tags:
+            -  { name: 'api_platform.state_provider' }
+
     app.dummy_dto_no_input.data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
         public: false

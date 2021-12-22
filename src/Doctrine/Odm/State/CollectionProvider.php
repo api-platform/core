@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -29,6 +30,8 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class CollectionProvider implements ProviderInterface
 {
+    use LinksHandlerTrait;
+
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
     private $collectionExtensions;
@@ -55,6 +58,9 @@ final class CollectionProvider implements ProviderInterface
         }
 
         $aggregationBuilder = $repository->createAggregationBuilder();
+
+        $this->handleLinks($aggregationBuilder, $identifiers, $context, $resourceClass, $operationName);
+
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
 
@@ -82,6 +88,10 @@ final class CollectionProvider implements ProviderInterface
         }
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+
+        if ($operation instanceof GraphQlOperation) {
+            return true;
+        }
 
         return $operation->isCollection() ?? false;
     }
