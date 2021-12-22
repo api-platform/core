@@ -808,6 +808,41 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testItLoadsMetadataConfigFileInAlphabeticalOrder()
     {
+        $yamlExtractorDefinition = $this->prophesize(Definition::class);
+$yamlExtractorDefinition->replaceArgument(0, Argument::that(static function ($paths): bool {
+            self::assertIsArray($paths);
+            self::assertContainsOnly('string', $paths);
+
+            $normalizePaths = static function (array $paths): array {
+                return array_map(
+                    static function (string $path): string {
+                        return str_replace(\DIRECTORY_SEPARATOR, '/', $path);
+                    },
+                    $paths
+                );
+            };
+
+            $testsDirectory = \dirname(__DIR__, 4);
+
+            self::assertSame(
+                $normalizePaths([
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/B.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/Bb.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/a/a.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/b/a.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c.yaml",
+                    "{$testsDirectory}/Bridge/Symfony/Bundle/DependencyInjection/Fixtures/resources/c/a.yaml",
+                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources.yml",
+                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/dummy_address.yml",
+                    "{$testsDirectory}/Fixtures/TestBundle/Resources/config/api_resources/my_resource.yml",
+                ]),
+                $normalizePaths($paths)
+            );
+
+            return true;
+        }))->shouldBeCalled()->willReturn($yamlExtractorDefinition->reveal());
+
         $dummyDefinition = $this->prophesize(Definition::class);
         $dummyDefinition->replaceArgument(Argument::type('int'), Argument::any())->willReturn($dummyDefinition->reveal());
 
@@ -819,7 +854,7 @@ class ApiPlatformExtensionTest extends TestCase
             ->shouldBeCalled();
         $containerBuilderProphecy
             ->getDefinition('api_platform.metadata.extractor.yaml')
-            ->willReturn($dummyDefinition->reveal())
+            ->willReturn($yamlExtractorDefinition)
             ->shouldBeCalled();
 
         $config = self::DEFAULT_CONFIG;

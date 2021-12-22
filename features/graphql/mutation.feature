@@ -669,7 +669,7 @@ Feature: GraphQL mutation support
     When I send the following GraphQL request:
     """
     mutation {
-      updateRelatedDummy(input: {id: "/related_dummies/2", symfony: "laravel", embeddedDummy: "{}", thirdLevel: "/third_levels/1"}) {
+      updateRelatedDummy(input: {id: "/related_dummies/2", symfony: "laravel", thirdLevel: "/third_levels/1"}) {
         relatedDummy {
           id
           symfony

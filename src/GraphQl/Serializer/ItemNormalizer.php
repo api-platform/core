@@ -129,10 +129,6 @@ final class ItemNormalizer extends BaseItemNormalizer
             $attribute = 'id';
         }
 
-        if ('{}' === $value) {
-            $value = [];
-        }
-
         parent::setAttributeValue($object, $attribute, $value, $format, $context);
     }
 }
