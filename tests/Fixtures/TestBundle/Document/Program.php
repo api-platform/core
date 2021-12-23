@@ -11,37 +11,34 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  *
- * @ORM\Entity
+ * @ODM\Document
  */
-class Comment
+class Program
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="text")
+     * @ODM\Field(type="string")
      */
-    public $comment;
+    public $name;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ODM\Field(type="date")
      */
     public $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ODM\ReferenceOne(targetDocument=User::class, storeAs="id")
      */
     public $author;
 

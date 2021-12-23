@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<resources xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://api-platform.com/schema/metadata/resources-3.0
+           https://api-platform.com/schema/metadata/resources-3.0.xsd">
+    <resource class="ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment"/>
+
+    <resource
+        uriTemplate="/users/{userId}/comments"
+        description="User comments"
+        class="ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment">
+        <uriVariables>
+            <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Document\User" toProperty="author" />
+        </uriVariables>
+
+        <operations>
+            <operation class="ApiPlatform\Metadata\GetCollection" name="custom_operation_name"/>
+            <operation class="ApiPlatform\Metadata\Get" uriTemplate="/users/{userId}/comments/{id}">
+                <uriVariables>
+                    <uriVariable parameterName="userId" fromClass="ApiPlatform\Tests\Fixtures\TestBundle\Document\User" toProperty="author" />
+                    <uriVariable parameterName="id" />
+                </uriVariables>
+            </operation>
+        </operations>
+    </resource>
+</resources>

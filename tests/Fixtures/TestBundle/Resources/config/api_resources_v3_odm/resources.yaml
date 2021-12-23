@@ -1,0 +1,20 @@
+resources:
+    ApiPlatform\Tests\Fixtures\TestBundle\Document\Program:
+        -   ~
+        -   uriTemplate: /users/{author}/programs
+            uriVariables:
+                author:
+                    fromClass: ApiPlatform\Tests\Fixtures\TestBundle\Document\User
+                    toProperty: author
+            types: [someirischema]
+            description: User programs
+            operations:
+                ApiPlatform\Metadata\GetCollection: ~
+                ApiPlatform\Metadata\Get:
+                    uriTemplate: /users/{userId}/programs/{id}
+                    types: [anotheririschema]
+                    uriVariables:
+                        userId:
+                            fromClass: ApiPlatform\Tests\Fixtures\TestBundle\Document\User
+                            toProperty: author
+                        id: [ApiPlatform\Tests\Fixtures\TestBundle\Document\Program, id]

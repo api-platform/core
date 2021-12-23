@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as A
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Book as BookDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment as CommentDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
@@ -73,6 +74,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Program as ProgramDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
@@ -1309,9 +1311,9 @@ final class DoctrineContext implements Context
      */
     public function thereArePrograms(int $nb)
     {
-        $author = $this->doctrine->getRepository(User::class)->find(1);
+        $author = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find(1);
         if (null === $author) {
-            $author = new User();
+            $author = $this->isOrm() ? new User() : new UserDocument();
             $author->setEmail('john.doe@example.com');
             $author->setFullname('John DOE');
             $author->setPlainPassword('p4$$w0rd');
@@ -1320,8 +1322,17 @@ final class DoctrineContext implements Context
             $this->manager->flush();
         }
 
-        for ($i = $this->doctrine->getRepository(Program::class)->count(['author' => $author]) + 1; $i <= $nb; ++$i) {
-            $program = new Program();
+        if ($this->isOrm()) {
+            $count = $this->doctrine->getRepository(Program::class)->count(['author' => $author]);
+        } else {
+            $count = $this->doctrine->getRepository(ProgramDocument::class)
+                ->createQueryBuilder('f')
+                ->field('author')->equals($author)
+                ->count()->getQuery()->execute();
+        }
+
+        for ($i = $count + 1; $i <= $nb; ++$i) {
+            $program = $this->isOrm() ? new Program() : new ProgramDocument();
             $program->name = "Lorem ipsum $i";
             $program->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
             $program->author = $author;
@@ -1346,9 +1357,9 @@ final class DoctrineContext implements Context
      */
     public function thereAreComments(int $nb)
     {
-        $author = $this->doctrine->getRepository(User::class)->find(1);
+        $author = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find(1);
         if (null === $author) {
-            $author = new User();
+            $author = $this->isOrm() ? new User() : new UserDocument();
             $author->setEmail('john.doe@example.com');
             $author->setFullname('John DOE');
             $author->setPlainPassword('p4$$w0rd');
@@ -1357,8 +1368,17 @@ final class DoctrineContext implements Context
             $this->manager->flush();
         }
 
-        for ($i = $this->doctrine->getRepository(Comment::class)->count(['author' => $author]) + 1; $i <= $nb; ++$i) {
-            $comment = new Comment();
+        if ($this->isOrm()) {
+            $count = $this->doctrine->getRepository(Comment::class)->count(['author' => $author]);
+        } else {
+            $count = $this->doctrine->getRepository(CommentDocument::class)
+                ->createQueryBuilder()
+                ->field('author')->equals($author)
+                ->count()->getQuery()->execute();
+        }
+
+        for ($i = $count + 1; $i <= $nb; ++$i) {
+            $comment = $this->isOrm() ? new Comment() : new CommentDocument();
             $comment->comment = "Lorem ipsum dolor sit amet $i";
             $comment->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
             $comment->author = $author;

@@ -2,7 +2,10 @@ resources:
     ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program:
         -   ~
         -   uriTemplate: /users/{author}/programs
-            uriVariables: [author]
+            uriVariables:
+                author:
+                    fromClass: ApiPlatform\Tests\Fixtures\TestBundle\Entity\User
+                    toProperty: author
             types: [someirischema]
             description: User programs
             operations:
