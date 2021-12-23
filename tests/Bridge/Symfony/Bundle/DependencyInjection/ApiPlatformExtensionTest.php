@@ -809,7 +809,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testItLoadsMetadataConfigFileInAlphabeticalOrder()
     {
         $yamlExtractorDefinition = $this->prophesize(Definition::class);
-$yamlExtractorDefinition->replaceArgument(0, Argument::that(static function ($paths): bool {
+        $yamlExtractorDefinition->replaceArgument(0, Argument::that(static function ($paths): bool {
             self::assertIsArray($paths);
             self::assertContainsOnly('string', $paths);
 
