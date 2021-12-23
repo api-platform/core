@@ -61,7 +61,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testExecuteWithCollectionOperationGet()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'api_dummies_get_collection_collection', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'api_dummies_get_collection', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
@@ -75,7 +75,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testExecuteWithJsonldFormatOption()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'api_dummies_post_collection_collection', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'api_dummies_post_collection', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('@id', $result);
