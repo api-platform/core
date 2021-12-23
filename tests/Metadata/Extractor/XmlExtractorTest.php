@@ -365,7 +365,7 @@ class XmlExtractorTest extends TestCase
     public function testInvalidXML(string $path, string $error): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($error);
+        $this->expectExceptionMessageMatches($error);
 
         (new XmlResourceExtractor([$path]))->getResources();
     }
@@ -373,7 +373,7 @@ class XmlExtractorTest extends TestCase
     public function getInvalidPaths(): array
     {
         return [
-            [__DIR__.'/xml/invalid/required_class.xml', "[ERROR 1868] Element '{https://api-platform.com/schema/metadata/resources-3.0}resource': The attribute 'class' is required but missing. (in ".realpath(__DIR__.'/../../../').'/ - line 7, column 0)'],
+            [__DIR__.'/xml/invalid/required_class.xml', "/^\[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./"],
         ];
     }
 }
