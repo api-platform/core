@@ -162,8 +162,6 @@ class Operation
      * @param string|null       $securityMessage                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string|null       $securityPostDenormalize        https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
-     * @param string|null       $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
-     * @param string|null       $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param bool|null         $read                           https://api-platform.com/docs/core/events/#the-event-system
      * @param bool|null         $deserialize                    https://api-platform.com/docs/core/events/#the-event-system
      * @param bool|null         $validate                       https://api-platform.com/docs/core/events/#the-event-system
@@ -301,8 +299,6 @@ class Operation
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
         $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
