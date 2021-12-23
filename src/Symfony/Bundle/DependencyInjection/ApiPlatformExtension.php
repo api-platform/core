@@ -839,11 +839,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeAlias('api_platform.graphql.schema_builder');
         $container->setAlias('api_platform.graphql.schema_builder', 'api_platform.graphql.schema_builder.legacy');
 
-        $container->getDefinition('api_platform.metadata.property.metadata_factory.serializer')
-                  ->setArgument('$resourceMetadataFactory', new Reference('api_platform.metadata.resource.metadata_factory'));
-
-        $container->getDefinition('api_platform.route_loader')
-                  ->setArgument('$resourceMetadataFactory', new Reference('api_platform.metadata.resource.metadata_factory'));
+        foreach ([
+            'api_platform.metadata.property.metadata_factory.serializer',
+            'api_platform.route_loader',
+        ] as $id) {
+            $container->getDefinition($id)->setArgument('$resourceMetadataFactory', new Reference('api_platform.metadata.resource.metadata_factory'));
+        }
 
         $container->getDefinition('api_platform.metadata.property.identifier_metadata_factory.xml')
                   ->setDecoratedService('api_platform.metadata.property.metadata_factory');
