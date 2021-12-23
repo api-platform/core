@@ -9,37 +9,9 @@
 
     <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment" name="comment"
               description="Comment message" readable="true" writable="true">
-        <jsonldContext>
-            <values>
-                <value name="foo">
-                    <values>
-                        <value name="bar">baz</value>
-                    </values>
-                </value>
-            </values>
-        </jsonldContext>
-        <openapiContext>
-            <values>
-                <value name="bar">baz</value>
-            </values>
-        </openapiContext>
-        <types>
-            <type>someirischema</type>
-            <type>anotheririschema</type>
-        </types>
         <builtinTypes>
             <builtinType>string</builtinType>
         </builtinTypes>
-        <schema>
-            <values>
-                <value name="bar">baz</value>
-            </values>
-        </schema>
-        <extraProperties>
-            <values>
-                <value name="foo">bar</value>
-            </values>
-        </extraProperties>
     </property>
 
     <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment" name="date"
