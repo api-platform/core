@@ -43,6 +43,8 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 
     /**
      * {@inheritdoc}
+     *
+     * @return array
      */
     public function normalize($object, $format = null, array $context = [])
     {
