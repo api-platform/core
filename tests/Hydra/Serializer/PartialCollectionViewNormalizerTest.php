@@ -134,11 +134,11 @@ class PartialCollectionViewNormalizerTest extends TestCase
             $lastSoMany->id = 2;
             $lastSoMany->content = 'SoMany #2';
 
-            $paginatorProphecy->rewind()->willReturn()->shouldBeCalledOnce();
+            $paginatorProphecy->rewind()->shouldBeCalledOnce();
             $paginatorProphecy->valid()->willReturn(true, true, false)->shouldBeCalledTimes(3);
             $paginatorProphecy->key()->willReturn(1, 2)->shouldBeCalledTimes(2);
             $paginatorProphecy->current()->willReturn($firstSoMany, $lastSoMany)->shouldBeCalledTimes(2);
-            $paginatorProphecy->next()->willReturn()->shouldBeCalledTimes(2);
+            $paginatorProphecy->next()->shouldBeCalledTimes(2);
 
             $soManyMetadata = new ResourceMetadata(null, null, null, null, ['get' => ['pagination_via_cursor' => [['field' => 'id', 'direction' => 'desc']]]]);
 
