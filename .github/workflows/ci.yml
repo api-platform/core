@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     steps:
       - name: Checkout
@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
@@ -102,8 +102,9 @@ jobs:
           - '7.3'
           - '7.4'
           - '8.0'
+          - '8.1'
         include:
-          - php: '8.0'
+          - php: '8.1'
             coverage: true
       fail-fast: false
     steps:
@@ -136,7 +137,7 @@ jobs:
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle \
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
@@ -147,10 +148,10 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        if: (!startsWith(matrix.php, '8.0'))
+        if: (!startsWith(matrix.php, '8.'))
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Clear test app cache (php 8.0)
-        if: (startsWith(matrix.php, '8.0'))
+      - name: Clear test app cache (php 8)
+        if: (startsWith(matrix.php, '8.'))
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run PHPUnit tests
         run: |
@@ -197,8 +198,9 @@ jobs:
           - '7.3'
           - '7.4'
           - '8.0'
+          - '8.1'
         include:
-          - php: '8.0'
+          - php: '8.1'
             coverage: true
       fail-fast: false
     steps:
@@ -213,7 +215,7 @@ jobs:
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
           composer config platform.php 7.4.99
       - name: Get composer cache directory
@@ -242,10 +244,10 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        if: (!startsWith(matrix.php, '8.0'))
+        if: (!startsWith(matrix.php, '8.'))
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Clear test app cache (php 8.0)
-        if: (startsWith(matrix.php, '8.0'))
+      - name: Clear test app cache (php 8)
+        if: (startsWith(matrix.php, '8.'))
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
         run: |
@@ -647,7 +649,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
@@ -659,7 +661,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
@@ -695,7 +697,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     steps:
       - name: Checkout
@@ -703,7 +705,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
@@ -743,6 +745,7 @@ jobs:
         php:
           - '7.4'
           - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -768,7 +771,7 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
@@ -791,6 +794,7 @@ jobs:
         php:
           - '7.4'
           - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -816,7 +820,7 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
