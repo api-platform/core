@@ -44,7 +44,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -63,7 +63,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -84,7 +84,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo', '/bar']]),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -105,7 +105,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -126,7 +126,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -148,7 +148,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -170,7 +170,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -192,7 +192,7 @@ class AddTagsListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_subresource_operation_name' => 'api_dummies_relatedDummies_get_subresource', '_api_subresource_context' => ['collection' => true]]),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 

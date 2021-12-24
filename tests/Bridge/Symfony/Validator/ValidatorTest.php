@@ -35,6 +35,8 @@ class ValidatorTest extends TestCase
         $data = new DummyEntity();
 
         $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationListProphecy->count()->willReturn(0);
+
         $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
         $symfonyValidatorProphecy->validate($data, null, null)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
@@ -68,6 +70,8 @@ class ValidatorTest extends TestCase
         $expectedValidationGroups = ['a', 'b', 'c'];
 
         $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationListProphecy->count()->willReturn(0);
+
         $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
         $symfonyValidatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
@@ -83,6 +87,7 @@ class ValidatorTest extends TestCase
         $data = new DummyEntity();
 
         $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationListProphecy->count()->willReturn(0);
 
         $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
         $symfonyValidatorProphecy->validate($data, null, ['a', 'b', 'c'])->willReturn($constraintViolationListProphecy)->shouldBeCalled();
@@ -109,6 +114,7 @@ class ValidatorTest extends TestCase
         $data = new DummyEntity();
 
         $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationListProphecy->count()->willReturn(0);
 
         $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
         $symfonyValidatorProphecy->validate($data, null, ['a', 'b', 'c'])->willReturn($constraintViolationListProphecy);
@@ -132,6 +138,8 @@ class ValidatorTest extends TestCase
         $expectedValidationGroups = ['foo'];
 
         $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationListProphecy->count()->willReturn(0);
+
         $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
         $symfonyValidatorProphecy->validate($data, null, $expectedValidationGroups)->willreturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
         $symfonyValidator = $symfonyValidatorProphecy->reveal();

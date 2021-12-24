@@ -97,11 +97,11 @@ final class AddHeadersListener
         }
 
         if (null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate')) {
-            $response->headers->addCacheControlDirective('stale-while-revalidate', $staleWhileRevalidate);
+            $response->headers->addCacheControlDirective('stale-while-revalidate', (string) $staleWhileRevalidate);
         }
 
         if (null !== ($staleIfError = $resourceCacheHeaders['stale_if_error'] ?? $this->staleIfError) && !$response->headers->hasCacheControlDirective('stale-if-error')) {
-            $response->headers->addCacheControlDirective('stale-if-error', $staleIfError);
+            $response->headers->addCacheControlDirective('stale-if-error', (string) $staleIfError);
         }
     }
 }
