@@ -923,11 +923,11 @@ class ApiPlatformExtensionTest extends TestCase
         $containerBuilderProphecy->getDefinition(Argument::type('string'))->willReturn(new Definition());
         $containerBuilderProphecy
             ->getDefinition('api_platform.metadata.resource_extractor.xml')
-            ->willReturn($this->prophesize(Definition::class))
+            ->willReturn($dummyDefinition->reveal())
             ->shouldBeCalled();
         $containerBuilderProphecy
             ->getDefinition('api_platform.metadata.property_extractor.xml')
-            ->willReturn($this->prophesize(Definition::class))
+            ->willReturn($dummyDefinition->reveal())
             ->shouldBeCalled();
         $containerBuilderProphecy
             ->getDefinition('api_platform.metadata.resource_extractor.yaml')
@@ -1272,6 +1272,7 @@ class ApiPlatformExtensionTest extends TestCase
             $definitionProphecy = $this->prophesize(Definition::class);
             $definitionProphecy->replaceArgument(0, Argument::type('array'))->willReturn($definitionProphecy->reveal())->shouldBeCalled();
             $containerBuilderProphecy->getDefinition('api_platform.metadata.resource_extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
+            $containerBuilderProphecy->getDefinition('api_platform.metadata.property_extractor.'.$format)->willReturn($definitionProphecy->reveal())->shouldBeCalled();
         }
 
         return $containerBuilderProphecy;
