@@ -108,6 +108,8 @@ class Operation
     protected $securityMessage;
     protected $securityPostDenormalize;
     protected $securityPostDenormalizeMessage;
+    protected $securityPostValidation;
+    protected $securityPostValidationMessage;
     protected $compositeIdentifier;
     protected $exceptionToStatus;
     protected $queryParameterValidationEnabled;
@@ -224,6 +226,8 @@ class Operation
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?bool $compositeIdentifier = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -295,6 +299,8 @@ class Operation
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+        $this->securityPostValidation = $securityPostValidation;
+        $this->securityPostValidationMessage = $securityPostValidationMessage;
         $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
@@ -1099,6 +1105,32 @@ class Operation
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidation(): ?string
+    {
+        return $this->securityPostValidation;
+    }
+
+    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidation = $securityPostValidation;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidationMessage(): ?string
+    {
+        return $this->securityPostValidationMessage;
+    }
+
+    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidationMessage = $securityPostValidationMessage;
 
         return $self;
     }

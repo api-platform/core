@@ -126,8 +126,19 @@ final class DenyAccessListener
                 return;
             }
 
-            $isGranted = 'security' === $attribute ? $operation->getSecurity() : $operation->getSecurityPostDenormalize();
-            $message = 'security' === $attribute ? $operation->getSecurityMessage() : $operation->getSecurityPostDenormalize();
+            switch ($attribute) {
+                case 'security_post_denormalize':
+                    $isGranted = $operation->getSecurityPostDenormalize();
+                    $message = $operation->getSecurityPostDenormalizeMessage();
+                    break;
+                case 'security_post_validation':
+                    $isGranted = $operation->getSecurityPostValidation();
+                    $message = $operation->getSecurityPostValidationMessage();
+                    break;
+                default:
+                    $isGranted = $operation->getSecurity();
+                    $message = $operation->getSecurityMessage();
+            }
         }
 
         if (null === $isGranted) {
