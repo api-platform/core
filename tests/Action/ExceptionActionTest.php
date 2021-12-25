@@ -53,7 +53,7 @@ class ExceptionActionTest extends TestCase
         }
         $flattenException = class_exists(FlattenException::class) ? FlattenException::create($serializerException->reveal()) : LegacyFlattenException::create($serializerException->reveal()); /** @phpstan-ignore-line */
         $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn();
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => Response::HTTP_BAD_REQUEST])->willReturn('');
 
         $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']], [ExceptionInterface::class => Response::HTTP_BAD_REQUEST, InvalidArgumentException::class => Response::HTTP_BAD_REQUEST]);
 
@@ -84,7 +84,7 @@ class ExceptionActionTest extends TestCase
         $flattenException = FlattenException::create($exception);
 
         $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn();
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn('');
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
@@ -137,7 +137,7 @@ class ExceptionActionTest extends TestCase
         $flattenException = FlattenException::create($exception);
 
         $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn();
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn('');
 
         $operation = (new Get())->withShortName('Foo');
         $resource = (new ApiResource())->withShortName('Foo');
@@ -286,7 +286,7 @@ class ExceptionActionTest extends TestCase
 
         $flattenException = class_exists(FlattenException::class) ? FlattenException::create($serializerException->reveal()) : LegacyFlattenException::create($serializerException->reveal()); /** @phpstan-ignore-line */
         $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $flattenException->getStatusCode()])->willReturn();
+        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $flattenException->getStatusCode()])->willReturn('');
 
         $exceptionAction = new ExceptionAction($serializer->reveal(), ['jsonproblem' => ['application/problem+json'], 'jsonld' => ['application/ld+json']]);
 

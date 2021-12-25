@@ -41,17 +41,17 @@ class ApiPlatformBundleTest extends TestCase
     public function testBuild()
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(AnnotationFilterPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101)->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(FilterPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(ElasticsearchClientPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(GraphQlQueryResolverPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(GraphQlMutationResolverPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(DeprecateMercurePublisherPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(TestClientPass::class))->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(AnnotationFilterPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101)->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(FilterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(ElasticsearchClientPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(GraphQlQueryResolverPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(GraphQlMutationResolverPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(DeprecateMercurePublisherPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(TestClientPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
         $bundle->build($containerProphecy->reveal());

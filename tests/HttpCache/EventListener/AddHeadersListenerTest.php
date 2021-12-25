@@ -40,7 +40,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -57,7 +57,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -73,7 +73,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request(),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -89,7 +89,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
         $listener = new AddHeadersListener(true);
@@ -104,7 +104,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -130,7 +130,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -151,7 +151,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -172,7 +172,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -201,7 +201,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -227,7 +227,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -252,7 +252,7 @@ class AddHeadersListenerTest extends TestCase
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 

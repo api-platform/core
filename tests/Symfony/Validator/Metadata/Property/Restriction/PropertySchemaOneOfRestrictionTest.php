@@ -52,10 +52,11 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 
     public function supportsProvider(): \Generator
     {
-        if (class_exists(AtLeastOneOf::class)) {
-            yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), true];
+        if (!class_exists(AtLeastOneOf::class)) {
+            return;
         }
 
+        yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), true];
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 

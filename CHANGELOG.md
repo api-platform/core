@@ -45,6 +45,12 @@
 * Add support for `security_post_validation` attribute
 * Mark the GraphQL subsystem as stable (#4500)
 
+## 2.6.7
+
+* feat: compatibility with Symfony 6 (#4503, #4582, #4604, #4564)
+* feat: compatibility with PHP 8.1 (#4503, #4582, #4604)
+* fix: pass the child context when normalizing nested non-resource objects (#4521)
+
 ## 2.6.6
 
 * fix(json-schema): consider `SplFileInfo` class as a binary type (#4332)

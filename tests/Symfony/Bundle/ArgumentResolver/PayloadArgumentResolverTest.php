@@ -192,7 +192,8 @@ class PayloadArgumentResolverTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $argumentsResolver = self::$container->get('argument_resolver');
+        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
+        $argumentsResolver = $container->get('argument_resolver');
 
         $arguments = $argumentsResolver->getArguments($request, $controller);
 

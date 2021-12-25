@@ -438,6 +438,7 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,
         ApiPlatform\Core\Util\AttributesExtractor::class => ApiPlatform\Util\AttributesExtractor::class,
         ApiPlatform\Core\Util\ClassInfoTrait::class => ApiPlatform\Util\ClassInfoTrait::class,
+        ApiPlatform\Core\Util\ClientTrait::class => ApiPlatform\Util\ClientTrait::class,
         ApiPlatform\Core\Util\CloneTrait::class => ApiPlatform\Util\CloneTrait::class,
         ApiPlatform\Core\Util\CorsTrait::class => ApiPlatform\Util\CorsTrait::class,
         ApiPlatform\Core\Util\ErrorFormatGuesser::class => ApiPlatform\Util\ErrorFormatGuesser::class,
@@ -448,6 +449,7 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Util\RequestAttributesExtractor::class => ApiPlatform\Util\RequestAttributesExtractor::class,
         ApiPlatform\Core\Util\RequestParser::class => ApiPlatform\Util\RequestParser::class,
         ApiPlatform\Core\Util\ResourceClassInfoTrait::class => ApiPlatform\Util\ResourceClassInfoTrait::class,
+        ApiPlatform\Core\Util\ResponseTrait::class => ApiPlatform\Util\ResponseTrait::class,
         ApiPlatform\Core\Util\SortTrait::class => ApiPlatform\Util\SortTrait::class,
 
         // Validator

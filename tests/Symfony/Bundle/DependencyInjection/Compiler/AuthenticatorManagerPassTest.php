@@ -51,7 +51,7 @@ final class AuthenticatorManagerPassTest extends TestCase
         $this->containerBuilderProphecy->has('security.authenticator.manager')->willReturn(true);
         $authenticatorManagerDefinitionProphecy = $this->prophesize(Definition::class);
         $this->containerBuilderProphecy->getDefinition('api_platform.security.resource_access_checker')->willReturn($authenticatorManagerDefinitionProphecy->reveal());
-        $authenticatorManagerDefinitionProphecy->setArgument(5, false)->shouldBeCalledOnce();
+        $authenticatorManagerDefinitionProphecy->setArgument(5, false)->willReturn($authenticatorManagerDefinitionProphecy->reveal())->shouldBeCalledOnce();
 
         $this->authenticatorManagerPass->process($this->containerBuilderProphecy->reveal());
     }

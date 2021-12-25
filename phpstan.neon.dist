@@ -58,7 +58,6 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- tests/Fixtures/TestBundle/Entity/
-				- tests/Core/Behat/
 				- src/Core/Identifier/
 				- src/OpenApi/Factory/OpenApiFactory.php
 		-
@@ -66,14 +65,6 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- tests/Fixtures/TestBundle/Entity/
-		-
-			message: '#Unreachable statement - code above always terminates.#'
-			paths:
-				- tests/GraphQl/Resolver/Stage/SecurityPostDenormalizeStageTest.php
-		-
-			message: "#Parameter \\#2 \\$dqlPart of method Doctrine\\\\ORM\\\\QueryBuilder::add\\(\\) expects array<'join'\\|int, array<int\\|string, object>\\|string>\\|object\\|string, array\\{o\\: Doctrine\\\\ORM\\\\Query\\\\Expr\\\\Join\\} given\\.#"
-			paths:
-				- tests/Doctrine/Orm/Extension/FilterEagerLoadingExtensionTest.php
 		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
@@ -152,3 +143,9 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionValueType\(\)#'
+			path: src
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
+			path: src

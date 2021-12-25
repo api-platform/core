@@ -16,7 +16,6 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -45,7 +44,7 @@ class MetadataAwareNameConverterPassTest extends TestCase
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->hasAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(true);
-        $containerBuilderProphecy->getAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(Argument::any());
+        $containerBuilderProphecy->getAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(new Alias('api_platform.name_converter'));
         $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->willReturn($definition)->shouldBeCalled();
         $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldBeCalled();
@@ -62,7 +61,7 @@ class MetadataAwareNameConverterPassTest extends TestCase
         $definition = $this->prophesize(Definition::class);
         $definition->getArguments()->willReturn([0, 1])->shouldBeCalled();
         $definition->getArgument(1)->willReturn(null)->shouldBeCalled();
-        $definition->setArgument(1, $reference)->shouldBeCalled();
+        $definition->setArgument(1, $reference)->shouldBeCalled()->willReturn($definition);
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(true)->shouldBeCalled();
@@ -91,7 +90,7 @@ class MetadataAwareNameConverterPassTest extends TestCase
 
         $definition = $this->prophesize(Definition::class);
         $definition->getArguments()->willReturn([0])->shouldBeCalled();
-        $definition->addArgument(new Reference('app.name_converter'))->shouldBeCalled();
+        $definition->addArgument(new Reference('app.name_converter'))->willReturn($definition)->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->willReturn(true)->shouldBeCalled();

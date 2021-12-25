@@ -83,7 +83,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
      */
     public function testGrantedLegacy(): void
     {
-        self::markTestSkipped('The deprecation is handled in the Metadata transformation, this is not required anymore.');
+        self::markTestSkipped('The deprecation is handled in the Metadata transformation, this is not required anymore.'); // @phpstan-ignore-next-line
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';

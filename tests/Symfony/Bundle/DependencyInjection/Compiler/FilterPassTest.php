@@ -38,10 +38,10 @@ class FilterPassTest extends TestCase
         $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
         $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
             return !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference;
-        }))->shouldBeCalled();
+        }))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
-        $filterCollectionFactoryDefinitionProphecy->addArgument(['my_id'])->shouldBeCalled();
+        $filterCollectionFactoryDefinitionProphecy->addArgument(['my_id'])->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
@@ -60,10 +60,10 @@ class FilterPassTest extends TestCase
         $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
         $filterLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
             return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
-        }))->shouldBeCalled();
+        }))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $filterCollectionFactoryDefinitionProphecy = $this->prophesize(Definition::class);
-        $filterCollectionFactoryDefinitionProphecy->addArgument(['bar'])->shouldBeCalled();
+        $filterCollectionFactoryDefinitionProphecy->addArgument(['bar'])->willReturn($filterCollectionFactoryDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();

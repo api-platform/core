@@ -58,7 +58,7 @@ class CachedIdentifiersExtractorTest extends TestCase
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false);
-        $cacheItemProphecy->set(['id'])->shouldBeCalled();
+        $cacheItemProphecy->set(['id'])->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
 
         $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPoolProphecy->getItem($cacheItemKey)->willReturn($cacheItemProphecy);

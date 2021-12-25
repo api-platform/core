@@ -188,8 +188,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         if ($object instanceof OpenApi) {
             @trigger_error('Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.', \E_USER_DEPRECATED);
