@@ -38,6 +38,7 @@ parameters:
 		- tests/Symfony/Bundle/Test/WebTestCaseTest.php
 		- tests/Core/ProphecyTrait.php
 		- tests/Core/Behat/CoverageContext.php
+		- tests/Core/Behat/DoctrineContext.php
 		- tests/Fixtures/TestBundle/Security/AbstractSecurityUser.php
 		# Templates for Maker
 		- src/Core/Bridge/Symfony/Maker/Resources/skeleton
