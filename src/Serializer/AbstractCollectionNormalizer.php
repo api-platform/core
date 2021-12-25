@@ -77,8 +77,10 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      * {@inheritdoc}
      *
      * @param iterable $object
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
             return $this->normalizeRawCollection($object, $format, $context);

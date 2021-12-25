@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
+use ApiPlatform\Util\ResponseTrait;
 use Symfony\Component\BrowserKit\Response as BrowserKitResponse;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\JsonException;
@@ -33,6 +34,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class Response implements ResponseInterface
 {
+    use ResponseTrait;
+
     private $httpFoundationResponse;
     private $browserKitResponse;
     private $headers;
@@ -65,20 +68,6 @@ final class Response implements ResponseInterface
             'error' => null,
             'response_headers' => $responseHeaders,
         ] + $info;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return mixed
-     */
-    public function getInfo(string $type = null)
-    {
-        if ($type) {
-            return $this->info[$type] ?? null;
-        }
-
-        return $this->info;
     }
 
     /**

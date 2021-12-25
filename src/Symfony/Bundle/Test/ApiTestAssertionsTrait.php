@@ -149,9 +149,11 @@ trait ApiTestAssertionsTrait
 
     private static function getSchemaFactory(): SchemaFactoryInterface
     {
+        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
+
         try {
             /** @var SchemaFactoryInterface $schemaFactory */
-            $schemaFactory = static::$container->get('api_platform.json_schema.schema_factory');
+            $schemaFactory = $container->get('api_platform.json_schema.schema_factory');
         } catch (ServiceNotFoundException $e) {
             throw new \LogicException('You cannot use the resource JSON Schema assertions if the "api_platform.swagger.versions" config is null or empty.');
         }

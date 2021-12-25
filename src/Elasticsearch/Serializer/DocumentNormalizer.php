@@ -77,8 +77,10 @@ final class DocumentNormalizer extends ObjectNormalizer
      * {@inheritdoc}
      *
      * @throws LogicException
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         throw new LogicException(sprintf('%s is a write-only format.', self::FORMAT));
     }

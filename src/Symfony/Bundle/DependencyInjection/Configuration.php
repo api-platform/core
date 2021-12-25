@@ -20,8 +20,8 @@ use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\Version as DoctrineOrmVersion;
 use Elasticsearch\Client as ElasticsearchClient;
 use FOS\UserBundle\FOSUserBundle;
 use GraphQL\GraphQL;
@@ -236,7 +236,7 @@ final class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('doctrine')
-                    ->{class_exists(DoctrineBundle::class) && class_exists(DoctrineOrmVersion::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->{class_exists(DoctrineBundle::class) && interface_exists(EntityManagerInterface::class) ? 'canBeDisabled' : 'canBeEnabled'}()
                 ->end()
             ->end();
     }

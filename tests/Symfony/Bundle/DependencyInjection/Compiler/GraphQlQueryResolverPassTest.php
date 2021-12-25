@@ -38,7 +38,7 @@ class GraphQlQueryResolverPassTest extends TestCase
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
         $typeLocatorDefinitionProphecy->addArgument(Argument::that(function (array $arg) {
             return !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference;
-        }))->shouldBeCalled();
+        }))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.graphql.enabled')->willReturn(true)->shouldBeCalled();
@@ -55,10 +55,10 @@ class GraphQlQueryResolverPassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $typeLocatorDefinitionProphecy->addArgument(Argument::any())->shouldNotBeCalled();
+        $typeLocatorDefinitionProphecy->addArgument(Argument::any())->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldNotBeCalled();
 
         $typesFactoryDefinitionProphecy = $this->prophesize(Definition::class);
-        $typesFactoryDefinitionProphecy->addArgument(['my_id'])->shouldNotBeCalled();
+        $typesFactoryDefinitionProphecy->addArgument(['my_id'])->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldNotBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.graphql.enabled')->willReturn(false)->shouldBeCalled();

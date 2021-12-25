@@ -37,8 +37,10 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         [$messages, $violations] = $this->getMessagesAndViolations($object);
 
