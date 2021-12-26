@@ -35,6 +35,7 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\User\User as SymfonyCoreUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
@@ -117,6 +118,17 @@ class AppKernel extends Kernel
 
         $c->getDefinition(DoctrineContext::class)->setArgument('$passwordHasher', class_exists(NativePasswordHasher::class) ? 'security.user_password_encoder' : 'security.user_password_hasher');
 
+        $messengerConfig = [
+            'default_bus' => 'messenger.bus.default',
+            'buses' => [
+                'messenger.bus.default' => ['default_middleware' => 'allow_no_handlers'],
+            ],
+        ];
+
+        // Symfony 5.4+
+        if (class_exists(SessionFactory::class)) {
+            $messengerConfig['reset_on_message'] = true;
+        }
         $c->prependExtensionConfig('framework', [
             'secret' => 'dunglas.fr',
             'validation' => ['enable_annotations' => true],
@@ -127,12 +139,7 @@ class AppKernel extends Kernel
                 'enabled' => true,
                 'collect' => false,
             ],
-            'messenger' => [
-                'default_bus' => 'messenger.bus.default',
-                'buses' => [
-                    'messenger.bus.default' => ['default_middleware' => 'allow_no_handlers'],
-                ],
-            ],
+            'messenger' => $messengerConfig,
             'router' => ['utf8' => true],
         ]);
 
@@ -178,7 +185,7 @@ class AppKernel extends Kernel
                 ],
             ],
             'access_control' => [
-                ['path' => '^/', 'role' => class_exists(SymfonyCoreUser::class) ? 'IS_AUTHENTICATED_ANONYMOUSLY' : 'PUBLIC_ACCESS'],
+                ['path' => '^/', 'role' => interface_exists(AccessDecisionStrategyInterface::class) ? 'PUBLIC_ACCESS' : 'IS_AUTHENTICATED_ANONYMOUSLY'],
             ],
         ];
 
