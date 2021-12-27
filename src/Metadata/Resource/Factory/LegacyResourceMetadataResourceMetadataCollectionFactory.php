@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -34,14 +33,12 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     use DeprecationMetadataTrait;
     private $decorated;
     private $resourceMetadataFactory;
-    private $identifiersExtractor;
     private $defaults;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, IdentifiersExtractorInterface $identifiersExtractor = null, array $defaults = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, array $defaults = [])
     {
         $this->decorated = $decorated;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
-        $this->identifiersExtractor = $identifiersExtractor;
         $this->defaults = $defaults + ['attributes' => []];
     }
 
@@ -161,8 +158,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             if ($newOperation->isCollection()) {
                 $newOperation = $newOperation->withUriVariables([]);
-            } elseif (null !== $this->identifiersExtractor) {
-                $newOperation = $newOperation->withUriVariables($this->identifiersExtractor->getIdentifiersFromResourceClass($resource->getClass()));
             }
 
             // Default behavior in API Platform < 2.7
