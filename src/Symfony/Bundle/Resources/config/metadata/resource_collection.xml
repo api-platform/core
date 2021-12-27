@@ -20,6 +20,7 @@
         <service id="api_platform.metadata.resource.metadata_collection_factory.legacy_resource_metadata" class="ApiPlatform\Metadata\Resource\Factory\LegacyResourceMetadataResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="1000" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.legacy_resource_metadata.inner" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument type="service" id="api_platform.identifiers_extractor.legacy" />
             <argument>%api_platform.defaults%</argument>
         </service>
 
