@@ -15,7 +15,10 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -33,12 +36,16 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     use DeprecationMetadataTrait;
     private $decorated;
     private $resourceMetadataFactory;
+    private $propertyNameCollectionFactory;
+    private $propertyMetadataFactory;
     private $defaults;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, array $defaults = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory = null, PropertyMetadataFactoryInterface $propertyMetadataFactory = null, array $defaults = [])
     {
         $this->decorated = $decorated;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
+        $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->defaults = $defaults + ['attributes' => []];
     }
 
@@ -70,6 +77,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         $resource = (new ApiResource())
             ->withShortName($resourceMetadata->getShortName())
             ->withClass($resourceClass)
+            ->withCompositeIdentifier($resourceMetadata->getAttribute('composite_identifier', true))
             ->withExtraProperties(['is_legacy_resource_metadata' => true]);
 
         if ($description = $resourceMetadata->getDescription()) {
@@ -83,6 +91,8 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         foreach ($attributes as $key => $value) {
             $resource = $this->setAttributeValue($resource, $key, $value);
         }
+
+        $resource = $this->identifiersToUriVariables($resourceMetadata, $resource);
 
         $operations = [];
         foreach ($this->createOperations($resourceMetadata->getItemOperations(), OperationType::ITEM, $resource) as $operationName => $operation) {
@@ -147,6 +157,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             $newOperation = (new Operation())
                 ->withMethod($operation['method'])
                 ->withCollection(OperationType::COLLECTION === $type)
+                ->withCompositeIdentifier($resource->getCompositeIdentifier())
                 ->withClass($resource->getClass())
                 ->withPriority($priority++);
 
@@ -158,11 +169,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             if ($newOperation->isCollection()) {
                 $newOperation = $newOperation->withUriVariables([]);
-            }
-
-            // Default behavior in API Platform < 2.7
-            if (null === $newOperation->getCompositeIdentifier()) {
-                $newOperation = $newOperation->withCompositeIdentifier(true);
             }
 
             $newOperation = $newOperation->withExtraProperties($newOperation->getExtraProperties() + ['is_legacy_resource_metadata' => true]);
@@ -209,5 +215,41 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         }
 
         return $operation->withExtraProperties($operation->getExtraProperties() + [$key => $value]);
+    }
+
+    /**
+     * @param ApiResource|Operation $resource
+     *
+     * @return ApiResource|Operation
+     */
+    private function identifiersToUriVariables(ResourceMetadata $resourceMetadata, $resource)
+    {
+        $identifiers = [];
+
+        foreach ($this->propertyNameCollectionFactory->create($resource->getClass()) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resource->getClass(), $property);
+            if ($propertyMetadata->isIdentifier()) {
+                $identifiers[] = $property;
+            }
+        }
+
+        $compositeIdentifier = $resourceMetadata->getAttribute('composite_identifier', null);
+        $numIdentifiers = \count($identifiers);
+        if (null === $compositeIdentifier) {
+            $compositeIdentifier = $numIdentifiers > 1 ? true : false;
+        }
+
+        if ($compositeIdentifier || 1 === $numIdentifiers) {
+            $parameterName = 1 === $numIdentifiers ? $identifiers[0] : 'id';
+
+            return $resource->withUriVariables([$parameterName => (new Link())->withFromClass($resource->getClass())->withIdentifiers($identifiers)->withParameterName($parameterName)->withCompositeIdentifier($compositeIdentifier)]);
+        }
+
+        $uriVariables = [];
+        foreach ($identifiers as $identifier) {
+            $uriVariables[$identifier] = (new Link())->withFromClass($resource->getClass())->withIdentifiers([$identifier])->withParameterName($identifier)->withCompositeIdentifier($compositeIdentifier);
+        }
+
+        return $resource->withUriVariables($uriVariables);
     }
 }
