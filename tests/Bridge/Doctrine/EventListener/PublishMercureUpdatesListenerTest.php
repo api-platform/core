@@ -93,8 +93,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(DummyFriend::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => "['foo', 'bar']"]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
-        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+        $serializerProphecy->serialize($toInsert, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('1');
+        $serializerProphecy->serialize($toUpdate, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('2');
 
         $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
 
@@ -189,10 +195,22 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['/dummies/1', '/users/3'], 'normalization_context' => ['groups' => ['baz']]]]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
-        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
-        $serializerProphecy->serialize($toUpdateMercureOptions, 'jsonld', ['groups' => ['baz']])->willReturn('mercure_options');
-        $serializerProphecy->serialize($toUpdateMercureTopicOptions, 'jsonld', ['groups' => ['baz']])->willReturn('mercure_options');
+        $serializerProphecy->serialize($toInsert, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('1');
+        $serializerProphecy->serialize($toUpdate, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('2');
+        $serializerProphecy->serialize($toUpdateMercureOptions, 'jsonld', [
+            'resource_class' => DummyOffer::class,
+            'groups' => ['baz'],
+        ])->willReturn('mercure_options');
+        $serializerProphecy->serialize($toUpdateMercureTopicOptions, 'jsonld', [
+            'resource_class' => DummyMercure::class,
+            'groups' => ['baz'],
+        ])->willReturn('mercure_options');
 
         $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
 
@@ -290,10 +308,22 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(DummyMercure::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['topics' => ['/dummies/1', '/users/3'], 'normalization_context' => ['groups' => ['baz']], 'hub' => 'managed', 'enable_async_update' => false]]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
-        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
-        $serializerProphecy->serialize($toUpdateMercureOptions, 'jsonld', ['groups' => ['baz']])->willReturn('mercure_options');
-        $serializerProphecy->serialize($toUpdateMercureTopicOptions, 'jsonld', ['groups' => ['baz']])->willReturn('mercure_options');
+        $serializerProphecy->serialize($toInsert, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('1');
+        $serializerProphecy->serialize($toUpdate, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('2');
+        $serializerProphecy->serialize($toUpdateMercureOptions, 'jsonld', [
+            'resource_class' => DummyOffer::class,
+            'groups' => ['baz'],
+        ])->willReturn('mercure_options');
+        $serializerProphecy->serialize($toUpdateMercureTopicOptions, 'jsonld', [
+            'resource_class' => DummyMercure::class,
+            'groups' => ['baz'],
+        ])->willReturn('mercure_options');
 
         $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
 
@@ -361,7 +391,10 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['enable_async_update' => false], 'normalization_context' => ['groups' => ['foo', 'bar']]]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+        $serializerProphecy->serialize($toUpdate, 'jsonld', [
+            'resource_class' => Dummy::class,
+            'groups' => ['foo', 'bar'],
+        ])->willReturn('2');
 
         $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
 
