@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\UriVariable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,14 +24,25 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ApiResource]
 #[Post]
-#[ApiResource('/companies/{companyId}/employees/{id}')]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/employees/{id}',
+    uriVariables: [
+        'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
+        'id' => ['from_class' => Employee::class],
+    ]
+)]
 #[Get]
-#[ApiResource('/companies/{companyId}/employees')]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/employees',
+    uriVariables: [
+        'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
+    ]
+)]
 #[GetCollection]
 class Employee
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -50,8 +60,7 @@ class Employee
     /**
      * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
      */
-    #[UriVariable('companyId')]
-    public Company $company;
+    public ?Company $company;
 
     public function getId()
     {

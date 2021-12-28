@@ -18,7 +18,7 @@ use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider as OdmCol
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider as OdmItemDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
-use ApiPlatform\Doctrine\Orm\State\Processor;
+use ApiPlatform\Doctrine\Common\State\Processor;
 use ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -39,7 +39,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $manager;
     private $schemaTool;
     private $env;
-    private $metadataBackwardCompatibilityLayer;
 
     protected function setUp(): void
     {
@@ -58,7 +57,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->schemaTool->dropSchema($classes);
         $this->manager->clear();
         $this->schemaTool->createSchema($classes);
-        $this->metadataBackwardCompatibilityLayer = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
 
         $this->ensureKernelShutdown();
     }
@@ -230,7 +228,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
         // Metadata tab
         $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('_api_/processor_entities.{_format}_post_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
+        $this->assertSame('_api_/processor_entities.{_format}_post', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
 
         // Data provider tab
         $tabContent = $crawler->filter('.data-provider-tab-content');

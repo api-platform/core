@@ -48,7 +48,7 @@ class ValidateListenerTest extends TestCase
 
         $listener = new ValidateListener($validatorProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, []);
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, []);
         $listener->onKernelView($event);
     }
 
@@ -82,7 +82,7 @@ class ValidateListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -105,7 +105,7 @@ class ValidateListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -135,7 +135,7 @@ class ValidateListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -182,7 +182,7 @@ class ValidateListenerTest extends TestCase
         ]);
 
         $request->setMethod('POST');
-        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
+        $event = new ViewEvent($kernel, $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $data);
 
         return [$resourceMetadataFactory, $event];
     }

@@ -28,7 +28,7 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 /**
  * @experimental
  */
-final class LegacyApiResourceAttributeToApiResourceAttributeRector extends AbstractLegacyApiResourceToApiResourceAttribute implements ConfigurableRectorInterface
+final class LegacyApiResourceAttributeToApiResourceAttributeRector extends AbstractAnnotationToAttributeRector implements ConfigurableRectorInterface
 {
     /**
      * @var string

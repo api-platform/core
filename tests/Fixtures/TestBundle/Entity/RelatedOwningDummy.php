@@ -35,14 +35,14 @@ class RelatedOwningDummy
     private $id;
 
     /**
-     * @var string A name
+     * @var string|null A name
      *
      * @ORM\Column(nullable=true)
      */
     public $name;
 
     /**
-     * @var Dummy
+     * @var Dummy|null
      *
      * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, mappedBy="relatedOwningDummy")
      * @ApiSubresource

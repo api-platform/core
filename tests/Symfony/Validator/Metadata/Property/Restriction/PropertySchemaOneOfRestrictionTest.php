@@ -47,17 +47,16 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
      */
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
-        if (!class_exists(AtLeastOneOf::class)) {
-            self::markTestSkipped();
-        }
-
         self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->supports($constraint, $propertyMetadata));
     }
 
     public function supportsProvider(): \Generator
     {
-        yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), true];
+        if (!class_exists(AtLeastOneOf::class)) {
+            return;
+        }
 
+        yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), true];
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 

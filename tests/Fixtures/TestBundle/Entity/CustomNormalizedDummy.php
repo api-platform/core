@@ -43,7 +43,7 @@ class CustomNormalizedDummy
     private $id;
 
     /**
-     * @var string|null The dummy name
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank

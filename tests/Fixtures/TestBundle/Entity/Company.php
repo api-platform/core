@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\UriVariable;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,12 +25,23 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource]
 #[Get]
 #[Post]
-#[ApiResource('/employees/{employeeId}/company')]
+#[ApiResource(
+    uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
+    uriVariables: [
+        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
+    ],
+)]
 #[Get]
+#[ApiResource(
+    uriTemplate: '/employees/{employeeId}/company',
+    uriVariables: [
+        'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
+    ],
+)]
 class Company
 {
     /**
-     * @var int The id
+     * @var int|null The id
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -45,9 +56,9 @@ class Company
      */
     public string $name;
 
-    // TODO 3.0: Set the uri variable directly in the api resource and remove this property
-    #[UriVariable(parameterName: 'employeeId', inverseProperty: 'company', property: null, targetClass: Employee::class)]
-    public $employees; // only used to set metadata
+    /** @var Employee[] */
+    #[Link(toProperty: 'company')]
+    public $employees = []; // only used to set metadata
 
     public function getId()
     {

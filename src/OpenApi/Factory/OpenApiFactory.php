@@ -22,6 +22,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -181,7 +182,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             // Set up parameters
             foreach ($uriVariables ?? [] as $parameterName => $uriVariable) {
-                $parameter = new Model\Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getTargetClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
+                $parameter = new Model\Parameter($parameterName, 'path', (new \ReflectionClass($uriVariable->getFromClass()))->getShortName().' identifier', true, false, false, ['type' => 'string']);
                 if ($this->hasParameter($parameter, $parameters)) {
                     continue;
                 }
@@ -229,7 +230,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     break;
             }
 
-            if (!$operation->isCollection()) {
+            if (!$operation->isCollection() && !$operation instanceof Post) {
                 $responses['404'] = new Model\Response('Resource not found');
             }
 
@@ -254,12 +255,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
 
-                $requestBody = new Model\RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
+                $requestBody = new Model\RequestBody(sprintf('The %s %s resource', Operation::METHOD_POST === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true);
             }
 
             $pathItem = $pathItem->{'with'.ucfirst($method)}(new Model\Operation(
                 $operationId,
-                $operation->getOpenapiContext()['tags'] ?? ([$operation->getShortName()] ?? [$resourceShortName]),
+                $operation->getOpenapiContext()['tags'] ?? [$operation->getShortName() ?: $resourceShortName],
                 $responses,
                 $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection() ?? false),
                 $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection() ?? false),
@@ -369,7 +370,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
                 $parameters = [];
-                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation->isCollection() || Operation::METHOD_GET !== $operation->getMethod() ?? Operation::METHOD_GET) {
+                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation->isCollection() || Operation::METHOD_GET !== ($operation->getMethod() ?: Operation::METHOD_GET)) {
                     continue;
                 }
 
@@ -379,7 +380,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if ($operationUriVariables[$parameterName]->getIdentifiers() === $uriVariableDefinition->getIdentifiers() && $operationUriVariables[$parameterName]->getTargetClass() === $uriVariableDefinition->getTargetClass()) {
+                    if ($operationUriVariables[$parameterName]->getIdentifiers() === $uriVariableDefinition->getIdentifiers() && $operationUriVariables[$parameterName]->getFromClass() === $uriVariableDefinition->getFromClass()) {
                         $parameters[$parameterName] = '$request.path.'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }
@@ -389,7 +390,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         continue;
                     }
 
-                    if (($uriVariableDefinition->getTargetClass() ?? null) === $currentOperation->getClass()) {
+                    if (($uriVariableDefinition->getFromClass() ?? null) === $currentOperation->getClass()) {
                         $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition->getIdentifiers()[0];
                     }
                 }

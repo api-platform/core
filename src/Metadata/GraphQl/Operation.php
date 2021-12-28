@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\WithResourceTrait;
 
 class Operation
@@ -24,6 +25,8 @@ class Operation
     protected $args;
     protected $shortName;
     protected $class;
+    /** @var Link[]|null */
+    protected $links;
     protected $paginationEnabled;
     protected $paginationType;
     protected $paginationItemsPerPage;
@@ -73,6 +76,7 @@ class Operation
     protected $validate;
     protected $write;
     protected $serialize;
+    protected $delete;
     protected $fetchPartial;
     protected $forceEager;
     protected $priority;
@@ -106,12 +110,14 @@ class Operation
      * @param bool|string       $messenger
      * @param bool              $elasticsearch
      * @param int               $urlGenerationStrategy
+     * @param bool              $delete
      * @param bool              $fetchPartial
      * @param bool              $forceEager
      * @param mixed|null        $input
      * @param mixed|null        $output
      */
     public function __construct(
+        ?bool $delete = null,
         ?string $resolver = null,
         bool $collection = false,
         ?array $args = null,
@@ -196,6 +202,7 @@ class Operation
         $this->validate = $validate;
         $this->write = $write;
         $this->serialize = $serialize;
+        $this->delete = $delete;
         $this->fetchPartial = $fetchPartial;
         $this->forceEager = $forceEager;
         $this->priority = $priority;
@@ -203,7 +210,7 @@ class Operation
         $this->extraProperties = $extraProperties;
     }
 
-    public function withOperation(self $operation): self
+    public function withOperation($operation)
     {
         return $this->copyFrom($operation);
     }
@@ -269,6 +276,25 @@ class Operation
     {
         $self = clone $this;
         $self->class = $class;
+
+        return $self;
+    }
+
+    /**
+     * @return Link[]|null
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * @param Link[] $links
+     */
+    public function withLinks(array $links): self
+    {
+        $self = clone $this;
+        $self->links = $links;
 
         return $self;
     }
@@ -727,6 +753,19 @@ class Operation
     {
         $self = clone $this;
         $self->serialize = $serialize;
+
+        return $self;
+    }
+
+    public function isDelete(): ?bool
+    {
+        return $this->delete;
+    }
+
+    public function withDelete(?bool $delete = null): self
+    {
+        $self = clone $this;
+        $self->delete = $delete;
 
         return $self;
     }

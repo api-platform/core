@@ -51,7 +51,7 @@ class ValidateListenerTest extends TestCase
 
         $listener = new ValidateListener($validator, $resourceMetadataFactory);
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, []);
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, []);
         $listener->onKernelView($event);
     }
 
@@ -60,8 +60,10 @@ class ValidateListenerTest extends TestCase
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
 
-        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationList->count()->willReturn(0);
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
@@ -79,8 +81,10 @@ class ValidateListenerTest extends TestCase
         $data = new DummyEntity();
         $expectedValidationGroups = ['a', 'b', 'c'];
 
-        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationList->count()->willReturn(0);
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $validatorProphecy->validate($data, null, $expectedValidationGroups)->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
@@ -98,8 +102,10 @@ class ValidateListenerTest extends TestCase
     {
         $data = new DummyEntity();
 
-        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationList->count()->willReturn(0);
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $validatorProphecy->validate($data, null, ['a', 'b', 'c'])->willReturn($constraintViolationList)->shouldBeCalled();
         $validator = $validatorProphecy->reveal();
 
@@ -124,8 +130,10 @@ class ValidateListenerTest extends TestCase
         $data = new DummyEntity();
         $expectedValidationGroups = ['foo'];
 
-        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $constraintViolationList = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationList->count()->willReturn(0);
+
+        $validatorProphecy = $this->prophesize(ValidatorInterface::class);
         $validatorProphecy->validate($data, null, $expectedValidationGroups)->willreturn($constraintViolationList)->shouldBeCalled();
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
@@ -197,7 +205,7 @@ class ValidateListenerTest extends TestCase
         ]);
 
         $request->setMethod('POST');
-        $event = new ViewEvent($kernel, $request, HttpKernelInterface::MASTER_REQUEST, $data);
+        $event = new ViewEvent($kernel, $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $data);
 
         return [$resourceMetadataFactory, $event];
     }

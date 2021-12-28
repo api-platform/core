@@ -36,8 +36,7 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
-use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Symfony\Component\Routing\RouteCollectionBuilder;
+use Symfony\Component\Security\Core\User\User as SymfonyCoreUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -93,14 +92,11 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }
 
-    /**
-     * @param RoutingConfigurator|RouteCollectionBuilder $routes
-     */
     protected function configureRoutes($routes)
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
@@ -178,16 +174,26 @@ class AppKernel extends Kernel
                 ],
                 'default' => [
                     'provider' => 'chain_provider',
+                    'stateless' => true,
                     'http_basic' => null,
                     'anonymous' => null,
-                    'stateless' => true,
                     'entry_point' => 'app.security.authentication_entrypoint',
                 ],
             ],
             'access_control' => [
-                ['path' => '^/', 'role' => 'IS_AUTHENTICATED_ANONYMOUSLY'],
+                ['path' => '^/', 'role' => class_exists(SymfonyCoreUser::class) ? 'IS_AUTHENTICATED_ANONYMOUSLY' : 'PUBLIC_ACCESS'],
             ],
         ];
+
+        if (!class_exists(SymfonyCoreUser::class)) {
+            $securityConfig['role_hierarchy'] = [
+                'ROLE_ADMIN' => ['ROLE_USER'],
+            ];
+            unset($securityConfig['firewalls']['default']['anonymous']);
+            $securityConfig['firewalls']['default']['http_basic'] = [
+                'realm' => 'Secured Area',
+            ];
+        }
 
         if (class_exists(NativePasswordHasher::class)) {
             $securityConfig['enable_authenticator_manager'] = true;

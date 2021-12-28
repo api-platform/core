@@ -26,7 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
 class ConvertedOwner
 {
     /**
-     * @var int
+     * @var int|null
      *
      * @ORM\Column(type="integer", nullable=true)
      * @ORM\Id
@@ -35,7 +35,7 @@ class ConvertedOwner
     private $id;
 
     /**
-     * @var ConvertedRelated
+     * @var ConvertedRelated|null
      *
      * @ORM\ManyToOne(targetEntity="ConvertedRelated")
      */

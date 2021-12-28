@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     steps:
       - name: Checkout
@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
@@ -65,10 +65,12 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Allow unstable project dependencies
+        run: composer config minimum-stability dev
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
@@ -82,11 +84,14 @@ jobs:
         continue-on-error: true
       - name: Clear test app cache
         run: |
-          tests/Fixtures/app/console cache:clear --ansi
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:warmup
       - name: Run PHPStan analysis
         env:
           SYMFONY_PHPUNIT_VERSION: '9.5'
-        run: ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
+        run: 
+          ./vendor/bin/phpstan --version
+          ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -100,8 +105,9 @@ jobs:
           - '7.3'
           - '7.4'
           - '8.0'
+          - '8.1'
         include:
-          - php: '8.0'
+          - php: '8.1'
             coverage: true
       fail-fast: false
     steps:
@@ -142,7 +148,7 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -192,8 +198,9 @@ jobs:
           - '7.3'
           - '7.4'
           - '8.0'
+          - '8.1'
         include:
-          - php: '8.0'
+          - php: '8.1'
             coverage: true
       fail-fast: false
     steps:
@@ -207,10 +214,6 @@ jobs:
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
-      - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
-        run: |
-          composer config platform.php 7.4.99
       - name: Get composer cache directory
         id: composercache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
@@ -238,17 +241,17 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
-        if: (!startsWith(matrix.php, '8.0'))
+        if: (!startsWith(matrix.php, '8.'))
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Clear test app cache (php 8.0)
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
-        if: (!startsWith(matrix.php, '8.0'))
+        if: (!startsWith(matrix.php, '8.'))
         run: |
           mkdir -p build/logs/behat
           if [ "$COVERAGE" = '1' ]; then
@@ -261,7 +264,7 @@ jobs:
             fi
           fi
       - name: Run Behat tests
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
           mkdir -p build/logs/behat
           if [ "$COVERAGE" = '1' ]; then
@@ -274,6 +277,7 @@ jobs:
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
+          mkdir -p build/coverage
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
         continue-on-error: true
       - name: Upload test artifacts
@@ -307,12 +311,16 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
           tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
-            npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
+          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -350,10 +358,10 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi --no-update
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi --prefer-lowest
-      - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Install PHPUnit
@@ -390,10 +398,10 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Require Symfony components
+        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi --no-update
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi --prefer-lowest
-      - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -444,7 +452,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -496,7 +504,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -545,7 +553,7 @@ jobs:
         run: |
           composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -564,6 +572,7 @@ jobs:
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
           chmod +x /usr/local/bin/phpcov
+          mkdir -p build/coverage
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
         continue-on-error: true
       - name: Upload test artifacts
@@ -598,6 +607,7 @@ jobs:
         php:
           - '7.4'
           - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
@@ -634,7 +644,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install Elasticsearch-php # there is a version matrix for this package: https://packagist.org/packages/elasticsearch/elasticsearch
         run: composer require "elasticsearch/elasticsearch:v7.14.0" --no-interaction --no-progress --ansi
       - name: Install PHPUnit
@@ -678,7 +688,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -687,15 +697,13 @@ jobs:
         run: vendor/bin/simple-phpunit
 
   phpunit-symfony-next:
-    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony dev)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.0'
-        symfony:
-          - '5.4'
+          - '8.1'
       fail-fast: false
     env:
       # See https://github.com/doctrine/DoctrineMongoDBBundle/pull/673
@@ -707,7 +715,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
@@ -729,20 +737,6 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Flag held back Symfony packages
-        env:
-          symfony_version: ${{ matrix.symfony }}
-        run: |
-          version_pattern=$symfony_version.x-dev
-          if [ "${symfony_version%.4}" != "$symfony_version" ]; then
-            current_major=${symfony_version%.4}
-            next_major=$((current_major + 1))
-            version_pattern=$version_pattern'|'$next_major.0.x-dev'|'dev-master
-          fi
-          version_pattern=$(echo "$version_pattern" | sed -r 's/\./\\./g')
-          symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
-          ! echo "$symfony_packages" | grep -vE "$version_pattern"
-        continue-on-error: true
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -751,15 +745,13 @@ jobs:
         run: vendor/bin/simple-phpunit
 
   behat-symfony-next:
-    name: Behat (PHP ${{ matrix.php }}) (Symfony ${{ matrix.symfony }})
+    name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.0'
-        symfony:
-          - '5.4'
+          - '8.1'
       fail-fast: false
     steps:
       - name: Checkout
@@ -767,7 +759,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring 
           coverage: none
@@ -791,20 +783,6 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Flag held back Symfony packages
-        env:
-          symfony_version: ${{ matrix.symfony }}
-        run: |
-          version_pattern=$symfony_version.x-dev
-          if [ "${symfony_version%.4}" != "$symfony_version" ]; then
-            current_major=${symfony_version%.4}
-            next_major=$((current_major + 1))
-            version_pattern=$version_pattern'|'$next_major.0.x-dev'|'dev-master
-          fi
-          version_pattern=$(echo "$version_pattern" | sed -r 's/\./\\./g')
-          symfony_packages=$(composer show symfony/* | tr -s ' ' '\t' | cut -f1-2 | grep -vE 'polyfill|contracts|mercure')
-          ! echo "$symfony_packages" | grep -vE "$version_pattern"
-        continue-on-error: true
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -819,7 +797,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.0'
+          - '8.1'
       fail-fast: false
     steps:
       - name: Checkout
@@ -840,25 +818,24 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components and Rector dependencies
-        run: composer require symfony/intl symfony/uid rector/rector --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid rector/rector:0.12.5 --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Convert annotations to attributes
         run: |
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --transform-apisubresource -s
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --annotation-to-api-resource -s
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --transform-apisubresource -s 
-          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --annotation-to-api-resource -s
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --transform-apisubresource -s  -n
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Entity --annotation-to-api-resource -s -n
       - name: Clear test app cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
           vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
-        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
@@ -873,6 +850,10 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
           tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Validate OpenAPI documents
         run: |
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
@@ -886,7 +867,67 @@ jobs:
           name: openapi-docs-php${{ matrix.php }}
           path: build/out/openapi
         continue-on-error: true
-        
+
+  behat-rector-upgrade-mongodb:
+    name: Behat (PHP ${{ matrix.php }}) (Rector / MongoDB)
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: mongodb
+      MONGODB_URL: mongodb://localhost:27017
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.1'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check
+        run: |
+          sudo systemctl start mongod.service
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: composer update --no-interaction --no-progress --ansi
+      - name: Require Symfony components and Rector dependencies
+        run: composer require symfony/uid rector/rector:0.12.5 --dev --no-interaction --no-progress --ansi
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
+      - name: Clear test app cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Convert annotations to attributes
+        run: |
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --transform-apisubresource -s -n
+          tests/Fixtures/app/console api:rector:upgrade tests/Fixtures/TestBundle/Document --annotation-to-api-resource -s -n
+      - name: Clear test app cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Run Behat tests
+        run: |
+          mkdir -p build/logs/behat
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: behat-logs-php${{ matrix.php }}
+          path: build/logs/behat
+        continue-on-error: true
+
   windows-phpunit:
     name: Windows PHPUnit (PHP ${{ matrix.php }}) (SQLite)
     runs-on: windows-latest
@@ -896,6 +937,7 @@ jobs:
         php:
           - '7.4'
           - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -921,13 +963,13 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -944,6 +986,7 @@ jobs:
         php:
           - '7.4'
           - '8.0'
+          - '8.1'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -969,13 +1012,13 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Set Composer platform config
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
             composer config platform.php 7.4.99
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1022,7 +1065,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1066,7 +1109,7 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
-        run: composer require symfony/intl symfony/uid --dev --no-interaction --no-progress --ansi
+        run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1076,7 +1119,7 @@ jobs:
           mkdir -p build/logs/behat
           vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction --tags='~@php8'
       - name: Run Behat tests
-        if: (startsWith(matrix.php, '8.0'))
+        if: (startsWith(matrix.php, '8.'))
         run: |
           mkdir -p build/logs/behat
           vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=default --no-interaction
@@ -1087,6 +1130,10 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
           tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Validate OpenAPI documents
         run: |
             npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json

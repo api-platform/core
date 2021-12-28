@@ -42,7 +42,7 @@ class Operation
      */
     protected $outputFormats;
     /**
-     * @var array<string, UriVariable>|array<string, array>|string[]|string|null
+     * @var array<string, Link>|array<string, array>|string[]|string|null
      */
     protected $uriVariables;
     protected $routePrefix;
@@ -108,6 +108,8 @@ class Operation
     protected $securityMessage;
     protected $securityPostDenormalize;
     protected $securityPostDenormalizeMessage;
+    protected $securityPostValidation;
+    protected $securityPostValidationMessage;
     protected $compositeIdentifier;
     protected $exceptionToStatus;
     protected $queryParameterValidationEnabled;
@@ -224,6 +226,8 @@ class Operation
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?bool $compositeIdentifier = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -295,6 +299,8 @@ class Operation
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+        $this->securityPostValidation = $securityPostValidation;
+        $this->securityPostValidationMessage = $securityPostValidationMessage;
         $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
@@ -309,7 +315,7 @@ class Operation
         $this->extraProperties = $extraProperties;
     }
 
-    public function withOperation(self $operation): self
+    public function withOperation($operation)
     {
         return $this->copyFrom($operation);
     }
@@ -444,7 +450,7 @@ class Operation
     }
 
     /**
-     * @return array<string, UriVariable>|array<string, array>|string[]|string|null
+     * @return array<string, Link>|array<string, array>|string[]|string|null
      */
     public function getUriVariables()
     {
@@ -452,7 +458,7 @@ class Operation
     }
 
     /**
-     * @param array<string, UriVariable>|array<string, array>|string[]|string|null $uriVariables
+     * @param array<string, Link>|array<string, array>|string[]|string $uriVariables
      */
     public function withUriVariables($uriVariables): self
     {
@@ -877,6 +883,11 @@ class Operation
         return $self;
     }
 
+    public function isDelete(): bool
+    {
+        return self::METHOD_DELETE === $this->getMethod();
+    }
+
     public function getFetchPartial(): ?bool
     {
         return $this->fetchPartial;
@@ -1094,6 +1105,32 @@ class Operation
     {
         $self = clone $this;
         $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidation(): ?string
+    {
+        return $this->securityPostValidation;
+    }
+
+    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidation = $securityPostValidation;
+
+        return $self;
+    }
+
+    public function getSecurityPostValidationMessage(): ?string
+    {
+        return $this->securityPostValidationMessage;
+    }
+
+    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    {
+        $self = clone $this;
+        $self->securityPostValidationMessage = $securityPostValidationMessage;
 
         return $self;
     }

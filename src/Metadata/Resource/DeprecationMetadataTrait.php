@@ -74,6 +74,9 @@ trait DeprecationMetadataTrait
             $key = 'graphQlOperations';
         } elseif ('identifiers' === $key) {
             $key = 'uriVariables';
+        } elseif ('doctrine_mongodb' === $key) {
+            $key = 'extra_properties';
+            $value = ['doctrine_mongodb' => $value];
         }
 
         return [$this->camelCaseToSnakeCaseNameConverter->denormalize($key), $value];

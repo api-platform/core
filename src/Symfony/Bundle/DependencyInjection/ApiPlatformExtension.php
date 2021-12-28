@@ -816,6 +816,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeAlias('api_platform.openapi.factory');
         $container->setAlias('api_platform.openapi.factory', 'api_platform.openapi.factory.legacy');
 
+        $container->removeAlias('api_platform.graphql.resolver.stage.read');
+        $container->setAlias('api_platform.graphql.resolver.stage.read', 'api_platform.graphql.resolver.stage.read.legacy');
+
+        $container->removeAlias('api_platform.graphql.resolver.stage.write');
+        $container->setAlias('api_platform.graphql.resolver.stage.write', 'api_platform.graphql.resolver.stage.write.legacy');
+
         $container->removeAlias('api_platform.graphql.type_converter');
         $container->setAlias('api_platform.graphql.type_converter', 'api_platform.graphql.type_converter.legacy');
 

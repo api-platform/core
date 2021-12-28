@@ -32,7 +32,7 @@ use Webmozart\Assert\Assert;
 /**
  * @experimental
  */
-final class ApiResourceAnnotationToApiResourceAttributeRector extends AbstractLegacyApiResourceToApiResourceAttribute implements ConfigurableRectorInterface
+final class ApiResourceAnnotationToApiResourceAttributeRector extends AbstractAnnotationToAttributeRector implements ConfigurableRectorInterface
 {
     use DeprecationMetadataTrait;
 
@@ -86,7 +86,7 @@ use ApiPlatform\Metadata\Get;
 class Book
 CODE_SAMPLE
             , [
-                self::ANNOTATION_TO_ATTRIBUTE => [new AnnotationToAttribute(\ApiPlatform\Core\Annotation\ApiResource::class, \ApiPlatform\Core\Annotation\ApiResource::class)],
+                self::ANNOTATION_TO_ATTRIBUTE => [new AnnotationToAttribute(\ApiPlatform\Core\Annotation\ApiResource::class, \ApiPlatform\Metadata\ApiResource::class)],
                 self::REMOVE_TAG => true,
             ]),
         ]);

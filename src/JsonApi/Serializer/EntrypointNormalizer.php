@@ -56,8 +56,10 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 

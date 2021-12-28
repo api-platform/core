@@ -56,7 +56,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -92,7 +92,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -134,7 +134,7 @@ class WriteListenerTest extends TestCase
             $event = new ViewEvent(
                 $this->prophesize(HttpKernelInterface::class)->reveal(),
                 $request,
-                HttpKernelInterface::MASTER_REQUEST,
+                \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
                 $dummy
             );
 
@@ -171,7 +171,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -197,7 +197,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -224,7 +224,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -248,7 +248,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
@@ -275,7 +275,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -311,7 +311,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -339,7 +339,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -364,7 +364,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 
@@ -391,7 +391,7 @@ class WriteListenerTest extends TestCase
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            HttpKernelInterface::MASTER_REQUEST,
+            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $dummy
         );
 

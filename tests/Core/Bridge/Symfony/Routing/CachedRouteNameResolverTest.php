@@ -67,7 +67,7 @@ class CachedRouteNameResolverTest extends TestCase
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false)->shouldBeCalledTimes(1);
-        $cacheItemProphecy->set('some_item_route')->shouldBeCalledTimes(1);
+        $cacheItemProphecy->set('some_item_route')->shouldBeCalledTimes(1)->willReturn($cacheItemProphecy->reveal());
 
         $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPoolProphecy->getItem(Argument::type('string'))->shouldBeCalledTimes(1)->willReturn($cacheItemProphecy);
@@ -126,7 +126,7 @@ class CachedRouteNameResolverTest extends TestCase
     {
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->shouldBeCalledTimes(1)->willReturn(false);
-        $cacheItemProphecy->set('some_collection_route')->shouldBeCalledTimes(1);
+        $cacheItemProphecy->set('some_collection_route')->shouldBeCalledTimes(1)->willReturn($cacheItemProphecy->reveal());
 
         $cacheItemPoolProphecy = $this->prophesize(CacheItemPoolInterface::class);
         $cacheItemPoolProphecy->getItem(Argument::type('string'))->shouldBeCalledTimes(1)->willReturn($cacheItemProphecy);

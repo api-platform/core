@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Bridge\Symfony\Identifier\Normalizer;
 
 use ApiPlatform\Exception\InvalidIdentifierException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -26,7 +25,7 @@ final class UuidNormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      *
-     * @return AbstractUid|Uuid
+     * @return mixed
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {

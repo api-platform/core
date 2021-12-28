@@ -29,6 +29,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\PropertyInfo\Type;
@@ -85,8 +86,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         $classes = [];
         $entrypointProperties = [];
@@ -342,7 +345,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperations = [];
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if (($operation->isCollection() ?? false) !== $collection) {
+                    if (($operation instanceof Post || ($operation->isCollection() ?? false)) !== $collection) {
                         continue;
                     }
 
@@ -372,7 +375,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getHydraOperation(string $resourceClass, $resourceMetadata, string $operationName, $operation, string $prefixedShortName, ?string $operationType = null, SubresourceMetadata $subresourceMetadata = null): array
     {
         if ($operation instanceof Operation) {
-            $method = $operation->getMethod() ?? Operation::METHOD_GET;
+            $method = $operation->getMethod() ?: Operation::METHOD_GET;
         } elseif ($this->operationMethodResolver) {
             if (OperationType::COLLECTION === $operationType) {
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);

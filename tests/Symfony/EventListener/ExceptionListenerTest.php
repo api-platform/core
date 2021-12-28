@@ -39,7 +39,7 @@ class ExceptionListenerTest extends TestCase
         $kernel->handle(Argument::type(Request::class), HttpKernelInterface::SUB_REQUEST, false)->willReturn(new Response())->shouldBeCalled();
 
         $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
-        $event = new ExceptionEvent($kernel->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $event = new ExceptionEvent($kernel->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
 
         $this->assertInstanceOf(Response::class, $event->getResponse());
@@ -56,7 +56,7 @@ class ExceptionListenerTest extends TestCase
     public function testDoNothingWhenNotAnApiCall()
     {
         $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());
@@ -68,7 +68,7 @@ class ExceptionListenerTest extends TestCase
         $request->setRequestFormat('html');
 
         $listener = new ExceptionListener('foo:bar', null, false, class_exists(ErrorListener::class) ? $this->prophesize(ErrorListener::class)->reveal() : null);
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
 
         $this->assertNull($event->getResponse());

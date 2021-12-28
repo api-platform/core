@@ -76,6 +76,8 @@ final class Post extends Operation
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
+        ?string $securityPostValidation = null,
+        ?string $securityPostValidationMessage = null,
         ?bool $compositeIdentifier = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -91,6 +93,5 @@ final class Post extends Operation
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_POST, ...\func_get_args());
-        $this->collection = $collection ?? true;
     }
 }

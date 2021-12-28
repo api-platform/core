@@ -17,9 +17,9 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\UriVariable;
 
 #[ApiResource(normalizationContext: ['skip_null_values' => true])]
 #[Get]
@@ -36,7 +36,7 @@ final class AttributeResource
     /**
      * @var ?Dummy
      */
-    #[UriVariable('dummyId')]
+    #[link('dummyId')]
     public $dummy = null;
 
     /**

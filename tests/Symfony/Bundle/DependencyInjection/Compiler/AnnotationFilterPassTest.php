@@ -188,7 +188,7 @@ class AnnotationFilterPassTest extends TestCase
         $containerBuilderProphecy->getParameter('api_platform.resource_class_directories')->willReturn([
             __DIR__.'/../../../../Fixtures/TestBundle/Entity/',
         ]);
-        $containerBuilderProphecy->has('annotation_reader')->willReturn($readerProphecy);
+        $containerBuilderProphecy->has('annotation_reader')->willReturn(true);
         $containerBuilderProphecy->get('annotation_reader')->willReturn($readerProphecy);
         $containerBuilderProphecy->has('annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_api_platform_doctrine_orm_filter_search_filter')->willReturn(false);
         $containerBuilderProphecy->getReflectionClass(SearchFilter::class, false)->willReturn(null);

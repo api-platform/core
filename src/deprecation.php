@@ -16,12 +16,14 @@ spl_autoload_register(function ($className) {
     static $deprecatedAnnotations = [
         'ApiResource' => [ApiPlatform\Core\Annotation\ApiResource::class, ApiPlatform\Metadata\ApiResource::class],
         'ApiProperty' => [ApiPlatform\Core\Annotation\ApiProperty::class, ApiPlatform\Metadata\ApiProperty::class],
+        'ApiFilter' => [ApiPlatform\Core\Annotation\ApiFilter::class, ApiPlatform\Metadata\ApiFilter::class],
     ];
 
     static $deprecatedClasses = [
         ApiPlatform\Core\Api\UrlGeneratorInterface::class => ApiPlatform\Api\UrlGeneratorInterface::class,
         ApiPlatform\Core\Annotation\ApiResource::class => ApiPlatform\Metadata\ApiResource::class,
         ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
+        ApiPlatform\Core\Annotation\ApiFilter::class => ApiPlatform\Metadata\ApiFilter::class,
         ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class,
 
@@ -436,6 +438,7 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Util\ArrayTrait::class => ApiPlatform\Util\ArrayTrait::class,
         ApiPlatform\Core\Util\AttributesExtractor::class => ApiPlatform\Util\AttributesExtractor::class,
         ApiPlatform\Core\Util\ClassInfoTrait::class => ApiPlatform\Util\ClassInfoTrait::class,
+        ApiPlatform\Core\Util\ClientTrait::class => ApiPlatform\Util\ClientTrait::class,
         ApiPlatform\Core\Util\CloneTrait::class => ApiPlatform\Util\CloneTrait::class,
         ApiPlatform\Core\Util\CorsTrait::class => ApiPlatform\Util\CorsTrait::class,
         ApiPlatform\Core\Util\ErrorFormatGuesser::class => ApiPlatform\Util\ErrorFormatGuesser::class,
@@ -446,6 +449,7 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Util\RequestAttributesExtractor::class => ApiPlatform\Util\RequestAttributesExtractor::class,
         ApiPlatform\Core\Util\RequestParser::class => ApiPlatform\Util\RequestParser::class,
         ApiPlatform\Core\Util\ResourceClassInfoTrait::class => ApiPlatform\Util\ResourceClassInfoTrait::class,
+        ApiPlatform\Core\Util\ResponseTrait::class => ApiPlatform\Util\ResponseTrait::class,
         ApiPlatform\Core\Util\SortTrait::class => ApiPlatform\Util\SortTrait::class,
 
         // Validator

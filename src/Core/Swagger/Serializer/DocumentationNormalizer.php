@@ -188,8 +188,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         if ($object instanceof OpenApi) {
             @trigger_error('Using the swagger DocumentationNormalizer is deprecated in favor of decorating the OpenApiFactory, use the "openapi.backward_compatibility_layer" configuration to change this behavior.', \E_USER_DEPRECATED);
@@ -396,6 +398,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 // Avoid duplicates parameters when there is a filter on a subresource identifier
                 $parametersMemory = [];
                 $pathOperation['parameters'] = [];
+
                 foreach ($resourceMetadata->getAttributes()['identifiers'] as $parameterName => [$class, $identifier]) {
                     $parameter = ['name' => $parameterName, 'in' => 'path', 'required' => true];
                     $v3 ? $parameter['schema'] = ['type' => 'string'] : $parameter['type'] = 'string';
@@ -575,7 +578,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $pathOperation['summary'] ?? $pathOperation['summary'] = sprintf('Creates a %s resource.', $resourceShortName);
 
+        $identifiers = (array) $resourceMetadata
+                ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
+
+        $operationType = $identifiers ? $operationType : OperationType::COLLECTION;
         $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
+
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
         [$successResponse, $defined] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
 

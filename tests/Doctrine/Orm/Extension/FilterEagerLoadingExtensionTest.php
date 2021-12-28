@@ -429,7 +429,7 @@ SQL;
             ->innerJoin('o.compositeItem', 'item')
             ->innerJoin('o.compositeLabel', 'label')
             ->leftJoin('o.foo', 'foo', 'WITH', 'o.bar = item.foo')
-            ->add('join', ['o' => $carJoin], true)
+            ->add('join', ['o' => $carJoin], true) // @phpstan-ignore-line
             ->where('item.field1 = :foo')
             ->setParameter('foo', 1);
 

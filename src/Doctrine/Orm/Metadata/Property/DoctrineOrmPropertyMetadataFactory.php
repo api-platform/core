@@ -76,6 +76,7 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
         }
 
         if ($doctrineClassMetadata instanceof ClassMetadataInfo && \in_array($property, $doctrineClassMetadata->getFieldNames(), true)) {
+            /** @var mixed[] */
             $fieldMapping = $doctrineClassMetadata->getFieldMapping($property);
             $propertyMetadata = $propertyMetadata->withDefault($fieldMapping['options']['default'] ?? $propertyMetadata->getDefault());
         }

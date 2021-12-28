@@ -157,6 +157,7 @@ class SerializeStageTest extends TestCase
     {
         $partialPaginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
         $partialPaginatorProphecy->count()->willReturn(2);
+        $partialPaginatorProphecy->valid()->willReturn(false);
 
         return [
             'not paginator' => [[], [], null, \LogicException::class, 'Collection returned by the collection data provider must implement ApiPlatform\State\Pagination\PaginatorInterface'],

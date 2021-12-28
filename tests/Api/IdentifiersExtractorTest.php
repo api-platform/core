@@ -16,11 +16,12 @@ namespace ApiPlatform\Tests\Api;
 use ApiPlatform\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\UriVariable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
@@ -76,18 +77,15 @@ class IdentifiersExtractorTest extends TestCase
             $propertyMetadataFactoryProphecy->reveal()
         );
 
-        $operation = $this->prophesize(Operation::class);
+        $operation = (new Get())->withUriVariables(['id' => (new Link())->withIdentifiers(['id'])->withFromClass(Dummy::class)->withParameterName('id')]);
         $item = new Dummy();
         $item->setId(1);
         $resourceClass = Dummy::class;
         $context = [
-            'operation' => $operation->reveal(),
+            'operation' => $operation,
         ];
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
-        $uriVariable = new UriVariable();
-        $uriVariable = $uriVariable->withIdentifiers(['id'])->withTargetClass(Dummy::class);
-        $operation->getUriVariables()->willReturn(['id' => $uriVariable]);
 
         $this->assertEquals(['id' => '1'], $identifiersExtractor->getIdentifiersFromItem($item, 'operation', $context));
     }

@@ -55,6 +55,15 @@
         <service id="api_platform.graphql.resolver.stage.read" class="ApiPlatform\GraphQl\Resolver\Stage\ReadStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
+            <argument type="service" id="api_platform.state_provider" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+            <argument>%api_platform.graphql.nesting_separator%</argument>
+        </service>
+
+        <!-- TODO: 3.0 change class -->
+        <service id="api_platform.graphql.resolver.stage.read.legacy" class="ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.symfony.iri_converter" />
             <argument type="service" id="api_platform.collection_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
@@ -90,6 +99,13 @@
         </service>
 
         <service id="api_platform.graphql.resolver.stage.write" class="ApiPlatform\GraphQl\Resolver\Stage\WriteStage" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.state_processor" />
+            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
+        </service>
+
+        <!-- TODO: 3.0 change class -->
+        <service id="api_platform.graphql.resolver.stage.write.legacy" class="ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStage" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />

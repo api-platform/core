@@ -22,6 +22,7 @@ use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 
 /**
  * Item state provider using the Doctrine ODM.
@@ -31,6 +32,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class ItemProvider implements ProviderInterface
 {
+    use LinksHandlerTrait;
+
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
     private $itemExtensions;
@@ -52,9 +55,10 @@ final class ItemProvider implements ProviderInterface
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData) {
-            return $manager->getReference($resourceClass, $identifiers);
+            return $manager->getReference($resourceClass, reset($identifiers));
         }
 
+        /** @var ObjectRepository $repository */
         $repository = $manager->getRepository($resourceClass);
         if (!$repository instanceof DocumentRepository) {
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
@@ -62,9 +66,7 @@ final class ItemProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        foreach ($identifiers as $propertyName => $value) {
-            $aggregationBuilder->match()->field($propertyName)->equals($value);
-        }
+        $this->handleLinks($aggregationBuilder, $identifiers, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
             $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);

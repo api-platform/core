@@ -55,8 +55,10 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = $this->collectionNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {

@@ -133,8 +133,17 @@ final class ApiLoader extends Loader
                         }
                     }
 
+                    $path = ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate();
+                    foreach ($operation->getUriVariables() ?? [] as $parameterName => $link) {
+                        if (!$expandedValue = $link->getExpandedValue()) {
+                            continue;
+                        }
+
+                        $path = str_replace(sprintf('{%s}', $parameterName), $expandedValue, $path);
+                    }
+
                     $route = new Route(
-                        ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate(),
+                        $path,
                         $legacyDefaults + [
                             '_controller' => $operation->getController() ?? 'api_platform.action.placeholder',
                             '_format' => null,

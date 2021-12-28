@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hal\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

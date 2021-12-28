@@ -27,7 +27,7 @@ use Symfony\Component\String\UnicodeString;
 /**
  * @experimental
  */
-abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractRector
+abstract class AbstractAnnotationToAttributeRector extends AbstractRector
 {
     use DeprecationMetadataTrait;
 
@@ -38,8 +38,8 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
         'itemOperations' => [
             'get',
             'put',
-            'patch',
             'delete',
+            'patch', // TODO: add this only if our API accepts the patch format
         ],
         'collectionOperations' => [
             'get',
@@ -155,6 +155,16 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
             }
         }
 
+        return $this->resolveAttributes($values);
+    }
+
+    /**
+     * @param mixed $items
+     */
+    protected function resolveAttributes($items): array
+    {
+        $values = $items instanceof DoctrineAnnotationTagValueNode ? $items->getValues() : $items;
+
         $camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
 
         // Transform "attributes" keys
@@ -171,7 +181,11 @@ abstract class AbstractLegacyApiResourceToApiResourceAttribute extends AbstractR
         foreach ($values as $attribute => $value) {
             [$updatedAttribute, $updatedValue] = $this->getKeyValue(str_replace('"', '', $camelCaseToSnakeCaseNameConverter->normalize($attribute)), $value);
             if ($attribute !== $updatedAttribute) {
-                $values[$updatedAttribute] = $updatedValue;
+                if (\array_key_exists($updatedAttribute, $values) && \is_array($values[$updatedAttribute])) {
+                    $values[$updatedAttribute] = array_merge($values[$updatedAttribute], $updatedValue);
+                } else {
+                    $values[$updatedAttribute] = $updatedValue;
+                }
                 unset($values[$attribute]);
             }
         }

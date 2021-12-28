@@ -282,7 +282,7 @@ Feature: JSON-LD DTO input and output
 
   @!mongodb
   Scenario: Use messenger with an input where the handler gives a synchronous result
-    And I send a "POST" request to "/messenger_with_inputs" with body:
+    When I send a "POST" request to "/messenger_with_inputs" with body:
     """
     {
       "var": "test"

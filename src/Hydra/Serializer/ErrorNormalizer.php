@@ -46,8 +46,10 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize($object, $format = null, array $context = [])
     {
         $data = [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'Error']),

@@ -17,9 +17,11 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -30,7 +32,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class CollectionProvider implements ProviderInterface
 {
-    use UriVariablesHandlerTrait;
+    use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
     private $managerRegistry;
@@ -51,6 +53,7 @@ final class CollectionProvider implements ProviderInterface
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
+        /** @var EntityRepository */
         $repository = $manager->getRepository($resourceClass);
         if (!method_exists($repository, 'createQueryBuilder')) {
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
@@ -59,7 +62,7 @@ final class CollectionProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleUriVariables($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
@@ -79,6 +82,10 @@ final class CollectionProvider implements ProviderInterface
         }
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+
+        if ($operation instanceof GraphQlOperation) {
+            return true;
+        }
 
         return $operation->isCollection() ?? false;
     }

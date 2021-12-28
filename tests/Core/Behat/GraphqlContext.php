@@ -43,7 +43,7 @@ final class GraphqlContext implements Context
     /**
      * @var int
      */
-    private $graphqlLine;
+    private $graphqlLine; // @phpstan-ignore-line
 
     private $request;
 

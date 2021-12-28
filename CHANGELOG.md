@@ -32,7 +32,6 @@
 * GraphQL: **BC** Fix security on association collection properties. The collection resource `item_query` security is no longer used. `ApiProperty` security can now be used to secure collection (or any other) properties. (#4143)
 * Deprecate `allow_plain_identifiers` option (#4167)
 * Exception: Add the ability to customize multiple status codes based on the validation exception (#4017)
-* GraphQL: Fix graphql fetching with Elasticsearch (#4217)
 * ApiLoader: Support `_format` resolving (#4292)
 * Metadata: new namespace `ApiPlatform\Metadata` instead of `ApiPlatform\Core\Metadata`, for example `ApiPlatform\Metadata\ApiResource` (#4351)
 * Metadata: deprecation of `ApiPlatform\Core\Annotation` (#4351)
@@ -45,6 +44,12 @@
 * A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
 * Add support for `security_post_validation` attribute
 * Mark the GraphQL subsystem as stable (#4500)
+
+## 2.6.7
+
+* feat: compatibility with Symfony 6 (#4503, #4582, #4604, #4564)
+* feat: compatibility with PHP 8.1 (#4503, #4582, #4604)
+* fix: pass the child context when normalizing nested non-resource objects (#4521)
 
 ## 2.6.6
 

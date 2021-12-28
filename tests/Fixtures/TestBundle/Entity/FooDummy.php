@@ -50,7 +50,7 @@ class FooDummy
     private $name;
 
     /**
-     * @var Dummy The foo dummy
+     * @var Dummy|null The foo dummy
      *
      * @ORM\ManyToOne(targetEntity="Dummy", cascade={"persist"})
      */

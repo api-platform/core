@@ -24,8 +24,10 @@ trait WithResourceTrait
 
     /**
      * @param ApiResource|Operation|GraphQlOperation $resource
+     *
+     * @return ApiResource|Operation|GraphQlOperation
      */
-    private function copyFrom($resource): self
+    private function copyFrom($resource)
     {
         $self = clone $this;
         foreach (get_class_methods($resource) as $method) {
