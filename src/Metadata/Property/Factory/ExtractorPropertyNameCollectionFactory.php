@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
 /**
@@ -23,13 +23,14 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
 final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     private $extractor;
     private $decorated;
 
-    public function __construct(ExtractorInterface $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
+    public function __construct(PropertyExtractorInterface $extractor, PropertyNameCollectionFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
@@ -57,7 +58,7 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
             }
         }
 
-        if (!class_exists($resourceClass)) {
+        if (!class_exists($resourceClass) && !interface_exists($resourceClass)) {
             if (null !== $propertyNameCollection) {
                 return $propertyNameCollection;
             }
@@ -65,7 +66,7 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
             throw new ResourceClassNotFoundException(sprintf('The resource class "%s" does not exist.', $resourceClass));
         }
 
-        if ($properties = $this->extractor->getResources()[$resourceClass]['properties'] ?? false) {
+        if ($properties = $this->extractor->getProperties()[$resourceClass] ?? false) {
             foreach ($properties as $propertyName => $property) {
                 $propertyNames[$propertyName] = $propertyName;
             }

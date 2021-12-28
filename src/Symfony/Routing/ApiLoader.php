@@ -314,7 +314,7 @@ final class ApiLoader extends Loader
             $operation['identifiers'] = (array) ($operation['identifiers'] ?? $resourceMetadata->getAttribute('identifiers', $this->identifiersExtractor ? $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass) : ['id']));
         }
 
-        $operation['has_composite_identifier'] = \count($operation['identifiers']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
+        $operation['has_composite_identifier'] = isset($operation['identifiers']) && \count($operation['identifiers']) > 1 ? $resourceMetadata->getAttribute('composite_identifier', true) : false;
         $path = trim(trim($resourceMetadata->getAttribute('route_prefix', '')), '/');
         $path .= $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
 
@@ -327,7 +327,7 @@ final class ApiLoader extends Loader
                 '_api_resource_class' => $resourceClass,
                 '_api_identifiers' => $operation['identifiers'] ?? [],
                 '_api_has_composite_identifier' => $operation['has_composite_identifier'] ?? true,
-                sprintf('_api_%s_operation_name', $operationType) => $operationName,
+                sprintf('_api_%s_operation_name', $operationType) => RouteNameGenerator::generate($operationName, $resourceShortName, $operationType),
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],
             $operation['options'] ?? [],

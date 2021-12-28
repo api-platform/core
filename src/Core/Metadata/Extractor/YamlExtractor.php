@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Extractor\AbstractResourceExtractor;
+use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -23,9 +25,31 @@ use Symfony\Component\Yaml\Yaml;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @deprecated since 2.7, to remove in 3.0 (replaced by ApiPlatform\Metadata\Extractor\YamlExtractor)
  */
-final class YamlExtractor extends AbstractExtractor
+final class YamlExtractor extends AbstractResourceExtractor implements PropertyExtractorInterface
 {
+    private $properties;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProperties(): array
+    {
+        if (null !== $this->properties) {
+            return $this->properties;
+        }
+
+        $this->properties = [];
+        foreach ($this->paths as $path) {
+            $this->extractPath($path);
+        }
+
+        return $this->properties;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -75,7 +99,7 @@ final class YamlExtractor extends AbstractExtractor
             ];
 
             if (!isset($resourceYaml['properties'])) {
-                $this->resources[$resourceName]['properties'] = null;
+                $this->properties[$resourceName] = $this->resources[$resourceName]['properties'] = null;
 
                 continue;
             }
@@ -92,7 +116,7 @@ final class YamlExtractor extends AbstractExtractor
     {
         foreach ($resourceYaml['properties'] as $propertyName => $propertyValues) {
             if (null === $propertyValues) {
-                $this->resources[$resourceName]['properties'][$propertyName] = null;
+                $this->properties[$resourceName][$propertyName] = $this->resources[$resourceName]['properties'][$propertyName] = null;
 
                 continue;
             }
@@ -104,7 +128,7 @@ final class YamlExtractor extends AbstractExtractor
                 $propertyValues['subresource']['resourceClass'] = $this->resolve($propertyValues['subresource']['resourceClass']);
             }
 
-            $this->resources[$resourceName]['properties'][$propertyName] = [
+            $this->properties[$resourceName][$propertyName] = $this->resources[$resourceName]['properties'][$propertyName] = [
                 'description' => $this->phpize($propertyValues, 'description', 'string'),
                 'readable' => $this->phpize($propertyValues, 'readable', 'bool'),
                 'writable' => $this->phpize($propertyValues, 'writable', 'bool'),

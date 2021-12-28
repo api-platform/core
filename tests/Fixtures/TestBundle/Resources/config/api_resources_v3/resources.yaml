@@ -1,0 +1,21 @@
+properties:
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface:
+        foo:
+            identifier: true
+
+resources:
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyAddress:
+        operations:
+            ApiPlatform\Metadata\GetCollection:
+                openapiContext:
+                    x-visibility: hide
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface:
+        operations:
+            ApiPlatform\Metadata\GetCollection: ~
+            ApiPlatform\Metadata\Get: ~
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceBarInterface:
+        operations:
+            ApiPlatform\Metadata\GetCollection: ~
+            ApiPlatform\Metadata\Get: ~

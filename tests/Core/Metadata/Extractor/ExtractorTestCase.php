@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Extractor;
 
-use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
@@ -593,11 +593,11 @@ abstract class ExtractorTestCase extends TestCase
     /**
      * @param string[] $paths
      */
-    final protected function createExtractor(array $paths, ContainerInterface $container = null): ExtractorInterface
+    final protected function createExtractor(array $paths, ContainerInterface $container = null): ResourceExtractorInterface
     {
         $extractorClass = $this->getExtractorClass();
 
-        $this->assertTrue(is_a($extractorClass, ExtractorInterface::class, true));
+        $this->assertTrue(is_a($extractorClass, ResourceExtractorInterface::class, true));
 
         return new $extractorClass($paths, $container);
     }

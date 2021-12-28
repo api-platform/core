@@ -299,7 +299,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ));
         }
 
-        $container->getDefinition('api_platform.metadata.extractor.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 
         if (class_exists(Annotation::class)) {
             $loader->load('metadata/annotation.xml');
@@ -307,7 +308,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (class_exists(Yaml::class)) {
             $loader->load('metadata/yaml.xml');
-            $container->getDefinition('api_platform.metadata.extractor.yaml')->replaceArgument(0, $yamlResources);
+            $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
+            $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
         }
 
         if (interface_exists(DocBlockFactoryInterface::class)) {
@@ -805,6 +807,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        $container->removeDefinition('api_platform.metadata.resource.metadata_collection_factory.xml');
+        $container->removeDefinition('api_platform.metadata.resource.metadata_collection_factory.yaml');
+
         $container->removeDefinition('api_platform.symfony.listener.view.write');
 
         $container->removeAlias('api_platform.identifiers_extractor');
@@ -834,13 +839,24 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeAlias('api_platform.graphql.schema_builder');
         $container->setAlias('api_platform.graphql.schema_builder', 'api_platform.graphql.schema_builder.legacy');
 
-        $definition = $container->getDefinition('api_platform.metadata.property.metadata_factory.serializer');
-        $definition->setArgument(0, new Reference('api_platform.metadata.resource.metadata_factory'));
-        $container->setDefinition('api_platform.metadata.property.metadata_factory.serializer', $definition);
+        foreach ([
+            'api_platform.metadata.property.metadata_factory.serializer',
+            'api_platform.route_loader',
+        ] as $id) {
+            $container->getDefinition($id)->setArgument('$resourceMetadataFactory', new Reference('api_platform.metadata.resource.metadata_factory'));
+        }
 
-        $container->getDefinition('api_platform.metadata.extractor.xml')->setClass(XmlExtractor::class);
+        $container->getDefinition('api_platform.metadata.property.identifier_metadata_factory.xml')
+                  ->setDecoratedService('api_platform.metadata.property.metadata_factory');
+
+        $container->getDefinition('api_platform.metadata.property.identifier_metadata_factory.yaml')
+                  ->setDecoratedService('api_platform.metadata.property.metadata_factory');
+
+        $container->getDefinition('api_platform.metadata.resource_extractor.xml')->setClass(XmlExtractor::class);
+        $container->getDefinition('api_platform.metadata.property_extractor.xml')->setClass(XmlExtractor::class);
         if (class_exists(Yaml::class)) {
-            $container->getDefinition('api_platform.metadata.extractor.yaml')->setClass(YamlExtractor::class);
+            $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->setClass(YamlExtractor::class);
+            $container->getDefinition('api_platform.metadata.property_extractor.yaml')->setClass(YamlExtractor::class);
         }
     }
 

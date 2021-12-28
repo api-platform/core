@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<properties xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0
+           https://api-platform.com/schema/metadata/properties-3.0.xsd">
+    <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment" name="id" description="Comment identifier"
+              readable="true" writable="false" identifier="true"/>
+
+    <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment" name="comment"
+              description="Comment message" readable="true" writable="true">
+        <builtinTypes>
+            <builtinType>string</builtinType>
+        </builtinTypes>
+    </property>
+
+    <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment" name="date"
+              description="Comment creation date" readable="true" writable="true"/>
+
+    <property resource="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment" name="author" description="Comment author"
+              readable="true" writable="false"/>
+</properties>

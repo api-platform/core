@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\AbsoluteUrlRelationDummy as A
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Address as AddressDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Answer as AnswerDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Book as BookDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Comment as CommentDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositeItem as CompositeItemDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositeLabel as CompositeLabelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
@@ -73,6 +74,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\PersonToPet as PersonToPetDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Pet as PetDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Program as ProgramDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy as RelatedOwnedDummyDocument;
@@ -92,6 +94,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Book;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositePrimitiveItem;
@@ -148,6 +151,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PersonToPet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Product;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Program;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RamseyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -1290,6 +1294,98 @@ final class DoctrineContext implements Context
     {
         $urlEncodedIdResource = ($this->isOrm() ? new UrlEncodedId() : new UrlEncodedIdDocument());
         $this->manager->persist($urlEncodedIdResource);
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a Program
+     */
+    public function thereIsAProgram()
+    {
+        $this->thereArePrograms(1);
+    }
+
+    /**
+     * @Given there are :nb Programs
+     */
+    public function thereArePrograms(int $nb)
+    {
+        $author = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find(1);
+        if (null === $author) {
+            $author = $this->isOrm() ? new User() : new UserDocument();
+            $author->setEmail('john.doe@example.com');
+            $author->setFullname('John DOE');
+            $author->setPlainPassword('p4$$w0rd');
+
+            $this->manager->persist($author);
+            $this->manager->flush();
+        }
+
+        if ($this->isOrm()) {
+            $count = $this->doctrine->getRepository(Program::class)->count(['author' => $author]);
+        } else {
+            $count = $this->doctrine->getRepository(ProgramDocument::class)
+                ->createQueryBuilder('f')
+                ->field('author')->equals($author)
+                ->count()->getQuery()->execute();
+        }
+
+        for ($i = $count + 1; $i <= $nb; ++$i) {
+            $program = $this->isOrm() ? new Program() : new ProgramDocument();
+            $program->name = "Lorem ipsum $i";
+            $program->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
+            $program->author = $author;
+
+            $this->manager->persist($program);
+        }
+
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a Comment
+     */
+    public function thereIsAComment()
+    {
+        $this->thereAreComments(1);
+    }
+
+    /**
+     * @Given there are :nb Comments
+     */
+    public function thereAreComments(int $nb)
+    {
+        $author = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find(1);
+        if (null === $author) {
+            $author = $this->isOrm() ? new User() : new UserDocument();
+            $author->setEmail('john.doe@example.com');
+            $author->setFullname('John DOE');
+            $author->setPlainPassword('p4$$w0rd');
+
+            $this->manager->persist($author);
+            $this->manager->flush();
+        }
+
+        if ($this->isOrm()) {
+            $count = $this->doctrine->getRepository(Comment::class)->count(['author' => $author]);
+        } else {
+            $count = $this->doctrine->getRepository(CommentDocument::class)
+                ->createQueryBuilder()
+                ->field('author')->equals($author)
+                ->count()->getQuery()->execute();
+        }
+
+        for ($i = $count + 1; $i <= $nb; ++$i) {
+            $comment = $this->isOrm() ? new Comment() : new CommentDocument();
+            $comment->comment = "Lorem ipsum dolor sit amet $i";
+            $comment->date = new \DateTimeImmutable(sprintf('2015-03-0%dT10:00:00+00:00', $i));
+            $comment->author = $author;
+
+            $this->manager->persist($comment);
+        }
+
         $this->manager->flush();
         $this->manager->clear();
     }

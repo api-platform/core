@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Extractor;
+namespace ApiPlatform\Metadata\Extractor;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
@@ -19,12 +19,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
 /**
  * Base file extractor.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-abstract class AbstractExtractor implements ExtractorInterface
+abstract class AbstractPropertyExtractor implements PropertyExtractorInterface
 {
     protected $paths;
-    protected $resources;
+    protected $properties;
     private $container;
     private $collectedParameters = [];
 
@@ -40,18 +40,18 @@ abstract class AbstractExtractor implements ExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function getResources(): array
+    public function getProperties(): array
     {
-        if (null !== $this->resources) {
-            return $this->resources;
+        if (null !== $this->properties) {
+            return $this->properties;
         }
 
-        $this->resources = [];
+        $this->properties = [];
         foreach ($this->paths as $path) {
             $this->extractPath($path);
         }
 
-        return $this->resources;
+        return $this->properties;
     }
 
     /**

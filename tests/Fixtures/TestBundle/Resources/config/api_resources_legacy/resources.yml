@@ -1,0 +1,27 @@
+resources:
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\DummyAddress:
+        collectionOperations:
+            get:
+                openapi_context:
+                    x-visibility: hide
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface:
+        itemOperations:
+            get:
+                method: 'GET'
+
+        collectionOperations:
+            get:
+                method: 'GET'
+
+        properties:
+            foo:
+                identifier: true
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceBarInterface:
+        itemOperations:
+            get:
+                method: 'GET'
+        collectionOperations:
+            get:
+                method: 'GET'

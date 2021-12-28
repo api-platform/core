@@ -299,8 +299,6 @@ class Operation
         $this->securityMessage = $securityMessage;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-        $this->securityPostValidation = $securityPostValidation;
-        $this->securityPostValidationMessage = $securityPostValidationMessage;
         $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
@@ -1114,7 +1112,7 @@ class Operation
         return $this->securityPostValidation;
     }
 
-    public function withSecurityPostValidation(?string $securityPostValidation = null): self
+    public function withSecurityPostValidation(string $securityPostValidation): self
     {
         $self = clone $this;
         $self->securityPostValidation = $securityPostValidation;
@@ -1127,7 +1125,7 @@ class Operation
         return $this->securityPostValidationMessage;
     }
 
-    public function withSecurityPostValidationMessage(?string $securityPostValidationMessage = null): self
+    public function withSecurityPostValidationMessage(string $securityPostValidationMessage): self
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;

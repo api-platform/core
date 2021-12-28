@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xsd:schema
+    xmlns="https://api-platform.com/schema/metadata/resources-3.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="https://api-platform.com/schema/metadata/resources-3.0"
+    elementFormDefault="qualified">
+
+    <xsd:element name="resources">
+        <xsd:complexType>
+            <xsd:sequence maxOccurs="unbounded">
+                <xsd:element name="resource" type="resource"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="resource">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:group ref="extendedBase"/>
+            <xsd:element name="operations" minOccurs="0" type="operations"/>
+            <xsd:element name="graphQlOperations" minOccurs="0" type="graphQlOperations"/>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="extendedBase"/>
+        <xsd:attribute type="xsd:string" name="uriTemplate"/>
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="operations">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="operation" maxOccurs="unbounded" type="operation"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="operation">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:group ref="extendedBase"/>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="extendedBase"/>
+        <xsd:attribute type="xsd:string" name="class" use="required"/>
+        <xsd:attribute type="xsd:string" name="uriTemplate"/>
+        <xsd:attribute type="xsd:string" name="method"/>
+        <xsd:attribute type="xsd:boolean" name="read"/>
+        <xsd:attribute type="xsd:boolean" name="deserialize"/>
+        <xsd:attribute type="xsd:boolean" name="validate"/>
+        <xsd:attribute type="xsd:boolean" name="write"/>
+        <xsd:attribute type="xsd:boolean" name="serialize"/>
+        <!-- todo replace by queryParameterValidationEnabled? -->
+        <xsd:attribute type="xsd:boolean" name="queryParameterValidate"/>
+        <xsd:attribute type="xsd:positiveInteger" name="priority"/>
+        <xsd:attribute type="xsd:string" name="name"/>
+        <xsd:attribute type="xsd:boolean" name="collection"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="graphQlOperations">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="mutation" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
+            <xsd:element name="query" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
+            <xsd:element name="subscription" minOccurs="0" maxOccurs="unbounded" type="graphQlOperation"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="graphQlOperation">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:group ref="base"/>
+            <xsd:element name="args" minOccurs="0" type="args"/>
+        </xsd:sequence>
+        <xsd:attributeGroup ref="base"/>
+        <xsd:attribute type="xsd:string" name="resolver"/>
+        <xsd:attribute type="xsd:string" name="class"/>
+        <xsd:attribute type="xsd:boolean" name="read"/>
+        <xsd:attribute type="xsd:boolean" name="deserialize"/>
+        <xsd:attribute type="xsd:boolean" name="validate"/>
+        <xsd:attribute type="xsd:boolean" name="write"/>
+        <xsd:attribute type="xsd:boolean" name="serialize"/>
+        <xsd:attribute type="xsd:positiveInteger" name="priority"/>
+        <xsd:attribute type="xsd:string" name="name"/>
+        <xsd:attribute type="xsd:boolean" name="collection"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="args">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="arg" maxOccurs="unbounded" type="arg"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="arg">
+        <xsd:complexContent>
+            <xsd:extension base="sequenceWithValues">
+                <xsd:attribute name="id" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="types">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="type" maxOccurs="unbounded" type="type"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="type">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="uriVariables">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="uriVariable" maxOccurs="unbounded" type="uriVariable"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="uriVariable">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="identifiers" type="sequenceWithValues"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="parameterName" use="required"/>
+        <xsd:attribute type="xsd:string" name="fromProperty"/>
+        <xsd:attribute type="xsd:string" name="toProperty"/>
+        <xsd:attribute type="xsd:string" name="fromClass"/>
+        <xsd:attribute type="xsd:string" name="toClass"/>
+        <xsd:attribute type="xsd:boolean" name="compositeIdentifier"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="formats">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="format" maxOccurs="unbounded" type="format"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="format">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute type="xsd:string" name="name"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="cacheHeaders">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="cacheHeader" maxOccurs="unbounded" type="cacheHeader"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="cacheHeader" mixed="true">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
+        </xsd:sequence>
+        <xsd:attribute type="xsd:string" name="name" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="filters">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="filter" maxOccurs="unbounded" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="paginationViaCursor">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="paginationField" maxOccurs="unbounded" type="paginationField"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="paginationField">
+        <xsd:attribute type="xsd:string" name="field" use="required"/>
+        <xsd:attribute type="xsd:string" name="direction" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="exceptionToStatus">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="exception" maxOccurs="unbounded" type="exception"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="exception">
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="statusCode" use="required">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:positiveInteger">
+                    <xsd:enumeration value="100"/>
+                    <xsd:enumeration value="101"/>
+                    <xsd:enumeration value="102"/>
+                    <xsd:enumeration value="103"/>
+                    <xsd:enumeration value="200"/>
+                    <xsd:enumeration value="201"/>
+                    <xsd:enumeration value="202"/>
+                    <xsd:enumeration value="203"/>
+                    <xsd:enumeration value="204"/>
+                    <xsd:enumeration value="205"/>
+                    <xsd:enumeration value="206"/>
+                    <xsd:enumeration value="207"/>
+                    <xsd:enumeration value="208"/>
+                    <xsd:enumeration value="226"/>
+                    <xsd:enumeration value="300"/>
+                    <xsd:enumeration value="301"/>
+                    <xsd:enumeration value="302"/>
+                    <xsd:enumeration value="303"/>
+                    <xsd:enumeration value="304"/>
+                    <xsd:enumeration value="305"/>
+                    <xsd:enumeration value="306"/>
+                    <xsd:enumeration value="307"/>
+                    <xsd:enumeration value="308"/>
+                    <xsd:enumeration value="400"/>
+                    <xsd:enumeration value="401"/>
+                    <xsd:enumeration value="402"/>
+                    <xsd:enumeration value="403"/>
+                    <xsd:enumeration value="404"/>
+                    <xsd:enumeration value="405"/>
+                    <xsd:enumeration value="406"/>
+                    <xsd:enumeration value="407"/>
+                    <xsd:enumeration value="408"/>
+                    <xsd:enumeration value="409"/>
+                    <xsd:enumeration value="410"/>
+                    <xsd:enumeration value="411"/>
+                    <xsd:enumeration value="412"/>
+                    <xsd:enumeration value="413"/>
+                    <xsd:enumeration value="414"/>
+                    <xsd:enumeration value="415"/>
+                    <xsd:enumeration value="416"/>
+                    <xsd:enumeration value="417"/>
+                    <xsd:enumeration value="418"/>
+                    <xsd:enumeration value="421"/>
+                    <xsd:enumeration value="422"/>
+                    <xsd:enumeration value="423"/>
+                    <xsd:enumeration value="424"/>
+                    <xsd:enumeration value="425"/>
+                    <xsd:enumeration value="426"/>
+                    <xsd:enumeration value="428"/>
+                    <xsd:enumeration value="429"/>
+                    <xsd:enumeration value="431"/>
+                    <xsd:enumeration value="451"/>
+                    <xsd:enumeration value="500"/>
+                    <xsd:enumeration value="501"/>
+                    <xsd:enumeration value="502"/>
+                    <xsd:enumeration value="503"/>
+                    <xsd:enumeration value="504"/>
+                    <xsd:enumeration value="505"/>
+                    <xsd:enumeration value="506"/>
+                    <xsd:enumeration value="507"/>
+                    <xsd:enumeration value="508"/>
+                    <xsd:enumeration value="510"/>
+                    <xsd:enumeration value="511"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="values">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="value" maxOccurs="unbounded" type="value"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="value" mixed="true">
+        <xsd:choice>
+            <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
+        </xsd:choice>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="schemes">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="scheme" minOccurs="0" maxOccurs="unbounded" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="mercure">
+        <xsd:attribute type="xsd:boolean" name="private"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="requirements">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="requirement" minOccurs="0" maxOccurs="unbounded" type="requirement"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="requirement">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute type="xsd:string" name="property" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="order">
+        <xsd:choice>
+            <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="sequenceWithValues">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:group name="base">
+        <xsd:sequence>
+            <xsd:element name="denormalizationContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="extraProperties" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="filters" minOccurs="0" type="filters"/>
+            <xsd:element name="mercure" minOccurs="0" type="mercure"/>
+            <xsd:element name="normalizationContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="order" minOccurs="0" type="order"/>
+            <xsd:element name="validationContext" minOccurs="0" type="sequenceWithValues"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:group name="extendedBase">
+        <xsd:sequence>
+            <xsd:group ref="base"/>
+            <xsd:element name="exceptionToStatus" minOccurs="0" type="exceptionToStatus"/>
+            <xsd:element name="cacheHeaders" minOccurs="0" type="cacheHeaders"/>
+            <xsd:element name="defaults" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="formats" minOccurs="0" type="formats"/>
+            <xsd:element name="hydraContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="inputFormats" minOccurs="0" type="formats"/>
+            <xsd:element name="openapiContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="options" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="outputFormats" minOccurs="0" type="formats"/>
+            <xsd:element name="paginationViaCursor" minOccurs="0" type="paginationViaCursor"/>
+            <xsd:element name="requirements" minOccurs="0" type="requirements"/>
+            <xsd:element name="schemes" minOccurs="0" type="schemes"/>
+            <xsd:element name="types" minOccurs="0" type="types"/>
+            <xsd:element name="uriVariables" minOccurs="0" type="uriVariables"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:attributeGroup name="base">
+        <xsd:attribute type="xsd:string" name="shortName"/>
+        <xsd:attribute type="xsd:token" name="description"/>
+        <xsd:attribute type="xsd:integer" name="urlGenerationStrategy"/>
+        <xsd:attribute type="xsd:string" name="deprecationReason"/>
+        <xsd:attribute type="xsd:boolean" name="elasticsearch"/>
+        <xsd:attribute type="xsd:string" name="messenger"/>
+        <xsd:attribute type="xsd:string" name="input"/>
+        <xsd:attribute type="xsd:string" name="output"/>
+        <xsd:attribute type="xsd:boolean" name="fetchPartial"/>
+        <xsd:attribute type="xsd:boolean" name="forceEager"/>
+        <xsd:attribute type="xsd:boolean" name="paginationClientEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="paginationClientItemsPerPage"/>
+        <xsd:attribute type="xsd:boolean" name="paginationClientPartial"/>
+        <xsd:attribute type="xsd:boolean" name="paginationEnabled"/>
+        <xsd:attribute type="xsd:boolean" name="paginationFetchJoinCollection"/>
+        <xsd:attribute type="xsd:boolean" name="paginationUseOutputWalkers"/>
+        <xsd:attribute type="xsd:positiveInteger" name="paginationItemsPerPage"/>
+        <xsd:attribute type="xsd:positiveInteger" name="paginationMaximumItemsPerPage"/>
+        <xsd:attribute type="xsd:boolean" name="paginationPartial"/>
+        <xsd:attribute type="xsd:string" name="paginationType"/>
+        <xsd:attribute type="xsd:string" name="security"/>
+        <xsd:attribute type="xsd:string" name="securityMessage"/>
+        <xsd:attribute type="xsd:string" name="securityPostDenormalize"/>
+        <xsd:attribute type="xsd:string" name="securityPostDenormalizeMessage"/>
+        <xsd:attribute type="xsd:string" name="securityPostValidation"/>
+        <xsd:attribute type="xsd:string" name="securityPostValidationMessage"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="extendedBase">
+        <xsd:attributeGroup ref="base"/>
+        <xsd:attribute type="xsd:boolean" name="queryParameterValidationEnabled"/>
+        <xsd:attribute type="xsd:string" name="routePrefix"/>
+        <xsd:attribute type="xsd:boolean" name="stateless"/>
+        <xsd:attribute type="xsd:string" name="sunset"/>
+        <xsd:attribute type="xsd:string" name="acceptPatch"/>
+        <xsd:attribute type="xsd:positiveInteger" name="status"/>
+        <xsd:attribute type="xsd:string" name="host"/>
+        <xsd:attribute type="xsd:string" name="condition"/>
+        <xsd:attribute type="xsd:string" name="controller"/>
+        <xsd:attribute type="xsd:boolean" name="compositeIdentifier"/>
+    </xsd:attributeGroup>
+</xsd:schema>

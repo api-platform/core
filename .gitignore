@@ -11,5 +11,7 @@
 /swagger.yaml
 /tests/Fixtures/app/var/
 /tests/Fixtures/app/public/bundles/
+/tests/Metadata/Extractor/Adapter/*.xml
+/tests/Metadata/Extractor/Adapter/*.yaml
 /vendor/
 /Dockerfile

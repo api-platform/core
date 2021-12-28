@@ -15,6 +15,7 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -52,15 +53,15 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         // TODO: 3.0 change the condition to remove the ResourceMetadataFactorym only used to skip null values
         if (
             $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface
-            && isset($attributes['operation_name'])
+            && (isset($attributes['operation_name']) || isset($attributes['operation']))
         ) {
             $operation = $attributes['operation'] ?? $this->resourceMetadataFactory->create($attributes['resource_class'])->getOperation($attributes['operation_name']);
             $context = $normalization ? ($operation->getNormalizationContext() ?? []) : ($operation->getDenormalizationContext() ?? []);
-            $context['operation_name'] = $attributes['operation_name'];
+            $context['operation_name'] = $operation->getName();
             $context['operation'] = $operation;
             $context['resource_class'] = $attributes['resource_class'];
             // TODO: 3.0 becomes true by default
-            $context['skip_null_values'] = $context['skip_null_values'] ?? $this->shouldSkipNullValues($attributes['resource_class'], $attributes['operation_name']);
+            $context['skip_null_values'] = $context['skip_null_values'] ?? $this->shouldSkipNullValues($attributes['resource_class'], $context['operation_name']);
             // TODO: remove in 3.0, operation type will not exist anymore
             $context['operation_type'] = $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM;
             $context['iri_only'] = $context['iri_only'] ?? false;
@@ -92,6 +93,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
+        /** @var ResourceMetadata $resourceMetadata */
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
         $key = $normalization ? 'normalization_context' : 'denormalization_context';
         if (isset($attributes['collection_operation_name'])) {

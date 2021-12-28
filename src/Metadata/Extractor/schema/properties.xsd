@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xsd:schema
+    xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="https://api-platform.com/schema/metadata/properties-3.0"
+    elementFormDefault="qualified">
+
+    <xsd:element name="properties">
+        <xsd:complexType>
+            <xsd:sequence maxOccurs="unbounded">
+                <xsd:element name="property" type="property"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="property">
+        <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="jsonldContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="openapiContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="types" minOccurs="0" type="types"/>
+            <xsd:element name="builtinTypes" minOccurs="0" type="builtinTypes"/>
+            <xsd:element name="schema" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="extraProperties" minOccurs="0" type="sequenceWithValues"/>
+        </xsd:sequence>
+        <xsd:attribute name="resource" type="xsd:string" use="required"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="description" type="xsd:string"/>
+        <xsd:attribute name="example" type="xsd:string"/>
+        <xsd:attribute name="default" type="xsd:string"/>
+        <xsd:attribute name="readable" type="xsd:boolean"/>
+        <xsd:attribute name="writable" type="xsd:boolean"/>
+        <xsd:attribute name="readableLink" type="xsd:boolean"/>
+        <xsd:attribute name="writableLink" type="xsd:boolean"/>
+        <xsd:attribute name="required" type="xsd:boolean"/>
+        <xsd:attribute name="identifier" type="xsd:boolean"/>
+        <xsd:attribute name="deprecationReason" type="xsd:string"/>
+        <xsd:attribute name="fetchable" type="xsd:boolean"/>
+        <xsd:attribute name="fetchEager" type="xsd:boolean"/>
+        <xsd:attribute name="push" type="xsd:boolean"/>
+        <xsd:attribute name="security" type="xsd:string"/>
+        <xsd:attribute name="securityPostDenormalize" type="xsd:string"/>
+        <xsd:attribute name="initializable" type="xsd:boolean"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="types">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="type" maxOccurs="unbounded" type="type"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="type">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="builtinTypes">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="builtinType" maxOccurs="unbounded" type="builtinType"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="builtinType">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="sequenceWithValues">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="values">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="value" maxOccurs="unbounded" type="value"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="value" mixed="true">
+        <xsd:choice>
+            <xsd:element name="values" minOccurs="0" maxOccurs="unbounded" type="values"/>
+        </xsd:choice>
+        <xsd:attribute type="xsd:string" name="name"/>
+    </xsd:complexType>
+</xsd:schema>

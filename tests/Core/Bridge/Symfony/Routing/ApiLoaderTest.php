@@ -74,37 +74,37 @@ class ApiLoaderTest extends TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value', '_stateless' => null]),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'api_dummies_get_item', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value', '_stateless' => null]),
             $routeCollection->get('api_dummies_get_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'api_dummies_delete_item', ['DELETE']),
             $routeCollection->get('api_dummies_delete_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
+            $this->getRoute('/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'api_dummies_put_item', ['PUT']),
             $routeCollection->get('api_dummies_put_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'my_op', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value', '_format' => 'a valid format', '_stateless' => null], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
+            $this->getRoute('/dummies.{_format}', 'some.service.name', DummyEntity::class, 'api_dummies_my_op_collection', ['GET'], true, ['_format' => 'a valid format'], ['my_default' => 'default_value', '_format' => 'a valid format', '_stateless' => null], [], '', [], "request.headers.get('User-Agent') matches '/firefox/i'"),
             $routeCollection->get('api_dummies_my_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'my_second_op', ['POST'], true, [], ['_stateless' => null], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.post_collection', DummyEntity::class, 'api_dummies_my_second_op_collection', ['POST'], true, [], ['_stateless' => null], ['option' => 'option_value'], '{subdomain}.api-platform.com', ['https']),
             $routeCollection->get('api_dummies_my_second_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, 'my_path_op', ['GET'], true),
+            $this->getRoute('/some/custom/path', 'api_platform.action.get_collection', DummyEntity::class, 'api_dummies_my_path_op_collection', ['GET'], true),
             $routeCollection->get('api_dummies_my_path_op_collection')
         );
 
         $this->assertEquals(
-            $this->getRoute('/dummies.{_format}', 'api_platform.action.get_collection', DummyEntity::class, 'my_stateless_op', ['GET'], true, [], ['_stateless' => true]),
+            $this->getRoute('/dummies.{_format}', 'api_platform.action.get_collection', DummyEntity::class, 'api_dummies_my_stateless_op_collection', ['GET'], true, [], ['_stateless' => true]),
             $routeCollection->get('api_dummies_my_stateless_op_collection')
         );
 
@@ -128,17 +128,17 @@ class ApiLoaderTest extends TestCase
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata)->load(null);
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'get', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value', '_stateless' => null]),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.get_item', DummyEntity::class, 'api_dummies_get_item', ['GET'], false, ['id' => '\d+'], ['my_default' => 'default_value', '_stateless' => null]),
             $routeCollection->get('api_dummies_get_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'delete', ['DELETE']),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.delete_item', DummyEntity::class, 'api_dummies_delete_item', ['DELETE']),
             $routeCollection->get('api_dummies_delete_item')
         );
 
         $this->assertEquals(
-            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'put', ['PUT']),
+            $this->getRoute('/foobar-prefix/dummies/{id}.{_format}', 'api_platform.action.put_item', DummyEntity::class, 'api_dummies_put_item', ['PUT']),
             $routeCollection->get('api_dummies_put_item')
         );
     }

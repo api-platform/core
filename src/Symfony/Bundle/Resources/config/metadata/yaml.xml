@@ -5,30 +5,46 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.metadata.extractor.yaml" class="ApiPlatform\Core\Metadata\Extractor\YamlExtractor" public="false">
+        <service id="api_platform.metadata.resource_extractor.yaml" class="ApiPlatform\Metadata\Extractor\YamlResourceExtractor" public="false">
+            <argument type="collection" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="api_platform.metadata.property_extractor.yaml" class="ApiPlatform\Metadata\Extractor\YamlPropertyExtractor" public="false">
             <argument type="collection" />
             <argument type="service" id="service_container" />
         </service>
 
         <service id="api_platform.metadata.resource.name_collection_factory.yaml" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory" public="false">
-            <argument type="service" id="api_platform.metadata.extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.resource_extractor.yaml" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.yaml.inner" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_factory.yaml" decorates="api_platform.metadata.resource.metadata_factory" class="ApiPlatform\Core\Metadata\Resource\Factory\ExtractorResourceMetadataFactory" decoration-priority="40" public="false">
-            <argument type="service" id="api_platform.metadata.extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.resource_extractor.yaml" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory.yaml.inner" />
             <argument>%api_platform.defaults%</argument>
         </service>
 
         <service id="api_platform.metadata.property.name_collection_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory" decorates="api_platform.metadata.property.name_collection_factory" public="false">
-            <argument type="service" id="api_platform.metadata.extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.property_extractor.yaml" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.yaml.inner" />
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.yaml" class="ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="800" public="false">
+            <argument type="service" id="api_platform.metadata.resource_extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.yaml.inner" />
+            <argument>%api_platform.defaults%</argument>
+        </service>
+
         <service id="api_platform.metadata.property.metadata_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
-            <argument type="service" id="api_platform.metadata.extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.property_extractor.yaml" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.yaml.inner" />
+        </service>
+
+        <service id="api_platform.metadata.property.identifier_metadata_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="20" public="false">
+            <argument type="service" id="api_platform.metadata.property_extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.yaml.inner" />
         </service>
     </services>
 

@@ -46,13 +46,19 @@ final class RouteNameGenerator
             throw new InvalidArgumentException('Subresource operations are not supported by the RouteNameGenerator.');
         }
 
-        return sprintf(
-            '%s%s_%s_%s',
+        $operationName = sprintf(
+            '%s%s_%s',
             static::ROUTE_NAME_PREFIX,
             self::inflector($resourceShortName),
-            $operationName,
-            $operationType
+            $operationName
         );
+
+        // prevent api_foo_get_collection_collection
+        if ("_$operationType" !== substr($operationName, -\strlen("_$operationType"))) {
+            $operationName .= "_$operationType";
+        }
+
+        return $operationName;
     }
 
     /**

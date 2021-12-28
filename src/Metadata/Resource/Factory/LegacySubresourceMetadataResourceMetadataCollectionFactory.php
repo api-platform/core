@@ -84,7 +84,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 }
             }
 
-            $resourceMetadataCollection[] = $resource->withOperations(new Operations([$operationName => $operation]));
+            $resourceMetadataCollection[] = $resource->withOperations(new Operations([$operationName => $operation->withName($operationName)]));
         }
 
         return $resourceMetadataCollection;
@@ -123,7 +123,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 }
 
                 $resource = (new ApiResource())->withExtraProperties($extraProperties)->withCompositeIdentifier(false)->withUriVariables($identifiers)->withStateless(false);
-                $operation = (new Get())->withExtraProperties($extraProperties)->withCompositeIdentifier(false)->withUriVariables($identifiers);
+                $operation = (new Get())->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']])->withCompositeIdentifier(false)->withUriVariables($identifiers);
 
                 if ($subresourceMetadata['path']) {
                     $resource = $resource->withUriTemplate($subresourceMetadata['path']);

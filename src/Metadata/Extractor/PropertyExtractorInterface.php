@@ -11,21 +11,21 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Metadata\Extractor;
+namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 
 /**
  * Extracts an array of metadata from a file or a list of files.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-interface ExtractorInterface
+interface PropertyExtractorInterface
 {
     /**
      * Parses all metadata files and convert them in an array.
      *
      * @throws InvalidArgumentException
      */
-    public function getResources(): array;
+    public function getProperties(): array;
 }

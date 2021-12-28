@@ -74,6 +74,9 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
+        // TODO: 3.0 remove collection/item
+        $parameters['_api_operation_name'] = $parameters['_api_operation_name'] ?? $parameters['_api_collection_operation_name'] ?? $parameters['_api_item_operation_name'] ?? $parameters['_api_subresource_operation_name'] ?? null;
+
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
@@ -168,7 +171,7 @@ final class IriConverter implements IriConverterInterface
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['extra_properties']['legacy_subresource_operation_name']);
         }
 
-        $operation = $context['operation'] ?? null;
+        $operation = $context['operation'] ?? $operation ?? null;
 
         if ($operation) {
             // TODO: 2.7 should we deprecate this behavior ? example : Entity\Foo.php should take it's own operation? As it's a custom operation can we now?

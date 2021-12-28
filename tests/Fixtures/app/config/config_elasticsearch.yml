@@ -6,7 +6,8 @@ parameters:
 
 api_platform:
     mapping:
-        paths: ['%kernel.project_dir%/../Elasticsearch/Model']
+        paths:
+            - '%kernel.project_dir%/../Elasticsearch/Model'
     elasticsearch:
         hosts: '%env(resolve:ELASTICSEARCH_URL)%'
 
