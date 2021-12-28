@@ -57,7 +57,7 @@ final class CoverageContext implements Context
     public static function teardown()
     {
         $feature = getenv('FEATURE') ?: 'behat';
-        (new PHP())->process(self::$coverage, __DIR__."/../../build/coverage/coverage-$feature.cov");
+        (new PHP())->process(self::$coverage, __DIR__."/../../../build/coverage/coverage-$feature.cov");
     }
 
     /**
