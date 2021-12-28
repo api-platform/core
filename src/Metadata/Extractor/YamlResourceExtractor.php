@@ -30,6 +30,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class YamlResourceExtractor extends AbstractResourceExtractor
 {
+    use ResourceExtractorTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -98,21 +100,21 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'controller' => $this->phpize($resource, 'controller', 'string'),
             'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
-            'types' => $this->buildAttribute($resource, 'types'),
-            'cacheHeaders' => $this->buildAttribute($resource, 'cacheHeaders'),
-            'hydraContext' => $this->buildAttribute($resource, 'hydraContext'),
-            'openapiContext' => $this->buildAttribute($resource, 'openapiContext'),
-            'paginationViaCursor' => $this->buildAttribute($resource, 'paginationViaCursor'),
-            'exceptionToStatus' => $this->buildAttribute($resource, 'exceptionToStatus'),
-            'defaults' => $this->buildAttribute($resource, 'defaults'),
-            'requirements' => $this->buildAttribute($resource, 'requirements'),
-            'options' => $this->buildAttribute($resource, 'options'),
+            'types' => $this->buildArrayValue($resource, 'types'),
+            'cacheHeaders' => $this->buildArrayValue($resource, 'cacheHeaders'),
+            'hydraContext' => $this->buildArrayValue($resource, 'hydraContext'),
+            'openapiContext' => $this->buildArrayValue($resource, 'openapiContext'),
+            'paginationViaCursor' => $this->buildArrayValue($resource, 'paginationViaCursor'),
+            'exceptionToStatus' => $this->buildArrayValue($resource, 'exceptionToStatus'),
+            'defaults' => $this->buildArrayValue($resource, 'defaults'),
+            'requirements' => $this->buildArrayValue($resource, 'requirements'),
+            'options' => $this->buildArrayValue($resource, 'options'),
             'status' => $this->phpize($resource, 'status', 'integer'),
-            'schemes' => $this->buildAttribute($resource, 'schemes'),
-            'formats' => $this->buildAttribute($resource, 'formats'),
+            'schemes' => $this->buildArrayValue($resource, 'schemes'),
+            'formats' => $this->buildArrayValue($resource, 'formats'),
             'uriVariables' => $this->buildUriVariables($resource),
-            'inputFormats' => $this->buildAttribute($resource, 'inputFormats'),
-            'outputFormats' => $this->buildAttribute($resource, 'outputFormats'),
+            'inputFormats' => $this->buildArrayValue($resource, 'inputFormats'),
+            'outputFormats' => $this->buildArrayValue($resource, 'outputFormats'),
         ]);
     }
 
@@ -144,12 +146,12 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
             'input' => $this->phpize($resource, 'input', 'string'),
             'output' => $this->phpize($resource, 'output', 'string'),
-            'normalizationContext' => $this->buildAttribute($resource, 'normalizationContext'),
-            'denormalizationContext' => $this->buildAttribute($resource, 'denormalizationContext'),
-            'validationContext' => $this->buildAttribute($resource, 'validationContext'),
-            'filters' => $this->buildAttribute($resource, 'filters'),
-            'order' => $this->buildAttribute($resource, 'order'),
-            'extraProperties' => $this->buildAttribute($resource, 'extraProperties'),
+            'normalizationContext' => $this->buildArrayValue($resource, 'normalizationContext'),
+            'denormalizationContext' => $this->buildArrayValue($resource, 'denormalizationContext'),
+            'validationContext' => $this->buildArrayValue($resource, 'validationContext'),
+            'filters' => $this->buildArrayValue($resource, 'filters'),
+            'order' => $this->buildArrayValue($resource, 'order'),
+            'extraProperties' => $this->buildArrayValue($resource, 'extraProperties'),
             'mercure' => $this->buildMercure($resource),
             'messenger' => $this->buildMessenger($resource),
         ];
@@ -307,45 +309,5 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data;
-    }
-
-    private function buildAttribute(array $resource, string $key, $default = null)
-    {
-        if (empty($resource[$key])) {
-            return $default;
-        }
-
-        if (!\is_array($resource[$key])) {
-            throw new InvalidArgumentException(sprintf('"%s" setting is expected to be an array, %s given', $key, \gettype($resource[$key])));
-        }
-
-        return $resource[$key];
-    }
-
-    /**
-     * Transforms an XML attribute's value in a PHP value.
-     *
-     * @param mixed|null $default
-     *
-     * @return string|int|bool|array|null
-     */
-    private function phpize(?array $resource, string $key, string $type, $default = null)
-    {
-        if (!isset($resource[$key])) {
-            return $default;
-        }
-
-        switch ($type) {
-            case 'bool|string':
-                return \in_array($resource[$key], ['1', '0', 1, 0, 'true', 'false', true, false], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
-            case 'string':
-                return (string) $resource[$key];
-            case 'integer':
-                return (int) $resource[$key];
-            case 'bool':
-                return \in_array($resource[$key], ['1', 'true', 1, true], false);
-        }
-
-        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])));
     }
 }

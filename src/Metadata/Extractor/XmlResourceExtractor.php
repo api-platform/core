@@ -26,6 +26,8 @@ use Symfony\Component\Config\Util\XmlUtils;
  */
 final class XmlResourceExtractor extends AbstractResourceExtractor
 {
+    use ResourceExtractorTrait;
+
     public const SCHEMA = __DIR__.'/schema/resources.xsd';
 
     /**
@@ -161,17 +163,17 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 continue;
             }
 
-            if (null !== ($property = $this->phpize($data, 'fromProperty', 'string'))) {
-                $uriVariables[$parameterName]['from_property'] = $property;
+            if ($fromProperty = $this->phpize($data, 'fromProperty', 'string')) {
+                $uriVariables[$parameterName]['from_property'] = $fromProperty;
             }
-            if (null !== ($property = $this->phpize($data, 'toProperty', 'string'))) {
-                $uriVariables[$parameterName]['to_property'] = $property;
+            if ($toProperty = $this->phpize($data, 'toProperty', 'string')) {
+                $uriVariables[$parameterName]['to_property'] = $toProperty;
             }
-            if (null !== ($class = $this->phpize($data, 'fromClass', 'string'))) {
-                $uriVariables[$parameterName]['from_class'] = $class;
+            if ($fromClass = $this->phpize($data, 'fromClass', 'string')) {
+                $uriVariables[$parameterName]['from_class'] = $fromClass;
             }
-            if (null !== ($class = $this->phpize($data, 'toClass', 'string'))) {
-                $uriVariables[$parameterName]['to_class'] = $class;
+            if ($toClass = $this->phpize($data, 'toClass', 'string')) {
+                $uriVariables[$parameterName]['to_class'] = $toClass;
             }
             if (isset($data->identifiers->values)) {
                 $uriVariables[$parameterName]['identifiers'] = $this->buildValues($data->identifiers->values);
@@ -340,73 +342,5 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         }
 
         return $data;
-    }
-
-    private function buildArgs(\SimpleXMLElement $resource): ?array
-    {
-        if (!isset($resource->args->arg)) {
-            return null;
-        }
-
-        $data = [];
-        foreach ($resource->args->arg as $arg) {
-            $data[(string) $arg['id']] = $this->buildValues($arg->values);
-        }
-
-        return $data;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function buildValues(\SimpleXMLElement $resource): array
-    {
-        $data = [];
-        foreach ($resource->value as $value) {
-            if (null !== $value->attributes()->name) {
-                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->buildValues($value->values) : (string) $value;
-                continue;
-            }
-
-            $data[] = isset($value->values) ? $this->buildValues($value->values) : (string) $value;
-        }
-
-        return $data;
-    }
-
-    private function buildArrayValue(?\SimpleXMLElement $resource, string $key, $default = null)
-    {
-        if (!isset($resource->{$key.'s'}->{$key})) {
-            return $default;
-        }
-
-        return (array) $resource->{$key.'s'}->{$key};
-    }
-
-    /**
-     * Transforms an XML attribute's value in a PHP value.
-     *
-     * @param mixed|null $default
-     *
-     * @return string|int|bool|array|null
-     */
-    private function phpize(\SimpleXMLElement $resource, string $key, string $type, $default = null)
-    {
-        if (!isset($resource[$key])) {
-            return $default;
-        }
-
-        switch ($type) {
-            case 'bool|string':
-                return \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
-            case 'string':
-                return (string) $resource[$key];
-            case 'integer':
-                return (int) $resource[$key];
-            case 'bool':
-                return (bool) XmlUtils::phpize($resource[$key]);
-        }
-
-        return null;
     }
 }
