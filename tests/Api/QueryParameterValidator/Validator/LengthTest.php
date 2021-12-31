@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Filter\Validator;
+namespace ApiPlatform\Tests\Api\QueryParameterValidator\Validator;
 
-use ApiPlatform\Core\Filter\Validator\Length;
+use ApiPlatform\Api\QueryParameterValidator\Validator\Length;
 use PHPUnit\Framework\TestCase;
 
 /**

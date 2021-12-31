@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Filter;
+namespace ApiPlatform\Api\QueryParameterValidator;
 
 use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Exception\FilterValidationException;

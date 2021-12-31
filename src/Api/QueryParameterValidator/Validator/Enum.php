@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Filter\Validator;
+namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
-final class Pattern implements ValidatorInterface
+final class Enum implements ValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -25,11 +25,11 @@ final class Pattern implements ValidatorInterface
             return [];
         }
 
-        $pattern = $filterDescription['swagger']['pattern'] ?? null;
+        $enum = $filterDescription['swagger']['enum'] ?? null;
 
-        if (null !== $pattern && !preg_match($pattern, $value)) {
+        if (null !== $enum && !\in_array($value, $enum, true)) {
             return [
-                sprintf('Query parameter "%s" must match pattern %s', $name, $pattern),
+                sprintf('Query parameter "%s" must be one of "%s"', $name, implode(', ', $enum)),
             ];
         }
 

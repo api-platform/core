@@ -11,19 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Filter\Validator;
+namespace ApiPlatform\Tests\Api\QueryParameterValidator\Validator;
 
-use ApiPlatform\Core\Filter\Validator\Enum;
+use ApiPlatform\Api\QueryParameterValidator\Validator\MultipleOf;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
-class EnumTest extends TestCase
+class MultipleOfTest extends TestCase
 {
     public function testNonDefinedFilter()
     {
-        $filter = new Enum();
+        $filter = new MultipleOf();
 
         $this->assertEmpty(
             $filter->validate('some_filter', [], [])
@@ -32,41 +32,44 @@ class EnumTest extends TestCase
 
     public function testEmptyQueryParameter()
     {
-        $filter = new Enum();
+        $request = ['some_filter' => ''];
+        $filter = new MultipleOf();
 
         $this->assertEmpty(
-            $filter->validate('some_filter', [], ['some_filter' => ''])
+            $filter->validate('some_filter', [], $request)
         );
     }
 
     public function testNonMatchingParameter()
     {
-        $filter = new Enum();
+        $request = ['some_filter' => '8'];
+        $filter = new MultipleOf();
 
         $filterDefinition = [
             'swagger' => [
-                'enum' => ['foo', 'bar'],
+                'multipleOf' => 3,
             ],
         ];
 
         $this->assertEquals(
-            ['Query parameter "some_filter" must be one of "foo, bar"'],
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foobar'])
+            ['Query parameter "some_filter" must multiple of 3'],
+            $filter->validate('some_filter', $filterDefinition, $request)
         );
     }
 
     public function testMatchingParameter()
     {
-        $filter = new Enum();
+        $request = ['some_filter' => '8'];
+        $filter = new MultipleOf();
 
         $filterDefinition = [
             'swagger' => [
-                'enum' => ['foo', 'bar'],
+                'multipleOf' => 4,
             ],
         ];
 
         $this->assertEmpty(
-            $filter->validate('some_filter', $filterDefinition, ['some_filter' => 'foo'])
+            $filter->validate('some_filter', $filterDefinition, $request)
         );
     }
 }

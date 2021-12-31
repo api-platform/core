@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Filter;
+namespace ApiPlatform\Tests\Api\QueryParameterValidator;
 
+use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
 use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Filter\QueryParameterValidator;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

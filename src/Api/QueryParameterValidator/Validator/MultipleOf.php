@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Filter\Validator;
+namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
-final class Enum implements ValidatorInterface
+final class MultipleOf implements ValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -25,11 +25,11 @@ final class Enum implements ValidatorInterface
             return [];
         }
 
-        $enum = $filterDescription['swagger']['enum'] ?? null;
+        $multipleOf = $filterDescription['swagger']['multipleOf'] ?? null;
 
-        if (null !== $enum && !\in_array($value, $enum, true)) {
+        if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
             return [
-                sprintf('Query parameter "%s" must be one of "%s"', $name, implode(', ', $enum)),
+                sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf),
             ];
         }
 

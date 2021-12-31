@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Filter\Validator;
+namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
-final class MultipleOf implements ValidatorInterface
+final class Pattern implements ValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -25,11 +25,11 @@ final class MultipleOf implements ValidatorInterface
             return [];
         }
 
-        $multipleOf = $filterDescription['swagger']['multipleOf'] ?? null;
+        $pattern = $filterDescription['swagger']['pattern'] ?? null;
 
-        if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
+        if (null !== $pattern && !preg_match($pattern, $value)) {
             return [
-                sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf),
+                sprintf('Query parameter "%s" must match pattern %s', $name, $pattern),
             ];
         }
 

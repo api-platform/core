@@ -455,6 +455,15 @@ spl_autoload_register(function ($className) {
         // Validator
         ApiPlatform\Core\Validator\EventListener\ValidateListener::class => ApiPlatform\Symfony\EventListener\ValidateListener::class,
         ApiPlatform\Core\Validator\Exception\ValidationException::class => ApiPlatform\Symfony\EventListener\Exception\ValidationException::class,
+
+        ApiPlatform\Core\Filter\QueryParameterValidator::class => ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator::class,
+        ApiPlatform\Core\Filter\Validator\ArrayItems::class => ApiPlatform\Api\QueryParameterValidator\Validator\ArrayItems::class,
+        ApiPlatform\Core\Filter\Validator\Bounds::class => ApiPlatform\Api\QueryParameterValidator\Validator\Bounds::class,
+        ApiPlatform\Core\Filter\Validator\Enum::class => ApiPlatform\Api\QueryParameterValidator\Validator\Enum::class,
+        ApiPlatform\Core\Filter\Validator\Length::class => ApiPlatform\Api\QueryParameterValidator\Validator\Length::class,
+        ApiPlatform\Core\Filter\Validator\MultipleOf::class => ApiPlatform\Api\QueryParameterValidator\Validator\MultipleOf::class,
+        ApiPlatform\Core\Filter\Validator\Pattern::class => ApiPlatform\Api\QueryParameterValidator\Validator\Pattern::class,
+        ApiPlatform\Core\Filter\Validator\Required::class => ApiPlatform\Api\QueryParameterValidator\Validator\Required::class,
     ];
 
     $deprecatedInterfaces = include 'deprecated_interfaces.php';

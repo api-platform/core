@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Filter\Validator;
+namespace ApiPlatform\Api\QueryParameterValidator\Validator;
 
 final class Length implements ValidatorInterface
 {
