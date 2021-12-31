@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Api;
+namespace ApiPlatform\Api;
 
 /**
  * Matches a mime type to a format.

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;

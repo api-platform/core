@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Api\FilterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Api\FilterInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;

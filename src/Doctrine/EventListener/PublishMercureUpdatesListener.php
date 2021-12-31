@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api\QueryParameterValidator;
 
-use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Exception\FilterValidationException;
 use Psr\Container\ContainerInterface;
 

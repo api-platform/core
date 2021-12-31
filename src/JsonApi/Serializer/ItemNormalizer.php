@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;

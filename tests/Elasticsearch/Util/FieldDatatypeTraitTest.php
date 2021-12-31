@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Util;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;

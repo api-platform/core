@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

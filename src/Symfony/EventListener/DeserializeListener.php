@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Core\Api\FormatMatcher;
+use ApiPlatform\Api\FormatMatcher;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;

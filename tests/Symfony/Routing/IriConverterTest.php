@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;

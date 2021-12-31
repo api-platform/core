@@ -298,7 +298,7 @@
         <service id="api_platform.graphql.normalizer.object" class="ApiPlatform\GraphQl\Serializer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.normalizer.object" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.api.identifiers_extractor" />
 
             <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-995" />

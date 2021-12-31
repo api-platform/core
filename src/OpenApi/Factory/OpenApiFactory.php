@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Factory;
 
-use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;

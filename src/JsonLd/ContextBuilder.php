@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;

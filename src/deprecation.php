@@ -20,12 +20,15 @@ spl_autoload_register(function ($className) {
     ];
 
     static $deprecatedClasses = [
-        ApiPlatform\Core\Api\UrlGeneratorInterface::class => ApiPlatform\Api\UrlGeneratorInterface::class,
+        ApiPlatform\Core\Api\Entrypoint::class => ApiPlatform\Api\Entrypoint::class,
+        ApiPlatform\Core\Api\FilterLocatorTrait::class => ApiPlatform\Api\FilterLocatorTrait::class,
+        ApiPlatform\Core\Api\FormatMatcher::class => ApiPlatform\Api\FormatMatcher::class,
+        ApiPlatform\Core\Api\ResourceClassResolver::class => ApiPlatform\Api\ResourceClassResolver::class,
+
         ApiPlatform\Core\Annotation\ApiResource::class => ApiPlatform\Metadata\ApiResource::class,
         ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
         ApiPlatform\Core\Annotation\ApiFilter::class => ApiPlatform\Metadata\ApiFilter::class,
         ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
-        ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class,
 
         ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,
@@ -33,12 +36,10 @@ spl_autoload_register(function ($className) {
 
         ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class,
-        ApiPlatform\Core\Metadata\Extractor\ExtractorInterface::class => ApiPlatform\Metadata\Extractor\ResourceExtractorInterface::class,
         ApiPlatform\Core\Metadata\Extractor\AbstractExtractor::class => ApiPlatform\Metadata\Extractor\AbstractResourceExtractor::class,
         ApiPlatform\Core\Metadata\Extractor\XmlExtractor::class => ApiPlatform\Metadata\Extractor\XmlResourceExtractor::class,
         ApiPlatform\Core\Metadata\Extractor\YamlExtractor::class => ApiPlatform\Metadata\Extractor\YamlResourceExtractor::class,
 
-        ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class,
         ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class => ApiPlatform\Metadata\Property\PropertyNameCollection::class,
 
         // Exceptions
@@ -56,26 +57,6 @@ spl_autoload_register(function ($className) {
 
         // GraphQl
         ApiPlatform\Core\GraphQl\Executor::class => ApiPlatform\GraphQl\Executor::class,
-        ApiPlatform\Core\GraphQl\ExecutorInterface::class => ApiPlatform\GraphQl\ExecutorInterface::class,
-        ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface::class => ApiPlatform\GraphQl\Error\ErrorHandlerInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface::class => ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface::class => ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface::class => ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface::class => ApiPlatform\GraphQl\Resolver\MutationResolverInterface::class,
-        ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface::class => ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface::class,
-        ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface::class => ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface::class,
-        ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface::class => ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface::class,
-        ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface::class,
-        ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface::class => ApiPlatform\GraphQl\Type\TypesFactoryInterface::class,
-        ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface::class => ApiPlatform\GraphQl\Type\Definition\TypeInterface::class,
-        ApiPlatform\Core\GraphQl\Type\TypesContainerInterface::class => ApiPlatform\GraphQl\Type\TypesContainerInterface::class,
         ApiPlatform\Core\GraphQl\Error\ErrorHandler::class => ApiPlatform\GraphQl\Error\ErrorHandler::class,
         ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage::class => ApiPlatform\GraphQl\Resolver\Stage\ValidateStage::class,
         ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStage::class => ApiPlatform\GraphQl\Resolver\Stage\ReadStage::class,
@@ -488,9 +469,19 @@ spl_autoload_register(function ($className) {
     }
 
     if (isset($deprecatedInterfaces[$className])) {
-        class_alias($deprecatedInterfaces[$className], $className);
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $className, $deprecatedClasses[$className]));
+        // It can be declared by the path below
+        if (!class_exists($deprecatedInterfaces[$className])) {
+            class_alias($deprecatedInterfaces[$className], $className);
+        }
+
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $className, $deprecatedInterfaces[$className]));
 
         return;
+    }
+
+    // We try to use the new interface but it isn't aliased yet
+    if (in_array($className, $deprecatedInterfaces, true) && !class_exists($className)) {
+        $oldClassName = array_search($className, $deprecatedInterfaces, true);
+        class_alias($oldClassName, $className);
     }
 });

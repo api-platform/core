@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;

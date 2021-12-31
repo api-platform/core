@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**

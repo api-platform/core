@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Serializer\ContextTrait;

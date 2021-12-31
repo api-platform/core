@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;

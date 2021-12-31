@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

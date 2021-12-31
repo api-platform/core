@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonApi\Serializer;
 
-use ApiPlatform\Core\Api\Entrypoint;
+use ApiPlatform\Api\Entrypoint;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;

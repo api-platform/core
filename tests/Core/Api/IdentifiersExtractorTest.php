@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Api;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;

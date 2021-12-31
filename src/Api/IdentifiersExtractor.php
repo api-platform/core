@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;

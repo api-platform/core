@@ -11,8 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Api;
+namespace ApiPlatform\Api;
 
+use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 

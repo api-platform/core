@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Action;
 
 use ApiPlatform\Action\EntrypointAction;
-use ApiPlatform\Core\Api\Entrypoint;
+use ApiPlatform\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;

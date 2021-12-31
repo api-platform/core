@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Routing;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;

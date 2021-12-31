@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Api\QueryParameterValidator;
 
+use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
-use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

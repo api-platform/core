@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures;
 
-use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Api\FilterInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>

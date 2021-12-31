@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;

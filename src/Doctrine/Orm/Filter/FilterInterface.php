@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 

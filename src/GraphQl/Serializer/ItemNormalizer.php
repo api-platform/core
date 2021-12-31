@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider;
 
+use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Extractor\AnnotationsProvider\ApiPlatformProvider;
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
 use ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolverInterface;

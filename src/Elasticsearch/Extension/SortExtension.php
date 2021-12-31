@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;

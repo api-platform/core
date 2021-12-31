@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Api;
 
-use ApiPlatform\Core\Api\Entrypoint;
+use ApiPlatform\Api\Entrypoint;
 use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;

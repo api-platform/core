@@ -15,9 +15,9 @@ namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;

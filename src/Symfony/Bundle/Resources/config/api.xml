@@ -10,10 +10,10 @@
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
 
-        <service id="api_platform.resource_class_resolver" class="ApiPlatform\Core\Api\ResourceClassResolver" public="false">
+        <service id="api_platform.resource_class_resolver" class="ApiPlatform\Api\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
-        <service id="ApiPlatform\Core\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
+        <service id="ApiPlatform\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
 
         <service id="api_platform.operation_method_resolver" class="ApiPlatform\Core\Bridge\Symfony\Routing\OperationMethodResolver" public="false">
             <argument type="service" id="api_platform.router" />

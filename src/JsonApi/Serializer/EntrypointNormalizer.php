@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
+use ApiPlatform\Api\Entrypoint;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\Entrypoint;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\InvalidArgumentException;

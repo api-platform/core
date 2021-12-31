@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;

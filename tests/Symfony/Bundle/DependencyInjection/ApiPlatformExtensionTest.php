@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Action\NotFoundAction;
+use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
