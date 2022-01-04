@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Annotation;
 
-use ApiPlatform\Api\FilterInterface;
+use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 
 /**
