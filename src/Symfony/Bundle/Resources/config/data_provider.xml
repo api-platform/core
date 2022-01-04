@@ -34,6 +34,13 @@
         </service>
         <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination" />
 
+        <service id="api_platform.pagination.legacy" class="ApiPlatform\Core\DataProvider\Pagination">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument>%api_platform.collection.pagination%</argument>
+            <argument>%api_platform.graphql.collection.pagination%</argument>
+        </service>
+        <service id="ApiPlatform\Core\DataProvider\Pagination" alias="api_platform.pagination.legacy" />
+
         <service id="api_platform.pagination_options" class="ApiPlatform\State\Pagination\PaginationOptions">
             <argument>%api_platform.collection.pagination.enabled%</argument>
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
