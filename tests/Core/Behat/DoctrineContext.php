@@ -82,7 +82,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedToDummyFriend as Relat
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelationEmbedder as RelationEmbedderDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as SecuredDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoManyUids as SoManyUidsDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
@@ -313,7 +312,7 @@ final class DoctrineContext implements Context
         for ($i = 1; $i <= $nb; ++$i) {
             $ids[] = UuidV6::uuid6()->toString();
             $id = $ids[$i - 1] ?? null;
-            $dummy = $this->isOrm() ? new SoManyUids($id) : new SoManyUidsDocument($id);
+            $dummy = new SoManyUids($id);
             $dummy->content = 'Many #'.$i;
 
             $this->manager->persist($dummy);

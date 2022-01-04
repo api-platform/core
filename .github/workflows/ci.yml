@@ -564,9 +564,9 @@ jobs:
         run: |
           mkdir -p build/logs/behat
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction --tags='~@php8'
+            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction --tags='~@php8&&~@uuid/v6'
           else
-            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@php8'
+            vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@php8&&~@uuid/v6'
           fi
       - name: Merge code coverage reports
         run: |
@@ -919,7 +919,7 @@ jobs:
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@uuid/v6'
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
