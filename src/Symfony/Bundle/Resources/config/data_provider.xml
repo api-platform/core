@@ -27,12 +27,13 @@
         </service>
         <service id="ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface" alias="api_platform.subresource_data_provider" />
 
-        <service id="api_platform.pagination" class="ApiPlatform\State\Pagination\Pagination">
+        <service id="api_platform.pagination.next" class="ApiPlatform\State\Pagination\Pagination">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument>%api_platform.collection.pagination%</argument>
             <argument>%api_platform.graphql.collection.pagination%</argument>
         </service>
-        <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination" />
+        <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination.next" />
+        <service id="api_platform.pagination" alias="api_platform.pagination.next" />
 
         <service id="api_platform.pagination.legacy" class="ApiPlatform\Core\DataProvider\Pagination">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />

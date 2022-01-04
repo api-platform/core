@@ -839,8 +839,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->removeAlias('api_platform.graphql.schema_builder');
         $container->setAlias('api_platform.graphql.schema_builder', 'api_platform.graphql.schema_builder.legacy');
 
-        $container->removeDefinition('api_platform.pagination');
-        $container->setDefinition('api_platform.pagination', $container->getDefinition('api_platform.pagination.legacy'));
+        $container->removeAlias('api_platform.pagination');
+        $container->setAlias('api_platform.pagination', 'api_platform.pagination.legacy');
 
         foreach ([
             'api_platform.metadata.property.metadata_factory.serializer',

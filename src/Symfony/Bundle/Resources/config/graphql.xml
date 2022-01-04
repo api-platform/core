@@ -89,7 +89,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
-            <argument type="service" id="api_platform.pagination" />
+            <argument type="service" id="api_platform.pagination.next" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.deserialize" class="ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage" public="false">
@@ -168,7 +168,7 @@
             <argument type="service" id="api_platform.graphql.types_container" />
             <argument type="service" id="api_platform.graphql.resolver.resource_field" />
             <argument type="service" id="api_platform.graphql.fields_builder_locator" />
-            <argument type="service" id="api_platform.pagination" />
+            <argument type="service" id="api_platform.pagination.legacy" />
         </service>
 
         <service id="api_platform.graphql.type_builder" class="ApiPlatform\GraphQl\Type\TypeBuilder" public="false">
@@ -191,7 +191,7 @@
             <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" />
             <argument type="service" id="api_platform.graphql.resolver.factory.item_subscription" />
             <argument type="service" id="api_platform.filter_locator" />
-            <argument type="service" id="api_platform.pagination" />
+            <argument type="service" id="api_platform.pagination.legacy" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument>%api_platform.graphql.nesting_separator%</argument>
         </service>
