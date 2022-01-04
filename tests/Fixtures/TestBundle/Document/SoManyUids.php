@@ -35,7 +35,7 @@ use Ramsey\Uuid\Nonstandard\UuidV6;
 class SoManyUids
 {
     /**
-     * @ODM\Id(type="uuid")
+     * @ODM\Id(strategy="NONE", type="uuid")
      */
     public $id;
 
