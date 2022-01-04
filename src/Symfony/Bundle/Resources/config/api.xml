@@ -71,14 +71,14 @@
         </service>
         <service id="ApiPlatform\Core\Api\IriConverterInterface" alias="api_platform.iri_converter.legacy" />
 
-        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false" decorates="api_platform.iri_converter.legacy">
+        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
             <argument type="service" id="api_platform.state_provider" />
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.api.identifiers_extractor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.uri_variables.converter" />
-            <argument type="service" id="api_platform.symfony.iri_converter.inner" />
+            <argument type="service" id="api_platform.iri_converter.legacy" />
         </service>
         <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
         <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
