@@ -18,12 +18,12 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface 
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -207,7 +207,12 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
     private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?Operation $operation = null): array
     {
         $context = $this->getBaseContext($referenceType);
-        $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
+        if ($this->propertyMetadataFactory instanceof LegacyPropertyMetadataFactoryInterface) {
+            $propertyContext = [];
+        } else {
+            $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
+        }
+
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             /** @var PropertyMetadata|ApiProperty */
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $propertyContext);
@@ -217,8 +222,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             }
 
             $convertedName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $resourceClass, self::FORMAT) : $propertyName;
-            $jsonldContext = ($propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttributes()['jsonld_context'] : $propertyMetadata->getJsonldContext()) ?? [];
-            $id = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getIri() : ($propertyMetadata->getTypes()[0] ?? null);
+            if ($propertyMetadata instanceof PropertyMetadata) {
+                $jsonldContext = ($propertyMetadata->getAttributes() ?? [])['jsonld_context'] ?? [];
+                $id = $propertyMetadata->getIri();
+            } else {
+                $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
+                $id = $propertyMetadata->getTypes()[0] ?? null;
+            }
 
             if (!$id) {
                 $id = sprintf('%s/%s', $shortName, $convertedName);

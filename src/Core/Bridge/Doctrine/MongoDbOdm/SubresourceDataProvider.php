@@ -19,6 +19,7 @@ use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
@@ -52,9 +53,9 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     private $itemExtensions;
 
     /**
-     * @param AggregationCollectionExtensionInterface[] $collectionExtensions
-     * @param AggregationItemExtensionInterface[]       $itemExtensions
-     * @param mixed                                     $resourceMetadataFactory
+     * @param AggregationCollectionExtensionInterface[]                                   $collectionExtensions
+     * @param AggregationItemExtensionInterface[]                                         $itemExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {
@@ -98,12 +99,19 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             throw new ResourceClassNotSupportedException('The given resource class is not a subresource.');
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
-            $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
-        } catch (OperationNotFoundException $e) {
-            $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
+        $attribute = [];
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            try {
+                $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
+                $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
+            } catch (OperationNotFoundException $e) {
+                $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
+            }
+        } else {
+            /** @var ResourceMetadata */
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $attribute = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'doctrine_mongodb', [], true);
         }
 
         $executeOptions = $attribute['execute_options'] ?? [];

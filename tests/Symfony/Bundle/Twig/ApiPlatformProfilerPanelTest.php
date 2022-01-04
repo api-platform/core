@@ -13,13 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\Twig;
 
-use ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider as OdmCollectionDataProvider;
-use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider as OdmItemDataProvider;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
 use ApiPlatform\Doctrine\Common\State\Processor;
-use ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ContainNonResourceItemDataProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
@@ -45,6 +39,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         parent::setUp();
         $kernel = self::bootKernel();
         $this->env = $kernel->getEnvironment();
+        $this->legacy = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
 
         /** @var ManagerRegistry $doctrine */
         $doctrine = $kernel->getContainer()->get('doctrine');
@@ -70,6 +65,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testDebugBarContentNotResourceClass()
     {
+        if ($this->legacy) {
+            $this->markTestSkipped('Legacy test.');
+
+            return;
+        }
+
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
@@ -89,6 +90,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testDebugBarContent()
     {
+        if ($this->legacy) {
+            $this->markTestSkipped('Legacy test.');
+
+            return;
+        }
+
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
@@ -107,6 +114,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testProfilerGeneralLayoutNotResourceClass()
     {
+        if ($this->legacy) {
+            $this->markTestSkipped('Legacy test.');
+
+            return;
+        }
+
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
@@ -128,6 +141,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testProfilerGeneralLayout()
     {
+        if ($this->legacy) {
+            $this->markTestSkipped('Legacy test.');
+
+            return;
+        }
+
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
@@ -164,61 +183,17 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertNotEmpty($crawler->filter('.data-processor-tab-content .empty'));
     }
 
-    public function testGetCollectionProfiler()
-    {
-        $client = static::createClient();
-        $client->enableProfiler();
-        $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('GET', '/_profiler/latest?panel=api_platform.data_collector.request');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        // Metadata tab
-        $tabContent = $crawler->filter('.metadata-tab-content th.status-success');
-        $this->assertSame('api_dummies_get_collection', $tabContent->html(), 'The actual operation should be highlighted.');
-
-        // Data provider tab
-        $tabContent = $crawler->filter('.data-provider-tab-content');
-        $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString('mongodb' === $this->env ? OdmCollectionDataProvider::class : CollectionDataProvider::class, $tabContent->html());
-
-        $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
-        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
-
-        // Processors tab
-        $this->assertStringContainsString('No calls to processors have been recorded.', $crawler->filter('.data-processor-tab-content .empty')->html());
-    }
-
-    public function testPostCollectionProfiler()
-    {
-        $client = static::createClient();
-        $client->enableProfiler();
-        $client->request('POST', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json', 'CONTENT_TYPE' => 'application/ld+json'], '{"name": "foo"}');
-        $this->assertEquals(201, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('get', '/_profiler/latest?panel=api_platform.data_collector.request');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        // Metadata tab
-        $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('api_dummies_post_collection', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
-
-        // Data provider tab
-        $tabContent = $crawler->filter('.data-provider-tab-content');
-        $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
-        $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
-        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
-
-        // Data persiters tab
-        $tabContent = $crawler->filter('.data-persister-tab-content');
-        $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString(DataPersister::class, $tabContent->html());
-    }
-
     /**
      * @requires PHP 8.0
      */
     public function testPostCollectionProcessorProfiler()
     {
+        if ($this->legacy) {
+            $this->markTestSkipped('Legacy test.');
+
+            return;
+        }
+
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('POST', '/processor_entities', [], [], ['HTTP_ACCEPT' => 'application/ld+json', 'CONTENT_TYPE' => 'application/ld+json'], '{"foo": "bar"}');
@@ -240,42 +215,5 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $tabContent = $crawler->filter('.data-processor-tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
         $this->assertStringContainsString(Processor::class, $tabContent->html());
-    }
-
-    /**
-     * @group legacy
-     * Group legacy is due ApiPlatform\Exception\ResourceClassNotSupportedException, the annotation could be removed in 3.0 but the test should stay
-     */
-    public function testGetItemProfiler()
-    {
-        $dummy = new Dummy();
-        $dummy->setName('bar');
-        $this->manager->persist($dummy);
-        $this->manager->flush();
-
-        $client = static::createClient();
-        $client->enableProfiler();
-        $client->request('GET', '/dummies/1', [], [], ['HTTP_ACCEPT' => 'application/ld+json', 'CONTENT_TYPE' => 'application/ld+json'], '{"name": "foo"}');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('get', '/_profiler/latest?panel=api_platform.data_collector.request');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        // Metadata tab
-        $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('api_dummies_get_item', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
-
-        // Data provider tab
-        $tabContent = $crawler->filter('.data-provider-tab-content');
-        $this->assertSame('FALSE', $tabContent->filter('tr:first-of-type .status-error')->html());
-        $this->assertSame(ContainNonResourceItemDataProvider::class, $tabContent->filter('table tbody tr:first-of-type td:nth-of-type(3)')->html());
-
-        $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString('mongodb' === $this->env ? OdmItemDataProvider::class : ItemDataProvider::class, $tabContent->html());
-
-        $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
-        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
-
-        // Data processors tab
-        $this->assertStringContainsString('No calls to processors have been recorded.', $crawler->filter('.data-processor-tab-content .empty')->html());
     }
 }

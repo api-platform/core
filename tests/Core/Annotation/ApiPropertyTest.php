@@ -33,9 +33,6 @@ class ApiPropertyTest extends TestCase
         $property->iri = 'http://example.com/prop';
         $property->identifier = true;
         $property->attributes = ['foo' => 'bar'];
-        $property->example = 'foo';
-        $property->schema = ['foo'];
-        $property->builtinTypes = ['foo', 'bar'];
 
         $this->assertEquals('description', $property->description);
         $this->assertTrue($property->readable);
@@ -46,9 +43,6 @@ class ApiPropertyTest extends TestCase
         $this->assertEquals('http://example.com/prop', $property->iri);
         $this->assertTrue($property->identifier);
         $this->assertEquals(['foo' => 'bar'], $property->attributes);
-        $this->assertEquals('foo', $property->example);
-        $this->assertEquals(['foo'], $property->schema);
-        $this->assertEquals(['foo', 'bar'], $property->builtinTypes);
     }
 
     public function testConstruct()
@@ -59,7 +53,6 @@ class ApiPropertyTest extends TestCase
             'fetchEager' => false,
             'jsonldContext' => ['foo' => 'bar'],
             'security' => 'is_granted(\'ROLE_ADMIN\')',
-            'securityPostDenormalize' => 'is_granted(\'VIEW\', object)',
             'swaggerContext' => ['foo' => 'baz'],
             'openapiContext' => ['foo' => 'baz'],
             'push' => true,
@@ -71,7 +64,6 @@ class ApiPropertyTest extends TestCase
             'fetch_eager' => false,
             'jsonld_context' => ['foo' => 'bar'],
             'security' => 'is_granted(\'ROLE_ADMIN\')',
-            'security_post_denormalize' => 'is_granted(\'VIEW\', object)',
             'swagger_context' => ['foo' => 'baz'],
             'openapi_context' => ['foo' => 'baz'],
             'push' => true,
@@ -91,7 +83,6 @@ return new \ApiPlatform\Core\Annotation\ApiProperty(
     fetchEager: false,
     jsonldContext: ['foo' => 'bar'],
     security: 'is_granted(\'ROLE_ADMIN\')',
-    securityPostDenormalize: 'is_granted(\'VIEW\', object)',
     swaggerContext: ['foo' => 'baz'],
     openapiContext: ['foo' => 'baz'],
     push: true,
@@ -106,11 +97,11 @@ PHP
             'fetch_eager' => false,
             'jsonld_context' => ['foo' => 'bar'],
             'security' => 'is_granted(\'ROLE_ADMIN\')',
-            'security_post_denormalize' => 'is_granted(\'VIEW\', object)',
             'swagger_context' => ['foo' => 'baz'],
             'openapi_context' => ['foo' => 'baz'],
             'push' => true,
             'unknown' => 'unknown',
+            'security_post_denormalize' => null,
         ], $property->attributes);
     }
 }

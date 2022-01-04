@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Documentation\Documentation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -42,11 +42,12 @@ final class SwaggerCommand extends Command
     private $apiVersion;
     private $apiFormats;
     private $swaggerVersions;
+    private $legacyMode;
 
     /**
      * @param int[] $swaggerVersions
      */
-    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null, array $swaggerVersions = [2, 3])
+    public function __construct(NormalizerInterface $normalizer, ResourceNameCollectionFactoryInterface $resourceNameCollection, string $apiTitle, string $apiDescription, string $apiVersion, array $apiFormats = null, array $swaggerVersions = [2, 3], bool $legacyMode = false)
     {
         $this->normalizer = $normalizer;
         $this->resourceNameCollectionFactory = $resourceNameCollection;
@@ -55,6 +56,7 @@ final class SwaggerCommand extends Command
         $this->apiVersion = $apiVersion;
         $this->apiFormats = $apiFormats;
         $this->swaggerVersions = $swaggerVersions;
+        $this->legacyMode = $legacyMode;
 
         if (null !== $apiFormats) {
             @trigger_error(sprintf('Passing a 6th parameter to the constructor of "%s" is deprecated since API Platform 2.5', __CLASS__), \E_USER_DEPRECATED);
@@ -92,6 +94,10 @@ final class SwaggerCommand extends Command
 
         if (3 === (int) $version) {
             @trigger_error('The command "api:swagger:export" is deprecated for the spec version 3 use "api:openapi:export".', \E_USER_DEPRECATED);
+        }
+
+        if (!$this->legacyMode) {
+            @trigger_error('The command "api:swagger:export" is using pre-2.7 metadata, new metadata will not appear, use "api:openapi:export" instead.', \E_USER_DEPRECATED);
         }
 
         $documentation = new Documentation($this->resourceNameCollectionFactory->create(), $this->apiTitle, $this->apiDescription, $this->apiVersion, $this->apiFormats);

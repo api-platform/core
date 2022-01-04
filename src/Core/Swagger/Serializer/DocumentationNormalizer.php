@@ -108,6 +108,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $identifiersExtractor;
 
     private $openApiNormalizer;
+    private $legacyMode;
 
     /**
      * @param SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
@@ -117,7 +118,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      * @param int[]                                                      $swaggerVersions
      * @param mixed                                                      $resourceMetadataFactory
      */
-    public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null)
+    public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null, bool $legacyMode = false)
     {
         if ($jsonSchemaTypeFactory instanceof OperationMethodResolverInterface) {
             @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
@@ -178,12 +179,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $this->itemsPerPageParameterName = $itemsPerPageParameterName;
         $this->paginationClientEnabled = $paginationClientEnabled;
         $this->paginationClientEnabledParameterName = $paginationClientEnabledParameterName;
-
         $this->defaultContext[self::SPEC_VERSION] = $swaggerVersions[0] ?? 2;
-
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
         $this->identifiersExtractor = $identifiersExtractor;
         $this->openApiNormalizer = $openApiNormalizer;
+        $this->legacyMode = $legacyMode;
     }
 
     /**
@@ -295,6 +295,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getPath(string $resourceShortName, string $operationName, array $operation, string $operationType): string
     {
         $path = $this->operationPathResolver->resolveOperationPath($resourceShortName, $operation, $operationType, $operationName);
+
         if ('.{_format}' === substr($path, -10)) {
             $path = substr($path, 0, -10);
         }
@@ -686,6 +687,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($resourceClass);
             } catch (RuntimeException $e) {
                 // Ignore exception here
+            } catch (ResourceClassNotFoundException $e) {
+                if (false === $this->legacyMode) {
+                    // Skipping these, swagger is not compatible with post 2.7 resource metadata
+                    return $pathOperation;
+                }
+                throw $e;
             }
         }
 

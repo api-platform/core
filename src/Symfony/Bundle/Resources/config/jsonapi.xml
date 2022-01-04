@@ -16,7 +16,7 @@
         </service>
 
         <service id="api_platform.jsonapi.normalizer.entrypoint" class="ApiPlatform\JsonApi\Serializer\EntrypointNormalizer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />
 
@@ -26,7 +26,7 @@
         <service id="api_platform.jsonapi.normalizer.collection" class="ApiPlatform\JsonApi\Serializer\CollectionNormalizer" public="false">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <!-- Run after api_platform.jsonapi.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->
             <tag name="serializer.normalizer" priority="-985" />
@@ -39,7 +39,7 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="collection" />
             <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
@@ -52,7 +52,7 @@
             <argument type="service" id="serializer.normalizer.object" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <!-- Run after serializer.denormalizer.array but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-995" />
@@ -83,7 +83,7 @@
         </service>
 
         <service id="api_platform.jsonapi.listener.request.transform_fieldsets_parameters" class="ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="5" />
         </service>

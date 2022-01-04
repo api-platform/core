@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\OpenApi\Serializer;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Documentation;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;

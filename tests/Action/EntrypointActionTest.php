@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Action;
 
 use ApiPlatform\Action\EntrypointAction;
 use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use PHPUnit\Framework\TestCase;
 
 /**

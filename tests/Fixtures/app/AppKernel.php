@@ -247,6 +247,22 @@ class AppKernel extends Kernel
                 ],
             ]);
 
+            if ('mongodb' === $this->environment) {
+                $c->prependExtensionConfig('api_platform', [
+                    'mapping' => [
+                        'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy_odm'],
+                    ],
+                ]);
+
+                return;
+            }
+
+            $c->prependExtensionConfig('api_platform', [
+                'mapping' => [
+                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy_orm'],
+                ],
+            ]);
+
             return;
         }
 

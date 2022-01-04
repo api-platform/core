@@ -13,23 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Exception\ItemNotFoundException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
-use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
-use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Util\ArrayTrait;
-use ApiPlatform\Util\ClassInfoTrait;
+use ApiPlatform\Core\Exception\ItemNotFoundException;
+use ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Util\ArrayTrait;
+use ApiPlatform\Core\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Read stage of GraphQL resolvers.
+ *
+ * @experimental
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -39,16 +39,16 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    private $resourceMetadataCollectionFactory;
+    private $resourceMetadataFactory;
     private $iriConverter;
     private $collectionDataProvider;
     private $subresourceDataProvider;
     private $serializerContextBuilder;
     private $nestingSeparator;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, IriConverterInterface $iriConverter, ContextAwareCollectionDataProviderInterface $collectionDataProvider, SubresourceDataProviderInterface $subresourceDataProvider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
@@ -61,14 +61,8 @@ final class ReadStage implements ReadStageInterface
      */
     public function __invoke(?string $resourceClass, ?string $rootClass, string $operationName, array $context)
     {
-        $operation = null;
-        try {
-            $operation = $resourceClass ? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName) : null;
-        } catch (OperationNotFoundException $e) {
-            // ReadStage may be invoked without an existing operation
-        }
-
-        if ($operation && !($operation->canRead() ?? true)) {
+        $resourceMetadata = $resourceClass ? $this->resourceMetadataFactory->create($resourceClass) : null;
+        if ($resourceMetadata && !$resourceMetadata->getGraphqlAttribute($operationName, 'read', true, true)) {
             return $context['is_collection'] ? [] : null;
         }
 
@@ -85,7 +79,7 @@ final class ReadStage implements ReadStageInterface
                 }
 
                 if ($resourceClass !== $this->getObjectClass($item)) {
-                    throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $operation->getShortName()));
+                    throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $resourceMetadata->getShortName()));
                 }
             }
 

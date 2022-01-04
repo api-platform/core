@@ -32,6 +32,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     private $tester;
 
     private $entityClass;
+    private $legacy;
 
     protected function setUp(): void
     {
@@ -43,6 +44,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->entityClass = 'mongodb' === $kernel->getEnvironment() ? DocumentDummy::class : Dummy::class;
         $this->tester = new ApplicationTester($application);
+        $this->legacy = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
     }
 
     public function testExecuteWithoutOption()
@@ -75,7 +77,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testExecuteWithJsonldFormatOption()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => 'api_dummies_post_collection', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--collectionOperation' => $this->legacy ? 'post' : 'api_dummies_post_collection', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('@id', $result);

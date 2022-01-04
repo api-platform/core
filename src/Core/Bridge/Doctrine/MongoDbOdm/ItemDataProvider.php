@@ -24,7 +24,6 @@ use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -46,8 +45,8 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
     private $itemExtensions;
 
     /**
-     * @param AggregationItemExtensionInterface[] $itemExtensions
-     * @param mixed                               $resourceMetadataFactory
+     * @param AggregationItemExtensionInterface[]                                         $itemExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
     {
@@ -108,12 +107,19 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
             }
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if ($resourceMetadata instanceof ResourceMetadataCollection) {
-            $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
+        $attribute = [];
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            try {
+                $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
+                $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
+            } catch (OperationNotFoundException $e) {
+                $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
+            }
         } else {
-            $attribute = $resourceMetadata->getItemOperationAttribute($operationName, 'doctrine_mongodb', [], true);
+            /** @var ResourceMetadata */
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $attribute = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'doctrine_mongodb', [], true);
         }
 
         $executeOptions = $attribute['execute_options'] ?? [];

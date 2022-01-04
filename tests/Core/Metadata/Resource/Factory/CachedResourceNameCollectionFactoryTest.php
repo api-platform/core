@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\CachedResourceNameCollectionFactory;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Metadata\Resource\Factory\CachedResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheException;

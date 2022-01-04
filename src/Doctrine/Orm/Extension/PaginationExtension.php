@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\DataProvider\Pagination as LegacyPagination;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Orm\AbstractPaginator;
@@ -110,8 +111,8 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             }
         } elseif (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             throw new InvalidArgumentException(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', ResourceMetadataFactoryInterface::class));
-        } elseif (!$pagination instanceof Pagination) {
-            throw new InvalidArgumentException(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class.', Pagination::class));
+        } elseif (!$pagination instanceof Pagination && !$pagination instanceof LegacyPagination) {
+            throw new InvalidArgumentException(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class, "%s" given.', Pagination::class, \get_class($pagination)));
         }
 
         $this->managerRegistry = $managerRegistry;

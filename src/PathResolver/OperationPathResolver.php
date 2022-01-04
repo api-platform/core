@@ -15,8 +15,8 @@ namespace ApiPlatform\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 
 /**
  * Generates an operation path.

@@ -139,11 +139,6 @@ jobs:
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle
-      - name: Remove ElasticSearch
-        if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2')
-        run: |
-          composer remove --dev --no-interaction --no-progress --no-update --ansi \
-            elasticsearch/elasticsearch
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -232,11 +227,6 @@ jobs:
           composer remove --dev --no-interaction --no-progress --no-update --ansi \
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle
-      - name: Remove ElasticSearch
-        if: startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2')
-        run: |
-          composer remove --dev --no-interaction --no-progress --no-update --ansi \
-            elasticsearch/elasticsearch
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
@@ -645,8 +635,6 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Install Elasticsearch-php # there is a version matrix for this package: https://packagist.org/packages/elasticsearch/elasticsearch
-        run: composer require "elasticsearch/elasticsearch:v7.14.0" --no-interaction --no-progress --ansi
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache

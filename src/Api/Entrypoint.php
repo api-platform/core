@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 
 /**
  * The first path you will see in the API.

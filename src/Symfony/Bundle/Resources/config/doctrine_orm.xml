@@ -9,12 +9,6 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="api_platform.doctrine.orm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
-            <argument type="service" id="doctrine" />
-
-            <tag name="api_platform.data_persister" priority="-1000" />
-        </service>
-
         <service id="api_platform.doctrine.orm.state.processor" class="ApiPlatform\Doctrine\Common\State\Processor">
             <argument type="service" id="doctrine" />
 
@@ -29,46 +23,12 @@
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
 
-        <service id="api_platform.doctrine.orm.collection_data_provider" public="false" abstract="true">
-            <argument type="service" id="doctrine" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
-        </service>
-
-        <service id="api_platform.doctrine.orm.item_data_provider" public="false" abstract="true">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-        </service>
-
-        <service id="api_platform.doctrine.orm.subresource_data_provider" public="false" abstract="true">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-        </service>
-
         <service id="api_platform.doctrine.orm.state.item_provider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine" />
             <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
 
             <tag name="api_platform.state_provider" priority="-100" />
-        </service>
-
-        <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider">
-            <tag name="api_platform.collection_data_provider" />
-        </service>
-
-        <service id="api_platform.doctrine.orm.default.item_data_provider" parent="api_platform.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider">
-            <tag name="api_platform.item_data_provider" />
-        </service>
-
-        <service id="api_platform.doctrine.orm.default.subresource_data_provider" parent="api_platform.doctrine.orm.subresource_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\SubresourceDataProvider">
-            <tag name="api_platform.subresource_data_provider" />
         </service>
 
         <!-- Filter -->
@@ -135,19 +95,12 @@
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\ExistsFilter" alias="api_platform.doctrine.orm.exists_filter" />
 
-        <!-- Metadata loader -->
-
-        <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
-        </service>
-
         <!-- Doctrine Query extensions -->
 
         <service id="api_platform.doctrine.orm.query_extension.eager_loading" class="ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument>%api_platform.eager_loading.max_joins%</argument>
             <argument>%api_platform.eager_loading.force_eager%</argument>
             <argument>null</argument>
@@ -162,7 +115,7 @@
         <service id="ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.eager_loading" />
 
         <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Doctrine\Orm\Extension\FilterExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-16" />
@@ -172,7 +125,7 @@
         <!-- This needs to be executed right after the filter extension -->
 
         <service id="api_platform.doctrine.orm.query_extension.filter_eager_loading" class="ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument>%api_platform.eager_loading.force_eager%</argument>
             <argument type="service" id="api_platform.resource_class_resolver" />
 
@@ -182,7 +135,7 @@
 
         <service id="api_platform.doctrine.orm.query_extension.pagination" class="ApiPlatform\Doctrine\Orm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="service" id="api_platform.pagination" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-64" />
@@ -191,16 +144,11 @@
 
         <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Doctrine\Orm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-32" />
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Extension\OrderExtension" alias="api_platform.doctrine.orm.query_extension.order" />
-
-        <service id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="40">
-            <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
-        </service>
     </services>
 
 </container>

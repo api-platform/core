@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Api;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractor;
+use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -28,23 +28,16 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @group legacy
  */
 class IdentifiersExtractorTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testGetIdentifiersFromResourceClass()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -54,12 +47,8 @@ class IdentifiersExtractorTest extends TestCase
         $this->assertSame(['id'], $identifiersExtractor->getIdentifiersFromResourceClass(Dummy::class));
     }
 
-    /**
-     * @group legacy
-     */
     public function testGetCompositeIdentifiersFromResourceClass()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -83,14 +72,12 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProvider
-     * @group legacy
      *
      * @param mixed $item
      * @param mixed $expected
      */
     public function testGetIdentifiersFromItem($item, $expected)
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -117,14 +104,12 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProviderComposite
-     * @group legacy
      *
      * @param mixed $item
      * @param mixed $expected
      */
     public function testGetCompositeIdentifiersFromItem($item, $expected)
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'name']);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -159,14 +144,12 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @dataProvider itemProviderRelated
-     * @group legacy
      *
      * @param mixed $item
      * @param mixed $expected
      */
     public function testGetRelatedIdentifiersFromItem($item, $expected)
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         $prophecies = $this->getMetadataFactoryProphecies(Dummy::class, ['id', 'relatedDummy']);
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(RelatedDummy::class, ['id'], $prophecies);
 
@@ -181,12 +164,8 @@ class IdentifiersExtractorTest extends TestCase
         $this->assertSame($expected, $identifiersExtractor->getIdentifiersFromItem($item));
     }
 
-    /**
-     * @group legacy
-     */
     public function testThrowNoIdentifierFromItem()
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No identifier found in "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\RelatedDummy" through relation "relatedDummy" of "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" used as identifier');
 
@@ -210,12 +189,8 @@ class IdentifiersExtractorTest extends TestCase
         $identifiersExtractor->getIdentifiersFromItem($dummy);
     }
 
-    /**
-     * @group legacy
-     */
     public function testGetsIdentifiersFromCorrectResourceClass(): void
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         $item = new ResourceInterfaceImplementation();
         $item->setFoo('woot');
 
@@ -223,8 +198,8 @@ class IdentifiersExtractorTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(ResourceInterface::class)->willReturn(new PropertyNameCollection(['foo', 'fooz']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(ResourceInterface::class, 'foo')->willReturn((new ApiProperty())->withIdentifier(true));
-        $propertyMetadataFactoryProphecy->create(ResourceInterface::class, 'fooz')->willReturn(new ApiProperty());
+        $propertyMetadataFactoryProphecy->create(ResourceInterface::class, 'foo')->willReturn((new PropertyMetadata())->withIdentifier(true));
+        $propertyMetadataFactoryProphecy->create(ResourceInterface::class, 'fooz')->willReturn(new PropertyMetadata());
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn(ResourceInterface::class);
@@ -236,18 +211,14 @@ class IdentifiersExtractorTest extends TestCase
         $this->assertSame(['foo' => 'woot'], $identifiersExtractor->getIdentifiersFromItem($item));
     }
 
-    /**
-     * @group legacy
-     */
     public function testNoIdentifiers(): void
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No identifier defined in "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy". You should add #[\ApiPlatform\Core\Annotation\ApiProperty(identifier: true)]" on the property identifying the resource.');
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['foo']));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo')->willReturn(new ApiProperty());
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'foo')->willReturn(new PropertyMetadata());
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
 
@@ -256,10 +227,10 @@ class IdentifiersExtractorTest extends TestCase
 
     /**
      * @group legacy
+     * @expectedDeprecation Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the IdentifiersExtractor might introduce cache issues with object identifiers.
      */
     public function testLegacyGetIdentifiersFromItem()
     {
-        $this->expectDeprecation('Not injecting ApiPlatform\Core\Api\ResourceClassResolverInterface in the IdentifiersExtractor might introduce cache issues with object identifiers.');
         [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy] = $this->getMetadataFactoryProphecies(Dummy::class, ['id']);
 
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal());
@@ -284,23 +255,19 @@ class IdentifiersExtractorTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create($class)->willReturn(new PropertyNameCollection($properties));
 
         foreach ($properties as $prop) {
-            $metadata = new ApiProperty();
+            $metadata = new PropertyMetadata();
             $propertyMetadataFactoryProphecy->create($class, $prop)->willReturn($metadata->withIdentifier(\in_array($prop, $identifiers, true)));
         }
 
         return [$propertyNameCollectionFactoryProphecy, $propertyMetadataFactoryProphecy];
     }
 
-    /**
-     * @group legacy
-     */
     public function testDefaultIdentifierId(): void
     {
-        $this->expectDeprecation('Since api-platform/core 2.7: The service "ApiPlatform\Core\Api\IdentifiersExtractor" is deprecated, use ApiPlatform\Api\IdentifiersExtractor instead.');
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class)->willReturn(new PropertyNameCollection(['id']));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn(new ApiProperty());
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn(new PropertyMetadata());
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $identifiersExtractor = new IdentifiersExtractor($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
 

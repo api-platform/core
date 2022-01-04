@@ -19,6 +19,7 @@ use PhpParser\Node;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\Stmt\Class_;
 use Rector\BetterPhpDocParser\PhpDoc\DoctrineAnnotationTagValueNode;
+use Rector\BetterPhpDocParser\ValueObject\PhpDoc\DoctrineAnnotation\CurlyListNode;
 use Rector\Core\Rector\AbstractRector;
 use Rector\PhpAttribute\Printer\PhpAttributeGroupFactory;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -181,6 +182,10 @@ abstract class AbstractAnnotationToAttributeRector extends AbstractRector
         foreach ($values as $attribute => $value) {
             [$updatedAttribute, $updatedValue] = $this->getKeyValue(str_replace('"', '', $camelCaseToSnakeCaseNameConverter->normalize($attribute)), $value);
             if ($attribute !== $updatedAttribute) {
+                if ($updatedValue instanceof CurlyListNode) {
+                    $updatedValue = $updatedValue->getValues();
+                }
+
                 if (\array_key_exists($updatedAttribute, $values) && \is_array($values[$updatedAttribute])) {
                     $values[$updatedAttribute] = array_merge($values[$updatedAttribute], $updatedValue);
                 } else {

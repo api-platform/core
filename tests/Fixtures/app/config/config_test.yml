@@ -7,7 +7,6 @@ api_platform:
     mapping:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
-            - '%kernel.project_dir%/config/api_resources_orm.yaml'
 
 services:
     ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager:

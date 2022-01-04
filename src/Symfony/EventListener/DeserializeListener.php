@@ -45,13 +45,14 @@ final class DeserializeListener
     private $formatsProvider;
 
     /**
-     * @param ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
      */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory, ResourceMetadataFactoryInterface $legacyResourceMetadataFactory = null)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->resourceMetadataFactory = ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface || $resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) ? $resourceMetadataFactory : $legacyResourceMetadataFactory;
+
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
 
         if ($resourceMetadataFactory) {
             if (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {

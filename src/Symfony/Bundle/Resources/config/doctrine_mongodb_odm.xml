@@ -16,22 +16,10 @@
             <factory service="doctrine_mongodb.odm.default_document_manager" method="getMetadataFactory"/>
         </service>
 
-        <service id="api_platform.doctrine_mongodb.odm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
-            <argument type="service" id="doctrine_mongodb" />
-
-            <tag name="api_platform.data_persister" priority="-1000" />
-        </service>
-
         <service id="api_platform.doctrine_mongodb.odm.state.processor" class="ApiPlatform\Doctrine\Common\State\Processor">
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.state_processor" priority="-100" />
-        </service>
-
-        <service id="api_platform.doctrine_mongodb.odm.collection_data_provider" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
         </service>
 
         <service id="api_platform.doctrine.odm.state.collection_provider" class="ApiPlatform\Doctrine\Odm\State\CollectionProvider" public="false">
@@ -42,14 +30,6 @@
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
 
-        <service id="api_platform.doctrine_mongodb.odm.item_data_provider" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory"/>
-            <argument type="service" id="api_platform.metadata.property.metadata_factory"/>
-            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
-        </service>
-
         <service id="api_platform.doctrine.odm.state.item_provider" class="ApiPlatform\Doctrine\Odm\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine_mongodb" />
@@ -58,33 +38,7 @@
             <tag name="api_platform.state_provider" priority="-100" />
         </service>
 
-        <service id="api_platform.doctrine_mongodb.odm.subresource_data_provider" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
-            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
-        </service>
-
-        <service id="api_platform.doctrine_mongodb.odm.default.collection_data_provider"
-                 parent="api_platform.doctrine_mongodb.odm.collection_data_provider"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider">
-            <tag name="api_platform.collection_data_provider"/>
-        </service>
-        <service id="api_platform.doctrine_mongodb.odm.default.item_data_provider"
-                 parent="api_platform.doctrine_mongodb.odm.item_data_provider"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider">
-            <tag name="api_platform.item_data_provider"/>
-        </service>
-        <service id="api_platform.doctrine_mongodb.odm.default.subresource_data_provider"
-                 parent="api_platform.doctrine_mongodb.odm.subresource_data_provider"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\SubresourceDataProvider">
-            <tag name="api_platform.subresource_data_provider" />
-        </service>
-
         <!-- Filter -->
-
         <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -139,15 +93,6 @@
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\RangeFilter" alias="api_platform.doctrine_mongodb.odm.range_filter" />
-
-        <!-- Metadata loader -->
-
-        <service id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory"
-                 class="ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
-                 decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
-            <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner"/>
-        </service>
 
         <!-- Doctrine Aggregation extensions -->
 

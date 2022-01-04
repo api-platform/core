@@ -163,14 +163,14 @@ services:
     app.serializer.denormalizer.related_dummy_plain_identifier:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\RelatedDummyPlainIdentifierDenormalizer'
         public: false
-        arguments: ['@api_platform.symfony.iri_converter']
+        arguments: ['@api_platform.iri_converter']
         tags:
             -  { name: 'serializer.normalizer' }
 
     app.serializer.denormalizer.dummy_plain_identifier:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\DummyPlainIdentifierDenormalizer'
         public: false
-        arguments: ['@api_platform.symfony.iri_converter']
+        arguments: ['@api_platform.iri_converter']
         tags:
             -  { name: 'serializer.normalizer' }
 
@@ -299,12 +299,6 @@ services:
         public: true
         tags: ['messenger.message_handler']
     mercure.hub.default.publisher: '@mercure.hub.default.message_handler'
-
-    app.serializer.normalizer.override_documentation:
-        class: ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
-        decorates: api_platform.swagger.normalizer.documentation
-        public: false
-        arguments: ['@app.serializer.normalizer.override_documentation.inner']
 
     app.data_transformer.custom_input_dto:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomInputDtoDataTransformer'
@@ -436,3 +430,10 @@ services:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Security\AuthenticationEntryPoint'
         arguments:
             $router: '@router'
+
+    app.serializer.normalizer.override_documentation:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
+        decorates: api_platform.swagger.normalizer.documentation
+        public: false
+        arguments: ['@app.serializer.normalizer.override_documentation.inner']
+

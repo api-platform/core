@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Serializer;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
@@ -28,6 +28,7 @@ use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
@@ -1185,7 +1186,7 @@ class AbstractItemNormalizerTest extends TestCase
             new PropertyNameCollection(['name', 'nickname'])
         )->shouldBeCalled();
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(DummyTableInheritance::class, 'name', [])->willReturn(
             new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING), '', true)
         )->shouldBeCalled();
@@ -1247,7 +1248,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(new PropertyMetadata(new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class), '', false, true, false, false));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -1306,7 +1307,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
             new PropertyMetadata(
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),
@@ -1368,7 +1369,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummy']));
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
             new PropertyMetadata(
                 new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class),

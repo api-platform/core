@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.doctrine_mongodb.odm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
+            <argument type="service" id="doctrine_mongodb" />
+
+            <tag name="api_platform.data_persister" priority="-1000" />
+        </service>
+
+        <service id="api_platform.doctrine_mongodb.odm.collection_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
+        </service>
+
+        <service id="api_platform.doctrine_mongodb.odm.item_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory"/>
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy"/>
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+        </service>
+
+        <service id="api_platform.doctrine_mongodb.odm.subresource_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+        </service>
+
+        <service id="api_platform.doctrine_mongodb.odm.default.collection_data_provider"
+                 parent="api_platform.doctrine_mongodb.odm.collection_data_provider"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider">
+            <tag name="api_platform.collection_data_provider"/>
+        </service>
+        <service id="api_platform.doctrine_mongodb.odm.default.item_data_provider"
+                 parent="api_platform.doctrine_mongodb.odm.item_data_provider"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\ItemDataProvider">
+            <tag name="api_platform.item_data_provider"/>
+        </service>
+        <service id="api_platform.doctrine_mongodb.odm.default.subresource_data_provider"
+                 parent="api_platform.doctrine_mongodb.odm.subresource_data_provider"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\SubresourceDataProvider">
+            <tag name="api_platform.subresource_data_provider" />
+        </service>
+
+        <!-- Metadata loader -->
+        <service id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.legacy"
+                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
+                 decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.legacy.inner"/>
+        </service>
+    </services>
+</container>

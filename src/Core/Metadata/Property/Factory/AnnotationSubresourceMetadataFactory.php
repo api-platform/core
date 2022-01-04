@@ -43,7 +43,7 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = [])
+    public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
         /** @var ApiPropertyMetadata|PropertyMetadata */
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);

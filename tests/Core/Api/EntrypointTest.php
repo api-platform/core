@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Api;
 
 use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 

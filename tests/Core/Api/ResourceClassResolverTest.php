@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Api;
 
 use ApiPlatform\Api\ResourceClassResolver;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\Tests\Fixtures\DummyResourceImplementation;
 use ApiPlatform\Tests\Fixtures\DummyResourceInterface;

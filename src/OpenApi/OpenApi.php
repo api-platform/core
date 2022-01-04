@@ -23,7 +23,9 @@ final class OpenApi implements DocumentationInterface
 {
     use ExtensionTrait;
 
-    public const VERSION = '3.1.0';
+    // We're actually supporting 3.1 but swagger ui has a version constraint
+    // public const VERSION = '3.1.0';
+    public const VERSION = '3.0.0';
 
     private $openapi;
     private $info;

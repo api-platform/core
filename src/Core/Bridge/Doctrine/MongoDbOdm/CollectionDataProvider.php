@@ -15,10 +15,13 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -38,8 +41,8 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
     private $collectionExtensions;
 
     /**
-     * @param AggregationCollectionExtensionInterface[] $collectionExtensions
-     * @param mixed                                     $resourceMetadataFactory
+     * @param AggregationCollectionExtensionInterface[]                                   $collectionExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
@@ -78,13 +81,21 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
             }
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
-            $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
-        } catch (OperationNotFoundException $e) {
-            $attribute = $resourceMetadata->getOperation(null, true)->getExtraProperties()['doctrine_mongodb'] ?? [];
+        $attribute = [];
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            try {
+                $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
+                $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
+            } catch (OperationNotFoundException $e) {
+                $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
+            }
+        } else {
+            /** @var ResourceMetadata */
+            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+            $attribute = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'doctrine_mongodb', [], true);
         }
+
         $executeOptions = $attribute['execute_options'] ?? [];
         $builder = $aggregationBuilder->hydrate($resourceClass);
 

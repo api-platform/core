@@ -24,7 +24,7 @@ trait DeprecationMetadataTrait
 {
     private $camelCaseToSnakeCaseNameConverter;
 
-    private function withDeprecatedAttributes(ApiPropertyMetadata $propertyMetadata, array $attributes)
+    private function withDeprecatedAttributes(ApiPropertyMetadata $propertyMetadata, array $attributes): ApiPropertyMetadata
     {
         $extraProperties = [];
         if (!$this->camelCaseToSnakeCaseNameConverter) {

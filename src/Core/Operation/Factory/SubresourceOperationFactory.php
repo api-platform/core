@@ -18,8 +18,8 @@ use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 
 /**
  * @internal

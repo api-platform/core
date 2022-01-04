@@ -56,7 +56,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     private $nameConverter;
     private $distinctFormats = [];
 
-    public function __construct(TypeFactoryInterface $typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(TypeFactoryInterface $typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->typeFactory = $typeFactory;
         if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {

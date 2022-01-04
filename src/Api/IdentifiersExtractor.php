@@ -88,13 +88,18 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $resourceClass = $this->getResourceClass($item, true);
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            $type = $propertyMetadata->getType();
-            if (!$type) {
+
+            $types = $propertyMetadata->getBuiltinTypes();
+            if (null === ($type = $types[0] ?? null)) {
                 continue;
             }
 
-            if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && $collectionValueType->getClassName() === $class) {
-                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+            if ($type->isCollection()) {
+                $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+
+                if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
+                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+                }
             }
 
             if ($type->getClassName() === $class) {

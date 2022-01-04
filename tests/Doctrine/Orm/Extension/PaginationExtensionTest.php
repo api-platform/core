@@ -111,7 +111,7 @@ class PaginationExtensionTest extends TestCase
     public function testConstructWithBadPagination()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class.', Pagination::class));
+        $this->expectExceptionMessage(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class, "stdClass" given.', Pagination::class));
 
         new PaginationExtension(
             $this->prophesize(ManagerRegistry::class)->reveal(),

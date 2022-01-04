@@ -12,36 +12,6 @@
             </argument>
         </service>
 
-        <service id="api_platform.item_data_provider" class="ApiPlatform\Core\DataProvider\ChainItemDataProvider">
-            <argument type="tagged" tag="api_platform.item_data_provider" />
-        </service>
-        <service id="ApiPlatform\Core\DataProvider\ItemDataProviderInterface" alias="api_platform.item_data_provider" />
-
-        <service id="api_platform.collection_data_provider" class="ApiPlatform\Core\DataProvider\ChainCollectionDataProvider">
-            <argument type="tagged" tag="api_platform.collection_data_provider" />
-        </service>
-        <service id="ApiPlatform\Core\DataProvider\CollectionDataProviderInterface" alias="api_platform.collection_data_provider" />
-
-        <service id="api_platform.subresource_data_provider" class="ApiPlatform\Core\DataProvider\ChainSubresourceDataProvider">
-            <argument type="tagged" tag="api_platform.subresource_data_provider" />
-        </service>
-        <service id="ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface" alias="api_platform.subresource_data_provider" />
-
-        <service id="api_platform.pagination.next" class="ApiPlatform\State\Pagination\Pagination">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument>%api_platform.collection.pagination%</argument>
-            <argument>%api_platform.graphql.collection.pagination%</argument>
-        </service>
-        <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination.next" />
-        <service id="api_platform.pagination" alias="api_platform.pagination.next" />
-
-        <service id="api_platform.pagination.legacy" class="ApiPlatform\Core\DataProvider\Pagination">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument>%api_platform.collection.pagination%</argument>
-            <argument>%api_platform.graphql.collection.pagination%</argument>
-        </service>
-        <service id="ApiPlatform\Core\DataProvider\Pagination" alias="api_platform.pagination.legacy" />
-
         <service id="api_platform.pagination_options" class="ApiPlatform\State\Pagination\PaginationOptions">
             <argument>%api_platform.collection.pagination.enabled%</argument>
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>

@@ -15,10 +15,10 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Property\Factory\InheritedPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +37,7 @@ class InheritedPropertyMetadataFactoryTest extends TestCase
         $resourceNameCollectionFactory->create()->willReturn(new ResourceNameCollection([DummyTableInheritance::class, DummyTableInheritanceChild::class]))->shouldBeCalled();
 
         $type = new Type(Type::BUILTIN_TYPE_STRING);
-        $nicknameMetadata = (new ApiProperty())->withBuiltinTypes([$type])->withDescription('nickname')->withReadable(true)->withWritable(true)->withWritableLink(false)->withReadableLink(false)->withRequired(true)->withIdentifier(false)->withTypes(['http://example.com/foo'])->withExtraProperties(['foo' => 'bar']);
+        $nicknameMetadata = (new PropertyMetadata())->withType($type)->withDescription('nickname')->withReadable(true)->withWritable(true)->withWritableLink(false)->withReadableLink(false)->withRequired(true)->withIdentifier(false)->withIri('http://example.com/foo')->withAttributes(['foo' => 'bar']);
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create(DummyTableInheritance::class, 'nickname', [])->willReturn($nicknameMetadata)->shouldBeCalled();
         $propertyMetadataFactory->create(DummyTableInheritanceChild::class, 'nickname', [])->willReturn($nicknameMetadata)->shouldBeCalled();

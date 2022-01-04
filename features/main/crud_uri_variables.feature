@@ -2,6 +2,7 @@ Feature: Uri Variables
 
   @createSchema
   @php8
+  @v3
   Scenario: Create a resource Company
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/companies" with body:
@@ -28,6 +29,7 @@ Feature: Uri Variables
     """
 
   @php8
+  @v3
   Scenario: Create a second resource Company
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/companies" with body:
@@ -39,6 +41,7 @@ Feature: Uri Variables
     Then the response status code should be 201
 
   @php8
+  @v3
   Scenario: Create first Employee
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/employees" with body:
@@ -66,6 +69,7 @@ Feature: Uri Variables
     """
 
   @php8
+  @v3
   Scenario: Create second Employee
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/employees" with body:
@@ -78,6 +82,7 @@ Feature: Uri Variables
     Then the response status code should be 201
 
   @php8
+  @v3
   Scenario: Create third Employee
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/employees" with body:
@@ -90,6 +95,7 @@ Feature: Uri Variables
     Then the response status code should be 201
 
   @php8
+  @v3
   Scenario: Retrieve the collection of employees
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/companies/2/employees"
@@ -152,6 +158,7 @@ Feature: Uri Variables
     And the JSON node "data.companies.edges[1].node.employees.edges[1].node.name" should be equal to "foo3"
 
   @php8
+  @v3
   Scenario: Retrieve the company of an employee
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/employees/1/company"
@@ -171,6 +178,7 @@ Feature: Uri Variables
     """
 
   @php8
+  @v3
   Scenario: Retrieve an employee
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/companies/1/employees/1"
@@ -190,6 +198,7 @@ Feature: Uri Variables
     """
 
   @php8
+  @v3
   Scenario: Trying to get an employee of wrong company
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "GET" request to "/companies/1/employees/2"

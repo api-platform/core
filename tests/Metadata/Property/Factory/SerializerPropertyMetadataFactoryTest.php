@@ -93,7 +93,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
 
-        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(null, $serializerClassMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory($serializerClassMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
         $actual = [];
         $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'foo', $context);
@@ -144,7 +144,6 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $decoratedProphecy->create(DummyIgnoreProperty::class, 'ignored', $options)->willReturn($ignoredPropertyMetadata);
 
         $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(
-            null,
             $serializerClassMetadataFactoryProphecy->reveal(),
             $decoratedProphecy->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal()

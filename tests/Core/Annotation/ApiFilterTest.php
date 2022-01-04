@@ -34,7 +34,7 @@ class ApiFilterTest extends TestCase
     public function testInvalidFilter()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The filter class "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" does not implement "ApiPlatform\\Api\\FilterInterface". Did you forget a use statement?');
+        $this->expectExceptionMessage('The filter class "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\Dummy" does not implement "ApiPlatform\\Core\\Api\\FilterInterface". Did you forget a use statement?');
 
         new ApiFilter(['value' => Dummy::class]); // @phpstan-ignore-line
     }

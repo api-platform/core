@@ -14,6 +14,7 @@ declare(strict_types=1);
 return [
     ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class,
     ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class,
+    ApiPlatform\Core\Metadata\Resource\ResourceNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface::class,
     ApiPlatform\Core\Metadata\Extractor\ExtractorInterface::class => ApiPlatform\Metadata\Extractor\ResourceExtractorInterface::class,
 
     // Bridge\Doctrine => Doctrine
@@ -99,7 +100,6 @@ return [
     ApiPlatform\Core\Validator\ValidatorInterface::class => ApiPlatform\Symfony\EventListener\ValidatorInterface::class,
 
     // API:
-    ApiPlatform\Core\Api\FilterInterface::class => ApiPlatform\Api\FilterInterface::class,
     ApiPlatform\Core\Api\ResourceClassResolverInterface::class => ApiPlatform\Api\ResourceClassResolverInterface::class,
     ApiPlatform\Core\Api\UrlGeneratorInterface::class => ApiPlatform\Api\UrlGeneratorInterface::class,
 
@@ -124,4 +124,6 @@ return [
     ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface::class => ApiPlatform\GraphQl\Type\TypesFactoryInterface::class,
     ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface::class => ApiPlatform\GraphQl\Type\Definition\TypeInterface::class,
     ApiPlatform\Core\GraphQl\Type\TypesContainerInterface::class => ApiPlatform\GraphQl\Type\TypesContainerInterface::class,
+
+    ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface::class => ApiPlatform\Operation\PathSegmentNameGeneratorInterface::class,
 ];

@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Core\Filter\QueryParameterValidator;
+use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
+use ApiPlatform\Core\Filter\QueryParameterValidator as LegacyQueryParameterValidator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -40,7 +41,11 @@ final class QueryParameterValidateListener
 
     private $enabled;
 
-    public function __construct($resourceMetadataFactory, QueryParameterValidator $queryParameterValidator, bool $enabled = true)
+    /**
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param QueryParameterValidator|LegacyQueryParameterValidator                       $queryParameterValidator
+     */
+    public function __construct($resourceMetadataFactory, $queryParameterValidator, bool $enabled = true)
     {
         if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));

@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
-use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Property metadata provider for file configured factories tests.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
+ * @group legacy
  */
 abstract class FileConfigurationMetadataFactoryProvider extends TestCase
 {
@@ -33,7 +34,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'readableLink' => false,
             'writableLink' => false,
             'required' => true,
-            'extraProperties' => [
+            'attributes' => [
                 'foo' => ['Foo'],
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
@@ -54,7 +55,7 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
             'writableLink' => false,
             'required' => true,
             'identifier' => false,
-            'extraProperties' => [
+            'attributes' => [
                 'foo' => ['Foo'],
                 'bar' => [['Bar'], 'baz' => 'Baz'],
                 'baz' => 'Baz',
@@ -65,9 +66,9 @@ abstract class FileConfigurationMetadataFactoryProvider extends TestCase
         return [[$this->getPropertyMetadata($metadata)]];
     }
 
-    private function getPropertyMetadata(array $metadata): ApiProperty
+    private function getPropertyMetadata(array $metadata): PropertyMetadata
     {
-        $propertyMetadata = new ApiProperty();
+        $propertyMetadata = new PropertyMetadata();
 
         foreach ($metadata as $propertyName => $propertyValue) {
             $propertyMetadata = $propertyMetadata->{'with'.ucfirst($propertyName)}($propertyValue);
