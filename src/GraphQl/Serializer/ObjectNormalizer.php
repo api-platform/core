@@ -63,6 +63,8 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
      * {@inheritdoc}
      *
      * @throws UnexpectedValueException
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
     public function normalize($object, $format = null, array $context = [])
     {

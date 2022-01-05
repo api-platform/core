@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -34,11 +35,15 @@ class ValidationExceptionListenerTest extends TestCase
 
     public function testNotValidationException()
     {
+        if (!class_exists(Countries::class)) {
+            $this->markTestSkipped('symfony/intl not installed');
+        }
+
         $listener = new ValidationExceptionListener(
             $this->prophesize(SerializerInterface::class)->reveal(),
             ['hydra' => ['application/ld+json']]);
 
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new \Exception());
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new \Exception());
         $listener->onKernelException($event);
         $this->assertNull($event->getResponse());
     }
@@ -52,7 +57,7 @@ class ValidationExceptionListenerTest extends TestCase
         $serializerProphecy->serialize($list, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, new ValidationException($list));
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, new ValidationException($list));
         $listener->onKernelException($event);
 
         $response = $event->getResponse();
@@ -73,7 +78,7 @@ class ValidationExceptionListenerTest extends TestCase
         $serializerProphecy->serialize($exception, 'hydra')->willReturn($exceptionJson)->shouldBeCalled();
 
         $listener = new ValidationExceptionListener($serializerProphecy->reveal(), ['hydra' => ['application/ld+json']]);
-        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), HttpKernelInterface::MASTER_REQUEST, $exception);
+        $event = new ExceptionEvent($this->prophesize(HttpKernelInterface::class)->reveal(), new Request(), \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $exception);
         $listener->onKernelException($event);
 
         $response = $event->getResponse();

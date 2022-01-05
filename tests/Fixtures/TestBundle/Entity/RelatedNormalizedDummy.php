@@ -45,7 +45,7 @@ class RelatedNormalizedDummy
     private $id;
 
     /**
-     * @var string|null The dummy name
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Assert\NotBlank
@@ -55,7 +55,7 @@ class RelatedNormalizedDummy
     private $name;
 
     /**
-     * @var Collection Several Normalized dummies
+     * @var Collection<int, CustomNormalizedDummy> Several Normalized dummies
      *
      * @ORM\ManyToMany(targetEntity="CustomNormalizedDummy")
      * @Groups({"related_output", "related_input"})
@@ -87,9 +87,6 @@ class RelatedNormalizedDummy
         return $this->customNormalizedDummy;
     }
 
-    /**
-     * @param Collection|array $customNormalizedDummy
-     */
     public function setCustomNormalizedDummy($customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;

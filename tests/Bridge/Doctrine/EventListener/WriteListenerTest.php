@@ -49,7 +49,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('POST');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
@@ -73,7 +73,7 @@ class WriteListenerTest extends TestCase
         $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', 'Dummy');
 
-        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($this->prophesize(HttpKernelInterface::class)->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $dummy);
         $writeListener->onKernelView($event);
     }
 
@@ -95,7 +95,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('HEAD');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
@@ -117,7 +117,7 @@ class WriteListenerTest extends TestCase
         $httpKernelProphecy = $this->prophesize(HttpKernelInterface::class);
         $request = new Request();
         $request->setMethod('POST');
-        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }
@@ -139,7 +139,7 @@ class WriteListenerTest extends TestCase
         $request = new Request();
         $request->setMethod('DELETE');
         $request->attributes->set('_api_resource_class', 'Dummy');
-        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, HttpKernelInterface::MASTER_REQUEST, $dummy);
+        $event = new ViewEvent($httpKernelProphecy->reveal(), $request, \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST, $dummy);
 
         $writeListener->onKernelView($event);
     }

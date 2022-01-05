@@ -30,6 +30,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 
 /**
  * Subresource data provider for the Doctrine MongoDB ODM.
@@ -75,6 +76,7 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
         }
 
         $repository = $manager->getRepository($resourceClass);
+        /** @var ObjectRepository $repository */
         if (!$repository instanceof DocumentRepository) {
             throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $resourceClass, DocumentRepository::class));
         }

@@ -120,6 +120,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * @throws LogicException
+     *
+     * @return array|string|int|float|bool|\ArrayObject|null
      */
     public function normalize($object, $format = null, array $context = [])
     {
@@ -191,7 +193,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function denormalize($data, $class, $format = null, array $context = [])
     {
         if (null === $objectToPopulate = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
-            $normalizedData = $this->prepareForDenormalization($data);
+            $normalizedData = is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
             $class = $this->getClassDiscriminatorResolvedClass($normalizedData, $class);
         }
         $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
@@ -362,6 +364,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @return array|bool
      */
     protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
     {

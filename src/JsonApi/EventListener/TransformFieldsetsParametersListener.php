@@ -49,7 +49,7 @@ final class TransformFieldsetsParametersListener
             return;
         }
 
-        $includeParameter = explode(',', $includeParameter ?? '');
+        $includeParameter = explode(',', $includeParameter);
         if (!$fieldsParameter) {
             $request->attributes->set('_api_included', $includeParameter);
 
