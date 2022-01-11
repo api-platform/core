@@ -214,7 +214,7 @@
 
 /* No `.graphiql-container` here so themes can overwrite */
 
-.result-window .CodeMirror {
+.result-window .CodeMirror.cm-s-graphiql {
   background: #f6f7f8;
 }
 
@@ -527,7 +527,7 @@ div.CodeMirror-lint-tooltip > * + * {
 /* Comment */
 
 .cm-comment {
-  color: #999;
+  color: #666;
 }
 
 /* Punctuation */
@@ -642,7 +642,7 @@ div.CodeMirror-lint-tooltip > * + * {
 .CodeMirror-linenumbers {}
 
 .CodeMirror-linenumber {
-  color: #999;
+  color: #666;
   min-width: 20px;
   padding: 0 3px 0 5px;
   text-align: right;
@@ -651,7 +651,7 @@ div.CodeMirror-lint-tooltip > * + * {
 
 .CodeMirror-guttermarker { color: black; }
 
-.CodeMirror-guttermarker-subtle { color: #999; }
+.CodeMirror-guttermarker-subtle { color: #666; }
 
 /* CURSOR */
 
@@ -729,7 +729,7 @@ div.CodeMirror-overwrite div.CodeMirror-cursor {}
 
 .cm-s-default .cm-builtin {color: #30a;}
 
-.cm-s-default .cm-bracket {color: #997;}
+.cm-s-default .cm-bracket {color: #666;}
 
 .cm-s-default .cm-tag {color: #170;}
 
@@ -739,7 +739,7 @@ div.CodeMirror-overwrite div.CodeMirror-cursor {}
 
 .cm-s-default .cm-quote {color: #090;}
 
-.cm-s-default .cm-hr {color: #999;}
+.cm-s-default .cm-hr {color: #666;}
 
 .cm-s-default .cm-link {color: #00c;}
 
@@ -1500,7 +1500,7 @@ li.CodeMirror-hint-active {
 }
 
 .graphiql-container .field-short-description {
-  color: #999;
+  color: #666;
   margin-left: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
