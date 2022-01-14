@@ -430,6 +430,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function validateType(string $attribute, Type $type, $value, string $format = null)
     {
+        if (is_null($value)) {
+            return; // Leave the function to let symfony assert work properly
+        }
+
         $builtinType = $type->getBuiltinType();
         if (Type::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && false !== strpos($format, 'json')) {
             $isValid = \is_float($value) || \is_int($value);
