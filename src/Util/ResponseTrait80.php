@@ -15,7 +15,10 @@ namespace ApiPlatform\Core\Util;
 
 trait ResponseTrait80
 {
-    public function getInfo(?string $type = null): mixed
+    /**
+     * @return mixed
+     */
+    public function getInfo(?string $type = null)
     {
         if ($type) {
             return $this->info[$type] ?? null;

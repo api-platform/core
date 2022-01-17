@@ -15,7 +15,10 @@ namespace ApiPlatform\Core\Util;
 
 trait ClientTrait80
 {
-    public function withOptions(array $options): static
+    /**
+     * @return static
+     */
+    public function withOptions(array $options)
     {
         $clone = clone $this;
         $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
