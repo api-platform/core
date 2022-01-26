@@ -19,6 +19,7 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\Core\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilder;
 use ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -27,6 +28,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -315,5 +317,61 @@ class ReadStageTest extends TestCase
         $result = ($this->readStage)($resourceClass, 'myResource', $operationName, $context);
 
         $this->assertSame([], $result);
+    }
+
+    public function testCollectionFilterApplication(): void
+    {
+        $operationName = 'collection_query';
+        $resourceClass = 'myResource';
+        $filterId = 'customFilter';
+        $info = $this->prophesize(ResolveInfo::class)->reveal();
+        $fieldName = 'subresource';
+        $info->fieldName = $fieldName;
+        $context = [
+            'is_collection' => true,
+            'is_mutation' => false,
+            'is_subscription' => false,
+            'args' => [
+                $filterId => 'customFilterValue',
+            ],
+            'info' => $info,
+            'fields' => [],
+            'source' => null,
+        ];
+
+        $customFilter = $this->prophesize();
+        $customFilter->willImplement('ApiPlatform\Core\Serializer\Filter\FilterInterface');
+        $customFilter->apply(
+            Argument::type(Request::class),
+            true,
+            [],
+            Argument::type('array'),
+        )->shouldBeCalledOnce();
+
+        $filterLocatorProphecy = $this->prophesize();
+        $filterLocatorProphecy->willImplement('Psr\Container\ContainerInterface');
+        $filterLocatorProphecy->has($filterId)->willReturn(true);
+        $filterLocatorProphecy->get($filterId)->willReturn($customFilter->reveal());
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadata = (new ResourceMetadata())->withAttributes(['filters' => [$filterId]]);
+        $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $serializerContextBuilder = new SerializerContextBuilder(
+            $resourceMetadataFactoryProphecy->reveal(),
+            null,
+            $filterLocatorProphecy->reveal(),
+        );
+
+        $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
+        $readStage = new ReadStage(
+            $this->resourceMetadataFactoryProphecy->reveal(),
+            $this->iriConverterProphecy->reveal(),
+            $this->collectionDataProviderProphecy->reveal(),
+            $this->subresourceDataProviderProphecy->reveal(),
+            $serializerContextBuilder,
+            '_'
+        );
+
+        $readStage($resourceClass, $resourceClass, $operationName, $context);
     }
 }
