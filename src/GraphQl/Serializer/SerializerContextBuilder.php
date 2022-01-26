@@ -15,7 +15,10 @@ namespace ApiPlatform\Core\GraphQl\Serializer;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Serializer\Filter\FilterInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -30,11 +33,13 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 {
     private $resourceMetadataFactory;
     private $nameConverter;
+    private $filterLocator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?NameConverterInterface $nameConverter)
+    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?NameConverterInterface $nameConverter, ContainerInterface $filterLocator)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->nameConverter = $nameConverter;
+        $this->filterLocator = $filterLocator;
     }
 
     public function create(?string $resourceClass, string $operationName, array $resolverContext, bool $normalization): array
@@ -60,6 +65,20 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
 
         if ($normalization) {
             $context['attributes'] = $this->fieldsToAttributes($resourceClass, $resourceMetadata, $resolverContext, $context);
+        }
+
+        if ($resourceMetadata && $normalization) {
+            $resourceFilters = $resourceMetadata->getOperationAttribute($context['attributes'], 'filters', [], true);
+            if (!$resourceFilters) {
+                return $context;
+            }
+
+            foreach ($resourceFilters as $filterId) {
+                if ($this->filterLocator->has($filterId) && ($filter = $this->filterLocator->get($filterId)) instanceof FilterInterface) {
+                    $request = new Request($resolverContext['args'] ?? []);
+                    $filter->apply($request, $normalization, $context['attributes'], $context);
+                }
+            }
         }
 
         return $context;
