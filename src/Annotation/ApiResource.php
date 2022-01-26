@@ -168,7 +168,7 @@ final class ApiResource
      * @param bool         $stateless
      * @param string       $sunset                         https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
      * @param array        $swaggerContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array        $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
+     * @param string|array $validationGroups               https://api-platform.com/docs/core/validation/#using-validation-groups
      * @param int          $urlGenerationStrategy
      *
      * @throws InvalidArgumentException
@@ -217,7 +217,7 @@ final class ApiResource
         ?bool $stateless = null,
         ?string $sunset = null,
         ?array $swaggerContext = null,
-        ?array $validationGroups = null,
+        $validationGroups = null,
         ?int $urlGenerationStrategy = null,
         ?bool $compositeIdentifier = null
     ) {
