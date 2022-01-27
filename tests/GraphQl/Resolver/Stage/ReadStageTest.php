@@ -345,7 +345,7 @@ class ReadStageTest extends TestCase
             Argument::type(Request::class),
             true,
             [],
-            Argument::type('array'),
+            Argument::type('array')
         )->shouldBeCalledOnce();
 
         $filterLocatorProphecy = $this->prophesize();
@@ -359,7 +359,7 @@ class ReadStageTest extends TestCase
         $serializerContextBuilder = new SerializerContextBuilder(
             $resourceMetadataFactoryProphecy->reveal(),
             null,
-            $filterLocatorProphecy->reveal(),
+            $filterLocatorProphecy->reveal()
         );
 
         $this->resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata());
