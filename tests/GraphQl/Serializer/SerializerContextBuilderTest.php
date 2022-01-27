@@ -33,6 +33,7 @@ class SerializerContextBuilderTest extends TestCase
     /** @var SerializerContextBuilder */
     private $serializerContextBuilder;
     private $resourceMetadataFactoryProphecy;
+    private $filterLocatorProphecy;
 
     /**
      * {@inheritdoc}
@@ -40,13 +41,18 @@ class SerializerContextBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $this->filterLocatorProphecy = $this->prophesize()->willImplement('Psr\Container\ContainerInterface');
 
         $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
     }
 
     private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
     {
-        return new SerializerContextBuilder($this->resourceMetadataFactoryProphecy->reveal(), $advancedNameConverter ?? new CustomConverter());
+        return new SerializerContextBuilder(
+            $this->resourceMetadataFactoryProphecy->reveal(),
+            $advancedNameConverter ?? new CustomConverter(),
+            $this->filterLocatorProphecy->reveal()
+        );
     }
 
     /**
