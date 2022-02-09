@@ -37,6 +37,7 @@
             <argument>%api_platform.oauth.tokenUrl%</argument>
             <argument>%api_platform.oauth.authorizationUrl%</argument>
             <argument>%api_platform.oauth.scopes%</argument>
+            <argument>%api_platform.oauth.pkce%</argument>
             <argument>%api_platform.show_webby%</argument>
             <argument>%api_platform.enable_swagger_ui%</argument>
             <argument>%api_platform.enable_re_doc%</argument>
