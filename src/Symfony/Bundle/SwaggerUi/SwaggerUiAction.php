@@ -40,9 +40,9 @@ final class SwaggerUiAction
     private $resourceMetadataFactory;
     private $oauthClientId;
     private $oauthClientSecret;
-    private $oauthPKCE;
+    private $oauthPkce;
 
-    public function __construct($resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null, bool $oauthPKCE = true)
+    public function __construct($resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null, bool $oauthPkce = false)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->twig = $twig;
@@ -54,7 +54,7 @@ final class SwaggerUiAction
         $this->formats = $formats;
         $this->oauthClientId = $oauthClientId;
         $this->oauthClientSecret = $oauthClientSecret;
-        $this->oauthPKCE = $oauthPKCE;
+        $this->oauthPkce = $oauthPkce;
 
         if (null === $this->twig) {
             throw new \RuntimeException('The documentation cannot be displayed since the Twig bundle is not installed. Try running "composer require symfony/twig-bundle".');
@@ -91,7 +91,7 @@ final class SwaggerUiAction
                 'scopes' => $this->openApiOptions->getOAuthScopes(),
                 'clientId' => $this->oauthClientId,
                 'clientSecret' => $this->oauthClientSecret,
-                'pkce' => $this->oauthPKCE,
+                'pkce' => $this->oauthPkce,
             ],
             'extraConfiguration' => $this->swaggerUiContext->getExtraConfiguration(),
         ];
