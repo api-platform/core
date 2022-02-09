@@ -262,7 +262,7 @@ final class Configuration implements ConfigurationInterface
                         ->scalarNode('clientId')->defaultValue('')->info('The oauth client id.')->end()
                         ->scalarNode('clientSecret')
                             ->defaultValue('')
-                            ->info('The oauth client secret. Never use this parameter in your production environment. It exposes crucial security information. This feature is intended for dev/test environments only. Enable `oauth.pkce` instead')
+                            ->info('The OAuth client secret. Never use this parameter in your production environment. It exposes crucial security information. This feature is intended for dev/test environments only. Enable "oauth.pkce" instead')
                         ->end()
                         ->booleanNode('pkce')->defaultFalse()->info('Enable the oauth PKCE.')->end()
                         ->scalarNode('type')->defaultValue('oauth2')->info('The oauth type.')->end()

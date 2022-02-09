@@ -37,7 +37,6 @@
             <argument>%api_platform.oauth.tokenUrl%</argument>
             <argument>%api_platform.oauth.authorizationUrl%</argument>
             <argument>%api_platform.oauth.scopes%</argument>
-            <argument>%api_platform.oauth.pkce%</argument>
             <argument>%api_platform.show_webby%</argument>
             <argument>%api_platform.enable_swagger_ui%</argument>
             <argument>%api_platform.enable_re_doc%</argument>
@@ -48,6 +47,7 @@
             <argument type="service" id="api_platform.swagger_ui.action" />
             <argument>%api_platform.asset_package%</argument>
             <argument>%api_platform.swagger_ui.extra_configuration%</argument>
+            <argument>%api_platform.oauth.pkce%</argument>
         </service>
     </services>
 </container>

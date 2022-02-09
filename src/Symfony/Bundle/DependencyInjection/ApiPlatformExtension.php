@@ -429,10 +429,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
 
         if ($container->hasDefinition('api_platform.swagger.action.ui')) {
-            $container->getDefinition('api_platform.swagger.action.ui')->setArgument('$oauthPkce', $config['oauth']['pkce']);
+            $container->getDefinition('api_platform.swagger.action.ui')->setArgument(27, $config['oauth']['pkce']);
         }
         if ($container->hasDefinition('api_platform.swagger_ui.action')) {
-            $container->getDefinition('api_platform.swagger_ui.action')->setArgument('$oauthPkce', $config['oauth']['pkce']);
+            $container->getDefinition('api_platform.swagger_ui.action')->setArgument(10, $config['oauth']['pkce']);
         }
     }
 
