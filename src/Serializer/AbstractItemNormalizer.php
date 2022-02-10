@@ -934,7 +934,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // In XML and CSV all basic datatypes are represented as strings, it is e.g. not possible to determine,
         // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
         // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
-        if (\is_string($value) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
+        if (\is_string($value) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format || 'multipart' === $format)) {
             if ('' === $value && $type->isNullable() && \in_array($type->getBuiltinType(), [Type::BUILTIN_TYPE_BOOL, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT], true)) {
                 return null;
             }
