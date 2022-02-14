@@ -51,11 +51,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
 
-        if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
-            return;
-        }
-
-        //If no where part, nothing to do
+        // If no where part, nothing to do
         $wherePart = $queryBuilder->getDQLPart('where');
 
         if (!$wherePart) {
@@ -64,8 +60,11 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $joinParts = $queryBuilder->getDQLPart('join');
         $originAlias = $queryBuilder->getRootAliases()[0];
-
         if (!$joinParts || !isset($joinParts[$originAlias])) {
+            return;
+        }
+
+        if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerOneToManyInWhere($queryBuilder, $classMetadata)) {
             return;
         }
 

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -62,30 +62,80 @@ trait EagerLoadingTrait
     }
 
     /**
-     * Checks if the class has an associationMapping with FETCH=EAGER.
-     *
-     * @param array $checked array cache of tested metadata classes
+     * Checks if the class has a one-to-many associationMapping with FETCH=EAGER in the where clause.
      */
-    private function hasFetchEagerAssociation(EntityManagerInterface $em, ClassMetadataInfo $classMetadata, array &$checked = []): bool
+    private function hasFetchEagerOneToManyInWhere(QueryBuilder $queryBuilder, ClassMetadataInfo $classMetadata): bool
     {
-        $checked[] = $classMetadata->name;
+        $em = $queryBuilder->getEntityManager();
+        $wherePart = $queryBuilder->getDQLPart('where');
+        $aliasMapping = $this->createAliasMapping($queryBuilder);
+        $checked = [];
 
-        foreach ($classMetadata->getAssociationMappings() as $mapping) {
-            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
-                return true;
-            }
+        foreach ($wherePart->getParts() as $part) {
+            foreach ($aliasMapping as $alias => $fieldPath) {
+                if ('' === $fieldPath) {
+                    // Root alias
+                    continue;
+                }
 
-            $related = $em->getClassMetadata($mapping['targetEntity']);
-
-            if (\in_array($related->name, $checked, true)) {
-                continue;
-            }
-
-            if (true === $this->hasFetchEagerAssociation($em, $related, $checked)) {
-                return true;
+                if (false !== strpos((string) $part, $alias.'.')) {
+                    $fields = explode('.', $fieldPath);
+                    $clonedClassMetadata = clone $classMetadata;
+                    foreach ($fields as $field) {
+                        $mapping = $clonedClassMetadata->getAssociationMapping($field);
+                        $fieldId = $field.'-'.$mapping['targetEntity'];
+                        if (\in_array($fieldId, $checked, true)) {
+                            $clonedClassMetadata = $em->getClassMetadata($mapping['targetEntity']);
+                            continue;
+                        }
+                        $checked[] = $fieldId;
+                        if (
+                            ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']
+                            && ClassMetadataInfo::ONE_TO_MANY === $mapping['type']
+                        ) {
+                            return true;
+                        }
+                        $clonedClassMetadata = $em->getClassMetadata($mapping['targetEntity']);
+                    }
+                }
             }
         }
 
         return false;
+    }
+
+    private function createAliasMapping(QueryBuilder $queryBuilder): array
+    {
+        if (\count($queryBuilder->getRootAliases()) > 1) {
+            throw new \UnexpectedValueException('Expected 1 root alias');
+        }
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+        $aliasMapping = [$rootAlias => ''];
+        foreach ($queryBuilder->getDQLPart('join') as $joins) {
+            foreach ($joins as $join) {
+                $joinTargetField = $this->getJoinTargetField($join);
+                if ($joinTargetField && isset($aliasMapping[$joinTargetField[0]])) {
+                    $aliasMapping[$join->getAlias()] = trim($aliasMapping[$joinTargetField[0]].'.'.$joinTargetField[1], '.');
+                }
+            }
+        }
+
+        return $aliasMapping;
+    }
+
+    private function getJoinTargetField($join): array
+    {
+        $targetFile = explode('.', $join->getJoin());
+        if ($join->getConditionType()) {
+            $condition = $join->getCondition();
+            $selfAlias = $join->getAlias();
+            if (1 === preg_match('/(.+)(=)(.+)/', $condition, $matches)) {
+                // It can be replaced with str_starts_with once upgrade to PHP8
+                $operand = 0 === strpos(trim($matches[1]), $selfAlias.'.') ? $matches[3] : $matches[1];
+                $targetFile = explode('.', trim($operand));
+            }
+        }
+
+        return $targetFile;
     }
 }

@@ -52,7 +52,10 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $em->getClassMetadata(DummyCar::class)->shouldBeCalled()->willReturn(new ClassMetadataInfo(DummyCar::class));
 
         $qb = $this->prophesize(QueryBuilder::class);
-        $qb->getDQLPart('where')->shouldNotBeCalled();
+        $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Expr\Andx());
+        $join = new Expr\Join(Expr\Join::INNER_JOIN, 'o.relatedDummy', 'existing_join_alias');
+        $qb->getDQLPart('join')->shouldBeCalled()->willReturn(['o' => [$join]]);
+        $qb->getRootAliases()->shouldBeCalled()->willReturn(['o']);
         $qb->getEntityManager()->willReturn($em);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
@@ -72,7 +75,10 @@ class FilterEagerLoadingExtensionTest extends TestCase
         ], ['force_eager' => false]));
 
         $qb = $this->prophesize(QueryBuilder::class);
-        $qb->getDQLPart('where')->shouldNotBeCalled();
+        $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Expr\Andx());
+        $join = new Expr\Join(Expr\Join::INNER_JOIN, 'o.relatedDummy', 'existing_join_alias');
+        $qb->getDQLPart('join')->shouldBeCalled()->willReturn(['o' => [$join]]);
+        $qb->getRootAliases()->shouldBeCalled()->willReturn(['o']);
         $qb->getEntityManager()->willReturn($em);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
@@ -92,7 +98,10 @@ class FilterEagerLoadingExtensionTest extends TestCase
         ]));
 
         $qb = $this->prophesize(QueryBuilder::class);
-        $qb->getDQLPart('where')->shouldNotBeCalled();
+        $qb->getDQLPart('where')->shouldBeCalled()->willReturn(new Expr\Andx());
+        $join = new Expr\Join(Expr\Join::INNER_JOIN, 'o.relatedDummy', 'existing_join_alias');
+        $qb->getDQLPart('join')->shouldBeCalled()->willReturn(['o' => [$join]]);
+        $qb->getRootAliases()->shouldBeCalled()->willReturn(['o']);
         $qb->getEntityManager()->willReturn($em);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
@@ -111,6 +120,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
 
         $qb = $this->prophesize(QueryBuilder::class);
         $qb->getDQLPart('where')->shouldBeCalled()->willReturn(null);
+        $qb->getDQLPart('join')->shouldNotBeCalled();
         $qb->getEntityManager()->willReturn($em);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
@@ -400,17 +410,24 @@ SQL;
         $resourceMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new ResourceMetadata(CompositeRelation::class));
         $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata(DummyCar::class));
 
-        $classMetadata = new ClassMetadataInfo(CompositeRelation::class);
-        $classMetadata->isIdentifierComposite = true;
-        $classMetadata->identifier = ['item', 'label'];
-        $classMetadata->associationMappings = [
-            'item' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => CompositeItem::class],
-            'label' => ['fetch' => 3, 'joinColumns' => [['nullable' => false]], 'targetEntity' => CompositeLabel::class],
+        $compositeRelationClassMetadata = new ClassMetadataInfo(CompositeRelation::class);
+        $compositeRelationClassMetadata->isIdentifierComposite = true;
+        $compositeRelationClassMetadata->identifier = ['compositeItem', 'compositeLabel'];
+        $compositeRelationClassMetadata->associationMappings = [
+            'compositeItem' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => CompositeItem::class, 'type' => ClassMetadataInfo::MANY_TO_ONE],
+            'compositeLabel' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'joinColumns' => [['nullable' => false]], 'targetEntity' => CompositeLabel::class, 'type' => ClassMetadataInfo::MANY_TO_ONE],
+        ];
+
+        $compositeItemClassMetadata = new ClassMetadataInfo(CompositeItem::class);
+        $compositeItemClassMetadata->isIdentifierComposite = false;
+        $compositeItemClassMetadata->identifier = ['id'];
+        $compositeItemClassMetadata->associationMappings = [
+            'compositeValues' => ['fetch' => ClassMetadataInfo::FETCH_EAGER, 'targetEntity' => CompositeRelation::class, 'type' => ClassMetadataInfo::ONE_TO_MANY],
         ];
 
         $em = $this->prophesize(EntityManager::class);
-        $em->getExpressionBuilder()->shouldBeCalled()->willReturn(new Expr());
-        $em->getClassMetadata(CompositeRelation::class)->shouldBeCalled()->willReturn($classMetadata);
+        $em->getClassMetadata(CompositeRelation::class)->shouldBeCalled()->willReturn($compositeRelationClassMetadata);
+        $em->getClassMetadata(CompositeItem::class)->shouldBeCalled()->willReturn($compositeItemClassMetadata);
 
         $qb = new QueryBuilder($em->reveal());
 
@@ -424,11 +441,6 @@ SQL;
             ->setParameter('foo', 1);
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
-        $queryNameGenerator->generateJoinAlias('compositeItem')->shouldBeCalled()->willReturn('item_2');
-        $queryNameGenerator->generateJoinAlias('compositeLabel')->shouldBeCalled()->willReturn('label_2');
-        $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
-
-        $queryNameGenerator->generateJoinAlias('foo')->shouldBeCalled()->willReturn('foo_2');
         $queryNameGenerator->generateJoinAlias(DummyCar::class)->shouldNotBeCalled();
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension($resourceMetadataFactoryProphecy->reveal(), false);
@@ -441,19 +453,7 @@ INNER JOIN o.compositeItem item
 INNER JOIN o.compositeLabel label
 LEFT JOIN o.foo foo WITH o.bar = item.foo
 LEFT JOIN ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar car WITH car.id = o.car
-WHERE o.item IN(
-    SELECT IDENTITY(o_2.item) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
-    WHERE item_2.field1 = :foo
-) AND o.label IN(
-    SELECT IDENTITY(o_2.label) FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation o_2
-    INNER JOIN o_2.compositeItem item_2
-    INNER JOIN o_2.compositeLabel label_2
-    LEFT JOIN o_2.foo foo_2 WITH o_2.bar = item_2.foo
-    WHERE item_2.field1 = :foo
-)
+WHERE item.field1 = :foo
 DQL;
 
         $this->assertEquals($this->toDQLString($expected), $qb->getDQL());
