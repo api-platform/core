@@ -305,7 +305,11 @@ final class TypeBuilder implements TypeBuilderInterface
         $this->typesContainer->set("{$shortName}PaginationInfo", $paginationInfoObjectType);
 
         return [
-            'collection' => GraphQLType::listOf($resourceType),
+            'collection' => GraphQLType::nonNull(
+                GraphQLType::listOf(
+                    GraphQLType::nonNull($resourceType)
+                )
+            ),
             'paginationInfo' => GraphQLType::nonNull($paginationInfoObjectType),
         ];
     }
