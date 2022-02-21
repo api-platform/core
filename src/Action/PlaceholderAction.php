@@ -25,7 +25,7 @@ final class PlaceholderAction
      *
      * @return object
      */
-    public function __invoke($data)
+    public function __invoke(mixed $data = null)
     {
         return $data;
     }

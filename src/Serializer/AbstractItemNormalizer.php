@@ -231,7 +231,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_denormalize'] = true;
         $context['resource_class'] = $resourceClass;
 
-        if (null !== ($inputClass = $this->getInputClass($resourceClass, $context)) && null !== ($dataTransformer = $this->getDataTransformer($data, $resourceClass, $context))) {
+        $inputClass = $this->getInputClass($resourceClass, $context);
+        $dataTransformer = $this->getDataTransformer($data, $resourceClass, $context);
+
+        if (null !== $inputClass && null === $dataTransformer) {
+            $resourceClass = $inputClass;
+            $context['resource_class'] = $inputClass;
+        } elseif (null !== $inputClass && null !== $dataTransformer) {
             $dataTransformerContext = $context;
 
             unset($context['input']);
