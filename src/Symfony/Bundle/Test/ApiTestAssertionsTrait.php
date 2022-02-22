@@ -19,6 +19,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Bundle\FrameworkBundle\Test\BrowserKitAssertionsTrait;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
