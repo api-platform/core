@@ -29,3 +29,15 @@ Feature: State processor
     Then the response status code should be 404
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
+
+  Scenario: Request a password reset with a malformed email
+    And I send a "POST" request to "/user-reset-password" with body:
+    """
+    {
+      "email": "this is not an email"
+    }
+    """
+    Then the response status code should be 422
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"

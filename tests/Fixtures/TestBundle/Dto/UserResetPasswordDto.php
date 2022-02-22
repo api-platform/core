@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
+use Symfony\Component\Validator\Constraints as Assert;
+
 final class UserResetPasswordDto
 {
+    #[Assert\Email()]
     private $email;
 
     public function getEmail(): string

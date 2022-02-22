@@ -22,7 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Post(
     uriTemplate: '/user-reset-password',
     shortName: 'user-reset-password',
-    validate: false,
     input: UserResetPasswordDto::class,
 )]
 final class UserResource
