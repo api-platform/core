@@ -15,6 +15,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
+use ApiPlatform\Doctrine\Orm\Extension\CacheableSupportsExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
@@ -31,6 +33,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
+
     private $managerRegistry;
     private $collectionExtensions;
 
@@ -66,6 +70,10 @@ class CollectionDataProvider implements ContextAwareCollectionDataProviderInterf
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
         foreach ($this->collectionExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 
             if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {

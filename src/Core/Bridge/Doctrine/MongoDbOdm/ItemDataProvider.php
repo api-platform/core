@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -38,6 +39,7 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderInterface, RestrictedDataProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
     use IdentifierManagerTrait;
 
     private $managerRegistry;
@@ -100,6 +102,10 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
         }
 
         foreach ($this->itemExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToItem($aggregationBuilder, $resourceClass, $id, $operationName, $context);
 
             if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {

@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
@@ -36,6 +37,8 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class CollectionDataProvider implements CollectionDataProviderInterface, RestrictedDataProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
+
     private $managerRegistry;
     private $resourceMetadataFactory;
     private $collectionExtensions;
@@ -74,6 +77,10 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
 
         $aggregationBuilder = $repository->createAggregationBuilder();
         foreach ($this->collectionExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
 
             if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
