@@ -1,7 +1,7 @@
 Feature: State processor
-  In order to use the API independently of the framework
+  In order to have different resource representations in the request body and in in the response body
   As a software developer
-  I need to be able to use state processor in API resources
+  I need to be able to set classes which aren't marked with #[ApiResource] as input and output
 
   Background:
     Given I add "Accept" header equal to "application/json"
@@ -29,4 +29,3 @@ Feature: State processor
     Then the response status code should be 404
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "detail" should be equal to "User does not exist."

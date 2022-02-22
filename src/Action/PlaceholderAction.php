@@ -21,11 +21,11 @@ namespace ApiPlatform\Action;
 final class PlaceholderAction
 {
     /**
-     * @param object $data
+     * @param mixed|null $data
      *
      * @return object
      */
-    public function __invoke(mixed $data = null)
+    public function __invoke($data = null)
     {
         return $data;
     }

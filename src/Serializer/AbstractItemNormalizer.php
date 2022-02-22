@@ -231,38 +231,38 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_denormalize'] = true;
         $context['resource_class'] = $resourceClass;
 
-        $inputClass = $this->getInputClass($resourceClass, $context);
-        $dataTransformer = $this->getDataTransformer($data, $resourceClass, $context);
+        if (null !== $inputClass = $this->getInputClass($resourceClass, $context)) {
+            if (null !== $dataTransformer = $this->getDataTransformer($data, $resourceClass, $context)) {
+                $dataTransformerContext = $context;
 
-        if (null !== $inputClass && null === $dataTransformer) {
-            $resourceClass = $inputClass;
-            $context['resource_class'] = $inputClass;
-        } elseif (null !== $inputClass && null !== $dataTransformer) {
-            $dataTransformerContext = $context;
+                unset($context['input']);
+                unset($context['resource_class']);
 
-            unset($context['input']);
-            unset($context['resource_class']);
+                if (!$this->serializer instanceof DenormalizerInterface) {
+                    throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
+                }
 
-            if (!$this->serializer instanceof DenormalizerInterface) {
-                throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
+                if ($dataTransformer instanceof DataTransformerInitializerInterface) {
+                    $context[AbstractObjectNormalizer::OBJECT_TO_POPULATE] = $dataTransformer->initialize($inputClass, $context);
+                    $context[AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE] = true;
+                }
+
+                try {
+                    $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
+                } catch (NotNormalizableValueException $e) {
+                    throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
+                }
+
+                if (!\is_object($denormalizedInput)) {
+                    throw new UnexpectedValueException('Expected denormalized input to be an object.');
+                }
+
+                return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
+            } else {
+                // no data transformer
+                $resourceClass = $inputClass;
+                $context['resource_class'] = $inputClass;
             }
-
-            if ($dataTransformer instanceof DataTransformerInitializerInterface) {
-                $context[AbstractObjectNormalizer::OBJECT_TO_POPULATE] = $dataTransformer->initialize($inputClass, $context);
-                $context[AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE] = true;
-            }
-
-            try {
-                $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
-            } catch (NotNormalizableValueException $e) {
-                throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
-            }
-
-            if (!\is_object($denormalizedInput)) {
-                throw new UnexpectedValueException('Expected denormalized input to be an object.');
-            }
-
-            return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
         }
 
         $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();

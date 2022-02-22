@@ -56,6 +56,7 @@ api_platform:
         Symfony\Component\Serializer\Exception\ExceptionInterface: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
         ApiPlatform\Exception\FilterValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+        ApiPlatform\Tests\Fixtures\TestBundle\Exception\UserNotFoundException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND
     http_cache:
         invalidation:
             enabled: true

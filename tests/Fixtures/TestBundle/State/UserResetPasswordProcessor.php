@@ -15,21 +15,15 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\UserResetPasswordDto;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use ApiPlatform\Tests\Fixtures\TestBundle\Exception\UserNotFoundException;
 
 class UserResetPasswordProcessor implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
     public function resumable(?string $operationName = null, array $context = []): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
         if (! $data instanceof UserResetPasswordDto) {
@@ -43,9 +37,6 @@ class UserResetPasswordProcessor implements ProcessorInterface
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
         if (! $data instanceof UserResetPasswordDto) {
@@ -59,7 +50,7 @@ class UserResetPasswordProcessor implements ProcessorInterface
             case 'user@example.com':
                 return $userResetPasswordDto;
             case 'does-not-exist@example.com':
-                throw new NotFoundHttpException('User does not exist.');
+                throw new UserNotFoundException();
             default:
                 throw new \LogicException('Should not be here');
         }
