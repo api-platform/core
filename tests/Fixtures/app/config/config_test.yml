@@ -109,6 +109,12 @@ services:
         tags:
             -  { name: 'api_platform.data_persister' }
 
+    app.user_reset_password_data_persister:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\DataPersister\UserResetPasswordDataPersister
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }
+
     app.graphql.query_resolver.dummy_custom_not_retrieved_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemResolver'
         public: false

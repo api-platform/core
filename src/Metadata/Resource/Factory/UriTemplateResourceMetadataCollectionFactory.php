@@ -59,21 +59,33 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
             $operations = new Operations();
             foreach ($resource->getOperations() ?? new Operations() as $key => $operation) {
+                /** @var Operation */
                 $operation = $this->configureUriVariables($operation);
 
                 if ($operation->getUriTemplate()) {
                     $operation = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
+                    if (!$operation->getName()) {
+                        $operation = $operation->withName($key);
+                    }
+
                     $operations->add($key, $operation);
                     continue;
                 }
 
                 if ($routeName = $operation->getRouteName()) {
+                    if (!$operation->getName()) {
+                        $operation = $operation->withName($routeName);
+                    }
+
                     $operations->add($routeName, $operation);
                     continue;
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
                 $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation->isCollection() ? '_collection' : '');
+                if (!$operation->getName()) {
+                    $operation = $operation->withName($operationName);
+                }
 
                 $operations->add($operationName, $operation);
             }

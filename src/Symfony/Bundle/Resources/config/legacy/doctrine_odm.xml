@@ -53,7 +53,7 @@
         <!-- Metadata loader -->
         <service id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.legacy"
                  class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
-                 decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+                 decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="40" public="false">
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.legacy.inner"/>
         </service>

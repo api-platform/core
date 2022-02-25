@@ -64,6 +64,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $openApiOptions;
     private $paginationOptions;
     private $router;
+    private $routeCollection;
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
     {
@@ -141,8 +142,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $uriVariables = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
+            $routeName = $operation->getRouteName() ?? $operation->getName();
 
-            $path = $this->getPath($operation->getRouteName() ? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
+            if (!$this->routeCollection && $this->router) {
+                $this->routeCollection = $this->router->getRouteCollection();
+            }
+
+            $path = $this->getPath($routeName && $this->routeCollection ? $this->routeCollection->get($routeName)->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
             $method = $operation->getMethod() ?? Operation::METHOD_GET;
 
             if (!\in_array($method, Model\PathItem::$methods, true)) {
