@@ -140,7 +140,11 @@ jobs:
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle
       - name: Update project dependencies
+        if: (!startsWith(matrix.php, '7.1'))
         run: composer update --no-interaction --no-progress --ansi
+      - name: Update project dependencies (7.1)
+        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2'))
+        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
@@ -228,7 +232,11 @@ jobs:
             doctrine/mongodb-odm \
             doctrine/mongodb-odm-bundle
       - name: Update project dependencies
+        if: (!startsWith(matrix.php, '7.1'))
         run: composer update --no-interaction --no-progress --ansi
+      - name: Update project dependencies (7.1)
+        if: (startsWith(matrix.php, '7.1') || startsWith(matrix.php, '7.2'))
+        run: composer update --no-interaction --no-progress --ansi --ignore-platform-reqs
       - name: Require Symfony components
         if: (!startsWith(matrix.php, '7.1'))
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi

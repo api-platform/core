@@ -34,5 +34,5 @@ final class UserResource
     /**
      * @Assert\NotBlank
      */
-    public string $username;
+    public $username;
 }
