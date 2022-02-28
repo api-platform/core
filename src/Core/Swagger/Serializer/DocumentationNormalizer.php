@@ -582,7 +582,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $identifiers = (array) $resourceMetadata
                 ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
 
-        $operationType = $identifiers ? $operationType : OperationType::COLLECTION;
         $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
 
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
@@ -681,6 +680,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $identifiers = (array) $resourceMetadata
                 ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
+
+        // Auto-generated routes in API Platform < 2.7 are considered as collection, hotfix this as the OpenApi Factory supports new operations anyways.
+        // this also fixes a bug where we could not create POST item operations in API P 2.6
+        if (OperationType::ITEM === $operationType && 'post' === substr($operationName, -4)) {
+            $operationType = OperationType::COLLECTION;
+        }
 
         if (!$identifiers && OperationType::COLLECTION !== $operationType) {
             try {
