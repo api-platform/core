@@ -118,7 +118,8 @@ class ApiPlatformExtensionTest extends TestCase
         'enable_docs' => true,
     ]];
 
-    private ContainerBuilder $container;
+    /** @var ContainerBuilder */
+    private $container;
 
     protected function setUp(): void
     {
