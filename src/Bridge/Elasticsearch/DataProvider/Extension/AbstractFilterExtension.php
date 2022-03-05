@@ -41,12 +41,7 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
     public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if (OperationType::SUBRESOURCE === ($context['operation_type'] ?? null)) {
-            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
-        } else {
-            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-        }
+        $resourceFilters = $resourceMetadata->getOperationAttribute($context, 'filters', [], true);
 
         if (!$resourceFilters) {
             return $requestBody;

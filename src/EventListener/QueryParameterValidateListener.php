@@ -53,11 +53,8 @@ final class QueryParameterValidateListener
         $queryParameters = $queryString ? RequestParser::parseRequestParams($queryString) : [];
 
         $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        if (isset($attributes['operation_type']) && OperationType::SUBRESOURCE === $attributes['operation_type']) {
-            $resourceFilters = $resourceMetadata->getSubresourceOperationAttribute($operationName, 'filters', [], true);
-        } else {
-            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-        }
+        $resourceFilters = $resourceMetadata->getOperationAttribute($attributes, 'filters', [], true);
+
         $this->queryParameterValidator->validateFilters($attributes['resource_class'], $resourceFilters, $queryParameters);
     }
 }
