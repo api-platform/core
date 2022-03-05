@@ -171,6 +171,8 @@ class ItemDataProviderTest extends TestCase
     public function testGetItemWrongCompositeIdentifier()
     {
         $this->expectException(PropertyNotFoundException::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataFactories(Dummy::class, [
             'ida',
@@ -185,7 +187,7 @@ class ItemDataProviderTest extends TestCase
             ],
         ]);
 
-        $dataProvider = new ItemDataProvider($managerRegistry, $this->resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
+        $dataProvider = new ItemDataProvider($managerRegistry, $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactory, $propertyMetadataFactory);
         $dataProvider->getItem(Dummy::class, 'ida=1;', 'foo');
     }
 
