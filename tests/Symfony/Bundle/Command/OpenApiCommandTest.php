@@ -31,6 +31,7 @@ class OpenApiCommandTest extends KernelTestCase
      * @var ApplicationTester
      */
     private $tester;
+    private $legacy;
 
     protected function setUp(): void
     {
@@ -40,6 +41,7 @@ class OpenApiCommandTest extends KernelTestCase
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
 
+        $this->legacy = static::$kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
         $this->tester = new ApplicationTester($application);
     }
 
@@ -61,21 +63,23 @@ class OpenApiCommandTest extends KernelTestCase
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);
+        $operationId = $this->legacy ? 'getDummyCarCollection' : 'api_dummy_cars_get_collection';
 
         $expected = <<<YAML
   /dummy_cars:
     get:
-      operationId: api_dummy_cars_get_collection
+      operationId: $operationId
       tags:
         - DummyCar
 YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
+        $operationId = $this->legacy ? 'getDummyCarItem' : 'api_dummy_cars_get_item';
         $expected = <<<YAML
   '/dummy_cars/{id}':
     get:
-      operationId: api_dummy_cars_get_item
+      operationId: $operationId
       tags: []
 YAML;
 

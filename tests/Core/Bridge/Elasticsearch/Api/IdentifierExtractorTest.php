@@ -16,15 +16,12 @@ namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\Api;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractor;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group legacy
- */
 class IdentifierExtractorTest extends TestCase
 {
     use ProphecyTrait;
@@ -62,7 +59,7 @@ class IdentifierExtractorTest extends TestCase
     public function testGetIdentifierFromResourceClassWithNoIdentifier()
     {
         $this->expectException(NonUniqueIdentifierException::class);
-        $this->expectExceptionMessage('Resource "ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy" has no identifiers.');
+        $this->expectExceptionMessage('Resource "ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy" has no identifiers.');
 
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Dummy::class)->willReturn([])->shouldBeCalled();

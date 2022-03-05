@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;

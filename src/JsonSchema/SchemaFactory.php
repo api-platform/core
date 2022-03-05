@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonSchema;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
@@ -56,7 +56,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     private $nameConverter;
     private $distinctFormats = [];
 
-    public function __construct(TypeFactoryInterface $typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(TypeFactoryInterface $typeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, NameConverterInterface $nameConverter = null, ResourceClassResolverInterface $resourceClassResolver = null)
     {
         $this->typeFactory = $typeFactory;
         if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {

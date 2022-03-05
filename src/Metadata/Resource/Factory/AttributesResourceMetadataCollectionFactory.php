@@ -137,12 +137,8 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
-            if (\count($resource->getOperations() ?? [])) {
-                continue;
-            }
-
             $operations = [];
-            foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $i => $operation) {
+            foreach ($resource->getOperations() ?? [new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $i => $operation) {
                 [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
                 $operations[$key] = $operation;
             }

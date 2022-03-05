@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Factory;
 
-use ApiPlatform\Core\Api\FilterLocatorTrait;
+use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
@@ -26,6 +25,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
@@ -64,6 +64,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $openApiOptions;
     private $paginationOptions;
     private $router;
+    private $routeCollection;
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
     {
@@ -141,8 +142,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $uriVariables = $operation->getUriVariables();
             $resourceClass = $operation->getClass() ?? $resource->getClass();
+            $routeName = $operation->getRouteName() ?? $operation->getName();
 
-            $path = $this->getPath($operation->getRouteName() ? $this->router->getRouteCollection()->get($operation->getRouteName())->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
+            if (!$this->routeCollection && $this->router) {
+                $this->routeCollection = $this->router->getRouteCollection();
+            }
+
+            $path = $this->getPath($routeName && $this->routeCollection ? $this->routeCollection->get($routeName)->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
             $method = $operation->getMethod() ?? Operation::METHOD_GET;
 
             if (!\in_array($method, Model\PathItem::$methods, true)) {

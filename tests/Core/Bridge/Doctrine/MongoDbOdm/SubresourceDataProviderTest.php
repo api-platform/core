@@ -13,25 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm;
 
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\SubresourceDataProvider;
+use ApiPlatform\Core\Exception\ResourceClassNotSupportedException;
+use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\ThirdLevel;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
-use ApiPlatform\Exception\ResourceClassNotSupportedException;
-use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
@@ -45,10 +42,9 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 
 /**
- * @author Alan Poulain <contact@alanpoulain.eu>
- *
  * @group mongodb
- * @group legacy
+ *
+ * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class SubresourceDataProviderTest extends TestCase
 {
@@ -63,7 +59,7 @@ class SubresourceDataProviderTest extends TestCase
     {
         parent::setUp();
 
-        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $this->resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
     }
 
     private function getMetadataProphecies(array $resourceClassesIdentifiers)
@@ -75,7 +71,7 @@ class SubresourceDataProviderTest extends TestCase
             $nameCollection = ['foobar'];
 
             foreach ($identifiers as $identifier) {
-                $metadata = new ApiProperty();
+                $metadata = new PropertyMetadata();
                 $metadata = $metadata->withIdentifier(true);
                 $propertyMetadataFactoryProphecy->create($resourceClass, $identifier)->willReturn($metadata);
 
@@ -83,7 +79,7 @@ class SubresourceDataProviderTest extends TestCase
             }
 
             //random property to prevent the use of non-identifiers metadata while looping
-            $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new ApiProperty());
+            $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new PropertyMetadata());
 
             $propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection($nameCollection));
         }
@@ -165,9 +161,7 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
-            (new ApiResource())->withOperations(new Operations(['get' => new Get()])),
-        ]));
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => ['id']]);
 
@@ -256,9 +250,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadataCollection(ThirdLevel::class, [
-            (new ApiResource())->withOperations(new Operations(['get' => new Get()])),
-        ]));
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
@@ -347,9 +339,15 @@ class SubresourceDataProviderTest extends TestCase
 
         $managerRegistryProphecy->getManagerForClass(ThirdLevel::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadataCollection(ThirdLevel::class, [
-            (new ApiResource())->withOperations(new Operations(['third_level_operation_name' => (new Get())->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])])),
-        ]));
+        $this->resourceMetadataFactoryProphecy->create(ThirdLevel::class)->willReturn(new ResourceMetadata(
+            'ThirdLevel',
+            null,
+            null,
+            null,
+            null,
+            null,
+            ['third_level_operation_name' => ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]]]
+        ));
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 
@@ -401,9 +399,7 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedOwningDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadataCollection(RelatedOwningDummy::class, [
-            (new ApiResource())->withOperations(new Operations(['get' => new Get()])),
-        ]));
+        $this->resourceMetadataFactoryProphecy->create(RelatedOwningDummy::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -451,9 +447,7 @@ class SubresourceDataProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($managerProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
-            (new ApiResource())->withOperations(new Operations(['get' => new Get()])),
-        ]));
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers]);
 
@@ -472,7 +466,7 @@ class SubresourceDataProviderTest extends TestCase
     public function testCannotCreateQueryBuilder()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The repository for "ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
+        $this->expectExceptionMessage('The repository for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
 
         $identifiers = ['id'];
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
@@ -534,9 +528,7 @@ class SubresourceDataProviderTest extends TestCase
 
         $rDummyManagerProphecy->getRepository(RelatedDummy::class)->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
 
-        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
-            (new ApiResource())->withOperations(new Operations(['get' => new Get()])),
-        ]));
+        $this->resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata());
 
         [$propertyNameCollectionFactory, $propertyMetadataFactory] = $this->getMetadataProphecies([Dummy::class => $identifiers, RelatedDummy::class => $identifiers]);
 

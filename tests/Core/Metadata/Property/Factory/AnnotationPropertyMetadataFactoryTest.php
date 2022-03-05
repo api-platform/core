@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\PropertyNotFoundException;
-use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
-use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use Doctrine\Common\Annotations\Reader;
@@ -35,7 +35,6 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
 
     /**
      * @dataProvider dependenciesProvider
-     * @group legacy
      *
      * @param mixed $reader
      * @param mixed $decorated
@@ -100,7 +99,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $decoratedThrowNotFoundProphecy->create(Dummy::class, 'name', [])->willThrow(new PropertyNotFoundException())->shouldBeCalled();
 
         $decoratedReturnProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decoratedReturnProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiPropertyMetadata())->withDescription('hi'))->shouldBeCalled();
+        $decoratedReturnProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(null, 'Hi'))->shouldBeCalled();
 
         return [
             [$propertyReaderProphecy, null, 'description'],
@@ -121,7 +120,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
 
     public function testClassNotFoundButParentFound()
     {
-        $propertyMetadata = new ApiProperty();
+        $propertyMetadata = new PropertyMetadata();
 
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedProphecy->create('\DoNotExist', 'foo', [])->willReturn($propertyMetadata);

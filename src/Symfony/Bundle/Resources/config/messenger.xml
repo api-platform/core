@@ -8,7 +8,7 @@
         <service id="api_platform.message_bus" alias="messenger.default_bus" />
 
         <service id="api_platform.messenger.data_persister" class="ApiPlatform\Core\Bridge\Symfony\Messenger\DataPersister" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="service" id="api_platform.message_bus" />
 
             <tag name="api_platform.data_persister" priority="-1000" />
@@ -22,7 +22,7 @@
         </service>
 
         <service id="api_platform.messenger.data_transformer" class="ApiPlatform\Symfony\Messenger\DataTransformer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <tag name="api_platform.data_transformer" priority="-10" />
         </service>

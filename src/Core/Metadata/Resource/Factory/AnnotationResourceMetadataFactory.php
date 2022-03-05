@@ -65,6 +65,7 @@ final class AnnotationResourceMetadataFactory implements ResourceMetadataFactory
         }
 
         $resourceAnnotation = $this->reader->getClassAnnotation($reflectionClass, ApiResource::class);
+
         if (!$resourceAnnotation instanceof ApiResource) {
             return $this->handleNotFound($parentResourceMetadata, $resourceClass);
         }

@@ -11,7 +11,26 @@
 
 declare(strict_types=1);
 
-spl_autoload_register(function ($className) {
+// Must be declared first!
+class_alias('ApiPlatform\Core\Api\FilterInterface', 'ApiPlatform\Api\FilterInterface');
+class_alias('ApiPlatform\Core\Api\ResourceClassResolverInterface', 'ApiPlatform\Api\ResourceClassResolverInterface');
+
+$deprecatedInterfaces = include 'deprecated_interfaces.php';
+foreach ($deprecatedInterfaces as $oldInterfaceName => $interfaceName) {
+    // Do not replace existing interface
+    if (interface_exists($oldInterfaceName)) {
+        continue;
+    }
+
+    if (!interface_exists($interfaceName)) {
+        dump("interface $interfaceName does not exist, replacement $oldInterfaceName neither");
+        continue;
+    }
+
+    class_alias($interfaceName, $oldInterfaceName);
+}
+
+spl_autoload_register(function ($className) use ($deprecatedInterfaces) {
     // We can not class alias when working with doctrine annotations
     static $deprecatedAnnotations = [
         'ApiResource' => [ApiPlatform\Core\Annotation\ApiResource::class, ApiPlatform\Metadata\ApiResource::class],
@@ -20,25 +39,26 @@ spl_autoload_register(function ($className) {
     ];
 
     static $deprecatedClasses = [
-        ApiPlatform\Core\Api\UrlGeneratorInterface::class => ApiPlatform\Api\UrlGeneratorInterface::class,
+        ApiPlatform\Core\Api\Entrypoint::class => ApiPlatform\Api\Entrypoint::class,
+        ApiPlatform\Core\Api\FilterLocatorTrait::class => ApiPlatform\Api\FilterLocatorTrait::class,
+        ApiPlatform\Core\Api\FormatMatcher::class => ApiPlatform\Api\FormatMatcher::class,
+        ApiPlatform\Core\Api\ResourceClassResolver::class => ApiPlatform\Api\ResourceClassResolver::class,
+
         ApiPlatform\Core\Annotation\ApiResource::class => ApiPlatform\Metadata\ApiResource::class,
         ApiPlatform\Core\Annotation\ApiProperty::class => ApiPlatform\Metadata\ApiProperty::class,
         ApiPlatform\Core\Annotation\ApiFilter::class => ApiPlatform\Metadata\ApiFilter::class,
-        ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
-        ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class,
 
+        ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\DefaultPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\DefaultPropertyMetadataFactory::class,
 
         ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class,
         ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class,
-        ApiPlatform\Core\Metadata\Extractor\ExtractorInterface::class => ApiPlatform\Metadata\Extractor\ResourceExtractorInterface::class,
         ApiPlatform\Core\Metadata\Extractor\AbstractExtractor::class => ApiPlatform\Metadata\Extractor\AbstractResourceExtractor::class,
         ApiPlatform\Core\Metadata\Extractor\XmlExtractor::class => ApiPlatform\Metadata\Extractor\XmlResourceExtractor::class,
         ApiPlatform\Core\Metadata\Extractor\YamlExtractor::class => ApiPlatform\Metadata\Extractor\YamlResourceExtractor::class,
 
-        ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class,
         ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class => ApiPlatform\Metadata\Property\PropertyNameCollection::class,
 
         // Exceptions
@@ -56,26 +76,6 @@ spl_autoload_register(function ($className) {
 
         // GraphQl
         ApiPlatform\Core\GraphQl\Executor::class => ApiPlatform\GraphQl\Executor::class,
-        ApiPlatform\Core\GraphQl\ExecutorInterface::class => ApiPlatform\GraphQl\ExecutorInterface::class,
-        ApiPlatform\Core\GraphQl\Error\ErrorHandlerInterface::class => ApiPlatform\GraphQl\Error\ErrorHandlerInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\WriteStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStageInterface::class => ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\QueryItemResolverInterface::class => ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\QueryCollectionResolverInterface::class => ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface::class => ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface::class,
-        ApiPlatform\Core\GraphQl\Resolver\MutationResolverInterface::class => ApiPlatform\GraphQl\Resolver\MutationResolverInterface::class,
-        ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface::class => ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface::class,
-        ApiPlatform\Core\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface::class => ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface::class,
-        ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface::class => ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface::class,
-        ApiPlatform\Core\GraphQl\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface::class,
-        ApiPlatform\Core\GraphQl\Type\TypesFactoryInterface::class => ApiPlatform\GraphQl\Type\TypesFactoryInterface::class,
-        ApiPlatform\Core\GraphQl\Type\Definition\TypeInterface::class => ApiPlatform\GraphQl\Type\Definition\TypeInterface::class,
-        ApiPlatform\Core\GraphQl\Type\TypesContainerInterface::class => ApiPlatform\GraphQl\Type\TypesContainerInterface::class,
         ApiPlatform\Core\GraphQl\Error\ErrorHandler::class => ApiPlatform\GraphQl\Error\ErrorHandler::class,
         ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage::class => ApiPlatform\GraphQl\Resolver\Stage\ValidateStage::class,
         ApiPlatform\Core\GraphQl\Resolver\Stage\ReadStage::class => ApiPlatform\GraphQl\Resolver\Stage\ReadStage::class,
@@ -265,8 +265,8 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class => ApiPlatform\Symfony\Messenger\RemoveStamp::class,
 
         // Bridge\Symfony\PropertyInfo\Metadata\Property => Metadata\Property
-        ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\PropertyInfoPropertyMetadataFactory::class,
-        ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class,
+        ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory::class,
+        ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyNameCollectionFactory::class,
 
         // Bridge\Symfony\Routing
         ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader::class => ApiPlatform\Symfony\Routing\ApiLoader::class,
@@ -276,20 +276,6 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class => ApiPlatform\Symfony\Validator\EventListener\ValidationExceptionListener::class,
         ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class => ApiPlatform\Symfony\Validator\Exception\ValidationException::class,
         ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class => ApiPlatform\Symfony\Validator\Validator::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanOrEqualRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanOrEqualRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanOrEqualRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanOrEqualRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLessThanRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRangeRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRangeRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction::class => ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory::class => ApiPlatform\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory::class,
 
         // Cache
         ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
@@ -382,6 +368,8 @@ spl_autoload_register(function ($className) {
         ApiPlatform\Core\OpenApi\Model\OAuthFlows::class => ApiPlatform\OpenApi\Model\OAuthFlows::class,
         ApiPlatform\Core\OpenApi\Model\Parameter::class => ApiPlatform\OpenApi\Model\Parameter::class,
         ApiPlatform\Core\OpenApi\Model\Paths::class => ApiPlatform\OpenApi\Model\Paths::class,
+        ApiPlatform\Core\OpenApi\Model\PathItem::class => ApiPlatform\OpenApi\Model\PathItem::class,
+        ApiPlatform\Core\OpenApi\Model\Operation::class => ApiPlatform\OpenApi\Model\Operation::class,
         ApiPlatform\Core\OpenApi\Model\RequestBody::class => ApiPlatform\OpenApi\Model\RequestBody::class,
         ApiPlatform\Core\OpenApi\Model\Response::class => ApiPlatform\OpenApi\Model\Response::class,
         ApiPlatform\Core\OpenApi\Model\Schema::class => ApiPlatform\OpenApi\Model\Schema::class,
@@ -455,9 +443,18 @@ spl_autoload_register(function ($className) {
         // Validator
         ApiPlatform\Core\Validator\EventListener\ValidateListener::class => ApiPlatform\Symfony\EventListener\ValidateListener::class,
         ApiPlatform\Core\Validator\Exception\ValidationException::class => ApiPlatform\Symfony\EventListener\Exception\ValidationException::class,
-    ];
 
-    $deprecatedInterfaces = include 'deprecated_interfaces.php';
+        ApiPlatform\Core\Filter\QueryParameterValidator::class => ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator::class,
+        ApiPlatform\Core\Filter\Validator\ArrayItems::class => ApiPlatform\Api\QueryParameterValidator\Validator\ArrayItems::class,
+        ApiPlatform\Core\Filter\Validator\Bounds::class => ApiPlatform\Api\QueryParameterValidator\Validator\Bounds::class,
+        ApiPlatform\Core\Filter\Validator\Enum::class => ApiPlatform\Api\QueryParameterValidator\Validator\Enum::class,
+        ApiPlatform\Core\Filter\Validator\Length::class => ApiPlatform\Api\QueryParameterValidator\Validator\Length::class,
+        ApiPlatform\Core\Filter\Validator\MultipleOf::class => ApiPlatform\Api\QueryParameterValidator\Validator\MultipleOf::class,
+        ApiPlatform\Core\Filter\Validator\Pattern::class => ApiPlatform\Api\QueryParameterValidator\Validator\Pattern::class,
+        ApiPlatform\Core\Filter\Validator\Required::class => ApiPlatform\Api\QueryParameterValidator\Validator\Required::class,
+        ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator::class => ApiPlatform\Operation\UnderscorePathSegmentNameGenerator::class,
+        ApiPlatform\Core\Operation\DashPathSegmentNameGenerator::class => ApiPlatform\Operation\DashPathSegmentNameGenerator::class,
+    ];
 
     if (ApiPlatform\Core\Metadata\Property\PropertyMetadata::class === $className) {
         trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, ApiPlatform\Metadata\ApiProperty::class));
@@ -479,9 +476,6 @@ spl_autoload_register(function ($className) {
     }
 
     if (isset($deprecatedInterfaces[$className])) {
-        class_alias($deprecatedInterfaces[$className], $className);
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $className, $deprecatedClasses[$className]));
-
-        return;
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The interface %s is deprecated, use %s instead.', $className, $deprecatedInterfaces[$className]));
     }
 });

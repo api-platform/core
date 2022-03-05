@@ -25,3 +25,6 @@ resources:
         collectionOperations:
             get:
                 method: 'GET'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~
+

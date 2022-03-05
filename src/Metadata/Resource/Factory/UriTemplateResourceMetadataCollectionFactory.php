@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -59,21 +59,33 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
             $operations = new Operations();
             foreach ($resource->getOperations() ?? new Operations() as $key => $operation) {
+                /** @var Operation */
                 $operation = $this->configureUriVariables($operation);
 
                 if ($operation->getUriTemplate()) {
                     $operation = $operation->withExtraProperties($operation->getExtraProperties() + ['user_defined_uri_template' => true]);
+                    if (!$operation->getName()) {
+                        $operation = $operation->withName($key);
+                    }
+
                     $operations->add($key, $operation);
                     continue;
                 }
 
                 if ($routeName = $operation->getRouteName()) {
+                    if (!$operation->getName()) {
+                        $operation = $operation->withName($routeName);
+                    }
+
                     $operations->add($routeName, $operation);
                     continue;
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
                 $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation->isCollection() ? '_collection' : '');
+                if (!$operation->getName()) {
+                    $operation = $operation->withName($operationName);
+                }
 
                 $operations->add($operationName, $operation);
             }
@@ -182,7 +194,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     if (2 !== \count($normalizedUriVariable)) {
                         throw new \LogicException("The uriVariables shortcut syntax needs to be the tuple: 'uriVariable' => [fromClass, fromProperty]");
                     }
-                    $normalizedUriVariable = (new Link())->withIdentifiers([$normalizedUriVariable[1]])->withFromClass($normalizedUriVariable[0]);
+                    $normalizedUriVariable = (new Link())->withFromProperty($normalizedUriVariable[1])->withFromClass($normalizedUriVariable[0]);
                 } else {
                     $normalizedUriVariable = new Link($normalizedParameterName, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['from_class'] ?? null, $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
                 }

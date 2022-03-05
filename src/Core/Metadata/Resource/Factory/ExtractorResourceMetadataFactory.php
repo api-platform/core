@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 
 /**

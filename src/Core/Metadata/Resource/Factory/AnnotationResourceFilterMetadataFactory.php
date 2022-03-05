@@ -44,11 +44,7 @@ final class AnnotationResourceFilterMetadataFactory implements ResourceMetadataF
     {
         $parentResourceMetadata = null;
         if ($this->decorated) {
-            try {
-                $parentResourceMetadata = $this->decorated->create($resourceClass);
-            } catch (ResourceClassNotFoundException $resourceNotFoundException) {
-                // Ignore not found exception from decorated factories
-            }
+            $parentResourceMetadata = $this->decorated->create($resourceClass);
         }
 
         if (null === $parentResourceMetadata) {

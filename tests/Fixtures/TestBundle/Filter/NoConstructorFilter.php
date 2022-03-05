@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Api\FilterInterface;
 
 final class NoConstructorFilter implements FilterInterface
 {

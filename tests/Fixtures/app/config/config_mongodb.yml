@@ -21,7 +21,6 @@ api_platform:
     mapping:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
-            - '%kernel.project_dir%/config/api_resources_mongodb_odm.yaml'
 
 services:
     app.my_dummy_resource.mongodb.boolean_filter:

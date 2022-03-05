@@ -663,6 +663,7 @@ Feature: GraphQL mutation support
     And the JSON node "data.createDummyGroup.clientMutationId" should be equal to "myId"
 
   @createSchema
+  @v3
   Scenario: Use serialization groups with relations
     Given there is 1 dummy object with relatedDummy and its thirdLevel
     And there is a RelatedDummy with 2 friends

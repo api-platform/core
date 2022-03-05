@@ -7,6 +7,7 @@ Feature: JSON DTO input and output
     Given I add "Accept" header equal to "application/json"
     And I add "Content-Type" header equal to "application/json"
 
+  @createSchema
   Scenario: Request a password reset
     And I send a "POST" request to "/users/password_reset_request" with body:
     """
@@ -24,6 +25,7 @@ Feature: JSON DTO input and output
     }
     """
 
+  @createSchema
   Scenario: Request a password reset for a non-existent user
     And I send a "POST" request to "/users/password_reset_request" with body:
     """
@@ -35,3 +37,4 @@ Feature: JSON DTO input and output
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "detail" should be equal to "User does not exist."
+

@@ -5,35 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="debug.api_platform.collection_data_provider" class="ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainCollectionDataProvider" decorates="api_platform.collection_data_provider">
-            <argument type="service" id="debug.api_platform.collection_data_provider.inner" />
-        </service>
-
-        <service id="debug.api_platform.item_data_provider" class="ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainItemDataProvider" decorates="api_platform.item_data_provider">
-            <argument type="service" id="debug.api_platform.item_data_provider.inner" />
-        </service>
-
-        <service id="debug.api_platform.subresource_data_provider" class="ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainSubresourceDataProvider" decorates="api_platform.subresource_data_provider">
-            <argument type="service" id="debug.api_platform.subresource_data_provider.inner" />
-        </service>
-
-        <service id="debug.api_platform.data_persister" class="ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersister" decorates="api_platform.data_persister">
-            <argument type="service" id="debug.api_platform.data_persister.inner" />
-        </service>
-
         <service id="debug.var_dumper.cloner" class="Symfony\Component\VarDumper\Cloner\VarCloner" />
 
         <service id="debug.var_dumper.cli_dumper" class="Symfony\Component\VarDumper\Dumper\CliDumper" />
-
-        <service id="debug.api_platform.debug_resource.command" class="ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand">
-            <tag name="console.command" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="debug.var_dumper.cloner" />
-            <argument type="service" id="debug.var_dumper.cli_dumper" />
-        </service>
-
-        <service id="debug.api_platform.processor" class="ApiPlatform\Symfony\Bundle\Processor\TraceableChainProcessor" decorates="api_platform.state_processor">
-            <argument type="service" id="debug.api_platform.processor.inner" />
-        </service>
     </services>
 </container>

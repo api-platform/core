@@ -1,0 +1,16 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.operation_path_resolver" alias="api_platform.operation_path_resolver.legacy" public="false" />
+
+        <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.legacy" />
+        <service id="api_platform.metadata.resource.name_collection_factory" alias="api_platform.metadata.resource.name_collection_factory.xml.legacy" />
+        <service id="api_platform.route_loader" alias="api_platform.route_loader.legacy" />
+        <service id="api_platform.iri_converter" alias="api_platform.iri_converter.legacy" />
+        <service id="api_platform.identifiers_extractor" alias="api_platform.identifiers_extractor.legacy" />
+        <service id="api_platform.pagination" alias="api_platform.pagination.legacy" />
+        <service id="api_platform.cache.metadata.property" alias="api_platform.cache.metadata.property.legacy"/>
+        <service id="api_platform.openapi.factory" alias="api_platform.openapi.factory.legacy" />
+    </services>
+</container>

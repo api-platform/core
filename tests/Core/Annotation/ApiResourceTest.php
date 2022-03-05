@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Annotation;
 
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Tests\Fixtures\AnnotatedClass;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
@@ -167,7 +167,7 @@ return new \ApiPlatform\Core\Annotation\ApiResource(
     swaggerContext:  ['description' => 'bar'],
     validationGroups:  ['foo', 'bar'],
     sunset:  'Thu, 11 Oct 2018 00:00:00 +0200',
-    urlGenerationStrategy:  \ApiPlatform\Core\Api\UrlGeneratorInterface::ABS_PATH,
+    urlGenerationStrategy:  \ApiPlatform\Api\UrlGeneratorInterface::ABS_PATH,
     deprecationReason: 'reason',
     elasticsearch: true,
     hydraContext: ['hydra' => 'foo'],

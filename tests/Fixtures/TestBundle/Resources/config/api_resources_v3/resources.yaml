@@ -19,3 +19,5 @@ resources:
         operations:
             ApiPlatform\Metadata\GetCollection: ~
             ApiPlatform\Metadata\Get: ~
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Entity\FlexConfig: ~

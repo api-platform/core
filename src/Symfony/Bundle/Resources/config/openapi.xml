@@ -50,41 +50,8 @@
         </service>
         <service id="ApiPlatform\OpenApi\Options" alias="api_platform.openapi.options" />
 
-        <service id="api_platform.openapi.factory.next" class="ApiPlatform\OpenApi\Factory\OpenApiFactory" public="false">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.json_schema.schema_factory" />
-            <argument type="service" id="api_platform.json_schema.type_factory" />
-            <argument type="service" id="api_platform.operation_path_resolver" />
-            <argument type="service" id="api_platform.filter_locator" />
-            <argument>%api_platform.formats%</argument>
-            <argument type="service" id="api_platform.openapi.options" />
-            <argument type="service" id="api_platform.pagination_options" />
-            <argument type="service" id="api_platform.router" />
-        </service>
-
-        <service id="api_platform.openapi.factory.legacy" class="ApiPlatform\Core\OpenApi\Factory\OpenApiFactory" public="false">
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.json_schema.schema_factory" />
-            <argument type="service" id="api_platform.json_schema.type_factory" />
-            <argument type="service" id="api_platform.operation_path_resolver" />
-            <argument type="service" id="api_platform.filter_locator" />
-            <argument type="service" id="api_platform.subresource_operation_factory" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
-            <argument>%api_platform.formats%</argument>
-            <argument type="service" id="api_platform.openapi.options" />
-            <argument type="service" id="api_platform.pagination_options" />
-        </service>
-        <service id="api_platform.openapi.factory" alias="api_platform.openapi.factory.next" />
-        <service id="ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface" alias="api_platform.openapi.factory" />
-
         <service id="api_platform.openapi.command" class="ApiPlatform\Symfony\Bundle\Command\OpenApiCommand">
-            <argument type="service" id="api_platform.openapi.factory.next" />
+            <argument type="service" id="api_platform.openapi.factory" />
             <argument type="service" id="api_platform.serializer" />
             <tag name="console.command" />
         </service>

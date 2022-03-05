@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -26,6 +24,9 @@ use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
@@ -923,11 +924,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         if ($legacy) {
+            $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new PropertyMetadata();
             $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => true]);
         } else {
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new ApiProperty();
             $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(true);
             $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
@@ -1041,11 +1043,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         if ($legacy) {
+            $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new PropertyMetadata();
             $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => false]);
         } else {
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new ApiProperty();
             $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(false);
         }

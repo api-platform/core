@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Property;
 
-use ApiPlatform\Metadata\Property\PropertyInfoPropertyNameCollectionFactory;
+use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyNameCollectionFactory;
 use ApiPlatform\Tests\Fixtures\DummyIgnoreProperty;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithOnlyPrivateProperty;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithOnlyPublicProperty;

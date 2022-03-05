@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
+use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Exception\OperationNotFoundException;

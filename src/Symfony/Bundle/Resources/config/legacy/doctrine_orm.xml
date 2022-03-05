@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="api_platform.doctrine.orm.data_persister" class="ApiPlatform\Core\Bridge\Doctrine\Common\DataPersister" public="false">
+            <argument type="service" id="doctrine" />
+
+            <tag name="api_platform.data_persister" priority="-1000" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.collection_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.item_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
+            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="null" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.subresource_data_provider" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
+            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
+            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="null" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.default.collection_data_provider" parent="api_platform.doctrine.orm.collection_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\CollectionDataProvider">
+            <tag name="api_platform.collection_data_provider" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.default.item_data_provider" parent="api_platform.doctrine.orm.item_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider">
+            <tag name="api_platform.item_data_provider" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.default.subresource_data_provider" parent="api_platform.doctrine.orm.subresource_data_provider" class="ApiPlatform\Core\Bridge\Doctrine\Orm\SubresourceDataProvider">
+            <tag name="api_platform.subresource_data_provider" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.metadata.property.metadata_factory.legacy" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="40" public="false">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.legacy.inner" />
+        </service>
+    </services>
+</container>

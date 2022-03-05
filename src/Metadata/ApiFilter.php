@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Core\Api\FilterInterface;
+use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 
 /**

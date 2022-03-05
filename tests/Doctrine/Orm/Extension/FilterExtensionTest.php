@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
+use ApiPlatform\Api\FilterInterface as ApiFilterInterface;
 use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\FilterInterface as ApiFilterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;

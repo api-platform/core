@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Documentation;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 
 /**
  * Generates the API documentation.

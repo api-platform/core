@@ -20,13 +20,13 @@ use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactory;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidResourceException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\PathResolver\OperationPathResolver;
 use ApiPlatform\Symfony\Routing\ApiLoader;
@@ -316,6 +316,8 @@ class ApiLoaderTest extends TestCase
 
     private function getRoute(string $path, string $controller, string $resourceClass, string $operationName, array $methods, bool $collection = false, array $requirements = [], array $extraDefaults = ['_stateless' => null], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
+        $legacyOperationName = str_replace('api_dummies_', '', str_replace($collection ? '_collection' : '_item', '', $operationName));
+
         return new Route(
             $path,
             [
@@ -324,7 +326,8 @@ class ApiLoaderTest extends TestCase
                 '_api_resource_class' => $resourceClass,
                 '_api_identifiers' => ['id'],
                 '_api_has_composite_identifier' => false,
-                sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $operationName,
+                sprintf('_api_%s_operation_name', $collection ? 'collection' : 'item') => $legacyOperationName,
+                '_api_operation_name' => $operationName,
             ] + $extraDefaults,
             $requirements,
             $options,

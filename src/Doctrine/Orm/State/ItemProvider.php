@@ -87,6 +87,6 @@ final class ItemProvider implements ProviderInterface
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
 
-        return !($operation->isCollection() ?? false);
+        return !($operation->getExtraProperties()['is_legacy_subresource'] ?? false) && !($operation->isCollection() ?? false);
     }
 }
