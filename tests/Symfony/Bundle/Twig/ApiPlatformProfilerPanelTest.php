@@ -162,7 +162,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(7, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
+        $this->assertCount(8, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
         $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
@@ -178,9 +178,17 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Data Providers', $crawler->filter('.data-provider-tab-title')->html());
         $this->assertNotEmpty($crawler->filter('.data-provider-tab-content'));
 
-        // Data processors tab
-        $this->assertSame('Processors', $crawler->filter('.data-processor-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.data-processor-tab-content .empty'));
+        // Data persisters tab
+        $this->assertSame('Data Persisters', $crawler->filter('.data-persister-tab-title')->html());
+        $this->assertNotEmpty($crawler->filter('.data-persister-tab-content'));
+
+        // Providers tab
+        $this->assertSame('Providers', $crawler->filter('.provider-tab-title')->html());
+        $this->assertNotEmpty($crawler->filter('.provider-tab-content .empty'));
+
+        // Processors tab
+        $this->assertSame('Processors', $crawler->filter('.processor-tab-title')->html());
+        $this->assertNotEmpty($crawler->filter('.processor-tab-content .empty'));
     }
 
     /**
@@ -211,9 +219,30 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
         $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
 
-        // Data processors tab
-        $tabContent = $crawler->filter('.data-processor-tab-content');
+        // Processors tab
+        $tabContent = $crawler->filter('.processor-tab-content');
         $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
         $this->assertStringContainsString(Processor::class, $tabContent->html());
     }
+
+    public function testStateProvidersProfiler()
+    {
+        if ($this->legacy) {
+            $this->markTestSkipped('Legacy test.');
+
+            return;
+        }
+
+        $client = static::createClient();
+        $client->enableProfiler();
+        // request to resource that uses state provider
+        $client->request('GET', '/attribute_resources/2', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $crawler = $client->request('GET', '/_profiler/latest?panel=api_platform.data_collector.request', [], [], []);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+
+        // Providers tab
+        $this->assertNotEmpty($crawler->filter('.provider-tab-content table'));
+    }
 }
+
