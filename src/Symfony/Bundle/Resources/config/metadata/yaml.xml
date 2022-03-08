@@ -35,5 +35,10 @@
             <argument type="service" id="api_platform.metadata.property_extractor.yaml" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory.yaml.inner" />
         </service>
+
+        <service id="api_platform.metadata.property.identifier_metadata_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="20" public="false">
+            <argument type="service" id="api_platform.metadata.property_extractor.yaml" />
+            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.yaml.inner" />
+        </service>
     </services>
 </container>

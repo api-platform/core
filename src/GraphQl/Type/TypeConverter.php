@@ -154,13 +154,22 @@ final class TypeConverter implements TypeConverterInterface
             return GraphQLType::string();
         }
 
+        $operationName = $rootOperation->getName();
+        $isCollection = 'collection_query' === $operationName;
+
+        // We're retrieving the type of a property which is a relation to the rootResource
+        if ($resourceClass !== $rootResource && $property && $rootOperation instanceof Query) {
+            $isCollection = $this->typeBuilder->isCollection($type);
+            $operationName = $isCollection ? 'collection_query' : 'query';
+        }
+
         try {
-            $operation = $resourceMetadataCollection->getOperation($rootOperation->getName());
+            $operation = $resourceMetadataCollection->getOperation($operationName);
         } catch (OperationNotFoundException $e) {
             $operation = (new Query())
                 ->withResource($resourceMetadataCollection[0])
-                ->withName($rootOperation->getName())
-                ->withCollection('collection_query' === $rootOperation->getName());
+                ->withName($operationName)
+                ->withCollection($isCollection);
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);

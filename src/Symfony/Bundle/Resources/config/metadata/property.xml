@@ -35,7 +35,8 @@
             <argument type="service" id="api_platform.metadata.property_extractor.xml" />
         </service>
 
-        <!-- Property metadata used to compute identifiers, we want to avoid using the serializer property metadata factory-->
+        <!-- Property metadata used to compute identifiers, we want to avoid using the serializer property metadata factory -->
+        <!-- TODO: in 3.0 the serializer property metadata factory doesn't need the resource metadata anymore so these will be removed -->
         <service id="api_platform.metadata.property.identifier_metadata_factory" alias="api_platform.metadata.property.identifier_metadata_factory.property_info" />
 
         <service id="api_platform.metadata.property.identifier_metadata_factory.property_info" class="ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory" public="false">
@@ -51,9 +52,9 @@
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.xml.inner" />
         </service>
 
-        <service id="api_platform.metadata.property.identifier_metadata_factory.yaml" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="20" public="false">
-            <argument type="service" id="api_platform.metadata.property_extractor.yaml" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.yaml.inner" />
+        <service id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata" class="ApiPlatform\Metadata\Property\Factory\LegacyPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="1000" public="false">
+            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
+            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata.inner" />
         </service>
 
         <!-- Cache -->
