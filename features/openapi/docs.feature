@@ -133,26 +133,26 @@ Feature: Documentation support
                     "properties": {
                         "@id": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "@type": {
                             "type": "string"
                         },
                         "hydra:first": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "hydra:last": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "hydra:previous": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         },
                         "hydra:next": {
                             "type": "string",
-                            "format": "iri-reference"
+                            "format": "iri-template"
                         }
                     }
                 },
