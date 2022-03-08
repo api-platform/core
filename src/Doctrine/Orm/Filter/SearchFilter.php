@@ -228,7 +228,10 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         }
 
         $queryBuilder->andWhere($queryBuilder->expr()->orX(...$ors));
-        array_walk($parameters, [$queryBuilder, 'setParameter']);
+        foreach ($parameters as $paramValue => $paramKey ) {
+            $paramValue = is_numeric($paramValue) ? (string) $paramValue : $paramValue;
+            $queryBuilder->setParameter($paramKey, $paramValue);
+        }
     }
 
     /**
