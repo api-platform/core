@@ -183,7 +183,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() : null;
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
-            //Don't join if max depth is enabled and the current depth limit is reached
+            // Don't join if max depth is enabled and the current depth limit is reached
             if (0 === $currentDepth && ($normalizationContext[AbstractObjectNormalizer::ENABLE_MAX_DEPTH] ?? false)) {
                 continue;
             }
@@ -192,11 +192,11 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
-                //skip properties not found
+                // skip properties not found
                 continue;
                 // @phpstan-ignore-next-line indeed this can be thrown by the SerializerPropertyMetadataFactory
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
-                //skip associations that are not resource classes
+                // skip associations that are not resource classes
                 continue;
             }
 
@@ -317,7 +317,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             // If it's an embedded property see below
             if (!\array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
                 $isFetchable = $propertyMetadata instanceof ApiProperty ? $propertyMetadata->isFetchable() : $propertyMetadata->getAttribute('fetchable');
-                //the field test allows to add methods to a Resource which do not reflect real database fields
+                // the field test allows to add methods to a Resource which do not reflect real database fields
                 if ($targetClassMetadata->hasField($property) && (true === $isFetchable || $propertyMetadata->isReadable())) {
                     $select[] = $property;
                 }

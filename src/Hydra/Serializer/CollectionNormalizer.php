@@ -88,7 +88,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         if ($this->iriConverter instanceof IriConverterInterface) {
             $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
         } else {
-            //TODO: remove in 3.0
+            // TODO: remove in 3.0
             $data['@id'] = isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] ? $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
         }
 

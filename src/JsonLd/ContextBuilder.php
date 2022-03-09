@@ -92,7 +92,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $context = $this->getBaseContext($referenceType);
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            //TODO: remove in 3.0
+            // TODO: remove in 3.0
             if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
                 $shortName = $this->resourceMetadataFactory->create($resourceClass)->getShortName();
             } else {
