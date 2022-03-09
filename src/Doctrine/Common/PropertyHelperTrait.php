@@ -47,7 +47,7 @@ trait PropertyHelperTrait
     /**
      * Determines whether the given property is nested.
      */
-    protected function isPropertyNested(string $property/*, string $resourceClass*/): bool
+    protected function isPropertyNested(string $property/* , string $resourceClass */): bool
     {
         if (\func_num_args() > 1) {
             $resourceClass = (string) func_get_arg(1);
@@ -84,7 +84,7 @@ trait PropertyHelperTrait
      *   - associations: array of associations according to nesting order
      *   - field: string holding the actual field (leaf node)
      */
-    protected function splitPropertyParts(string $property/*, string $resourceClass*/): array
+    protected function splitPropertyParts(string $property/* , string $resourceClass */): array
     {
         $resourceClass = null;
         $parts = explode('.', $property);

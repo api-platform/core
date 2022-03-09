@@ -296,7 +296,7 @@ class EagerLoadingExtensionTest extends TestCase
     public function testDenormalizeItemWithCorrectResourceClass()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        //Dummy is the correct class for the denormalization context serialization groups, and we're fetching RelatedDummy
+        // Dummy is the correct class for the denormalization context serialization groups, and we're fetching RelatedDummy
         $resourceMetadata = (new ResourceMetadata())->withAttributes(['normalization_context' => ['groups' => ['foo']]]);
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -319,7 +319,7 @@ class EagerLoadingExtensionTest extends TestCase
     public function testDenormalizeItemWithExistingGroups()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        //groups exist from the context, we don't need to compute them again
+        // groups exist from the context, we don't need to compute them again
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldNotBeCalled();
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -513,7 +513,7 @@ class EagerLoadingExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        //$propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
+        // $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $relationPropertyMetadata = new ApiProperty();

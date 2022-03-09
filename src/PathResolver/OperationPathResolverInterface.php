@@ -28,5 +28,5 @@ interface OperationPathResolverInterface
      * @param string|bool $operationType     One of the constants defined in ApiPlatform\Core\Api\OperationType
      *                                       If the property is a boolean, true represents OperationType::COLLECTION, false is for OperationType::ITEM
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string;
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string;
 }

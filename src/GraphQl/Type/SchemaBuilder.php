@@ -62,7 +62,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operationName => $operation) {
                     $configuration = null !== $operation->getArgs() ? ['args' => $operation->getArgs()] : [];
 
-                    //TODO: 3.0 remove these
+                    // TODO: 3.0 remove these
                     if ('item_query' === $operationName) {
                         $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
                         continue;

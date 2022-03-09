@@ -41,7 +41,7 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      *
      * @throws InvalidArgumentException
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string
     {
         if (\func_num_args() >= 4) {
             $operationName = (string) func_get_arg(3);

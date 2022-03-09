@@ -50,7 +50,7 @@ final class SerializeStage implements SerializeStageInterface
      */
     public function __invoke($itemOrCollection, string $resourceClass, string $operationName, array $context): ?array
     {
-        //TODO: replace by $operation->isCollection and $operation instanceof Mutation
+        // TODO: replace by $operation->isCollection and $operation instanceof Mutation
         $isCollection = $context['is_collection'];
         $isMutation = $context['is_mutation'];
         $isSubscription = $context['is_subscription'];

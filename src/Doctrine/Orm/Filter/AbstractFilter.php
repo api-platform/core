@@ -60,7 +60,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */)
     {
         @trigger_error(sprintf('Using "%s::apply()" is deprecated since 2.2. Use "%s::apply()" with the "filters" context key instead.', __CLASS__, AbstractContextAwareFilter::class), \E_USER_DEPRECATED);
 
@@ -78,7 +78,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @param mixed $value
      */
-    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/);
+    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */);
 
     protected function getManagerRegistry(): ManagerRegistry
     {
@@ -98,7 +98,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Determines whether the given property is enabled.
      */
-    protected function isPropertyEnabled(string $property/*, string $resourceClass*/): bool
+    protected function isPropertyEnabled(string $property/* , string $resourceClass */): bool
     {
         if (\func_num_args() > 1) {
             $resourceClass = func_get_arg(1);
@@ -123,7 +123,7 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Extracts properties to filter from the request.
      */
-    protected function extractProperties(Request $request/*, string $resourceClass*/): array
+    protected function extractProperties(Request $request/* , string $resourceClass */): array
     {
         @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), \E_USER_DEPRECATED);
 

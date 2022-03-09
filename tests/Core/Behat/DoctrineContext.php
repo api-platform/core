@@ -196,7 +196,7 @@ final class DoctrineContext implements Context
     /**
      * @var UserPasswordHasherInterface|UserPasswordEncoderInterface
      */
-    private $passwordHasher; //@phpstan-ignore-line
+    private $passwordHasher; // @phpstan-ignore-line
     private $schemaTool;
     private $schemaManager;
 

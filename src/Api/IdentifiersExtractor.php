@@ -121,7 +121,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
         }
 
-        if (is_scalar($identifierValue)) {
+        if (\is_scalar($identifierValue)) {
             return $identifierValue;
         }
 
@@ -140,7 +140,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             if (1 === \count($relatedLinks)) {
                 $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedLinks)->getIdentifiers()[0], $parameterName);
 
-                if (is_scalar($identifierValue)) {
+                if (\is_scalar($identifierValue)) {
                     return $identifierValue;
                 }
 

@@ -67,7 +67,7 @@ class ApiLoaderTest extends TestCase
                 // Custom operations
                 'api_dummies_my_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withDefaults(['my_default' => 'default_value', '_format' => 'a valid format'])->withRequirements(['_format' => 'a valid format'])->withCondition("request.headers.get('User-Agent') matches '/firefox/i'")->withController('some.service.name')->withCollection(true),
                 'api_dummies_my_second_op_collection' => (new Post())->withUriTemplate('/dummies.{_format}')->withOptions(['option' => 'option_value'])->withHost('{subdomain}.api-platform.com')->withSchemes(['https'])->withCollection(true),
-                //without controller, takes the default one
+                // without controller, takes the default one
                 'api_dummies_my_path_op_collection' => (new Get())->withUriTemplate('some/custom/path')->withCollection(true),
                 // Custom path
                 'api_dummies_my_stateless_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withStateless(true)->withCollection(true),

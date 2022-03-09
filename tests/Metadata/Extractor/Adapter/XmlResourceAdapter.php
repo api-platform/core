@@ -97,7 +97,7 @@ XML
                     continue;
                 }
 
-                if (\in_array($parameterName, self::ATTRIBUTES, true) && is_scalar($value)) {
+                if (\in_array($parameterName, self::ATTRIBUTES, true) && \is_scalar($value)) {
                     $resource->addAttribute($parameterName, $this->parse($value));
                     continue;
                 }
