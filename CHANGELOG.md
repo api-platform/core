@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* Swagger UI: Add `usePkceWithAuthorizationCodeGrant` to Swagger UI initOAuth (#4649)
 * **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
 * GraphQL: Add ability to use different pagination types for the queries of a resource (#4453)
 * Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)

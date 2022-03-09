@@ -56,6 +56,7 @@ final class SwaggerUiAction
     private $oauthTokenUrl;
     private $oauthAuthorizationUrl;
     private $oauthScopes;
+    private $oauthPkce;
     private $formatsProvider;
     private $swaggerUiEnabled;
     private $reDocEnabled;
@@ -81,7 +82,7 @@ final class SwaggerUiAction
      * @param mixed      $oauthScopes
      * @param mixed      $resourceMetadataFactory
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, NormalizerInterface $normalizer, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null, array $swaggerUiExtraConfiguration = [])
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, $resourceMetadataFactory, NormalizerInterface $normalizer, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, string $title = '', string $description = '', string $version = '', $formats = [], $oauthEnabled = false, $oauthClientId = '', $oauthClientSecret = '', $oauthType = '', $oauthFlow = '', $oauthTokenUrl = '', $oauthAuthorizationUrl = '', $oauthScopes = [], bool $showWebby = true, bool $swaggerUiEnabled = false, bool $reDocEnabled = false, bool $graphqlEnabled = false, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false, array $swaggerVersions = [2, 3], OpenApiSwaggerUiAction $swaggerUiAction = null, $assetPackage = null, array $swaggerUiExtraConfiguration = [], bool $oauthPkce = false)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -109,6 +110,7 @@ final class SwaggerUiAction
         $this->swaggerUiAction = $swaggerUiAction;
         $this->swaggerUiExtraConfiguration = $swaggerUiExtraConfiguration;
         $this->assetPackage = $assetPackage;
+        $this->oauthPkce = $oauthPkce;
 
         if (null === $this->twig) {
             throw new \RuntimeException('The documentation cannot be displayed since the Twig bundle is not installed. Try running "composer require symfony/twig-bundle".');
@@ -183,6 +185,7 @@ final class SwaggerUiAction
             'enabled' => $this->oauthEnabled,
             'clientId' => $this->oauthClientId,
             'clientSecret' => $this->oauthClientSecret,
+            'pkce' => $this->oauthPkce,
             'type' => $this->oauthType,
             'flow' => $this->oauthFlow,
             'tokenUrl' => $this->oauthTokenUrl,

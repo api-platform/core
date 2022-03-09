@@ -47,6 +47,7 @@
             <argument type="service" id="api_platform.swagger_ui.action" />
             <argument>%api_platform.asset_package%</argument>
             <argument>%api_platform.swagger_ui.extra_configuration%</argument>
+            <argument>%api_platform.oauth.pkce%</argument>
         </service>
     </services>
 </container>

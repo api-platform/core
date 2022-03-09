@@ -63,7 +63,8 @@ window.onload = function() {
             realm: data.oauth.type,
             appName: data.spec.info.title,
             scopeSeparator: ' ',
-            additionalQueryStringParams: {}
+            additionalQueryStringParams: {},
+            usePkceWithAuthorizationCodeGrant: data.oauth.pkce,
         });
     }
 

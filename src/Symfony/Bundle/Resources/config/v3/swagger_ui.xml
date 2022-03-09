@@ -15,6 +15,7 @@
             <argument>%api_platform.formats%</argument>
             <argument>%api_platform.oauth.clientId%</argument>
             <argument>%api_platform.oauth.clientSecret%</argument>
+            <argument>%api_platform.oauth.pkce%</argument>
         </service>
     </services>
 </container>

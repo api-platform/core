@@ -102,6 +102,7 @@ class SwaggerUiActionTest extends TestCase
                     'tokenUrl' => '',
                     'authorizationUrl' => '',
                     'scopes' => [],
+                    'pkce' => false,
                 ],
                 'shortName' => 'F',
                 'operationId' => 'getFCollection',
@@ -137,6 +138,7 @@ class SwaggerUiActionTest extends TestCase
                     'tokenUrl' => '',
                     'authorizationUrl' => '',
                     'scopes' => [],
+                    'pkce' => false,
                 ],
                 'shortName' => 'F',
                 'operationId' => 'getFItem',
@@ -195,6 +197,7 @@ class SwaggerUiActionTest extends TestCase
                     'tokenUrl' => '',
                     'authorizationUrl' => '',
                     'scopes' => [],
+                    'pkce' => false,
                 ],
             ],
         ])->shouldBeCalled()->willReturn('');
