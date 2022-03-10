@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Core\DataProvider\SerializerAwareDataProviderTrait;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerAwareProviderInterface;
+use ApiPlatform\State\SerializerAwareProviderTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-class SerializableProvider implements ProviderInterface
+class SerializableProvider implements ProviderInterface, SerializerAwareProviderInterface
 {
-    use SerializerAwareDataProviderTrait;
+    use SerializerAwareProviderTrait;
 
     /**
      * {@inheritDoc}

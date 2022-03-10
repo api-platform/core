@@ -11,17 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Rector\Parser;
+namespace ApiPlatform\Core\Upgrade;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
 
-final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
+final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
 {
+    use RemoveAnnotationTrait;
     private $subresourceMetadata;
     private $referenceType;
 
@@ -35,19 +38,35 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
     {
         $operationToCreate = $this->subresourceMetadata['collection'] ? GetCollection::class : Get::class;
         $operationUseStatementNeeded = true;
+        $apiResourceUseStatementNeeded = true;
+
+        $comment = $node->getDocComment();
+        if ($comment && preg_match('/@ApiSubresource/', $comment->getText())) {
+            $node->setDocComment($this->removeAnnotationByTag($comment, 'ApiSubresource'));
+        }
 
         if ($node instanceof Node\Stmt\Namespace_) {
-            foreach ($node->stmts as $stmt) {
+            foreach ($node->stmts as $i => $stmt) {
                 if (!$stmt instanceof Node\Stmt\Use_) {
                     break;
                 }
 
                 $useStatement = implode('\\', $stmt->uses[0]->name->parts);
+                if (ApiSubresource::class === $useStatement) {
+                    unset($node->stmts[$i]);
+                }
+
+                if (ApiResource::class === $useStatement) {
+                    $apiResourceUseStatementNeeded = false;
+                    continue;
+                }
+
                 if ($useStatement === $operationToCreate) {
                     $operationUseStatementNeeded = false;
-                    break;
+                    continue;
                 }
             }
+
             if ($operationUseStatementNeeded) {
                 array_unshift(
                     $node->stmts,
@@ -55,6 +74,19 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
                         new Node\Stmt\UseUse(
                             new Node\Name(
                                 $this->subresourceMetadata['collection'] ? GetCollection::class : Get::class
+                            )
+                        ),
+                    ])
+                );
+            }
+
+            if ($apiResourceUseStatementNeeded) {
+                array_unshift(
+                    $node->stmts,
+                    new Node\Stmt\Use_([
+                        new Node\Stmt\UseUse(
+                            new Node\Name(
+                                ApiResource::class
                             )
                         ),
                     ])
@@ -218,23 +250,34 @@ final class TransformApiSubresourceVisitor extends NodeVisitorAbstract
                 );
             }
 
+            $arguments[] = new Node\Arg(
+                    new Node\Expr\Array_(
+                        [
+                            new Node\Expr\ArrayItem(
+                                new Node\Expr\New_(
+                                    new Node\Name($this->subresourceMetadata['collection'] ? 'GetCollection' : 'Get')
+                                ),
+                            ),
+                        ],
+                        [
+                            'kind' => Node\Expr\Array_::KIND_SHORT,
+                        ]
+                    ),
+                    false,
+                    false,
+                    [],
+                    new Node\Identifier('operations')
+                );
+
             $apiResourceAttribute =
                 new Node\AttributeGroup([
                     new Node\Attribute(
-                        new Node\Name('\\ApiPlatform\\Metadata\\ApiResource'),
+                        new Node\Name('ApiResource'),
                         $arguments
                     ),
                 ]);
 
-            $operationAttribute =
-                new Node\AttributeGroup([
-                    new Node\Attribute(
-                        new Node\Name($this->subresourceMetadata['collection'] ? 'GetCollection' : 'Get')
-                    ),
-                ]);
-
             $node->attrGroups[] = $apiResourceAttribute;
-            $node->attrGroups[] = $operationAttribute;
         }
     }
 }

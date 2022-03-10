@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Core\Bridge\Rector\Service;
 
-use ApiPlatform\Core\Bridge\Rector\Service\SubresourceTransformer;
+use ApiPlatform\Core\Upgrade\SubresourceTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer;

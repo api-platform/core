@@ -52,7 +52,6 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         foreach ($resourceMetadataCollection as $i => $resource) {
             /** @var ApiResource $resource */
             $resource = $this->configureUriVariables($resource);
-
             if ($resource->getUriTemplate()) {
                 $resourceMetadataCollection[$i] = $resource->withExtraProperties($resource->getExtraProperties() + ['user_defined_uri_template' => true]);
             }

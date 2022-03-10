@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Bridge\Rector\Service;
+namespace ApiPlatform\Core\Upgrade;
 
 use ApiPlatform\Util\Inflector;
 use Doctrine\Common\Annotations\AnnotationReader;

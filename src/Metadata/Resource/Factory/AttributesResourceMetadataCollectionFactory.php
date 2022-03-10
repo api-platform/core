@@ -75,10 +75,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         if (\PHP_VERSION_ID >= 80000 && $this->hasResourceAttributes($reflectionClass)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
-                if (0 === $i && $this->graphQlEnabled && null === $resource->getGraphQlOperations()) {
-                    $resource = $this->addDefaultGraphQlOperations($resource);
-                }
-
                 $resourceMetadataCollection[] = $resource;
             }
         }
@@ -144,6 +140,24 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             $resources[$index] = $resources[$index]->withOperations(new Operations($operations));
+            $graphQlOperations = $resource->getGraphQlOperations();
+
+            if ([] === $graphQlOperations) {
+                continue;
+            }
+
+            if (null === $graphQlOperations) {
+                $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
+                continue;
+            }
+
+            $graphQlOperationsWithDefaults = [];
+            foreach ($graphQlOperations as $i => $operation) {
+                [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
+                $graphQlOperationsWithDefaults[$key] = $operation;
+            }
+
+            $resources[$index] = $resources[$index]->withGraphQlOperations($graphQlOperationsWithDefaults);
         }
 
         return $resources;
@@ -199,6 +213,9 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             return [$operation->getName(), $operation];
         }
 
+        if ($operation->getRouteName()) {
+            $operation = $operation->withName($operation->getRouteName());
+        }
         // Check for name conflict
         if ($operation->getName()) {
             if (null !== $resource->getOperations() && !$resource->getOperations()->has($operation->getName())) {
@@ -218,7 +235,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource
     {
         $resource = $resource
-            ->withShortName($shortName)
+            ->withShortName($resource->getShortName() ?? $shortName)
             ->withClass($resourceClass);
 
         foreach ($this->defaults['attributes'] as $key => $value) {

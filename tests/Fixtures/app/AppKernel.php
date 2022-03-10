@@ -85,9 +85,7 @@ class AppKernel extends Kernel
             $bundles[] = new NelmioApiDocBundle();
         }
 
-        if ('elasticsearch' !== $this->getEnvironment()) {
-            $bundles[] = new TestBundle();
-        }
+        $bundles[] = new TestBundle();
 
         return $bundles;
     }

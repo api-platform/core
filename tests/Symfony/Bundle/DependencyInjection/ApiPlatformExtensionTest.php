@@ -1785,13 +1785,13 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $services = [
-            // legacy/rector.xml
-            'api_platform.rector.subresource_transformer',
-            'api_platform.rector.command',
+            // legacy/upgrade.xml
+            'api_platform.upgrade.subresource_transformer',
+            'api_platform.upgrade_resource.command',
         ];
 
         $tags = [
-            'api_platform.rector.command' => 'console.command',
+            'api_platform.upgrade_resource.command' => 'console.command',
         ];
 
         $this->assertContainerHas($services, [], $tags);

@@ -131,7 +131,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($container, $loader, $config);
         $this->registerLegacyServices($container, $config, $loader);
-        $this->registerRectorConfiguration($container, $loader, $config);
+        $this->registerUpgradeCommandConfiguration($container, $loader, $config);
 
         // TODO: remove in 3.x
         $container->registerForAutoconfiguration(DataPersisterInterface::class)
@@ -918,9 +918,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('legacy/api.xml');
     }
 
-    private function registerRectorConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
+    private function registerUpgradeCommandConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
     {
-        $loader->load('legacy/rector.xml');
+        $loader->load('legacy/upgrade.xml');
     }
 
     private function buildDeprecationArgs(string $version, string $message): array

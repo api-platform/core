@@ -88,12 +88,28 @@ services:
         tags:
             -   name: 'api_platform.item_data_provider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider'
+        public: false
+        arguments:
+            $managerRegistry: '@doctrine'
+        tags:
+            -  name: 'api_platform.state_provider'
+
     ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
         public: false
         arguments:
             $managerRegistry: '@doctrine'
         tags:
             -   name: 'api_platform.item_data_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider'
+        public: false
+        arguments:
+            $managerRegistry: '@doctrine'
+        tags:
+            -  name: 'api_platform.state_provider'
 
     app.dummy_dto_no_input.data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
