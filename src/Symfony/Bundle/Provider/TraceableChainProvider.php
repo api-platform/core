@@ -66,4 +66,3 @@ final class TraceableChainProvider implements ProviderInterface
         return $this->decorated->supports($resourceClass, $identifiers, $operationName, $context);
     }
 }
-

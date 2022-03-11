@@ -225,6 +225,9 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertStringContainsString(Processor::class, $tabContent->html());
     }
 
+    /**
+     * @requires PHP 8.0
+     */
     public function testStateProvidersProfiler()
     {
         if ($this->legacy) {
@@ -245,4 +248,3 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertNotEmpty($crawler->filter('.provider-tab-content table'));
     }
 }
-
