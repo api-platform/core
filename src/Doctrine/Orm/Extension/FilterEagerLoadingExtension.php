@@ -167,14 +167,14 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         // Change join aliases
         foreach ($joinParts[$originAlias] as $joinPart) {
             /** @var Join $joinPart */
-            $joinString = str_replace($aliases, $replacements, $joinPart->getJoin());
+            $joinString = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getJoin());
             $pos = strpos($joinString, '.');
             if (false === $pos) {
                 if (null !== $joinPart->getCondition() && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($joinString)) {
                     $newAlias = $queryNameGenerator->generateJoinAlias($joinPart->getAlias());
                     $aliases[] = "{$joinPart->getAlias()}.";
                     $replacements[] = "$newAlias.";
-                    $condition = str_replace($aliases, $replacements, $joinPart->getCondition());
+                    $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition());
                     $join = new Join($joinPart->getJoinType(), $joinPart->getJoin(), $newAlias, $joinPart->getConditionType(), $condition);
                     /* @phpstan-ignore-next-line */
                     $queryBuilderClone->add('join', [$replacement => $join], true);
@@ -187,12 +187,19 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             $newAlias = $queryNameGenerator->generateJoinAlias($association);
             $aliases[] = "{$joinPart->getAlias()}.";
             $replacements[] = "$newAlias.";
-            $condition = str_replace($aliases, $replacements, $joinPart->getCondition() ?? '');
+            $condition = preg_replace($this->buildReplacePatterns($aliases), $replacements, $joinPart->getCondition() ?? '');
             QueryBuilderHelper::addJoinOnce($queryBuilderClone, $queryNameGenerator, $alias, $association, $joinPart->getJoinType(), $joinPart->getConditionType(), $condition, $originAlias, $newAlias);
         }
 
-        $queryBuilderClone->add('where', str_replace($aliases, $replacements, (string) $wherePart));
+        $queryBuilderClone->add('where', preg_replace($this->buildReplacePatterns($aliases), $replacements, (string) $wherePart));
 
         return $queryBuilderClone;
+    }
+
+    private function buildReplacePatterns(array $aliases): array
+    {
+        return array_map(static function (string $alias): string {
+            return '/\b'.preg_quote($alias, '/').'/';
+        }, $aliases);
     }
 }
