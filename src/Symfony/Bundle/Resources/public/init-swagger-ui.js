@@ -149,4 +149,8 @@ window.onload = function() {
             }, 10000);
         });
     }
+
+    // Make SwaggerUIBundle and data available for some other scripts
+    window.swaggerUI = ui;
+    window.swaggerData = data;
 };
