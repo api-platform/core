@@ -22,6 +22,7 @@ use ApiPlatform\Core\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Core\Tests\Fixtures\DummyEntityFilterAnnotated;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Core\Tests\Fixtures\TestBundle\Util\AnnotationFilterExtractor;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AnnotationFilterExtractorTraitTest extends KernelTestCase
@@ -31,7 +32,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->extractor = new AnnotationFilterExtractor(static::$kernel->getContainer()->get('test.annotation_reader'));
+        $this->extractor = new AnnotationFilterExtractor(new AnnotationReader());
     }
 
     public function testReadAnnotations()
