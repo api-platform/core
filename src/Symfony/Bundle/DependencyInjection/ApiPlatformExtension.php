@@ -36,6 +36,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
@@ -142,10 +143,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.collection_data_provider');
         $container->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
             ->addTag('api_platform.subresource_data_provider');
+
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)
             ->addTag('api_platform.state_provider');
+        $container->registerForAutoconfiguration(ProcessorInterface::class)
+            ->addTag('api_platform.state_processor');
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void

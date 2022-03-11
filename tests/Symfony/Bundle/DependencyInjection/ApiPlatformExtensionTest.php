@@ -13,9 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\DataPersister\DataPersisterInterface;
+use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
+use ApiPlatform\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
+use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
+use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
+use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
+use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
+use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
+use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
+use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
+use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -1599,6 +1620,10 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $this->assertContainerHas($services, $aliases, $tags);
+
+        $autoconfiguredInstances = $this->container->getAutoconfiguredInstanceof();
+        $this->assertArrayHasKey(RequestBodySearchCollectionExtensionInterface::class, $autoconfiguredInstances);
+        $this->assertArrayHasKey('api_platform.elasticsearch.request_body_search_extension.collection', $autoconfiguredInstances[RequestBodySearchCollectionExtensionInterface::class]->getTags());
     }
 
     public function testSecurityConfiguration(): void
@@ -1795,5 +1820,44 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $this->assertContainerHas($services, [], $tags);
+    }
+
+    public function testAutoConfigurableInterfaces(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $interfaces = [
+            FilterInterface::class => 'api_platform.filter',
+            ProviderInterface::class => 'api_platform.state_provider',
+            ProcessorInterface::class => 'api_platform.state_processor',
+            DataPersisterInterface::class => 'api_platform.data_persister',
+            ItemDataProviderInterface::class => 'api_platform.item_data_provider',
+            CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
+            SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
+            DataTransformerInterface::class => 'api_platform.data_transformer',
+            DataTransformerInitializerInterface::class => 'api_platform.data_transformer',
+            ValidationGroupsGeneratorInterface::class => 'api_platform.validation_groups_generator',
+            PropertySchemaRestrictionMetadataInterface::class => 'api_platform.metadata.property_schema_restriction',
+            QueryItemResolverInterface::class => 'api_platform.graphql.query_resolver',
+            QueryCollectionResolverInterface::class => 'api_platform.graphql.query_resolver',
+            MutationResolverInterface::class => 'api_platform.graphql.mutation_resolver',
+            GraphQlTypeInterface::class => 'api_platform.graphql.type',
+            ErrorHandlerInterface::class => 'api_platform.graphql.error_handler',
+            QueryItemExtensionInterface::class => 'api_platform.doctrine.orm.query_extension.item',
+            DoctrineQueryCollectionExtensionInterface::class => 'api_platform.doctrine.orm.query_extension.collection',
+            AggregationItemExtensionInterface::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.item',
+            AggregationCollectionExtensionInterface::class => 'api_platform.doctrine_mongodb.odm.aggregation_extension.collection',
+        ];
+
+        $has = [];
+        foreach ($this->container->getAutoconfiguredInstanceof() as $interface => $childDefinition) {
+            if (isset($interfaces[$interface])) {
+                $has[] = $interface;
+                $this->assertArrayHasKey($interfaces[$interface], $childDefinition->getTags());
+            }
+        }
+
+        $this->assertEmpty(array_diff(array_keys($interfaces), $has), 'Not all expected interfaces are autoconfigurable.');
     }
 }
