@@ -55,7 +55,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
             return;
         }
 
-        //If no where part, nothing to do
+        // If no where part, nothing to do
         $wherePart = $queryBuilder->getDQLPart('where');
 
         if (!$wherePart) {
@@ -123,14 +123,14 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         $joinParts = $queryBuilder->getDQLPart('join');
         $wherePart = $queryBuilder->getDQLPart('where');
 
-        //reset parts
+        // reset parts
         $queryBuilderClone->resetDQLPart('join');
         $queryBuilderClone->resetDQLPart('where');
         $queryBuilderClone->resetDQLPart('orderBy');
         $queryBuilderClone->resetDQLPart('groupBy');
         $queryBuilderClone->resetDQLPart('having');
 
-        //Change from alias
+        // Change from alias
         $from = $queryBuilderClone->getDQLPart('from')[0];
         $queryBuilderClone->resetDQLPart('from');
         $queryBuilderClone->from($from->getFrom(), $replacement);
@@ -138,7 +138,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         $aliases = ["$originAlias."];
         $replacements = ["$replacement."];
 
-        //Change join aliases
+        // Change join aliases
         foreach ($joinParts[$originAlias] as $joinPart) {
             /** @var Join $joinPart */
             $joinString = str_replace($aliases, $replacements, $joinPart->getJoin());
