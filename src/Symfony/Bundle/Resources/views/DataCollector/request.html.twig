@@ -41,18 +41,18 @@
             <thead>
             <tr>
                 <th>#</th>
-                <th>Answer</th>
+                <th>Used</th>
                 <th>{{ name|capitalize }}</th>
             </tr>
             </thead>
             <tbody>
-            {% for class, answer in object.responses %}
+            {% for class, used in object.responses %}
                 <tr>
                     <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                     <td class="font-normal">
-                        {% if answer is same as(true) %}
+                        {% if used is same as(true) %}
                             <span class="label status-success same-width">TRUE</span>
-                        {% elseif answer is same as(false) %}
+                        {% elseif used is same as(false) %}
                             <span class="label status-error same-width">FALSE</span>
                         {% else %}
                             <span class="label status-info same-width">NOT USED</span>
@@ -202,8 +202,15 @@
             </div>
 
             <div class="tab">
-                <h3 class="tab-title data-processor-tab-title">Processors</h3>
-                <div class="tab-content data-processor-tab-content">
+                <h3 class="tab-title provider-tab-title">Providers</h3>
+                <div class="tab-content provider-tab-content">
+                    {{ apiPlatform.providerTable(collector.providers, 'provider') }}
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title processor-tab-title">Processors</h3>
+                <div class="tab-content processor-tab-content">
                     {{ apiPlatform.providerTable(collector.processors, 'processors') }}
                 </div>
             </div>
