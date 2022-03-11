@@ -69,7 +69,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/*, array $context = []*/)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */)
     {
         if (\func_num_args() > 6) {
             $context = func_get_arg(6);
@@ -194,7 +194,7 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
     /**
      * {@inheritdoc}
      */
-    protected function extractProperties(Request $request/*, string $resourceClass*/): array
+    protected function extractProperties(Request $request/* , string $resourceClass */): array
     {
         if (!$request->query->has($this->existsParameterName)) {
             $resourceClass = \func_num_args() > 1 ? (string) func_get_arg(1) : null;
