@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -242,5 +243,16 @@ final class Client implements HttpClientInterface
         }
 
         return $headers;
+    }
+
+    public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
+    {
+        if (!method_exists($this->kernelBrowser, 'loginUser')) {
+            throw new \LogicException(sprintf('"%s" requires symfony/framework-bundle 5.1+ to be installed.', __METHOD__));
+        }
+
+        $this->kernelBrowser->loginUser($user, $firewallContext);
+
+        return $this;
     }
 }

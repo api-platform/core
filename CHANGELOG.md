@@ -45,6 +45,7 @@
 * A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
 * Add support for `security_post_validation` attribute
 * Mark the GraphQL subsystem as stable (#4500)
+* feat(test): add `Client::loginUser()`
 
 ## 2.6.7
 
