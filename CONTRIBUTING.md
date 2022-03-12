@@ -45,7 +45,7 @@ Alternatively, you can also work with the test application we provide:
 ### Matching Coding Standards
 
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
-But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.sensiolabs.org/) tool:
+But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.symfony.com) tool:
 
     php-cs-fixer.phar fix
 

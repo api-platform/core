@@ -765,10 +765,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         unset($context['resource_class']);
 
         if ($type && $type->getClassName()) {
-            if (!\is_object($attributeValue) && null !== $attributeValue) {
-                throw new UnexpectedValueException('Unexpected non-object value for object property.');
-            }
-
             $childContext = $this->createChildContext($context, $attribute, $format);
             unset($childContext['iri']);
 
