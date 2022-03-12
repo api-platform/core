@@ -29,7 +29,7 @@ trait PropertyHelperTrait
     /**
      * Splits the given property into parts.
      */
-    abstract protected function splitPropertyParts(string $property/*, string $resourceClass*/): array;
+    abstract protected function splitPropertyParts(string $property/* , string $resourceClass */): array;
 
     /**
      * Adds the necessary joins for a nested property.
@@ -40,7 +40,7 @@ trait PropertyHelperTrait
      *               the second element is the $field name
      *               the third element is the $associations array
      */
-    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/*, string $resourceClass, string $joinType*/): array
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator/* , string $resourceClass, string $joinType */): array
     {
         if (\func_num_args() > 4) {
             $resourceClass = func_get_arg(4);

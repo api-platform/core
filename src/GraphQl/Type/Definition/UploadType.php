@@ -27,7 +27,7 @@ if (\PHP_VERSION_ID >= 70200) {
          *
          * @return mixed
          */
-        public function parseLiteral(/*Node */ $valueNode, array $variables = null)
+        public function parseLiteral(/* Node */ $valueNode, array $variables = null)
         {
             throw new Error('`Upload` cannot be hardcoded in query, be sure to conform to GraphQL multipart request specification.', $valueNode);
         }

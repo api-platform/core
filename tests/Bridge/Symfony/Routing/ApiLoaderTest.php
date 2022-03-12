@@ -52,17 +52,17 @@ class ApiLoaderTest extends TestCase
         $resourceMetadata = new ResourceMetadata();
         $resourceMetadata = $resourceMetadata->withShortName('dummy');
         $resourceMetadata = $resourceMetadata->withAttributes(['identifiers' => 'id']);
-        //default operation based on OperationResourceMetadataFactory
+        // default operation based on OperationResourceMetadataFactory
         $resourceMetadata = $resourceMetadata->withItemOperations([
             'get' => ['method' => 'GET', 'requirements' => ['id' => '\d+'], 'defaults' => ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'], 'stateless' => null],
             'put' => ['method' => 'PUT', 'stateless' => null],
             'delete' => ['method' => 'DELETE', 'stateless' => null],
         ]);
-        //custom operations
+        // custom operations
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'", 'stateless' => null], //with controller
-            'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https'], 'stateless' => null], //without controller, takes the default one
-            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'requirements' => ['_format' => 'a valid format'], 'defaults' => ['my_default' => 'default_value'], 'condition' => "request.headers.get('User-Agent') matches '/firefox/i'", 'stateless' => null], // with controller
+            'my_second_op' => ['method' => 'POST', 'options' => ['option' => 'option_value'], 'host' => '{subdomain}.api-platform.com', 'schemes' => ['https'], 'stateless' => null], // without controller, takes the default one
+            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], // custom path
             'my_stateless_op' => ['method' => 'GET', 'stateless' => true],
         ]);
         $resourceMetadata = $resourceMetadata->withSubresourceOperations([
@@ -194,9 +194,9 @@ class ApiLoaderTest extends TestCase
             'delete' => ['method' => 'DELETE', 'stateless' => null],
         ]);
         $resourceMetadata = $resourceMetadata->withCollectionOperations([
-            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'stateless' => null], //with controller
-            'my_second_op' => ['method' => 'POST', 'stateless' => null], //without controller, takes the default one
-            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], //custom path
+            'my_op' => ['method' => 'GET', 'controller' => 'some.service.name', 'stateless' => null], // with controller
+            'my_second_op' => ['method' => 'POST', 'stateless' => null], // without controller, takes the default one
+            'my_path_op' => ['method' => 'GET', 'path' => 'some/custom/path', 'stateless' => null], // custom path
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadata($resourceMetadata, true)->load(null);

@@ -124,10 +124,18 @@ class DummyCar
      */
     private $brand = 'DummyBrand';
 
+    /**
+     * @var DummyCarInfo
+     *
+     * @ORM\Embedded(class="DummyCarInfo")
+     */
+    private $info;
+
     public function __construct()
     {
         $this->id = new DummyCarIdentifier();
         $this->colors = new ArrayCollection();
+        $this->info = new DummyCarInfo();
     }
 
     public function getId()
@@ -218,5 +226,15 @@ class DummyCar
     public function setBrand(string $brand): void
     {
         $this->brand = $brand;
+    }
+
+    public function getInfo(): DummyCarInfo
+    {
+        return $this->info;
+    }
+
+    public function setInfo(DummyCarInfo $info): void
+    {
+        $this->info = $info;
     }
 }

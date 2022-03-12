@@ -94,7 +94,7 @@ final class MatchesJsonSchema extends Constraint
      */
     private function normalizeJson($document)
     {
-        if (is_scalar($document) || \is_object($document)) {
+        if (\is_scalar($document) || \is_object($document)) {
             return $document;
         }
 
