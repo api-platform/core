@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -80,12 +81,17 @@ trait EagerLoadingTrait
 
                 if (false !== strpos((string) $part, $alias.'.')) {
                     $fields = explode('.', $fieldPath);
-                    $clonedClassMetadata = clone $classMetadata;
+                    $targetEntityClassMetadata = $classMetadata;
                     foreach ($fields as $field) {
-                        $mapping = $clonedClassMetadata->getAssociationMapping($field);
+                        try {
+                            $mapping = $targetEntityClassMetadata->getAssociationMapping($field);
+                        } catch (MappingException $e) {
+                            // If no mapping information on one of the fields, we continue to the next alias.
+                            continue 2;
+                        }
                         $fieldId = $field.'-'.$mapping['targetEntity'];
                         if (\in_array($fieldId, $checked, true)) {
-                            $clonedClassMetadata = $em->getClassMetadata($mapping['targetEntity']);
+                            $targetEntityClassMetadata = $em->getClassMetadata($mapping['targetEntity']);
                             continue;
                         }
                         $checked[] = $fieldId;
@@ -95,7 +101,7 @@ trait EagerLoadingTrait
                         ) {
                             return true;
                         }
-                        $clonedClassMetadata = $em->getClassMetadata($mapping['targetEntity']);
+                        $targetEntityClassMetadata = $em->getClassMetadata($mapping['targetEntity']);
                     }
                 }
             }
