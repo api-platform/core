@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Symfony\EventListener\ValidatorInterface;
+use ApiPlatform\Validator\ValidatorInterface;
 
 /**
  * Validate stage of GraphQL resolvers.

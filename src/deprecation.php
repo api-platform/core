@@ -274,7 +274,7 @@ spl_autoload_register(function ($className) use ($deprecatedInterfaces) {
 
         // Bridge\Symfony\Validator
         ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class => ApiPlatform\Symfony\Validator\EventListener\ValidationExceptionListener::class,
-        ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class => ApiPlatform\Symfony\Validator\Exception\ValidationException::class,
+        ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class => ApiPlatform\Validator\Exception\ValidationException::class,
         ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class => ApiPlatform\Symfony\Validator\Validator::class,
 
         // Cache

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\EventListener;
+namespace ApiPlatform\Validator;
 
-use ApiPlatform\Symfony\EventListener\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 
 /**
  * Validates an item.
