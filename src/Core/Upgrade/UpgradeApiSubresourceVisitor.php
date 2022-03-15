@@ -18,6 +18,7 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use ReflectionClass;
@@ -89,6 +90,13 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
                                 ApiResource::class
                             )
                         ),
+                    ]),
+                    new Node\Stmt\Use_([
+                        new Node\Stmt\UseUse(
+                            new Node\Name(
+                                Link::class
+                            )
+                        ),
                     ])
                 );
             }
@@ -99,62 +107,44 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
 
             foreach ($this->subresourceMetadata['uri_variables'] as $identifier => $resource) {
                 $identifierNodes = [
-                    new Node\Expr\ArrayItem(
-                        new Node\Expr\ClassConstFetch(
+                    'fromClass' => new Node\Expr\ClassConstFetch(
                             new Node\Name(
                                 ($resource['from_class'] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource['from_class']
                             ),
                             'class'
                         ),
-                        new Node\Scalar\String_('from_class')
-                    ),
-                    new Node\Expr\ArrayItem(
-                        new Node\Expr\Array_(
+                    'identifiers' => new Node\Expr\Array_(
                             isset($resource['identifiers'][0]) ? [
                                 new Node\Expr\ArrayItem(new Node\Scalar\String_($resource['identifiers'][0])),
                             ] : [],
-                            ['kind' => Node\Expr\Array_::KIND_SHORT]),
-                        new Node\Scalar\String_('identifiers')
-                    ),
+                            ['kind' => Node\Expr\Array_::KIND_SHORT]
+                        ),
                 ];
 
                 if (isset($resource['expanded_value'])) {
-                    $identifierNodes[] = new Node\Expr\ArrayItem(
-                        new Node\Scalar\String_('expanded_value'),
-                        new Node\Scalar\String_($resource['expanded_value'])
-                    );
+                    $identifierNodes['expandedValue'] = new Node\Scalar\String_($resource['expanded_value']);
                 }
 
                 if (isset($resource['from_property']) || isset($resource['to_property'])) {
-                    $identifierNodes[] = new Node\Expr\ArrayItem(
-                        new Node\Scalar\String_($resource['to_property'] ?? $resource['from_property']),
-                        new Node\Scalar\String_(isset($resource['to_property']) ? 'to_property' : 'from_property')
-                    );
+                    $identifierNodes[isset($resource['to_property']) ? 'toProperty' : 'fromProperty'] = new Node\Scalar\String_($resource['to_property'] ?? $resource['from_property']);
                 }
 
-                $identifiersNodeItems[] = new Node\Expr\ArrayItem(
-                    new Node\Expr\Array_(
-                        $identifierNodes,
-                        [
-                            'kind' => Node\Expr\Array_::KIND_SHORT,
-                        ]
-                    ),
+                $identifierNodeItems[] = new Node\Expr\ArrayItem(
+                    new Node\Expr\New_(new Node\Name('Link'), $this->arrayToArguments($identifierNodes)),
                     new Node\Scalar\String_($identifier)
                 );
             }
 
-            $identifiersNode = new Node\Expr\Array_($identifiersNodeItems, ['kind' => Node\Expr\Array_::KIND_SHORT]);
-
             $arguments = [
                 new Node\Arg(
-                    new Node\Scalar\String_(str_replace('.{_format}', '', $this->subresourceMetadata['path'])),
+                    new Node\Scalar\String_($this->subresourceMetadata['path']),
                     false,
                     false,
                     [],
                     new Node\Identifier('uriTemplate')
                 ),
                 new Node\Arg(
-                    $identifiersNode,
+                    new Node\Expr\Array_($identifierNodeItems, ['kind' => Node\Expr\Array_::KIND_SHORT]),
                     false,
                     false,
                     [],
@@ -279,5 +269,18 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
 
             $node->attrGroups[] = $apiResourceAttribute;
         }
+    }
+
+    /**
+     * @return Node\Arg[]
+     */
+    private function arrayToArguments(array $arguments)
+    {
+        $args = [];
+        foreach ($arguments as $key => $value) {
+            $args[] = new Node\Arg($value, false, false, [], new Node\Identifier($key));
+        }
+
+        return $args;
     }
 }
