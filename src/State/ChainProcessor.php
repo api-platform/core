@@ -35,17 +35,6 @@ final class ChainProcessor implements ProcessorInterface
         $this->processors = $processors;
     }
 
-    public function resumable(?string $operationName = null, array $context = []): bool
-    {
-        foreach ($this->processors as $processor) {
-            if ($processor->resumable($operationName, $context)) {
-                return $processor->resumable($operationName, $context);
-            }
-        }
-
-        return false;
-    }
-
     public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
         foreach ($this->processors as $processor) {

@@ -51,14 +51,6 @@ class ProcessorTest extends TestCase
         $this->assertTrue($processor->supports(new Dummy(), [], 'create'));
     }
 
-    public function testResumable()
-    {
-        $metadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $processor = new Processor($metadataFactoryProphecy->reveal(), $this->prophesize(MessageBusInterface::class)->reveal());
-        $this->assertFalse($processor->resumable());
-    }
-
     public function testSupportWithContext()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

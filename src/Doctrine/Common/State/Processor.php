@@ -31,11 +31,6 @@ final class Processor implements ProcessorInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    public function resumable(?string $operationName = null, array $context = []): bool
-    {
-        return false;
-    }
-
     public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
     {
         return null !== $this->getManager($data);
