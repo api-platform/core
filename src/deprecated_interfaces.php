@@ -97,7 +97,7 @@ return [
     ApiPlatform\Core\Serializer\Filter\FilterInterface::class => ApiPlatform\Serializer\Filter\FilterInterface::class,
     ApiPlatform\Core\Serializer\SerializerContextBuilderInterface::class => ApiPlatform\Serializer\SerializerContextBuilderInterface::class,
 
-    ApiPlatform\Core\Validator\ValidatorInterface::class => ApiPlatform\Symfony\EventListener\ValidatorInterface::class,
+    ApiPlatform\Core\Validator\ValidatorInterface::class => ApiPlatform\Validator\ValidatorInterface::class,
 
     // API:
     ApiPlatform\Core\Api\ResourceClassResolverInterface::class => ApiPlatform\Api\ResourceClassResolverInterface::class,

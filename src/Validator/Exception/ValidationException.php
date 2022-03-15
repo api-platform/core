@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\EventListener\Exception;
+namespace ApiPlatform\Validator\Exception;
 
 use ApiPlatform\Exception\RuntimeException;
 
