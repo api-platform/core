@@ -92,7 +92,7 @@ class UpgradeApiResourceCommandTest extends TestCase
             '+use ApiPlatform\\Metadata\\ApiResource',
             '+use ApiPlatform\\Metadata\\Get',
             "+#[ApiResource(graphQlOperations: [new Query(name: 'item_query'), new Mutation(name: 'update', normalizationContext: ['groups' => ['chicago', 'fakemanytomany']], denormalizationContext: ['groups' => ['friends']])], types: ['https://schema.org/Product'], normalizationContext: ['groups' => ['friends']], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'])]",
-            "+#[ApiResource(uriTemplate: '/related_dummies/{id}/id', uriVariables: ['id' => ['from_class' => self::class, 'identifiers' => ['id']]], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]",
+            "#[ApiResource(uriTemplate: '/related_dummies/{id}/id.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]",
         ];
 
         $display = $commandTester->getDisplay();
