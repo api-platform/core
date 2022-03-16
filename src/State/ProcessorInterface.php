@@ -21,12 +21,6 @@ namespace ApiPlatform\State;
 interface ProcessorInterface
 {
     /**
-     * Should we continue calling the next Processor or stop after this one?
-     * Defaults to stop the ChainProcessor if this interface is not implemented.
-     */
-    public function resumable(?string $operationName = null, array $context = []): bool;
-
-    /**
      * Whether this state handler supports the class/identifier tuple.
      *
      * @param mixed $data

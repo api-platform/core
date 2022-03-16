@@ -42,7 +42,7 @@ final class TraceableChainProcessor implements ProcessorInterface
             if (
                 ($this->processorsResponse[\get_class($processor)] = $found ? false : $processor->supports($data, $context))
                 &&
-                !($processor instanceof ProcessorInterface && $processor->resumable()) && !$found
+                !$found
             ) {
                 $found = true;
             }

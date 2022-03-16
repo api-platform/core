@@ -67,11 +67,6 @@ final class Processor implements ProcessorInterface
         );
     }
 
-    public function resumable(?string $operationName = null, array $context = []): bool
-    {
-        return false;
-    }
-
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
         if (\array_key_exists('operation', $context) && $context['operation']->isDelete()) {
