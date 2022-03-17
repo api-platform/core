@@ -74,8 +74,8 @@ final class AddTagsListener
         $resources = $request->attributes->get('_resources');
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false) || ($operation && $operation->isCollection())) {
             // Allows to purge collections
-            $identifiers = $this->getOperationIdentifiers($operation, $request->attributes->all(), $attributes['resource_class']);
-            $iri = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], $attributes['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $identifiers]) : $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
+            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
+            $iri = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], $attributes['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $uriVariables]) : $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
             $resources[$iri] = $iri;
         }
 

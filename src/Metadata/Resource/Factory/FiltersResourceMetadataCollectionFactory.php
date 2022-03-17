@@ -35,7 +35,6 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
     {
         $this->decorated = $decorated;
         if ($reader) {
-            trigger_deprecation('api-platform/core', '2.7', 'Use php attributes instead of doctrine annotations.');
             $this->reader = $reader;
         }
     }
@@ -58,6 +57,10 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
         }
 
         $filters = array_keys($this->readFilterAnnotations($reflectionClass, $this->reader));
+
+        if (\count($filters)) {
+            trigger_deprecation('api-platform/core', '2.7', 'Use php attributes instead of doctrine annotations to declare filters.');
+        }
 
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() as $operationName => $operation) {

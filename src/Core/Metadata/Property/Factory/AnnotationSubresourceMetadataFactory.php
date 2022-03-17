@@ -36,8 +36,6 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
     {
         $this->reader = $reader;
         $this->decorated = $decorated;
-
-        trigger_deprecation('api-platform/core', '2.7', 'Use alternate urls instead of declaring subresources on properties.');
     }
 
     /**
@@ -62,6 +60,8 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
 
             $annotation = $this->reader->getPropertyAnnotation($reflectionProperty, ApiSubresource::class);
             if ($annotation instanceof ApiSubresource) {
+                trigger_deprecation('api-platform/core', '2.7', sprintf('Declare a new resource instead of using ApiSubresource on the property "%s".', $property));
+
                 return $this->updateMetadata($annotation, $propertyMetadata, $resourceClass, $property);
             }
         }

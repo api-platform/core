@@ -35,21 +35,21 @@ final class ChainProvider implements ProviderInterface
         $this->providers = $providers;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         foreach ($this->providers as $provider) {
-            if ($provider->supports($resourceClass, $identifiers, $operationName, $context)) {
-                return $provider->provide($resourceClass, $identifiers, $operationName, $context);
+            if ($provider->supports($resourceClass, $uriVariables, $operationName, $context)) {
+                return $provider->provide($resourceClass, $uriVariables, $operationName, $context);
             }
         }
 
-        return \count($identifiers) ? null : [];
+        return \count($uriVariables) ? null : [];
     }
 
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         foreach ($this->providers as $provider) {
-            if ($provider->supports($resourceClass, $identifiers, $operationName, $context)) {
+            if ($provider->supports($resourceClass, $uriVariables, $operationName, $context)) {
                 return true;
             }
         }
