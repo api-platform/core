@@ -25,12 +25,12 @@ interface ProcessorInterface
      *
      * @param mixed $data
      */
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool;
+    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool;
 
     /**
      * Handle the state.
      *
      * @param mixed $data
      */
-    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = []);
+    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = []);
 }

@@ -41,10 +41,10 @@ final class TraceableChainProvider implements ProviderInterface
         return $this->context;
     }
 
-    private function traceProviders(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    private function traceProviders(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         foreach ($this->providers as $provider) {
-            $this->providersResponse[\get_class($provider)] = $provider->supports($resourceClass, $identifiers, $operationName, $context);
+            $this->providersResponse[\get_class($provider)] = $provider->supports($resourceClass, $uriVariables, $operationName, $context);
         }
     }
 
@@ -53,16 +53,16 @@ final class TraceableChainProvider implements ProviderInterface
         $this->context = $context;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
-        $this->traceProviders($resourceClass, $identifiers, $operationName, $context);
+        $this->traceProviders($resourceClass, $uriVariables, $operationName, $context);
         $this->traceContext($context);
 
-        return $this->decorated->provide($resourceClass, $identifiers, $operationName, $context);
+        return $this->decorated->provide($resourceClass, $uriVariables, $operationName, $context);
     }
 
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
-        return $this->decorated->supports($resourceClass, $identifiers, $operationName, $context);
+        return $this->decorated->supports($resourceClass, $uriVariables, $operationName, $context);
     }
 }

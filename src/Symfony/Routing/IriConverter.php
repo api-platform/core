@@ -88,12 +88,12 @@ final class IriConverter implements IriConverterInterface
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
         try {
-            $identifiers = $this->getOperationIdentifiers($operation, $parameters, $attributes['resource_class']);
+            $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
         } catch (InvalidIdentifierException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($item = $this->stateProvider->provide($attributes['resource_class'], $identifiers, $attributes['operation_name'], $context)) {
+        if ($item = $this->stateProvider->provide($attributes['resource_class'], $uriVariables, $attributes['operation_name'], $context)) {
             return $item;
         }
 

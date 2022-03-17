@@ -46,7 +46,7 @@ final class CollectionProvider implements ProviderInterface
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
@@ -59,7 +59,7 @@ final class CollectionProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        $this->handleLinks($aggregationBuilder, $identifiers, $context, $resourceClass, $operationName);
+        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
 
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
@@ -81,7 +81,7 @@ final class CollectionProvider implements ProviderInterface
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);
     }
 
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof DocumentManager) {
             return false;

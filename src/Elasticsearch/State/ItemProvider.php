@@ -50,7 +50,7 @@ final class ItemProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         try {
             $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
@@ -74,7 +74,7 @@ final class ItemProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
@@ -82,7 +82,7 @@ final class ItemProvider implements ProviderInterface
             $document = $this->client->get([
                 'index' => $documentMetadata->getIndex(),
                 'type' => $documentMetadata->getType(),
-                'id' => (string) reset($identifiers),
+                'id' => (string) reset($uriVariables),
             ]);
         } catch (Missing404Exception $e) {
             return null;

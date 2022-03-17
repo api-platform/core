@@ -26,10 +26,10 @@ interface ProviderInterface
      *
      * @return object|array|null
      */
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []);
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []);
 
     /**
      * Whether this state provider supports the class/identifier tuple.
      */
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool;
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool;
 }

@@ -77,12 +77,12 @@ final class WriteListener
 
         $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];
         try {
-            $identifiers = $this->getOperationIdentifiers($operation, $request->attributes->all(), $attributes['resource_class']);
+            $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
         } catch (InvalidIdentifierException $e) {
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
         }
 
-        if (!$this->processor->supports($controllerResult, $identifiers, $operation->getName(), $context)) {
+        if (!$this->processor->supports($controllerResult, $uriVariables, $operation->getName(), $context)) {
             return;
         }
 
@@ -90,7 +90,7 @@ final class WriteListener
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $persistResult = $this->processor->process($controllerResult, $identifiers, $operation->getName(), $context);
+                $persistResult = $this->processor->process($controllerResult, $uriVariables, $operation->getName(), $context);
 
                 if ($persistResult) {
                     $controllerResult = $persistResult;
@@ -113,7 +113,7 @@ final class WriteListener
 
                 break;
             case 'DELETE':
-                $this->processor->process($controllerResult, $identifiers, $operation->getName(), $context);
+                $this->processor->process($controllerResult, $uriVariables, $operation->getName(), $context);
                 $event->setControllerResult(null);
                 break;
         }

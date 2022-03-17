@@ -54,15 +54,15 @@ final class TraceableChainProcessor implements ProcessorInterface
         return false;
     }
 
-    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         $this->traceProcessors($data, $context);
 
-        return $this->decorated->process($data, $identifiers, $operationName, $context);
+        return $this->decorated->process($data, $uriVariables, $operationName, $context);
     }
 
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
-        return $this->decorated->supports($data, $identifiers, $operationName, $context);
+        return $this->decorated->supports($data, $uriVariables, $operationName, $context);
     }
 }
