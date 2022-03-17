@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Exception\PropertyNotFoundException;
+use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 
@@ -48,7 +48,7 @@ final class LegacyPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         try {
-            $legacyPropertyMetadata = $this->legacyPropertyMetadataFactory->create($resourceClass, $property, $options);
+            $legacyPropertyMetadata = $this->legacyPropertyMetadataFactory->create($resourceClass, $property, ['deprecate' => false] + $options);
         } catch (PropertyNotFoundException|ResourceClassNotFoundException $propertyNotFoundException) {
             return $propertyMetadata;
         }

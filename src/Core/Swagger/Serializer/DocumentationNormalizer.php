@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Swagger\Serializer;
 
+use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\FormatsProviderInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface;
@@ -38,6 +38,7 @@ use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\OpenApi;
+use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\PathResolver\OperationPathResolverInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;

@@ -13,10 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Api;
 
-use ApiPlatform\Metadata\Operation;
-
-trigger_deprecation('api-platform', '2.7', sprintf('%s is deprecated, an operation can be a collection using the %s::collection property.', OperationType::class, Operation::class));
-
 final class OperationType
 {
     public const ITEM = 'item';
