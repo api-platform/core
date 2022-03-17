@@ -49,11 +49,6 @@ final class TraceableChainProcessor implements ProcessorInterface
         }
     }
 
-    public function resumable(?string $operationName = null, array $context = []): bool
-    {
-        return false;
-    }
-
     public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         $this->traceProcessors($data, $context);

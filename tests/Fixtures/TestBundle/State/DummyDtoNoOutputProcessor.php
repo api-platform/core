@@ -32,14 +32,6 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function resumable(?string $operationName = null, array $context = []): bool
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
         $isOrm = true;
