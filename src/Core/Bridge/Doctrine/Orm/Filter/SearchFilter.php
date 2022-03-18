@@ -11,15 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
-use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
-use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,8 +34,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final
  */
 class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
 {
@@ -55,7 +54,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    protected function getIriConverter()
+    protected function getIriConverter(): IriConverterInterface
     {
         return $this->iriConverter;
     }

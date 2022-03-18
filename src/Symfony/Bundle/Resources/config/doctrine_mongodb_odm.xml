@@ -39,16 +39,6 @@
         </service>
 
         <!-- Filter -->
-        <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
-            <argument type="service" id="api_platform.property_accessor" />
-            <argument type="service" id="logger" on-invalid="ignore" />
-            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
-        </service>
-
-        <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
 
         <service id="api_platform.doctrine_mongodb.odm.boolean_filter" class="ApiPlatform\Doctrine\Odm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
