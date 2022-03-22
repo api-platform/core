@@ -18,6 +18,11 @@ use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\UuidRangeFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyUuidV6;
 
+/**
+ * @group mongodb
+ *
+ * @author Kai Dederichs <kai.dederichs@protonmail.com>
+ */
 class UuidRangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use UuidRangeFilterTestTrait;
