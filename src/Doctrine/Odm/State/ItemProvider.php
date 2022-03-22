@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\State;
 
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Exception\RuntimeException;
@@ -32,6 +33,7 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class ItemProvider implements ProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
     use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
@@ -69,6 +71,10 @@ final class ItemProvider implements ProviderInterface
         $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operationName, $context);
 
             if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {

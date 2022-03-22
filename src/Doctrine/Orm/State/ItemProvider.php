@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\State;
 
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
@@ -31,6 +32,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class ItemProvider implements ProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
     use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
@@ -69,6 +71,10 @@ final class ItemProvider implements ProviderInterface
         $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operationName, $context);
 
             if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {

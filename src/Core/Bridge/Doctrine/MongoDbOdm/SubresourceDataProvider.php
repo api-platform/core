@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -46,7 +45,6 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class SubresourceDataProvider implements SubresourceDataProviderInterface
 {
-    use CacheableSupportsExtensionTrait;
     use IdentifierManagerTrait;
 
     private $managerRegistry;
@@ -122,10 +120,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         if (true === $context['collection']) {
             foreach ($this->collectionExtensions as $extension) {
-                if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
-                    continue;
-                }
-
                 $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
                 if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                     return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
@@ -133,10 +127,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             }
         } else {
             foreach ($this->itemExtensions as $extension) {
-                if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
-                    continue;
-                }
-
                 $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);
                 if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                     return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);

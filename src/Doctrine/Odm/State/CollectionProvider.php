@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\State;
 
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
@@ -30,6 +31,7 @@ use Doctrine\Persistence\ObjectRepository;
  */
 final class CollectionProvider implements ProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
     use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
@@ -62,6 +64,10 @@ final class CollectionProvider implements ProviderInterface
         $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
 
         foreach ($this->collectionExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
 
             if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {

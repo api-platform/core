@@ -14,15 +14,17 @@ trait CacheableSupportsExtensionTrait
             return true;
         }
 
-        $extensionType = \get_class($extension);
-
-        if ($extension->hasCacheableSupportsMethod()) {
-            $operationName = $operationName ?? '';
-
-            return $this->extensionCache[$resourceClass][$operationName][$extensionType] ?? ($this->extensionCache[$resourceClass][$operationName][$extensionType] = $extension->supports($resourceClass, $operationName, $context));
+        if (!$extension->hasCacheableSupportsMethod()) {
+            return $extension->supports($resourceClass, $operationName, $context);
         }
 
+        $extensionType = \get_class($extension);
+        $operationName = $operationName ?? '';
 
-        return $extension->supports($resourceClass, $operationName, $context);
+        if (isset($this->extensionCache[$resourceClass][$operationName][$extensionType])) {
+            return $this->extensionCache[$resourceClass][$operationName][$extensionType];
+        }
+
+        return $this->extensionCache[$resourceClass][$operationName][$extensionType] = $extension->supports($resourceClass, $operationName, $context);
     }
 }

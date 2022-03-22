@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\State;
 
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
@@ -32,6 +33,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class CollectionProvider implements ProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
     use LinksHandlerTrait;
 
     private $resourceMetadataCollectionFactory;
@@ -65,6 +67,10 @@ final class CollectionProvider implements ProviderInterface
         $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->collectionExtensions as $extension) {
+            if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
 
             if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {

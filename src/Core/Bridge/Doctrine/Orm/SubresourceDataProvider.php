@@ -15,7 +15,6 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -39,7 +38,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class SubresourceDataProvider implements SubresourceDataProviderInterface
 {
-    use CacheableSupportsExtensionTrait;
     use IdentifierManagerTrait;
 
     private $managerRegistry;
@@ -102,10 +100,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                     continue;
                 }
 
-                if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
-                    continue;
-                }
-
                 $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
                 if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                     return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
@@ -113,10 +107,6 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
             }
         } else {
             foreach ($this->itemExtensions as $extension) {
-                if (!$this->extensionSupports($extension, $resourceClass, $operationName, $context)) {
-                    continue;
-                }
-
                 $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
                 if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                     return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);

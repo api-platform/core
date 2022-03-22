@@ -16,7 +16,6 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
-use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
@@ -37,8 +36,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class CollectionDataProvider implements ContextAwareCollectionDataProviderInterface, RestrictedDataProviderInterface
 {
-    use CacheableSupportsExtensionTrait;
-
     private $client;
     private $documentMetadataFactory;
     private $identifierExtractor;
@@ -117,10 +114,6 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
-            if (!$this->extensionSupports($collectionExtension, $resourceClass, $operationName, $context)) {
-                continue;
-            }
-
             $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
         }
 

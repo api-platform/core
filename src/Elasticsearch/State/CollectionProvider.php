@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
+use ApiPlatform\Core\Extension\CacheableSupportsExtensionTrait;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
@@ -34,6 +35,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class CollectionProvider implements ProviderInterface
 {
+    use CacheableSupportsExtensionTrait;
+
     private $client;
     private $documentMetadataFactory;
     private $denormalizer;
@@ -89,6 +92,10 @@ final class CollectionProvider implements ProviderInterface
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
+            if (!$this->extensionSupports($collectionExtension, $resourceClass, $operationName, $context)) {
+                continue;
+            }
+
             $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
         }
 
