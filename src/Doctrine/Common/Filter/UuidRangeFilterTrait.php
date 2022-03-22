@@ -50,8 +50,10 @@ trait UuidRangeFilterTrait
 
     /**
      * Normalize the value.
+     *
+     * @return string|null
      */
-    protected function normalizeValue(string $value, string $operator): ?string
+    protected function normalizeValue(string $value, string $operator)
     {
         if (!$this->isValidUid($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
