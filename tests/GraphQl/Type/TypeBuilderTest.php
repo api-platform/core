@@ -28,12 +28,14 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -494,16 +496,18 @@ class TypeBuilderTest extends TestCase
 
         /** @var NonNull $nonNullableEdgesType */
         $nonNullableEdgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
+        $this->assertInstanceOf(NonNull::class, $nonNullableEdgesType);
+
         /** @var ListOfType $edgesType */
         $edgesType = $nonNullableEdgesType->getWrappedType();
+        $this->assertInstanceOf(ListOfType::class, $edgesType);
+
         /** @var NonNull $nonNullWrappedType */
         $nonNullWrappedType = $edgesType->getWrappedType();
+        $this->assertInstanceOf(NonNull::class, $nonNullWrappedType);
+
         /** @var ObjectType $wrappedType */
         $wrappedType = $nonNullWrappedType->getWrappedType();
-
-        $this->assertInstanceOf(NonNull::class, $nonNullableEdgesType);
-        $this->assertInstanceOf(ListOfType::class, $edgesType);
-        $this->assertInstanceOf(NonNull::class, $nonNullWrappedType);
         $this->assertInstanceOf(ObjectType::class, $wrappedType);
         $this->assertSame('StringEdge', $wrappedType->name);
         $this->assertSame('Edge of String.', $wrappedType->description);
@@ -560,6 +564,26 @@ class TypeBuilderTest extends TestCase
         $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
         $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
         $this->assertArrayHasKey('paginationInfo', $resourcePaginatedCollectionTypeFields);
+
+        /** @var FieldDefinition $nonNullCollectionListDefinition */
+        $nonNullCollectionListDefinition = $resourcePaginatedCollectionTypeFields['collection'];
+        $this->assertInstanceOf(FieldDefinition::class, $nonNullCollectionListDefinition);
+
+        /** @var NonNull $nonNullCollectionList */
+        $nonNullCollectionList = $nonNullCollectionListDefinition->getType();
+        $this->assertInstanceOf(NonNull::class, $nonNullCollectionList);
+
+        /** @var ListOfType $collectionList */
+        $collectionList = $nonNullCollectionList->getWrappedType();
+        $this->assertInstanceOf(ListOfType::class, $collectionList);
+
+        /** @var NonNull $nonNullCollectionItem */
+        $nonNullCollectionItem = $collectionList->getWrappedType();
+        $this->assertInstanceOf(NonNull::class, $nonNullCollectionItem);
+
+        $collectionItem = $nonNullCollectionItem->getWrappedType();
+        $this->assertInstanceOf(StringType::class, $collectionItem);
+
 
         /** @var NonNull $paginationInfoType */
         $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
