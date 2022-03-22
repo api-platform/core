@@ -905,7 +905,7 @@ jobs:
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@uuid/v6
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb --no-interaction --tags='~@uuid/v6'
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1
