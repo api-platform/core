@@ -474,7 +474,7 @@ class TypeBuilderTest extends TestCase
     {
         $this->typesContainerProphecy->has('StringCursorConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringCursorConnection', Argument::type(ObjectType::class))->shouldBeCalled();
-        $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('StringEdge', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->resourceMetadataCollectionFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('StringResourceClass', [
             (new ApiResource())->withGraphQlOperations([
@@ -492,16 +492,27 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('pageInfo', $resourcePaginatedCollectionTypeFields);
         $this->assertArrayHasKey('totalCount', $resourcePaginatedCollectionTypeFields);
 
+        /** @var NonNull $nonNullableEdgesType */
+        $nonNullableEdgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
         /** @var ListOfType $edgesType */
-        $edgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
+        $edgesType = $nonNullableEdgesType->getWrappedType();
+        /** @var NonNull $nonNullWrappedType */
+        $nonNullWrappedType = $edgesType->getWrappedType();
         /** @var ObjectType $wrappedType */
-        $wrappedType = $edgesType->getWrappedType();
+        $wrappedType = $nonNullWrappedType->getWrappedType();
+
+        $this->assertInstanceOf(NonNull::class, $nonNullableEdgesType);
+        $this->assertInstanceOf(ListOfType::class, $edgesType);
+        $this->assertInstanceOf(NonNull::class, $nonNullWrappedType);
+        $this->assertInstanceOf(ObjectType::class, $wrappedType);
         $this->assertSame('StringEdge', $wrappedType->name);
         $this->assertSame('Edge of String.', $wrappedType->description);
+
         $edgeObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('node', $edgeObjectTypeFields);
         $this->assertArrayHasKey('cursor', $edgeObjectTypeFields);
-        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['node']->getType());
+        $this->assertInstanceOf(NonNull::class, $edgeObjectTypeFields['node']->getType());
+        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['node']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $edgeObjectTypeFields['cursor']->getType());
         $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['cursor']->getType()->getWrappedType());
 
