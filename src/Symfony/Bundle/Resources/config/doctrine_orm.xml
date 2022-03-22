@@ -62,6 +62,14 @@
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\RangeFilter" alias="api_platform.doctrine.orm.range_filter" />
 
+        <service id="api_platform.doctrine.orm.uuid_range_filter" class="ApiPlatform\Doctrine\Orm\Filter\UuidRangeFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument>null</argument>
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
+        </service>
+        <service id="ApiPlatform\Doctrine\Orm\Filter\UuidRangeFilter" alias="api_platform.doctrine.orm.uuid_range_filter" />
+
         <service id="api_platform.doctrine.orm.date_filter" class="ApiPlatform\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument>null</argument>

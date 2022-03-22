@@ -71,6 +71,10 @@ services:
         parent:    'api_platform.doctrine_mongodb.odm.search_filter'
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.mongodb.name' } ]
+    app.my_dummy_resource.mongodb.uuid_range_filter:
+        parent: 'api_platform.doctrine_mongodb.odm.uuid_range_filter'
+        arguments: [ { 'id': ~ } ]
+        tags: [ { name: 'api_platform.filter', id: 'my_dummy.mongodb.uuid_range' } ]
 
     ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
         public: false

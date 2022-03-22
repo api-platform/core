@@ -75,6 +75,11 @@ services:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
+        
+    app.my_dummy_resource.uuid_range_filter:
+        parent:    'api_platform.doctrine.orm.uuid_range_filter'
+        arguments: [ { 'id': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.uuid_range' } ]
 
     ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\GeneratorDataProvider:
         public: false

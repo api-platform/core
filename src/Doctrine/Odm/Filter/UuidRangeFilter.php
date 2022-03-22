@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\UuidRangeFilterTrait;
-use ApiPlatform\Doctrine\Orm\Filter\AbstractRangeFilter;
 
 /**
  * Filters the collection by range using UUIDs (UUID v6).

@@ -163,6 +163,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoMany;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SoManyUids;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
@@ -177,6 +178,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Ramsey\Uuid\Nonstandard\UuidV6;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -290,6 +292,35 @@ final class DoctrineContext implements Context
             $this->manager->persist($dummy);
         }
 
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb of these so many uid objects
+     */
+    public function thereAreOfTheseSoManyUidObjects(int $nb)
+    {
+        $ids = [
+            '1ec5c128-f3d2-643a-8b17-68fef707f0bd', // 1
+            '1ec5c128-f3d3-6cf4-a77e-68fef707f0bd',
+            '1ec5c128-f3d3-6e02-8834-68fef707f0bd',
+            '1ec5c128-f3d3-6ef2-b5f3-68fef707f0bd',
+            '1ec5c128-f3d3-6fc4-8b52-68fef707f0bd',
+            '1ec5c128-f3d4-6096-b820-68fef707f0bd',
+            '1ec5c128-f3d4-61ae-bb3c-68fef707f0bd', // 7
+            '1ec5c128-f3d4-62d0-b528-68fef707f0bd',
+            '1ec5c128-f3d4-63f2-b845-68fef707f0bd',
+            '1ec5c128-f3d4-6514-8d2b-68fef707f0bd', // 10
+        ];
+
+        for ($i = 1; $i <= $nb; ++$i) {
+            $ids[] = UuidV6::uuid6()->toString();
+            $id = $ids[$i - 1] ?? null;
+            $dummy = new SoManyUids($id);
+            $dummy->content = 'Many #'.$i;
+
+            $this->manager->persist($dummy);
+        }
         $this->manager->flush();
     }
 

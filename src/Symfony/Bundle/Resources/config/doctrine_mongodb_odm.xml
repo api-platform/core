@@ -94,6 +94,13 @@
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Filter\RangeFilter" alias="api_platform.doctrine_mongodb.odm.range_filter" />
 
+        <service id="api_platform.doctrine_mongodb.odm.uuid_range_filter" class="ApiPlatform\Doctrine\Odm\Filter\UuidRangeFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\UuidRangeFilter" alias="api_platform.doctrine_mongodb.odm.uuid_range_filter" />
+
         <!-- Doctrine Aggregation extensions -->
 
         <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.filter" class="ApiPlatform\Doctrine\Odm\Extension\FilterExtension" public="false">

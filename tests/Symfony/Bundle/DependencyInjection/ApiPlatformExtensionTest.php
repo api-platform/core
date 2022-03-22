@@ -1105,6 +1105,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.order_filter',
             'api_platform.doctrine.orm.range_filter',
+            'api_platform.doctrine.orm.uuid_range_filter',
             'api_platform.doctrine.orm.query_extension.eager_loading',
             'api_platform.doctrine.orm.query_extension.filter',
             'api_platform.doctrine.orm.query_extension.filter_eager_loading',
