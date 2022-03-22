@@ -13,17 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\UuidRangeFilterTrait;
 
 /**
- * Filters the collection by range using numbers.
+ * Filters the collection by range using UUIDs.
  *
- * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Kai Dederichs <kai.dederichs@protonmail.com>
- *
- * @final
  */
-class RangeFilter extends AbstractRangeFilter
+final class UuidRangeFilter extends AbstractRangeFilter
 {
-    use RangeFilterTrait;
+    use UuidRangeFilterTrait;
 }
