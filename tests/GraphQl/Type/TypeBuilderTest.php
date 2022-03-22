@@ -584,7 +584,6 @@ class TypeBuilderTest extends TestCase
         $collectionItem = $nonNullCollectionItem->getWrappedType();
         $this->assertInstanceOf(StringType::class, $collectionItem);
 
-
         /** @var NonNull $paginationInfoType */
         $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
         /** @var ObjectType $wrappedType */
