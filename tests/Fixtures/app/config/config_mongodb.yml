@@ -14,14 +14,17 @@ doctrine_mongodb:
     default_database: '%env(resolve:MONGODB_DB)%'
     document_managers:
         default:
-            auto_mapping: true
+            mappings:
+                TestBundle:
+                    type: 'annotation'
+                    dir: '%kernel.project_dir%/../TestBundle/Document'
+                    prefix: 'ApiPlatform\Tests\Fixtures\TestBundle\Document'
 
 api_platform:
     doctrine: false
     mapping:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
-            - '%kernel.project_dir%/config/api_resources_mongodb_odm.yaml'
 
 services:
     app.my_dummy_resource.mongodb.boolean_filter:
@@ -77,6 +80,15 @@ services:
         tags:
             -   name: 'api_platform.item_data_provider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider'
+        public: false
+        arguments:
+            $managerRegistry: '@doctrine_mongodb'
+            $orm: false
+        tags:
+            -  name: 'api_platform.state_provider'
+
     ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
         public: false
         arguments:
@@ -84,6 +96,15 @@ services:
             $orm: false
         tags:
             -   name: 'api_platform.item_data_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider'
+        public: false
+        arguments:
+            $managerRegistry: '@doctrine_mongodb'
+            $orm: false
+        tags:
+            -  name: 'api_platform.state_provider'
 
     related_questions.state_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'

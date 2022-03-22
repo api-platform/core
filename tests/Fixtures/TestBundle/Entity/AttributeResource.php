@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -36,7 +36,7 @@ final class AttributeResource
     /**
      * @var ?Dummy
      */
-    #[link('dummyId')]
+    #[Link('dummyId')]
     public $dummy = null;
 
     /**

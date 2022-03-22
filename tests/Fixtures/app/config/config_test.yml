@@ -7,7 +7,6 @@ api_platform:
     mapping:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
-            - '%kernel.project_dir%/config/api_resources_orm.yaml'
 
 services:
     ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\EntityManager:
@@ -89,12 +88,28 @@ services:
         tags:
             -   name: 'api_platform.item_data_provider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider'
+        public: false
+        arguments:
+            $managerRegistry: '@doctrine'
+        tags:
+            -  name: 'api_platform.state_provider'
+
     ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
         public: false
         arguments:
             $managerRegistry: '@doctrine'
         tags:
             -   name: 'api_platform.item_data_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider'
+        public: false
+        arguments:
+            $managerRegistry: '@doctrine'
+        tags:
+            -  name: 'api_platform.state_provider'
 
     app.dummy_dto_no_input.data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
@@ -106,6 +121,12 @@ services:
     app.dummy_dto_no_output_data_persister:
         class: ApiPlatform\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
         arguments: ['@doctrine']
+        public: false
+        tags:
+            -  { name: 'api_platform.data_persister' }
+
+    app.user_reset_password_data_persister:
+        class: ApiPlatform\Tests\Fixtures\TestBundle\DataPersister\UserResetPasswordDataPersister
         public: false
         tags:
             -  { name: 'api_platform.data_persister' }

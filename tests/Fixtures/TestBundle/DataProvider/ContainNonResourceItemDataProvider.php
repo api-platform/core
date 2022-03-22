@@ -34,7 +34,7 @@ class ContainNonResourceItemDataProvider implements ItemDataProviderInterface, R
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-        if (!is_scalar($id)) {
+        if (!\is_scalar($id)) {
             throw new \InvalidArgumentException('The id must be a scalar.');
         }
 

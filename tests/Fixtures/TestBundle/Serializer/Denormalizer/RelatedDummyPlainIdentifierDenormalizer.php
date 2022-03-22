@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy as RelatedDummyEntity;
@@ -34,11 +35,11 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
     use DenormalizerAwareTrait;
 
     /**
-     * @var IriConverterInterface
+     * @var IriConverterInterface|LegacyIriConverterInterface
      */
     private $iriConverter;
 
-    public function __construct(IriConverterInterface $iriConverter)
+    public function __construct($iriConverter)
     {
         $this->iriConverter = $iriConverter;
     }
@@ -50,6 +51,12 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
+        if ($this->iriConverter instanceof LegacyIriConverterInterface) {
+            $data['thirdLevel'] = '/third_levels/'.$data['thirdLevel'];
+
+            return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
+        }
+
         $iriConverterContext = ['identifiers_values' => ['id' => $data['thirdLevel']], 'force_collection' => false, 'operation' => null] + $context;
 
         $data['thirdLevel'] = $this->iriConverter->getIriFromResourceClass(

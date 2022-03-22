@@ -18,15 +18,14 @@ use ApiPlatform\Core\Identifier\IdentifierConverter;
 use ApiPlatform\Core\Identifier\Normalizer\DateTimeIdentifierDenormalizer;
 use ApiPlatform\Core\Identifier\Normalizer\IntegerDenormalizer;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Metadata\ApiProperty;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @group legacy
  */
 class IdentifierConverterTest extends TestCase
 {
@@ -42,9 +41,9 @@ class IdentifierConverterTest extends TestCase
 
         $class = 'Dummy';
 
-        $integerPropertyMetadata = (new ApiProperty())->withIdentifier(true)->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]);
-        $identifierPropertyMetadata = (new ApiProperty())->withIdentifier(true);
-        $dateIdentifierPropertyMetadata = (new ApiProperty())->withIdentifier(true)->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]);
+        $integerPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
+        $identifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true);
+        $dateIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create($class, 'a')->shouldBeCalled()->willReturn($integerPropertyMetadata);
@@ -68,7 +67,7 @@ class IdentifierConverterTest extends TestCase
         $identifier = ['funkyid' => '2015-04-05'];
         $class = 'Dummy';
 
-        $dateIdentifierPropertyMetadata = (new ApiProperty())->withIdentifier(true)->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class)]);
+        $dateIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create($class, 'funkyid')->shouldBeCalled()->willReturn($dateIdentifierPropertyMetadata);
@@ -87,7 +86,7 @@ class IdentifierConverterTest extends TestCase
         $identifier = ['id' => '42'];
         $class = 'Dummy';
 
-        $integerIdentifierPropertyMetadata = (new ApiProperty())->withIdentifier(true)->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]);
+        $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create($class, 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);
@@ -106,7 +105,7 @@ class IdentifierConverterTest extends TestCase
         $identifier = ['id' => '42'];
         $class = 'Dummy';
 
-        $integerIdentifierPropertyMetadata = (new ApiProperty())->withIdentifier(true)->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]);
+        $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create($class, 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);
@@ -127,7 +126,7 @@ class IdentifierConverterTest extends TestCase
     {
         $identifier = ['id' => '42', 'book' => '21'];
 
-        $integerIdentifierPropertyMetadata = (new ApiProperty())->withIdentifier(true)->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]);
+        $integerIdentifierPropertyMetadata = (new PropertyMetadata())->withIdentifier(true)->withType(new Type(Type::BUILTIN_TYPE_INT));
 
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactory->create('Author', 'id')->shouldBeCalled()->willReturn($integerIdentifierPropertyMetadata);

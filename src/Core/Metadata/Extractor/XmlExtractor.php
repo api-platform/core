@@ -16,6 +16,8 @@ namespace ApiPlatform\Core\Metadata\Extractor;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Extractor\AbstractResourceExtractor;
 use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
+use ApiPlatform\Metadata\Extractor\XmlPropertyExtractor;
+use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use Symfony\Component\Config\Util\XmlUtils;
 
 /**
@@ -60,7 +62,20 @@ final class XmlExtractor extends AbstractResourceExtractor implements PropertyEx
             /** @var \SimpleXMLElement $xml */
             $xml = simplexml_import_dom(XmlUtils::loadFile($path, self::RESOURCE_SCHEMA));
         } catch (\InvalidArgumentException $e) {
-            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            // Test if this is a new resource
+            try {
+                $xml = XmlUtils::loadFile($path, XmlResourceExtractor::SCHEMA);
+
+                return;
+            } catch (\InvalidArgumentException $newResourceException) {
+                try {
+                    $xml = XmlUtils::loadFile($path, XmlPropertyExtractor::SCHEMA);
+
+                    return;
+                } catch (\InvalidArgumentException $newPropertyException) {
+                    throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+                }
+            }
         }
 
         foreach ($xml->resource as $resource) {

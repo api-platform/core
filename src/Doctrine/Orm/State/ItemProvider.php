@@ -47,14 +47,14 @@ final class ItemProvider implements ProviderInterface
         $this->itemExtensions = $itemExtensions;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData) {
-            return $manager->getReference($resourceClass, $identifiers);
+            return $manager->getReference($resourceClass, $uriVariables);
         }
 
         /** @var EntityRepository $repository */
@@ -66,10 +66,10 @@ final class ItemProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operationName, $context);
 
             if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
@@ -79,7 +79,7 @@ final class ItemProvider implements ProviderInterface
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface) {
             return false;
@@ -87,6 +87,6 @@ final class ItemProvider implements ProviderInterface
 
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
 
-        return !($operation->isCollection() ?? false);
+        return !($operation->getExtraProperties()['is_legacy_subresource'] ?? false) && !($operation->isCollection() ?? false);
     }
 }

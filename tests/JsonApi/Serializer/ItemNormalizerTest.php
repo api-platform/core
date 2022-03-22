@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonApi\Serializer;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
@@ -27,6 +27,7 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -120,6 +121,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(10);
@@ -174,7 +176,7 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['id', 'name', 'inherited', '\bad_property']));
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(new PropertyMetadata(null, null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn(new PropertyMetadata(null, null, true, null, null, null, null, true));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'inherited', [])->willReturn(new PropertyMetadata(null, null, true, null, null, null, null, null, null, 'foo'));
@@ -186,6 +188,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(10);
@@ -298,6 +301,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($dummy, 'bar')->willThrow(new NoSuchPropertyException());
@@ -383,6 +387,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
@@ -471,6 +476,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
@@ -527,6 +533,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
@@ -580,6 +587,7 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 

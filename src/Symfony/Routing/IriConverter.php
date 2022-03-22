@@ -15,9 +15,9 @@ namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
@@ -48,9 +48,8 @@ final class IriConverter implements IriConverterInterface
     private $router;
     private $identifiersExtractor;
     private $resourceMetadataCollectionFactory;
-    private $decorated;
 
-    public function __construct(ProviderInterface $stateProvider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null, \ApiPlatform\Core\Api\IriConverterInterface $decorated)
+    public function __construct(ProviderInterface $stateProvider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
     {
         $this->stateProvider = $stateProvider;
         $this->router = $router;
@@ -60,7 +59,6 @@ final class IriConverter implements IriConverterInterface
         // For the ResourceClassInfoTrait
         $this->resourceClassResolver = $resourceClassResolver;
         $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
-        $this->decorated = $decorated;
     }
 
     /**
@@ -83,13 +81,6 @@ final class IriConverter implements IriConverterInterface
 
         $context['operation'] = $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
-        if (
-            ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
-            ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false)
-        ) {
-            return $this->decorated->getItemFromIri($iri, $context);
-        }
-
         if ($operation->isCollection()) {
             throw new InvalidArgumentException(sprintf('The iri "%s" references a collection not an item.', $iri));
         }
@@ -97,12 +88,12 @@ final class IriConverter implements IriConverterInterface
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
         try {
-            $identifiers = $this->getOperationIdentifiers($operation, $parameters, $attributes['resource_class']);
+            $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
         } catch (InvalidIdentifierException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($item = $this->stateProvider->provide($attributes['resource_class'], $identifiers, $attributes['operation_name'], $context)) {
+        if ($item = $this->stateProvider->provide($attributes['resource_class'], $uriVariables, $attributes['operation_name'], $context)) {
             return $item;
         }
 

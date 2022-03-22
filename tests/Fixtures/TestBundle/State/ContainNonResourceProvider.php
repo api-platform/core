@@ -29,7 +29,7 @@ class ContainNonResourceProvider implements ProviderInterface
     public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
     {
         $id = $identifiers['id'] ?? null;
-        if (!is_scalar($id)) {
+        if (!\is_scalar($id)) {
             throw new \InvalidArgumentException('The id must be a scalar.');
         }
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\GraphQl\Type;
 
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface as TypesContainerLegacyInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
@@ -40,9 +41,10 @@ final class TypeConverter implements TypeConverterInterface
     /** @var TypesContainerLegacyInterface|TypesContainerInterface */
     private $typesContainer;
     private $resourceMetadataFactory;
+    /** @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface */
     private $propertyMetadataFactory;
 
-    public function __construct(TypeBuilderInterface $typeBuilder, $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory = null)
+    public function __construct(TypeBuilderInterface $typeBuilder, $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory, $propertyMetadataFactory = null)
     {
         $this->typeBuilder = $typeBuilder;
         $this->typesContainer = $typesContainer;

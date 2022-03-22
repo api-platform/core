@@ -41,7 +41,7 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
      *
      * @throws InvalidArgumentException
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string
     {
         if (\func_num_args() >= 4) {
             $operationName = (string) func_get_arg(3);
@@ -57,8 +57,10 @@ final class RouterOperationPathResolver implements OperationPathResolverInterfac
             throw new InvalidArgumentException('Subresource operations are not supported by the RouterOperationPathResolver without a route name.');
         } elseif (null === $operationName) {
             return $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
+        } elseif (isset($operation['uri_template'])) {
+            return $operation['uri_template'];
         } else {
-            $routeName = isset($operation['uri_template']) ? $operationName : RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
+            $routeName = RouteNameGenerator::generate($operationName, $resourceShortName, $operationType);
         }
 
         if (!$route = $this->router->getRouteCollection()->get($routeName)) {

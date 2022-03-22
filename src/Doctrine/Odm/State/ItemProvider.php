@@ -48,14 +48,14 @@ final class ItemProvider implements ProviderInterface
         $this->itemExtensions = $itemExtensions;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData) {
-            return $manager->getReference($resourceClass, reset($identifiers));
+            return $manager->getReference($resourceClass, reset($uriVariables));
         }
 
         /** @var ObjectRepository $repository */
@@ -66,10 +66,10 @@ final class ItemProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        $this->handleLinks($aggregationBuilder, $identifiers, $context, $resourceClass, $operationName);
+        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operationName, $context);
 
             if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
@@ -87,7 +87,7 @@ final class ItemProvider implements ProviderInterface
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions)->current() ?: null;
     }
 
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof DocumentManager) {
             return false;

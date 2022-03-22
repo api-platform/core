@@ -40,6 +40,12 @@ class SwaggerCommandTest extends KernelTestCase
         $application->setAutoExit(false);
 
         $this->tester = new ApplicationTester($application);
+
+        if (false === static::$kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer')) {
+            $this->markTestSkipped(
+                'Swagger is not compatible with the new metadata.'
+            );
+        }
     }
 
     /**
@@ -67,7 +73,6 @@ class SwaggerCommandTest extends KernelTestCase
         $expected = <<<YAML
   /dummy_cars:
     get:
-      operationId: api_dummy_cars_get_collection
       tags:
         - DummyCar
 YAML;
@@ -79,7 +84,6 @@ YAML;
   '/dummy_cars/{id}':
     get:
       tags: []
-      operationId: api_dummy_cars_get_item
 YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');

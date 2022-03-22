@@ -48,7 +48,7 @@ final class CollectionProvider implements ProviderInterface
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
@@ -62,7 +62,7 @@ final class CollectionProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleLinks($queryBuilder, $identifiers, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operationName);
 
         foreach ($this->collectionExtensions as $extension) {
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
@@ -75,7 +75,7 @@ final class CollectionProvider implements ProviderInterface
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface) {
             return false;

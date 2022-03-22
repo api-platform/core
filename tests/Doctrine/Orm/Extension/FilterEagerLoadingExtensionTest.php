@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Api\ResourceClassResolver;
+use ApiPlatform\Api\ResourceClassResolver;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
@@ -233,7 +233,9 @@ SQL;
             ->from(DummyCar::class, 'o')
             ->leftJoin('o.colors', 'colors', 'ON', 'o.id = colors.car AND colors.id IN (1,2,3)')
             ->where('o.colors = :foo')
-            ->setParameter('foo', 1);
+            ->andWhere('o.info.name = :bar')
+            ->setParameter('foo', 1)
+            ->setParameter('bar', 'a');
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
@@ -249,7 +251,7 @@ LEFT JOIN o.colors colors ON o.id = colors.car AND colors.id IN (1,2,3)
 WHERE o IN(
   SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
   LEFT JOIN o_2.colors colors_2 ON o_2.id = colors_2.car AND colors_2.id IN (1,2,3)
-  WHERE o_2.colors = :foo
+  WHERE o_2.colors = :foo AND o_2.info.name = :bar
 )
 SQL;
 

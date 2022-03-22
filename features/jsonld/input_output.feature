@@ -354,3 +354,27 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 400
     And the response should be in JSON
     And the JSON node "hydra:description" should be equal to "The input data is misformatted."
+
+  @!mongodb
+  Scenario: Reset password through an input DTO without DataTransformer 
+    When I send a "POST" request to "/user-reset-password" with body:
+    """
+    {
+      "email": "user@example.com"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "email" should be equal to "user@example.com"
+
+  @!mongodb
+  Scenario: Reset password with an invalid payload through an input DTO without DataTransformer 
+    And I send a "POST" request to "/user-reset-password" with body:
+    """
+    {
+      "email": "this is not an email"
+    }
+    """
+    Then the response status code should be 422
+    And the response should be in JSON

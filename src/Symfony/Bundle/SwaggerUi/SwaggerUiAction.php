@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,12 +37,12 @@ final class SwaggerUiAction
     private $openApiOptions;
     private $swaggerUiContext;
     private $formats;
-    /** @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface */
     private $resourceMetadataFactory;
     private $oauthClientId;
     private $oauthClientSecret;
+    private $oauthPkce;
 
-    public function __construct($resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null)
+    public function __construct($resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null, bool $oauthPkce = false)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->twig = $twig;
@@ -56,6 +54,7 @@ final class SwaggerUiAction
         $this->formats = $formats;
         $this->oauthClientId = $oauthClientId;
         $this->oauthClientSecret = $oauthClientSecret;
+        $this->oauthPkce = $oauthPkce;
 
         if (null === $this->twig) {
             throw new \RuntimeException('The documentation cannot be displayed since the Twig bundle is not installed. Try running "composer require symfony/twig-bundle".');
@@ -92,6 +91,7 @@ final class SwaggerUiAction
                 'scopes' => $this->openApiOptions->getOAuthScopes(),
                 'clientId' => $this->oauthClientId,
                 'clientSecret' => $this->oauthClientSecret,
+                'pkce' => $this->oauthPkce,
             ],
             'extraConfiguration' => $this->swaggerUiContext->getExtraConfiguration(),
         ];
@@ -102,16 +102,18 @@ final class SwaggerUiAction
 
             $metadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            $swaggerData['shortName'] = $metadata instanceof ResourceMetadata ? $metadata->getShortName() : $metadata[0]->getShortName();
-
-            if ($operationName = $request->attributes->get('_api_operation_name')) {
-                $swaggerData['operationId'] = $operationName;
-            } elseif (null !== $collectionOperationName = $request->attributes->get('_api_collection_operation_name')) {
-                $swaggerData['operationId'] = sprintf('%s%sCollection', $collectionOperationName, ucfirst($swaggerData['shortName']));
-            } elseif (null !== $itemOperationName = $request->attributes->get('_api_item_operation_name')) {
-                $swaggerData['operationId'] = sprintf('%s%sItem', $itemOperationName, ucfirst($swaggerData['shortName']));
-            } elseif (null !== $subresourceOperationContext = $request->attributes->get('_api_subresource_context')) {
-                $swaggerData['operationId'] = $subresourceOperationContext['operationId'];
+            if ($metadata instanceof ResourceMetadata) {
+                $swaggerData['shortName'] = $metadata->getShortName();
+                if (null !== $collectionOperationName = $request->attributes->get('_api_collection_operation_name')) {
+                    $swaggerData['operationId'] = sprintf('%s%sCollection', $collectionOperationName, ucfirst($swaggerData['shortName']));
+                } elseif (null !== $itemOperationName = $request->attributes->get('_api_item_operation_name')) {
+                    $swaggerData['operationId'] = sprintf('%s%sItem', $itemOperationName, ucfirst($swaggerData['shortName']));
+                } elseif (null !== $subresourceOperationContext = $request->attributes->get('_api_subresource_context')) {
+                    $swaggerData['operationId'] = $subresourceOperationContext['operationId'];
+                }
+            } else {
+                $swaggerData['shortName'] = $metadata[0]->getShortName();
+                $swaggerData['operationId'] = $request->attributes->get('_api_operation_name');
             }
 
             [$swaggerData['path'], $swaggerData['method']] = $this->getPathAndMethod($swaggerData);

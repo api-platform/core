@@ -26,7 +26,9 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Bundle\Processor\TraceableChainProcessor;
+use ApiPlatform\Symfony\Bundle\Provider\TraceableChainProvider;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
@@ -51,16 +53,26 @@ final class RequestDataCollector extends DataCollector
     private $itemDataProvider;
     private $subresourceDataProvider;
     private $dataPersister;
+    private $provider;
     private $processor;
 
-    public function __construct($metadataFactory, ContainerInterface $filterLocator, CollectionDataProviderInterface $collectionDataProvider = null, ItemDataProviderInterface $itemDataProvider = null, SubresourceDataProviderInterface $subresourceDataProvider = null, DataPersisterInterface $dataPersister = null, ProcessorInterface $processor = null)
-    {
+    public function __construct(
+        $metadataFactory,
+        ContainerInterface $filterLocator,
+        CollectionDataProviderInterface $collectionDataProvider = null,
+        ItemDataProviderInterface $itemDataProvider = null,
+        SubresourceDataProviderInterface $subresourceDataProvider = null,
+        DataPersisterInterface $dataPersister = null,
+        ProviderInterface $provider = null,
+        ProcessorInterface $processor = null
+    ) {
         $this->metadataFactory = $metadataFactory;
         $this->filterLocator = $filterLocator;
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->dataPersister = $dataPersister;
+        $this->provider = $provider;
         $this->processor = $processor;
 
         if (!$metadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
@@ -103,6 +115,7 @@ final class RequestDataCollector extends DataCollector
             'dataProviders' => [],
             'dataPersisters' => ['responses' => []],
             'request_attributes' => $requestAttributes,
+            'providers' => ['responses' => []],
             'processors' => ['responses' => []],
         ];
 
@@ -129,6 +142,13 @@ final class RequestDataCollector extends DataCollector
 
         if ($this->dataPersister instanceof TraceableChainDataPersister) {
             $this->data['dataPersisters']['responses'] = $this->dataPersister->getPersistersResponse();
+        }
+
+        if ($this->provider instanceof TraceableChainProvider) {
+            $this->data['providers'] = [
+                'context' => $this->cloneVar($this->provider->getContext()),
+                'responses' => $this->provider->getProvidersResponse(),
+            ];
         }
 
         if ($this->processor instanceof TraceableChainProcessor) {
@@ -197,6 +217,11 @@ final class RequestDataCollector extends DataCollector
     public function getDataPersisters(): array
     {
         return $this->data['dataPersisters'] ?? ['responses' => []];
+    }
+
+    public function getProviders(): array
+    {
+        return $this->data['providers'] ?? ['responses' => []];
     }
 
     public function getProcessors(): array

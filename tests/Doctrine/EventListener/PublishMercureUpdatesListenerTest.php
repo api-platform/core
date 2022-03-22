@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Api\UrlGeneratorInterface as ApiUrlGeneratorInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\EventListener\PublishMercureUpdatesListener;

@@ -35,21 +35,10 @@ final class ChainProcessor implements ProcessorInterface
         $this->processors = $processors;
     }
 
-    public function resumable(?string $operationName = null, array $context = []): bool
+    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         foreach ($this->processors as $processor) {
-            if ($processor->resumable($operationName, $context)) {
-                return $processor->resumable($operationName, $context);
-            }
-        }
-
-        return false;
-    }
-
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        foreach ($this->processors as $processor) {
-            if ($supports = $processor->supports($data, $identifiers, $operationName, $context)) {
+            if ($supports = $processor->supports($data, $uriVariables, $operationName, $context)) {
                 return $supports;
             }
         }
@@ -57,11 +46,11 @@ final class ChainProcessor implements ProcessorInterface
         return false;
     }
 
-    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         foreach ($this->processors as $processor) {
-            if ($processor->supports($data, $identifiers, $operationName, $context)) {
-                return $processor->process($data, $identifiers, $operationName, $context);
+            if ($processor->supports($data, $uriVariables, $operationName, $context)) {
+                return $processor->process($data, $uriVariables, $operationName, $context);
             }
         }
 

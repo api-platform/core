@@ -17,8 +17,6 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
@@ -30,7 +28,9 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\PathResolver\OperationPathResolver;
 use ApiPlatform\Symfony\Routing\ApiLoader;
@@ -67,7 +67,7 @@ class ApiLoaderTest extends TestCase
                 // Custom operations
                 'api_dummies_my_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withDefaults(['my_default' => 'default_value', '_format' => 'a valid format'])->withRequirements(['_format' => 'a valid format'])->withCondition("request.headers.get('User-Agent') matches '/firefox/i'")->withController('some.service.name')->withCollection(true),
                 'api_dummies_my_second_op_collection' => (new Post())->withUriTemplate('/dummies.{_format}')->withOptions(['option' => 'option_value'])->withHost('{subdomain}.api-platform.com')->withSchemes(['https'])->withCollection(true),
-                //without controller, takes the default one
+                // without controller, takes the default one
                 'api_dummies_my_path_op_collection' => (new Get())->withUriTemplate('some/custom/path')->withCollection(true),
                 // Custom path
                 'api_dummies_my_stateless_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withStateless(true)->withCollection(true),

@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -26,6 +24,9 @@ use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConcreteDummy;
@@ -295,7 +296,7 @@ class EagerLoadingExtensionTest extends TestCase
     public function testDenormalizeItemWithCorrectResourceClass()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        //Dummy is the correct class for the denormalization context serialization groups, and we're fetching RelatedDummy
+        // Dummy is the correct class for the denormalization context serialization groups, and we're fetching RelatedDummy
         $resourceMetadata = (new ResourceMetadata())->withAttributes(['normalization_context' => ['groups' => ['foo']]]);
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -318,7 +319,7 @@ class EagerLoadingExtensionTest extends TestCase
     public function testDenormalizeItemWithExistingGroups()
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        //groups exist from the context, we don't need to compute them again
+        // groups exist from the context, we don't need to compute them again
         $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldNotBeCalled();
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -512,7 +513,7 @@ class EagerLoadingExtensionTest extends TestCase
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($resourceMetadata);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        //$propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
+        // $propertyNameCollectionFactoryProphecy->create(UnknownDummy::class)->willReturn(new PropertyNameCollection(['id']))->shouldBeCalled();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $relationPropertyMetadata = new ApiProperty();
@@ -923,11 +924,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         if ($legacy) {
+            $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new PropertyMetadata();
             $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => true]);
         } else {
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new ApiProperty();
             $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(true);
             $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
@@ -1041,11 +1043,12 @@ class EagerLoadingExtensionTest extends TestCase
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         if ($legacy) {
+            $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new PropertyMetadata();
             $relationPropertyMetadata = $relationPropertyMetadata->withAttributes(['fetchEager' => false]);
         } else {
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
             $relationPropertyMetadata = new ApiProperty();
             $relationPropertyMetadata = $relationPropertyMetadata->withFetchEager(false);
         }

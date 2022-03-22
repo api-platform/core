@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
@@ -89,13 +88,18 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $resourceClass = $this->getResourceClass($item, true);
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
-            $type = $propertyMetadata->getType();
-            if (!$type) {
+
+            $types = $propertyMetadata->getBuiltinTypes();
+            if (null === ($type = $types[0] ?? null)) {
                 continue;
             }
 
-            if ($type->isCollection() && ($collectionValueType = $type->getCollectionValueType()) && $collectionValueType->getClassName() === $class) {
-                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+            if ($type->isCollection()) {
+                $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+
+                if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
+                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+                }
             }
 
             if ($type->getClassName() === $class) {
@@ -117,7 +121,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             throw new RuntimeException('No identifier value found, did you forgot to persist the entity?');
         }
 
-        if (is_scalar($identifierValue)) {
+        if (\is_scalar($identifierValue)) {
             return $identifierValue;
         }
 
@@ -136,7 +140,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             if (1 === \count($relatedLinks)) {
                 $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedLinks)->getIdentifiers()[0], $parameterName);
 
-                if (is_scalar($identifierValue)) {
+                if (\is_scalar($identifierValue)) {
                     return $identifierValue;
                 }
 

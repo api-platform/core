@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Validator\Exception;
 
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Symfony\EventListener\Exception\ValidationException as MainValidationException;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException as MainValidationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;

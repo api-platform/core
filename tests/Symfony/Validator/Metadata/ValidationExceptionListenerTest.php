@@ -15,10 +15,10 @@ namespace ApiPlatform\Tests\Symfony\Validator\EventListener;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\FilterValidationException;
-use ApiPlatform\Symfony\EventListener\Exception\ValidationException as BaseValidationException;
 use ApiPlatform\Symfony\Validator\EventListener\ValidationExceptionListener;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

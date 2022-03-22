@@ -1,0 +1,16 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <!-- Metadata loader -->
+        <service id="api_platform.doctrine.orm.metadata.property.metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.inner" />
+        </service>
+
+        <service id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="40">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="api_platform.doctrine.orm.metadata.property.identifier_metadata_factory.inner" />
+        </service>
+    </services>
+</container>

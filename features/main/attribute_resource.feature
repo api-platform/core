@@ -4,6 +4,7 @@ Feature: Resource attributes
   I should be able to fetch data from a state provider
   
   @php8
+  @v3
   @!mysql
   @!mongodb
   Scenario: Retrieve a Resource collection
@@ -36,6 +37,7 @@ Feature: Resource attributes
     """
 
   @php8
+  @v3
   @!mysql
   @!mongodb
   Scenario: Retrieve the first resource 
@@ -56,6 +58,7 @@ Feature: Resource attributes
     """
 
   @php8
+  @v3
   @!mysql
   @!mongodb
   Scenario: Retrieve the aliased resource
@@ -78,6 +81,7 @@ Feature: Resource attributes
     """
 
   @php8
+  @v3
   @!mysql
   @!mongodb
   Scenario: Patch the aliased resource

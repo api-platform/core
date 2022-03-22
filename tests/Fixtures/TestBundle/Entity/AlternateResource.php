@@ -16,20 +16,22 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Metadata\Get;
 
-#[Get]
-#[Get('/alternate/{id}', uriVariables: ['id' => ['from_class' => AlternateResource::class, 'identifiers' => ['id']]])]
-final class AlternateResource
-{
-    #[ApiProperty(identifier: true)]
-    public string $id;
-
-    public function __construct(string $id)
+if (\PHP_VERSION_ID > 80000) {
+    #[Get]
+    #[Get('/alternate/{id}', uriVariables: ['id' => ['from_class' => AlternateResource::class, 'identifiers' => ['id']]])]
+    final class AlternateResource
     {
-        $this->id = $id;
-    }
+        #[ApiProperty(identifier: true)]
+        public string $id;
 
-    public function getId()
-    {
-        return $this->id;
+        public function __construct(string $id)
+        {
+            $this->id = $id;
+        }
+
+        public function getId()
+        {
+            return $this->id;
+        }
     }
 }

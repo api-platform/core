@@ -2,6 +2,7 @@
 
 ## 2.7.0
 
+* Swagger UI: Add `usePkceWithAuthorizationCodeGrant` to Swagger UI initOAuth (#4649)
 * **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
 * GraphQL: Add ability to use different pagination types for the queries of a resource (#4453)
 * Security: **BC** Fix `ApiProperty` `security` attribute expression being passed a class string for the `object` variable on updates/creates - null is now passed instead if the object is not available (#4184)
@@ -44,6 +45,14 @@
 * A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
 * Add support for `security_post_validation` attribute
 * Mark the GraphQL subsystem as stable (#4500)
+* feat(test): add `Client::loginUser()`
+
+## 2.6.8
+
+* fix: serializing embedded non resource objects
+* chore(openapi): upgrade Swagger UI to version 4.1.3
+* chore(openapi): upgrade ReDoc to version 2.0.0-rc.59
+* chore(graphql): upgrade GraphiQL to version 1.5.16
 
 ## 2.6.7
 

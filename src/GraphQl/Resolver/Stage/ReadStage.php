@@ -93,7 +93,7 @@ final class ReadStage implements ReadStageInterface
             return [];
         }
 
-        $identifiers = [];
+        $uriVariables = [];
         $normalizationContext['filters'] = $this->getNormalizedFilters($args);
 
         if (!$operation && $resourceClass) {
@@ -106,11 +106,11 @@ final class ReadStage implements ReadStageInterface
         /** @var ResolveInfo $info */
         $info = $context['info'];
         if (isset($source[$info->fieldName], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
-            $identifiers = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
+            $uriVariables = $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY];
             $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
         }
 
-        return $this->provider->provide($resourceClass, $identifiers, $operationName, $normalizationContext);
+        return $this->provider->provide($resourceClass, $uriVariables, $operationName, $normalizationContext);
     }
 
     /**

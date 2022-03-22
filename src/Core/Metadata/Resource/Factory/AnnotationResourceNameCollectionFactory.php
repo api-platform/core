@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Metadata\Resource\Factory;
 
-use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use Doctrine\Common\Annotations\Reader;
 
 /**
@@ -31,17 +29,15 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
     private $reader;
     private $paths;
     private $decorated;
-    private $metadataBackwardCompatibilityLayer;
 
     /**
      * @param string[] $paths
      */
-    public function __construct(Reader $reader = null, array $paths, ResourceNameCollectionFactoryInterface $decorated = null, bool $metadataBackwardCompatibilityLayer = true)
+    public function __construct(Reader $reader = null, array $paths, ResourceNameCollectionFactoryInterface $decorated = null)
     {
         $this->reader = $reader;
         $this->paths = $paths;
         $this->decorated = $decorated;
-        $this->metadataBackwardCompatibilityLayer = $metadataBackwardCompatibilityLayer;
     }
 
     /**
@@ -59,30 +55,13 @@ final class AnnotationResourceNameCollectionFactory implements ResourceNameColle
 
         foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($this->paths) as $className => $reflectionClass) {
             if (
-                (\PHP_VERSION_ID >= 80000 && $this->isResource($reflectionClass)) ||
-                (null !== $this->reader && $this->reader->getClassAnnotation($reflectionClass, ApiResourceAnnotation::class))
+                (\PHP_VERSION_ID >= 80000 && $reflectionClass->getAttributes(ApiResource::class)) ||
+                (null !== $this->reader && $this->reader->getClassAnnotation($reflectionClass, ApiResource::class))
             ) {
                 $classes[$className] = true;
             }
         }
 
         return new ResourceNameCollection(array_keys($classes));
-    }
-
-    private function isResource(\ReflectionClass $reflectionClass): bool
-    {
-        if ($this->metadataBackwardCompatibilityLayer) {
-            return $reflectionClass->getAttributes(ApiResourceAnnotation::class) ? true : false;
-        }
-
-        if ($reflectionClass->getAttributes(ApiResourceAnnotation::class) || $reflectionClass->getAttributes(ApiResource::class)) {
-            return true;
-        }
-
-        if ($reflectionClass->getAttributes(Operation::class, \ReflectionAttribute::IS_INSTANCEOF) || $reflectionClass->getAttributes(GraphQlOperation::class, \ReflectionAttribute::IS_INSTANCEOF)) {
-            return true;
-        }
-
-        return false;
     }
 }

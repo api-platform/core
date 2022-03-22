@@ -17,6 +17,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\ItemDataProvider;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -26,7 +27,6 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -256,15 +256,15 @@ class ItemDataProviderTest extends TestCase
         $nameCollection = ['foobar'];
 
         foreach ($identifiers as $identifier) {
-            $metadata = new ApiProperty();
+            $metadata = new PropertyMetadata();
             $metadata = $metadata->withIdentifier(true);
             $propertyMetadataFactoryProphecy->create($resourceClass, $identifier)->willReturn($metadata);
 
             $nameCollection[] = $identifier;
         }
 
-        //random property to prevent the use of non-identifiers metadata while looping
-        $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new ApiProperty());
+        // random property to prevent the use of non-identifiers metadata while looping
+        $propertyMetadataFactoryProphecy->create($resourceClass, 'foobar')->willReturn(new PropertyMetadata());
 
         $propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection($nameCollection));
         $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadata('dummy'));

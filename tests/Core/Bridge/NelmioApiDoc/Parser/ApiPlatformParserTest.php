@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\NelmioApiDoc\Parser;
 
 use ApiPlatform\Core\Bridge\NelmioApiDoc\Parser\ApiPlatformParser;
+use ApiPlatform\Core\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UnknownDummy;
 use Doctrine\Common\Collections\Collection;
 use Nelmio\ApiDocBundle\DataTypes;
 use Nelmio\ApiDocBundle\Parser\ParserInterface;
@@ -134,14 +134,14 @@ class ApiPlatformParserTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $idPropertyMetadata = (new ApiProperty())
+        $idPropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_INT, false))
             ->withDescription('The id.')
             ->withReadable(true)
             ->withWritable(false)
             ->withRequired(true);
         $propertyMetadataFactoryProphecy->create('Acme\CustomAttributeDummy', 'id')->willReturn($idPropertyMetadata)->shouldBeCalled();
-        $namePropertyMetadata = (new ApiProperty())
+        $namePropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_STRING, false))
             ->withDescription('The dummy name.')
             ->withReadable(true)
@@ -240,21 +240,21 @@ class ApiPlatformParserTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $idPropertyMetadata = (new ApiProperty())
+        $idPropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_INT, false))
             ->withDescription('The id.')
             ->withReadable(true)
             ->withWritable(false)
             ->withRequired(true);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id')->willReturn($idPropertyMetadata)->shouldBeCalled();
-        $namePropertyMetadata = (new ApiProperty())
+        $namePropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_STRING, false))
             ->withDescription('The dummy name.')
             ->withReadable(true)
             ->withWritable(true)
             ->withRequired(true);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name')->willReturn($namePropertyMetadata)->shouldBeCalled();
-        $dummyPricePropertyMetadata = (new ApiProperty())
+        $dummyPricePropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_FLOAT, true))
             ->withDescription('A dummy price.')
             ->withReadable(true)
@@ -307,7 +307,7 @@ class ApiPlatformParserTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $dummyDatePropertyMetadata = (new ApiProperty())
+        $dummyDatePropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class))
             ->withDescription('A dummy date.')
             ->withReadable(true)
@@ -355,14 +355,14 @@ class ApiPlatformParserTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relatedDummyPropertyMetadata = (new ApiProperty())
+        $relatedDummyPropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class))
             ->withDescription('A related dummy.')
             ->withReadable(true)
             ->withWritable(true)
             ->withRequired(false);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->willReturn($relatedDummyPropertyMetadata)->shouldBeCalled();
-        $relatedDummiesPropertyMetadata = (new ApiProperty())
+        $relatedDummiesPropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)))
             ->withDescription('Several dummies.')
             ->withReadable(true)
@@ -370,13 +370,13 @@ class ApiPlatformParserTest extends TestCase
             ->withReadableLink(true)
             ->withRequired(false);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies')->willReturn($relatedDummiesPropertyMetadata)->shouldBeCalled();
-        $idPropertyMetadata = (new ApiProperty())
+        $idPropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_INT, false))
             ->withReadable(true)
             ->withWritable(false)
             ->withRequired(true);
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id')->willReturn($idPropertyMetadata)->shouldBeCalled();
-        $namePropertyMetadata = (new ApiProperty())
+        $namePropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_STRING, false))
             ->withDescription('A name.')
             ->withReadable(true)
@@ -440,7 +440,7 @@ class ApiPlatformParserTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $nameConvertedPropertyMetadata = (new ApiProperty())
+        $nameConvertedPropertyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_STRING, true))
             ->withDescription('A converted name')
             ->withReadable(true)
@@ -489,7 +489,7 @@ class ApiPlatformParserTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $relatedDummyMetadatata = (new ApiProperty())
+        $relatedDummyMetadatata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, RelatedDummy::class))
             ->withDescription('A related Dummy.')
             ->withReadable(true)
@@ -498,7 +498,7 @@ class ApiPlatformParserTest extends TestCase
             ->withWritable(true)
             ->withRequired(false);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy')->willReturn($relatedDummyMetadatata)->shouldBeCalled();
-        $dummyMetadata = (new ApiProperty())
+        $dummyMetadata = (new PropertyMetadata())
             ->withType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class))
             ->withDescription('A Dummy.')
             ->withReadable(true)

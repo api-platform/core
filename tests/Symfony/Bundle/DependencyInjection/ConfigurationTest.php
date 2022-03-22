@@ -148,6 +148,7 @@ class ConfigurationTest extends TestCase
                 'authorizationUrl' => '',
                 'refreshUrl' => '',
                 'scopes' => [],
+                'pkce' => false,
             ],
             'swagger' => [
                 'versions' => [2, 3],

@@ -15,8 +15,8 @@ namespace ApiPlatform\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\OperationTypeDeprecationHelper;
-use ApiPlatform\Core\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 
 /**
  * Generates an operation path.
@@ -35,7 +35,7 @@ final class OperationPathResolver implements OperationPathResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/*, string $operationName = null*/): string
+    public function resolveOperationPath(string $resourceShortName, array $operation, $operationType/* , string $operationName = null */): string
     {
         if (\func_num_args() < 4) {
             @trigger_error(sprintf('Method %s() will have a 4th `string $operationName` argument in version 3.0. Not defining it is deprecated since 2.1.', __METHOD__), \E_USER_DEPRECATED);

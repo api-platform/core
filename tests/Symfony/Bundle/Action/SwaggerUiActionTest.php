@@ -15,11 +15,11 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Action;
 
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Documentation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -102,6 +102,7 @@ class SwaggerUiActionTest extends TestCase
                     'tokenUrl' => '',
                     'authorizationUrl' => '',
                     'scopes' => [],
+                    'pkce' => false,
                 ],
                 'shortName' => 'F',
                 'operationId' => 'getFCollection',
@@ -137,6 +138,7 @@ class SwaggerUiActionTest extends TestCase
                     'tokenUrl' => '',
                     'authorizationUrl' => '',
                     'scopes' => [],
+                    'pkce' => false,
                 ],
                 'shortName' => 'F',
                 'operationId' => 'getFItem',
@@ -195,6 +197,7 @@ class SwaggerUiActionTest extends TestCase
                     'tokenUrl' => '',
                     'authorizationUrl' => '',
                     'scopes' => [],
+                    'pkce' => false,
                 ],
             ],
         ])->shouldBeCalled()->willReturn('');

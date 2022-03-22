@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\GraphQl\Type;
 
+use ApiPlatform\Core\DataProvider\Pagination;
 use ApiPlatform\Core\GraphQl\Resolver\Factory\ResolverFactoryInterface as ResolverFactoryLegacyInterface;
 use ApiPlatform\Core\GraphQl\Type\TypesContainerInterface as TypesContainerLegacyInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -23,7 +24,6 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
-use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Util\Inflector;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\NullableType;

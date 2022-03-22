@@ -31,12 +31,7 @@ final class Processor implements ProcessorInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    public function resumable(?string $operationName = null, array $context = []): bool
-    {
-        return false;
-    }
-
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
+    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
     {
         return null !== $this->getManager($data);
     }
@@ -67,7 +62,7 @@ final class Processor implements ProcessorInterface
         $manager->flush();
     }
 
-    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         if (\array_key_exists('operation', $context) && $context['operation']->isDelete()) {
             return $this->remove($data);

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator;
 
-use ApiPlatform\Symfony\EventListener\ValidatorInterface;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;

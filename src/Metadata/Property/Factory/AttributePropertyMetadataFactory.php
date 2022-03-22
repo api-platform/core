@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Util\Reflection;
@@ -35,7 +34,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass, string $property, array $options = [])
+    public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         $parentPropertyMetadata = null;
         if ($this->decorated) {
@@ -81,13 +80,11 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * Returns the metadata from the decorated factory if available or throws an exception.
      *
-     * @param ApiProperty|PropertyMetadata|null $parentPropertyMetadata
+     * @param ApiProperty|null $parentPropertyMetadata
      *
      * @throws PropertyNotFoundException
-     *
-     * @return ApiProperty|PropertyMetadata
      */
-    private function handleNotFound($parentPropertyMetadata, string $resourceClass, string $property)
+    private function handleNotFound($parentPropertyMetadata, string $resourceClass, string $property): ApiProperty
     {
         if (null !== $parentPropertyMetadata) {
             return $parentPropertyMetadata;

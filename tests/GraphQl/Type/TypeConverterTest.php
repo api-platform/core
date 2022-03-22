@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\GraphQl\Type\TypeBuilderInterface;
 use ApiPlatform\GraphQl\Type\TypeConverter;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -139,7 +139,7 @@ class TypeConverterTest extends TestCase
         $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['test' => new Query()])]);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
-        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new PropertyMetadata())->withWritableLink(false));
+        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withWritableLink(false));
 
         $graphqlType = $this->typeConverter->convertType($type, true, (new Operation())->withName('test'), 'dummy', 'rootClass', 'dummyProperty', 1);
         $this->assertEquals(GraphQLType::string(), $graphqlType);
@@ -154,7 +154,7 @@ class TypeConverterTest extends TestCase
 
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
-        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new PropertyMetadata())->withWritableLink(true));
+        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withWritableLink(true));
         $this->typeBuilderProphecy->getResourceObjectType('dummy', $graphqlResourceMetadata, $operation, true, false, 1)->shouldBeCalled()->willReturn($expectedGraphqlType);
 
         $graphqlType = $this->typeConverter->convertType($type, true, (new Operation())->withName('test'), 'dummy', 'rootClass', 'dummyProperty', 1);

@@ -20,6 +20,8 @@ use Psr\Container\ContainerInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
+ * @deprecated see FilterCollection
+ *
  * @internal
  */
 class FilterCollectionFactory

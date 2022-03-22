@@ -22,6 +22,7 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Tests\Fixtures\DummyEntityFilterAnnotated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Util\AnnotationFilterExtractor;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class AnnotationFilterExtractorTraitTest extends KernelTestCase
@@ -31,7 +32,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->extractor = new AnnotationFilterExtractor(static::$kernel->getContainer()->get('test.annotation_reader'));
+        $this->extractor = new AnnotationFilterExtractor(new AnnotationReader());
     }
 
     public function testReadAnnotations()
@@ -39,7 +40,7 @@ class AnnotationFilterExtractorTraitTest extends KernelTestCase
         $reflectionClass = new \ReflectionClass(DummyCar::class);
         $this->assertEquals($this->extractor->getFilters($reflectionClass), [
             'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_doctrine_orm_filter_date_filter' => [
-                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null', 'brand' => 'exclude_null', 'secondColors' => 'exclude_null', 'thirdColors' => 'exclude_null', 'uuid' => 'exclude_null']],
+                ['properties' => ['id' => 'exclude_null', 'colors' => 'exclude_null', 'name' => 'exclude_null', 'canSell' => 'exclude_null', 'availableAt' => 'exclude_null', 'brand' => 'exclude_null', 'secondColors' => 'exclude_null', 'thirdColors' => 'exclude_null', 'uuid' => 'exclude_null', 'info' => 'exclude_null']],
                 DateFilter::class,
             ],
             'annotated_api_platform_tests_fixtures_test_bundle_entity_dummy_car_api_platform_doctrine_orm_filter_boolean_filter' => [

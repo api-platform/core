@@ -63,7 +63,8 @@ window.onload = function() {
             realm: data.oauth.type,
             appName: data.spec.info.title,
             scopeSeparator: ' ',
-            additionalQueryStringParams: {}
+            additionalQueryStringParams: {},
+            usePkceWithAuthorizationCodeGrant: data.oauth.pkce,
         });
     }
 
@@ -148,4 +149,8 @@ window.onload = function() {
             }, 10000);
         });
     }
+
+    // Make SwaggerUIBundle and data available for some other scripts
+    window.swaggerUI = ui;
+    window.swaggerData = data;
 };

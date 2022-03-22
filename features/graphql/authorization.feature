@@ -152,6 +152,7 @@ Feature: Authorization checking
     And the JSON node "data.securedDummy.relatedDummy" should exist
     And the JSON node "data.securedDummy.relatedDummy" should not be null
 
+  @v3
   @createSchema
   Scenario: A user can't access a secured collection relation
     Given there are 1 SecuredDummy objects owned by dunglas with related dummies
@@ -175,6 +176,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.relatedDummies" should be null
 
+  @v3
   Scenario: A user can't access a secured relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
@@ -232,6 +234,7 @@ Feature: Authorization checking
     And the JSON node "errors[0].message" should be equal to "Access Denied."
     And the JSON node "data.relatedSecuredDummies" should be null
 
+  @v3
   Scenario: A user can access a secured collection relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
@@ -253,6 +256,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.relatedSecuredDummies" should have 1 element
 
+  @v3
   Scenario: A user can access a secured relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
@@ -271,6 +275,7 @@ Feature: Authorization checking
     And the JSON node "data.securedDummy.relatedSecuredDummy" should exist
     And the JSON node "data.securedDummy.relatedSecuredDummy" should not be null
 
+  @v3
   Scenario: A user can access a non-secured collection relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
@@ -292,6 +297,7 @@ Feature: Authorization checking
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.securedDummy.publicRelatedSecuredDummies" should have 1 element
 
+  @v3
   Scenario: A user can access a non-secured relation
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     When I send the following GraphQL request:
@@ -382,6 +388,7 @@ Feature: Authorization checking
     And the response should be in JSON
     And the JSON node "data.securedDummies.edges[2].node.ownerOnlyProperty" should be equal to "it works"
 
+  @v3
   Scenario: An admin can't create a secured resource with an owner-only property if they won't be the owner
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
     And I send the following GraphQL request:
@@ -465,6 +472,7 @@ Feature: Authorization checking
     And the JSON node "data.securedDummy.adminOnlyProperty" should exist
     And the JSON node "data.securedDummy.adminOnlyProperty" should not be null
 
+  @v3
   Scenario: A user can't see a secured admin-only property on an object they own
     When I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
     And I send the following GraphQL request:
@@ -527,6 +535,7 @@ Feature: Authorization checking
     And the response should be in JSON
     And the JSON node "data.securedDummy.ownerOnlyProperty" should be equal to the string "updated"
 
+  @v3
   Scenario: An admin can't see a secured owner-only property on an object they don't own
     When I add "Authorization" header equal to "Basic YWRtaW46a2l0dGVu"
     And I send the following GraphQL request:

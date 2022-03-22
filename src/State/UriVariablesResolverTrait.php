@@ -33,7 +33,7 @@ trait UriVariablesResolverTrait
      *
      * @param Operation|null $operation
      */
-    private function getOperationIdentifiers($operation, array $parameters, string $resourceClass): array
+    private function getOperationUriVariables($operation, array $parameters, string $resourceClass): array
     {
         $identifiers = [];
 

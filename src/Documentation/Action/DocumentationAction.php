@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Documentation\Action;
 
 use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface as LegacyOpenApiFactoryInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,10 +39,11 @@ final class DocumentationAction
     private $openApiFactory;
 
     /**
-     * @param int[]                                $swaggerVersions
-     * @param mixed|array|FormatsProviderInterface $formatsProvider
+     * @param int[]                                                 $swaggerVersions
+     * @param mixed|array|FormatsProviderInterface                  $formatsProvider
+     * @param LegacyOpenApiFactoryInterface|OpenApiFactoryInterface $openApiFactory
      */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3], OpenApiFactoryInterface $openApiFactory = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3], $openApiFactory = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->title = $title;

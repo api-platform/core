@@ -13,16 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Util;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Util\IriHelper;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class IriHelperTest extends TestCase
 {
+    use ExpectDeprecationTrait;
+
     public function testHelpers()
     {
         $parsed = [
@@ -42,10 +45,10 @@ class IriHelperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a bool as 5th parameter to "ApiPlatform\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Core\Api\UrlGeneratorInterface" constant (int) instead.
      */
     public function testLegacyHelpers()
     {
+        $this->expectDeprecation('Passing a bool as 5th parameter to "ApiPlatform\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Api\UrlGeneratorInterface" constant (int) instead.');
         $parsed = [
             'parts' => [
                 'path' => '/hello.json',
@@ -63,10 +66,10 @@ class IriHelperTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation Passing a bool as 5th parameter to "ApiPlatform\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Core\Api\UrlGeneratorInterface" constant (int) instead.
      */
     public function testLegacyHelpersWithAbsoluteUrl()
     {
+        $this->expectDeprecation('Passing a bool as 5th parameter to "ApiPlatform\Util\IriHelper::createIri()" is deprecated since API Platform 2.6. Pass an "ApiPlatform\Api\UrlGeneratorInterface" constant (int) instead.');
         $parsed = [
             'parts' => [
                 'path' => '/hello.json',

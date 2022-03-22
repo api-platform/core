@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\Exception;
 
-use ApiPlatform\Symfony\EventListener\Exception\ValidationException as BaseValidationException;
+use ApiPlatform\Validator\Exception\ValidationException as BaseValidationException;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**

@@ -16,10 +16,10 @@ namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Metadata\Property\Factory\AnnotationSubresourceMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidResourceException;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Annotations\Reader;
@@ -60,7 +60,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
         $subresourceType = new Type(Type::BUILTIN_TYPE_OBJECT, false, ArrayCollection::class, true, new Type(Type::BUILTIN_TYPE_INT), $relatedDummyType);
 
         $decoratedReturnProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decoratedReturnProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$subresourceType])->withDescription('Several dummies'))->shouldBeCalled();
+        $decoratedReturnProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new PropertyMetadata())->withType($subresourceType)->withDescription('Several dummies'))->shouldBeCalled();
 
         return [
             [$propertyReaderProphecy, $decoratedReturnProphecy],
@@ -78,7 +78,7 @@ class AnnotationSubresourceMetadataFactoryTest extends TestCase
         $propertyReaderProphecy->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiSubresource::class)->willReturn($annotation)->shouldBeCalled();
 
         $decoratedReturnProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decoratedReturnProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withDescription('Several dummies'))->shouldBeCalled();
+        $decoratedReturnProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new PropertyMetadata())->withDescription('Several dummies'))->shouldBeCalled();
 
         $factory = new AnnotationSubresourceMetadataFactory($propertyReaderProphecy->reveal(), $decoratedReturnProphecy->reveal());
         $factory->create(Dummy::class, 'relatedDummies');

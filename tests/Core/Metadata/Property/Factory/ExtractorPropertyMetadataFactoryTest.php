@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
 
+use ApiPlatform\Core\Exception\InvalidArgumentException;
+use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
 use ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\PropertyNotFoundException;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -39,7 +39,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider propertyMetadataProvider
      */
-    public function testCreateXml(ApiProperty $expectedPropertyMetadata)
+    public function testCreateXml(PropertyMetadata $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.xml';
 
@@ -52,14 +52,14 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithParentPropertyMetadataFactoryXml(ApiProperty $expectedPropertyMetadata)
+    public function testCreateWithParentPropertyMetadataFactoryXml(PropertyMetadata $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.xml';
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn((new ApiProperty())->withReadableLink(true)->withIdentifier(false)->withSubresource(new SubresourceMetadata('Foo', false, null)))
+            ->willReturn(new PropertyMetadata(null, null, null, null, true, null, null, false, null, null, ['Foo'], new SubresourceMetadata('Foo', false)))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new XmlExtractor([$configPath]), $decorated->reveal());
@@ -101,7 +101,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider propertyMetadataProvider
      */
-    public function testCreateYaml(ApiProperty $expectedPropertyMetadata)
+    public function testCreateYaml(PropertyMetadata $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -114,14 +114,14 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithParentPropertyMetadataFactoryYaml(ApiProperty $expectedPropertyMetadata)
+    public function testCreateWithParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn((new ApiProperty())->withReadableLink(true)->withIdentifier(false)->withSubresource(new SubresourceMetadata('Foo', false)))
+            ->willReturn(new PropertyMetadata(null, null, null, null, true, null, null, false, null, null, ['Foo'], new SubresourceMetadata('Foo', false)))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
@@ -133,7 +133,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(ApiProperty $expectedPropertyMetadata)
+    public function testCreateWithCollectionTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
@@ -145,13 +145,13 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
                     new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
                 );
 
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withBuiltinTypes([$collectionType]);
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withType($collectionType);
         $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, true, 1));
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn((new ApiProperty())->withBuiltinTypes([$collectionType])->withReadableLink(true)->withIdentifier(false))
+            ->willReturn(new PropertyMetadata($collectionType, null, null, null, true, null, null, false, null, null, ['Foo'], null))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
@@ -163,19 +163,19 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     /**
      * @dataProvider decoratedPropertyMetadataProvider
      */
-    public function testCreateWithTypedParentPropertyMetadataFactoryYaml(ApiProperty $expectedPropertyMetadata)
+    public function testCreateWithTypedParentPropertyMetadataFactoryYaml(PropertyMetadata $expectedPropertyMetadata)
     {
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resources.yml';
 
         $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
 
-        $expectedPropertyMetadata = $expectedPropertyMetadata->withBuiltinTypes([$type]);
+        $expectedPropertyMetadata = $expectedPropertyMetadata->withType($type);
         $expectedPropertyMetadata = $expectedPropertyMetadata->withSubresource(new SubresourceMetadata(RelatedDummy::class, false, 1));
 
         $decorated = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decorated
             ->create(FileConfigDummy::class, 'foo', [])
-            ->willReturn((new ApiProperty())->withBuiltinTypes([$type])->withReadableLink(true)->withIdentifier(false))
+            ->willReturn(new PropertyMetadata($type, null, null, null, true, null, null, false, null, null, ['Foo'], null))
             ->shouldBeCalled();
 
         $propertyMetadataFactory = new ExtractorPropertyMetadataFactory(new YamlExtractor([$configPath]), $decorated->reveal());
@@ -207,7 +207,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     public function testCreateWithMalformedResourcesSettingYaml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/"resources" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/resourcesinvalid\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"resources" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/resourcesinvalid\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/resourcesinvalid.yml';
 
@@ -217,7 +217,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     public function testCreateWithMalformedPropertiesSettingYaml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/"properties" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertiesinvalid\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"properties" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertiesinvalid\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/propertiesinvalid.yml';
 
@@ -227,7 +227,7 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
     public function testCreateWithMalformedPropertySettingYaml()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/"foo" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertyinvalid\\.yml"\\./');
+        $this->expectExceptionMessageMatches('/"foo" setting is expected to be null or an array, string given in ".+\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/Fixtures\\/FileConfigurations\\/propertyinvalid\\.yml"\\./');
 
         $configPath = __DIR__.'/../../../../Fixtures/FileConfigurations/propertyinvalid.yml';
 
@@ -251,8 +251,8 @@ class ExtractorPropertyMetadataFactoryTest extends FileConfigurationMetadataFact
         $metadataSomething = $propertyMetadataFactory->create(DummyResourceInterface::class, 'something');
         $metadataSomethingElse = $propertyMetadataFactory->create(DummyResourceInterface::class, 'somethingElse');
 
-        $this->assertInstanceOf(ApiProperty::class, $metadataSomething);
-        $this->assertInstanceOf(ApiProperty::class, $metadataSomethingElse);
+        $this->assertInstanceOf(PropertyMetadata::class, $metadataSomething);
+        $this->assertInstanceOf(PropertyMetadata::class, $metadataSomethingElse);
         $this->assertTrue($metadataSomething->isIdentifier());
         $this->assertFalse($metadataSomethingElse->isWritable());
     }

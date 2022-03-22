@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
@@ -152,7 +152,7 @@ final class PurgeHttpCacheListener
 
     private function addTagsFor($value): void
     {
-        if (!$value || is_scalar($value)) {
+        if (!$value || \is_scalar($value)) {
             return;
         }
 
@@ -174,7 +174,7 @@ final class PurgeHttpCacheListener
     private function addTagForItem($value): void
     {
         try {
-            //TODO: test if this is a resource class
+            // TODO: test if this is a resource class
             $iri = $this->iriConverter->getIriFromItem($value);
             $this->tags[$iri] = $iri;
         } catch (RuntimeException|InvalidArgumentException $e) {

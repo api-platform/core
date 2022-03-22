@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Filter;
 
-use ApiPlatform\Core\Api\FilterInterface as BaseFilterInterface;
+use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
 
 /**
  * Elasticsearch filter interface.

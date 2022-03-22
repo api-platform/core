@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\WrappingType;
 use GraphQL\Type\Schema;
@@ -62,7 +62,7 @@ final class SchemaBuilder implements SchemaBuilderInterface
                 foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operationName => $operation) {
                     $configuration = null !== $operation->getArgs() ? ['args' => $operation->getArgs()] : [];
 
-                    //TODO: 3.0 remove these
+                    // TODO: 3.0 remove these
                     if ('item_query' === $operationName) {
                         $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
                         continue;

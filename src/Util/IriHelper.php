@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Util;
 
-use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 
 /**

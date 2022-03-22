@@ -17,13 +17,13 @@ use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Bridge\Symfony\Routing\RouteNameGenerator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Exception\InvalidResourceException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\PathResolver\OperationPathResolverInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
@@ -327,7 +327,8 @@ final class ApiLoader extends Loader
                 '_api_resource_class' => $resourceClass,
                 '_api_identifiers' => $operation['identifiers'] ?? [],
                 '_api_has_composite_identifier' => $operation['has_composite_identifier'] ?? true,
-                sprintf('_api_%s_operation_name', $operationType) => RouteNameGenerator::generate($operationName, $resourceShortName, $operationType),
+                '_api_operation_name' => RouteNameGenerator::generate($operationName, $resourceShortName, $operationType),
+                sprintf('_api_%s_operation_name', $operationType) => $operationName,
             ] + ($operation['defaults'] ?? []),
             $operation['requirements'] ?? [],
             $operation['options'] ?? [],
