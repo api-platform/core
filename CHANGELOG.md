@@ -46,6 +46,7 @@
 * Add support for `security_post_validation` attribute
 * Mark the GraphQL subsystem as stable (#4500)
 * feat(test): add `Client::loginUser()`
+* Add `UuidRangeFilter` to allow cursor based pagination on UUIDs (V1 and V6)
 
 ## 2.6.8
 
