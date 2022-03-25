@@ -220,7 +220,7 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class => ApiPlatform\Symfony\Validator\Validator::class,
 
     // Cache
-    ApiPlatform\Core\Cached\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
+    ApiPlatform\Core\Cache\CachedTrait::class => ApiPlatform\Util\CachedTrait::class,
 
     // DataProvider => State/Pagination
     ApiPlatform\Core\DataProvider\ArrayPaginator::class => ApiPlatform\State\Pagination\ArrayPaginator::class,
