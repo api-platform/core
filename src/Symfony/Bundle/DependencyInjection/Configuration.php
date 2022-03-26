@@ -278,6 +278,7 @@ final class Configuration implements ConfigurationInterface
                             ->prototype('scalar')->end()
                         ->end()
                         ->arrayNode('api_keys')
+                            ->useAttributeAsKey('key')
                             ->prototype('array')
                                 ->children()
                                     ->scalarNode('name')
