@@ -52,7 +52,6 @@
         "phpstan/phpstan-doctrine": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
-        "phpunit/phpunit": "^9.5",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^3.7 || ^4.0",
         "ramsey/uuid-doctrine": "^1.4",
