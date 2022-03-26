@@ -195,7 +195,7 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class => ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class,
 
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class => ApiPlatform\Symfony\Bundle\Test\ApiTestAssertionsTrait::class,
-    'ApiPlatform\\Core\\Bridge\\Symfony\\Bundle\\Test\\ApiTestCase' => 'ApiPlatform\\Symfony\\Bundle\\Test\\ApiTestCase',
+    // ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class => ApiPlatform\Symfony\Bundle\Test\Client::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class => ApiPlatform\Symfony\Bundle\Test\Response::class,
 
