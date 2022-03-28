@@ -9,7 +9,7 @@
             <argument type="service" id="service_container" />
         </service>
 
-      <service id="api_platform.metadata.property.metadata_factory.yaml.legacy" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="20" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.yaml.legacy" class="ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="20" public="false">
             <argument type="service" id="api_platform.metadata.extractor.yaml.legacy" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.yaml.legacy.inner" />
         </service>

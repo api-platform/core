@@ -1305,7 +1305,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // symfony/validator.xml
-            'ApiPlatform\Symfony\EventListener\ValidatorInterface',
+            'ApiPlatform\Validator\ValidatorInterface',
         ];
 
         $tags = [
@@ -1366,7 +1366,8 @@ class ApiPlatformExtensionTest extends TestCase
 
         $aliases = [
             // legacy/validator.xml
-            'ApiPlatform\Symfony\EventListener\ValidatorInterface',
+            'ApiPlatform\Validator\ValidatorInterface',
+            'ApiPlatform\Core\Validator\ValidatorInterface',
         ];
 
         $tags = [
