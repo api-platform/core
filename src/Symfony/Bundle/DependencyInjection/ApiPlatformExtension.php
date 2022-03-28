@@ -301,6 +301,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
 
+        $loader->load('metadata/resource_name.xml');
         $loader->load('metadata/property_name.xml');
 
         if (!empty($config['resource_class_directories'])) {
@@ -341,7 +342,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
         $loader->load('metadata/resource.xml');
-        $loader->load('metadata/resource_name.xml');
 
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);

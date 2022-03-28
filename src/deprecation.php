@@ -40,6 +40,12 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class,
 
+    // Test cases
+    ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
+    ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,
+    ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmTestCase::class,
+    ApiPlatform\Core\Test\DoctrineOrmFilterTestCase::class => ApiPlatform\Test\DoctrineOrmFilterTestCase::class,
+
     // Exceptions
     ApiPlatform\Core\Exception\DeserializationException::class => ApiPlatform\Exception\DeserializationException::class,
     ApiPlatform\Core\Exception\FilterValidationException::class => ApiPlatform\Exception\FilterValidationException::class,
@@ -376,13 +382,7 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Filter\Validator\Required::class => ApiPlatform\Api\QueryParameterValidator\Validator\Required::class,
     ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator::class => ApiPlatform\Operation\UnderscorePathSegmentNameGenerator::class,
     ApiPlatform\Core\Operation\DashPathSegmentNameGenerator::class => ApiPlatform\Operation\DashPathSegmentNameGenerator::class,
-];
 
-foreach ($deprecatedClassesWithAliases as $class => $alias) {
-    class_alias($alias, $class);
-}
-
-$graphQlAliases = [
     // GraphQl
     ApiPlatform\Core\GraphQl\Executor::class => ApiPlatform\GraphQl\Executor::class,
     ApiPlatform\Core\GraphQl\Error\ErrorHandler::class => ApiPlatform\GraphQl\Error\ErrorHandler::class,
@@ -396,13 +396,6 @@ $graphQlAliases = [
     ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class => ApiPlatform\GraphQl\Type\Definition\IterableType::class,
     ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
 ];
-
-// Only load these aliases if graphql is installed
-if (class_exists(GraphQL\Type\Definition\ScalarType::class)) {
-    foreach ($graphQlAliases as $class => $alias) {
-        class_alias($alias, $class);
-    }
-}
 
 // These classes are deprecated but we don't want aliases as the interfaces changed
 $deprecatedClassesWithoutAliases = [
@@ -454,22 +447,7 @@ $deprecatedClassesWithoutAliases = [
     ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Orm\Filter\SearchFilter::class,
 ];
 
-$testCaseClasses = [
-    ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
-    ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,
-    ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmTestCase::class,
-    ApiPlatform\Core\Test\DoctrineOrmFilterTestCase::class => ApiPlatform\Test\DoctrineOrmFilterTestCase::class,
-];
-
-// class_alias does load the class you alias too, when PHPUnit is not installed it throws warnings
-if (class_exists(PHPUnit\Framework\TestCase::class)) {
-    foreach ($testCaseClasses as $class => $alias) {
-        class_alias($alias, $class);
-    }
-}
-
-$deprecatedClasses = array_merge($deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases, $testCaseClasses, $graphQlAliases);
-spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClasses) {
+spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases) {
     // We can not class alias when working with doctrine annotations
     static $deprecatedAnnotations = [
         'ApiResource' => [ApiPlatform\Core\Annotation\ApiResource::class, ApiPlatform\Metadata\ApiResource::class],
@@ -477,8 +455,16 @@ spl_autoload_register(function ($className) use ($deprecatedInterfaces, $depreca
         'ApiFilter' => [ApiPlatform\Core\Annotation\ApiFilter::class, ApiPlatform\Metadata\ApiFilter::class],
     ];
 
-    if (isset($deprecatedClasses[$className])) {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClasses[$className]));
+    if (isset($deprecatedClassesWithoutAliases[$className])) {
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClassesWithoutAliases[$className]));
+
+        return;
+    }
+
+    if (isset($deprecatedClassesWithAliases[$className])) {
+        trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClassesWithAliases[$className]));
+
+        class_alias($deprecatedClassesWithAliases[$className], $className);
 
         return;
     }
