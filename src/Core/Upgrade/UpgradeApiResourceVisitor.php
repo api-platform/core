@@ -60,6 +60,9 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
         return $this->resourceAnnotation->{$key} ?? $default;
     }
 
+    /**
+     * @return int|Node|null
+     */
     public function enterNode(Node $node)
     {
         // We don't go through every resources to remove ApiSubresource annotations, do this here as well if there are some

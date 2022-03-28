@@ -35,6 +35,9 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
         $this->referenceType = $referenceType;
     }
 
+    /**
+     * @return int|Node|null
+     */
     public function enterNode(Node $node)
     {
         $operationToCreate = $this->subresourceMetadata['collection'] ? GetCollection::class : Get::class;
