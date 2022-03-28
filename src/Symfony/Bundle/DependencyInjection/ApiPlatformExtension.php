@@ -343,7 +343,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('metadata/yaml.xml');
             $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
             $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
-            $loader->load('metadata/backward_compatibility.xml');
         }
     }
 
