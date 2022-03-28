@@ -131,16 +131,5 @@
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
-
-        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
-            <argument type="service" id="api_platform.state_provider" />
-            <argument type="service" id="api_platform.router" />
-            <argument type="service" id="api_platform.api.identifiers_extractor" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.uri_variables.converter" />
-            <argument>null</argument>
-        </service>
-        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
     </services>
 </container>
