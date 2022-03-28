@@ -170,8 +170,6 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Bridge\Symfony\Bundle\Command\GraphQlExportCommand::class => ApiPlatform\Symfony\Bundle\Command\GraphQlExportCommand::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand::class => ApiPlatform\Symfony\Bundle\Command\OpenApiCommand::class,
 
-    ApiPlatform\Core\Bridge\Symfony\Bundle\DataCollector\RequestDataCollector::class => ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector::class,
-
     ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass::class => ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass::class,
@@ -195,7 +193,6 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class => ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class,
 
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class => ApiPlatform\Symfony\Bundle\Test\ApiTestAssertionsTrait::class,
-    // ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Client::class => ApiPlatform\Symfony\Bundle\Test\Client::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class => ApiPlatform\Symfony\Bundle\Test\Response::class,
 
@@ -358,10 +355,7 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer::class => ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer::class,
 
     // Test
-    // ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,
     ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup::class => ApiPlatform\Test\DoctrineMongoDbOdmSetup::class,
-    // ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmTestCase::class,
-    // ApiPlatform\Core\Test\DoctrineOrmFilterTestCase::class => ApiPlatform\Test\DoctrineOrmFilterTestCase::class,
 
     // Util
     ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class => ApiPlatform\Util\AnnotationFilterExtractorTrait::class,
@@ -403,7 +397,7 @@ foreach ($deprecatedClassesWithAliases as $class => $alias) {
 }
 
 // These classes are deprecated but we don't want aliases as the interfaces changed
-$deprecatedClasses = [
+$deprecatedClassesWithoutAliases = [
     ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,
@@ -451,7 +445,22 @@ $deprecatedClasses = [
     ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Orm\Filter\SearchFilter::class,
 ];
 
-spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClasses, $deprecatedClassesWithAliases) {
+$testCaseClasses = [
+    ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class => ApiPlatform\Symfony\Bundle\Test\ApiTestCase::class,
+    ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase::class,
+    ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class => ApiPlatform\Test\DoctrineMongoDbOdmTestCase::class,
+    ApiPlatform\Core\Test\DoctrineOrmFilterTestCase::class => ApiPlatform\Test\DoctrineOrmFilterTestCase::class,
+];
+
+// class_alias does load the class you alias too, when PHPUnit is not installed it throws warnings
+if (class_exists(PHPUnit\Framework\TestCase::class)) {
+    foreach ($testCaseClasses as $class => $alias) {
+        class_alias($alias, $class);
+    }
+}
+
+$deprecatedClasses = array_merge($deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases, $testCaseClasses);
+spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClasses) {
     // We can not class alias when working with doctrine annotations
     static $deprecatedAnnotations = [
         'ApiResource' => [ApiPlatform\Core\Annotation\ApiResource::class, ApiPlatform\Metadata\ApiResource::class],
@@ -459,13 +468,6 @@ spl_autoload_register(function ($className) use ($deprecatedInterfaces, $depreca
         'ApiFilter' => [ApiPlatform\Core\Annotation\ApiFilter::class, ApiPlatform\Metadata\ApiFilter::class],
     ];
 
-    if (isset($deprecatedClassesWithAliases[$className])) {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClassesWithAliases[$className]));
-
-        return;
-    }
-
-    // No class alias
     if (isset($deprecatedClasses[$className])) {
         trigger_deprecation('api-platform/core', '2.7', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClasses[$className]));
 

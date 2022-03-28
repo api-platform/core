@@ -332,10 +332,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // Load the legacy metadata as well
         if ($config['metadata_backward_compatibility_layer']) {
             $loader->load('legacy/metadata_backward_compatibility.xml');
+
             return;
         }
 
-        // V3 metadata 
+        // V3 metadata
         $loader->load('metadata/xml.xml');
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
