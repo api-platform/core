@@ -349,9 +349,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('metadata/php_doc.xml');
         }
 
-        $loader->load('metadata/yaml.xml');
-        $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
-        $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
+        if (class_exists(Yaml::class)) {
+            $loader->load('metadata/yaml.xml');
+            $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
+            $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
+        }
     }
 
     private function getBundlesResourcesPaths(ContainerBuilder $container, array $config): array
