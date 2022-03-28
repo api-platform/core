@@ -53,19 +53,6 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Exception\ResourceClassNotSupportedException::class => ApiPlatform\Exception\ResourceClassNotSupportedException::class,
     ApiPlatform\Core\Exception\ItemNotFoundException::class => ApiPlatform\Exception\ItemNotFoundException::class,
 
-    // GraphQl
-    ApiPlatform\Core\GraphQl\Executor::class => ApiPlatform\GraphQl\Executor::class,
-    ApiPlatform\Core\GraphQl\Error\ErrorHandler::class => ApiPlatform\GraphQl\Error\ErrorHandler::class,
-    ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait::class => ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait::class,
-    ApiPlatform\Core\GraphQl\Action\EntrypointAction::class => ApiPlatform\GraphQl\Action\EntrypointAction::class,
-    ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class => ApiPlatform\GraphQl\Action\GraphiQlAction::class,
-    ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction::class => ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction::class,
-    ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class => ApiPlatform\GraphQl\Type\TypeNotFoundException::class,
-    ApiPlatform\Core\GraphQl\Type\TypesFactory::class => ApiPlatform\GraphQl\Type\TypesFactory::class,
-    ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class => ApiPlatform\GraphQl\Type\Definition\UploadType::class,
-    ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class => ApiPlatform\GraphQl\Type\Definition\IterableType::class,
-    ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
-
     // Action
     ApiPlatform\Core\Action\EntrypointAction::class => ApiPlatform\Action\EntrypointAction::class,
     ApiPlatform\Core\Action\ExceptionAction::class => ApiPlatform\Action\ExceptionAction::class,
@@ -395,6 +382,28 @@ foreach ($deprecatedClassesWithAliases as $class => $alias) {
     class_alias($alias, $class);
 }
 
+$graphQlAliases = [
+    // GraphQl
+    ApiPlatform\Core\GraphQl\Executor::class => ApiPlatform\GraphQl\Executor::class,
+    ApiPlatform\Core\GraphQl\Error\ErrorHandler::class => ApiPlatform\GraphQl\Error\ErrorHandler::class,
+    ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait::class => ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait::class,
+    ApiPlatform\Core\GraphQl\Action\EntrypointAction::class => ApiPlatform\GraphQl\Action\EntrypointAction::class,
+    ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class => ApiPlatform\GraphQl\Action\GraphiQlAction::class,
+    ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction::class => ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction::class,
+    ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class => ApiPlatform\GraphQl\Type\TypeNotFoundException::class,
+    ApiPlatform\Core\GraphQl\Type\TypesFactory::class => ApiPlatform\GraphQl\Type\TypesFactory::class,
+    ApiPlatform\Core\GraphQl\Type\Definition\UploadType::class => ApiPlatform\GraphQl\Type\Definition\UploadType::class,
+    ApiPlatform\Core\GraphQl\Type\Definition\IterableType::class => ApiPlatform\GraphQl\Type\Definition\IterableType::class,
+    ApiPlatform\Core\GraphQl\Type\TypesContainer::class => ApiPlatform\GraphQl\Type\TypesContainer::class,
+];
+
+// Only load these aliases if graphql is installed
+if (class_exists(GraphQL\Type\Definition\ScalarType::class)) {
+    foreach ($graphQlAliases as $class => $alias) {
+        class_alias($alias, $class);
+    }
+}
+
 // These classes are deprecated but we don't want aliases as the interfaces changed
 $deprecatedClassesWithoutAliases = [
     ApiPlatform\Core\DataProvider\Pagination::class => ApiPlatform\State\Pagination\Pagination::class,
@@ -459,7 +468,7 @@ if (class_exists(PHPUnit\Framework\TestCase::class)) {
     }
 }
 
-$deprecatedClasses = array_merge($deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases, $testCaseClasses);
+$deprecatedClasses = array_merge($deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases, $testCaseClasses, $graphQlAliases);
 spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClasses) {
     // We can not class alias when working with doctrine annotations
     static $deprecatedAnnotations = [
