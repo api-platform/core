@@ -221,7 +221,6 @@ $deprecatedClassesWithAliases = [
 
     // DataProvider => State/Pagination
     ApiPlatform\Core\DataProvider\ArrayPaginator::class => ApiPlatform\State\Pagination\ArrayPaginator::class,
-    ApiPlatform\Core\DataProvider\Pagination::class => ApiPlatform\State\Pagination\Pagination::class,
     ApiPlatform\Core\DataProvider\PaginationOptions::class => ApiPlatform\State\Pagination\PaginationOptions::class,
     ApiPlatform\Core\DataProvider\TraversablePaginator::class => ApiPlatform\State\Pagination\TraversablePaginator::class,
 
@@ -398,6 +397,7 @@ foreach ($deprecatedClassesWithAliases as $class => $alias) {
 
 // These classes are deprecated but we don't want aliases as the interfaces changed
 $deprecatedClassesWithoutAliases = [
+    ApiPlatform\Core\DataProvider\Pagination::class => ApiPlatform\State\Pagination\Pagination::class,
     ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,
