@@ -65,12 +65,9 @@ class ApiPlatformExtensionTest extends TestCase
             'enabled' => true,
             'varnish_urls' => ['test'],
             'xkey' => [
-                'enabled' => false,
                 'glue' => ' ',
             ],
-            'http_tags' => [
-                'enabled' => true,
-            ],
+            'purger' => 'api_platform.http_cache.purger.varnish.ban',
             'request_options' => [
                 'allow_redirects' => [
                     'max' => 5,
@@ -1245,8 +1242,8 @@ class ApiPlatformExtensionTest extends TestCase
 
             // http_cache_tags.xml
             'api_platform.http_cache.purger.varnish_client',
-            'api_platform.http_cache.purger.varnish',
             'api_platform.http_cache.purger.varnish.xkey',
+            'api_platform.http_cache.purger.varnish.ban',
             'api_platform.http_cache.listener.response.add_tags',
         ];
 
@@ -1261,7 +1258,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.listener.response.add_tags' => 'kernel.event_listener',
         ];
 
-        $this->assertContainerHas($services, [], $tags);
+        $this->assertTrue($this->container->hasAlias('api_platform.http_cache.purger.varnish'));
 
         $this->assertSame([
             ['event' => 'preUpdate'],

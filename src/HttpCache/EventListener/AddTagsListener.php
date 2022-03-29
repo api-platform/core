@@ -15,6 +15,8 @@ namespace ApiPlatform\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\HttpCache\PurgerInterface as LegacyPurgerInterface;
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -41,17 +43,19 @@ final class AddTagsListener
     use UriVariablesResolverTrait;
 
     private $iriConverter;
-    private $xkeyEnabled;
-    private $xkeyGlue;
-    private $httpTagsEnabled;
+    private $purger;
 
-    public function __construct($iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, bool $xkeyEnabled = false, string $xkeyGlue = ' ', bool $httpTagsEnabled = true)
+    /**
+     * @var LegacyPurgerInterface|PurgerInterface
+     *
+     * @param mixed      $iriConverter
+     * @param mixed|null $purger
+     */
+    public function __construct($iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $purger = null)
     {
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        $this->xkeyEnabled = $xkeyEnabled;
-        $this->xkeyGlue = $xkeyGlue;
-        $this->httpTagsEnabled = $httpTagsEnabled;
+        $this->purger = $purger;
     }
 
     /**
@@ -83,12 +87,17 @@ final class AddTagsListener
             return;
         }
 
-        if ($this->httpTagsEnabled) {
+        if ($this->purger instanceof LegacyPurgerInterface || !$this->purger) {
             $response->headers->set('Cache-Tags', implode(',', $resources));
+            trigger_deprecation('api-platform/core', '2.7', sprintf('The interface "%s" is deprecated, use "%s" instead.', LegacyPurgerInterface::class, PurgerInterface::class));
+
+            return;
         }
 
-        if ($this->xkeyEnabled) {
-            $response->headers->set('xkey', implode($this->xkeyGlue, $resources));
+        $headers = $this->purger->getResponseHeaders($resources);
+
+        foreach ($headers as $key => $value) {
+            $response->headers->set($key, $value);
         }
     }
 }

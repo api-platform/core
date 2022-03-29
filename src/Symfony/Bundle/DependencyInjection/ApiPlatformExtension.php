@@ -46,7 +46,6 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -54,6 +53,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mercure\Discovery;
 use Symfony\Component\Mercure\HubRegistry;
@@ -244,9 +244,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.vary', $config['defaults']['cache_headers']['vary'] ?? $config['http_cache']['vary']);
         $container->setParameter('api_platform.http_cache.public', $config['defaults']['cache_headers']['public'] ?? $config['http_cache']['public']);
         $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
-        $container->setParameter('api_platform.http_cache.invalidation.xkey.enabled', $config['defaults']['cache_headers']['invalidation']['xkey_enabled'] ?? $this->isConfigEnabled($container, $config['http_cache']['invalidation']['xkey']));
         $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
-        $container->setParameter('api_platform.http_cache.invalidation.http_tags.enabled', $config['defaults']['cache_headers']['invalidation']['http_tags_enabled'] ?? $this->isConfigEnabled($container, $config['http_cache']['invalidation']['http_tags']));
 
         $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
@@ -686,35 +684,29 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        if (!$this->isConfigEnabled($container, $config['http_cache']['invalidation']['xkey']) && !$this->isConfigEnabled($container, $config['http_cache']['invalidation']['http_tags'])) {
-            throw new RuntimeException('You can not set both xkey and http_tags to false.');
-        }
-
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_http_cache_purger.xml');
         }
 
-        $loader->load('http_cache_tags.xml');
+        $loader->load('http_cache_purger.xml');
 
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
-            $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
-            $definition->addArgument(['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']);
+            $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
+            $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
 
             $definitions[] = $definition;
         }
 
-        if ($this->isConfigEnabled($container, $config['http_cache']['invalidation']['http_tags'])) {
-            $container->getDefinition('api_platform.http_cache.purger.varnish')->setArguments([$definitions,
-                $config['http_cache']['invalidation']['max_header_length'], ]);
-            $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish');
+        foreach (['api_platform.http_cache.purger.varnish.ban', 'api_platform.http_cache.purger.varnish.xkey'] as $serviceName) {
+            $container->findDefinition($serviceName)->setArguments([
+                $definitions,
+                $config['http_cache']['invalidation']['max_header_length'],
+            ]);
         }
 
-        if ($this->isConfigEnabled($container, $config['http_cache']['invalidation']['xkey'])) {
-            $container->getDefinition('api_platform.http_cache.purger.varnish.xkey')->setArguments([$definitions,
-                $config['http_cache']['invalidation']['max_header_length'], ]);
-            $container->setAlias('api_platform.http_cache.purger.xkey', 'api_platform.http_cache.purger.varnish.xkey');
-        }
+        $serviceName = $config['http_cache']['invalidation']['purger'];
+        $container->setAlias('api_platform.http_cache.purger', $serviceName);
     }
 
     /**

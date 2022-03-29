@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\HttpCache\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\HttpCache\EventListener\AddTagsListener;
+use ApiPlatform\HttpCache\Header;
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
@@ -224,15 +226,46 @@ class AddTagsListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
             HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), true);
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->getResponseHeader(['/foo' => '/foo', '/bar' => '/bar', '/dummies' => '/dummies'])->willReturn(new Header('xkey', '/foo /bar /dummies'));
+
+        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $purgerProphecy->reveal());
         $listener->onKernelResponse($event);
 
-        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
         $this->assertSame('/foo /bar /dummies', $response->headers->get('xkey'));
+    }
+
+    public function testAddTagsWithoutHeader()
+    {
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, 'get', 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => new GetCollection()]))]);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
+
+        $response = new Response();
+        $response->setPublic();
+        $response->setEtag('foo');
+
+        $event = new ResponseEvent(
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
+            new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            HttpKernelInterface::MASTER_REQUEST,
+            $response
+        );
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->getResponseHeader(['/foo' => '/foo', '/bar' => '/bar', '/dummies' => '/dummies'])->willReturn(null);
+
+        $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $purgerProphecy->reveal());
+        $listener->onKernelResponse($event);
+
+        $this->assertNull($response->headers->get('xkey'));
     }
 }

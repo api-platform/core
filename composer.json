@@ -42,7 +42,6 @@
         "friends-of-behat/mink-browserkit-driver": "^1.3.1",
         "friends-of-behat/mink-extension": "^2.2",
         "friends-of-behat/symfony-extension": "^2.1",
-        "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "justinrainbow/json-schema": "^5.2.1",
         "phpdocumentor/reflection-docblock": "^3.0 || ^4.0 || ^5.1",
@@ -97,7 +96,6 @@
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
-        "guzzlehttp/guzzle": "To use the HTTP cache invalidation system.",
         "ocramius/package-versions": "To display the API Platform's version in the debug bar.",
         "phpdocumentor/reflection-docblock": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
@@ -106,6 +104,7 @@
         "symfony/cache": "To have metadata caching when using Symfony integration.",
         "symfony/config": "To load XML configuration files.",
         "symfony/expression-language": "To use authorization features.",
+        "symfony/http-client": "To use the HTTP cache invalidation system.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
         "symfony/uid": "To support Symfony UUID/ULID identifiers.",

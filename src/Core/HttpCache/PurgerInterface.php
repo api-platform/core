@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\HttpCache;
+namespace ApiPlatform\Core\HttpCache;
 
 /**
  * Purges resources from the cache.
@@ -28,11 +28,4 @@ interface PurgerInterface
      * @param string[] $iris
      */
     public function purge(array $iris);
-
-    /**
-     * Get the response header containing purged tags.
-     *
-     * @param string[] $iris
-     */
-    public function getResponseHeaders(array $iris): array;
 }
