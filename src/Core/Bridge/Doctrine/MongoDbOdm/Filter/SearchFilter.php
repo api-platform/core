@@ -11,13 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Odm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDBClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -52,7 +53,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
-    protected function getIriConverter()
+    protected function getIriConverter(): IriConverterInterface
     {
         return $this->iriConverter;
     }
@@ -212,7 +213,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             case MongoDbType::BOOLEAN:
                 return 'bool';
             case MongoDbType::DATE:
-            case MongoDbType::DATE_IMMUTABLE:
                 return \DateTimeInterface::class;
             case MongoDbType::FLOAT:
                 return 'float';

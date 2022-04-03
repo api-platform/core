@@ -131,6 +131,5 @@
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">
             <tag name="cache.pool" />
         </service>
-
     </services>
 </container>

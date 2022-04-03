@@ -299,18 +299,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
-        $loader->load('metadata/xml.xml');
-        $loader->load('metadata/property_name.xml');
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
+
+        $loader->load('metadata/resource_name.xml');
+        $loader->load('metadata/property_name.xml');
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
                 $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
             ));
         }
-
-        $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
-        $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 
         $loader->load('legacy/metadata.xml');
         $container->getDefinition('api_platform.metadata.extractor.xml.legacy')->replaceArgument(0, $xmlResources);
@@ -326,24 +324,36 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (class_exists(Yaml::class)) {
             $loader->load('legacy/metadata_yaml.xml');
             $container->getDefinition('api_platform.metadata.extractor.yaml.legacy')->replaceArgument(0, $yamlResources);
+
+            if ($config['metadata_backward_compatibility_layer']) {
+                $loader->load('legacy/metadata_yaml_backward_compatibility.xml');
+            }
         }
 
         // Load the legacy metadata as well
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('metadata/links.xml');
-            $loader->load('metadata/property.xml');
-            $loader->load('metadata/property_name.xml');
-            $loader->load('metadata/resource.xml');
-            $loader->load('metadata/resource_name.xml');
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/metadata_backward_compatibility.xml');
 
-            if (interface_exists(DocBlockFactoryInterface::class)) {
-                $loader->load('metadata/php_doc.xml');
-            }
+            return;
+        }
 
+        // V3 metadata
+        $loader->load('metadata/xml.xml');
+        $loader->load('metadata/links.xml');
+        $loader->load('metadata/property.xml');
+        $loader->load('metadata/resource.xml');
+
+        $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
+
+        if (interface_exists(DocBlockFactoryInterface::class)) {
+            $loader->load('metadata/php_doc.xml');
+        }
+
+        if (class_exists(Yaml::class)) {
             $loader->load('metadata/yaml.xml');
             $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
             $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
-            $loader->load('metadata/backward_compatibility.xml');
         }
     }
 
