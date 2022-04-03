@@ -47,6 +47,14 @@ Feature: GraphQL introspection support
             ofType {
               name
               kind
+              ofType {
+                name
+                kind
+                ofType {
+                  name
+                  kind
+                }
+              }
             }
           }
         }
@@ -61,6 +69,10 @@ Feature: GraphQL introspection support
             ofType {
               name
               kind
+              ofType {
+                name
+                kind
+              }
             }
           }
         }
@@ -88,10 +100,18 @@ Feature: GraphQL introspection support
       "name":"edges",
       "type":{
         "name":null,
-        "kind":"LIST",
+        "kind":"NON_NULL",
         "ofType":{
-          "name":"DummyAggregateOfferEdge",
-          "kind":"OBJECT"
+          "name":null,
+          "kind":"LIST",
+          "ofType":{
+            "name":null,
+            "kind":"NON_NULL",
+            "ofType":{
+              "name":"DummyAggregateOfferEdge",
+              "kind":"OBJECT"
+            }
+          }
         }
       }
     }
@@ -101,9 +121,13 @@ Feature: GraphQL introspection support
     {
       "name":"node",
       "type":{
-        "name":"DummyAggregateOffer",
-        "kind":"OBJECT",
-        "ofType":null
+        "name":null,
+        "kind":"NON_NULL",
+        "ofType":{
+          "name":"DummyAggregateOffer",
+          "kind":"OBJECT",
+          "ofType":null
+        }
       }
     }
     """
@@ -116,7 +140,8 @@ Feature: GraphQL introspection support
         "kind":"NON_NULL",
         "ofType":{
           "name":"String",
-          "kind":"SCALAR"
+          "kind":"SCALAR",
+          "ofType":null
         }
       }
     }
