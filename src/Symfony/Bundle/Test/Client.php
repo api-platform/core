@@ -146,8 +146,6 @@ final class Client implements HttpClientInterface
 
     /**
      * Gets the underlying test client.
-     *
-     * @internal
      */
     public function getKernelBrowser(): KernelBrowser
     {
