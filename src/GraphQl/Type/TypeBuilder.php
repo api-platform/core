@@ -258,8 +258,6 @@ final class TypeBuilder implements TypeBuilderInterface
     {
         $shortName = $resourceType->name;
 
-        // TODO Do we need this guard?
-        // TODO If so, what to do with the callable
         if ($resourceType instanceof NullableType) {
             $resourceType = GraphQLType::nonNull($resourceType);
         }
@@ -317,8 +315,6 @@ final class TypeBuilder implements TypeBuilderInterface
         $paginationInfoObjectType = new ObjectType($paginationInfoObjectTypeConfiguration);
         $this->typesContainer->set("{$shortName}PaginationInfo", $paginationInfoObjectType);
 
-        // TODO Do we need this guard?
-        // TODO If so, what to do with the callable
         if ($resourceType instanceof NullableType) {
             $resourceType = GraphQLType::nonNull($resourceType);
         }
