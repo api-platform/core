@@ -273,6 +273,45 @@ Feature: Collections support
     }
     """
 
+  @!mongodb
+  @createSchema
+  Scenario: Change the number of element by page client side with v3, attributes and PHP8. Defaults should not override resource attribute parameters
+    Given there are 80 pagination entities
+    When I send a "GET" request to "/pagination_entities?page=2&itemsPerPage=40"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/PaginationEntity"},
+        "@id": {"pattern": "^/pagination_entities"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:totalItems": {"type":"number", "maximum": 80},
+        "hydra:member": {
+          "type": "array",
+          "minItems": 30,
+          "maxItems": 30
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/pagination_entities\\?itemsPerPage=40&page=2$"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"},
+            "hydra:first": {"pattern": "^/pagination_entities\\?itemsPerPage=40&page=1$"},
+            "hydra:last": {"pattern": "^/pagination_entities\\?itemsPerPage=40&page=3$"},
+            "hydra:previous": {"pattern": "^/pagination_entities\\?itemsPerPage=40&page=1$"},
+            "hydra:next": {"pattern": "^/pagination_entities\\?itemsPerPage=40&page=3$"}
+          }
+        },
+        "hydra:search": {}
+      },
+      "additionalProperties": false
+    }
+    """
+
   Scenario: Test presence of next
     When I send a "GET" request to "/dummies?page=3"
     Then the response status code should be 200

@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PaginationEntity;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 

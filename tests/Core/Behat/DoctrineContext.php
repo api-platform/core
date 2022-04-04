@@ -145,6 +145,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Order;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PaginationEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PatchDummyRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Payment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
@@ -273,6 +274,19 @@ final class DoctrineContext implements Context
             $dummy->nameConverted = 'Converted '.$i;
 
             $this->manager->persist($dummy);
+        }
+
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there are :nb pagination entities
+     */
+    public function thereArePaginationEntities(int $nb)
+    {
+        for ($i = 1; $i <= $nb; ++$i) {
+            $paginationEntity = new PaginationEntity();
+            $this->manager->persist($paginationEntity);
         }
 
         $this->manager->flush();
