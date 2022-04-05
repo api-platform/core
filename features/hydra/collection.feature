@@ -274,6 +274,7 @@ Feature: Collections support
     """
 
   @!mongodb
+  @php8
   Scenario: Change the number of element by page client side with v3, attributes and PHP8. Defaults (max 40) should not override resource attribute (max 30)
     Given there are 80 pagination entities
     When I send a "GET" request to "/pagination_entities?page=2&itemsPerPage=40"

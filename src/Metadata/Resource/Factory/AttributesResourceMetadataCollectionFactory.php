@@ -147,7 +147,10 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             if (null === $graphQlOperations) {
-                $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
+                // Add default graphql operations on the first resource
+                if (0 === $index) {
+                    $resources[$index] = $this->addDefaultGraphQlOperations($resources[$index]);
+                }
                 continue;
             }
 
@@ -168,17 +171,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function getOperationWithDefaults(ApiResource $resource, $operation): array
     {
-        foreach ($this->defaults['attributes'] as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
-
-            $upperProperty = ucfirst($key);
-            $getter = "get$upperProperty";
-
-            if (method_exists($operation, $getter) && null === $operation->{$getter}()) {
-                $operation = $operation->{'with'.ucfirst($key)}($value);
-            }
-        }
-
+        // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
             if (0 !== strpos($methodName, 'get')) {
                 continue;
@@ -201,6 +194,9 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
+        // Add global defaults attributes to the operation
+        $operation = $this->addGlobalDefaults($operation);
+
         if ($operation instanceof GraphQlOperation) {
             if (!$operation->getName()) {
                 throw new RuntimeException('No GraphQL operation name.');
@@ -220,6 +216,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         if ($operation->getRouteName()) {
             $operation = $operation->withName($operation->getRouteName());
         }
+
         // Check for name conflict
         if ($operation->getName()) {
             if (null !== $resource->getOperations() && !$resource->getOperations()->has($operation->getName())) {
@@ -236,20 +233,30 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         ];
     }
 
+    /**
+     * @param ApiResource|Operation|GraphQlOperation $operation
+     */
+    private function addGlobalDefaults($operation)
+    {
+        foreach ($this->defaults['attributes'] as $key => $value) {
+            [$key, $value] = $this->getKeyValue($key, $value);
+            $upperKey = ucfirst($key);
+            $getter = 'get'.$upperKey;
+            if (method_exists($operation, $getter) && null === $operation->{$getter}()) {
+                $operation = $operation->{'with'.$upperKey}($value);
+            }
+        }
+
+        return $operation;
+    }
+
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource
     {
         $resource = $resource
             ->withShortName($resource->getShortName() ?? $shortName)
             ->withClass($resourceClass);
 
-        foreach ($this->defaults['attributes'] as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
-            if (method_exists($resource, 'get'.ucfirst($key)) && !$resource->{'get'.ucfirst($key)}()) {
-                $resource = $resource->{'with'.ucfirst($key)}($value);
-            }
-        }
-
-        return $resource;
+        return $this->addGlobalDefaults($resource);
     }
 
     private function hasResourceAttributes(\ReflectionClass $reflectionClass): bool
