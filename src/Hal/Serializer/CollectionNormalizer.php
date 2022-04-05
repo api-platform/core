@@ -105,3 +105,5 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         return $data;
     }
 }
+
+class_alias(CollectionNormalizer::class, \ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class);

@@ -87,3 +87,5 @@ final class ContextAction
         throw new NotFoundHttpException();
     }
 }
+
+class_alias(ContextAction::class, \ApiPlatform\Core\JsonLd\Action\ContextAction::class);

@@ -122,3 +122,5 @@ trait NumericFilterTrait
         return true;
     }
 }
+
+class_alias(NumericFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class);

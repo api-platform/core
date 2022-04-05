@@ -195,3 +195,5 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $data;
     }
 }
+
+class_alias(PartialCollectionViewNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\PartialCollectionViewNormalizer::class);

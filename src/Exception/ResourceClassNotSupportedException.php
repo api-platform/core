@@ -21,3 +21,5 @@ namespace ApiPlatform\Exception;
 class ResourceClassNotSupportedException extends \Exception implements ExceptionInterface
 {
 }
+
+class_alias(ResourceClassNotSupportedException::class, \ApiPlatform\Core\Exception\ResourceClassNotSupportedException::class);

@@ -33,3 +33,5 @@ trait IdentifierTrait
         return $args['id'] ?? null;
     }
 }
+
+class_alias(IdentifierTrait::class, \ApiPlatform\Core\GraphQl\Resolver\Util\IdentifierTrait::class);

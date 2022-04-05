@@ -97,3 +97,5 @@ final class Link
         return $clone;
     }
 }
+
+class_alias(Link::class, \ApiPlatform\Core\OpenApi\Model\Link::class);

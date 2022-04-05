@@ -49,3 +49,5 @@ final class Bounds implements ValidatorInterface
         return $errorList;
     }
 }
+
+class_alias(Bounds::class, \ApiPlatform\Core\Filter\Validator\Bounds::class);

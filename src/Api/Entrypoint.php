@@ -34,3 +34,5 @@ final class Entrypoint
         return $this->resourceNameCollection;
     }
 }
+
+class_alias(Entrypoint::class, \ApiPlatform\Core\Api\Entrypoint::class);

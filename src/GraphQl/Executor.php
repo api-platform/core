@@ -32,3 +32,5 @@ final class Executor implements ExecutorInterface
         return GraphQL::executeQuery($schema, $source, $rootValue, $context, $variableValues, $operationName, $fieldResolver, $validationRules);
     }
 }
+
+class_alias(Executor::class, \ApiPlatform\Core\GraphQl\Executor::class);

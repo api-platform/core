@@ -63,3 +63,5 @@ final class TransformSortingParametersListener
         $request->attributes->set('_api_filters', $filters);
     }
 }
+
+class_alias(TransformSortingParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformSortingParametersListener::class);

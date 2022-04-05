@@ -97,3 +97,5 @@ final class ValidateListener
         $this->validator->validate($controllerResult, $validationContext);
     }
 }
+
+class_alias(ValidateListener::class, \ApiPlatform\Core\Validator\EventListener\ValidateListener::class);

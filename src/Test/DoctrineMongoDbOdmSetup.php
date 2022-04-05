@@ -119,3 +119,5 @@ class DoctrineMongoDbOdmSetup
         return class_exists(ArrayCache::class) ? new ArrayCache() : new ArrayAdapter();
     }
 }
+
+class_alias(DoctrineMongoDbOdmSetup::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmSetup::class);

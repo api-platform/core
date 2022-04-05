@@ -33,3 +33,5 @@ trait SortTrait
         $sortFunction($array);
     }
 }
+
+class_alias(SortTrait::class, \ApiPlatform\Core\Util\SortTrait::class);

@@ -155,3 +155,5 @@ abstract class AbstractFilter implements FilterInterface
         return [$type, $hasAssociation, $currentResourceClass, $currentProperty];
     }
 }
+
+class_alias(AbstractFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class);

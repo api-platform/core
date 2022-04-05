@@ -74,3 +74,5 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
         throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
     }
 }
+
+class_alias(AttributeDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class);

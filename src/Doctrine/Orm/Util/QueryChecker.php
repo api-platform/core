@@ -205,3 +205,5 @@ final class QueryChecker
         return false;
     }
 }
+
+class_alias(QueryChecker::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::class);

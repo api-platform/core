@@ -59,3 +59,5 @@ trait ClassInfoTrait
         );
     }
 }
+
+class_alias(ClassInfoTrait::class, \ApiPlatform\Core\Util\ClassInfoTrait::class);

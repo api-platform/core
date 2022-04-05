@@ -104,3 +104,5 @@ final class AddLinkHeaderListener
         $this->discovery->addLink($request, $hub);
     }
 }
+
+class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Mercure\EventListener\AddLinkHeaderListener::class);

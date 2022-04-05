@@ -374,3 +374,5 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         return $context ?? [];
     }
 }
+
+class_alias(EagerLoadingExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension::class);

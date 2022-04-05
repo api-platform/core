@@ -109,3 +109,5 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         return $this->localIsResourceClassCache[$type] = false;
     }
 }
+
+class_alias(ResourceClassResolver::class, \ApiPlatform\Core\Api\ResourceClassResolver::class);

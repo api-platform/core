@@ -131,3 +131,5 @@ final class VarnishPurger implements PurgerInterface
         yield from $this->chunkRegexParts($nextParts);
     }
 }
+
+class_alias(VarnishPurger::class, \ApiPlatform\Core\HttpCache\VarnishPurger::class);

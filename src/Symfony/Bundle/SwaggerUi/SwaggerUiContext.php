@@ -76,3 +76,5 @@ final class SwaggerUiContext
         return $this->extraConfiguration;
     }
 }
+
+class_alias(SwaggerUiContext::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class);

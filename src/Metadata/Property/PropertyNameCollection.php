@@ -51,3 +51,5 @@ final class PropertyNameCollection implements \IteratorAggregate, \Countable
         return \count($this->properties);
     }
 }
+
+class_alias(PropertyNameCollection::class, \ApiPlatform\Core\Metadata\Property\PropertyNameCollection::class);

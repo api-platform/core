@@ -75,3 +75,5 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         return $context;
     }
 }
+
+class_alias(SerializerFilterContextBuilder::class, \ApiPlatform\Core\Serializer\SerializerFilterContextBuilder::class);

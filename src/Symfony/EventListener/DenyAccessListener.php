@@ -155,3 +155,5 @@ final class DenyAccessListener
         }
     }
 }
+
+class_alias(DenyAccessListener::class, \ApiPlatform\Core\Security\EventListener\DenyAccessListener::class);

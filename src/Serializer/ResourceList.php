@@ -19,3 +19,5 @@ namespace ApiPlatform\Serializer;
 class ResourceList extends \ArrayObject
 {
 }
+
+class_alias(ResourceList::class, \ApiPlatform\Core\Serializer\ResourceList::class);

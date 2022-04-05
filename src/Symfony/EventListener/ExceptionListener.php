@@ -51,3 +51,5 @@ final class ExceptionListener
         $this->exceptionListener->onKernelException($event);
     }
 }
+
+class_alias(ExceptionListener::class, \ApiPlatform\Core\EventListener\ExceptionListener::class);

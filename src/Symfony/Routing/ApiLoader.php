@@ -341,3 +341,5 @@ final class ApiLoader extends Loader
         $routeCollection->add(RouteNameGenerator::generate($operationName, $resourceShortName, $operationType), $route);
     }
 }
+
+class_alias(ApiLoader::class, \ApiPlatform\Core\Bridge\Symfony\Routing\ApiLoader::class);

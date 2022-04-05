@@ -64,3 +64,5 @@ final class OperationPathResolver implements OperationPathResolverInterface
         return $path;
     }
 }
+
+class_alias(OperationPathResolver::class, \ApiPlatform\Core\PathResolver\OperationPathResolver::class);

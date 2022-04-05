@@ -34,3 +34,5 @@ abstract class AbstractContextAwareFilter extends AbstractFilter implements Cont
         }
     }
 }
+
+class_alias(AbstractContextAwareFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter::class);

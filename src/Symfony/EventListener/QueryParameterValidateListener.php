@@ -99,3 +99,5 @@ final class QueryParameterValidateListener
         $this->queryParameterValidator->validateFilters($attributes['resource_class'], $resourceFilters, $queryParameters);
     }
 }
+
+class_alias(QueryParameterValidateListener::class, \ApiPlatform\Core\EventListener\QueryParameterValidateListener::class);

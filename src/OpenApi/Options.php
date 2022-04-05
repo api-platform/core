@@ -139,3 +139,5 @@ final class Options
         return $this->licenseUrl;
     }
 }
+
+class_alias(Options::class, \ApiPlatform\Core\OpenApi\Options::class);

@@ -32,3 +32,5 @@ final class UnderscorePathSegmentNameGenerator implements PathSegmentNameGenerat
         return $collection ? Inflector::pluralize($name) : $name;
     }
 }
+
+class_alias(UnderscorePathSegmentNameGenerator::class, \ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator::class);

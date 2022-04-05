@@ -39,3 +39,5 @@ final class ContextStamp implements StampInterface
         return $this->context;
     }
 }
+
+class_alias(ContextStamp::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp::class);

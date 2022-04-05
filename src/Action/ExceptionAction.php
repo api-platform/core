@@ -116,3 +116,5 @@ final class ExceptionAction
         );
     }
 }
+
+class_alias(ExceptionAction::class, \ApiPlatform\Core\Action\ExceptionAction::class);

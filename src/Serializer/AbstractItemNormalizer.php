@@ -1029,3 +1029,5 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $this->allowPlainIdentifiers && null !== $this->itemDataProvider;
     }
 }
+
+class_alias(AbstractItemNormalizer::class, \ApiPlatform\Core\Serializer\AbstractItemNormalizer::class);

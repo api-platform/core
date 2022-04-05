@@ -94,3 +94,5 @@ final class DocumentationAction
         return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
     }
 }
+
+class_alias(DocumentationAction::class, \ApiPlatform\Core\Documentation\Action\DocumentationAction::class);

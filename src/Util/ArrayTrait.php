@@ -40,3 +40,5 @@ trait ArrayTrait
         });
     }
 }
+
+class_alias(ArrayTrait::class, \ApiPlatform\Core\Util\ArrayTrait::class);
