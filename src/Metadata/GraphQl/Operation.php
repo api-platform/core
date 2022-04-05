@@ -119,7 +119,7 @@ class Operation
     public function __construct(
         ?bool $delete = null,
         ?string $resolver = null,
-        bool $collection = false,
+        ?bool $collection = null,
         ?array $args = null,
         ?string $shortName = null,
         ?string $class = null,
@@ -228,7 +228,7 @@ class Operation
         return $self;
     }
 
-    public function isCollection(): bool
+    public function isCollection(): ?bool
     {
         return $this->collection;
     }
