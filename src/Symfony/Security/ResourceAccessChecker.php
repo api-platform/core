@@ -108,3 +108,5 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
         }, $this->roleHierarchy->getReachableRoles($token->getRoles())); // @phpstan-ignore-line
     }
 }
+
+class_alias(ResourceAccessChecker::class, \ApiPlatform\Core\Security\ResourceAccessChecker::class);

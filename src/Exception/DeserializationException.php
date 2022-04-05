@@ -24,3 +24,5 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExcep
 class DeserializationException extends \Exception implements ExceptionInterface, SerializerExceptionInterface
 {
 }
+
+class_alias(DeserializationException::class, \ApiPlatform\Core\Exception\DeserializationException::class);

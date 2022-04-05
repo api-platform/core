@@ -43,3 +43,5 @@ final class TransformPaginationParametersListener
         $request->attributes->set('_api_pagination', $pageParameter);
     }
 }
+
+class_alias(TransformPaginationParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener::class);

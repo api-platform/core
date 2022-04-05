@@ -39,3 +39,5 @@ final class Reflection
         return null;
     }
 }
+
+class_alias(Reflection::class, \ApiPlatform\Core\Util\Reflection::class);

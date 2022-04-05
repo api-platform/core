@@ -68,3 +68,5 @@ final class BooleanFilter extends AbstractFilter
         $aggregationBuilder->match()->field($matchField)->equals($value);
     }
 }
+
+class_alias(BooleanFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter::class);

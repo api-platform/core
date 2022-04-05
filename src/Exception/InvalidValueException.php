@@ -16,3 +16,5 @@ namespace ApiPlatform\Exception;
 class InvalidValueException extends InvalidArgumentException
 {
 }
+
+class_alias(InvalidValueException::class, \ApiPlatform\Core\Exception\InvalidValueException::class);

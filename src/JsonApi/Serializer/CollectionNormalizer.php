@@ -117,3 +117,5 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         return $data;
     }
 }
+
+class_alias(CollectionNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\CollectionNormalizer::class);

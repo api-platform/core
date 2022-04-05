@@ -45,3 +45,5 @@ final class CustomOperationPathResolver implements OperationPathResolverInterfac
         return $operation['path'] ?? $this->deferred->resolveOperationPath($resourceShortName, $operation, OperationTypeDeprecationHelper::getOperationType($operationType), $operationName);
     }
 }
+
+class_alias(CustomOperationPathResolver::class, \ApiPlatform\Core\PathResolver\CustomOperationPathResolver::class);

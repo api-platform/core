@@ -21,3 +21,5 @@ namespace ApiPlatform\Exception;
 class InvalidResourceException extends \Exception implements ExceptionInterface
 {
 }
+
+class_alias(InvalidResourceException::class, \ApiPlatform\Core\Exception\InvalidResourceException::class);

@@ -667,3 +667,5 @@ final class Configuration implements ConfigurationInterface
             : [$message];
     }
 }
+
+class_alias(Configuration::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class);

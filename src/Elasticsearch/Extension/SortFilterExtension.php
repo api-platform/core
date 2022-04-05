@@ -44,3 +44,5 @@ final class SortFilterExtension extends AbstractFilterExtension
         return $requestBody;
     }
 }
+
+class_alias(SortFilterExtension::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortFilterExtension::class);

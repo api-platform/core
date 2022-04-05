@@ -66,3 +66,5 @@ final class ReflectionClassRecursiveIterator
         }
     }
 }
+
+class_alias(ReflectionClassRecursiveIterator::class, \ApiPlatform\Core\Util\ReflectionClassRecursiveIterator::class);

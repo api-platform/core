@@ -91,3 +91,5 @@ final class NumericFilter extends AbstractFilter
         return 'int';
     }
 }
+
+class_alias(NumericFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\NumericFilter::class);

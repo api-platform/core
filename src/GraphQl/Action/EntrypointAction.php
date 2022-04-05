@@ -221,3 +221,5 @@ final class EntrypointAction
         return $decoded;
     }
 }
+
+class_alias(EntrypointAction::class, \ApiPlatform\Core\GraphQl\Action\EntrypointAction::class);

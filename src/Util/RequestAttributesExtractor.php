@@ -35,3 +35,5 @@ final class RequestAttributesExtractor
         return AttributesExtractor::extractAttributes($request->attributes->all());
     }
 }
+
+class_alias(RequestAttributesExtractor::class, \ApiPlatform\Core\Util\RequestAttributesExtractor::class);

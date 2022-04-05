@@ -82,3 +82,5 @@ final class OAuthFlows
         return $clone;
     }
 }
+
+class_alias(OAuthFlows::class, \ApiPlatform\Core\OpenApi\Model\OAuthFlows::class);

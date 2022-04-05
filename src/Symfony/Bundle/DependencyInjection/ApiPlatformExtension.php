@@ -944,3 +944,5 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             : [true, $message];
     }
 }
+
+class_alias(ApiPlatformExtension::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension::class);

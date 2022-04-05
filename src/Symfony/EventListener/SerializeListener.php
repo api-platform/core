@@ -154,3 +154,5 @@ final class SerializeListener
         $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));
     }
 }
+
+class_alias(SerializeListener::class, \ApiPlatform\Core\EventListener\SerializeListener::class);

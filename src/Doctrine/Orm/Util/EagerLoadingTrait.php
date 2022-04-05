@@ -106,3 +106,5 @@ trait EagerLoadingTrait
         return false;
     }
 }
+
+class_alias(EagerLoadingTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\EagerLoadingTrait::class);

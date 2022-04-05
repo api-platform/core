@@ -169,3 +169,5 @@ final class DeserializeListener
         return $format;
     }
 }
+
+class_alias(DeserializeListener::class, \ApiPlatform\Core\EventListener\DeserializeListener::class);

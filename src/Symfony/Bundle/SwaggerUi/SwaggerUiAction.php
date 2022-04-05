@@ -135,3 +135,5 @@ final class SwaggerUiAction
         throw new RuntimeException(sprintf('The operation "%s" cannot be found in the Swagger specification.', $swaggerData['operationId']));
     }
 }
+
+class_alias(SwaggerUiAction::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class);

@@ -42,3 +42,5 @@ final class PropertyInfoPropertyNameCollectionFactory implements PropertyNameCol
         return new PropertyNameCollection($properties ?? []);
     }
 }
+
+class_alias(PropertyInfoPropertyNameCollectionFactory::class, \ApiPlatform\Core\Bridge\Symfony\PropertyInfo\Metadata\Property\PropertyInfoPropertyNameCollectionFactory::class);

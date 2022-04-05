@@ -77,3 +77,5 @@ final class FilterExtension implements AggregationCollectionExtensionInterface
         }
     }
 }
+
+class_alias(FilterExtension::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\FilterExtension::class);
