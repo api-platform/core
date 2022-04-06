@@ -189,7 +189,7 @@ class ConfigurationTest extends TestCase
                     'varnish_urls' => [],
                     'request_options' => [],
                     'max_header_length' => 7500,
-                    'purger' => 'api_platform.http_cache.purger.varnish.ban',
+                    'purger' => 'api_platform.http_cache.purger.varnish',
                 ],
                 'etag' => true,
                 'max_age' => null,

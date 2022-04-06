@@ -16,7 +16,6 @@ namespace ApiPlatform\Tests\HttpCache\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\HttpCache\EventListener\AddTagsListener;
-use ApiPlatform\HttpCache\Header;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -232,7 +231,7 @@ class AddTagsListenerTest extends TestCase
         );
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->getResponseHeader(['/foo' => '/foo', '/bar' => '/bar', '/dummies' => '/dummies'])->willReturn(new Header('xkey', '/foo /bar /dummies'));
+        $purgerProphecy->getResponseHeaders(['/foo' => '/foo', '/bar' => '/bar', '/dummies' => '/dummies'])->willReturn(['xkey' => '/foo /bar /dummies']);
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $purgerProphecy->reveal());
         $listener->onKernelResponse($event);
@@ -261,7 +260,7 @@ class AddTagsListenerTest extends TestCase
         );
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->getResponseHeader(['/foo' => '/foo', '/bar' => '/bar', '/dummies' => '/dummies'])->willReturn(null);
+        $purgerProphecy->getResponseHeaders(['/foo' => '/foo', '/bar' => '/bar', '/dummies' => '/dummies'])->willReturn([]);
 
         $listener = new AddTagsListener($iriConverterProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $purgerProphecy->reveal());
         $listener->onKernelResponse($event);
