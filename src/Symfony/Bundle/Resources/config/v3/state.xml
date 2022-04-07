@@ -4,6 +4,10 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="api_platform.state_provider.locator" class="ApiPlatform\State\CallableProvider">
+            <argument type="tagged_locator" tag="api_platform.state_provider"/>
+        </service>
+        <service id="api_platform.state_provider" alias="api_platform.state_provider.locator" />
 
         <service id="api_platform.pagination.next" class="ApiPlatform\State\Pagination\Pagination">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -13,16 +17,9 @@
         <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination.next" />
         <service id="api_platform.pagination" alias="api_platform.pagination.next" />
 
-        <service id="api_platform.state_provider" class="ApiPlatform\State\ChainProvider">
-            <argument type="tagged" tag="api_platform.state_provider" />
+        <service id="api_platform.state_processor.locator" class="ApiPlatform\State\CallableProcessor">
+            <argument type="tagged_locator" tag="api_platform.state_processor"/>
         </service>
-
-        <service id="ApiPlatform\State\ProviderInterface" alias="api_platform.state_provider" />
-
-        <service id="api_platform.state_processor" class="ApiPlatform\State\ChainProcessor" public="false">
-            <argument type="tagged" tag="api_platform.state_processor" />
-        </service>
-        <service id="ApiPlatform\State\ProcessorInterface" alias="api_platform.state_processor" />
-
+        <service id="api_platform.state_processor" alias="api_platform.state_processor.locator" />
     </services>
 </container>

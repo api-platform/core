@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\CollectionAbstractOperation;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 
 final class ResourceInterfaceImplementationProvider implements ProviderInterface
@@ -23,25 +24,15 @@ final class ResourceInterfaceImplementationProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        /** @var Operation */
-        $operation = $context['operation'];
-        if ($operation->isCollection()) {
+        if ($operation instanceof CollectionOperationInterface) {
             return (function () {
                 yield (new ResourceInterfaceImplementation())->setFoo('item1');
                 yield (new ResourceInterfaceImplementation())->setFoo('item2');
             })();
         }
 
-        return 'some-id' === $identifiers['foo'] ? (new ResourceInterfaceImplementation())->setFoo('single item') : null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        return ResourceInterface::class === $resourceClass;
+        return 'some-id' === $uriVariables['foo'] ? (new ResourceInterfaceImplementation())->setFoo('single item') : null;
     }
 }

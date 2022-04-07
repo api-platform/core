@@ -18,6 +18,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Error\SyntaxError;
@@ -166,10 +167,9 @@ final class TypeConverter implements TypeConverterInterface
         try {
             $operation = $resourceMetadataCollection->getOperation($operationName);
         } catch (OperationNotFoundException $e) {
-            $operation = (new Query())
+            $operation = ($isCollection ? new QueryCollection() : new Query())
                 ->withResource($resourceMetadataCollection[0])
-                ->withName($operationName)
-                ->withCollection($isCollection);
+                ->withName($operationName);
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);

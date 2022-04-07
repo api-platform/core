@@ -88,8 +88,8 @@ services:
         tags:
             -   name: 'api_platform.item_data_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ProductItemProvider'
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ProductProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ProductProvider'
         public: false
         arguments:
             $managerRegistry: '@doctrine'

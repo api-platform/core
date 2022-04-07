@@ -96,7 +96,7 @@ services:
         autowire: true
         autoconfigure: true
 
-    attribute_resources.state_provider:
+    ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider'
         public: false
         tags:
@@ -109,7 +109,7 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    operation_resources.state_processor:
+    ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
         public: false
         arguments: [ '@doctrine' ]
@@ -128,7 +128,13 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    resource_interface.state_provider:
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory'
+        decorates: api_platform.metadata.resource.metadata_collection_factory
+        arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory.inner']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider'
         public: false
         tags:

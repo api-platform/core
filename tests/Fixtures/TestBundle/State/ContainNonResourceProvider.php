@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\NotAResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\ContainNonResource as ContainNonResourceDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -26,13 +25,14 @@ class ContainNonResourceProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        $id = $identifiers['id'] ?? null;
+        $id = $uriVariables['id'] ?? null;
         if (!\is_scalar($id)) {
             throw new \InvalidArgumentException('The id must be a scalar.');
         }
 
+        $resourceClass = $operation->getClass();
         // Retrieve the blog post item from somewhere
         $cnr = new $resourceClass();
         $cnr->id = $id;
@@ -42,13 +42,5 @@ class ContainNonResourceProvider implements ProviderInterface
         $cnr->nested->notAResource = new NotAResource('f2', 'b2');
 
         return $cnr;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        return \in_array($resourceClass, [ContainNonResource::class, ContainNonResourceDocument::class], true);
     }
 }

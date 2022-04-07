@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
@@ -20,24 +21,19 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class AttributeResourceProvider implements ProviderInterface
 {
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        if (isset($identifiers['identifier'])) {
-            $resource = new AttributeResource($identifiers['identifier'], 'Foo');
+        if (isset($uriVariables['identifier'])) {
+            $resource = new AttributeResource($uriVariables['identifier'], 'Foo');
 
-            if ($identifiers['dummyId'] ?? false) {
+            if ($uriVariables['dummyId'] ?? false) {
                 $resource->dummy = new Dummy();
-                $resource->dummy->setId($identifiers['dummyId']);
+                $resource->dummy->setId($uriVariables['dummyId']);
             }
 
             return $resource;
         }
 
         return new AttributeResources(new AttributeResource(1, 'Foo'), new AttributeResource(2, 'Bar'));
-    }
-
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        return AttributeResource::class === $resourceClass || AttributeResources::class === $resourceClass;
     }
 }

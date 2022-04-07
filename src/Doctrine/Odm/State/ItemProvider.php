@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Odm\State;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\ProviderInterface;
@@ -48,8 +49,9 @@ final class ItemProvider implements ProviderInterface
         $this->itemExtensions = $itemExtensions;
     }
 
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
+        $resourceClass = $operation->getClass();
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
@@ -85,16 +87,5 @@ final class ItemProvider implements ProviderInterface
         $executeOptions = $attribute['execute_options'] ?? [];
 
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions)->current() ?: null;
-    }
-
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
-    {
-        if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof DocumentManager) {
-            return false;
-        }
-
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-
-        return !($operation->isCollection() ?? false);
     }
 }

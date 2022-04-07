@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Metadata\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
@@ -39,10 +40,11 @@ trait ApiResourceToLegacyResourceMetadataTrait
             $arrayOperation['openapi_context']['operationId'] = $name;
 
             if ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) {
-                $arrayOperation['composite_identifier'] = $operation->getCompositeIdentifier() ?? false;
+                // TODO ?
+                // $arrayOperation['composite_identifier'] = $operation->getCompositeIdentifier() ?? false;
             }
 
-            if ($operation->isCollection()) {
+            if ($operation instanceof CollectionOperationInterface) {
                 $collectionOperations[$name] = $arrayOperation;
                 continue;
             }

@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
-use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
-use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
@@ -50,32 +49,9 @@ final class ItemProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        try {
-            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
-            if (false === $operation->getElasticsearch() || true === ($operation->isCollection() ?? false)) {
-                return false;
-            }
-        } catch (OperationNotFoundException $e) {
-            return false;
-        }
-
-        try {
-            $this->documentMetadataFactory->create($resourceClass);
-        } catch (IndexNotFoundException $e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
-    {
+        $resourceClass = $operation->getClass();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
         try {

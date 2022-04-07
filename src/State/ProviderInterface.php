@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
+use ApiPlatform\Metadata\AbstractOperation;
+
 /**
  * Retrieves data from a persistence layer.
  *
@@ -26,10 +28,5 @@ interface ProviderInterface
      *
      * @return object|array|null
      */
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []);
-
-    /**
-     * Whether this state provider supports the class/identifier tuple.
-     */
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool;
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = []);
 }

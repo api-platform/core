@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Get;
@@ -109,7 +110,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
         if (null === $data) {
             foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+                $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
                 $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
             }
 
@@ -141,7 +142,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
             }
 
             if (empty($attributes['name'])) {
-                $attributes['name'] = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+                $attributes['name'] = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
             }
             $operations[$attributes['name']] = $this->getOperationWithDefaults($resource, $operation)->withName($attributes['name']);
         }

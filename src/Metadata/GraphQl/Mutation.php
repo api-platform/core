@@ -20,9 +20,7 @@ class Mutation extends Operation
      * {@inheritdoc}
      */
     public function __construct(
-        ?bool $delete = null,
         ?string $resolver = null,
-        ?bool $collection = null,
         ?array $args = null,
         ?string $shortName = null,
         ?string $class = null,
@@ -64,6 +62,8 @@ class Mutation extends Operation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(...\func_get_args());

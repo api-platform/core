@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Exception\InvalidResourceException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -117,20 +118,22 @@ final class ApiLoader extends Loader
                         $legacyDefaults['_api_subresource_context'] = [
                             'property' => $operation->getExtraProperties()['legacy_subresource_property'],
                             'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'],
-                            'collection' => $operation->isCollection(),
+                            'collection' => $operation instanceof CollectionOperationInterface,
                             'operationId' => $operation->getExtraProperties()['legacy_subresource_operation_name'] ?? null,
                         ];
                         $legacyDefaults['_api_identifiers'] = $operation->getExtraProperties()['legacy_subresource_identifiers'];
                     } elseif ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) {
-                        $legacyDefaults[sprintf('_api_%s_operation_name', $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM)] = $operationName;
+                        $legacyDefaults[sprintf('_api_%s_operation_name', $operation instanceof CollectionOperationInterface ? OperationType::COLLECTION : OperationType::ITEM)] = $operationName;
                         $legacyDefaults['_api_identifiers'] = [];
-                        $legacyDefaults['_api_has_composite_identifier'] = $operation->getCompositeIdentifier();
                         // Legacy identifiers
+                        $hasCompositeIdentifier = false;
                         foreach ($operation->getUriVariables() ?? [] as $parameterName => $identifiedBy) {
+                            $hasCompositeIdentifier = $identifiedBy->getCompositeIdentifier();
                             foreach ($identifiedBy->getIdentifiers() ?? [] as $identifier) {
                                 $legacyDefaults['_api_identifiers'][] = $identifier;
                             }
                         }
+                        $legacyDefaults['_api_has_composite_identifier'] = $hasCompositeIdentifier;
                     }
 
                     $path = ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate();

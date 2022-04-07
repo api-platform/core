@@ -20,13 +20,18 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -115,9 +120,8 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         $graphQlOperations = [];
         foreach ($resourceMetadata->getGraphql() as $operationName => $operation) {
             if (false !== strpos($operationName, 'query') || isset($operation['item_query']) || isset($operation['collection_query'])) {
-                $graphQlOperation = (new Query())
-                    ->withCollection(isset($operation['collection_query']) || false !== strpos($operationName, 'collection'))
-                    ->withName($operationName);
+                $graphQlOperation = isset($operation['collection_query']) || false !== strpos($operationName, 'collection') ? new QueryCollection() : new Query();
+                $graphQlOperation = $graphQlOperation->withName($operationName);
             } else {
                 $graphQlOperation = (new Mutation())
                     ->withDescription(ucfirst("{$operationName}s a {$resourceMetadata->getShortName()}."))
@@ -154,12 +158,18 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     {
         $priority = 0;
         foreach ($operations as $operationName => $operation) {
-            $newOperation = (new Operation())
-                ->withMethod($operation['method'])
-                ->withCollection(OperationType::COLLECTION === $type)
-                ->withCompositeIdentifier($resource->getCompositeIdentifier())
+            $newOperation = OperationType::COLLECTION === $type ? new GetCollection() : new Operation();
+
+            $newOperation = $newOperation->withMethod($operation['method'])
                 ->withClass($resource->getClass())
                 ->withPriority($priority++);
+            // ->withCompositeIdentifier($resource->getCompositeIdentifier())
+
+            if (Operation::METHOD_DELETE === $operation['method']) {
+                $newOperation = (new Delete())->withOperation($newOperation);
+            } elseif (Operation::METHOD_POST === $operation['method'] && !isset($operation['path'])) {
+                $newOperation = (new Post())->withOperation($newOperation)->withUriVariables([])->withRead(false);
+            }
 
             foreach ($operation as $key => $value) {
                 $newOperation = $this->setAttributeValue($newOperation, $key, $value);
@@ -167,7 +177,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             $newOperation = $newOperation->withResource($resource);
 
-            if ($newOperation->isCollection()) {
+            if ($newOperation instanceof CollectionOperationInterface) {
                 $newOperation = $newOperation->withUriVariables([]);
             }
 
@@ -186,7 +196,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     private function setAttributeValue($operation, string $key, $value)
     {
         if ('identifiers' === $key) {
-            if (!$operation instanceof ApiResource && $operation->isCollection()) {
+            if (!$operation instanceof ApiResource && $operation instanceof CollectionOperationInterface) {
                 return $operation;
             }
 

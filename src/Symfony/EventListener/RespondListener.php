@@ -17,6 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -111,7 +112,7 @@ final class RespondListener
             ) {
                 $status = 301;
 
-                if ($operation->isCollection()) {
+                if ($operation instanceof CollectionOperationInterface) {
                     $headers['Location'] = $this->iriConverter->getIriFromResourceClass($operation->getClass(), $operation->getName(), UrlGeneratorInterface::ABS_PATH, ['operation' => $operation]);
                 } else {
                     $headers['Location'] = $this->iriConverter->getIriFromItem($request->attributes->get('data'), $operation->getName(), UrlGeneratorInterface::ABS_PATH, ['operation' => $operation]);

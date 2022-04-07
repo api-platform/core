@@ -20,12 +20,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  */
-#[ApiResource(normalizationContext: ['skip_null_values' => true])]
+#[ApiResource(normalizationContext: ['skip_null_values' => true], processor: OperationResourceProcessor::class)]
 #[Get]
 #[Patch(inputFormats: ['json' => ['application/merge-patch+json']])]
 #[Post]

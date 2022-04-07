@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -31,6 +32,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -186,7 +188,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             // TODO: remove in 3.0
-            if ($operation instanceof Operation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation->isCollection() && !$operation->getUriVariables()) {
+            if ($operation instanceof Operation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation instanceof CollectionOperationInterface && !$operation->getUriVariables()) {
                 trigger_deprecation('api-platform', '2.7', 'Identifiers are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 the collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.');
                 continue;
             }
@@ -206,9 +208,9 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
             }
 
-            if ('delete' === $operation->getName()) {
-                $operation = $operation->withDelete(true);
-            }
+            // if ('delete' === $operation->getName()) {
+            //     $operation = $operation->withDelete(true);
+            // }
 
             return [$operation->getName(), $operation];
         }

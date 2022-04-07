@@ -13,16 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
+
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class QueryCollection extends Query
+final class QueryCollection extends Query implements CollectionOperationInterface
 {
     /**
      * {@inheritdoc}
      */
     public function __construct(
         ?string $resolver = null,
-        ?bool $collection = null,
         ?array $args = null,
+        ?array $links = null,
+
+        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -35,6 +39,7 @@ final class QueryCollection extends Query
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
+        ?bool $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -63,10 +68,11 @@ final class QueryCollection extends Query
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(...\func_get_args());
-        $this->collection = true;
         $this->name = $name ?: 'collection_query';
     }
 }

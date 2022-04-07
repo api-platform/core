@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
- *     attributes={"identifiers"="code"},
+ *     attributes={"identifiers"="code", "provider"=TaxonProvider::class},
  *     shortName="Taxon",
  *     normalizationContext={
  *         "groups"={"taxon_read"},

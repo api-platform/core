@@ -13,10 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-class Operation
-{
-    use WithResourceTrait;
+// TODO clean these:
+// protected $swaggerContext;
+// protected $compositeIdentifier;
+// protected $queryParameterValidate;
+// ?array $swaggerContext = null,
+// ?bool $compositeIdentifier = null,
+// TODO: replace by queryParameterValidationEnabled?
+// ?bool $queryParameterValidate = null,
+        // $this->swaggerContext = $swaggerContext;
 
+class Operation extends AbstractOperation
+{
     public const METHOD_GET = 'GET';
     public const METHOD_POST = 'POST';
     public const METHOD_PUT = 'PUT';
@@ -24,27 +32,31 @@ class Operation
     public const METHOD_DELETE = 'DELETE';
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_OPTIONS = 'OPTIONS';
+
     protected $method;
     protected $uriTemplate;
-    protected $shortName;
-    protected $description;
     protected $types;
+
     /**
      * @var array|mixed|string|null
      */
     protected $formats;
+
     /**
      * @var array|mixed|string|null
      */
     protected $inputFormats;
+
     /**
      * @var array|mixed|string|null
      */
     protected $outputFormats;
+
     /**
      * @var array<string, Link>|array<string, array>|string[]|string|null
      */
     protected $uriVariables;
+
     protected $routePrefix;
     protected $routeName;
     protected $defaults;
@@ -53,6 +65,7 @@ class Operation
     protected $stateless;
     protected $sunset;
     protected $acceptPatch;
+    protected $cacheHeaders;
     /**
      * @var string|int|null
      */
@@ -61,67 +74,15 @@ class Operation
     protected $schemes;
     protected $condition;
     protected $controller;
-    protected $class;
-    protected $urlGenerationStrategy;
-    protected $collection;
-    protected $deprecationReason;
-    protected $cacheHeaders;
-    protected $normalizationContext;
-    protected $denormalizationContext;
     /**
      * @var string[]
      */
     protected $hydraContext;
     protected $openapiContext;
-    protected $swaggerContext;
-    protected $validationContext;
-    /**
-     * @var string[]
-     */
-    protected $filters;
-    protected $elasticsearch;
-    /**
-     * @var array|bool|mixed|null
-     */
-    protected $mercure;
-    /**
-     * @var bool|mixed|null
-     */
-    protected $messenger;
-    protected $input;
-    protected $output;
-    protected $order;
-    protected $fetchPartial;
-    protected $forceEager;
-    protected $paginationClientEnabled;
-    protected $paginationClientItemsPerPage;
-    protected $paginationClientPartial;
-    protected $paginationViaCursor;
-    protected $paginationEnabled;
-    protected $paginationFetchJoinCollection;
-    protected $paginationUseOutputWalkers;
-    protected $paginationItemsPerPage;
-    protected $paginationMaximumItemsPerPage;
-    protected $paginationPartial;
-    protected $paginationType;
-    protected $security;
-    protected $securityMessage;
-    protected $securityPostDenormalize;
-    protected $securityPostDenormalizeMessage;
-    protected $securityPostValidation;
-    protected $securityPostValidationMessage;
-    protected $compositeIdentifier;
+
     protected $exceptionToStatus;
+
     protected $queryParameterValidationEnabled;
-    protected $read;
-    protected $deserialize;
-    protected $validate;
-    protected $write;
-    protected $serialize;
-    protected $queryParameterValidate;
-    protected $priority;
-    protected $name;
-    protected $extraProperties;
 
     /**
      * @param array|null        $types                          the RDF types of this property
@@ -138,7 +99,6 @@ class Operation
      * @param array|null        $denormalizationContext         https://api-platform.com/docs/core/serialization/#using-serialization-groups
      * @param string[]|null     $hydraContext                   https://api-platform.com/docs/core/extending-jsonld-context/#hydra
      * @param array|null        $openapiContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param array|null        $swaggerContext                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param string[]|null     $filters                        https://api-platform.com/docs/core/filters/#doctrine-orm-and-mongodb-odm-filters
      * @param bool|null         $elasticsearch                  https://api-platform.com/docs/core/elasticsearch/
      * @param mixed|null        $mercure                        https://api-platform.com/docs/core/mercure
@@ -171,8 +131,6 @@ class Operation
     public function __construct(
         string $method = self::METHOD_GET,
         ?string $uriTemplate = null,
-        ?string $shortName = null,
-        ?string $description = null,
         ?array $types = null,
         $formats = null,
         $inputFormats = null,
@@ -191,55 +149,58 @@ class Operation
         ?array $schemes = null,
         ?string $condition = null,
         ?string $controller = null,
-        ?string $class = null,
-        ?int $urlGenerationStrategy = null,
-        ?bool $collection = null,
-        ?string $deprecationReason = null,
         ?array $cacheHeaders = null,
-        ?array $normalizationContext = null,
-        ?array $denormalizationContext = null,
+
         ?array $hydraContext = null,
         ?array $openapiContext = null,
-        ?array $swaggerContext = null,
-        ?array $validationContext = null,
-        ?array $filters = null,
-        ?bool $elasticsearch = null,
-        $mercure = null,
-        $messenger = null,
-        $input = null,
-        $output = null,
-        ?array $order = null,
-        ?bool $fetchPartial = null,
-        ?bool $forceEager = null,
-        ?bool $paginationClientEnabled = null,
-        ?bool $paginationClientItemsPerPage = null,
-        ?bool $paginationClientPartial = null,
-        ?array $paginationViaCursor = null,
+        ?array $exceptionToStatus = null,
+
+        ?bool $queryParameterValidationEnabled = null,
+
+        // abstract operation arguments
+        ?string $shortName = null,
+        ?string $class = null,
         ?bool $paginationEnabled = null,
-        ?bool $paginationFetchJoinCollection = null,
-        ?bool $paginationUseOutputWalkers = null,
+        ?string $paginationType = null,
         ?int $paginationItemsPerPage = null,
         ?int $paginationMaximumItemsPerPage = null,
         ?bool $paginationPartial = null,
-        ?string $paginationType = null,
+        ?bool $paginationClientEnabled = null,
+        ?bool $paginationClientItemsPerPage = null,
+        ?bool $paginationClientPartial = null,
+        ?bool $paginationFetchJoinCollection = null,
+        ?bool $paginationUseOutputWalkers = null,
+        ?array $paginationViaCursor = null,
+        ?array $order = null,
+        ?string $description = null,
+        ?array $normalizationContext = null,
+        ?array $denormalizationContext = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
-        ?bool $compositeIdentifier = null,
-        ?array $exceptionToStatus = null,
-        ?bool $queryParameterValidationEnabled = null,
+        ?string $deprecationReason = null,
+        ?array $filters = null,
+        ?array $validationContext = null,
+        $input = null,
+        $output = null,
+        $mercure = null,
+        $messenger = null,
+        ?bool $elasticsearch = null,
+        ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
         ?bool $validate = null,
         ?bool $write = null,
         ?bool $serialize = null,
-        // TODO: replace by queryParameterValidationEnabled?
-        ?bool $queryParameterValidate = null,
+        ?bool $fetchPartial = null,
+        ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
         $this->method = $method;
@@ -266,14 +227,12 @@ class Operation
         $this->controller = $controller;
         $this->class = $class;
         $this->urlGenerationStrategy = $urlGenerationStrategy;
-        $this->collection = $collection;
         $this->deprecationReason = $deprecationReason;
         $this->cacheHeaders = $cacheHeaders;
         $this->normalizationContext = $normalizationContext;
         $this->denormalizationContext = $denormalizationContext;
         $this->hydraContext = $hydraContext;
         $this->openapiContext = $openapiContext;
-        $this->swaggerContext = $swaggerContext;
         $this->validationContext = $validationContext;
         $this->filters = $filters;
         $this->elasticsearch = $elasticsearch;
@@ -301,7 +260,7 @@ class Operation
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
         $this->securityPostValidation = $securityPostValidation;
         $this->securityPostValidationMessage = $securityPostValidationMessage;
-        $this->compositeIdentifier = $compositeIdentifier;
+        // $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
         $this->read = $read;
@@ -309,28 +268,12 @@ class Operation
         $this->validate = $validate;
         $this->write = $write;
         $this->serialize = $serialize;
-        $this->queryParameterValidate = $queryParameterValidate;
+        // $this->queryParameterValidate = $queryParameterValidate;
         $this->priority = $priority;
         $this->name = $name;
+        $this->provider = $provider;
+        $this->processor = $processor;
         $this->extraProperties = $extraProperties;
-    }
-
-    public function withOperation($operation)
-    {
-        return $this->copyFrom($operation);
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function withName(string $name): self
-    {
-        $self = clone $this;
-        $self->name = $name;
-
-        return $self;
     }
 
     public function getMethod(): string
@@ -355,32 +298,6 @@ class Operation
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
-
-        return $self;
-    }
-
-    public function getShortName(): ?string
-    {
-        return $this->shortName;
-    }
-
-    public function withShortName(?string $shortName = null): self
-    {
-        $self = clone $this;
-        $self->shortName = $shortName;
-
-        return $self;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function withDescription(?string $description = null): self
-    {
-        $self = clone $this;
-        $self->description = $description;
 
         return $self;
     }
@@ -637,58 +554,6 @@ class Operation
         return $self;
     }
 
-    public function getClass(): ?string
-    {
-        return $this->class;
-    }
-
-    public function withClass(string $class): self
-    {
-        $self = clone $this;
-        $self->class = $class;
-
-        return $self;
-    }
-
-    public function getUrlGenerationStrategy(): ?int
-    {
-        return $this->urlGenerationStrategy;
-    }
-
-    public function withUrlGenerationStrategy(int $urlGenerationStrategy): self
-    {
-        $self = clone $this;
-        $self->urlGenerationStrategy = $urlGenerationStrategy;
-
-        return $self;
-    }
-
-    public function isCollection(): ?bool
-    {
-        return $this->collection;
-    }
-
-    public function withCollection(bool $collection): self
-    {
-        $self = clone $this;
-        $self->collection = $collection;
-
-        return $self;
-    }
-
-    public function getDeprecationReason(): ?string
-    {
-        return $this->deprecationReason;
-    }
-
-    public function withDeprecationReason(string $deprecationReason): self
-    {
-        $self = clone $this;
-        $self->deprecationReason = $deprecationReason;
-
-        return $self;
-    }
-
     public function getCacheHeaders(): ?array
     {
         return $this->cacheHeaders;
@@ -698,32 +563,6 @@ class Operation
     {
         $self = clone $this;
         $self->cacheHeaders = $cacheHeaders;
-
-        return $self;
-    }
-
-    public function getNormalizationContext(): ?array
-    {
-        return $this->normalizationContext;
-    }
-
-    public function withNormalizationContext(array $normalizationContext): self
-    {
-        $self = clone $this;
-        $self->normalizationContext = $normalizationContext;
-
-        return $self;
-    }
-
-    public function getDenormalizationContext(): ?array
-    {
-        return $this->denormalizationContext;
-    }
-
-    public function withDenormalizationContext(array $denormalizationContext): self
-    {
-        $self = clone $this;
-        $self->denormalizationContext = $denormalizationContext;
 
         return $self;
     }
@@ -757,397 +596,6 @@ class Operation
         return $self;
     }
 
-    public function getSwaggerContext(): ?array
-    {
-        return $this->swaggerContext;
-    }
-
-    public function withSwaggerContext(array $swaggerContext): self
-    {
-        $self = clone $this;
-        $self->swaggerContext = $swaggerContext;
-
-        return $self;
-    }
-
-    public function getValidationContext(): ?array
-    {
-        return $this->validationContext;
-    }
-
-    public function withValidationContext(array $validationContext): self
-    {
-        $self = clone $this;
-        $self->validationContext = $validationContext;
-
-        return $self;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getFilters(): ?array
-    {
-        return $this->filters;
-    }
-
-    public function withFilters(array $filters): self
-    {
-        $self = clone $this;
-        $self->filters = $filters;
-
-        return $self;
-    }
-
-    public function getElasticsearch(): ?bool
-    {
-        return $this->elasticsearch;
-    }
-
-    public function withElasticsearch(bool $elasticsearch): self
-    {
-        $self = clone $this;
-        $self->elasticsearch = $elasticsearch;
-
-        return $self;
-    }
-
-    /**
-     * @return array|bool|mixed|null
-     */
-    public function getMercure()
-    {
-        return $this->mercure;
-    }
-
-    public function withMercure($mercure): self
-    {
-        $self = clone $this;
-        $self->mercure = $mercure;
-
-        return $self;
-    }
-
-    /**
-     * @return bool|mixed|null
-     */
-    public function getMessenger()
-    {
-        return $this->messenger;
-    }
-
-    public function withMessenger($messenger): self
-    {
-        $self = clone $this;
-        $self->messenger = $messenger;
-
-        return $self;
-    }
-
-    public function getInput()
-    {
-        return $this->input;
-    }
-
-    public function withInput($input): self
-    {
-        $self = clone $this;
-        $self->input = $input;
-
-        return $self;
-    }
-
-    public function getOutput()
-    {
-        return $this->output;
-    }
-
-    public function withOutput($output): self
-    {
-        $self = clone $this;
-        $self->output = $output;
-
-        return $self;
-    }
-
-    public function getOrder(): ?array
-    {
-        return $this->order;
-    }
-
-    public function withOrder(array $order): self
-    {
-        $self = clone $this;
-        $self->order = $order;
-
-        return $self;
-    }
-
-    public function isDelete(): bool
-    {
-        return self::METHOD_DELETE === $this->getMethod();
-    }
-
-    public function getFetchPartial(): ?bool
-    {
-        return $this->fetchPartial;
-    }
-
-    public function withFetchPartial(bool $fetchPartial): self
-    {
-        $self = clone $this;
-        $self->fetchPartial = $fetchPartial;
-
-        return $self;
-    }
-
-    public function getForceEager(): ?bool
-    {
-        return $this->forceEager;
-    }
-
-    public function withForceEager(bool $forceEager): self
-    {
-        $self = clone $this;
-        $self->forceEager = $forceEager;
-
-        return $self;
-    }
-
-    public function getPaginationClientEnabled(): ?bool
-    {
-        return $this->paginationClientEnabled;
-    }
-
-    public function withPaginationClientEnabled(bool $paginationClientEnabled): self
-    {
-        $self = clone $this;
-        $self->paginationClientEnabled = $paginationClientEnabled;
-
-        return $self;
-    }
-
-    public function getPaginationClientItemsPerPage(): ?bool
-    {
-        return $this->paginationClientItemsPerPage;
-    }
-
-    public function withPaginationClientItemsPerPage(bool $paginationClientItemsPerPage): self
-    {
-        $self = clone $this;
-        $self->paginationClientItemsPerPage = $paginationClientItemsPerPage;
-
-        return $self;
-    }
-
-    public function getPaginationClientPartial(): ?bool
-    {
-        return $this->paginationClientPartial;
-    }
-
-    public function withPaginationClientPartial(bool $paginationClientPartial): self
-    {
-        $self = clone $this;
-        $self->paginationClientPartial = $paginationClientPartial;
-
-        return $self;
-    }
-
-    public function getPaginationViaCursor(): ?array
-    {
-        return $this->paginationViaCursor;
-    }
-
-    public function withPaginationViaCursor(array $paginationViaCursor): self
-    {
-        $self = clone $this;
-        $self->paginationViaCursor = $paginationViaCursor;
-
-        return $self;
-    }
-
-    public function getPaginationEnabled(): ?bool
-    {
-        return $this->paginationEnabled;
-    }
-
-    public function withPaginationEnabled(bool $paginationEnabled): self
-    {
-        $self = clone $this;
-        $self->paginationEnabled = $paginationEnabled;
-
-        return $self;
-    }
-
-    public function getPaginationFetchJoinCollection(): ?bool
-    {
-        return $this->paginationFetchJoinCollection;
-    }
-
-    public function withPaginationFetchJoinCollection(bool $paginationFetchJoinCollection): self
-    {
-        $self = clone $this;
-        $self->paginationFetchJoinCollection = $paginationFetchJoinCollection;
-
-        return $self;
-    }
-
-    public function getPaginationUseOutputWalkers(): ?bool
-    {
-        return $this->paginationUseOutputWalkers;
-    }
-
-    public function withPaginationUseOutputWalkers(bool $paginationUseOutputWalkers): self
-    {
-        $self = clone $this;
-        $self->paginationUseOutputWalkers = $paginationUseOutputWalkers;
-
-        return $self;
-    }
-
-    public function getPaginationItemsPerPage(): ?int
-    {
-        return $this->paginationItemsPerPage;
-    }
-
-    public function withPaginationItemsPerPage(int $paginationItemsPerPage): self
-    {
-        $self = clone $this;
-        $self->paginationItemsPerPage = $paginationItemsPerPage;
-
-        return $self;
-    }
-
-    public function getPaginationMaximumItemsPerPage(): ?int
-    {
-        return $this->paginationMaximumItemsPerPage;
-    }
-
-    public function withPaginationMaximumItemsPerPage(int $paginationMaximumItemsPerPage): self
-    {
-        $self = clone $this;
-        $self->paginationMaximumItemsPerPage = $paginationMaximumItemsPerPage;
-
-        return $self;
-    }
-
-    public function getPaginationPartial(): ?bool
-    {
-        return $this->paginationPartial;
-    }
-
-    public function withPaginationPartial(bool $paginationPartial): self
-    {
-        $self = clone $this;
-        $self->paginationPartial = $paginationPartial;
-
-        return $self;
-    }
-
-    public function getPaginationType(): ?string
-    {
-        return $this->paginationType;
-    }
-
-    public function withPaginationType(string $paginationType): self
-    {
-        $self = clone $this;
-        $self->paginationType = $paginationType;
-
-        return $self;
-    }
-
-    public function getSecurity(): ?string
-    {
-        return $this->security;
-    }
-
-    public function withSecurity(string $security): self
-    {
-        $self = clone $this;
-        $self->security = $security;
-
-        return $self;
-    }
-
-    public function getSecurityMessage(): ?string
-    {
-        return $this->securityMessage;
-    }
-
-    public function withSecurityMessage(string $securityMessage): self
-    {
-        $self = clone $this;
-        $self->securityMessage = $securityMessage;
-
-        return $self;
-    }
-
-    public function getSecurityPostDenormalize(): ?string
-    {
-        return $this->securityPostDenormalize;
-    }
-
-    public function withSecurityPostDenormalize(string $securityPostDenormalize): self
-    {
-        $self = clone $this;
-        $self->securityPostDenormalize = $securityPostDenormalize;
-
-        return $self;
-    }
-
-    public function getSecurityPostDenormalizeMessage(): ?string
-    {
-        return $this->securityPostDenormalizeMessage;
-    }
-
-    public function withSecurityPostDenormalizeMessage(string $securityPostDenormalizeMessage): self
-    {
-        $self = clone $this;
-        $self->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
-
-        return $self;
-    }
-
-    public function getSecurityPostValidation(): ?string
-    {
-        return $this->securityPostValidation;
-    }
-
-    public function withSecurityPostValidation(string $securityPostValidation): self
-    {
-        $self = clone $this;
-        $self->securityPostValidation = $securityPostValidation;
-
-        return $self;
-    }
-
-    public function getSecurityPostValidationMessage(): ?string
-    {
-        return $this->securityPostValidationMessage;
-    }
-
-    public function withSecurityPostValidationMessage(string $securityPostValidationMessage): self
-    {
-        $self = clone $this;
-        $self->securityPostValidationMessage = $securityPostValidationMessage;
-
-        return $self;
-    }
-
-    public function getCompositeIdentifier(): ?bool
-    {
-        return $this->compositeIdentifier;
-    }
-
-    public function withCompositeIdentifier(bool $compositeIdentifier): self
-    {
-        $self = clone $this;
-        $self->compositeIdentifier = $compositeIdentifier;
-
-        return $self;
-    }
-
     public function getExceptionToStatus(): ?array
     {
         return $this->exceptionToStatus;
@@ -1170,110 +618,6 @@ class Operation
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
-
-        return $self;
-    }
-
-    public function getExtraProperties(): ?array
-    {
-        return $this->extraProperties;
-    }
-
-    public function withExtraProperties(array $extraProperties): self
-    {
-        $self = clone $this;
-        $self->extraProperties = $extraProperties;
-
-        return $self;
-    }
-
-    public function canRead(): ?bool
-    {
-        return $this->read;
-    }
-
-    public function withRead(bool $read): self
-    {
-        $self = clone $this;
-        $self->read = $read;
-
-        return $self;
-    }
-
-    public function canDeserialize(): ?bool
-    {
-        return $this->deserialize;
-    }
-
-    public function withDeserialize(bool $deserialize): self
-    {
-        $self = clone $this;
-        $self->deserialize = $deserialize;
-
-        return $self;
-    }
-
-    public function canValidate(): ?bool
-    {
-        return $this->validate;
-    }
-
-    public function withValidate(bool $validate): self
-    {
-        $self = clone $this;
-        $self->validate = $validate;
-
-        return $self;
-    }
-
-    public function canWrite(): ?bool
-    {
-        return $this->write;
-    }
-
-    public function withWrite(bool $write): self
-    {
-        $self = clone $this;
-        $self->write = $write;
-
-        return $self;
-    }
-
-    public function canSerialize(): ?bool
-    {
-        return $this->serialize;
-    }
-
-    public function withSerialize(bool $serialize): self
-    {
-        $self = clone $this;
-        $self->serialize = $serialize;
-
-        return $self;
-    }
-
-    public function canQueryParameterValidate(): ?bool
-    {
-        return $this->validate;
-    }
-
-    public function withQueryParameterValidate(bool $validate): self
-    {
-        $self = clone $this;
-        $self->validate = $validate;
-
-        return $self;
-    }
-
-    public function getPriority(): ?int
-    {
-        return $this->priority;
-    }
-
-    public function withPriority(int $priority): self
-    {
-        $self = clone $this;
-        $self->priority = $priority;
 
         return $self;
     }

@@ -48,6 +48,6 @@ final class WriteStage implements WriteStageInterface
 
         $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, false);
 
-        return $this->processor->process($data, [], $operation->getName(), ['operation' => $operation] + $denormalizationContext);
+        return $this->processor->process($data, $operation, [], ['operation' => $operation] + $denormalizationContext);
     }
 }

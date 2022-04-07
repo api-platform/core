@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -75,6 +76,10 @@ final class WriteListener
             return;
         }
 
+        if (!$operation->getProcessor()) {
+            throw new RuntimeException(sprintf('The operation "%s" has no processor, it should not be writeable.', $operation->getName()));
+        }
+
         $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
@@ -82,15 +87,11 @@ final class WriteListener
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
         }
 
-        if (!$this->processor->supports($controllerResult, $uriVariables, $operation->getName(), $context)) {
-            return;
-        }
-
         switch ($request->getMethod()) {
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $persistResult = $this->processor->process($controllerResult, $uriVariables, $operation->getName(), $context);
+                $persistResult = $this->processor->process($controllerResult, $operation, $uriVariables, $context);
 
                 if ($persistResult) {
                     $controllerResult = $persistResult;
@@ -113,7 +114,7 @@ final class WriteListener
 
                 break;
             case 'DELETE':
-                $this->processor->process($controllerResult, $uriVariables, $operation->getName(), $context);
+                $this->processor->process($controllerResult, $operation, $uriVariables, $context);
                 $event->setControllerResult(null);
                 break;
         }

@@ -75,8 +75,9 @@ final class ReadListener
         if (
             !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || $request->isMethod('POST') && isset($attributes['collection_operation_name'])
+            || ($request->isMethod('POST') && isset($attributes['collection_operation_name']))
             || ($operation && !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false))
+            || ($operation && false === $operation->canRead())
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
         ) {
             return;

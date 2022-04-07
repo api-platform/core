@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\State;
 
 use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
+use ApiPlatform\Metadata\AbstractOperation;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
 
@@ -22,7 +23,7 @@ trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
 
-    private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGenerator $queryNameGenerator, array $context, string $resourceClass, ?string $operationName = null): void
+    private function handleLinks(QueryBuilder $queryBuilder, array $identifiers, QueryNameGenerator $queryNameGenerator, array $context, string $resourceClass, AbstractOperation $operation): void
     {
         if (!$identifiers) {
             return;
@@ -32,7 +33,6 @@ trait LinksHandlerTrait
         $doctrineClassMetadata = $manager->getClassMetadata($resourceClass);
         $alias = $queryBuilder->getRootAliases()[0];
 
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
         $links = $this->getLinks($resourceClass, $operation, $context);
 
         if (!$links) {

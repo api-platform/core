@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerAwareProviderInterface;
 use ApiPlatform\State\SerializerAwareProviderTrait;
-use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -28,7 +28,7 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     /**
      * {@inheritDoc}
      */
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
         return $this->getSerializer()->deserialize(<<<'JSON'
 {
@@ -38,13 +38,5 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
 }
 JSON
             , $resourceClass, 'json');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        return SerializableResource::class === $resourceClass;
     }
 }

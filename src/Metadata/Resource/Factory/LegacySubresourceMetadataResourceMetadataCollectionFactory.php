@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
@@ -74,7 +75,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 }
 
                 $operationValue = $operation->{$methodName}();
-                if (null !== $operationValue && [] !== $operationValue) {
+                if (null !== $operationValue) {
                     continue;
                 }
 
@@ -108,7 +109,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                         continue;
                     }
 
-                    $identifiers[$parameterName] = (new Link())->withFromClass($class)->withIdentifiers([$property])->withParameterName($parameterName);
+                    $identifiers[$parameterName] = (new Link())->withFromClass($class)->withIdentifiers([$property])->withParameterName($parameterName)->withCompositeIdentifier(false);
                 }
 
                 $extraProperties = ['is_legacy_subresource' => true];
@@ -121,8 +122,8 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                     unset($subresourceMetadata['identifiers']);
                 }
 
-                $resource = (new ApiResource())->withExtraProperties($extraProperties)->withCompositeIdentifier(false)->withUriVariables($identifiers)->withStateless(false);
-                $operation = (new Get())->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']])->withCompositeIdentifier(false)->withUriVariables($identifiers);
+                $resource = (new ApiResource())->withExtraProperties($extraProperties)->withUriVariables($identifiers)->withStateless(false);
+                $operation = ($subresourceMetadata['collection'] ? new GetCollection() : new Get())->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']])->withUriVariables($identifiers);
 
                 if ($subresourceMetadata['path']) {
                     $resource = $resource->withUriTemplate($subresourceMetadata['path']);
@@ -137,10 +138,6 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 if ($subresourceMetadata['resource_class']) {
                     $resource = $resource->withClass($subresourceMetadata['resource_class']);
                     $operation = $operation->withClass($subresourceMetadata['resource_class']);
-                }
-
-                if ($subresourceMetadata['collection']) {
-                    $operation = $operation->withCollection($subresourceMetadata['collection']);
                 }
 
                 foreach ($subresourceMetadata as $key => $value) {

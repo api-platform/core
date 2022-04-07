@@ -16,8 +16,9 @@ namespace ApiPlatform\State;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 /**
@@ -40,14 +41,14 @@ final class LegacyDataProviderState implements ProviderInterface
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        $operation = $context['operation'] ?? null;
+        exit('hello');
         if ($operation && (
                 ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
                 ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
             )) {
-            $subresourceContext = ['filters' => $context['filters'] ?? [], 'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'] ?? [], 'property' => $operation->getExtraProperties()['legacy_subresource_property'] ?? null, 'collection' => $operation->isCollection()] + $context;
+            $subresourceContext = ['filters' => $context['filters'] ?? [], 'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'] ?? [], 'property' => $operation->getExtraProperties()['legacy_subresource_property'] ?? null, 'collection' => $operation instanceof CollectionOperationInterface] + $context;
             $subresourceIdentifiers = [];
             foreach ($operation->getUriVariables() as $parameterName => $uriTemplateDefinition) {
                 $subresourceIdentifiers[$parameterName] = [$uriTemplateDefinition->getIdentifiers()[0] => $identifiers[$parameterName]];
@@ -65,24 +66,5 @@ final class LegacyDataProviderState implements ProviderInterface
         }
 
         return $this->collectionDataProvider->getCollection($resourceClass, $operationName);
-    }
-
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-        if (!($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
-            // FIXME: uncomment the following line when all providers will be ported
-            return false;
-        }
-
-        if ($identifiers && $this->itemDataProvider instanceof RestrictedDataProviderInterface) {
-            return $this->itemDataProvider->supports($resourceClass, $operationName, $context);
-        }
-
-        if ($this->collectionDataProvider instanceof RestrictedDataProviderInterface) {
-            return $this->collectionDataProvider->supports($resourceClass, $operationName, $context);
-        }
-
-        return false;
     }
 }

@@ -90,8 +90,11 @@ final class Delete extends Operation
         ?bool $queryParameterValidate = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
+        $args = array_slice(\func_get_args(), 1);
         parent::__construct(self::METHOD_DELETE, ...\func_get_args());
     }
 }

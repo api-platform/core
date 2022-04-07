@@ -13,24 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
+use ApiPlatform\Metadata\AbstractOperation;
+
 /**
  * Process data: send an email, persist to storage, add to queue etc.
  *
+ * @author Antoine Bluchet <soyuka@gmail.com>
  * @experimental
  */
 interface ProcessorInterface
 {
     /**
-     * Whether this state handler supports the class/identifier tuple.
-     *
-     * @param mixed $data
-     */
-    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool;
-
-    /**
      * Handle the state.
      *
      * @param mixed $data
+     *
+     * @return mixed
      */
-    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = []);
+    public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = []);
 }

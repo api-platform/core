@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\State;
 
-use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
-use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
@@ -59,32 +58,9 @@ final class CollectionProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        try {
-            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName, true);
-            if (false === $operation->getElasticsearch() || !($operation->isCollection() ?? false)) {
-                return false;
-            }
-        } catch (OperationNotFoundException $e) {
-            return false;
-        }
-
-        try {
-            $this->documentMetadataFactory->create($resourceClass);
-        } catch (IndexNotFoundException $e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
-    {
+        $resourceClass = $operation->getClass();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];
 

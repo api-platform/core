@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
@@ -81,7 +82,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                 }
 
                 $operation = $operation->withUriTemplate($this->generateUriTemplate($operation));
-                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation->isCollection() ? '_collection' : '');
+                $operationName = $operation->getName() ?: sprintf('_api_%s_%s%s', $operation->getUriTemplate(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
                 if (!$operation->getName()) {
                     $operation = $operation->withName($operationName);
                 }
@@ -122,7 +123,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     private function configureUriVariables($operation)
     {
         // We will generate the collection route, don't initialize variables here
-        if ($operation instanceof Operation && $operation->isCollection() && !$operation->getUriTemplate()) {
+        if ($operation instanceof Operation && (
+            [] === $operation->getUriVariables() ||
+            ($operation instanceof CollectionOperationInterface && null === $operation->getUriTemplate())
+        )) {
             return $operation;
         }
 
@@ -198,9 +202,9 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     $normalizedUriVariable = new Link($normalizedParameterName, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['from_class'] ?? null, $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
                 }
             }
-            if (null !== ($hasCompositeIdentifier = $operation->getCompositeIdentifier())) {
-                $normalizedUriVariable = $normalizedUriVariable->withCompositeIdentifier($hasCompositeIdentifier);
-            }
+            // if (null !== ($hasCompositeIdentifier = $operation->getCompositeIdentifier())) {
+            //     $normalizedUriVariable = $normalizedUriVariable->withCompositeIdentifier($hasCompositeIdentifier);
+            // }
 
             $normalizedUriVariable = $normalizedUriVariable->withParameterName($normalizedParameterName);
             $normalizedUriVariables[$normalizedParameterName] = $normalizedUriVariable;

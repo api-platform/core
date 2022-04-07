@@ -17,6 +17,7 @@ use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\HttpCache\PurgerInterface as LegacyPurgerInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -76,7 +77,7 @@ final class AddTagsListener
         }
 
         $resources = $request->attributes->get('_resources');
-        if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false) || ($operation && $operation->isCollection())) {
+        if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false) || ($operation && $operation instanceof CollectionOperationInterface)) {
             // Allows to purge collections
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
             $iri = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], $attributes['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $uriVariables]) : $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);

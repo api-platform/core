@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -31,11 +31,6 @@ final class OperationResourceProcessor implements ProcessorInterface
     public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;
-    }
-
-    public function supports($data, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        return $data instanceof OperationResource;
     }
 
     private function persist($data, array $context = [])
@@ -64,9 +59,9 @@ final class OperationResourceProcessor implements ProcessorInterface
         $manager->flush();
     }
 
-    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
-        if (\array_key_exists('operation', $context) && Operation::METHOD_DELETE === ($context['operation']->getMethod() ?? null)) {
+        if ($operation instanceof DeleteOperationInterface) {
             return $this->remove($data);
         }
 

@@ -110,7 +110,7 @@ final class ReadStage implements ReadStageInterface
             $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
         }
 
-        return $this->provider->provide($resourceClass, $uriVariables, $operationName, $normalizationContext);
+        return $this->provider->provide($operation, $uriVariables, $normalizationContext);
     }
 
     /**

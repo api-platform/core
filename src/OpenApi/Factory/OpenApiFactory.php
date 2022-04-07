@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -165,7 +166,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = new Model\PathItem();
             }
 
-            $forceSchemaCollection = $operation->isCollection() && 'GET' === $method ? true : false;
+            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method ? true : false;
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
 
@@ -196,7 +197,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $parameters[] = $parameter;
             }
 
-            if ($operation->isCollection() && Operation::METHOD_POST !== $method) {
+            if ($operation instanceof CollectionOperationInterface && Operation::METHOD_POST !== $method) {
                 foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation)) as $parameter) {
                     if ($this->hasParameter($parameter, $parameters)) {
                         continue;
@@ -211,7 +212,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 case Operation::METHOD_GET:
                     $successStatus = (string) $operation->getStatus() ?: 200;
                     $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
-                    $responses[$successStatus] = new Model\Response(sprintf('%s %s', $resourceShortName, $operation->isCollection() ? 'collection' : 'resource'), $responseContent);
+                    $responses[$successStatus] = new Model\Response(sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $responseContent);
                     break;
                 case Operation::METHOD_POST:
                     $responseLinks = $this->getLinks($resourceMetadataCollection, $operation);
@@ -236,7 +237,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     break;
             }
 
-            if (!$operation->isCollection() && !$operation instanceof Post) {
+            if (!$operation instanceof CollectionOperationInterface && !$operation instanceof Post) {
                 $responses['404'] = new Model\Response('Resource not found');
             }
 
@@ -268,8 +269,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operationId,
                 $operation->getOpenapiContext()['tags'] ?? [$operation->getShortName() ?: $resourceShortName],
                 $responses,
-                $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection() ?? false),
-                $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method, $operation->isCollection() ?? false),
+                $operation->getOpenapiContext()['summary'] ?? $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
+                $operation->getOpenapiContext()['description'] ?? $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
                 isset($operation->getOpenapiContext()['externalDocs']) ? new ExternalDocumentation($operation->getOpenapiContext()['externalDocs']['description'] ?? null, $operation->getOpenapiContext()['externalDocs']['url']) : null,
                 $parameters,
                 $requestBody,
@@ -376,7 +377,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
                 $parameters = [];
-                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation->isCollection() || Operation::METHOD_GET !== ($operation->getMethod() ?: Operation::METHOD_GET)) {
+                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation instanceof CollectionOperationInterface || Operation::METHOD_GET !== ($operation->getMethod() ?: Operation::METHOD_GET)) {
                     continue;
                 }
 

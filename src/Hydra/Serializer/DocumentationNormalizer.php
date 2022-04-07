@@ -28,6 +28,7 @@ use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -285,7 +286,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         } else {
             $classes[$resourceClass] = true;
             foreach ($resourceMetadata->getOperations() as $operation) {
-                if (!$operation->isCollection()) {
+                if (!$operation instanceof CollectionOperationInterface) {
                     continue;
                 }
 
@@ -350,7 +351,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperations = [];
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if (($operation instanceof Post || ($operation->isCollection() ?? false)) !== $collection) {
+                    if (($operation instanceof Post || $operation instanceof CollectionOperationInterface) !== $collection) {
                         continue;
                     }
 
@@ -402,7 +403,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $shortName = $operation->getShortName();
             $inputMetadata = $operation->getInput() ?? [];
             $outputMetadata = $operation->getOutput() ?? [];
-            $operationType = $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM;
+            $operationType = $operation instanceof CollectionOperationInterface ? OperationType::COLLECTION : OperationType::ITEM;
         } else {
             $shortName = $resourceMetadata->getShortName();
             $inputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input', ['class' => false]);

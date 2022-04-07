@@ -17,7 +17,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,8 +48,9 @@ final class CollectionProvider implements ProviderInterface
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
     {
+        $resourceClass = $operation->getClass();
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
@@ -62,31 +63,16 @@ final class CollectionProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operation->getName(), $context);
 
-            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+                return $extension->getResult($queryBuilder, $resourceClass, $operation->getName(), $context);
             }
         }
 
         return $queryBuilder->getQuery()->getResult();
-    }
-
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
-    {
-        if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface) {
-            return false;
-        }
-
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-
-        if ($operation instanceof GraphQlOperation) {
-            return true;
-        }
-
-        return $operation->isCollection() ?? false;
     }
 }

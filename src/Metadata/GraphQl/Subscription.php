@@ -21,7 +21,6 @@ final class Subscription extends Operation
      */
     public function __construct(
         ?string $resolver = null,
-        ?bool $collection = null,
         ?array $args = null,
         ?string $shortName = null,
         ?string $class = null,
@@ -63,9 +62,11 @@ final class Subscription extends Operation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
-        parent::__construct(false, ...\func_get_args());
+        parent::__construct(...\func_get_args());
         $this->name = $name ?: 'update_subscription';
     }
 }
