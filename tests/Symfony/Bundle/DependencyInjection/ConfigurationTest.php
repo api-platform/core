@@ -190,6 +190,7 @@ class ConfigurationTest extends TestCase
                     'request_options' => [],
                     'max_header_length' => 7500,
                     'purger' => 'api_platform.http_cache.purger.varnish',
+                    'xkey' => ['glue' => ' '],
                 ],
                 'etag' => true,
                 'max_age' => null,
