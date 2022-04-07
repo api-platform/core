@@ -155,6 +155,14 @@ Feature: Documentation support
                             "type": "string",
                             "format": "iri-reference"
                         }
+                    },
+                    "example": {
+                        "@id": "string",
+                        "type": "string",
+                        "hydra:first": "string",
+                        "hydra:last": "string",
+                        "hydra:previous": "string",
+                        "hydra:next": "string"
                     }
                 },
                 "hydra:search": {
