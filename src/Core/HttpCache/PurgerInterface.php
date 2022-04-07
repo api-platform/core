@@ -27,5 +27,5 @@ interface PurgerInterface
      *
      * @param string[] $iris
      */
-    public function purge(array $iris);
+    public function purge(array $iris): void;
 }
