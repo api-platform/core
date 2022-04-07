@@ -62,10 +62,7 @@ api_platform:
         invalidation:
             enabled: true
             xkey: 
-                enabled: true
                 glue: ' '
-            http_tags: 
-                enabled: true
     openapi:
         backward_compatibility_layer: false
     defaults:
@@ -273,17 +270,10 @@ services:
     api_platform.http_cache.purger:
         class: ApiPlatform\Tests\Fixtures\NullPurger
         
-    api_platform.http_cache.purger.xkey:
-        class: ApiPlatform\Tests\Fixtures\NullPurger
-
     test.api_platform.http_cache.purger:
         alias: api_platform.http_cache.purger
         public: true
         
-    test.api_platform.http_cache.purger.xkey:
-        alias: api_platform.http_cache.purger.xkey
-        public: true
-
     test.property_accessor:
         alias: property_accessor
         public: true
@@ -438,4 +428,3 @@ services:
         decorates: api_platform.swagger.normalizer.documentation
         public: false
         arguments: ['@app.serializer.normalizer.override_documentation.inner']
-

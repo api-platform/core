@@ -36,4 +36,9 @@ final class NullPurger implements PurgerInterface
     {
         $this->iris = [];
     }
+
+    public function getResponseHeaders(array $iris): array
+    {
+        return ['Cache-Tags' => implode(',', $iris)];
+    }
 }

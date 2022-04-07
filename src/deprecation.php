@@ -445,6 +445,7 @@ $deprecatedClassesWithoutAliases = [
 
     ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Odm\Filter\SearchFilter::class,
     ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Orm\Filter\SearchFilter::class,
+    ApiPlatform\Core\HttpCache\PurgerInterface::class => ApiPlatform\HttpCache\PurgerInterface::class,
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases) {

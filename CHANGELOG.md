@@ -45,7 +45,8 @@
 * A new configuration is available to keep old services (IriConverter, IdentifiersExtractor and OpenApiFactory) `metadata_backward_compatibility_layer` (defaults to false) (#4351)
 * Add support for `security_post_validation` attribute
 * Mark the GraphQL subsystem as stable (#4500)
-* feat(test): add `Client::loginUser()`
+* feat(test): add `Client::loginUser()` (#4588)
+* feat(http_cache): use symfony/http-client instead of guzzlehttp/guzzle, `ApiPlatform\Core\HttpCache\PurgerInterface` is deprecated in favor of `ApiPlatform\HttpCache\PurgerInterface`, new purger that uses PURGE (#4695)
 
 ## 2.6.8
 

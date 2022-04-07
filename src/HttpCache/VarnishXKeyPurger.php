@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache;
 
-use GuzzleHttp\ClientInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Purges Varnish XKey.
@@ -31,7 +31,7 @@ final class VarnishXKeyPurger implements PurgerInterface
     private $xkeyGlue;
 
     /**
-     * @param ClientInterface[] $clients
+     * @param HttpClientInterface[] $clients
      */
     public function __construct(array $clients, int $maxHeaderLength = self::VARNISH_MAX_HEADER_LENGTH, string $xkeyGlue = ' ')
     {
@@ -54,6 +54,14 @@ final class VarnishXKeyPurger implements PurgerInterface
         foreach ($irisChunks as $irisChunk) {
             $this->purgeIris($irisChunk);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseHeaders(array $iris): array
+    {
+        return ['xkey' => implode($this->xkeyGlue, $iris)];
     }
 
     private function purgeIris(array $iris): void
