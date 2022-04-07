@@ -49,6 +49,8 @@
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.identifier.converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>null</argument>
+            <argument>%api_platform.metadata_backward_compatibility_layer%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>

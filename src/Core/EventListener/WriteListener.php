@@ -45,16 +45,20 @@ final class WriteListener
     private $dataPersister;
     /** @var IriConverterLegacyInterface|IriConverterInterface|null */
     private $iriConverter;
+    private $metadataBackwardCompatibilityLayer;
 
-    public function __construct(DataPersisterInterface $dataPersister, $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(DataPersisterInterface $dataPersister, $iriConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceClassResolverInterface $resourceClassResolver = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, bool $metadataBackwardCompatibilityLayer = null)
     {
         $this->dataPersister = $dataPersister;
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->metadataBackwardCompatibilityLayer = $metadataBackwardCompatibilityLayer;
 
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The listener "%s" is deprecated and will be removed in 3.0, use "%s" instead', __CLASS__, \ApiPlatform\Symfony\EventListener\WriteListener::class));
+        if ($metadataBackwardCompatibilityLayer || null === $metadataBackwardCompatibilityLayer) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('The listener "%s" is deprecated and will be removed in 3.0, use "%s" instead', __CLASS__, \ApiPlatform\Symfony\EventListener\WriteListener::class));
+        }
     }
 
     /**
@@ -75,6 +79,10 @@ final class WriteListener
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
         ) {
             return;
+        }
+
+        if (false === $this->metadataBackwardCompatibilityLayer) {
+            trigger_deprecation('api-platform/core', '2.7', 'The operation you requested uses legacy metadata, switch to #[ApiPlatform\Metadata\ApiResource].');
         }
 
         if (!$this->dataPersister->supports($controllerResult, $attributes)) {
