@@ -42,3 +42,5 @@ final class UuidDenormalizer implements DenormalizerInterface
         return \is_string($data) && is_a($type, UuidInterface::class, true);
     }
 }
+
+class_alias(UuidDenormalizer::class, \ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class);

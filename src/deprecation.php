@@ -206,7 +206,7 @@ $deprecatedClassesWithAliases = [
 
     // Bridge\Symfony\Validator
     ApiPlatform\Core\Bridge\Symfony\Validator\EventListener\ValidationExceptionListener::class => ApiPlatform\Symfony\Validator\EventListener\ValidationExceptionListener::class,
-    ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class => ApiPlatform\Validator\Exception\ValidationException::class,
+    ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class => ApiPlatform\Symfony\Validator\Exception\ValidationException::class,
     ApiPlatform\Core\Bridge\Symfony\Validator\Validator::class => ApiPlatform\Symfony\Validator\Validator::class,
 
     // Cache
@@ -445,6 +445,7 @@ $deprecatedClassesWithoutAliases = [
 
     ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Odm\Filter\SearchFilter::class,
     ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter::class => ApiPlatform\Doctrine\Orm\Filter\SearchFilter::class,
+    ApiPlatform\Core\HttpCache\PurgerInterface::class => ApiPlatform\HttpCache\PurgerInterface::class,
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedInterfaces, $deprecatedClassesWithoutAliases, $deprecatedClassesWithAliases) {

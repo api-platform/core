@@ -133,3 +133,5 @@ final class Schema extends \ArrayObject
         return substr($definitionKey, $prefix);
     }
 }
+
+class_alias(Schema::class, \ApiPlatform\Core\JsonSchema\Schema::class);

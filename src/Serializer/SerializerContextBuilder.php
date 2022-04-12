@@ -192,3 +192,5 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         return false;
     }
 }
+
+class_alias(SerializerContextBuilder::class, \ApiPlatform\Core\Serializer\SerializerContextBuilder::class);

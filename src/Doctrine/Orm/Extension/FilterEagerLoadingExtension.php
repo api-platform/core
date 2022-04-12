@@ -203,3 +203,5 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         }, $aliases);
     }
 }
+
+class_alias(FilterEagerLoadingExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension::class);

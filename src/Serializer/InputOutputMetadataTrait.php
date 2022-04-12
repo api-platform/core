@@ -85,3 +85,5 @@ trait InputOutputMetadataTrait
         return $metadata->getAttribute($inputOrOutput)['class'] ?? null;
     }
 }
+
+class_alias(InputOutputMetadataTrait::class, \ApiPlatform\Core\Serializer\InputOutputMetadataTrait::class);

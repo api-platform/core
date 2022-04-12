@@ -24,3 +24,5 @@ if (\PHP_VERSION_ID < 80000) {
         use ResponseTrait80;
     }
 }
+
+class_alias(ResponseTrait::class, \ApiPlatform\Core\Util\ResponseTrait::class);

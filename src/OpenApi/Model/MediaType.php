@@ -82,3 +82,5 @@ final class MediaType
         return $clone;
     }
 }
+
+class_alias(MediaType::class, \ApiPlatform\Core\OpenApi\Model\MediaType::class);

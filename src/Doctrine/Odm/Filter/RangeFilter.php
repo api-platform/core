@@ -126,3 +126,5 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
         }
     }
 }
+
+class_alias(RangeFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter::class);

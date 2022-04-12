@@ -22,6 +22,7 @@ use LogicException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -32,21 +33,21 @@ class VarnishPurgerTest extends TestCase
 
     public function testPurge()
     {
-        $clientProphecy1 = $this->prophesize(ClientInterface::class);
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
+        $clientProphecy1->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->shouldBeCalled();
 
-        $clientProphecy2 = $this->prophesize(ClientInterface::class);
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy2 = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
+        $clientProphecy2->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo|/bar)($|\,)']])->shouldBeCalled();
 
-        $clientProphecy3 = $this->prophesize(ClientInterface::class);
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy3 = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
+        $clientProphecy3->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->shouldBeCalled();
 
-        $clientProphecy4 = $this->prophesize(ClientInterface::class);
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->willReturn(new Response())->shouldBeCalled();
-        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->willReturn(new Response())->shouldBeCalled();
+        $clientProphecy4 = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/foo)($|\,)']])->shouldBeCalled();
+        $clientProphecy4->request('BAN', '', ['headers' => ['ApiPlatform-Ban-Regex' => '(/bar)($|\,)']])->shouldBeCalled();
 
         $purger = new VarnishPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
         $purger->purge(['/foo']);

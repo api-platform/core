@@ -109,3 +109,5 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         $this->decorated->setSerializer($serializer);
     }
 }
+
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\Bridge\Elasticsearch\Serializer\ItemNormalizer::class);

@@ -18,6 +18,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -35,6 +38,17 @@ use PHPUnit\Framework\TestCase;
 class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
+
+    private function getDefaultGraphqlOperations(string $shortName, string $class): array
+    {
+        return [
+            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true]),
+            'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true]),
+            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName."),
+            'delete' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], delete: true, name: 'delete', description: "Deletes a $shortName."),
+            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName."),
+        ];
+    }
 
     public function testCreate(): void
     {
@@ -56,7 +70,8 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                         '_api_AttributeResource_delete' => new Delete(
                             shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 3
                         ),
-                    ]
+                    ],
+                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class)
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
@@ -101,17 +116,24 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                         '_api_/attribute_resources.{_format}_post' => new Post(
                             shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2
                         ),
-                    ]
+                    ],
+                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class)
                 ),
             ]),
             $attributeResourceMetadataCollectionFactory->create(AttributeResources::class)
         );
+    }
 
-        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false);
+    public function testCreateWithDefaults(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['attributes' => ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']]);
+
+        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',
                 class: AttributeDefaultOperations::class,
+                graphQlOperations: [],
                 operations: [
                     '_api_AttributeDefaultOperations_get' => (new Get())->withOperation($operation),
                     '_api_AttributeDefaultOperations_get_collection' => (new GetCollection())->withOperation($operation),
@@ -119,16 +141,24 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     '_api_AttributeDefaultOperations_put' => (new Put())->withOperation($operation),
                     '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation),
                     '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation),
-                ]
+                ],
+                cacheHeaders: ['max_age' => 60],
+                paginationItemsPerPage: 10
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
     }
 
-    public function testCreateWithDefaults(): void
+    public function testCreateShouldNotOverrideWithDefault(): void
     {
-        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['attributes' => ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']]);
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(
+            null, null, [
+                'attributes' => [
+                    'pagination_items_per_page' => 3,
+                ],
+            ]
+        );
 
-        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false, cacheHeaders: ['max_age' => 60]);
+        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, paginationItemsPerPage: 10);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',
@@ -141,7 +171,8 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation),
                     '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation),
                 ],
-                cacheHeaders: ['max_age' => 60]
+                graphQlOperations: [],
+                paginationItemsPerPage: 10
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
     }

@@ -60,3 +60,5 @@ final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
         return implode('.', $convertedProperties);
     }
 }
+
+class_alias(InnerFieldsNameConverter::class, \ApiPlatform\Core\Bridge\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter::class);

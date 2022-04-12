@@ -36,3 +36,5 @@ final class Pattern implements ValidatorInterface
         return [];
     }
 }
+
+class_alias(Pattern::class, \ApiPlatform\Core\Filter\Validator\Pattern::class);

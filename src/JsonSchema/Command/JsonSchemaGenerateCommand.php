@@ -115,3 +115,5 @@ final class JsonSchemaGenerateCommand extends Command
         return 0;
     }
 }
+
+class_alias(JsonSchemaGenerateCommand::class, \ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand::class);

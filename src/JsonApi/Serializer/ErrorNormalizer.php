@@ -82,3 +82,5 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         return true;
     }
 }
+
+class_alias(ErrorNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ErrorNormalizer::class);

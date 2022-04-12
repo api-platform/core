@@ -416,19 +416,18 @@ final class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->info('To pass options to the client charged with the request.')
                                 ->end()
+                                ->scalarNode('purger')
+                                    ->defaultValue('api_platform.http_cache.purger.varnish')
+                                    ->info('Specify a varnish purger to use (available values: "api_platform.http_cache.purger.varnish.ban" or "api_platform.http_cache.purger.varnish.xkey").')
+                                ->end()
                                 ->arrayNode('xkey')
-                                    ->info('Enable support for xkey invalidation.')
-                                    ->canBeEnabled()
+                                    ->addDefaultsIfNotSet()
                                     ->children()
                                         ->scalarNode('glue')
                                         ->defaultValue(' ')
                                         ->info('xkey glue between keys')
                                         ->end()
                                     ->end()
-                                ->end()
-                                ->arrayNode('http_tags')
-                                    ->canBeDisabled()
-                                    ->info('Enable support for Cache-Tags invalidation.')
                                 ->end()
                             ->end()
                         ->end()
@@ -667,3 +666,5 @@ final class Configuration implements ConfigurationInterface
             : [$message];
     }
 }
+
+class_alias(Configuration::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class);

@@ -102,3 +102,5 @@ class NumericFilter extends AbstractContextAwareFilter
         return 'int';
     }
 }
+
+class_alias(NumericFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\NumericFilter::class);

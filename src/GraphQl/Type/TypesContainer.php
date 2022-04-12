@@ -60,3 +60,5 @@ final class TypesContainer implements TypesContainerInterface
         return \array_key_exists($id, $this->graphqlTypes);
     }
 }
+
+class_alias(TypesContainer::class, \ApiPlatform\Core\GraphQl\Type\TypesContainer::class);

@@ -56,3 +56,5 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new AuthenticatorManagerPass());
     }
 }
+
+class_alias(ApiPlatformBundle::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class);

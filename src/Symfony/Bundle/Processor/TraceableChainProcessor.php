@@ -61,3 +61,5 @@ final class TraceableChainProcessor implements ProcessorInterface
         return $this->decorated->supports($data, $uriVariables, $operationName, $context);
     }
 }
+
+class_alias(TraceableChainProcessor::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Processor\TraceableChainProcessor::class);

@@ -94,3 +94,5 @@ trait DateFilterTrait
         return $value;
     }
 }
+
+class_alias(DateFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait::class);

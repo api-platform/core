@@ -54,3 +54,5 @@ final class GraphQlPlaygroundAction
         throw new BadRequestHttpException('GraphQL Playground is not enabled.');
     }
 }
+
+class_alias(GraphQlPlaygroundAction::class, \ApiPlatform\Core\GraphQl\Action\GraphQlPlaygroundAction::class);

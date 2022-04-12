@@ -86,3 +86,5 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
         return $this->jsonEncoder->decode($data, $format, $context);
     }
 }
+
+class_alias(JsonEncoder::class, \ApiPlatform\Core\Serializer\JsonEncoder::class);

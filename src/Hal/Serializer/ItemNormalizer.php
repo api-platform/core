@@ -277,3 +277,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return false;
     }
 }
+
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ItemNormalizer::class);

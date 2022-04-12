@@ -211,3 +211,5 @@ class ExistsFilter extends AbstractContextAwareFilter implements ExistsFilterInt
         return \is_array($properties) ? $properties : [];
     }
 }
+
+class_alias(ExistsFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter::class);

@@ -36,3 +36,5 @@ final class EventPriorities
     // kernel.response
     public const POST_RESPOND = 0;
 }
+
+class_alias(EventPriorities::class, \ApiPlatform\Core\EventListener\EventPriorities::class);

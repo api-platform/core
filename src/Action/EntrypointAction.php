@@ -35,3 +35,5 @@ final class EntrypointAction
         return new Entrypoint($this->resourceNameCollectionFactory->create());
     }
 }
+
+class_alias(EntrypointAction::class, \ApiPlatform\Core\Action\EntrypointAction::class);

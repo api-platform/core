@@ -73,3 +73,5 @@ final class DocumentMetadata
         return $this->type;
     }
 }
+
+class_alias(DocumentMetadata::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\DocumentMetadata::class);

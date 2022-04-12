@@ -44,3 +44,5 @@ final class ClassMetadataFactory implements ClassMetadataFactoryInterface
         return $this->decorated->hasMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
     }
 }
+
+class_alias(ClassMetadataFactory::class, \ApiPlatform\Core\Serializer\Mapping\Factory\ClassMetadataFactory::class);

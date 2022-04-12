@@ -148,3 +148,5 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
         }
     }
 }
+
+class_alias(RangeFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter::class);

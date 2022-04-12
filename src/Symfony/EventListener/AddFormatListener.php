@@ -188,3 +188,5 @@ final class AddFormatListener
         ));
     }
 }
+
+class_alias(AddFormatListener::class, \ApiPlatform\Core\EventListener\AddFormatListener::class);

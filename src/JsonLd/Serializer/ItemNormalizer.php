@@ -149,3 +149,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return parent::denormalize($data, $class, $format, $context);
     }
 }
+
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ItemNormalizer::class);

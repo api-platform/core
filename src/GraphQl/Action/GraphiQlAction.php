@@ -54,3 +54,5 @@ final class GraphiQlAction
         throw new BadRequestHttpException('GraphiQL is not enabled.');
     }
 }
+
+class_alias(GraphiQlAction::class, \ApiPlatform\Core\GraphQl\Action\GraphiQlAction::class);

@@ -103,3 +103,5 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
 
     abstract public function provideApplyTestData(): array;
 }
+
+class_alias(DoctrineMongoDbOdmFilterTestCase::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase::class);

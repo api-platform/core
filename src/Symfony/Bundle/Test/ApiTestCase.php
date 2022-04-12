@@ -103,3 +103,5 @@ abstract class ApiTestCase extends KernelTestCase
         return $container->get('api_platform.iri_converter')->getIriFromItem($item);
     }
 }
+
+class_alias(ApiTestCase::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class);

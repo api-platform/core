@@ -84,3 +84,5 @@ trait ResourceClassInfoTrait
         return true;
     }
 }
+
+class_alias(ResourceClassInfoTrait::class, \ApiPlatform\Core\Util\ResourceClassInfoTrait::class);
