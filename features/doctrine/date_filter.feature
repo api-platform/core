@@ -507,6 +507,14 @@ Feature: Date filter on collections
     And the JSON node "hydra:member[1].dateIncludeNullBeforeAndAfter" should be null
 
   @createSchema
+  Scenario: Get collection filtered by wrong filter
+    Given there are 3 dummydate objects with nullable dateIncludeNullBeforeAndAfter
+    When I send a "GET" request to "/dummy_dates?dateIncludeNullBeforeAndAfter[before][]=2015-04-01"
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "hydra:totalItems" should be equal to 0
+
+  @createSchema
   Scenario: Get collection filtered by date that is an immutable date variant
     Given there are 30 dummyimmutabledate objects with dummyDate
     When I send a "GET" request to "/dummy_immutable_dates?dummyDate[after]=2015-04-28"
