@@ -13,11 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
@@ -32,14 +31,12 @@ final class SerializeStage implements SerializeStageInterface
 {
     use IdentifierTrait;
 
-    private $resourceMetadataCollectionFactory;
     private $normalizer;
     private $serializerContextBuilder;
     private $pagination;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
+    public function __construct(NormalizerInterface $normalizer, SerializerContextBuilderInterface $serializerContextBuilder, Pagination $pagination)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->normalizer = $normalizer;
         $this->serializerContextBuilder = $serializerContextBuilder;
         $this->pagination = $pagination;
@@ -48,23 +45,16 @@ final class SerializeStage implements SerializeStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke($itemOrCollection, string $resourceClass, string $operationName, array $context): ?array
+    public function __invoke($itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array
     {
-        // TODO: replace by $operation->isCollection and $operation instanceof Mutation
+        // TODO: replace by $operation->isCollection and $operation instanceof CollectionOperationInterface
         $isCollection = $context['is_collection'];
         $isMutation = $context['is_mutation'];
         $isSubscription = $context['is_subscription'];
+        $shortName = $operation->getShortName();
+        $operationName = $operation->getName();
 
-        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = null;
-        try {
-            $operation = $resourceMetadataCollection->getOperation($operationName);
-            $shortName = $operation->getShortName();
-        } catch (OperationNotFoundException $e) {
-            $shortName = $resourceMetadataCollection->getOperation()->getShortName();
-        }
-
-        if ($operation && !($operation->canSerialize() ?? true)) {
+        if (!($operation->canSerialize() ?? true)) {
             if ($isCollection) {
                 if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
                     return 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?

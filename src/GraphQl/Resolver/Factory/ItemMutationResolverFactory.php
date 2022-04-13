@@ -22,7 +22,8 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -47,10 +48,9 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
     private $writeStage;
     private $validateStage;
     private $mutationResolverLocator;
-    private $resourceMetadataCollectionFactory;
     private $securityPostValidationStage;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SecurityPostValidationStageInterface $securityPostValidationStage)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, DeserializeStageInterface $deserializeStage, WriteStageInterface $writeStage, ValidateStageInterface $validateStage, ContainerInterface $mutationResolverLocator, SecurityPostValidationStageInterface $securityPostValidationStage)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
@@ -60,46 +60,42 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
         $this->writeStage = $writeStage;
         $this->validateStage = $validateStage;
         $this->mutationResolverLocator = $mutationResolverLocator;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->securityPostValidationStage = $securityPostValidationStage;
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
-            if (null === $resourceClass || null === $operationName) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
+            if (null === $resourceClass || null === $operation) {
                 return null;
             }
 
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => true, 'is_subscription' => false];
 
-            $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
+            $item = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
-            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityStage)($resourceClass, $operation, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                 ],
             ]);
             $previousItem = $this->clone($item);
 
-            if ('delete' === $operationName) {
-                ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+            if ('delete' === $operation->getName() || $operation instanceof DeleteOperationInterface) {
+                ($this->securityPostDenormalizeStage)($resourceClass, $operation, $resolverContext + [
                     'extra_variables' => [
                         'object' => $item,
                         'previous_object' => $previousItem,
                     ],
                 ]);
-                $item = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
+                $item = ($this->writeStage)($item, $resourceClass, $operation, $resolverContext);
 
-                return ($this->serializeStage)($item, $resourceClass, $operationName, $resolverContext);
+                return ($this->serializeStage)($item, $resourceClass, $operation, $resolverContext);
             }
 
-            $item = ($this->deserializeStage)($item, $resourceClass, $operationName, $resolverContext);
-
-            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $resourceMetadataCollection->getOperation($operationName);
+            $item = ($this->deserializeStage)($item, $resourceClass, $operation, $resolverContext);
 
             $mutationResolverId = $operation->getResolver();
             if (null !== $mutationResolverId) {
@@ -111,7 +107,7 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
                 }
             }
 
-            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityPostDenormalizeStage)($resourceClass, $operation, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                     'previous_object' => $previousItem,
@@ -119,19 +115,19 @@ final class ItemMutationResolverFactory implements ResolverFactoryInterface
             ]);
 
             if (null !== $item) {
-                ($this->validateStage)($item, $resourceClass, $operationName, $resolverContext);
+                ($this->validateStage)($item, $resourceClass, $operation, $resolverContext);
 
-                ($this->securityPostValidationStage)($resourceClass, $operationName, $resolverContext + [
+                ($this->securityPostValidationStage)($resourceClass, $operation, $resolverContext + [
                     'extra_variables' => [
                         'object' => $item,
                         'previous_object' => $previousItem,
                     ],
                 ]);
 
-                $persistResult = ($this->writeStage)($item, $resourceClass, $operationName, $resolverContext);
+                $persistResult = ($this->writeStage)($item, $resourceClass, $operation, $resolverContext);
             }
 
-            return ($this->serializeStage)($persistResult ?? $item, $resourceClass, $operationName, $resolverContext);
+            return ($this->serializeStage)($persistResult ?? $item, $resourceClass, $operation, $resolverContext);
         };
     }
 }

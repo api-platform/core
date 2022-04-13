@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+
 /**
  * Resource metadata attribute.
  *
@@ -1096,6 +1098,9 @@ class ApiResource
         return $self;
     }
 
+    /**
+     * @return GraphQlOperation
+     */
     public function getGraphQlOperations(): ?array
     {
         return $this->graphQlOperations;

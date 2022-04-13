@@ -16,6 +16,9 @@ namespace ApiPlatform\GraphQl\Subscription;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use ApiPlatform\Util\SortTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -37,13 +40,15 @@ final class SubscriptionManager implements SubscriptionManagerInterface
     private $subscriptionIdentifierGenerator;
     private $serializeStage;
     private $iriConverter;
+    private $resourceMetadataCollectionFactory;
 
-    public function __construct(CacheItemPoolInterface $subscriptionsCache, SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, SerializeStageInterface $serializeStage, IriConverterInterface $iriConverter)
+    public function __construct(CacheItemPoolInterface $subscriptionsCache, SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, SerializeStageInterface $serializeStage, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
         $this->subscriptionsCache = $subscriptionsCache;
         $this->subscriptionIdentifierGenerator = $subscriptionIdentifierGenerator;
         $this->serializeStage = $serializeStage;
         $this->iriConverter = $iriConverter;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function retrieveSubscriptionId(array $context, ?array $result): ?string
@@ -85,12 +90,15 @@ final class SubscriptionManager implements SubscriptionManagerInterface
         $subscriptions = $this->getSubscriptionsFromIri($iri);
 
         $resourceClass = $this->getObjectClass($object);
+        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $shortName = $resourceMetadata->getOperation()->getShortName();
 
         $payloads = [];
         foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
             $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
-
-            $data = ($this->serializeStage)($object, $resourceClass, 'update_subscription', $resolverContext);
+            /** @var Operation */
+            $operation = (new Subscription())->withName('update_subscription')->withShortName($shortName);
+            $data = ($this->serializeStage)($object, $resourceClass, $operation, $resolverContext);
             unset($data['clientSubscriptionId']);
 
             if ($data !== $subscriptionResult) {

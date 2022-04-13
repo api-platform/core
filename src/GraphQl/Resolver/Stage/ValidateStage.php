@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Validator\ValidatorInterface;
 
 /**
@@ -23,23 +23,18 @@ use ApiPlatform\Validator\ValidatorInterface;
  */
 final class ValidateStage implements ValidateStageInterface
 {
-    private $resourceMetadataCollectionFactory;
     private $validator;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ValidatorInterface $validator)
+    public function __construct(ValidatorInterface $validator)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->validator = $validator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke($object, string $resourceClass, string $operationName, array $context): void
+    public function __invoke($object, string $resourceClass, Operation $operation, array $context): void
     {
-        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getOperation($operationName);
-
         if (!($operation->canValidate() ?? true)) {
             return;
         }

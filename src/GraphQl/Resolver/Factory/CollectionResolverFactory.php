@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -42,9 +41,8 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
     private $serializeStage;
     private $queryResolverLocator;
     private $requestStack;
-    private $resourceMetadataCollectionFactory;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, RequestStack $requestStack = null)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, RequestStack $requestStack = null)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
@@ -52,12 +50,11 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
         $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
         $this->requestStack = $requestStack;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
             // If authorization has failed for a relation field (e.g. via ApiProperty security), the field is not present in the source: null can be returned directly to ensure the collection isn't in the response.
             if (null === $resourceClass || null === $rootClass || (null !== $source && !\array_key_exists($info->fieldName, $source))) {
                 return null;
@@ -70,22 +67,14 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 );
             }
 
-            $operationName = $operationName ?? 'collection_query';
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => true, 'is_mutation' => false, 'is_subscription' => false];
 
-            $collection = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
+            $collection = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);
             if (!is_iterable($collection)) {
                 throw new \LogicException('Collection from read stage should be iterable.');
             }
 
-            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            try {
-                $operation = $resourceMetadataCollection->getOperation($operationName);
-                $queryResolverId = $operation->getResolver();
-            } catch (OperationNotFoundException $e) {
-                $queryResolverId = null;
-            }
-
+            $queryResolverId = $operation->getResolver();
             if (null !== $queryResolverId) {
                 /** @var QueryCollectionResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);
@@ -94,12 +83,12 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
 
             // Only perform security stage on the top-level query
             if (null === $source) {
-                ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+                ($this->securityStage)($resourceClass, $operation, $resolverContext + [
                     'extra_variables' => [
                         'object' => $collection,
                     ],
                 ]);
-                ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+                ($this->securityPostDenormalizeStage)($resourceClass, $operation, $resolverContext + [
                     'extra_variables' => [
                         'object' => $collection,
                         'previous_object' => $this->clone($collection),
@@ -107,7 +96,7 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 ]);
             }
 
-            return ($this->serializeStage)($collection, $resourceClass, $operationName, $resolverContext);
+            return ($this->serializeStage)($collection, $resourceClass, $operation, $resolverContext);
         };
     }
 }

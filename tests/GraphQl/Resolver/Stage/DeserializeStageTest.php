@@ -17,10 +17,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -33,7 +30,6 @@ class DeserializeStageTest extends TestCase
 
     /** @var DeserializeStage */
     private $deserializeStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $denormalizerProphecy;
     private $serializerContextBuilderProphecy;
 
@@ -42,12 +38,10 @@ class DeserializeStageTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $this->deserializeStage = new DeserializeStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->denormalizerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal()
         );
@@ -60,12 +54,9 @@ class DeserializeStageTest extends TestCase
      */
     public function testApplyDisabled($objectToPopulate): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withDeserialize(false)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
-
-        $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operationName, []);
+        $operation = (new Query())->withName('item_query')->withClass($resourceClass)->withDeserialize(false);
+        $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, []);
 
         $this->assertSame($objectToPopulate, $result);
     }
@@ -79,16 +70,15 @@ class DeserializeStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        $operation = (new Query())->withName($operationName)->withClass($resourceClass);
         $context = ['args' => ['input' => 'myInput']];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Query()])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
 
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
 
         $denormalizedData = new \stdClass();
         $this->denormalizerProphecy->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext)->shouldBeCalled()->willReturn($denormalizedData);
 
-        $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operationName, $context);
+        $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, $context);
 
         $this->assertSame($denormalizedData, $result);
     }

@@ -75,15 +75,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         continue;
                     }
 
-                    $isCollection = $operation instanceof CollectionOperationInterface;
-                    if ($operation instanceof Query && !$isCollection) {
-                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+                    if ($operation instanceof Query && $operation instanceof CollectionOperationInterface) {
+                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }
 
-                    if ($operation instanceof Query && $isCollection) {
-                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
+                    if ($operation instanceof Query) {
+                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }

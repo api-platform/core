@@ -15,10 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +32,6 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
     /** @var SecurityPostDenormalizeStage */
     private $securityPostDenormalizeStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $resourceAccessCheckerProphecy;
 
     /**
@@ -43,11 +39,9 @@ class SecurityPostDenormalizeStageTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
 
         $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->resourceAccessCheckerProphecy->reveal()
         );
     }
@@ -56,12 +50,11 @@ class SecurityPostDenormalizeStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Query()])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = new Query();
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
 
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, []);
+        ($this->securityPostDenormalizeStage)($resourceClass, $operation, []);
     }
 
     public function testGranted(): void
@@ -70,12 +63,11 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withSecurityPostDenormalize($isGranted)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, ['extra_variables' => $extraVariables]);
+        ($this->securityPostDenormalizeStage)($resourceClass, $operation, ['extra_variables' => $extraVariables]);
     }
 
     /**
@@ -88,8 +80,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withSecurityPostDenormalize($isGranted)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
@@ -102,8 +93,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withSecurityPostDenormalize($isGranted)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(false);
 
@@ -112,7 +102,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('Access Denied.');
 
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, [
+        ($this->securityPostDenormalizeStage)($resourceClass, $operation, [
             'info' => $info,
             'extra_variables' => $extraVariables,
         ]);
@@ -120,30 +110,28 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
     public function testNoSecurityBundleInstalled(): void
     {
-        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), null);
+        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage(null);
 
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withSecurityPostDenormalize($isGranted)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->expectException(\LogicException::class);
 
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, []);
+        ($this->securityPostDenormalizeStage)($resourceClass, $operation, []);
     }
 
     public function testNoSecurityBundleInstalledNoExpression(): void
     {
-        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage($this->resourceMetadataCollectionFactoryProphecy->reveal(), null);
+        $this->securityPostDenormalizeStage = new SecurityPostDenormalizeStage(null);
 
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Query()])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::any())->shouldNotBeCalled();
 
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, []);
+        ($this->securityPostDenormalizeStage)($resourceClass, $operation, []);
     }
 }
