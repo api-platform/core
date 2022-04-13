@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 
 class ServiceLocatorProcessor implements ProcessorInterface
@@ -21,7 +21,7 @@ class ServiceLocatorProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
     }
 }

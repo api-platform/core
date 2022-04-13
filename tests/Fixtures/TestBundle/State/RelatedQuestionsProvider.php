@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Question as QuestionDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
@@ -28,7 +28,7 @@ class RelatedQuestionsProvider implements ProviderInterface
         $this->registry = $registry;
     }
 
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $manager = $this->registry->getManagerForClass($operation->getClass());
         $repository = $manager->getRepository($operation->getClass());

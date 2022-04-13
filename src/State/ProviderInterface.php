@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Retrieves data from a persistence layer.
@@ -28,5 +28,5 @@ interface ProviderInterface
      *
      * @return object|array|null
      */
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = []);
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []);
 }

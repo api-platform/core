@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
@@ -34,7 +34,7 @@ class ProductProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($operation instanceof CollectionOperationInterface) {
             dd('todo');

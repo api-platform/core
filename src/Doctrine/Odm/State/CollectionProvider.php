@@ -17,7 +17,7 @@ use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -46,7 +46,7 @@ final class CollectionProvider implements ProviderInterface
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceClass = $operation->getClass();
         /** @var DocumentManager $manager */

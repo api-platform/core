@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
@@ -21,7 +21,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 
 class AttributeResourceProvider implements ProviderInterface
 {
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (isset($uriVariables['identifier'])) {
             $resource = new AttributeResource($uriVariables['identifier'], 'Foo');

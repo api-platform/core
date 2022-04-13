@@ -28,8 +28,8 @@ use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -158,16 +158,16 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     {
         $priority = 0;
         foreach ($operations as $operationName => $operation) {
-            $newOperation = OperationType::COLLECTION === $type ? new GetCollection() : new Operation();
+            $newOperation = OperationType::COLLECTION === $type ? new GetCollection() : new HttpOperation();
 
             $newOperation = $newOperation->withMethod($operation['method'])
                 ->withClass($resource->getClass())
                 ->withPriority($priority++);
             // ->withCompositeIdentifier($resource->getCompositeIdentifier())
 
-            if (Operation::METHOD_DELETE === $operation['method']) {
+            if (HttpOperation::METHOD_DELETE === $operation['method']) {
                 $newOperation = (new Delete())->withOperation($newOperation);
-            } elseif (Operation::METHOD_POST === $operation['method'] && !isset($operation['path'])) {
+            } elseif (HttpOperation::METHOD_POST === $operation['method'] && !isset($operation['path'])) {
                 $newOperation = (new Post())->withOperation($newOperation)->withUriVariables([])->withRead(false);
             }
 
@@ -188,10 +188,10 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     }
 
     /**
-     * @param Operation|GraphQlOperation|ApiResource $operation
-     * @param mixed                                  $value
+     * @param HttpOperation|GraphQlOperation|ApiResource $operation
+     * @param mixed                                      $value
      *
-     * @return Operation|GraphQlOperation|ApiResource
+     * @return HttpOperation|GraphQlOperation|ApiResource
      */
     private function setAttributeValue($operation, string $key, $value)
     {
@@ -228,9 +228,9 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     }
 
     /**
-     * @param ApiResource|Operation $resource
+     * @param ApiResource|HttpOperation $resource
      *
-     * @return ApiResource|Operation
+     * @return ApiResource|HttpOperation
      */
     private function identifiersToUriVariables(ResourceMetadata $resourceMetadata, $resource)
     {

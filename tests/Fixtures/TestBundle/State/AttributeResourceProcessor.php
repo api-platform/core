@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 
 class AttributeResourceProcessor
@@ -21,7 +21,7 @@ class AttributeResourceProcessor
     /**
      * {@inheritDoc}
      */
-    static public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    static public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
     }
 }

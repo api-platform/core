@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
-use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation as AbstractOperation;
 
 class Operation extends AbstractOperation
 {

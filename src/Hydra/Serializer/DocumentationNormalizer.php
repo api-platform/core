@@ -29,7 +29,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -376,12 +376,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      *
      * @param ResourceMetadata|ApiResource $resourceMetadata
      * @param SubresourceMetadata          $subresourceMetadata
-     * @param array|Operation              $operation
+     * @param array|HttpOperation          $operation
      */
     private function getHydraOperation(string $resourceClass, $resourceMetadata, string $operationName, $operation, string $prefixedShortName, ?string $operationType = null, SubresourceMetadata $subresourceMetadata = null): array
     {
-        if ($operation instanceof Operation) {
-            $method = $operation->getMethod() ?: Operation::METHOD_GET;
+        if ($operation instanceof HttpOperation) {
+            $method = $operation->getMethod() ?: HttpOperation::METHOD_GET;
         } elseif ($this->operationMethodResolver) {
             if (OperationType::COLLECTION === $operationType) {
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
@@ -394,12 +394,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
         }
 
-        $hydraOperation = $operation instanceof Operation ? ($operation->getHydraContext() ?? []) : ($operation['hydra_context'] ?? []);
-        if ($operation instanceof Operation ? $operation->getDeprecationReason() : $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
+        $hydraOperation = $operation instanceof HttpOperation ? ($operation->getHydraContext() ?? []) : ($operation['hydra_context'] ?? []);
+        if ($operation instanceof HttpOperation ? $operation->getDeprecationReason() : $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
             $hydraOperation['owl:deprecated'] = true;
         }
 
-        if ($operation instanceof Operation) {
+        if ($operation instanceof HttpOperation) {
             $shortName = $operation->getShortName();
             $inputMetadata = $operation->getInput() ?? [];
             $outputMetadata = $operation->getOutput() ?? [];

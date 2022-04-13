@@ -23,7 +23,7 @@ final class Operations implements \IteratorAggregate, \Countable
     private $operations;
 
     /**
-     * @param Operation[] $operations
+     * @param HttpOperation[] $operations
      */
     public function __construct(array $operations = [])
     {
@@ -49,7 +49,7 @@ final class Operations implements \IteratorAggregate, \Countable
         })();
     }
 
-    public function add(string $key, AbstractOperation $value): self
+    public function add(string $key, Operation $value): self
     {
         foreach ($this->operations as $i => [$operationName, $operation]) {
             if ($operationName === $key) {

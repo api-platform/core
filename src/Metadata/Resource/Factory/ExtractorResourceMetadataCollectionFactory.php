@@ -19,7 +19,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -122,7 +122,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 throw new \InvalidArgumentException(sprintf('Operation "%s" does not exist.', $attributes['class']));
             }
 
-            /** @var Operation $operation */
+            /** @var HttpOperation $operation */
             $operation = (new $attributes['class']())->withShortName($resource->getShortName());
             unset($attributes['class']);
             foreach ($attributes as $key => $value) {
@@ -155,7 +155,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         $operations = [];
 
         foreach ($data as $attributes) {
-            /** @var Operation $operation */
+            /** @var HttpOperation $operation */
             $operation = (new $attributes['graphql_operation_class']())->withShortName($resource->getShortName());
             unset($attributes['graphql_operation_class']);
 
@@ -181,7 +181,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
+    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);

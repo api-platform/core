@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class Post extends Operation
+final class Post extends HttpOperation
 {
     /**
      * {@inheritdoc}
@@ -94,7 +94,7 @@ final class Post extends Operation
         ?string $processor = null,
         array $extraProperties = []
     ) {
-        $args = array_slice(\func_get_args(), 1);
+        $args = \array_slice(\func_get_args(), 1);
         parent::__construct(self::METHOD_POST, ...$args);
     }
 }

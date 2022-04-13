@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State;
 
 use ApiPlatform\Core\Exception\RuntimeException;
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
 class CallableProvider implements ProviderInterface
@@ -29,7 +29,7 @@ class CallableProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (\is_callable($provider = $operation->getProvider())) {
             return $provider($operation, $uriVariables, $context);

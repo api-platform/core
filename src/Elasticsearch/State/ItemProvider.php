@@ -15,7 +15,7 @@ namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
@@ -49,7 +49,7 @@ final class ItemProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceClass = $operation->getClass();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);

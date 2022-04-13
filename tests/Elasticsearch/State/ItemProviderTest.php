@@ -20,7 +20,7 @@ use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryI
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -68,25 +68,25 @@ final class ItemProviderTest extends TestCase
 
         $fooResourceMetadataCollection = new ResourceMetadataCollection(Foo::class);
         $fooResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_foo_get' => (new Operation())->withElasticsearch(true)->withCollection(false),
+            'api_foo_get' => (new HttpOperation())->withElasticsearch(true)->withCollection(false),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn($fooResourceMetadataCollection);
 
         $dummyCarResourceMetadataCollection = new ResourceMetadataCollection(DummyCar::class);
         $dummyCarResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_car_get' => (new Operation())->withElasticsearch(false)->withCollection(false),
+            'api_dummy_car_get' => (new HttpOperation())->withElasticsearch(false)->withCollection(false),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn($dummyCarResourceMetadataCollection);
 
         $dummyResourceMetadataCollection = new ResourceMetadataCollection(Dummy::class);
         $dummyResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_get' => (new Operation())->withElasticsearch(true)->withCollection(false),
+            'api_dummy_get' => (new HttpOperation())->withElasticsearch(true)->withCollection(false),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyResourceMetadataCollection);
 
         $compositeRelationResourceMetadataCollection = new ResourceMetadataCollection(CompositeRelation::class);
         $compositeRelationResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_composite_relation_get_collection' => (new Operation())->withElasticsearch(true)->withCollection(true),
+            'api_composite_relation_get_collection' => (new HttpOperation())->withElasticsearch(true)->withCollection(true),
         ]));
         $resourceMetadataCollectionFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn($compositeRelationResourceMetadataCollection);
 

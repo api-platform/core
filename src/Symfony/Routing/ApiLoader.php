@@ -22,7 +22,7 @@ use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Exception\InvalidResourceException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\PathResolver\OperationPathResolverInterface;
@@ -158,7 +158,7 @@ final class ApiLoader extends Loader
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
                         $operation->getSchemes() ?? [],
-                        [$operation->getMethod() ?? Operation::METHOD_GET],
+                        [$operation->getMethod() ?? HttpOperation::METHOD_GET],
                         $operation->getCondition() ?? ''
                     );
 

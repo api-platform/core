@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerAwareProviderInterface;
 use ApiPlatform\State\SerializerAwareProviderTrait;
@@ -28,7 +28,7 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     /**
      * {@inheritDoc}
      */
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         return $this->getSerializer()->deserialize(<<<'JSON'
 {

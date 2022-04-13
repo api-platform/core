@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -519,7 +519,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         $operations = [];
         foreach ($values as $value) {
-            $class = $value['class'] ?? Operation::class;
+            $class = $value['class'] ?? HttpOperation::class;
             unset($value['class']);
             $operation = (new $class())->withClass(self::RESOURCE_CLASS);
 
@@ -597,7 +597,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
+    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (get_class_methods($resource) as $methodName) {
             if (0 !== strpos($methodName, 'get')) {

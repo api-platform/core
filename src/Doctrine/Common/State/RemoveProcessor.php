@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,7 +30,7 @@ final class RemoveProcessor implements ProcessorInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
             return;

@@ -17,12 +17,11 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
-use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -86,7 +85,7 @@ class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMetadataCo
         return $resourceMetadataCollection;
     }
 
-    private function addDefaults($operation): AbstractOperation
+    private function addDefaults($operation): Operation
     {
         if (null === $operation->getProvider()) {
             $operation = $operation->withProvider($this->getProvider($operation));
@@ -99,7 +98,7 @@ class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMetadataCo
         return $operation;
     }
 
-    private function getProvider(AbstractOperation $operation): string
+    private function getProvider(Operation $operation): string
     {
         if ($operation instanceof CollectionOperationInterface) {
             return CollectionProvider::class;
@@ -108,7 +107,7 @@ class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMetadataCo
         return ItemProvider::class;
     }
 
-    private function getProcessor(AbstractOperation $operation): string
+    private function getProcessor(Operation $operation): string
     {
         if ($operation instanceof DeleteOperationInterface) {
             return RemoveProcessor::class;

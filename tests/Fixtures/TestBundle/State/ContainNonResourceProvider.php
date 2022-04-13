@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 
@@ -25,7 +25,7 @@ class ContainNonResourceProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $id = $uriVariables['id'] ?? null;
         if (!\is_scalar($id)) {

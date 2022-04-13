@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class GetCollection extends Operation implements CollectionOperationInterface
+final class GetCollection extends HttpOperation implements CollectionOperationInterface
 {
     /**
      * {@inheritdoc}

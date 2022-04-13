@@ -21,9 +21,9 @@ trait WithResourceTrait
     }
 
     /**
-     * @param ApiResource|AbstractOperation $resource
+     * @param ApiResource|Operation $resource
      *
-     * @return ApiResource|AbstractOperation
+     * @return ApiResource|Operation
      */
     protected function copyFrom($resource)
     {

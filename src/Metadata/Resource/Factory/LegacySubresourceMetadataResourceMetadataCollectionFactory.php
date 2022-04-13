@@ -18,8 +18,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -104,12 +104,18 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
 
                 $identifiers = [];
                 // Removing the third tuple element
+                $previousParameterName = null;
                 foreach ($subresourceMetadata['identifiers'] as $parameterName => [$class, $property, $isPresent]) {
                     if (!$isPresent) {
                         continue;
                     }
 
                     $identifiers[$parameterName] = (new Link())->withFromClass($class)->withIdentifiers([$property])->withParameterName($parameterName)->withCompositeIdentifier(false);
+                    if ($previousParameterName) {
+                        $identifiers[$previousParameterName] = $identifiers[$previousParameterName]->withFromProperty($parameterName);
+                    }
+
+                    $previousParameterName = $parameterName;
                 }
 
                 $extraProperties = ['is_legacy_subresource' => true];
@@ -162,10 +168,10 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
     }
 
     /**
-     * @param Operation|GraphQlOperation|ApiResource $operation
-     * @param mixed                                  $value
+     * @param HttpOperation|GraphQlOperation|ApiResource $operation
+     * @param mixed                                      $value
      *
-     * @return Operation|GraphQlOperation|ApiResource
+     * @return HttpOperation|GraphQlOperation|ApiResource
      */
     private function setAttributeValue($operation, string $key, $value)
     {

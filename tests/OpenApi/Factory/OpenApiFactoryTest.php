@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -65,14 +65,14 @@ class OpenApiFactoryTest extends TestCase
 
     public function testInvoke(): void
     {
-        $baseOperation = (new Operation())->withShortName('Dummy')->withDescription('This is a dummy')->withTypes(['http://schema.example.com/Dummy'])->withClass(Dummy::class)->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withOutput([
+        $baseOperation = (new HttpOperation())->withShortName('Dummy')->withDescription('This is a dummy')->withTypes(['http://schema.example.com/Dummy'])->withClass(Dummy::class)->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withOutput([
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true);
         $dummyResource = (new ApiResource())->withOperations(new Operations([
             'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'customDummyItem' => (new Operation())->withMethod(Operation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext([
+            'customDummyItem' => (new HttpOperation())->withMethod(HttpOperation::METHOD_HEAD)->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapiContext([
                 'x-visibility' => 'hide',
                 'description' => 'Custom description',
                 'parameters' => [
@@ -117,7 +117,7 @@ class OpenApiFactoryTest extends TestCase
                 'externalDocs' => ['url' => 'http://schema.example.com/Dummy', 'description' => 'See also'],
             ]
             ),
-            'custom-http-verb' => (new Operation())->withMethod('TEST')->withOperation($baseOperation),
+            'custom-http-verb' => (new HttpOperation())->withMethod('TEST')->withOperation($baseOperation),
             'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
             'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
             'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenApiContext([

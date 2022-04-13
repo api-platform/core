@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Metadata\AbstractOperation;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Process data: send an email, persist to storage, add to queue etc.
@@ -30,5 +30,5 @@ interface ProcessorInterface
      *
      * @return mixed
      */
-    public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = []);
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []);
 }

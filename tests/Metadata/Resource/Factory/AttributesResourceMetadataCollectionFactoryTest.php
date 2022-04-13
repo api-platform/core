@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -128,7 +128,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['attributes' => ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']]);
 
-        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10);
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',
@@ -158,7 +158,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
             ]
         );
 
-        $operation = new Operation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, paginationItemsPerPage: 10);
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, paginationItemsPerPage: 10);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',

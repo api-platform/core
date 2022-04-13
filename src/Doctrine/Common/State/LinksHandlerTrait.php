@@ -14,19 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\State;
 
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 
 trait LinksHandlerTrait
 {
     /**
-     * @param Operation|GraphQlOperation $operation
+     * @param HttpOperation|GraphQlOperation $operation
      *
      * @return Link[]
      */
-    private function getLinks(string $resourceClass, AbstractOperation $operation, array $context): array
+    private function getLinks(string $resourceClass, Operation $operation, array $context): array
     {
         $links = ($operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables()) ?? [];
 

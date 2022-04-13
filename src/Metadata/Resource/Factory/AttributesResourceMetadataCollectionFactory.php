@@ -25,14 +25,13 @@ use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -109,7 +108,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 continue;
             }
 
-            if (!is_subclass_of($attribute->getName(), Operation::class) && !is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
+            if (!is_subclass_of($attribute->getName(), HttpOperation::class) && !is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
                 continue;
             }
 
@@ -169,7 +168,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     }
 
     /**
-     * @param Operation|GraphQlOperation $operation
+     * @param HttpOperation|GraphQlOperation $operation
      */
     private function getOperationWithDefaults(ApiResource $resource, $operation): array
     {
@@ -188,7 +187,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             // TODO: remove in 3.0
-            if ($operation instanceof Operation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation instanceof CollectionOperationInterface && !$operation->getUriVariables()) {
+            if ($operation instanceof HttpOperation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation instanceof CollectionOperationInterface && !$operation->getUriVariables()) {
                 trigger_deprecation('api-platform', '2.7', 'Identifiers are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 the collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.');
                 continue;
             }
@@ -230,13 +229,13 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
+            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
             $operation,
         ];
     }
 
     /**
-     * @param ApiResource|Operation|GraphQlOperation $operation
+     * @param ApiResource|HttpOperation|GraphQlOperation $operation
      */
     private function addGlobalDefaults($operation)
     {
@@ -264,7 +263,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private function hasResourceAttributes(\ReflectionClass $reflectionClass): bool
     {
         foreach ($reflectionClass->getAttributes() as $attribute) {
-            if (ApiResource::class === $attribute->getName() || is_subclass_of($attribute->getName(), Operation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
+            if (ApiResource::class === $attribute->getName() || is_subclass_of($attribute->getName(), HttpOperation::class) || is_subclass_of($attribute->getName(), GraphQlOperation::class)) {
                 return true;
             }
         }
@@ -280,7 +279,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      * #[Get(uriTemplate: '/alternate')]
      * class Example {}
      */
-    private function hasSameOperation(ApiResource $resource, string $operationClass, Operation $operation): bool
+    private function hasSameOperation(ApiResource $resource, string $operationClass, HttpOperation $operation): bool
     {
         foreach ($resource->getOperations() ?? [] as $o) {
             if ($o instanceof $operationClass && $operation->getUriTemplate() === $o->getUriTemplate() && $operation->getName() === $o->getName() && $operation->getRouteName() === $o->getRouteName()) {

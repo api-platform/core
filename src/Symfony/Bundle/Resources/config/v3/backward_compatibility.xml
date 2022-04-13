@@ -22,17 +22,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.legacy_subresource_metadata.inner" />
         </service>
 
-        <service id="api_platform.legacy_data_provider_state" class="ApiPlatform\State\LegacyDataProviderState">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.item_data_provider" />
-            <argument type="service" id="api_platform.collection_data_provider" />
-            <argument type="service" id="api_platform.subresource_data_provider" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-
-            <tag name="api_platform.state_provider" priority="-1000" />
-        </service>
-
         <service id="api_platform.listener.view.write.legacy" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="api_platform.iri_converter" />

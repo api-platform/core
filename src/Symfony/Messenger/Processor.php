@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Messenger;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Metadata\AbstractOperation;
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
@@ -68,7 +68,7 @@ final class Processor implements ProcessorInterface
         );
     }
 
-    public function process($data, AbstractOperation $operation, array $uriVariables = [], array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if ($operation instanceof DeleteOperationInterface) {
             return $this->remove($data);
