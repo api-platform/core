@@ -127,7 +127,7 @@ final class IriConverter implements IriConverterInterface
         }
 
         try {
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName, false, true);
         } catch (OperationNotFoundException $e) {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
             foreach ($resourceMetadataCollection as $resource) {

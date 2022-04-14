@@ -21,22 +21,6 @@
             <tag name="api_platform.state_processor" priority="-100" />
         </service>
 
-        <service id="ApiPlatform\Doctrine\Orm\State\CollectionProvider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="doctrine" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
-
-            <tag name="api_platform.state_provider" priority="-100" />
-        </service>
-
-        <service id="ApiPlatform\Doctrine\Orm\State\ItemProvider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="doctrine" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
-
-            <tag name="api_platform.state_provider" priority="-100" />
-        </service>
-
         <!-- Filter -->
 
         <service id="api_platform.doctrine.orm.order_filter" class="ApiPlatform\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">

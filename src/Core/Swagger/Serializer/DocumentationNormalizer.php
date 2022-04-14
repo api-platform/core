@@ -583,7 +583,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $identifiers = (array) $resourceMetadata
                 ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
 
-        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
+        $pathOperation = $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass, OperationType::ITEM === $operationType ? false : true);
 
         $successResponse = ['description' => sprintf('%s resource created', $resourceShortName)];
         [$successResponse, $defined] = $this->addSchemas($v3, $successResponse, $definitions, $resourceClass, $operationType, $operationName, $responseMimeTypes);
@@ -677,14 +677,14 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return $this->addItemOperationParameters($v3, $pathOperation, $operationType, $operationName, $resourceMetadata, $resourceClass);
     }
 
-    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation, string $operationType, string $operationName, ResourceMetadata $resourceMetadata, string $resourceClass): \ArrayObject
+    private function addItemOperationParameters(bool $v3, \ArrayObject $pathOperation, string $operationType, string $operationName, ResourceMetadata $resourceMetadata, string $resourceClass, bool $isPost = false): \ArrayObject
     {
         $identifiers = (array) $resourceMetadata
                 ->getTypedOperationAttribute($operationType, $operationName, 'identifiers', [], false);
 
         // Auto-generated routes in API Platform < 2.7 are considered as collection, hotfix this as the OpenApi Factory supports new operations anyways.
         // this also fixes a bug where we could not create POST item operations in API P 2.6
-        if (OperationType::ITEM === $operationType && 'post' === substr($operationName, -4)) {
+        if (OperationType::ITEM === $operationType && $isPost) {
             $operationType = OperationType::COLLECTION;
         }
 

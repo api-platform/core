@@ -23,8 +23,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -127,10 +127,9 @@ class OpenApiFactoryTest extends TestCase
             ])->withOperation($baseOperation),
             'postDummyCollection' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
             // Filtered
-            'filteredDummyCollection' => (new Get())->withUriTemplate('/filtered')->withCollection(true)->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
+            'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
             // Paginated
-            'paginatedDummyCollection' => (new Get())->withUriTemplate('/paginated')
-                                               ->withCollection(true)
+            'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
                                            ->withPaginationClientEnabled(true)
                                            ->withPaginationClientItemsPerPage(true)
                                            ->withPaginationItemsPerPage(20)

@@ -517,6 +517,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     if ($resourceMetadata instanceof ResourceMetadataCollection) {
                         $operation = $resourceMetadata->getOperation();
 
+                        if (!$operation instanceof HttpOperation) {
+                            return "#{$operation->getShortName()}";
+                        }
+
                         return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
                     }
 

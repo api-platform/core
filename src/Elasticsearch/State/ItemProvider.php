@@ -16,7 +16,6 @@ namespace ApiPlatform\Elasticsearch\State;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -36,14 +35,12 @@ final class ItemProvider implements ProviderInterface
     private $client;
     private $documentMetadataFactory;
     private $denormalizer;
-    private $resourceMetadataCollectionFactory;
 
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer)
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
         $this->denormalizer = $denormalizer;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**

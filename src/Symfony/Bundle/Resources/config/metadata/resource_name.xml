@@ -11,11 +11,6 @@
         </service>
 
         <!-- Resource name collection -->
-        <service id="api_platform.metadata.resource.name_collection_factory.attributes" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Metadata\Resource\Factory\AttributesResourceNameCollectionFactory" public="false">
-            <argument>%api_platform.resource_class_directories%</argument>
-            <argument type="service" id="api_platform.metadata.resource.name_collection_factory.attributes.inner" />
-        </service>
-
         <service id="api_platform.metadata.resource.name_collection_factory.cached" class="ApiPlatform\Metadata\Resource\Factory\CachedResourceNameCollectionFactory" decorates="api_platform.metadata.resource.name_collection_factory" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.resource" />
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory.cached.inner" />

@@ -271,6 +271,7 @@ class AppKernel extends Kernel
             return;
         }
 
+        $loader->load(__DIR__.'/config/config_v3.yml');
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3'],

@@ -17,7 +17,6 @@ use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInte
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
@@ -37,13 +36,12 @@ final class CollectionProvider implements ProviderInterface
     private $documentMetadataFactory;
     private $denormalizer;
     private $pagination;
-    private $resourceMetadataCollectionFactory;
     private $collectionExtensions;
 
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer, Pagination $pagination, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, DenormalizerInterface $denormalizer, Pagination $pagination, iterable $collectionExtensions = [])
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
@@ -51,7 +49,6 @@ final class CollectionProvider implements ProviderInterface
         $this->denormalizer = $denormalizer;
         $this->pagination = $pagination;
 
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->collectionExtensions = $collectionExtensions;
     }
 
@@ -61,6 +58,7 @@ final class CollectionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceClass = $operation->getClass();
+        $operationName = $operation->getName();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];
 

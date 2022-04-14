@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\CollectionAbstractOperation;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 

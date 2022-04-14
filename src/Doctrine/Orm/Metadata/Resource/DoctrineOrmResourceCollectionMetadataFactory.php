@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
+final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
     /**
      * @var ManagerRegistry

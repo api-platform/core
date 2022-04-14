@@ -340,6 +340,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
         $loader->load('metadata/resource.xml');
+        $loader->load('v3/metadata.xml');
 
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
@@ -835,6 +836,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('messenger.xml');
+
+        if (!$config['metadata_backward_compatibility_layer']) {
+            $loader->load('v3/messenger.xml');
+        }
     }
 
     private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -848,6 +853,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
+
+        if (!$config['metadata_backward_compatibility_layer']) {
+            $loader->load('v3/elasticsearch.xml');
+        }
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');

@@ -20,7 +20,6 @@ final class Post extends HttpOperation
      * {@inheritdoc}
      */
     public function __construct(
-        string $method = self::METHOD_GET,
         ?string $uriTemplate = null,
         ?array $types = null,
         $formats = null,
@@ -94,7 +93,6 @@ final class Post extends HttpOperation
         ?string $processor = null,
         array $extraProperties = []
     ) {
-        $args = \array_slice(\func_get_args(), 1);
-        parent::__construct(self::METHOD_POST, ...$args);
+        parent::__construct(self::METHOD_POST, ...\func_get_args());
     }
 }

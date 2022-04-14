@@ -1059,19 +1059,6 @@ class ApiResource
         return $self;
     }
 
-    public function getCompositeIdentifier(): ?bool
-    {
-        return $this->compositeIdentifier;
-    }
-
-    public function withCompositeIdentifier(bool $compositeIdentifier): self
-    {
-        $self = clone $this;
-        $self->compositeIdentifier = $compositeIdentifier;
-
-        return $self;
-    }
-
     public function getExceptionToStatus(): ?array
     {
         return $this->exceptionToStatus;

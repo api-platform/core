@@ -82,7 +82,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         $resource = (new ApiResource())
             ->withShortName($resourceMetadata->getShortName())
             ->withClass($resourceClass)
-            ->withCompositeIdentifier($resourceMetadata->getAttribute('composite_identifier', true))
+            // ->withCompositeIdentifier($resourceMetadata->getAttribute('composite_identifier', true))
             ->withExtraProperties(['is_legacy_resource_metadata' => true]);
 
         if ($description = $resourceMetadata->getDescription()) {

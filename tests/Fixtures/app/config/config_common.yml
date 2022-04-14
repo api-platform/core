@@ -102,12 +102,12 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    related_questions.state_provider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
-        public: false
-        arguments: ['@doctrine']
-        tags:
-            -  { name: 'api_platform.state_provider' }
+    # related_questions.state_provider:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
+    #     public: false
+    #     arguments: ['@doctrine']
+    #     tags:
+    #         -  { name: 'api_platform.state_provider' }
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
@@ -116,23 +116,19 @@ services:
         tags:
             - { name: 'api_platform.state_processor' }
 
-    contain_non_resource.state_provider:
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider'
         public: false
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    serializable.state_provider:
+    ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider'
         public: false
         tags:
             -  { name: 'api_platform.state_provider' }
 
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory'
-        decorates: api_platform.metadata.resource.metadata_collection_factory
-        arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory.inner']
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider'

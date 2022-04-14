@@ -24,6 +24,9 @@ class DeleteMutation extends Operation implements DeleteOperationInterface
     public function __construct(
         ?string $resolver = null,
         ?array $args = null,
+        ?array $links = null,
+
+        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -36,6 +39,7 @@ class DeleteMutation extends Operation implements DeleteOperationInterface
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
+        ?bool $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -67,7 +71,7 @@ class DeleteMutation extends Operation implements DeleteOperationInterface
         ?string $provider = null,
         ?string $processor = null,
         array $extraProperties = []
-    ) {
+) {
         parent::__construct(...\func_get_args());
     }
 }

@@ -15,9 +15,18 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Metadata;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\ContainNonResource as ContainNonResourceDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface as OdmResourceInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface as ResourceInterfaceDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider;
 
 class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -38,8 +47,20 @@ class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataColl
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
-        if ($resourceClass === ResourceInterface::class || $resourceClass === OdmResourceInterface::class) {
+        if (ResourceInterface::class === $resourceClass || ResourceInterfaceDocument::class === $resourceClass) {
             return $this->setProvider($resourceMetadataCollection, ResourceInterfaceImplementationProvider::class);
+        }
+
+        if (ContainNonResource::class === $resourceClass || ContainNonResourceDocument::class === $resourceClass) {
+            return $this->setProvider($resourceMetadataCollection, ContainNonResourceProvider::class);
+        }
+
+        if (SerializableResource::class === $resourceClass) {
+            return $this->setProvider($resourceMetadataCollection, SerializableProvider::class);
+        }
+
+        if (Taxon::class === $resourceClass || TaxonDocument::class === $resourceClass || TaxonInterface::class === $resourceClass) {
+            return $this->setProvider($resourceMetadataCollection, TaxonItemProvider::class);
         }
 
         return $resourceMetadataCollection;

@@ -20,6 +20,7 @@ use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
@@ -110,7 +111,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $metadata['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
         } elseif ($this->resourceMetadataFactory) {
             $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation();
-            $types = $operation->getTypes();
+            $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
                 $types = [$operation->getShortName()];
             }

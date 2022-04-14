@@ -76,7 +76,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="request_stack" />
         </service>
 
@@ -89,7 +88,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.write" />
             <argument type="service" id="api_platform.graphql.resolver.stage.validate" />
             <argument type="service" id="api_platform.graphql.mutation_resolver_locator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.graphql.resolver.stage.security_post_validation" />
         </service>
 
@@ -97,7 +95,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.read" />
             <argument type="service" id="api_platform.graphql.resolver.stage.security" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_manager" />
             <argument type="service" id="api_platform.graphql.subscription.mercure_iri_generator" on-invalid="ignore" />
         </service>

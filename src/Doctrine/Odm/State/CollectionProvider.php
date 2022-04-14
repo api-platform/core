@@ -60,19 +60,19 @@ final class CollectionProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
+        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
+            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operation->getName(), $context);
 
-            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
             }
         }
 
         $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
         try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
+            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operation->getName());
             $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
         } catch (OperationNotFoundException $e) {
             $attribute = $resourceMetadata->getOperation(null, true)->getExtraProperties()['doctrine_mongodb'] ?? [];

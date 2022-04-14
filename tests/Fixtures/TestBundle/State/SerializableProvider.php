@@ -37,6 +37,6 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     "bar": "Ipsum"
 }
 JSON
-            , $resourceClass, 'json');
+            , $operation->getClass(), 'json');
     }
 }

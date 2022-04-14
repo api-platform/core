@@ -204,7 +204,7 @@ class IriConverterTest extends TestCase
         ]));
 
         $stateProviderProphecy = $this->prophesize(ProviderInterface::class);
-        $stateProviderProphecy->provide(Dummy::class, ['id' => 1], $operationName, Argument::type('array'))->willReturn($item);
+        $stateProviderProphecy->provide($operation, ['id' => 1], Argument::type('array'))->willReturn($item);
         $iriConverter = $this->getIriConverter($stateProviderProphecy, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
         $this->assertEquals($item, $iriConverter->getItemFromIri('/dummies/1'));
     }
@@ -226,7 +226,7 @@ class IriConverterTest extends TestCase
         ]));
 
         $stateProviderProphecy = $this->prophesize(ProviderInterface::class);
-        $stateProviderProphecy->provide(Dummy::class, ['id' => 1], $operationName, Argument::type('array'))->willReturn(null);
+        $stateProviderProphecy->provide($operation, ['id' => 1], Argument::type('array'))->willReturn(null);
         $iriConverter = $this->getIriConverter($stateProviderProphecy, $routerProphecy, null, $resourceMetadataCollectionFactoryProphecy);
         $iriConverter->getItemFromIri('/dummies/1');
     }

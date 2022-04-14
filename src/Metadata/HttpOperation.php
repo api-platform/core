@@ -13,16 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-// TODO clean these:
-// protected $swaggerContext;
-// protected $compositeIdentifier;
-// protected $queryParameterValidate;
-// ?array $swaggerContext = null,
-// ?bool $compositeIdentifier = null,
-// TODO: replace by queryParameterValidationEnabled?
-// ?bool $queryParameterValidate = null,
-        // $this->swaggerContext = $swaggerContext;
-
 class HttpOperation extends Operation
 {
     public const METHOD_GET = 'GET';
@@ -260,7 +250,6 @@ class HttpOperation extends Operation
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
         $this->securityPostValidation = $securityPostValidation;
         $this->securityPostValidationMessage = $securityPostValidationMessage;
-        // $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
         $this->read = $read;
@@ -268,7 +257,6 @@ class HttpOperation extends Operation
         $this->validate = $validate;
         $this->write = $write;
         $this->serialize = $serialize;
-        // $this->queryParameterValidate = $queryParameterValidate;
         $this->priority = $priority;
         $this->name = $name;
         $this->provider = $provider;

@@ -5,6 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- TODO: remove this in 3.0 -->
+        <service id="api_platform.http_cache.purger.varnish_client" class="GuzzleHttp\Client" abstract="true" public="false" />
         <service id="api_platform.http_cache.purger.varnish" alias="api_platform.http_cache.purger.varnish.ban" public="false" />
         <service id="api_platform.http_cache.purger.varnish.ban" class="ApiPlatform\HttpCache\VarnishPurger" public="false" />
         <service id="api_platform.http_cache.purger.varnish.xkey" class="ApiPlatform\HttpCache\VarnishXKeyPurger" public="false">

@@ -18,7 +18,6 @@ use ApiPlatform\Doctrine\Odm\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
@@ -68,23 +67,17 @@ final class ItemProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
+        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operationName, $context);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operation->getName(), $context);
 
-            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
             }
         }
 
-        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-
-        if ($resourceMetadata instanceof ResourceMetadataCollection) {
-            $attribute = $resourceMetadata->getOperation()->getExtraProperties()['doctrine_mongodb'] ?? [];
-        }
-
-        $executeOptions = $attribute['execute_options'] ?? [];
+        $executeOptions = $operation->getExtraProperties()['doctrine_mongodb']['execute_options'] ?? [];
 
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions)->current() ?: null;
     }

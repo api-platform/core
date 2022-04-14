@@ -77,7 +77,8 @@ final class WriteListener
         }
 
         if (!$operation->getProcessor()) {
-            throw new RuntimeException(sprintf('The operation "%s" has no processor, it should not be writeable.', $operation->getName()));
+            return;
+            // throw new RuntimeException(sprintf('The operation "%s" has no processor, it should not be writeable.', $operation->getName()));
         }
 
         $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];

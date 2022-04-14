@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Metadata\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
@@ -38,10 +39,11 @@ trait ApiResourceToLegacyResourceMetadataTrait
             }
 
             $arrayOperation['openapi_context']['operationId'] = $name;
+            $arrayOperation['composite_identifier'] = $this->hasCompositeIdentifier($operation);
 
-            if ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) {
-                // TODO ?
-                // $arrayOperation['composite_identifier'] = $operation->getCompositeIdentifier() ?? false;
+            if (HttpOperation::METHOD_POST === $operation->getMethod() && !$operation->getUriVariables()) {
+                $collectionOperations[$name] = $arrayOperation;
+                continue;
             }
 
             if ($operation instanceof CollectionOperationInterface) {
@@ -109,5 +111,16 @@ trait ApiResourceToLegacyResourceMetadataTrait
         }
 
         return $arrayOperation;
+    }
+
+    private function hasCompositeIdentifier(HttpOperation $operation): bool
+    {
+        foreach ($operation->getUriVariables() ?? [] as $parameterName => $uriVariable) {
+            if ($uriVariable->getCompositeIdentifier()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

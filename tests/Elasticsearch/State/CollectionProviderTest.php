@@ -14,21 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Elasticsearch\State;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use PHPUnit\Framework\TestCase;
@@ -53,57 +47,9 @@ final class CollectionProviderTest extends TestCase
                 $this->prophesize(Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(DenormalizerInterface::class)->reveal(),
-                new Pagination($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()),
-                $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()
+                new Pagination($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal())
             )
         );
-    }
-
-    public function testSupports()
-    {
-        $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
-        $documentMetadataFactoryProphecy->create(Dummy::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
-        $documentMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new DocumentMetadata('composite_relation'))->shouldNotBeCalled();
-
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $fooResourceMetadataCollection = new ResourceMetadataCollection(Foo::class);
-        $fooResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_foo_get_collection' => (new HttpOperation())->withElasticsearch(true)->withCollection(true),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn($fooResourceMetadataCollection);
-
-        $dummyCarResourceMetadataCollection = new ResourceMetadataCollection(DummyCar::class);
-        $dummyCarResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_car_get_collection' => (new HttpOperation())->withElasticsearch(false)->withCollection(true),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn($dummyCarResourceMetadataCollection);
-
-        $dummyResourceMetadataCollection = new ResourceMetadataCollection(Dummy::class);
-        $dummyResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_get_collection' => (new HttpOperation())->withElasticsearch(true)->withCollection(true),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyResourceMetadataCollection);
-
-        $compositeRelationResourceMetadataCollection = new ResourceMetadataCollection(CompositeRelation::class);
-        $compositeRelationResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_composite_relation_get' => (new HttpOperation())->withElasticsearch(true)->withCollection(false),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn($compositeRelationResourceMetadataCollection);
-
-        $provider = new CollectionProvider(
-            $this->prophesize(Client::class)->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
-            $this->prophesize(DenormalizerInterface::class)->reveal(),
-            new Pagination($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()),
-            $resourceMetadataCollectionFactoryProphecy->reveal()
-        );
-
-        self::assertTrue($provider->supports(Foo::class, [], 'api_foo_get_collection'));
-        self::assertFalse($provider->supports(DummyCar::class, [], 'api_dummy_car_get_collection'));
-        self::assertFalse($provider->supports(Dummy::class, [], 'api_dummy_get_collection'));
-        self::assertFalse($provider->supports(CompositeRelation::class, [], 'api_composite_relation_get'));
     }
 
     public function testGetCollection()
@@ -186,13 +132,12 @@ final class CollectionProviderTest extends TestCase
             $documentMetadataFactoryProphecy->reveal(),
             $denormalizer = $this->prophesize(DenormalizerInterface::class)->reveal(),
             new Pagination($resourceMetadataCollectionFactoryProphecy->reveal(), ['items_per_page' => 2]),
-            $resourceMetadataCollectionFactoryProphecy->reveal(),
             [$requestBodySearchCollectionExtensionProphecy->reveal()]
         );
 
         self::assertEquals(
             new Paginator($denormalizer, $documents, Foo::class, 2, 0, $context),
-            $provider->provide(Foo::class, [], 'get', $context)
+            $provider->provide((new Get())->withName('get')->withClass(Foo::class), [], $context)
         );
     }
 }

@@ -20,7 +20,6 @@ final class Get extends HttpOperation
      * {@inheritdoc}
      */
     public function __construct(
-        string $method = self::METHOD_GET,
         ?string $uriTemplate = null,
         ?array $types = null,
         $formats = null,
@@ -93,6 +92,6 @@ final class Get extends HttpOperation
         ?string $processor = null,
         array $extraProperties = []
     ) {
-        parent::__construct(...\func_get_args());
+        parent::__construct(self::METHOD_GET, ...\func_get_args());
     }
 }

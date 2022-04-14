@@ -100,7 +100,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'host' => $this->phpize($resource, 'host', 'string'),
             'condition' => $this->phpize($resource, 'condition', 'string'),
             'controller' => $this->phpize($resource, 'controller', 'string'),
-            'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
             'types' => $this->buildArrayValue($resource, 'types'),
             'cacheHeaders' => $this->buildArrayValue($resource, 'cacheHeaders'),

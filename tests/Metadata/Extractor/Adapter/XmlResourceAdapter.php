@@ -30,7 +30,6 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'stateless',
         'sunset',
         'class',
-        'collection',
         'acceptPatch',
         'status',
         'host',
@@ -54,13 +53,14 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'paginationMaximumItemsPerPage',
         'paginationPartial',
         'paginationType',
+        'processor',
+        'provider',
         'security',
         'securityMessage',
         'securityPostDenormalize',
         'securityPostDenormalizeMessage',
         'securityPostValidation',
         'securityPostValidationMessage',
-        'compositeIdentifier',
         'queryParameterValidationEnabled',
     ];
 
@@ -91,6 +91,10 @@ XML
             foreach ($parameters as $parameter) {
                 $parameterName = $parameter->getName();
                 $value = \array_key_exists($parameterName, $fixture) ? $fixture[$parameterName] : null;
+
+                if ('compositeIdentifier' === $parameterName || 'provider' === $parameterName || 'processor' === $parameterName) {
+                    continue;
+                }
 
                 if (method_exists($this, 'build'.ucfirst($parameterName))) {
                     $this->{'build'.ucfirst($parameterName)}($resource, $value);

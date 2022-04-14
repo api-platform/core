@@ -37,7 +37,7 @@ final class ResourceMetadataCollection extends \ArrayObject
     /**
      * @return Operation
      */
-    public function getOperation(?string $operationName = null, bool $forceCollection = false)
+    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false)
     {
         if (isset($this->operationCache[$operationName ?? ''])) {
             return $this->operationCache[$operationName ?? ''];
@@ -67,6 +67,11 @@ final class ResourceMetadataCollection extends \ArrayObject
             }
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
+                $isCollection = $operation instanceof CollectionOperationInterface;
+                if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
+                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                }
+
                 if ($name === $operationName) {
                     return $this->operationCache['graphql_'.$operationName] = $operation;
                 }

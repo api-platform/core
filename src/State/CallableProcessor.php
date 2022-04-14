@@ -31,7 +31,11 @@ class CallableProcessor implements ProcessorInterface
      */
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        if (\is_callable($processor = $operation->getProcessor())) {
+        if (!($processor = $operation->getProcessor())) {
+            return;
+        }
+
+        if (\is_callable($processor)) {
             return $processor($data, $operation, $uriVariables, $context);
         }
 
@@ -45,7 +49,5 @@ class CallableProcessor implements ProcessorInterface
 
             return $processor->process($data, $operation, $uriVariables, $context);
         }
-
-        throw new RuntimeException(sprintf('Processor not found on operation "%s"', $operation->getName()));
     }
 }
