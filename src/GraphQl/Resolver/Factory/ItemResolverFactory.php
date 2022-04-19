@@ -76,11 +76,6 @@ final class ItemResolverFactory implements ResolverFactoryInterface
 
             // The item retrieved can be of another type when using an identifier (see Relay Nodes at query.feature:23)
             $resourceClass = $this->getResourceClass($item, $resourceClass);
-            // if ($test !== $operation->getClass()) {
-            // $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            // $operation = $resourceMetadataCollection->getOperation($operationName);
-            // }
-
             $queryResolverId = $operation->getResolver();
             if (null !== $queryResolverId) {
                 /** @var QueryItemResolverInterface $queryResolver */

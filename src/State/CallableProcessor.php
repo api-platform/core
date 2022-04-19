@@ -17,7 +17,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
-class CallableProcessor implements ProcessorInterface
+final class CallableProcessor implements ProcessorInterface
 {
     private $locator;
 

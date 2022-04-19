@@ -17,7 +17,7 @@ use ApiPlatform\Core\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
-class CallableProvider implements ProviderInterface
+final class CallableProvider implements ProviderInterface
 {
     private $locator;
 

@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -78,7 +77,6 @@ final class WriteListener
 
         if (!$operation->getProcessor()) {
             return;
-            // throw new RuntimeException(sprintf('The operation "%s" has no processor, it should not be writeable.', $operation->getName()));
         }
 
         $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];

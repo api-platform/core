@@ -82,7 +82,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         $resource = (new ApiResource())
             ->withShortName($resourceMetadata->getShortName())
             ->withClass($resourceClass)
-            // ->withCompositeIdentifier($resourceMetadata->getAttribute('composite_identifier', true))
             ->withExtraProperties(['is_legacy_resource_metadata' => true]);
 
         if ($description = $resourceMetadata->getDescription()) {
@@ -163,7 +162,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
             $newOperation = $newOperation->withMethod($operation['method'])
                 ->withClass($resource->getClass())
                 ->withPriority($priority++);
-            // ->withCompositeIdentifier($resource->getCompositeIdentifier())
 
             if (HttpOperation::METHOD_DELETE === $operation['method']) {
                 $newOperation = (new Delete())->withOperation($newOperation);
