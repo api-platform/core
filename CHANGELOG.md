@@ -1,6 +1,14 @@
 # Changelog
 
-## 2.7.0
+## 2.7.0-alpha.2
+
+* Review interfaces (ProcessorInterface, ProviderInterface, TypeConverterInterface, ResolverFactoryInterface etc.) to use `ApiPlatform\Metadata\Operation` instead of `operationName` (#4712)
+* Introduce `CollectionOperationInterface` instead of the `collection` flag (#4712)
+* Introduce `DeleteOperationInterface` instead of the `delete` flag (#4712)
+* The `compositeIdentifier` flag only lives under the `uriVariables` property (#4712)
+* The `provider` or `processor` property is specified within the `Operation` and we removed the chain pattern (#4712)
+
+## 2.7.0-alpha.1
 
 * Swagger UI: Add `usePkceWithAuthorizationCodeGrant` to Swagger UI initOAuth (#4649)
 * **BC**: `mapping.paths` in configuration should override bundles configuration (#4465)
