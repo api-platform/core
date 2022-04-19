@@ -143,7 +143,7 @@ JSON;
         $this->recreateSchema();
 
         /** @var EntityManagerInterface $manager */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
+        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager(); // @phpstan-ignore-line
         $dummyDtoInputOutput = new DummyDtoInputOutput();
         $dummyDtoInputOutput->str = 'lorem';
         $dummyDtoInputOutput->num = 54;
@@ -187,7 +187,7 @@ JSON;
         ]);
         $this->assertResponseIsSuccessful();
 
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
+        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
         $resource = 'mongodb' === $container->getParameter('kernel.environment') ? DummyDocument::class : Dummy::class;
         $this->assertMatchesRegularExpression('~^/dummies/\d+~', self::findIriBy($resource, ['name' => 'Kevin']));
         $this->assertNull(self::findIriBy($resource, ['name' => 'not-exist']));
@@ -198,7 +198,7 @@ JSON;
         self::bootKernel();
 
         /** @var EntityManagerInterface $manager */
-        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager();
+        $manager = (method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container)->get('doctrine')->getManager(); // @phpstan-ignore-line
         /** @var \Doctrine\ORM\Mapping\ClassMetadata[] $classes */
         $classes = $manager->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($manager);

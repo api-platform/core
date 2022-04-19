@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -95,7 +96,7 @@ class DummyProperty
     public $group;
 
     /**
-     * @var DummyGroup[]|null
+     * @var Collection<int, DummyGroup>
      *
      * @ORM\ManyToMany(targetEntity=DummyGroup::class, cascade={"persist"})
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})

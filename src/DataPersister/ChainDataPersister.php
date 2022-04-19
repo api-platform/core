@@ -56,7 +56,7 @@ final class ChainDataPersister implements ContextAwareDataPersisterInterface
     {
         foreach ($this->persisters as $persister) {
             if ($persister->supports($data, $context)) {
-                $data = $persister->persist($data, $context) ?? $data;
+                $data = $persister->persist($data, $context);
                 if ($persister instanceof ResumableDataPersisterInterface && $persister->resumable($context)) {
                     continue;
                 }

@@ -43,7 +43,7 @@ class DummyDifferentGraphQlSerializationGroup
     private $id;
 
     /**
-     * @var string|null The dummy name
+     * @var string The dummy name
      *
      * @ORM\Column
      * @Groups({"item_query", "collection_query"})

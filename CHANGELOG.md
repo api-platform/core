@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.6.8
+
+* fix: serializing embedded non resource objects
+* chore(openapi): upgrade Swagger UI to version 4.1.3
+* chore(openapi): upgrade ReDoc to version 2.0.0-rc.59
+* chore(graphql): upgrade GraphiQL to version 1.5.16
+
+## 2.6.7
+
+* feat: compatibility with Symfony 6 (#4503, #4582, #4604, #4564)
+* feat: compatibility with PHP 8.1 (#4503, #4582, #4604)
+* fix: pass the child context when normalizing nested non-resource objects (#4521)
+
 ## 2.6.6
 
 * fix(json-schema): consider `SplFileInfo` class as a binary type (#4332)

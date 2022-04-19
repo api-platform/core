@@ -38,7 +38,7 @@ class ElasticsearchClientPassTest extends TestCase
     public function testProcess()
     {
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
-        $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'fromConfig'])->shouldBeCalled();
+        $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'fromConfig'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
         $clientDefinitionProphecy->setArguments(
             Argument::allOf(
                 Argument::withEntry(0, Argument::allOf(
@@ -49,13 +49,13 @@ class ElasticsearchClientPassTest extends TestCase
                 )),
                 Argument::size(1)
             )
-        )->shouldBeCalled();
+        )->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.hosts')->willReturn(['http://localhost:9200'])->shouldBeCalled();
         $containerBuilderProphecy->has('logger')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
     }
@@ -63,13 +63,13 @@ class ElasticsearchClientPassTest extends TestCase
     public function testProcessWithoutConfiguration()
     {
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
-        $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'build'])->shouldBeCalled();
+        $clientDefinitionProphecy->setFactory([ClientBuilder::class, 'build'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.hosts')->willReturn([])->shouldBeCalled();
         $containerBuilderProphecy->has('logger')->willReturn(false)->shouldBeCalled();
-        $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy)->shouldBeCalled();
+        $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
     }

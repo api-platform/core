@@ -8,12 +8,14 @@ parameters:
 	symfony:
 		container_xml_path: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
 		constant_hassers: false
+	doctrine:
+		objectManagerLoader: tests/Fixtures/app/object-manager.php
 	bootstrapFiles:
 		- vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
 		- src/Bridge/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
-	excludes_analyse:
+	excludePaths:
 		# Symfony cache
 		- tests/Fixtures/app/var/cache
 		# Deprecated integrations (will be removed in API Platform 3)
@@ -42,6 +44,18 @@ parameters:
 	ignoreErrors:
 		# False positives
 		-
+			message: '#is never read, only written.#'
+			paths:
+				- tests/Fixtures/TestBundle/Document/
+				- tests/Fixtures/TestBundle/Entity/
+				- tests/Behat/
+				- src/Identifier/
+		-
+			message: '#is never written, only read.#'
+			paths:
+				- tests/Fixtures/TestBundle/Document/
+				- tests/Fixtures/TestBundle/Entity/
+		-
 			message: '#Strict comparison using !== between .+ and .+ will always evaluate to false\.#'
 			paths:
 				- src/Bridge/Doctrine/Common/PropertyHelperTrait.php
@@ -68,17 +82,14 @@ parameters:
 			path: tests/GraphQl/Type/TypeBuilderTest.php
 		# https://github.com/phpstan/phpstan-doctrine/issues/115
 		-
-			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<ApiPlatform\\Core\\Tests\\Fixtures\\TestBundle\\Document\\Dummy>\.#'
+			message: '#Property ApiPlatform\\Core\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<object>\.#'
 			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
-		-
-			message: "#Call to method PHPUnit\\\\Framework\\\\Assert::assertSame\\(\\) with array\\('(collection_context|item_context|subresource_context)'\\) and array<Symfony\\\\Component\\\\VarDumper\\\\Cloner\\\\Data>\\|bool\\|float\\|int\\|string\\|null will always evaluate to false\\.#"
-			path: tests/Bridge/Symfony/Bundle/DataCollector/RequestDataCollectorTest.php
 		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
 			path: tests/Identifier/Normalizer/IntegerDenormalizerTest.php
 		-
-			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\(.+\) and array\(.+\) will always evaluate to false\.#'
+			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\{.+\} and array\{.+\} will always evaluate to false\.#'
 			path: tests/Util/SortTraitTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
@@ -111,3 +122,20 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\Core\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+		# TODO: remove in v3.0
+		-
+			message: "#Dead catch - JsonException is never thrown in the try block.#"
+			path: src/Bridge/Symfony/Bundle/Test/Response.php
+		# See https://github.com/phpstan/phpstan-symfony/issues/27
+		- 
+			message: '#^Service "[^"]+" is private.$#'
+			path: src
+		- 
+			message: '#^Property .+ is unused.$#'
+			path: tests/Bridge/Doctrine/MongoDbOdm/PropertyInfo/Fixtures/DoctrineDummy.php
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionValueType\(\)#'
+			path: src
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
+			path: src

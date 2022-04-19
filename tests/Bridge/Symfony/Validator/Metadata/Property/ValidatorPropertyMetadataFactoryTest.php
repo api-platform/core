@@ -27,6 +27,7 @@ use ApiPlatform\Core\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Intl\Countries;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Validator\Constraints\AtLeastOneOf;
 use Symfony\Component\Validator\Constraints\Sequentially;
@@ -199,6 +200,10 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
     public function testCreateWithPropertyWithValidationConstraints()
     {
+        if (!class_exists(Countries::class)) {
+            $this->markTestSkipped('symfony/intl not installed');
+        }
+
         $validatorClassMetadata = new ClassMetadata(DummyIriWithValidationEntity::class);
         (new AnnotationLoader(new AnnotationReader()))->loadClassMetadata($validatorClassMetadata);
 

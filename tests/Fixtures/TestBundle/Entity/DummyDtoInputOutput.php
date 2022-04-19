@@ -50,7 +50,7 @@ class DummyDtoInputOutput
     public $str;
 
     /**
-     * @var int
+     * @var float
      * @ORM\Column(type="float")
      */
     public $num;

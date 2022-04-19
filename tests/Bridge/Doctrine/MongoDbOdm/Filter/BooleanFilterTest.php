@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\BooleanFilter;
 use ApiPlatform\Core\Test\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Core\Tests\Bridge\Doctrine\Common\Filter\BooleanFilterTestTrait;
+use ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy;
 
 /**
  * @group mongodb
@@ -27,6 +28,7 @@ class BooleanFilterTest extends DoctrineMongoDbOdmFilterTestCase
     use BooleanFilterTestTrait;
 
     protected $filterClass = BooleanFilter::class;
+    protected $resourceClass = Dummy::class;
 
     public function provideApplyTestData(): array
     {

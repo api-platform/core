@@ -50,7 +50,12 @@ final class AddHeadersListener
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request->isMethodCacheable() || !RequestAttributesExtractor::extractAttributes($request)) {
+        if (!$request->isMethodCacheable()) {
+            return;
+        }
+
+        $attributes = RequestAttributesExtractor::extractAttributes($request);
+        if (\count($attributes) < 1) {
             return;
         }
 
@@ -61,7 +66,8 @@ final class AddHeadersListener
         }
 
         $resourceCacheHeaders = [];
-        if ($this->resourceMetadataFactory && $attributes = RequestAttributesExtractor::extractAttributes($request)) {
+
+        if ($this->resourceMetadataFactory) {
             $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
             $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
         }
@@ -91,11 +97,11 @@ final class AddHeadersListener
         }
 
         if (null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate')) {
-            $response->headers->addCacheControlDirective('stale-while-revalidate', $staleWhileRevalidate);
+            $response->headers->addCacheControlDirective('stale-while-revalidate', (string) $staleWhileRevalidate);
         }
 
         if (null !== ($staleIfError = $resourceCacheHeaders['stale_if_error'] ?? $this->staleIfError) && !$response->headers->hasCacheControlDirective('stale-if-error')) {
-            $response->headers->addCacheControlDirective('stale-if-error', $staleIfError);
+            $response->headers->addCacheControlDirective('stale-if-error', (string) $staleIfError);
         }
     }
 }

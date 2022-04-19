@@ -77,6 +77,8 @@ final class ItemNormalizer extends ObjectNormalizer
      * {@inheritdoc}
      *
      * @throws LogicException
+     *
+     * @return mixed
      */
     public function normalize($object, $format = null, array $context = [])
     {

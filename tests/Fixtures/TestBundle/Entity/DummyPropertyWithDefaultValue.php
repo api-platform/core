@@ -41,7 +41,7 @@ class DummyPropertyWithDefaultValue
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(nullable=true)
      *
@@ -50,7 +50,7 @@ class DummyPropertyWithDefaultValue
     public $foo = 'foo';
 
     /**
-     * @var string|null A dummy with a Doctrine default options
+     * @var string A dummy with a Doctrine default options
      *
      * @ORM\Column(options={"default"="default value"})
      */

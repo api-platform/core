@@ -113,7 +113,7 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
                 $operation['identifiers'][$identifier] = [$rootResourceClass, $identifiers[$identifier][1] ?? $identifier, true];
                 $operation['operation_name'] = sprintf(
                     '%s_%s%s',
-                    RouteNameGenerator::inflector($operation['property'], $operation['collection'] ?? false),
+                    RouteNameGenerator::inflector($operation['property'], $operation['collection']),
                     $operationName,
                     self::SUBRESOURCE_SUFFIX
                 );

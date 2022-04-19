@@ -5,6 +5,7 @@
 /.php_cs.dist export-ignore
 /appveyor.yml export-ignore
 /behat.yml.dist export-ignore
+/docs export-ignore
 /features export-ignore
 /phpstan.neon.dist export-ignore
 /phpunit.xml.dist export-ignore

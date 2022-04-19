@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -44,7 +45,7 @@ class Pet
     /**
      * @ORM\OneToMany(targetEntity="PersonToPet", mappedBy="pet")
      *
-     * @var ArrayCollection
+     * @var Collection<int, PersonToPet>
      */
     public $people;
 

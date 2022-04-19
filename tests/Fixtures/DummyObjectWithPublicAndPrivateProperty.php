@@ -16,5 +16,4 @@ namespace ApiPlatform\Core\Tests\Fixtures;
 class DummyObjectWithPublicAndPrivateProperty
 {
     public $foo;
-    private $bar;
 }

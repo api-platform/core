@@ -42,7 +42,7 @@ class DummyTableInheritanceRelated
     private $id;
 
     /**
-     * @var Collection Related children
+     * @var Collection<int, DummyTableInheritance> Related children
      *
      * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
      * @ORM\OrderBy({"id"="ASC"})

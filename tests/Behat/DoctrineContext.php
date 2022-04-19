@@ -183,7 +183,11 @@ final class DoctrineContext implements Context
      */
     private $manager;
     private $doctrine;
-    private $passwordHasher;
+
+    /**
+     * @var UserPasswordHasherInterface|UserPasswordEncoderInterface
+     */
+    private $passwordHasher; // @phpstan-ignore-line
     private $schemaTool;
     private $schemaManager;
 
@@ -194,7 +198,7 @@ final class DoctrineContext implements Context
      * You can also pass arbitrary arguments to the
      * context constructor through behat.yml.
      *
-     * @param UserPasswordEncoderInterface|UserPasswordHasherInterface $passwordHasher
+     * @param mixed $passwordHasher
      */
     public function __construct(ManagerRegistry $doctrine, $passwordHasher)
     {
@@ -1203,6 +1207,7 @@ final class DoctrineContext implements Context
     public function thePasswordForUserShouldBeHashed(string $password, string $user)
     {
         $user = $this->doctrine->getRepository($this->isOrm() ? User::class : UserDocument::class)->find($user);
+        // @phpstan-ignore-next-line
         if (!$this->passwordHasher->isPasswordValid($user, $password)) {
             throw new \Exception('User password mismatch');
         }
