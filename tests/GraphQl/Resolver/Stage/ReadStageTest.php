@@ -19,13 +19,10 @@ use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +40,6 @@ class ReadStageTest extends TestCase
 
     /** @var ReadStage */
     private $readStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $iriConverterProphecy;
     private $providerProphecy;
     private $serializerContextBuilderProphecy;
@@ -53,13 +49,11 @@ class ReadStageTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $this->providerProphecy = $this->prophesize(ProviderInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
 
         $this->readStage = new ReadStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->iriConverterProphecy->reveal(),
             $this->providerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
@@ -74,14 +68,10 @@ class ReadStageTest extends TestCase
      */
     public function testApplyDisabled(array $context, $expectedResult): void
     {
-        $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = (new ApiResource())->withGraphQlOperations([
-            $operationName => (new Query())->withRead(false),
-        ]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [$resourceMetadata]));
+        $operation = (new Query())->withRead(false)->withName('item_query')->withClass($resourceClass);
 
-        $result = ($this->readStage)($resourceClass, null, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -112,7 +102,6 @@ class ReadStageTest extends TestCase
             'args' => ['id' => $identifier],
             'info' => $info,
         ];
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [new ApiResource()]));
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -123,7 +112,7 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
-        $result = ($this->readStage)($resourceClass, null, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, null, (new Query())->withName($operationName), $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -156,7 +145,6 @@ class ReadStageTest extends TestCase
             'args' => ['input' => ['id' => $identifier]],
             'info' => $info,
         ];
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withShortName('shortName')])]));
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -172,7 +160,7 @@ class ReadStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $result = ($this->readStage)($resourceClass, null, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, null, (new Mutation())->withName($operationName)->withShortName('shortName'), $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -211,15 +199,15 @@ class ReadStageTest extends TestCase
         ];
 
         $collectionOperation = (new GetCollection())->withFilters($expectedFilters);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([$collectionOperation]))]));
 
-        $normalizationContext = ['normalization' => true, 'operation' => (new QueryCollection())->withOperation($collectionOperation)];
+        $operation = (new QueryCollection())->withName($operationName);
+        $normalizationContext = ['normalization' => true, 'operation' => $operation];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
-        $this->providerProphecy->provide($resourceClass, ['id' => 3], $operationName, $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['subresource']);
+        $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
+        $this->providerProphecy->provide($operation, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['subresource']);
 
-        $result = ($this->readStage)($resourceClass, $rootClass, $operationName, $context);
+        $result = ($this->readStage)($resourceClass, $rootClass, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -245,14 +233,14 @@ class ReadStageTest extends TestCase
             'source' => null,
         ];
         $collectionOperation = (new GetCollection());
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([$collectionOperation]))]));
+        $operation = (new QueryCollection())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        ($this->readStage)($resourceClass, $resourceClass, $operationName, $context);
+        ($this->readStage)($resourceClass, $resourceClass, $operation, $context);
 
-        $this->providerProphecy->provide($resourceClass, [], $operationName, Argument::that(function ($args) {
+        $this->providerProphecy->provide($operation, [], Argument::that(function ($args) {
             // Prophecy does not check the order of items in associative arrays. Checking if some.field comes first manually
             return
             array_search('some.field', array_keys($args['filters']['order']), true) <
@@ -307,17 +295,16 @@ class ReadStageTest extends TestCase
             'source' => null,
         ];
         $filters = ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']];
-        $operation = (new GetCollection())->withFilters($filters);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([$operation]))]));
+        $operation = (new QueryCollection())->withName($operationName)->withClass($resourceClass)->withFilters($filters);
 
-        $normalizationContext = ['normalization' => true, 'operation' => (new QueryCollection())->withOperation($operation)];
+        $normalizationContext = ['normalization' => true, 'operation' => $operation];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
-        $this->providerProphecy->provide($resourceClass, [], $operationName, $normalizationContext + ['filters' => $filters])->willReturn([]);
+        $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $filters])->willReturn([]);
 
         $this->expectDeprecation('The filter syntax "filter: {filterArg1: "filterValue1", filterArg2: "filterValue2"}" is deprecated since API Platform 2.6, use the following syntax instead: "filter: [{filterArg1: "filterValue1"}, {filterArg2: "filterValue2"}]".');
 
-        $result = ($this->readStage)($resourceClass, 'myResource', $operationName, $context);
+        $result = ($this->readStage)($resourceClass, 'myResource', $operation, $context);
 
         $this->assertSame([], $result);
     }

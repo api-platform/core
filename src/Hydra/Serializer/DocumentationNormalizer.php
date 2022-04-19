@@ -28,7 +28,8 @@ use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -285,7 +286,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         } else {
             $classes[$resourceClass] = true;
             foreach ($resourceMetadata->getOperations() as $operation) {
-                if (!$operation->isCollection()) {
+                if (!$operation instanceof CollectionOperationInterface) {
                     continue;
                 }
 
@@ -350,7 +351,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperations = [];
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if (($operation instanceof Post || ($operation->isCollection() ?? false)) !== $collection) {
+                    if (($operation instanceof Post || $operation instanceof CollectionOperationInterface) !== $collection) {
                         continue;
                     }
 
@@ -375,12 +376,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      *
      * @param ResourceMetadata|ApiResource $resourceMetadata
      * @param SubresourceMetadata          $subresourceMetadata
-     * @param array|Operation              $operation
+     * @param array|HttpOperation          $operation
      */
     private function getHydraOperation(string $resourceClass, $resourceMetadata, string $operationName, $operation, string $prefixedShortName, ?string $operationType = null, SubresourceMetadata $subresourceMetadata = null): array
     {
-        if ($operation instanceof Operation) {
-            $method = $operation->getMethod() ?: Operation::METHOD_GET;
+        if ($operation instanceof HttpOperation) {
+            $method = $operation->getMethod() ?: HttpOperation::METHOD_GET;
         } elseif ($this->operationMethodResolver) {
             if (OperationType::COLLECTION === $operationType) {
                 $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
@@ -393,16 +394,16 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
         }
 
-        $hydraOperation = $operation instanceof Operation ? ($operation->getHydraContext() ?? []) : ($operation['hydra_context'] ?? []);
-        if ($operation instanceof Operation ? $operation->getDeprecationReason() : $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
+        $hydraOperation = $operation instanceof HttpOperation ? ($operation->getHydraContext() ?? []) : ($operation['hydra_context'] ?? []);
+        if ($operation instanceof HttpOperation ? $operation->getDeprecationReason() : $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
             $hydraOperation['owl:deprecated'] = true;
         }
 
-        if ($operation instanceof Operation) {
+        if ($operation instanceof HttpOperation) {
             $shortName = $operation->getShortName();
             $inputMetadata = $operation->getInput() ?? [];
             $outputMetadata = $operation->getOutput() ?? [];
-            $operationType = $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM;
+            $operationType = $operation instanceof CollectionOperationInterface ? OperationType::COLLECTION : OperationType::ITEM;
         } else {
             $shortName = $resourceMetadata->getShortName();
             $inputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input', ['class' => false]);
@@ -515,6 +516,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                     $resourceMetadata = $this->resourceMetadataFactory->create($className);
                     if ($resourceMetadata instanceof ResourceMetadataCollection) {
                         $operation = $resourceMetadata->getOperation();
+
+                        if (!$operation instanceof HttpOperation) {
+                            return "#{$operation->getShortName()}";
+                        }
 
                         return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
                     }

@@ -15,7 +15,7 @@ namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -26,13 +26,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class DeserializeStage implements DeserializeStageInterface
 {
-    private $resourceMetadataCollectionFactory;
     private $denormalizer;
     private $serializerContextBuilder;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, DenormalizerInterface $denormalizer, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(DenormalizerInterface $denormalizer, SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->denormalizer = $denormalizer;
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
@@ -40,15 +38,13 @@ final class DeserializeStage implements DeserializeStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke($objectToPopulate, string $resourceClass, string $operationName, array $context)
+    public function __invoke($objectToPopulate, string $resourceClass, Operation $operation, array $context)
     {
-        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getOperation($operationName);
         if (!($operation->canDeserialize() ?? true)) {
             return $objectToPopulate;
         }
 
-        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, false);
+        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, false);
         if (null !== $objectToPopulate) {
             $denormalizationContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $objectToPopulate;
         }

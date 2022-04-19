@@ -22,19 +22,26 @@ use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
 use ApiPlatform\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
+use ApiPlatform\Doctrine\Odm\State\CollectionProvider as MongoDbCollectionProvider;
+use ApiPlatform\Doctrine\Odm\State\ItemProvider as MongoDbItemProvider;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
+use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
+use ApiPlatform\Elasticsearch\State\CollectionProvider as ElasticsearchCollectionProvider;
+use ApiPlatform\Elasticsearch\State\ItemProvider as ElasticsearchItemProvider;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
-use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
+use ApiPlatform\Symfony\Messenger\Processor as MessengerProcessor;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use Doctrine\Common\Annotations\Annotation;
@@ -160,18 +167,28 @@ class ApiPlatformExtensionTest extends TestCase
         $this->container = new ContainerBuilder($containerParameterBag);
     }
 
-    private function assertContainerHas(array $services, array $aliases = [], array $tags = [])
+    private function assertContainerHas(array $services, array $aliases = [])
     {
         foreach ($services as $service) {
-            $this->assertTrue($this->container->hasDefinition($service));
+            $this->assertTrue($this->container->hasDefinition($service), sprintf('Definition "%s" not found.', $service));
         }
 
         foreach ($aliases as $alias) {
-            $this->assertTrue($this->container->hasAlias($alias));
+            $this->assertContainerHasAlias($alias);
         }
+    }
 
-        foreach ($tags as $service => $tag) {
-            $this->assertArrayHasKey($tag, $this->container->getDefinition($service)->getTags());
+    private function assertContainerHasAlias(string $alias)
+    {
+        $this->assertTrue($this->container->hasAlias($alias), sprintf('Alias "%s" not found.', $alias));
+    }
+
+    private function assertServiceHasTags($service, $tags = [])
+    {
+        $serviceTags = $this->container->getDefinition($service)->getTags();
+
+        foreach ($tags as $tag) {
+            $this->assertArrayHasKey($tag, $serviceTags, sprintf('Tag "%s" not found on the service "%s".', $tag, $service));
         }
     }
 
@@ -251,19 +268,17 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.path_segment_name_generator',
         ];
 
-        $tags = [
-            'api_platform.cache.route_name_resolver' => 'cache.pool',
-            'api_platform.serializer.normalizer.item' => 'serializer.normalizer',
-            'api_platform.serializer_locator' => 'container.service_locator',
-            'api_platform.filter_locator' => 'container.service_locator',
+        $this->assertContainerHas($services, $aliases);
 
-            // ramsey_uuid.xml
-            'api_platform.identifier.uuid_normalizer' => 'api_platform.identifier.denormalizer',
-            'api_platform.serializer.uuid_denormalizer' => 'serializer.normalizer',
-            'api_platform.ramsey_uuid.uri_variables.transformer.uuid' => 'api_platform.uri_variables.transformer',
-        ];
+        $this->assertServiceHasTags('api_platform.cache.route_name_resolver', ['cache.pool']);
+        $this->assertServiceHasTags('api_platform.serializer.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.serializer_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.filter_locator', ['container.service_locator']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // ramsey_uuid.xml
+        $this->assertServiceHasTags('api_platform.identifier.uuid_normalizer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.serializer.uuid_denormalizer', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.ramsey_uuid.uri_variables.transformer.uuid', ['api_platform.uri_variables.transformer']);
     }
 
     public function testCommonConfigurationAbstractUid(): void
@@ -282,14 +297,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.symfony.uri_variables.transformer.uuid',
         ];
 
-        $tags = [
-            'api_platform.identifier.symfony_ulid_normalizer' => 'api_platform.identifier.denormalizer',
-            'api_platform.identifier.symfony_uuid_normalizer' => 'api_platform.identifier.denormalizer',
-            'api_platform.symfony.uri_variables.transformer.ulid' => 'api_platform.uri_variables.transformer',
-            'api_platform.symfony.uri_variables.transformer.uuid' => 'api_platform.uri_variables.transformer',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        $this->assertServiceHasTags('api_platform.identifier.symfony_ulid_normalizer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.identifier.symfony_uuid_normalizer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.symfony.uri_variables.transformer.ulid', ['api_platform.uri_variables.transformer']);
+        $this->assertServiceHasTags('api_platform.symfony.uri_variables.transformer.uuid', ['api_platform.uri_variables.transformer']);
     }
 
     public function dataProviderCommonConfigurationAliasNameConverter()
@@ -374,23 +387,21 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.cache.metadata.property',
             'api_platform.openapi.factory',
         ];
-        $tags = [
-            // legacy/api.xml
-            'api_platform.route_loader.legacy' => 'routing.loader',
-            'api_platform.listener.request.add_format' => 'kernel.event_listener',
-            'api_platform.listener.request.deserialize' => 'kernel.event_listener',
-            'api_platform.listener.view.serialize' => 'kernel.event_listener',
-            'api_platform.listener.view.respond' => 'kernel.event_listener',
-            'api_platform.listener.exception.validation' => 'kernel.event_listener',
-            'api_platform.listener.exception' => 'kernel.event_listener',
-            'api_platform.listener.exception' => 'monolog.logger',
-            'api_platform.identifier.integer' => 'api_platform.identifier.denormalizer',
-            'api_platform.identifier.date_normalizer' => 'api_platform.identifier.denormalizer',
-            'api_platform.listener.view.write.legacy' => 'kernel.event_listener',
-            'api_platform.listener.request.read.legacy' => 'kernel.event_listener',
-        ];
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        $this->assertContainerHas($services, $aliases);
+
+        // legacy/api.xml
+        $this->assertServiceHasTags('api_platform.route_loader.legacy', ['routing.loader']);
+        $this->assertServiceHasTags('api_platform.listener.request.add_format', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.deserialize', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.serialize', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.respond', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception.validation', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception', ['kernel.event_listener', 'monolog.logger']);
+        $this->assertServiceHasTags('api_platform.identifier.integer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.identifier.date_normalizer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.listener.view.write.legacy', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
     }
 
     public function testCommonConfigurationWithoutMetadataBackwardCompatibilityLayer()
@@ -415,13 +426,10 @@ class ApiPlatformExtensionTest extends TestCase
 
             // v3/state.xml
             'api_platform.pagination.next',
-            'api_platform.state_provider',
-            'api_platform.state_processor',
 
             // v3/backward_compatibility.xml
             'api_platform.metadata.resource.metadata_collection_factory.legacy_resource_metadata',
             'api_platform.metadata.resource.metadata_collection_factory.legacy_subresource_metadata',
-            'api_platform.legacy_data_provider_state',
             'api_platform.listener.view.write.legacy',
             'api_platform.listener.request.read.legacy',
         ];
@@ -442,23 +450,18 @@ class ApiPlatformExtensionTest extends TestCase
             // v3/state.xml
             'ApiPlatform\State\Pagination\Pagination',
             'api_platform.pagination',
-            'ApiPlatform\State\ProviderInterface',
-            'ApiPlatform\State\ProcessorInterface',
         ];
 
-        $tags = [
-            // v3/api.xml
-            'api_platform.route_loader' => 'routing.loader',
-            'api_platform.uri_variables.transformer.integer' => 'api_platform.uri_variables.transformer',
-            'api_platform.uri_variables.transformer.date_time' => 'api_platform.uri_variables.transformer',
+        $this->assertContainerHas($services, $aliases);
 
-            // v3/backward_compatibility.xml
-            'api_platform.legacy_data_provider_state' => 'api_platform.state_provider',
-            'api_platform.listener.view.write.legacy' => 'kernel.event_listener',
-            'api_platform.listener.request.read.legacy' => 'kernel.event_listener',
-        ];
+        // v3/api.xml
+        $this->assertServiceHasTags('api_platform.route_loader', ['routing.loader']);
+        $this->assertServiceHasTags('api_platform.uri_variables.transformer.integer', ['api_platform.uri_variables.transformer']);
+        $this->assertServiceHasTags('api_platform.uri_variables.transformer.date_time', ['api_platform.uri_variables.transformer']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // v3/backward_compatibility.xml
+        $this->assertServiceHasTags('api_platform.listener.view.write.legacy', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
     }
 
     public function testMetadataConfiguration(): void
@@ -579,23 +582,21 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.property.metadata_factory',
         ];
 
-        $tags = [
-            // legacy/metadata.xml
-            'api_platform.cache.metadata.resource.legacy' => 'cache.pool',
-            'api_platform.cache.metadata.property.legacy' => 'cache.pool',
-            'api_platform.cache.subresource_operation_factory' => 'cache.pool',
+        $this->assertContainerHas($services, $aliases);
 
-            // metadata/property.xml
-            'api_platform.cache.metadata.property' => 'cache.pool',
+        // legacy/metadata.xml
+        $this->assertServiceHasTags('api_platform.cache.metadata.resource.legacy', ['cache.pool']);
+        $this->assertServiceHasTags('api_platform.cache.metadata.property.legacy', ['cache.pool']);
+        $this->assertServiceHasTags('api_platform.cache.subresource_operation_factory', ['cache.pool']);
 
-            // metadata/resource.xml
-            'api_platform.cache.metadata.resource_collection' => 'cache.pool',
+        // metadata/property.xml
+        $this->assertServiceHasTags('api_platform.cache.metadata.property', ['cache.pool']);
 
-            // metadata/resource_name.xml
-            'api_platform.cache.metadata.resource' => 'cache.pool',
-        ];
+        // metadata/resource.xml
+        $this->assertServiceHasTags('api_platform.cache.metadata.resource_collection', ['cache.pool']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // metadata/resource_name.xml
+        $this->assertServiceHasTags('api_platform.cache.metadata.resource', ['cache.pool']);
     }
 
     public function testMetadataConfigurationAnnotation()
@@ -706,20 +707,18 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.openapi.factory',
         ];
 
-        $tags = [
-            // json_schema.xml
-            'api_platform.json_schema.json_schema_generate_command' => 'console.command',
+        $this->assertContainerHas($services, $aliases);
 
-            // openapi.xml
-            'api_platform.openapi.normalizer' => 'serializer.normalizer',
-            'api_platform.openapi.command' => 'console.command',
-            'api_platform.openapi.normalizer.api_gateway' => 'serializer.normalizer',
+        // json_schema.xml
+        $this->assertServiceHasTags('api_platform.json_schema.json_schema_generate_command', ['console.command']);
 
-            // swagger_ui.xml
-            'api_platform.swagger.listener.ui' => 'kernel.event_listener',
-        ];
+        // openapi.xml
+        $this->assertServiceHasTags('api_platform.openapi.normalizer', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.openapi.command', ['console.command']);
+        $this->assertServiceHasTags('api_platform.openapi.normalizer.api_gateway', ['serializer.normalizer']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // swagger_ui.xml
+        $this->assertServiceHasTags('api_platform.swagger.listener.ui', ['kernel.event_listener']);
     }
 
     public function testSwaggerConfigurationMetadataBackwardCompatibilityLayer()
@@ -744,14 +743,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger_ui.action',
         ];
 
-        $tags = [
-            // legacy/swagger.xml
-            'api_platform.swagger.normalizer.documentation' => 'serializer.normalizer',
-            'api_platform.swagger.normalizer.api_gateway' => 'serializer.normalizer',
-            'api_platform.swagger.command.swagger_command' => 'console.command',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // legacy/swagger.xml
+        $this->assertServiceHasTags('api_platform.swagger.normalizer.documentation', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.swagger.normalizer.api_gateway', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.swagger.command.swagger_command', ['console.command']);
     }
 
     public function testJsonApiConfiguration(): void
@@ -779,22 +776,20 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.jsonapi.listener.request.transform_filtering_parameters',
         ];
 
-        $tags = [
-            // jsonapi.xml
-            'api_platform.jsonapi.encoder' => 'serializer.encoder',
-            'api_platform.jsonapi.normalizer.entrypoint' => 'serializer.normalizer',
-            'api_platform.jsonapi.normalizer.collection' => 'serializer.normalizer',
-            'api_platform.jsonapi.normalizer.item' => 'serializer.normalizer',
-            'api_platform.jsonapi.normalizer.object' => 'serializer.normalizer',
-            'api_platform.jsonapi.normalizer.constraint_violation_list' => 'serializer.normalizer',
-            'api_platform.jsonapi.normalizer.error' => 'serializer.normalizer',
-            'api_platform.jsonapi.listener.request.transform_pagination_parameters' => 'kernel.event_listener',
-            'api_platform.jsonapi.listener.request.transform_sorting_parameters' => 'kernel.event_listener',
-            'api_platform.jsonapi.listener.request.transform_fieldsets_parameters' => 'kernel.event_listener',
-            'api_platform.jsonapi.listener.request.transform_filtering_parameters' => 'kernel.event_listener',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // jsonapi.xml
+        $this->assertServiceHasTags('api_platform.jsonapi.encoder', ['serializer.encoder']);
+        $this->assertServiceHasTags('api_platform.jsonapi.normalizer.entrypoint', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonapi.normalizer.collection', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonapi.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonapi.normalizer.object', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonapi.normalizer.constraint_violation_list', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonapi.normalizer.error', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonapi.listener.request.transform_pagination_parameters', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.jsonapi.listener.request.transform_sorting_parameters', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.jsonapi.listener.request.transform_fieldsets_parameters', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.jsonapi.listener.request.transform_filtering_parameters', ['kernel.event_listener']);
     }
 
     public function testJsonLdHydraConfiguration(): void
@@ -822,22 +817,20 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.hydra.json_schema.schema_factory',
         ];
 
-        $tags = [
-            // jsonld.xml
-            'api_platform.jsonld.normalizer.item' => 'serializer.normalizer',
-            'api_platform.jsonld.normalizer.object' => 'serializer.normalizer',
-            'api_platform.jsonld.encoder' => 'serializer.encoder',
+        $this->assertContainerHas($services, []);
 
-            // hydra.xml
-            'api_platform.hydra.normalizer.documentation' => 'serializer.normalizer',
-            'api_platform.hydra.listener.response.add_link_header' => 'kernel.event_listener',
-            'api_platform.hydra.normalizer.constraint_violation_list' => 'serializer.normalizer',
-            'api_platform.hydra.normalizer.entrypoint' => 'serializer.normalizer',
-            'api_platform.hydra.normalizer.error' => 'serializer.normalizer',
-            'api_platform.hydra.normalizer.collection' => 'serializer.normalizer',
-        ];
+        // jsonld.xml
+        $this->assertServiceHasTags('api_platform.jsonld.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonld.normalizer.object', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.jsonld.encoder', ['serializer.encoder']);
 
-        $this->assertContainerHas($services, [], $tags);
+        // hydra.xml
+        $this->assertServiceHasTags('api_platform.hydra.normalizer.documentation', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hydra.listener.response.add_link_header', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.hydra.normalizer.constraint_violation_list', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hydra.normalizer.entrypoint', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hydra.normalizer.error', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hydra.normalizer.collection', ['serializer.normalizer']);
     }
 
     public function testJsonHalConfiguration(): void
@@ -855,16 +848,14 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.hal.json_schema.schema_factory',
         ];
 
-        $tags = [
-            // hal.xml
-            'api_platform.hal.encoder' => 'serializer.encoder',
-            'api_platform.hal.normalizer.entrypoint' => 'serializer.normalizer',
-            'api_platform.hal.normalizer.collection' => 'serializer.normalizer',
-            'api_platform.hal.normalizer.item' => 'serializer.normalizer',
-            'api_platform.hal.normalizer.object' => 'serializer.normalizer',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // hal.xml
+        $this->assertServiceHasTags('api_platform.hal.encoder', ['serializer.encoder']);
+        $this->assertServiceHasTags('api_platform.hal.normalizer.entrypoint', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hal.normalizer.collection', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hal.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.hal.normalizer.object', ['serializer.normalizer']);
     }
 
     public function testJsonProblemConfiguration(): void
@@ -879,14 +870,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.problem.normalizer.error',
         ];
 
-        $tags = [
-            // problem.xml
-            'api_platform.problem.encoder' => 'serializer.encoder',
-            'api_platform.problem.normalizer.constraint_violation_list' => 'serializer.normalizer',
-            'api_platform.problem.normalizer.error' => 'serializer.normalizer',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // problem.xml
+        $this->assertServiceHasTags('api_platform.problem.encoder', ['serializer.encoder']);
+        $this->assertServiceHasTags('api_platform.problem.normalizer.constraint_violation_list', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.problem.normalizer.error', ['serializer.normalizer']);
     }
 
     public function testGraphQlConfiguration(): void
@@ -947,27 +936,25 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface',
         ];
 
-        $tags = [
-            // graphql.xml
-            'api_platform.graphql.query_resolver_locator' => 'container.service_locator',
-            'api_platform.graphql.mutation_resolver_locator' => 'container.service_locator',
-            'api_platform.graphql.iterable_type' => 'api_platform.graphql.type',
-            'api_platform.graphql.upload_type' => 'api_platform.graphql.type',
-            'api_platform.graphql.type_locator' => 'container.service_locator',
-            'api_platform.graphql.fields_builder_locator' => 'container.service_locator',
-            'api_platform.graphql.cache.subscription' => 'cache.pool',
-            'api_platform.graphql.command.export_command' => 'console.command',
+        $this->assertContainerHas($services, $aliases);
 
-            // v3/graphql.xml
-            'api_platform.graphql.normalizer.item' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.object' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.error' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.validation_exception' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.http_exception' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.runtime_exception' => 'serializer.normalizer',
-        ];
+        // graphql.xml
+        $this->assertServiceHasTags('api_platform.graphql.query_resolver_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.mutation_resolver_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.iterable_type', ['api_platform.graphql.type']);
+        $this->assertServiceHasTags('api_platform.graphql.upload_type', ['api_platform.graphql.type']);
+        $this->assertServiceHasTags('api_platform.graphql.type_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.fields_builder_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.cache.subscription', ['cache.pool']);
+        $this->assertServiceHasTags('api_platform.graphql.command.export_command', ['console.command']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // v3/graphql.xml
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.object', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.error', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.validation_exception', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.http_exception', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.runtime_exception', ['serializer.normalizer']);
     }
 
     public function testGraphQlConfigurationMetadataBackwardCompatibilityLayer(): void
@@ -1019,25 +1006,23 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.command.export_command',
         ];
 
-        $tags = [
-            // legacy/graphql.xml
-            'api_platform.graphql.query_resolver_locator' => 'container.service_locator',
-            'api_platform.graphql.mutation_resolver_locator' => 'container.service_locator',
-            'api_platform.graphql.iterable_type' => 'api_platform.graphql.type',
-            'api_platform.graphql.upload_type' => 'api_platform.graphql.type',
-            'api_platform.graphql.type_locator' => 'container.service_locator',
-            'api_platform.graphql.fields_builder_locator' => 'container.service_locator',
-            'api_platform.graphql.normalizer.item' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.object' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.error' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.validation_exception' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.http_exception' => 'serializer.normalizer',
-            'api_platform.graphql.normalizer.runtime_exception' => 'serializer.normalizer',
-            'api_platform.graphql.cache.subscription' => 'cache.pool',
-            'api_platform.graphql.command.export_command' => 'console.command',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // legacy/graphql.xml
+        $this->assertServiceHasTags('api_platform.graphql.query_resolver_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.mutation_resolver_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.iterable_type', ['api_platform.graphql.type']);
+        $this->assertServiceHasTags('api_platform.graphql.upload_type', ['api_platform.graphql.type']);
+        $this->assertServiceHasTags('api_platform.graphql.type_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.fields_builder_locator', ['container.service_locator']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.item', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.object', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.error', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.validation_exception', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.http_exception', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.normalizer.runtime_exception', ['serializer.normalizer']);
+        $this->assertServiceHasTags('api_platform.graphql.cache.subscription', ['cache.pool']);
+        $this->assertServiceHasTags('api_platform.graphql.command.export_command', ['console.command']);
     }
 
     public function testLegacyBundlesConfigurationFosUserBundle(): void
@@ -1054,12 +1039,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.fos_user.event_listener',
         ];
 
-        $tags = [
-            // fos_user.xml
-            'api_platform.fos_user.event_listener' => 'kernel.event_listener',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // fos_user.xml
+        $this->assertServiceHasTags('api_platform.fos_user.event_listener', ['kernel.event_listener']);
     }
 
     public function testLegacyBundlesConfigurationNelmioApiDocBundle(): void
@@ -1078,13 +1061,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.nelmio_api_doc.parser',
         ];
 
-        $tags = [
-            // nelmio_api_doc.xml
-            'api_platform.nelmio_api_doc.annotations_provider' => 'nelmio_api_doc.extractor.annotations_provider',
-            'api_platform.nelmio_api_doc.parser' => 'nelmio_api_doc.extractor.parser',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // nelmio_api_doc.xml
+        $this->assertServiceHasTags('api_platform.nelmio_api_doc.annotations_provider', ['nelmio_api_doc.extractor.annotations_provider']);
+        $this->assertServiceHasTags('api_platform.nelmio_api_doc.parser', ['nelmio_api_doc.extractor.parser']);
     }
 
     public function testDoctrineOrmConfiguration(): void
@@ -1096,9 +1077,10 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             // doctrine_orm.xml
             'api_platform.doctrine.metadata_factory',
-            'api_platform.doctrine.orm.state.processor',
-            'api_platform.doctrine.orm.state.collection_provider',
-            'api_platform.doctrine.orm.state.item_provider',
+            RemoveProcessor::class,
+            PersistProcessor::class,
+            CollectionProvider::class,
+            ItemProvider::class,
             'api_platform.doctrine.orm.search_filter',
             'api_platform.doctrine.orm.order_filter',
             'api_platform.doctrine.orm.range_filter',
@@ -1134,26 +1116,24 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Doctrine\Orm\Extension\OrderExtension',
         ];
 
-        $tags = [
-            // doctrine_orm.xml
-            'api_platform.doctrine.orm.state.processor' => 'api_platform.state_processor',
-            'api_platform.doctrine.orm.state.collection_provider' => 'api_platform.state_provider',
-            'api_platform.doctrine.orm.state.item_provider' => 'api_platform.state_provider',
-            'api_platform.doctrine.orm.query_extension.eager_loading' => 'api_platform.doctrine.orm.query_extension.item',
-            'api_platform.doctrine.orm.query_extension.eager_loading' => 'api_platform.doctrine.orm.query_extension.collection',
-            'api_platform.doctrine.orm.query_extension.filter' => 'api_platform.doctrine.orm.query_extension.collection',
-            'api_platform.doctrine.orm.query_extension.filter_eager_loading' => 'api_platform.doctrine.orm.query_extension.collection',
-            'api_platform.doctrine.orm.query_extension.pagination' => 'api_platform.doctrine.orm.query_extension.collection',
-            'api_platform.doctrine.orm.query_extension.order' => 'api_platform.doctrine.orm.query_extension.collection',
+        $this->assertContainerHas($services, $aliases);
 
-            // legacy/doctrine_orm.xml
-            'api_platform.doctrine.orm.data_persister' => 'api_platform.data_persister',
-            'api_platform.doctrine.orm.default.collection_data_provider' => 'api_platform.collection_data_provider',
-            'api_platform.doctrine.orm.default.item_data_provider' => 'api_platform.item_data_provider',
-            'api_platform.doctrine.orm.default.subresource_data_provider' => 'api_platform.subresource_data_provider',
-        ];
+        // doctrine_orm.xml
+        $this->assertServiceHasTags(RemoveProcessor::class, ['api_platform.state_processor']);
+        $this->assertServiceHasTags(PersistProcessor::class, ['api_platform.state_processor']);
+        $this->assertServiceHasTags(CollectionProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags(ItemProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.eager_loading', ['api_platform.doctrine.orm.query_extension.item', 'api_platform.doctrine.orm.query_extension.collection']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.filter', ['api_platform.doctrine.orm.query_extension.collection']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.filter_eager_loading', ['api_platform.doctrine.orm.query_extension.collection']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.pagination', ['api_platform.doctrine.orm.query_extension.collection']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.query_extension.order', ['api_platform.doctrine.orm.query_extension.collection']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // legacy/doctrine_orm.xml
+        $this->assertServiceHasTags('api_platform.doctrine.orm.data_persister', ['api_platform.data_persister']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.default.collection_data_provider', ['api_platform.collection_data_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.default.item_data_provider', ['api_platform.item_data_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine.orm.default.subresource_data_provider', ['api_platform.subresource_data_provider']);
     }
 
     public function testDoctrineMongoDbOdmConfiguration(): void
@@ -1166,9 +1146,10 @@ class ApiPlatformExtensionTest extends TestCase
             // doctrine_mongo_odm.xml
             'api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor',
             'api_platform.doctrine.metadata_factory',
-            'api_platform.doctrine_mongodb.odm.state.processor',
-            'api_platform.doctrine.odm.state.collection_provider',
-            'api_platform.doctrine.odm.state.item_provider',
+            RemoveProcessor::class,
+            PersistProcessor::class,
+            MongoDbCollectionProvider::class,
+            MongoDbItemProvider::class,
             'api_platform.doctrine_mongodb.odm.search_filter',
             'api_platform.doctrine_mongodb.odm.boolean_filter',
             'api_platform.doctrine_mongodb.odm.date_filter',
@@ -1206,25 +1187,23 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Doctrine\Odm\Extension\OrderExtension',
         ];
 
-        $tags = [
-            // doctrine_mongo_odm.xml
-            'api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor' => 'property_info.list_extractor',
-            'api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor' => 'property_info.type_extractor',
-            'api_platform.doctrine_mongodb.odm.state.processor' => 'api_platform.state_processor',
-            'api_platform.doctrine.odm.state.collection_provider' => 'api_platform.state_provider',
-            'api_platform.doctrine.odm.state.item_provider' => 'api_platform.state_provider',
-            'api_platform.doctrine_mongodb.odm.aggregation_extension.filter' => 'api_platform.doctrine_mongodb.odm.aggregation_extension.collection',
-            'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination' => 'api_platform.doctrine_mongodb.odm.aggregation_extension.collection',
-            'api_platform.doctrine_mongodb.odm.aggregation_extension.order' => 'api_platform.doctrine_mongodb.odm.aggregation_extension.collection',
+        $this->assertContainerHas($services, $aliases);
 
-            // legacy/doctrine_odm.xml
-            'api_platform.doctrine_mongodb.odm.data_persister' => 'api_platform.data_persister',
-            'api_platform.doctrine_mongodb.odm.default.collection_data_provider' => 'api_platform.collection_data_provider',
-            'api_platform.doctrine_mongodb.odm.default.item_data_provider' => 'api_platform.item_data_provider',
-            'api_platform.doctrine_mongodb.odm.default.subresource_data_provider' => 'api_platform.subresource_data_provider',
-        ];
+        $this->assertServiceHasTags(RemoveProcessor::class, ['api_platform.state_processor']);
+        $this->assertServiceHasTags(PersistProcessor::class, ['api_platform.state_processor']);
+        $this->assertServiceHasTags(MongoDbCollectionProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags(MongoDbItemProvider::class, ['api_platform.state_provider']);
+        // doctrine_mongo_odm.xml
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', ['property_info.list_extractor', 'property_info.type_extractor']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.aggregation_extension.order', ['api_platform.doctrine_mongodb.odm.aggregation_extension.collection']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // legacy/doctrine_odm.xml
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.data_persister', ['api_platform.data_persister']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.default.collection_data_provider', ['api_platform.collection_data_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.default.item_data_provider', ['api_platform.item_data_provider']);
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.default.subresource_data_provider', ['api_platform.subresource_data_provider']);
     }
 
     public function testHttpCacheConfiguration(): void
@@ -1247,18 +1226,18 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.http_cache.listener.response.add_tags',
         ];
 
-        $tags = [
-            // http_cache.xml
-            'api_platform.http_cache.listener.response.configure' => 'kernel.event_listener',
+        $this->assertContainerHas($services);
 
-            // doctrine_orm_http_cache_purger.xml
-            'api_platform.doctrine.listener.http_cache.purge' => 'doctrine.event_listener',
+        // http_cache.xml
+        $this->assertServiceHasTags('api_platform.http_cache.listener.response.configure', ['kernel.event_listener']);
 
-            // http_cache_tags.xml
-            'api_platform.http_cache.listener.response.add_tags' => 'kernel.event_listener',
-        ];
+        // doctrine_orm_http_cache_purger.xml
+        $this->assertServiceHasTags('api_platform.doctrine.listener.http_cache.purge', ['doctrine.event_listener']);
 
-        $this->assertTrue($this->container->hasAlias('api_platform.http_cache.purger.varnish'));
+        // http_cache_tags.xml
+        $this->assertServiceHasTags('api_platform.http_cache.listener.response.add_tags', ['kernel.event_listener']);
+
+        $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
 
         $this->assertSame([
             ['event' => 'preUpdate'],
@@ -1305,28 +1284,26 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Validator\ValidatorInterface',
         ];
 
-        $tags = [
-            // metadata/validator.xml
-            'api_platform.metadata.property_schema.choice_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.collection_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.count_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.greater_than_or_equal_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.greater_than_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.length_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.less_than_or_equal_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.less_than_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.one_of_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.range_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.regex_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.format_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.unique_restriction' => 'api_platform.metadata.property_schema_restriction',
+        $this->assertContainerHas($services, $aliases);
 
-            // symfony/validator.xml
-            'api_platform.listener.view.validate' => 'kernel.event_listener',
-            'api_platform.listener.view.validate_query_parameters' => 'kernel.event_listener',
-        ];
+        // metadata/validator.xml
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.choice_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.collection_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.count_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.greater_than_or_equal_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.greater_than_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.length_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.less_than_or_equal_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.less_than_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.one_of_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.range_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.regex_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.format_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.unique_restriction', ['api_platform.metadata.property_schema_restriction']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // symfony/validator.xml
+        $this->assertServiceHasTags('api_platform.listener.view.validate', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.validate_query_parameters', ['kernel.event_listener']);
     }
 
     public function testValidatorConfigurationMetadataBackwardCompatibilityLayer(): void
@@ -1367,26 +1344,24 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Core\Validator\ValidatorInterface',
         ];
 
-        $tags = [
-            // legacy/validator.xml
-            'api_platform.metadata.property_schema.choice_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.collection_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.count_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.greater_than_or_equal_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.greater_than_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.length_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.less_than_or_equal_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.less_than_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.one_of_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.range_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.regex_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.format_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.metadata.property_schema.unique_restriction' => 'api_platform.metadata.property_schema_restriction',
-            'api_platform.listener.view.validate' => 'kernel.event_listener',
-            'api_platform.listener.view.validate_query_parameters' => 'kernel.event_listener',
-        ];
+        $this->assertContainerHas($services, $aliases);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // legacy/validator.xml
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.choice_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.collection_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.count_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.greater_than_or_equal_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.greater_than_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.length_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.less_than_or_equal_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.less_than_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.one_of_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.range_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.regex_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.format_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.metadata.property_schema.unique_restriction', ['api_platform.metadata.property_schema_restriction']);
+        $this->assertServiceHasTags('api_platform.listener.view.validate', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.validate_query_parameters', ['kernel.event_listener']);
     }
 
     public function testDataCollectorConfiguration(): void
@@ -1406,18 +1381,15 @@ class ApiPlatformExtensionTest extends TestCase
 
             // v3/debug.xml
             'debug.api_platform.debug_resource.command',
-            'debug.api_platform.processor',
         ];
 
-        $tags = [
-            // v3/data_collector.xml
-            'api_platform.data_collector.request' => 'data_collector',
+        $this->assertContainerHas($services, []);
 
-            // v3/debug.xml
-            'debug.api_platform.debug_resource.command' => 'console.command',
-        ];
+        // v3/data_collector.xml
+        $this->assertServiceHasTags('api_platform.data_collector.request', ['data_collector']);
 
-        $this->assertContainerHas($services, [], $tags);
+        // v3/debug.xml
+        $this->assertServiceHasTags('debug.api_platform.debug_resource.command', ['console.command']);
     }
 
     public function testDataCollectorConfigurationMetadataBackwardCompatibilityLayer(): void
@@ -1439,12 +1411,10 @@ class ApiPlatformExtensionTest extends TestCase
             'debug.api_platform.data_persister',
         ];
 
-        $tags = [
-            // legacy/data_collector.xml
-            'api_platform.data_collector.request' => 'data_collector',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // legacy/data_collector.xml
+        $this->assertServiceHasTags('api_platform.data_collector.request', ['data_collector']);
     }
 
     public function testMercureConfiguration(): void
@@ -1470,18 +1440,16 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.subscription.mercure_iri_generator',
         ];
 
-        $tags = [
-            // mercure.xml
-            'api_platform.mercure.listener.response.add_link_header' => 'kernel.event_listener',
+        $this->assertContainerHas($services, []);
 
-            // v3/doctrine_orm_mercure_publisher
-            'api_platform.doctrine.orm.listener.mercure.publish' => 'doctrine.event_listener',
+        // mercure.xml
+        $this->assertServiceHasTags('api_platform.mercure.listener.response.add_link_header', ['kernel.event_listener']);
 
-            // v3/doctrine_odm_mercure_publisher.xml
-            'api_platform.doctrine_mongodb.odm.listener.mercure.publish' => 'doctrine_mongodb.odm.event_listener',
-        ];
+        // v3/doctrine_orm_mercure_publisher
+        $this->assertServiceHasTags('api_platform.doctrine.orm.listener.mercure.publish', ['doctrine.event_listener']);
 
-        $this->assertContainerHas($services, [], $tags);
+        // v3/doctrine_odm_mercure_publisher.xml
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.listener.mercure.publish', ['doctrine_mongodb.odm.event_listener']);
 
         $this->assertSame([
             ['event' => 'onFlush'],
@@ -1514,14 +1482,13 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.subscription.mercure_iri_generator',
         ];
 
-        $tags = [
-            // legacy/doctrine_orm_mercure_publisher.xml
-            'api_platform.doctrine.orm.listener.mercure.publish' => 'doctrine.event_listener',
+        $this->assertContainerHas($services, []);
 
-            // legacy/doctrine_odm_mercure_publisher.xml
-            'api_platform.doctrine_mongodb.odm.listener.mercure.publish' => 'doctrine_mongodb.odm.event_listener',
-        ];
-        $this->assertContainerHas($services, [], $tags);
+        // legacy/doctrine_orm_mercure_publisher.xml
+        $this->assertServiceHasTags('api_platform.doctrine.orm.listener.mercure.publish', ['doctrine.event_listener']);
+
+        // legacy/doctrine_odm_mercure_publisher.xml
+        $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.listener.mercure.publish', ['doctrine_mongodb.odm.event_listener']);
 
         $this->assertSame([
             ['event' => 'onFlush'],
@@ -1542,8 +1509,8 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             // messenger.xml
             'api_platform.messenger.data_persister',
-            'api_platform.messenger.processor',
             'api_platform.messenger.data_transformer',
+            MessengerProcessor::class,
         ];
 
         $aliases = [
@@ -1551,14 +1518,12 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.message_bus',
         ];
 
-        $tags = [
-            // messenger.xml
-            'api_platform.messenger.data_persister' => 'api_platform.data_persister',
-            'api_platform.messenger.processor' => 'api_platform.state_processor',
-            'api_platform.messenger.data_transformer' => 'api_platform.data_transformer',
-        ];
+        $this->assertContainerHas($services, $aliases);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // messenger.xml
+        $this->assertServiceHasTags('api_platform.messenger.data_persister', ['api_platform.data_persister']);
+        $this->assertServiceHasTags('api_platform.messenger.data_transformer', ['api_platform.data_transformer']);
+        $this->assertServiceHasTags(MessengerProcessor::class, ['api_platform.state_processor']);
     }
 
     public function testElasticsearchConfiguration(): void
@@ -1569,6 +1534,8 @@ class ApiPlatformExtensionTest extends TestCase
 
         $services = [
             // elasticsearch.xml
+            ElasticsearchItemProvider::class,
+            ElasticsearchCollectionProvider::class,
             'api_platform.elasticsearch.client',
             'api_platform.elasticsearch.metadata.resource.metadata_factory.operation',
             'api_platform.elasticsearch.cache.metadata.document',
@@ -1580,9 +1547,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.elasticsearch.name_converter.inner_fields',
             'api_platform.elasticsearch.normalizer.item',
             'api_platform.elasticsearch.normalizer.document',
-            'api_platform.elasticsearch.state.item_provider',
             'api_platform.elasticsearch.item_data_provider',
-            'api_platform.elasticsearch.state.collection_provider',
             'api_platform.elasticsearch.collection_data_provider',
             'api_platform.elasticsearch.request_body_search_extension.filter',
             'api_platform.elasticsearch.request_body_search_extension.constant_score_filter',
@@ -1604,20 +1569,18 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Elasticsearch\Filter\OrderFilter',
         ];
 
-        $tags = [
-            // elasticsearch.xml
-            'api_platform.elasticsearch.cache.metadata.document' => 'cache.pool',
-            'api_platform.elasticsearch.normalizer.document' => 'serializer.normalizer',
-            'api_platform.elasticsearch.state.item_provider' => 'api_platform.state_provider',
-            'api_platform.elasticsearch.item_data_provider' => 'api_platform.item_data_provider',
-            'api_platform.elasticsearch.state.collection_provider' => 'api_platform.state_provider',
-            'api_platform.elasticsearch.collection_data_provider' => 'api_platform.collection_data_provider',
-            'api_platform.elasticsearch.request_body_search_extension.constant_score_filter' => 'api_platform.elasticsearch.request_body_search_extension.collection',
-            'api_platform.elasticsearch.request_body_search_extension.sort_filter' => 'api_platform.elasticsearch.request_body_search_extension.collection',
-            'api_platform.elasticsearch.request_body_search_extension.sort' => 'api_platform.elasticsearch.request_body_search_extension.collection',
-        ];
+        $this->assertContainerHas($services, $aliases);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // elasticsearch.xml
+        $this->assertServiceHasTags('api_platform.elasticsearch.cache.metadata.document', ['cache.pool']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.normalizer.document', ['serializer.normalizer']);
+        $this->assertServiceHasTags(ElasticsearchItemProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags(ElasticsearchCollectionProvider::class, ['api_platform.state_provider']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.item_data_provider', ['api_platform.item_data_provider']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.collection_data_provider', ['api_platform.collection_data_provider']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', ['api_platform.elasticsearch.request_body_search_extension.collection']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.sort_filter', ['api_platform.elasticsearch.request_body_search_extension.collection']);
+        $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.sort', ['api_platform.elasticsearch.request_body_search_extension.collection']);
 
         $autoconfiguredInstances = $this->container->getAutoconfiguredInstanceof();
         $this->assertArrayHasKey(RequestBodySearchCollectionExtensionInterface::class, $autoconfiguredInstances);
@@ -1642,13 +1605,11 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface',
         ];
 
-        $tags = [
-            // security.xml
-            'api_platform.security.listener.request.deny_access' => 'kernel.event_listener',
-            'api_platform.security.expression_language_provider' => 'security.expression_language_provider',
-        ];
+        $this->assertContainerHas($services, $aliases);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // security.xml
+        $this->assertServiceHasTags('api_platform.security.listener.request.deny_access', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.security.expression_language_provider', ['security.expression_language_provider']);
 
         $this->assertSame([
             ['event' => 'kernel.request', 'method' => 'onSecurity', 'priority' => 3],
@@ -1669,13 +1630,11 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.maker.command.data_persister',
         ];
 
-        $tags = [
-            // maker.xml
-            'api_platform.maker.command.data_provider' => 'maker.command',
-            'api_platform.maker.command.data_persister' => 'maker.command',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // maker.xml
+        $this->assertServiceHasTags('api_platform.maker.command.data_provider', ['maker.command']);
+        $this->assertServiceHasTags('api_platform.maker.command.data_persister', ['maker.command']);
     }
 
     public function testArgumentResolverConfiguration(): void
@@ -1688,12 +1647,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.argument_resolver.payload',
         ];
 
-        $tags = [
-            // argument_resolver.xml
-            'api_platform.argument_resolver.payload' => 'controller.argument_value_resolver',
-        ];
+        $this->assertContainerHas($services, []);
 
-        $this->assertContainerHas($services, [], $tags);
+        // argument_resolver.xml
+        $this->assertServiceHasTags('api_platform.argument_resolver.payload', ['controller.argument_value_resolver']);
     }
 
     public function testLegacyServices(): void
@@ -1725,24 +1682,22 @@ class ApiPlatformExtensionTest extends TestCase
             'ApiPlatform\Core\Api\IdentifiersExtractorInterface',
         ];
 
-        $tags = [
-            // legacy/identifiers.xml
-            'api_platform.cache.identifiers_extractor' => 'cache.pool',
+        $this->assertContainerHas($services, $aliases);
 
-            // symfony.xml
-            'api_platform.listener.request.add_format' => 'kernel.event_listener',
-            'api_platform.listener.request.read' => 'kernel.event_listener',
-            'api_platform.listener.view.write' => 'kernel.event_listener',
-            'api_platform.listener.request.deserialize' => 'kernel.event_listener',
-            'api_platform.listener.view.serialize' => 'kernel.event_listener',
-            'api_platform.listener.view.respond' => 'kernel.event_listener',
-            'api_platform.listener.exception.validation' => 'kernel.event_listener',
-            'api_platform.listener.exception' => 'kernel.event_listener',
-            'api_platform.listener.exception' => 'monolog.logger',
-            'api_platform.cache_warmer.cache_pool_clearer' => 'kernel.cache_warmer',
-        ];
+        // legacy/identifiers.xml
+        $this->assertServiceHasTags('api_platform.cache.identifiers_extractor', ['cache.pool']);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // symfony.xml
+        $this->assertServiceHasTags('api_platform.listener.request.add_format', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.read', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.write', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.deserialize', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.serialize', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.respond', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception.validation', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception', ['monolog.logger']);
+        $this->assertServiceHasTags('api_platform.cache_warmer.cache_pool_clearer', ['kernel.cache_warmer']);
     }
 
     public function testLegacyServicesMetadataBackwardCompatibilityLayer(): void
@@ -1782,23 +1737,21 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.operation_path_resolver.legacy',
         ];
 
-        $tags = [
-            // legacy/api.xml
-            'api_platform.route_loader.legacy' => 'routing.loader',
-            'api_platform.listener.request.add_format' => 'kernel.event_listener',
-            'api_platform.listener.request.deserialize' => 'kernel.event_listener',
-            'api_platform.listener.view.serialize' => 'kernel.event_listener',
-            'api_platform.listener.view.respond' => 'kernel.event_listener',
-            'api_platform.listener.exception.validation' => 'kernel.event_listener',
-            'api_platform.listener.exception' => 'kernel.event_listener',
-            'api_platform.listener.exception' => 'monolog.logger',
-            'api_platform.identifier.integer' => 'api_platform.identifier.denormalizer',
-            'api_platform.identifier.date_normalizer' => 'api_platform.identifier.denormalizer',
-            'api_platform.listener.view.write.legacy' => 'kernel.event_listener',
-            'api_platform.listener.request.read.legacy' => 'kernel.event_listener',
-        ];
+        $this->assertContainerHas($services, $aliases);
 
-        $this->assertContainerHas($services, $aliases, $tags);
+        // legacy/api.xml
+        $this->assertServiceHasTags('api_platform.route_loader.legacy', ['routing.loader']);
+        $this->assertServiceHasTags('api_platform.listener.request.add_format', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.deserialize', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.serialize', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.view.respond', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception.validation', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.exception', ['monolog.logger']);
+        $this->assertServiceHasTags('api_platform.identifier.integer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.identifier.date_normalizer', ['api_platform.identifier.denormalizer']);
+        $this->assertServiceHasTags('api_platform.listener.view.write.legacy', ['kernel.event_listener']);
+        $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
     }
 
     public function testRectorConfiguration(): void
@@ -1813,11 +1766,8 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.upgrade_resource.command',
         ];
 
-        $tags = [
-            'api_platform.upgrade_resource.command' => 'console.command',
-        ];
-
-        $this->assertContainerHas($services, [], $tags);
+        $this->assertContainerHas($services, []);
+        $this->assertServiceHasTags('api_platform.upgrade_resource.command', ['console.command']);
     }
 
     public function testAutoConfigurableInterfaces(): void
@@ -1827,8 +1777,6 @@ class ApiPlatformExtensionTest extends TestCase
 
         $interfaces = [
             FilterInterface::class => 'api_platform.filter',
-            ProviderInterface::class => 'api_platform.state_provider',
-            ProcessorInterface::class => 'api_platform.state_processor',
             DataPersisterInterface::class => 'api_platform.data_persister',
             ItemDataProviderInterface::class => 'api_platform.item_data_provider',
             CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',

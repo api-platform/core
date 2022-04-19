@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="ApiPlatform\Elasticsearch\State\ItemProvider" class="ApiPlatform\Elasticsearch\State\ItemProvider" public="false">
+            <argument type="service" id="api_platform.elasticsearch.client" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
+            <argument type="service" id="serializer" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
+        <service id="ApiPlatform\Elasticsearch\State\CollectionProvider" class="ApiPlatform\Elasticsearch\State\CollectionProvider" public="false">
+            <argument type="service" id="api_platform.elasticsearch.client" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" />
+            <argument type="service" id="serializer" />
+            <argument type="service" id="api_platform.pagination" />
+            <argument type="tagged" tag="api_platform.elasticsearch.request_body_search_extension.collection" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
+        <service id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory" class="ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
+            <argument type="service" id="api_platform.elasticsearch.client" />
+            <argument type="service" id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner" />
+        </service>
+
+    </services>
+</container>

@@ -23,6 +23,7 @@ use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -44,14 +45,14 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
-    private $stateProvider;
+    private $provider;
     private $router;
     private $identifiersExtractor;
     private $resourceMetadataCollectionFactory;
 
-    public function __construct(ProviderInterface $stateProvider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(ProviderInterface $provider, RouterInterface $router, IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, UriVariablesConverterInterface $uriVariablesConverter = null)
     {
-        $this->stateProvider = $stateProvider;
+        $this->provider = $provider;
         $this->router = $router;
         $this->uriVariablesConverter = $uriVariablesConverter;
         $this->identifiersExtractor = $identifiersExtractor;
@@ -81,7 +82,7 @@ final class IriConverter implements IriConverterInterface
 
         $context['operation'] = $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
-        if ($operation->isCollection()) {
+        if ($operation instanceof CollectionOperationInterface) {
             throw new InvalidArgumentException(sprintf('The iri "%s" references a collection not an item.', $iri));
         }
 
@@ -93,7 +94,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if ($item = $this->stateProvider->provide($attributes['resource_class'], $uriVariables, $attributes['operation_name'], $context)) {
+        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
             return $item;
         }
 
@@ -118,7 +119,7 @@ final class IriConverter implements IriConverterInterface
                 ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) ||
                 ($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false) ||
                 // When we want the Iri from an object, we don't want the collection uriTemplate, for this we use getIriFromResourceClass
-                $operation->isCollection() || $operation instanceof Post
+                $operation instanceof CollectionOperationInterface || $operation instanceof Post
             ) {
                 unset($context['operation']);
                 $operationName = null;
@@ -126,12 +127,12 @@ final class IriConverter implements IriConverterInterface
         }
 
         try {
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
+            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName, false, true);
         } catch (OperationNotFoundException $e) {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
             foreach ($resourceMetadataCollection as $resource) {
                 foreach ($resource->getOperations() as $name => $operation) {
-                    if ($operationName === $name && !$operation->isCollection()) {
+                    if ($operationName === $name && !$operation instanceof CollectionOperationInterface) {
                         break 2;
                     }
                 }

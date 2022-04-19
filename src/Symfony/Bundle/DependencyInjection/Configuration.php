@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiResource as LegacyApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Exception\FilterValidationException;
@@ -642,8 +643,18 @@ final class Configuration implements ConfigurationInterface
                 return $normalizedDefaults;
             });
 
-        [$publicProperties, $configurableAttributes] = ApiResource::getConfigMetadata();
-        foreach (array_merge($publicProperties, $configurableAttributes) as $attribute => $_) {
+        // TODO: test defaults with things that are no in the constructor
+        if (class_exists(ApiResource::class)) {
+            $reflection = new \ReflectionClass(ApiResource::class);
+            foreach ($reflection->getConstructor()->getParameters() as $parameter) {
+                $defaultsNode->children()->variableNode($nameConverter->normalize($parameter->getName()));
+            }
+
+            return;
+        }
+
+        [$publicProperties, $configurableAttributes] = LegacyApiResource::getConfigMetadata();
+        foreach (array_merge($publicProperties, $configurableAttributpies) as $attribute => $_) {
             $snakeCased = $nameConverter->normalize($attribute);
             $defaultsNode->children()->variableNode($snakeCased);
         }

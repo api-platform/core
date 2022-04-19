@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Metadata\Extractor;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
@@ -22,7 +23,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -87,7 +88,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'securityPostDenormalizeMessage' => 'Sorry, you must an admin to access this resource.',
             'securityPostValidation' => 'is_granted(\'ROLE_OWNER\')',
             'securityPostValidationMessage' => 'Sorry, you must the owner of this resource to access it.',
-            'compositeIdentifier' => true,
             'queryParameterValidationEnabled' => true,
             'types' => ['someirischema', 'anotheririschema'],
             'formats' => [
@@ -166,7 +166,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'description' => 'A list of Comments',
                         'class' => GetCollection::class,
                         'urlGenerationStrategy' => 0,
-                        'collection' => true,
                         'deprecationReason' => 'I don\'t know',
                         'normalizationContext' => [
                             'groups' => 'comment:read_collection',
@@ -270,7 +269,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'controller' => 'App\Controller\CustomController',
                     'class' => GetCollection::class,
                     'urlGenerationStrategy' => 0,
-                    'collection' => true,
                     'deprecationReason' => 'I don\'t know',
                     'cacheHeaders' => [
                         'max_age' => 60,
@@ -320,7 +318,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'securityMessage' => 'Sorry, you can\'t access this collection.',
                     'securityPostDenormalize' => 'is_granted(\'ROLE_CUSTOM_ADMIN\')',
                     'securityPostDenormalizeMessage' => 'Sorry, you must an admin to access this collection.',
-                    'compositeIdentifier' => false,
                     'exceptionToStatus' => [
                         'Symfony\Component\Serializer\Exception\ExceptionInterface' => 404,
                     ],
@@ -330,7 +327,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'validate' => false,
                     'write' => false,
                     'serialize' => true,
-                    'queryParameterValidate' => true,
                     'priority' => 200,
                     'extraProperties' => [
                         'foo' => 'bar',
@@ -373,6 +369,8 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'paginationMaximumItemsPerPage',
         'paginationPartial',
         'paginationType',
+        'processor',
+        'provider',
         'security',
         'securityMessage',
         'securityPostDenormalize',
@@ -396,7 +394,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'host',
         'condition',
         'controller',
-        'compositeIdentifier',
         'queryParameterValidationEnabled',
         'exceptionToStatus',
         'types',
@@ -455,7 +452,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 // Build default operations
                 $operations = [];
                 foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                    $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+                    $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
                     $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
                 }
 
@@ -519,7 +516,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         $operations = [];
         foreach ($values as $value) {
-            $class = $value['class'] ?? Operation::class;
+            $class = $value['class'] ?? HttpOperation::class;
             unset($value['class']);
             $operation = (new $class())->withClass(self::RESOURCE_CLASS);
 
@@ -543,7 +540,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             }
 
             if (null === $operation->getName()) {
-                $operation = $operation->withName(sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : ''));
+                $operation = $operation->withName(sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : ''));
             }
             $operations[$operation->getName()] = $operation;
         }
@@ -597,7 +594,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
+    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (get_class_methods($resource) as $methodName) {
             if (0 !== strpos($methodName, 'get')) {

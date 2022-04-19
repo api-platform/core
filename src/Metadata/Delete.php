@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class Delete extends Operation
+final class Delete extends HttpOperation implements DeleteOperationInterface
 {
     /**
      * {@inheritdoc}
@@ -90,6 +90,8 @@ final class Delete extends Operation
         ?bool $queryParameterValidate = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_DELETE, ...\func_get_args());

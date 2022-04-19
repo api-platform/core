@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Metadata\Document\Factory;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
  * Creates document's metadata using the attribute configuration.
@@ -26,10 +29,16 @@ use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
  */
 final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
+    /**
+     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
+     */
     private $resourceMetadataFactory;
     private $decorated;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
+    /**
+     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
+     */
+    public function __construct($resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->decorated = $decorated;
@@ -52,17 +61,22 @@ final class AttributeDocumentMetadataFactory implements DocumentMetadataFactoryI
         $resourceMetadata = null;
 
         if (!$documentMetadata || null === $documentMetadata->getIndex()) {
+            /** @var ResourceMetadata|ResourceMetadataCollection */
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
-            if (null !== $index = $resourceMetadata->getAttribute('elasticsearch_index')) {
+            $index = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getAttribute('elasticsearch_index') : ($resourceMetadata->getOperation()->getExtraProperties()['elasticsearch_index'] ?? null);
+
+            if (null !== $index) {
                 $documentMetadata = $documentMetadata ? $documentMetadata->withIndex($index) : new DocumentMetadata($index);
             }
         }
 
         if (!$documentMetadata || DocumentMetadata::DEFAULT_TYPE === $documentMetadata->getType()) {
+            /** @var ResourceMetadata|ResourceMetadataCollection */
             $resourceMetadata = $resourceMetadata ?? $this->resourceMetadataFactory->create($resourceClass);
+            $type = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getAttribute('elasticsearch_type') : ($resourceMetadata->getOperation()->getExtraProperties()['elasticsearch_type'] ?? null);
 
-            if (null !== $type = $resourceMetadata->getAttribute('elasticsearch_type')) {
+            if (null !== $type) {
                 $documentMetadata = $documentMetadata ? $documentMetadata->withType($type) : new DocumentMetadata(null, $type);
             }
         }

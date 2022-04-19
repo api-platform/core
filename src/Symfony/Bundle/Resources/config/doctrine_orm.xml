@@ -9,26 +9,16 @@
             <factory service="doctrine.orm.default_entity_manager" method="getMetadataFactory" />
         </service>
 
-        <service id="api_platform.doctrine.orm.state.processor" class="ApiPlatform\Doctrine\Common\State\Processor">
+        <service id="ApiPlatform\Doctrine\Common\State\RemoveProcessor" class="ApiPlatform\Doctrine\Common\State\RemoveProcessor">
             <argument type="service" id="doctrine" />
 
             <tag name="api_platform.state_processor" priority="-100" />
         </service>
 
-        <service id="api_platform.doctrine.orm.state.collection_provider" class="ApiPlatform\Doctrine\Orm\State\CollectionProvider" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+        <service id="ApiPlatform\Doctrine\Common\State\PersistProcessor" class="ApiPlatform\Doctrine\Common\State\PersistProcessor">
             <argument type="service" id="doctrine" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.collection" />
 
-            <tag name="api_platform.state_provider" priority="-100" />
-        </service>
-
-        <service id="api_platform.doctrine.orm.state.item_provider" class="ApiPlatform\Doctrine\Orm\State\ItemProvider" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="doctrine" />
-            <argument type="tagged" tag="api_platform.doctrine.orm.query_extension.item" />
-
-            <tag name="api_platform.state_provider" priority="-100" />
+            <tag name="api_platform.state_processor" priority="-100" />
         </service>
 
         <!-- Filter -->

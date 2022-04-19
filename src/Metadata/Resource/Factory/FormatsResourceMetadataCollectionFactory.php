@@ -15,7 +15,8 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -76,7 +77,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
                 $operation = $operation->withFormats($this->normalizeFormats($operation->getFormats()));
             }
 
-            if (($isPatch = Operation::METHOD_PATCH === $operation->getMethod()) && !$operation->getFormats() && !$operation->getInputFormats()) {
+            if (($isPatch = HttpOperation::METHOD_PATCH === $operation->getMethod()) && !$operation->getFormats() && !$operation->getInputFormats()) {
                 $operation = $operation->withInputFormats($this->patchFormats);
             }
 
@@ -96,7 +97,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
 
         // Prepare an Accept-Patch header
         foreach ($newOperations as $operationName => $operation) {
-            if ($operation->isCollection()) {
+            if ($operation instanceof CollectionOperationInterface) {
                 continue;
             }
 

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
+use ApiPlatform\Metadata\GraphQl\Operation;
+
 /**
  * Deserialize stage of GraphQL resolvers.
  *
@@ -25,5 +27,5 @@ interface DeserializeStageInterface
      *
      * @return object|null
      */
-    public function __invoke($objectToPopulate, string $resourceClass, string $operationName, array $context);
+    public function __invoke($objectToPopulate, string $resourceClass, Operation $operation, array $context);
 }

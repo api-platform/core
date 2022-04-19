@@ -14,19 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Elasticsearch\State;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -57,52 +50,6 @@ final class ItemProviderTest extends TestCase
         );
     }
 
-    public function testSupports()
-    {
-        $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
-        $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
-        $documentMetadataFactoryProphecy->create(Dummy::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
-        $documentMetadataFactoryProphecy->create(CompositeRelation::class)->willReturn(new DocumentMetadata('composite_relation'))->shouldNotBeCalled();
-
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $fooResourceMetadataCollection = new ResourceMetadataCollection(Foo::class);
-        $fooResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_foo_get' => (new Operation())->withElasticsearch(true)->withCollection(false),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->shouldBeCalled()->willReturn($fooResourceMetadataCollection);
-
-        $dummyCarResourceMetadataCollection = new ResourceMetadataCollection(DummyCar::class);
-        $dummyCarResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_car_get' => (new Operation())->withElasticsearch(false)->withCollection(false),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(DummyCar::class)->shouldBeCalled()->willReturn($dummyCarResourceMetadataCollection);
-
-        $dummyResourceMetadataCollection = new ResourceMetadataCollection(Dummy::class);
-        $dummyResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_dummy_get' => (new Operation())->withElasticsearch(true)->withCollection(false),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyResourceMetadataCollection);
-
-        $compositeRelationResourceMetadataCollection = new ResourceMetadataCollection(CompositeRelation::class);
-        $compositeRelationResourceMetadataCollection[] = (new ApiResource())->withOperations(new Operations([
-            'api_composite_relation_get_collection' => (new Operation())->withElasticsearch(true)->withCollection(true),
-        ]));
-        $resourceMetadataCollectionFactoryProphecy->create(CompositeRelation::class)->shouldBeCalled()->willReturn($compositeRelationResourceMetadataCollection);
-
-        $provider = new ItemProvider(
-            $this->prophesize(Client::class)->reveal(),
-            $documentMetadataFactoryProphecy->reveal(),
-            $this->prophesize(DenormalizerInterface::class)->reveal(),
-            $resourceMetadataCollectionFactoryProphecy->reveal()
-        );
-
-        self::assertTrue($provider->supports(Foo::class, [], 'api_foo_get'));
-        self::assertFalse($provider->supports(DummyCar::class, [], 'api_dummy_car_get'));
-        self::assertFalse($provider->supports(Dummy::class, [], 'api_dummy_get'));
-        self::assertFalse($provider->supports(CompositeRelation::class, [], 'api_composite_relation_get_collection'));
-    }
-
     public function testGetItem()
     {
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
@@ -131,11 +78,9 @@ final class ItemProviderTest extends TestCase
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
 
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $denormalizerProphecy->reveal());
 
-        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $denormalizerProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
-
-        self::assertSame($foo, $itemDataProvider->provide(Foo::class, ['id' => 1]));
+        self::assertSame($foo, $itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 1]));
     }
 
     public function testGetItemWithMissing404Exception()
@@ -148,8 +93,8 @@ final class ItemProviderTest extends TestCase
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
-        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
+        $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
 
-        self::assertNull($itemDataProvider->provide(Foo::class, ['id' => 404]));
+        self::assertNull($itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 404]));
     }
 }

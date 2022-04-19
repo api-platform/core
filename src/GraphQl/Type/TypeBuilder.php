@@ -15,6 +15,7 @@ namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -80,8 +81,8 @@ final class TypeBuilder implements TypeBuilderInterface
         if ('item_query' === $operationName || 'collection_query' === $operationName) {
             // Test if the collection/item operation exists and it has different groups
             try {
-                if ($resourceMetadataCollection->getOperation($operation->isCollection() ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
-                    $shortName .= $operation->isCollection() ? 'Collection' : 'Item';
+                if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
+                    $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
                 }
             } catch (OperationNotFoundException $e) {
             }
@@ -137,10 +138,9 @@ final class TypeBuilder implements TypeBuilderInterface
                     try {
                         $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
                     } catch (OperationNotFoundException $e) {
-                        $wrappedOperation = (new Query())
+                        $wrappedOperation = ('collection_query' === $wrappedOperationName ? new QueryCollection() : new Query())
                             ->withResource($resourceMetadataCollection[0])
-                            ->withName($wrappedOperationName)
-                            ->withCollection('collection_query' === $wrappedOperationName);
+                            ->withName($wrappedOperationName);
                     }
 
                     $fields = [

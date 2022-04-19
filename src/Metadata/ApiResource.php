@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+
 /**
  * Resource metadata attribute.
  *
@@ -20,96 +22,104 @@ namespace ApiPlatform\Metadata;
  * @experimental
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class ApiResource
+class ApiResource
 {
     use WithResourceTrait;
 
-    private $operations;
-    private $uriTemplate;
-    private $shortName;
-    private $description;
-    private $types;
+    protected $operations;
+    protected $uriTemplate;
+    protected $shortName;
+    protected $description;
+    protected $types;
     /**
      * @var array|mixed|string|null
      */
-    private $formats;
+    protected $formats;
     /**
      * @var array|mixed|string|null
      */
-    private $inputFormats;
+    protected $inputFormats;
     /**
      * @var array|mixed|string|null
      */
-    private $outputFormats;
+    protected $outputFormats;
     /**
      * @var array<string, Link>|array<string, array>|string[]|string|null
      */
-    private $uriVariables;
-    private $routePrefix;
-    private $defaults;
-    private $requirements;
-    private $options;
-    private $stateless;
-    private $sunset;
-    private $acceptPatch;
+    protected $uriVariables;
+    protected $routePrefix;
+    protected $defaults;
+    protected $requirements;
+    protected $options;
+    protected $stateless;
+    protected $sunset;
+    protected $acceptPatch;
 
-    private $status;
-    private $host;
-    private $schemes;
-    private $condition;
-    private $controller;
-    private $class;
-    private $urlGenerationStrategy;
-    private $deprecationReason;
-    private $cacheHeaders;
-    private $normalizationContext;
-    private $denormalizationContext;
+    protected $status;
+    protected $host;
+    protected $schemes;
+    protected $condition;
+    protected $controller;
+    protected $class;
+    protected $urlGenerationStrategy;
+    protected $deprecationReason;
+    protected $cacheHeaders;
+    protected $normalizationContext;
+    protected $denormalizationContext;
     /**
      * @var string[]|null
      */
-    private $hydraContext;
-    private $openapiContext;
-    private $validationContext;
+    protected $hydraContext;
+    protected $openapiContext;
+    protected $validationContext;
     /**
      * @var string[]
      */
-    private $filters;
-    private $elasticsearch;
+    protected $filters;
+    protected $elasticsearch;
     /**
      * @var array|bool|mixed|null
      */
-    private $mercure;
+    protected $mercure;
     /**
      * @var bool|mixed|null
      */
-    private $messenger;
-    private $input;
-    private $output;
-    private $order;
-    private $fetchPartial;
-    private $forceEager;
-    private $paginationClientEnabled;
-    private $paginationClientItemsPerPage;
-    private $paginationClientPartial;
-    private $paginationViaCursor;
-    private $paginationEnabled;
-    private $paginationFetchJoinCollection;
-    private $paginationUseOutputWalkers;
-    private $paginationItemsPerPage;
-    private $paginationMaximumItemsPerPage;
-    private $paginationPartial;
-    private $paginationType;
-    private $security;
-    private $securityMessage;
-    private $securityPostDenormalize;
-    private $securityPostDenormalizeMessage;
-    private $securityPostValidation;
-    private $securityPostValidationMessage;
-    private $compositeIdentifier;
-    private $exceptionToStatus;
-    private $queryParameterValidationEnabled;
-    private $graphQlOperations;
-    private $extraProperties;
+    protected $messenger;
+    protected $input;
+    protected $output;
+    protected $order;
+    protected $fetchPartial;
+    protected $forceEager;
+    protected $paginationClientEnabled;
+    protected $paginationClientItemsPerPage;
+    protected $paginationClientPartial;
+    protected $paginationViaCursor;
+    protected $paginationEnabled;
+    protected $paginationFetchJoinCollection;
+    protected $paginationUseOutputWalkers;
+    protected $paginationItemsPerPage;
+    protected $paginationMaximumItemsPerPage;
+    protected $paginationPartial;
+    protected $paginationType;
+    protected $security;
+    protected $securityMessage;
+    protected $securityPostDenormalize;
+    protected $securityPostDenormalizeMessage;
+    protected $securityPostValidation;
+    protected $securityPostValidationMessage;
+    protected $compositeIdentifier;
+    protected $exceptionToStatus;
+    protected $queryParameterValidationEnabled;
+    protected $graphQlOperations;
+    /**
+     * @var string|callable|null
+     */
+    protected $provider;
+    /**
+     * @var string|callable|null
+     */
+    protected $processor;
+    protected $extraProperties;
 
     /**
      * @param array|null        $types                          The RDF types of this resource
@@ -152,6 +162,8 @@ final class ApiResource
      * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string            $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
      * @param string            $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param mixed|null        $provider
+     * @param mixed|null        $processor
      */
     public function __construct(
         ?string $uriTemplate = null,
@@ -214,6 +226,8 @@ final class ApiResource
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $graphQlOperations = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         $this->operations = null === $operations ? null : new Operations($operations);
@@ -276,6 +290,8 @@ final class ApiResource
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
         $this->graphQlOperations = $graphQlOperations;
+        $this->provider = $provider;
+        $this->processor = $processor;
         $this->extraProperties = $extraProperties;
     }
 
@@ -1043,19 +1059,6 @@ final class ApiResource
         return $self;
     }
 
-    public function getCompositeIdentifier(): ?bool
-    {
-        return $this->compositeIdentifier;
-    }
-
-    public function withCompositeIdentifier(bool $compositeIdentifier): self
-    {
-        $self = clone $this;
-        $self->compositeIdentifier = $compositeIdentifier;
-
-        return $self;
-    }
-
     public function getExceptionToStatus(): ?array
     {
         return $this->exceptionToStatus;
@@ -1082,6 +1085,9 @@ final class ApiResource
         return $self;
     }
 
+    /**
+     * @return GraphQlOperation
+     */
     public function getGraphQlOperations(): ?array
     {
         return $this->graphQlOperations;
@@ -1091,6 +1097,38 @@ final class ApiResource
     {
         $self = clone $this;
         $self->graphQlOperations = $graphQlOperations;
+
+        return $self;
+    }
+
+    /**
+     * @return string|callable|null
+     */
+    public function getProcessor()
+    {
+        return $this->processor;
+    }
+
+    public function withProcessor($processor): self
+    {
+        $self = clone $this;
+        $self->processor = $processor;
+
+        return $self;
+    }
+
+    /**
+     * @return string|callable|null
+     */
+    public function getProvider()
+    {
+        return $this->provider;
+    }
+
+    public function withProvider($provider): self
+    {
+        $self = clone $this;
+        $self->provider = $provider;
 
         return $self;
     }

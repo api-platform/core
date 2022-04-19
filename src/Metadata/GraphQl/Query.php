@@ -21,8 +21,10 @@ class Query extends Operation
      */
     public function __construct(
         ?string $resolver = null,
-        ?bool $collection = null,
         ?array $args = null,
+        ?array $links = null,
+
+        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -35,6 +37,7 @@ class Query extends Operation
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
+        ?bool $paginationViaCursor = null,
         ?array $order = null,
         ?string $description = null,
         ?array $normalizationContext = null,
@@ -63,9 +66,11 @@ class Query extends Operation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
-        parent::__construct(false, ...\func_get_args());
+        parent::__construct(...\func_get_args());
         $this->name = $name ?: 'item_query';
     }
 }

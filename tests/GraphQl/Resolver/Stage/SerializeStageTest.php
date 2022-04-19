@@ -17,7 +17,6 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
@@ -39,7 +38,6 @@ class SerializeStageTest extends TestCase
 {
     use ProphecyTrait;
 
-    private $resourceMetadataCollectionFactoryProphecy;
     private $normalizerProphecy;
     private $serializerContextBuilderProphecy;
 
@@ -48,7 +46,6 @@ class SerializeStageTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $this->serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
     }
@@ -60,10 +57,9 @@ class SerializeStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Query())->withSerialize(false)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withSerialize(false);
 
-        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operationName, $context);
+        $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -92,15 +88,18 @@ class SerializeStageTest extends TestCase
             $operation = new Subscription();
         }
 
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => $operation->withShortName('shortName')->withCollection($context['is_collection'] ?? false)])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        if ($context['is_collection'] ?? false) {
+            $operation = new QueryCollection();
+        }
+
+        $operation = $operation->withShortName('shortName')->withName($operationName)->withClass($resourceClass);
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
-        $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operationName, $context);
+        $result = ($this->createSerializeStage($paginationEnabled))($itemOrCollection, $resourceClass, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -135,8 +134,8 @@ class SerializeStageTest extends TestCase
             'args' => $args,
             'info' => $this->prophesize(ResolveInfo::class)->reveal(),
         ];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new QueryCollection())->withShortName('shortName')])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+
+        $operation = (new QueryCollection())->withShortName('shortName')->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -148,7 +147,7 @@ class SerializeStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $result = ($this->createSerializeStage(true))($collection, $resourceClass, $operationName, $context);
+        $result = ($this->createSerializeStage(true))($collection, $resourceClass, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -180,8 +179,7 @@ class SerializeStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $context = ['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false, 'args' => [], 'info' => $this->prophesize(ResolveInfo::class)->reveal()];
-        $resourceMetadata = new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => new Query()])]);
-        $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
+        $operation = (new Query())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -191,15 +189,16 @@ class SerializeStageTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected serialized data to be a nullable array.');
 
-        ($this->createSerializeStage(false))(new \stdClass(), $resourceClass, $operationName, $context);
+        ($this->createSerializeStage(false))(new \stdClass(), $resourceClass, $operation, $context);
     }
 
     private function createSerializeStage(bool $paginationEnabled): SerializeStage
     {
-        $pagination = new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection(''));
+        $pagination = new Pagination($resourceMetadataCollectionFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
 
         return new SerializeStage(
-            $this->resourceMetadataCollectionFactoryProphecy->reveal(),
             $this->normalizerProphecy->reveal(),
             $this->serializerContextBuilderProphecy->reveal(),
             $pagination

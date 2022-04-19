@@ -15,7 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Util\ReflectionClassRecursiveIterator;
 
@@ -66,7 +66,7 @@ final class AttributesResourceNameCollectionFactory implements ResourceNameColle
             return true;
         }
 
-        if ($reflectionClass->getAttributes(Operation::class, \ReflectionAttribute::IS_INSTANCEOF) || $reflectionClass->getAttributes(GraphQlOperation::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+        if ($reflectionClass->getAttributes(HttpOperation::class, \ReflectionAttribute::IS_INSTANCEOF) || $reflectionClass->getAttributes(GraphQlOperation::class, \ReflectionAttribute::IS_INSTANCEOF)) {
             return true;
         }
 

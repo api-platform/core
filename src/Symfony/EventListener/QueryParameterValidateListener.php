@@ -17,6 +17,7 @@ use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
 use ApiPlatform\Core\Filter\QueryParameterValidator as LegacyQueryParameterValidator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -72,7 +73,7 @@ final class QueryParameterValidateListener
         }
 
         if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->canQueryParameterValidate() ?? true) || !$operation->isCollection())
+            (!$operation || !($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface)
         ) {
             return;
         }

@@ -30,7 +30,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -256,7 +256,7 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
         $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
 
-        $baseOperation = (new Operation())->withClass(Dummy::class)->withShortName('Dummy')->withDescription('This is a dummy.')->withTypes(['http://schema.example.com/Dummy'])
+        $baseOperation = (new HttpOperation())->withClass(Dummy::class)->withShortName('Dummy')->withDescription('This is a dummy.')->withTypes(['http://schema.example.com/Dummy'])
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
 
         $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [
@@ -271,7 +271,7 @@ class OpenApiNormalizerTest extends TestCase
             )),
         ]);
 
-        $zorroBaseOperation = (new Operation())->withClass('Zorro')->withShortName('Zorro')->withDescription('This is zorro.')->withTypes(['http://schema.example.com/Zorro'])
+        $zorroBaseOperation = (new HttpOperation())->withClass('Zorro')->withShortName('Zorro')->withDescription('This is zorro.')->withTypes(['http://schema.example.com/Zorro'])
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
 
         $zorroMetadata = new ResourceMetadataCollection(Dummy::class, [

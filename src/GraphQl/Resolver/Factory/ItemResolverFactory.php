@@ -18,6 +18,8 @@ use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
@@ -53,26 +55,27 @@ final class ItemResolverFactory implements ResolverFactoryInterface
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
             // Data already fetched and normalized (field or nested resource)
             if ($source && \array_key_exists($info->fieldName, $source)) {
                 return $source[$info->fieldName];
             }
 
-            $operationName = $operationName ?? 'item_query';
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => false];
 
-            $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
+            if (!$operation) {
+                $operation = new Query();
+            }
+
+            $item = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
 
+            // The item retrieved can be of another type when using an identifier (see Relay Nodes at query.feature:23)
             $resourceClass = $this->getResourceClass($item, $resourceClass);
-            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $resourceMetadataCollection->getOperation($operationName);
-
             $queryResolverId = $operation->getResolver();
             if (null !== $queryResolverId) {
                 /** @var QueryItemResolverInterface $queryResolver */
@@ -81,19 +84,19 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 $resourceClass = $this->getResourceClass($item, $resourceClass, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
-            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityStage)($resourceClass, $operation, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                 ],
             ]);
-            ($this->securityPostDenormalizeStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityPostDenormalizeStage)($resourceClass, $operation, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                     'previous_object' => $this->clone($item),
                 ],
             ]);
 
-            return ($this->serializeStage)($item, $resourceClass, $operationName, $resolverContext);
+            return ($this->serializeStage)($item, $resourceClass, $operation, $resolverContext);
         };
     }
 

@@ -23,9 +23,9 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -65,12 +65,12 @@ class ApiLoaderTest extends TestCase
                 'api_dummies_put_item' => (new Put())->withUriTemplate($path),
                 'api_dummies_delete_item' => (new Delete())->withUriTemplate($path),
                 // Custom operations
-                'api_dummies_my_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withDefaults(['my_default' => 'default_value', '_format' => 'a valid format'])->withRequirements(['_format' => 'a valid format'])->withCondition("request.headers.get('User-Agent') matches '/firefox/i'")->withController('some.service.name')->withCollection(true),
-                'api_dummies_my_second_op_collection' => (new Post())->withUriTemplate('/dummies.{_format}')->withOptions(['option' => 'option_value'])->withHost('{subdomain}.api-platform.com')->withSchemes(['https'])->withCollection(true),
+                'api_dummies_my_op_collection' => (new GetCollection())->withUriTemplate('/dummies.{_format}')->withDefaults(['my_default' => 'default_value', '_format' => 'a valid format'])->withRequirements(['_format' => 'a valid format'])->withCondition("request.headers.get('User-Agent') matches '/firefox/i'")->withController('some.service.name'),
+                'api_dummies_my_second_op_collection' => (new GetCollection())->withMethod('POST')->withUriTemplate('/dummies.{_format}')->withOptions(['option' => 'option_value'])->withHost('{subdomain}.api-platform.com')->withSchemes(['https']),
                 // without controller, takes the default one
-                'api_dummies_my_path_op_collection' => (new Get())->withUriTemplate('some/custom/path')->withCollection(true),
+                'api_dummies_my_path_op_collection' => (new GetCollection())->withUriTemplate('some/custom/path'),
                 // Custom path
-                'api_dummies_my_stateless_op_collection' => (new Get())->withUriTemplate('/dummies.{_format}')->withStateless(true)->withCollection(true),
+                'api_dummies_my_stateless_op_collection' => (new GetCollection())->withUriTemplate('/dummies.{_format}')->withStateless(true),
             ])),
         ]);
 

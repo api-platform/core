@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
-use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Product as ProductDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Product;
-use ApiPlatform\Tests\Fixtures\TestBundle\Model\ProductInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ProductItemProvider implements ProviderInterface
+class ProductProvider implements ProviderInterface
 {
     private $managerRegistry;
     private $orm;
@@ -35,21 +34,14 @@ class ProductItemProvider implements ProviderInterface
     /**
      * {@inheritDoc}
      */
-    public function provide(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
+        if ($operation instanceof CollectionOperationInterface) {
+            dd('todo');
+        }
+
         return $this->managerRegistry->getRepository($this->orm ? Product::class : ProductDocument::class)->findOneBy([
-            'code' => $identifiers['code'],
+            'code' => $uriVariables['code'],
         ]);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function supports(string $resourceClass, array $identifiers = [], ?string $operationName = null, array $context = []): bool
-    {
-        /** @var Operation */
-        $operation = $context['operation'] ?? new Get();
-
-        return is_a($resourceClass, ProductInterface::class, true) && !$operation->isCollection();
     }
 }

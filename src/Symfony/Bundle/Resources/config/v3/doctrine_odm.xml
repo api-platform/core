@@ -24,5 +24,26 @@
         </service>
 
         <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
+
+        <service id="ApiPlatform\Doctrine\Odm\State\CollectionProvider" class="ApiPlatform\Doctrine\Odm\State\CollectionProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
+        <service id="ApiPlatform\Doctrine\Odm\State\ItemProvider" class="ApiPlatform\Doctrine\Odm\State\ItemProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
+        <service id="api_platform.doctrine.odm.metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.doctrine.odm.metadata.resource.metadata_collection_factory.inner" />
+        </service>
     </services>
 </container>

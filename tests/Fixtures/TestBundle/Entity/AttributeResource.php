@@ -20,12 +20,23 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 
-#[ApiResource(normalizationContext: ['skip_null_values' => true])]
+#[ApiResource(
+    normalizationContext: ['skip_null_values' => true],
+    provider: AttributeResourceProvider::class
+)]
 #[Get]
 #[Put]
 #[Delete]
-#[ApiResource('/dummy/{dummyId}/attribute_resources/{identifier}.{_format}', inputFormats: ['json' => ['application/merge-patch+json']], status: 301)]
+#[ApiResource(
+    '/dummy/{dummyId}/attribute_resources/{identifier}.{_format}',
+    inputFormats: ['json' => ['application/merge-patch+json']],
+    status: 301,
+    provider: AttributeResourceProvider::class,
+    processor: [AttributeResourceProcessor::class, 'process']
+)]
 #[Get]
 #[Patch]
 final class AttributeResource

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\State;
 
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -20,7 +21,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
 
-final class Processor implements ProcessorInterface
+final class PersistProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
@@ -31,12 +32,7 @@ final class Processor implements ProcessorInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
-    {
-        return null !== $this->getManager($data);
-    }
-
-    private function persist($data, array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (!$manager = $this->getManager($data)) {
             return $data;
@@ -50,25 +46,6 @@ final class Processor implements ProcessorInterface
         $manager->refresh($data);
 
         return $data;
-    }
-
-    private function remove($data, array $context = [])
-    {
-        if (!$manager = $this->getManager($data)) {
-            return;
-        }
-
-        $manager->remove($data);
-        $manager->flush();
-    }
-
-    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
-    {
-        if (\array_key_exists('operation', $context) && $context['operation']->isDelete()) {
-            return $this->remove($data);
-        }
-
-        return $this->persist($data);
     }
 
     /**

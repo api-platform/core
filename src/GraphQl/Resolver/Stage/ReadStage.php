@@ -15,12 +15,10 @@ namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Exception\ItemNotFoundException;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\GraphQl\QueryCollection;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\ArrayTrait;
 use ApiPlatform\Util\ClassInfoTrait;
@@ -38,15 +36,13 @@ final class ReadStage implements ReadStageInterface
     use ClassInfoTrait;
     use IdentifierTrait;
 
-    private $resourceMetadataCollectionFactory;
     private $iriConverter;
     private $provider;
     private $serializerContextBuilder;
     private $nestingSeparator;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, IriConverterInterface $iriConverter, ProviderInterface $provider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
+    public function __construct(IriConverterInterface $iriConverter, ProviderInterface $provider, SerializerContextBuilderInterface $serializerContextBuilder, string $nestingSeparator)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->iriConverter = $iriConverter;
         $this->provider = $provider;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -56,21 +52,14 @@ final class ReadStage implements ReadStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke(?string $resourceClass, ?string $rootClass, string $operationName, array $context)
+    public function __invoke(?string $resourceClass, ?string $rootClass, Operation $operation, array $context)
     {
-        $operation = null;
-        try {
-            $operation = $resourceClass ? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName) : null;
-        } catch (OperationNotFoundException $e) {
-            // ReadStage may be invoked without an existing operation
-        }
-
-        if ($operation && !($operation->canRead() ?? true)) {
+        if (!($operation->canRead() ?? true)) {
             return $context['is_collection'] ? [] : null;
         }
 
         $args = $context['args'];
-        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
+        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, true);
 
         if (!$context['is_collection']) {
             $identifier = $this->getIdentifierFromContext($context);
@@ -95,12 +84,7 @@ final class ReadStage implements ReadStageInterface
 
         $uriVariables = [];
         $normalizationContext['filters'] = $this->getNormalizedFilters($args);
-
-        if (!$operation && $resourceClass) {
-            $operation = (new QueryCollection())->withOperation($this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, true));
-        }
-
-        $normalizationContext['operation'] = $operation ?? new QueryCollection();
+        $normalizationContext['operation'] = $operation;
 
         $source = $context['source'];
         /** @var ResolveInfo $info */
@@ -110,7 +94,7 @@ final class ReadStage implements ReadStageInterface
             $normalizationContext['linkClass'] = $source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY];
         }
 
-        return $this->provider->provide($resourceClass, $uriVariables, $operationName, $normalizationContext);
+        return $this->provider->provide($operation, $uriVariables, $normalizationContext);
     }
 
     /**

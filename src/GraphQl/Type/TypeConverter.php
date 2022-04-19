@@ -16,8 +16,10 @@ namespace ApiPlatform\GraphQl\Type;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Error\SyntaxError;
@@ -155,7 +157,7 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         $operationName = $rootOperation->getName();
-        $isCollection = 'collection_query' === $operationName;
+        $isCollection = $rootOperation instanceof CollectionOperationInterface || 'collection_query' === $operationName;
 
         // We're retrieving the type of a property which is a relation to the rootResource
         if ($resourceClass !== $rootResource && $property && $rootOperation instanceof Query) {
@@ -165,11 +167,15 @@ final class TypeConverter implements TypeConverterInterface
 
         try {
             $operation = $resourceMetadataCollection->getOperation($operationName);
+
+            if (!$operation instanceof Operation) {
+                throw new OperationNotFoundException();
+            }
         } catch (OperationNotFoundException $e) {
-            $operation = (new Query())
+            /** @var Operation */
+            $operation = ($isCollection ? new QueryCollection() : new Query())
                 ->withResource($resourceMetadataCollection[0])
-                ->withName($operationName)
-                ->withCollection($isCollection);
+                ->withName($operationName);
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceClass, $resourceMetadataCollection, $operation, $input, false, $depth);

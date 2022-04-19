@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -24,22 +24,18 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 final class SecurityStage implements SecurityStageInterface
 {
-    private $resourceMetadataCollectionFactory;
     private $resourceAccessChecker;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?ResourceAccessCheckerInterface $resourceAccessChecker)
+    public function __construct(?ResourceAccessCheckerInterface $resourceAccessChecker)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke(string $resourceClass, string $operationName, array $context): void
+    public function __invoke(string $resourceClass, Operation $operation, array $context): void
     {
-        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getOperation($operationName);
         $isGranted = $operation->getSecurity();
 
         if (null !== $isGranted && null === $this->resourceAccessChecker) {

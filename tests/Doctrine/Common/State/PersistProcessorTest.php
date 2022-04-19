@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\Common\State;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Doctrine\Common\State\Processor;
-use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -26,26 +26,13 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Prediction\CallPrediction;
 use Prophecy\Prediction\NoCallsPrediction;
 
-class ProcessorTest extends TestCase
+class PersistProcessorTest extends TestCase
 {
     use ProphecyTrait;
 
     public function testConstruct()
     {
-        $this->assertInstanceOf(ProcessorInterface::class, new Processor($this->prophesize(ManagerRegistry::class)->reveal()));
-    }
-
-    public function testSupports()
-    {
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($this->prophesize(ObjectManager::class)->reveal())->shouldBeCalled();
-
-        $this->assertTrue((new Processor($managerRegistryProphecy->reveal()))->supports(new Dummy()));
-    }
-
-    public function testDoesNotSupport()
-    {
-        $this->assertFalse((new Processor($this->prophesize(ManagerRegistry::class)->reveal()))->supports('dummy'));
+        $this->assertInstanceOf(ProcessorInterface::class, new PersistProcessor($this->prophesize(ManagerRegistry::class)->reveal()));
     }
 
     public function testPersist()
@@ -61,7 +48,7 @@ class ProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
-        $result = (new Processor($managerRegistryProphecy->reveal()))->process($dummy);
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 
@@ -79,7 +66,7 @@ class ProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
 
-        $result = (new Processor($managerRegistryProphecy->reveal()))->process($dummy);
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 
@@ -90,30 +77,8 @@ class ProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
 
-        $result = (new Processor($managerRegistryProphecy->reveal()))->process($dummy);
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
-    }
-
-    public function testRemove()
-    {
-        $dummy = new Dummy();
-
-        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
-        $objectManagerProphecy->remove($dummy)->shouldBeCalled();
-        $objectManagerProphecy->flush()->shouldBeCalled();
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
-
-        (new Processor($managerRegistryProphecy->reveal()))->process($dummy, [], null, ['operation' => new Delete()]);
-    }
-
-    public function testRemoveWithNullManager()
-    {
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
-
-        (new Processor($managerRegistryProphecy->reveal()))->process(new Dummy(), [], null, ['operation' => new Delete()]);
     }
 
     public function getTrackingPolicyParameters()
@@ -154,7 +119,7 @@ class ProcessorTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy)->shouldBeCalled();
 
-        $result = (new Processor($managerRegistryProphecy->reveal()))->process($dummy);
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
         $this->assertSame($dummy, $result);
     }
 }

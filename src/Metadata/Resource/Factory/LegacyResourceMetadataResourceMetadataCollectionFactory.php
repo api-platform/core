@@ -20,13 +20,18 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -77,7 +82,6 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         $resource = (new ApiResource())
             ->withShortName($resourceMetadata->getShortName())
             ->withClass($resourceClass)
-            ->withCompositeIdentifier($resourceMetadata->getAttribute('composite_identifier', true))
             ->withExtraProperties(['is_legacy_resource_metadata' => true]);
 
         if ($description = $resourceMetadata->getDescription()) {
@@ -115,9 +119,8 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         $graphQlOperations = [];
         foreach ($resourceMetadata->getGraphql() as $operationName => $operation) {
             if (false !== strpos($operationName, 'query') || isset($operation['item_query']) || isset($operation['collection_query'])) {
-                $graphQlOperation = (new Query())
-                    ->withCollection(isset($operation['collection_query']) || false !== strpos($operationName, 'collection'))
-                    ->withName($operationName);
+                $graphQlOperation = isset($operation['collection_query']) || false !== strpos($operationName, 'collection') ? new QueryCollection() : new Query();
+                $graphQlOperation = $graphQlOperation->withName($operationName);
             } else {
                 $graphQlOperation = (new Mutation())
                     ->withDescription(ucfirst("{$operationName}s a {$resourceMetadata->getShortName()}."))
@@ -154,12 +157,17 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     {
         $priority = 0;
         foreach ($operations as $operationName => $operation) {
-            $newOperation = (new Operation())
-                ->withMethod($operation['method'])
-                ->withCollection(OperationType::COLLECTION === $type)
-                ->withCompositeIdentifier($resource->getCompositeIdentifier())
+            $newOperation = OperationType::COLLECTION === $type ? new GetCollection() : new HttpOperation();
+
+            $newOperation = $newOperation->withMethod($operation['method'])
                 ->withClass($resource->getClass())
                 ->withPriority($priority++);
+
+            if (HttpOperation::METHOD_DELETE === $operation['method']) {
+                $newOperation = (new Delete())->withOperation($newOperation);
+            } elseif (HttpOperation::METHOD_POST === $operation['method'] && !isset($operation['path'])) {
+                $newOperation = (new Post())->withOperation($newOperation)->withUriVariables([])->withRead(false);
+            }
 
             foreach ($operation as $key => $value) {
                 $newOperation = $this->setAttributeValue($newOperation, $key, $value);
@@ -167,7 +175,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             $newOperation = $newOperation->withResource($resource);
 
-            if ($newOperation->isCollection()) {
+            if ($newOperation instanceof CollectionOperationInterface) {
                 $newOperation = $newOperation->withUriVariables([]);
             }
 
@@ -178,15 +186,15 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     }
 
     /**
-     * @param Operation|GraphQlOperation|ApiResource $operation
-     * @param mixed                                  $value
+     * @param HttpOperation|GraphQlOperation|ApiResource $operation
+     * @param mixed                                      $value
      *
-     * @return Operation|GraphQlOperation|ApiResource
+     * @return HttpOperation|GraphQlOperation|ApiResource
      */
     private function setAttributeValue($operation, string $key, $value)
     {
         if ('identifiers' === $key) {
-            if (!$operation instanceof ApiResource && $operation->isCollection()) {
+            if (!$operation instanceof ApiResource && $operation instanceof CollectionOperationInterface) {
                 return $operation;
             }
 
@@ -218,9 +226,9 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
     }
 
     /**
-     * @param ApiResource|Operation $resource
+     * @param ApiResource|HttpOperation $resource
      *
-     * @return ApiResource|Operation
+     * @return ApiResource|HttpOperation
      */
     private function identifiersToUriVariables(ResourceMetadata $resourceMetadata, $resource)
     {

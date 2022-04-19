@@ -200,20 +200,6 @@
                     {{ apiPlatform.providerTable(collector.dataPersisters, 'data persister') }}
                 </div>
             </div>
-
-            <div class="tab">
-                <h3 class="tab-title provider-tab-title">Providers</h3>
-                <div class="tab-content provider-tab-content">
-                    {{ apiPlatform.providerTable(collector.providers, 'provider') }}
-                </div>
-            </div>
-
-            <div class="tab">
-                <h3 class="tab-title processor-tab-title">Processors</h3>
-                <div class="tab-content processor-tab-content">
-                    {{ apiPlatform.providerTable(collector.processors, 'processors') }}
-                </div>
-            </div>
         </div>
     {% endif %}
 {% endblock %}

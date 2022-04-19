@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-
 trait WithResourceTrait
 {
     public function withResource(ApiResource $resource): self
@@ -23,11 +21,11 @@ trait WithResourceTrait
     }
 
     /**
-     * @param ApiResource|Operation|GraphQlOperation $resource
+     * @param ApiResource|Operation $resource
      *
-     * @return ApiResource|Operation|GraphQlOperation
+     * @return ApiResource|Operation
      */
-    private function copyFrom($resource)
+    protected function copyFrom($resource)
     {
         $self = clone $this;
         foreach (get_class_methods($resource) as $method) {

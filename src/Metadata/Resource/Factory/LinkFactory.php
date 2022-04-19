@@ -46,19 +46,6 @@ final class LinkFactory implements LinkFactoryInterface
             return [];
         }
 
-        if (!($operation->getCompositeIdentifier() ?? true)) {
-            $links = [];
-            foreach ($identifiers as $identifier) {
-                $links[] = (new Link())
-                    ->withFromClass($resourceClass)
-                    ->withParameterName($identifier)
-                    ->withIdentifiers([$identifier])
-                    ->withCompositeIdentifier(false);
-            }
-
-            return $links;
-        }
-
         $link = (new Link())->withFromClass($resourceClass)->withIdentifiers($identifiers);
         $parameterName = $identifiers[0];
 

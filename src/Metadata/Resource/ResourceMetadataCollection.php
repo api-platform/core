@@ -15,7 +15,8 @@ namespace ApiPlatform\Metadata\Resource;
 
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -34,9 +35,9 @@ final class ResourceMetadataCollection extends \ArrayObject
     }
 
     /**
-     * @return Operation|GraphQlOperation
+     * @return Operation
      */
-    public function getOperation(?string $operationName = null, bool $forceCollection = false)
+    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false)
     {
         if (isset($this->operationCache[$operationName ?? ''])) {
             return $this->operationCache[$operationName ?? ''];
@@ -55,7 +56,8 @@ final class ResourceMetadataCollection extends \ArrayObject
             $metadata = $it->current();
 
             foreach ($metadata->getOperations() ?? [] as $name => $operation) {
-                if ('' === $operationName && \in_array($operation->getMethod() ?? Operation::METHOD_GET, [Operation::METHOD_GET, Operation::METHOD_OPTIONS, Operation::METHOD_HEAD], true) && ($forceCollection ? $operation->isCollection() : !$operation->isCollection())) {
+                $isCollection = $operation instanceof CollectionOperationInterface;
+                if ('' === $operationName && \in_array($operation->getMethod() ?? HttpOperation::METHOD_GET, [HttpOperation::METHOD_GET, HttpOperation::METHOD_OPTIONS, HttpOperation::METHOD_HEAD], true) && ($forceCollection ? $isCollection : !$isCollection)) {
                     return $this->operationCache[$operationName] = $operation;
                 }
 
@@ -65,6 +67,11 @@ final class ResourceMetadataCollection extends \ArrayObject
             }
 
             foreach ($metadata->getGraphQlOperations() ?? [] as $name => $operation) {
+                $isCollection = $operation instanceof CollectionOperationInterface;
+                if ('' === $operationName && ($forceCollection ? $isCollection : !$isCollection) && false === $httpOperation) {
+                    return $this->operationCache['graphql_'.$operationName] = $operation;
+                }
+
                 if ($name === $operationName) {
                     return $this->operationCache['graphql_'.$operationName] = $operation;
                 }

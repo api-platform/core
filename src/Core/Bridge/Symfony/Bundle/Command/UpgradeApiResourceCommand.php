@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Command;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Core\Upgrade\ColorConsoleDiffFormatter;
@@ -42,15 +43,17 @@ final class UpgradeApiResourceCommand extends Command
     private $subresourceOperationFactory;
     private $subresourceTransformer;
     private $reader;
+    private $identifiersExtractor;
     private $localCache = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory, SubresourceTransformer $subresourceTransformer, AnnotationReader $reader)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory, SubresourceTransformer $subresourceTransformer, AnnotationReader $reader, IdentifiersExtractorInterface $identifiersExtractor)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->subresourceTransformer = $subresourceTransformer;
         $this->reader = $reader;
+        $this->identifiersExtractor = $identifiersExtractor;
 
         parent::__construct();
     }
@@ -204,7 +207,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
                 continue;
             }
 
-            $traverser->addVisitor(new UpgradeApiResourceVisitor($attribute, $isAnnotation));
+            $traverser->addVisitor(new UpgradeApiResourceVisitor($attribute, $isAnnotation, $this->identifiersExtractor, $resourceClass));
 
             $oldCode = file_get_contents($fileName);
             $oldStmts = $parser->parse($oldCode);

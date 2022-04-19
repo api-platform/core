@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -74,14 +75,14 @@ final class SchemaBuilder implements SchemaBuilderInterface
                         continue;
                     }
 
-                    if ($operation instanceof Query && !$operation->isCollection()) {
-                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
+                    if ($operation instanceof Query && $operation instanceof CollectionOperationInterface) {
+                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }
 
-                    if ($operation instanceof Query && $operation->isCollection()) {
-                        $queryFields += $this->fieldsBuilder->getCollectionQueryFields($resourceClass, $operation, $configuration);
+                    if ($operation instanceof Query) {
+                        $queryFields += $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
 
                         continue;
                     }
