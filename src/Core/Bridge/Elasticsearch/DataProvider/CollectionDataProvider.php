@@ -15,6 +15,7 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
+use ApiPlatform\Core\DataProvider\Pagination as LegacyPagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
@@ -46,8 +47,9 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     /**
      * @param RequestBodySearchCollectionExtensionInterface[]                             $collectionExtensions
      * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
+     * @param Pagination|LegacyPagination                                                 $pagination
      */
-    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor = null, DenormalizerInterface $denormalizer, Pagination $pagination, $resourceMetadataFactory, iterable $collectionExtensions = [])
+    public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor = null, DenormalizerInterface $denormalizer, $pagination, $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
         $this->client = $client;
         $this->documentMetadataFactory = $documentMetadataFactory;
