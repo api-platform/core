@@ -28,6 +28,8 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
 {
+    public const FORMAT = 'elasticsearch';
+
     private $decorated;
 
     public function __construct(NormalizerInterface $decorated)
