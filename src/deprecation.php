@@ -133,12 +133,6 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension::class => ApiPlatform\Elasticsearch\Extension\SortExtension::class,
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortFilterExtension::class => ApiPlatform\Elasticsearch\Extension\SortFilterExtension::class,
 
-    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractFilter::class,
-    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractSearchFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractSearchFilter::class,
-    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter::class => ApiPlatform\Elasticsearch\Filter\MatchFilter::class,
-    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter::class => ApiPlatform\Elasticsearch\Filter\OrderFilter::class,
-    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter::class => ApiPlatform\Elasticsearch\Filter\TermFilter::class,
-
     ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\AttributeDocumentMetadataFactory::class,
     ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class,
     ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class => ApiPlatform\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class,
@@ -399,7 +393,14 @@ $deprecatedClassesWithAliases = [
 
 // These classes are deprecated but we don't want aliases as the interfaces changed
 $deprecatedClassesWithoutAliases = [
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractFilter::class,
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractSearchFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractSearchFilter::class,
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter::class => ApiPlatform\Elasticsearch\Filter\MatchFilter::class,
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter::class => ApiPlatform\Elasticsearch\Filter\OrderFilter::class,
+    ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter::class => ApiPlatform\Elasticsearch\Filter\TermFilter::class,
+
     ApiPlatform\Core\DataProvider\Pagination::class => ApiPlatform\State\Pagination\Pagination::class,
+
     ApiPlatform\Core\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,

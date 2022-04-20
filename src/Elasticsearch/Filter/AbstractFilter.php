@@ -14,14 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Filter;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -40,12 +37,7 @@ abstract class AbstractFilter implements FilterInterface
     protected $propertyNameCollectionFactory;
     protected $nameConverter;
 
-    /**
-     * @var PropertyMetadataFactoryInterface|LegacyPropertyMetadataFactoryInterface
-     *
-     * @param mixed $propertyMetadataFactory
-     */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?array $properties = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
@@ -103,14 +95,12 @@ abstract class AbstractFilter implements FilterInterface
 
         foreach ($properties as $index => $currentProperty) {
             try {
-                /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->propertyMetadataFactory->create($currentResourceClass, $currentProperty);
             } catch (PropertyNotFoundException $e) {
                 return $noop;
             }
 
-            // TODO: 3.0 this is the default + allow multiple types
-            $type = $propertyMetadata instanceof ApiProperty ? ($propertyMetadata->getBuiltinTypes()[0] ?? null) : $propertyMetadata->getType();
+            $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
             if (null === $type) {
                 return $noop;
@@ -155,5 +145,3 @@ abstract class AbstractFilter implements FilterInterface
         return [$type, $hasAssociation, $currentResourceClass, $currentProperty];
     }
 }
-
-class_alias(AbstractFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class);
