@@ -75,7 +75,6 @@ final class CollectionProvider implements ProviderInterface
 
         $documents = $this->client->search([
             'index' => $documentMetadata->getIndex(),
-            'type' => $documentMetadata->getType(),
             'body' => $body,
         ]);
 
