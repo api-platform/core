@@ -44,5 +44,3 @@ final class MatchFilter extends AbstractSearchFilter
         return $matchQuery;
     }
 }
-
-class_alias(MatchFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\MatchFilter::class);
