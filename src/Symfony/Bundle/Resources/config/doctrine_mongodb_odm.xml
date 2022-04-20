@@ -108,14 +108,6 @@
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="16" />
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Extension\OrderExtension" alias="api_platform.doctrine_mongodb.odm.aggregation_extension.order" />
-
-        <service id="api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory"
-                 class="ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
-                 decorates="api_platform.metadata.property.identifier_metadata_factory"
-                 decoration-priority="40">
-            <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory.inner"/>
-        </service>
     </services>
 
 </container>

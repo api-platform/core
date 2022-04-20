@@ -178,6 +178,11 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
+    private function assertNotContainerHasService(string $service)
+    {
+        $this->assertFalse($this->container->hasDefinition($service), sprintf('Service "%s" found.', $service));
+    }
+
     private function assertContainerHasAlias(string $alias)
     {
         $this->assertTrue($this->container->hasAlias($alias), sprintf('Alias "%s" not found.', $alias));
@@ -1752,6 +1757,8 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.identifier.date_normalizer', ['api_platform.identifier.denormalizer']);
         $this->assertServiceHasTags('api_platform.listener.view.write.legacy', ['kernel.event_listener']);
         $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
+
+        $this->assertNotContainerHasService('api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory');
     }
 
     public function testRectorConfiguration(): void
