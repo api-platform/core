@@ -54,7 +54,6 @@ final class ItemProvider implements ProviderInterface
         try {
             $document = $this->client->get([
                 'index' => $documentMetadata->getIndex(),
-                'type' => $documentMetadata->getType(),
                 'id' => (string) reset($uriVariables),
             ]);
         } catch (Missing404Exception $e) {
