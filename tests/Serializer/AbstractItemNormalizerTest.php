@@ -13,23 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Serializer;
 
+use ApiPlatform\Api\IriConverterInterface as NewIriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
@@ -43,6 +46,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -60,6 +64,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class AbstractItemNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     /**
@@ -1445,16 +1450,19 @@ class AbstractItemNormalizerTest extends TestCase
      * 4. Messenger is used, we send the `Dummy`
      * 5. The handler receives a `{Dummy}` json representation and tries to denormalize it
      * 6. Because it has an `input`, the `AbstractItemNormalizer` tries to denormalize it as a `InputDto` which is wrong, it's a `{Dummy}`.
+     *
+     * @group legacy
      */
     public function testNormalizationWithDataTransformer()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The DataTransformer pattern is deprecated, use a Provider or a Processor and either use your input or return a new output there.');
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection(['name']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy = $this->prophesize(NewIriConverterInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
@@ -1496,8 +1504,11 @@ class AbstractItemNormalizerTest extends TestCase
 
         $itemDataProviderProphecy = $this->prophesize(ItemDataProviderInterface::class);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy', '', '', null, null, ['input' => ['class' => InputDto::class]]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(
+            Dummy::class,
+            [(new ApiResource())->withOperations(new Operations([(new Get())->withShortName('dummy')->withInput(['class' => InputDto::class])]))]
+        ));
 
         $dataTransformerProphecy = $this->prophesize(DataTransformerInterface::class);
         $dataTransformerProphecy->supportsTransformation($jsonInput, Dummy::class, $context)->willReturn(true);

@@ -15,10 +15,10 @@ namespace ApiPlatform\Tests\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -27,6 +27,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -38,6 +39,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class ItemNormalizerTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     /**
@@ -282,8 +284,12 @@ class ItemNormalizerTest extends TestCase
         $this->assertSame('hello', $object->getName());
     }
 
+    /**
+     * @group legacy
+     */
     public function testNormalizeWithDataTransformers()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: The DataTransformer pattern is deprecated, use a Provider or a Processor and either use your input or return a new output there.');
         $dummy = new Dummy();
         $dummy->setName('hello');
         $output = new OutputDto();

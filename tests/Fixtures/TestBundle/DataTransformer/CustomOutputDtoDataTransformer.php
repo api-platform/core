@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
-use ApiPlatform\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;

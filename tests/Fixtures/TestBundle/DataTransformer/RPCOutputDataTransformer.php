@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer;
 
-use ApiPlatform\DataTransformer\DataTransformerInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RPC as RPCDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RPCOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RPC;

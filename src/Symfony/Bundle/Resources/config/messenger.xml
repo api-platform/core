@@ -21,7 +21,7 @@
             <tag name="api_platform.state_processor" priority="-900" />
         </service>
 
-        <service id="api_platform.messenger.data_transformer" class="ApiPlatform\Symfony\Messenger\DataTransformer" public="false">
+        <service id="api_platform.messenger.data_transformer" class="ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <tag name="api_platform.data_transformer" priority="-10" />

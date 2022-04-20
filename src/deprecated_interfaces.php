@@ -65,10 +65,6 @@ return [
     ApiPlatform\Core\DataProvider\PaginatorInterface::class => ApiPlatform\State\Pagination\PaginatorInterface::class,
     ApiPlatform\Core\DataProvider\PartialPaginatorInterface::class => ApiPlatform\State\Pagination\PartialPaginatorInterface::class,
 
-    // DataTransformer
-    ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface::class => ApiPlatform\DataTransformer\DataTransformerInitializerInterface::class,
-    ApiPlatform\Core\DataTransformer\DataTransformerInterface::class => ApiPlatform\DataTransformer\DataTransformerInterface::class,
-
     // Documentation
     ApiPlatform\Core\Documentation\DocumentationInterface::class => ApiPlatform\Documentation\DocumentationInterface::class,
 

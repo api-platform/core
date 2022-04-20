@@ -188,7 +188,6 @@ $deprecatedClassesWithAliases = [
     // Bridge\Symfony\Messenger
     ApiPlatform\Core\Bridge\Symfony\Messenger\ContextStamp::class => ApiPlatform\Symfony\Messenger\ContextStamp::class,
     ApiPlatform\Core\Bridge\Symfony\Messenger\DispatchTrait::class => ApiPlatform\Symfony\Messenger\DispatchTrait::class,
-    ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer::class => ApiPlatform\Symfony\Messenger\DataTransformer::class,
     ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class => ApiPlatform\Symfony\Messenger\RemoveStamp::class,
 
     // Bridge\Symfony\PropertyInfo\Metadata\Property => Metadata\Property
