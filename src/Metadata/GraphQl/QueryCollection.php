@@ -13,16 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
+
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class QueryCollection extends Query
+final class QueryCollection extends Query implements CollectionOperationInterface
 {
     /**
      * {@inheritdoc}
      */
     public function __construct(
         ?string $resolver = null,
-        bool $collection = false,
         ?array $args = null,
+        ?array $links = null,
+
+        // abstract operation arguments
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -35,10 +39,11 @@ final class QueryCollection extends Query
         ?bool $paginationClientPartial = null,
         ?bool $paginationFetchJoinCollection = null,
         ?bool $paginationUseOutputWalkers = null,
-        array $order = [],
+        ?bool $paginationViaCursor = null,
+        ?array $order = null,
         ?string $description = null,
-        array $normalizationContext = [],
-        array $denormalizationContext = [],
+        ?array $normalizationContext = null,
+        ?array $denormalizationContext = null,
         ?string $security = null,
         ?string $securityMessage = null,
         ?string $securityPostDenormalize = null,
@@ -46,27 +51,28 @@ final class QueryCollection extends Query
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
         ?string $deprecationReason = null,
-        array $filters = [],
-        array $validationContext = [],
+        ?array $filters = null,
+        ?array $validationContext = null,
         $input = null,
         $output = null,
         $mercure = null,
         $messenger = null,
         ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
-        bool $read = true,
-        bool $deserialize = true,
-        bool $validate = true,
-        bool $write = true,
-        bool $serialize = true,
+        ?bool $read = null,
+        ?bool $deserialize = null,
+        ?bool $validate = null,
+        ?bool $write = null,
+        ?bool $serialize = null,
         ?bool $fetchPartial = null,
         ?bool $forceEager = null,
-        int $priority = 0,
-        string $name = '',
+        ?int $priority = null,
+        ?string $name = null,
+        ?string $provider = null,
+        ?string $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(...\func_get_args());
-        $this->collection = true;
         $this->name = $name ?: 'collection_query';
     }
 }

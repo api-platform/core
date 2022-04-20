@@ -75,3 +75,5 @@ final class ExtractorPropertyNameCollectionFactory implements PropertyNameCollec
         return new PropertyNameCollection(array_values($propertyNames));
     }
 }
+
+class_alias(ExtractorPropertyNameCollectionFactory::class, \ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory::class);

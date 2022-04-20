@@ -67,3 +67,5 @@ final class RequestBody
         return $clone;
     }
 }
+
+class_alias(RequestBody::class, \ApiPlatform\Core\OpenApi\Model\RequestBody::class);

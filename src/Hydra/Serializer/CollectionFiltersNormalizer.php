@@ -147,3 +147,5 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
     }
 }
+
+class_alias(CollectionFiltersNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer::class);

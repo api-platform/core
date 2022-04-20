@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -109,7 +110,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
         if (null === $data) {
             foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
-                $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+                $operationName = sprintf('_api_%s_%s%s', $resource->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
                 $operations[$operationName] = $this->getOperationWithDefaults($resource, $operation)->withName($operationName);
             }
 
@@ -121,7 +122,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                 throw new \InvalidArgumentException(sprintf('Operation "%s" does not exist.', $attributes['class']));
             }
 
-            /** @var Operation $operation */
+            /** @var HttpOperation $operation */
             $operation = (new $attributes['class']())->withShortName($resource->getShortName());
             unset($attributes['class']);
             foreach ($attributes as $key => $value) {
@@ -141,7 +142,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
             }
 
             if (empty($attributes['name'])) {
-                $attributes['name'] = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation->isCollection() ? '_collection' : '');
+                $attributes['name'] = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod()), $operation instanceof CollectionOperationInterface ? '_collection' : '');
             }
             $operations[$attributes['name']] = $this->getOperationWithDefaults($resource, $operation)->withName($attributes['name']);
         }
@@ -154,7 +155,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         $operations = [];
 
         foreach ($data as $attributes) {
-            /** @var Operation $operation */
+            /** @var HttpOperation $operation */
             $operation = (new $attributes['graphql_operation_class']())->withShortName($resource->getShortName());
             unset($attributes['graphql_operation_class']);
 
@@ -180,7 +181,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
         return $operations;
     }
 
-    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): Operation
+    private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
             [$key, $value] = $this->getKeyValue($key, $value);

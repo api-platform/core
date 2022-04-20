@@ -36,3 +36,5 @@ final class MultipleOf implements ValidatorInterface
         return [];
     }
 }
+
+class_alias(MultipleOf::class, \ApiPlatform\Core\Filter\Validator\MultipleOf::class);

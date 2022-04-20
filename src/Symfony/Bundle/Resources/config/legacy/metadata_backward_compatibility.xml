@@ -1,0 +1,11 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.metadata.extractor.xml" alias="api_platform.metadata.extractor.xml.legacy" public="false" />
+        <!-- This is used in the property_name_collection_factory -->
+        <service id="api_platform.metadata.property_extractor.xml" alias="api_platform.metadata.extractor.xml.legacy" public="false" />
+        <!-- This is used in the resource_name_collection_factory -->
+        <service id="api_platform.metadata.resource_extractor.xml" alias="api_platform.metadata.extractor.xml.legacy" public="false" />
+    </services>
+</container>

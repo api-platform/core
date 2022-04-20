@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 
-#[ApiResource]
+#[ApiResource(paginationItemsPerPage: 10, graphQlOperations: [])]
 final class AttributeDefaultOperations
 {
     #[ApiProperty(identifier: true)]

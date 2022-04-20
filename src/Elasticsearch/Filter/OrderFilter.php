@@ -108,3 +108,5 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
         return $description;
     }
 }
+
+class_alias(OrderFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\OrderFilter::class);

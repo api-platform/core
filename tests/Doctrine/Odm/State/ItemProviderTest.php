@@ -21,13 +21,11 @@ use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ProviderEntity;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -71,11 +69,16 @@ class ItemProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
         $extensionProphecy->applyToItem($aggregationBuilder, ProviderEntity::class, ['id' => 1], 'foo', $context)->shouldBeCalled();
 
-        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['id'])])]))]));
+        $operation = (new Get())
+            ->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['id'])])
+            ->withClass(ProviderEntity::class)
+            ->withName('foo');
+        $resourceMetadataCollection = new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => $operation]))]);
+        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn($resourceMetadataCollection);
 
         $dataProvider = new ItemProvider($resourceMetadataFactory->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($result, $dataProvider->provide(ProviderEntity::class, ['id' => 1], 'foo', $context));
+        $this->assertEquals($result, $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testGetItemWithExecuteOptions()
@@ -99,16 +102,20 @@ class ItemProviderTest extends TestCase
         $managerRegistry = $this->getManagerRegistry(ProviderEntity::class, $aggregationBuilder);
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [
-            (new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['id'])])->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]])])),
-        ]));
+        $operation = (new Get())
+            ->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['id'])])
+            ->withClass(ProviderEntity::class)
+            ->withName('foo')
+            ->withExtraProperties(['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]]);
+        $resourceMetadataCollection = new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => $operation]))]);
+        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn($resourceMetadataCollection);
 
         $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
         $extensionProphecy->applyToItem($aggregationBuilder, ProviderEntity::class, ['id' => 1], 'foo', $context)->shouldBeCalled();
 
         $dataProvider = new ItemProvider($resourceMetadataFactory->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($result, $dataProvider->provide(ProviderEntity::class, ['id' => 1], 'foo', $context));
+        $this->assertEquals($result, $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testGetItemDoubleIdentifier()
@@ -137,11 +144,16 @@ class ItemProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
         $extensionProphecy->applyToItem($aggregationBuilder, ProviderEntity::class, ['ida' => 1, 'idb' => 2], 'foo', $context)->shouldBeCalled();
 
-        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['ida', 'idb'])])]))]));
+        $operation = (new Get())
+            ->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['ida', 'idb'])])
+            ->withClass(ProviderEntity::class)
+            ->withName('foo');
+        $resourceMetadataCollection = new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => $operation]))]);
+        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn($resourceMetadataCollection);
 
         $dataProvider = new ItemProvider($resourceMetadataFactory->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals($result, $dataProvider->provide(ProviderEntity::class, ['ida' => 1, 'idb' => 2], 'foo', $context));
+        $this->assertEquals($result, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
     }
 
     public function testAggregationResultExtension()
@@ -163,61 +175,16 @@ class ItemProviderTest extends TestCase
         $extensionProphecy->getResult($aggregationBuilder, ProviderEntity::class, 'foo', $context)->willReturn([])->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
-        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => (new Get())->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['id'])])]))]));
+        $operation = (new Get())
+            ->withUriVariables([(new Link())->withFromClass(ProviderEntity::class)->withIdentifiers(['id'])])
+            ->withClass(ProviderEntity::class)
+            ->withName('foo');
+        $resourceMetadataCollection = new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => $operation]))]);
+        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn($resourceMetadataCollection);
 
         $dataProvider = new ItemProvider($resourceMetadataFactory->reveal(), $managerRegistry, [$extensionProphecy->reveal()]);
 
-        $this->assertEquals([], $dataProvider->provide(ProviderEntity::class, ['id' => 1], 'foo', $context));
-    }
-
-    public function testSupportedClass()
-    {
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $documentManagerProphecy = $this->prophesize(DocumentManager::class);
-
-        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => new Get()]))]));
-
-        $managerProphecy = $this->prophesize(ManagerRegistry::class);
-
-        $managerProphecy->getManagerForClass(ProviderEntity::class)->willReturn($documentManagerProphecy->reveal())->shouldBeCalled();
-
-        $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
-
-        $dataProvider = new ItemProvider($resourceMetadataFactory->reveal(), $managerProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertTrue($dataProvider->supports(ProviderEntity::class, [], 'foo'));
-    }
-
-    public function testNotItemOperation()
-    {
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $documentManagerProphecy = $this->prophesize(DocumentManager::class);
-
-        $resourceMetadataFactory->create(ProviderEntity::class)->willReturn(new ResourceMetadataCollection(ProviderEntity::class, [(new ApiResource())->withOperations(new Operations(['foo' => new GetCollection()]))]));
-
-        $managerProphecy = $this->prophesize(ManagerRegistry::class);
-
-        $managerProphecy->getManagerForClass(ProviderEntity::class)->willReturn($documentManagerProphecy->reveal())->shouldBeCalled();
-
-        $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
-
-        $dataProvider = new ItemProvider($resourceMetadataFactory->reveal(), $managerProphecy->reveal(), [$extensionProphecy->reveal()]);
-
-        $this->assertFalse($dataProvider->supports(ProviderEntity::class, [], 'foo'));
-    }
-
-    public function testUnsupportedClass()
-    {
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
-
-        $extensionProphecy = $this->prophesize(AggregationItemExtensionInterface::class);
-
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal();
-
-        $dataProvider = new ItemProvider($resourceMetadataFactory, $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertFalse($dataProvider->supports(Dummy::class, [], 'foo'));
+        $this->assertEquals([], $dataProvider->provide($operation, ['id' => 1], $context));
     }
 
     public function testCannotCreateAggregationBuilder()
@@ -237,7 +204,7 @@ class ItemProviderTest extends TestCase
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal();
 
-        (new ItemProvider($resourceMetadataFactory, $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]))->provide(ProviderEntity::class, [], 'foo', [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true]);
+        (new ItemProvider($resourceMetadataFactory, $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]))->provide((new Get())->withClass(ProviderEntity::class), [], [IdentifierConverterInterface::HAS_IDENTIFIER_CONVERTER => true]);
     }
 
     /**

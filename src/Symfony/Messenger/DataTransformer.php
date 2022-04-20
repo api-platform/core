@@ -96,3 +96,5 @@ final class DataTransformer implements DataTransformerInterface
                             );
     }
 }
+
+class_alias(DataTransformer::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer::class);

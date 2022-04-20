@@ -57,6 +57,8 @@
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata.inner" />
         </service>
 
+        <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />
+
         <!-- Cache -->
         <service id="api_platform.cache.metadata.property" parent="cache.system" public="false">
             <tag name="cache.pool" />

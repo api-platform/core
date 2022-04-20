@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Operation as ApiOperation;
+use ApiPlatform\Metadata\Operation as AbstractOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -45,6 +48,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private $propertyNameCollectionFactory;
     private $propertyMetadataFactory;
     private $resourceMetadataCollectionFactory;
+    private $resourceClassResolver;
     private $typesContainer;
     private $typeBuilder;
     private $typeConverter;
@@ -57,11 +61,12 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private $nameConverter;
     private $nestingSeparator;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ResolverFactoryInterface $itemSubscriptionResolverFactory, ContainerInterface $filterLocator, Pagination $pagination, ?NameConverterInterface $nameConverter, string $nestingSeparator)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, TypesContainerInterface $typesContainer, TypeBuilderInterface $typeBuilder, TypeConverterInterface $typeConverter, ResolverFactoryInterface $itemResolverFactory, ResolverFactoryInterface $collectionResolverFactory, ResolverFactoryInterface $itemMutationResolverFactory, ResolverFactoryInterface $itemSubscriptionResolverFactory, ContainerInterface $filterLocator, Pagination $pagination, ?NameConverterInterface $nameConverter, string $nestingSeparator)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->resourceClassResolver = $resourceClassResolver;
         $this->typesContainer = $typesContainer;
         $this->typeBuilder = $typeBuilder;
         $this->typeConverter = $typeConverter;
@@ -269,8 +274,10 @@ final class FieldsBuilder implements FieldsBuilderInterface
     private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, Operation $rootOperation, int $depth = 0, bool $forceNullable = false): ?array
     {
         try {
+            $isCollectionType = $this->typeBuilder->isCollection($type);
+
             if (
-                $this->typeBuilder->isCollection($type) &&
+                $isCollectionType &&
                 $collectionValueType = method_exists(Type::class, 'getCollectionValueTypes') ? ($type->getCollectionValueTypes()[0] ?? null) : $type->getCollectionValueType()
             ) {
                 $resourceClass = $collectionValueType->getClassName();
@@ -293,40 +300,45 @@ final class FieldsBuilder implements FieldsBuilderInterface
                 return null;
             }
 
-            $resourceMetadataCollection = $operation = null;
-            if (!empty($resourceClass)) {
+            $args = [];
+
+            $resolverOperation = $rootOperation;
+
+            if ($resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass) && $rootOperation->getClass() !== $resourceClass) {
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-                try {
-                    $operation = $resourceMetadataCollection->getOperation($rootOperation->getName());
-                } catch (OperationNotFoundException $e) {
+                $resolverOperation = $resourceMetadataCollection->getOperation(null, $isCollectionType);
+
+                if (!$resolverOperation instanceof Operation) {
+                    $resolverOperation = ($isCollectionType ? new QueryCollection() : new Query())->withOperation($resolverOperation);
                 }
             }
 
-            $args = [];
-            if (!$input && !$rootOperation instanceof Mutation && !$rootOperation instanceof Subscription && !$isStandardGraphqlType && $this->typeBuilder->isCollection($type)) {
+            if (!$input && !$rootOperation instanceof Mutation && !$rootOperation instanceof Subscription && !$isStandardGraphqlType && $isCollectionType) {
                 if ($this->pagination->isGraphQlEnabled($resourceClass, $rootOperation->getName())) {
                     $args = $this->getGraphQlPaginationArgs($resourceClass, $rootOperation->getName());
                 }
 
-                // Look for the collection operation if it exists
-                if (!$operation && $resourceMetadataCollection) {
+                // Find the collection operation to get filters, there might be a smarter way to do this
+                $operation = null;
+                if (!empty($resourceClass)) {
+                    $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
                     try {
                         $operation = $resourceMetadataCollection->getOperation(null, true);
                     } catch (OperationNotFoundException $e) {
                     }
                 }
 
-                $args = $this->getFilterArgs($args, $resourceClass, $operation, $rootResource, $rootOperation, $property, $depth);
+                $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $rootOperation, $property, $depth, $operation);
             }
 
             if ($isStandardGraphqlType || $input) {
                 $resolve = null;
             } elseif (($rootOperation instanceof Mutation || $rootOperation instanceof Subscription) && $depth <= 0) {
-                $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $rootOperation->getName()) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $rootOperation->getName());
+                $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $resolverOperation) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $resolverOperation);
             } elseif ($this->typeBuilder->isCollection($type)) {
-                $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $rootOperation->getName());
+                $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $resolverOperation);
             } else {
-                $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $rootOperation->getName());
+                $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resolverOperation);
             }
 
             return [
@@ -387,10 +399,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return $args;
     }
 
-    /**
-     * @param Operation|ApiOperation|null $operation
-     */
-    private function getFilterArgs(array $args, ?string $resourceClass, $operation, string $rootResource, Operation $rootOperation, ?string $property, int $depth): array
+    private function getFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $rootOperation, ?string $property, int $depth, ?AbstractOperation $operation = null): array
     {
         if (null === $operation || null === $resourceClass) {
             return $args;
@@ -429,8 +438,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
     }
 
     /**
-     * @param Operation|ApiOperation|null $operation
-     * @param mixed                       $original
+     * @param AbstractOperation|null $operation
+     * @param mixed                  $original
      */
     private function mergeFilterArgs(array $args, array $parsed, $operation = null, $original = ''): array
     {

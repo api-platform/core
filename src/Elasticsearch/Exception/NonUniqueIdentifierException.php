@@ -25,3 +25,5 @@ use ApiPlatform\Exception\ExceptionInterface;
 final class NonUniqueIdentifierException extends \Exception implements ExceptionInterface
 {
 }
+
+class_alias(NonUniqueIdentifierException::class, \ApiPlatform\Core\Bridge\Elasticsearch\Exception\NonUniqueIdentifierException::class);

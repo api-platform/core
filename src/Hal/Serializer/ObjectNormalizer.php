@@ -111,3 +111,5 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
         throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
     }
 }
+
+class_alias(ObjectNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ObjectNormalizer::class);

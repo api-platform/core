@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Api;
 
 use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\FilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 
@@ -63,3 +62,5 @@ trait FilterLocatorTrait
         return null;
     }
 }
+
+class_alias(FilterLocatorTrait::class, \ApiPlatform\Core\Api\FilterLocatorTrait::class);

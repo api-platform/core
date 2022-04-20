@@ -75,6 +75,10 @@ final class WriteListener
             return;
         }
 
+        if (!$operation->getProcessor()) {
+            return;
+        }
+
         $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
@@ -82,15 +86,11 @@ final class WriteListener
             throw new NotFoundHttpException('Invalid identifier value or configuration.', $e);
         }
 
-        if (!$this->processor->supports($controllerResult, $uriVariables, $operation->getName(), $context)) {
-            return;
-        }
-
         switch ($request->getMethod()) {
             case 'PUT':
             case 'PATCH':
             case 'POST':
-                $persistResult = $this->processor->process($controllerResult, $uriVariables, $operation->getName(), $context);
+                $persistResult = $this->processor->process($controllerResult, $operation, $uriVariables, $context);
 
                 if ($persistResult) {
                     $controllerResult = $persistResult;
@@ -113,7 +113,7 @@ final class WriteListener
 
                 break;
             case 'DELETE':
-                $this->processor->process($controllerResult, $uriVariables, $operation->getName(), $context);
+                $this->processor->process($controllerResult, $operation, $uriVariables, $context);
                 $event->setControllerResult(null);
                 break;
         }

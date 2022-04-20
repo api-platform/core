@@ -49,3 +49,5 @@ trait CachedTrait
         return $this->localCache[$cacheKey] = $value;
     }
 }
+
+class_alias(CachedTrait::class, \ApiPlatform\Core\Cache\CachedTrait::class);

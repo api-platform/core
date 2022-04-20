@@ -472,3 +472,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return $resourceMetadata->getOperation()->getShortName();
     }
 }
+
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ItemNormalizer::class);

@@ -126,3 +126,5 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
 
     abstract public function provideApplyTestData(): array;
 }
+
+class_alias(DoctrineOrmFilterTestCase::class, \ApiPlatform\Core\Test\DoctrineOrmFilterTestCase::class);

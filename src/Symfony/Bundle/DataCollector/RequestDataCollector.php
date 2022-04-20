@@ -27,8 +27,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Bundle\Processor\TraceableChainProcessor;
-use ApiPlatform\Symfony\Bundle\Provider\TraceableChainProvider;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
@@ -143,17 +141,6 @@ final class RequestDataCollector extends DataCollector
         if ($this->dataPersister instanceof TraceableChainDataPersister) {
             $this->data['dataPersisters']['responses'] = $this->dataPersister->getPersistersResponse();
         }
-
-        if ($this->provider instanceof TraceableChainProvider) {
-            $this->data['providers'] = [
-                'context' => $this->cloneVar($this->provider->getContext()),
-                'responses' => $this->provider->getProvidersResponse(),
-            ];
-        }
-
-        if ($this->processor instanceof TraceableChainProcessor) {
-            $this->data['processors']['responses'] = $this->processor->getProcessorsResponse();
-        }
     }
 
     private function setFilters(ApiResource $resourceMetadata, int $index, array &$filters, array &$counters): void
@@ -217,16 +204,6 @@ final class RequestDataCollector extends DataCollector
     public function getDataPersisters(): array
     {
         return $this->data['dataPersisters'] ?? ['responses' => []];
-    }
-
-    public function getProviders(): array
-    {
-        return $this->data['providers'] ?? ['responses' => []];
-    }
-
-    public function getProcessors(): array
-    {
-        return $this->data['processors'] ?? ['responses' => []];
     }
 
     public function getVersion(): ?string

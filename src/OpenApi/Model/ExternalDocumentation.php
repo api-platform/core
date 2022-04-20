@@ -52,3 +52,5 @@ final class ExternalDocumentation
         return $clone;
     }
 }
+
+class_alias(ExternalDocumentation::class, \ApiPlatform\Core\OpenApi\Model\ExternalDocumentation::class);

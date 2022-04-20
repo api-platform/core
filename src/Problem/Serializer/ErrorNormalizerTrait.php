@@ -53,3 +53,5 @@ trait ErrorNormalizerTrait
         return null;
     }
 }
+
+class_alias(ErrorNormalizerTrait::class, \ApiPlatform\Core\Problem\Serializer\ErrorNormalizerTrait::class);

@@ -184,3 +184,5 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
         return true;
     }
 }
+
+class_alias(AbstractSearchFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractSearchFilter::class);

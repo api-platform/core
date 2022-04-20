@@ -45,3 +45,5 @@ final class GraphQlMutationResolverPass implements CompilerPassInterface
         $container->getDefinition('api_platform.graphql.mutation_resolver_locator')->addArgument($mutations);
     }
 }
+
+class_alias(GraphQlMutationResolverPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass::class);

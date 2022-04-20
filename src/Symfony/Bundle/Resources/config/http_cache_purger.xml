@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <!-- TODO: remove this in 3.0 -->
+        <service id="api_platform.http_cache.purger.varnish_client" class="GuzzleHttp\Client" abstract="true" public="false" />
+        <service id="api_platform.http_cache.purger.varnish" alias="api_platform.http_cache.purger.varnish.ban" public="false" />
+        <service id="api_platform.http_cache.purger.varnish.ban" class="ApiPlatform\HttpCache\VarnishPurger" public="false" />
+        <service id="api_platform.http_cache.purger.varnish.xkey" class="ApiPlatform\HttpCache\VarnishXKeyPurger" public="false">
+            <argument type="collection"></argument>
+            <argument>%api_platform.http_cache.invalidation.max_header_length%</argument>
+            <argument>%api_platform.http_cache.invalidation.xkey.glue%</argument>
+        </service>
+
+        <service id="api_platform.http_cache.listener.response.add_tags" class="ApiPlatform\HttpCache\EventListener\AddTagsListener">
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="null" />
+            <argument type="service" id="api_platform.http_cache.purger" on-invalid="null" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onKernelResponse" priority="-2" />
+        </service>
+    </services>
+</container>

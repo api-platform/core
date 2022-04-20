@@ -21,7 +21,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -58,7 +58,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
-        /** @var Operation|GraphQlOperation|null */
+        /** @var HttpOperation|GraphQlOperation|null */
         $operation = null;
         $forceEager = $this->forceEager;
 
@@ -203,3 +203,5 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
         }, $aliases);
     }
 }
+
+class_alias(FilterEagerLoadingExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterEagerLoadingExtension::class);

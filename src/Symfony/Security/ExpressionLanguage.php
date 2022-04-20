@@ -47,3 +47,5 @@ class ExpressionLanguage extends BaseExpressionLanguage
         });
     }
 }
+
+class_alias(ExpressionLanguage::class, \ApiPlatform\Core\Security\ExpressionLanguage::class);

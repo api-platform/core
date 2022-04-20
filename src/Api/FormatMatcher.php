@@ -62,3 +62,5 @@ final class FormatMatcher
         return null;
     }
 }
+
+class_alias(FormatMatcher::class, \ApiPlatform\Core\Api\FormatMatcher::class);

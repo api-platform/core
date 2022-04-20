@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\Twig;
 
-use ApiPlatform\Doctrine\Common\State\Processor;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
@@ -162,7 +161,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(8, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
+        $this->assertCount(6, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
         $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
@@ -181,70 +180,5 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         // Data persisters tab
         $this->assertSame('Data Persisters', $crawler->filter('.data-persister-tab-title')->html());
         $this->assertNotEmpty($crawler->filter('.data-persister-tab-content'));
-
-        // Providers tab
-        $this->assertSame('Providers', $crawler->filter('.provider-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.provider-tab-content .empty'));
-
-        // Processors tab
-        $this->assertSame('Processors', $crawler->filter('.processor-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.processor-tab-content .empty'));
-    }
-
-    /**
-     * @requires PHP 8.0
-     */
-    public function testPostCollectionProcessorProfiler()
-    {
-        if ($this->legacy) {
-            $this->markTestSkipped('Legacy test.');
-
-            return;
-        }
-
-        $client = static::createClient();
-        $client->enableProfiler();
-        $client->request('POST', '/processor_entities', [], [], ['HTTP_ACCEPT' => 'application/ld+json', 'CONTENT_TYPE' => 'application/ld+json'], '{"foo": "bar"}');
-        $this->assertEquals(201, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('get', '/_profiler/latest?panel=api_platform.data_collector.request');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        // Metadata tab
-        $tabContent = $crawler->filter('.metadata-tab-content');
-        $this->assertSame('_api_/processor_entities.{_format}_post', $tabContent->filter('th.status-success')->html(), 'The actual operation should be highlighted.');
-
-        // Data provider tab
-        $tabContent = $crawler->filter('.data-provider-tab-content');
-        $this->assertStringContainsString('No calls to collection data provider have been recorded.', $tabContent->html());
-        $this->assertStringContainsString('No calls to item data provider have been recorded.', $tabContent->html());
-        $this->assertStringContainsString('No calls to subresource data provider have been recorded.', $tabContent->html());
-
-        // Processors tab
-        $tabContent = $crawler->filter('.processor-tab-content');
-        $this->assertSame('TRUE', $tabContent->filter('table tbody .status-success')->html());
-        $this->assertStringContainsString(Processor::class, $tabContent->html());
-    }
-
-    /**
-     * @requires PHP 8.0
-     */
-    public function testStateProvidersProfiler()
-    {
-        if ($this->legacy) {
-            $this->markTestSkipped('Legacy test.');
-
-            return;
-        }
-
-        $client = static::createClient();
-        $client->enableProfiler();
-        // request to resource that uses state provider
-        $client->request('GET', '/attribute_resources/2', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $crawler = $client->request('GET', '/_profiler/latest?panel=api_platform.data_collector.request', [], [], []);
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-
-        // Providers tab
-        $this->assertNotEmpty($crawler->filter('.provider-tab-content table'));
     }
 }

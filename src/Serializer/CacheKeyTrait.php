@@ -34,3 +34,5 @@ trait CacheKeyTrait
         }
     }
 }
+
+class_alias(CacheKeyTrait::class, \ApiPlatform\Core\Serializer\CacheKeyTrait::class);

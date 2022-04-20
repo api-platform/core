@@ -94,3 +94,5 @@ final class AttributesExtractor
         return $result;
     }
 }
+
+class_alias(AttributesExtractor::class, \ApiPlatform\Core\Util\AttributesExtractor::class);

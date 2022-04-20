@@ -49,8 +49,9 @@ final class ReadListener
     public const OPERATION_ATTRIBUTE_KEY = 'read';
 
     private $serializerContextBuilder;
+    private $metadataBackwardCompatibilityLayer;
 
-    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(CollectionDataProviderInterface $collectionDataProvider, ItemDataProviderInterface $itemDataProvider, SubresourceDataProviderInterface $subresourceDataProvider = null, SerializerContextBuilderInterface $serializerContextBuilder = null, IdentifierConverterInterface $identifierConverter = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, bool $metadataBackwardCompatibilityLayer = null)
     {
         $this->collectionDataProvider = $collectionDataProvider;
         $this->itemDataProvider = $itemDataProvider;
@@ -59,7 +60,11 @@ final class ReadListener
         $this->identifierConverter = $identifierConverter;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
-        trigger_deprecation('api-platform/core', '2.7', sprintf('The listener "%s" is deprecated and will be replaced by "%s" in 3.0.', __CLASS__, SymfonyReadListener::class));
+        $this->metadataBackwardCompatibilityLayer = $metadataBackwardCompatibilityLayer;
+
+        if ($metadataBackwardCompatibilityLayer || null === $metadataBackwardCompatibilityLayer) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('The listener "%s" is deprecated and will be replaced by "%s" in 3.0.', __CLASS__, SymfonyReadListener::class));
+        }
     }
 
     /**
@@ -75,11 +80,16 @@ final class ReadListener
         if (
             !($attributes = RequestAttributesExtractor::extractAttributes($request))
             || !$attributes['receive']
-            || $request->isMethod('POST') && isset($attributes['collection_operation_name'])
+            || ($request->isMethod('POST') && isset($attributes['collection_operation_name']))
             || ($operation && !($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && !($operation->getExtraProperties()['is_legacy_subresource'] ?? false))
+            || ($operation && false === $operation->canRead())
             || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
         ) {
             return;
+        }
+
+        if (false === $this->metadataBackwardCompatibilityLayer) {
+            trigger_deprecation('api-platform/core', '2.7', 'The operation you requested uses legacy metadata, switch to #[ApiPlatform\Metadata\ApiResource].');
         }
 
         if (null === $filters = $request->attributes->get('_api_filters')) {

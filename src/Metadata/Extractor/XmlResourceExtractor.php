@@ -85,7 +85,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'hydraContext' => isset($resource->hydraContext->values) ? $this->buildValues($resource->hydraContext->values) : null,
             'openapiContext' => isset($resource->openapiContext->values) ? $this->buildValues($resource->openapiContext->values) : null,
             'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
-            'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
         ]);

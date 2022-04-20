@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\State\ProcessorInterface;
 
 /**
@@ -24,13 +24,11 @@ use ApiPlatform\State\ProcessorInterface;
  */
 final class WriteStage implements WriteStageInterface
 {
-    private $resourceMetadataCollectionFactory;
     private $processor;
     private $serializerContextBuilder;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ProcessorInterface $processor, SerializerContextBuilderInterface $serializerContextBuilder)
+    public function __construct(ProcessorInterface $processor, SerializerContextBuilderInterface $serializerContextBuilder)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->processor = $processor;
         $this->serializerContextBuilder = $serializerContextBuilder;
     }
@@ -38,16 +36,14 @@ final class WriteStage implements WriteStageInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke($data, string $resourceClass, string $operationName, array $context)
+    public function __invoke($data, string $resourceClass, Operation $operation, array $context)
     {
-        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $operation = $resourceMetadataCollection->getOperation($operationName);
         if (null === $data || !($operation->canWrite() ?? true)) {
             return $data;
         }
 
-        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, false);
+        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, false);
 
-        return $this->processor->process($data, [], $operation->getName(), ['operation' => $operation] + $denormalizationContext);
+        return $this->processor->process($data, $operation, [], ['operation' => $operation] + $denormalizationContext);
     }
 }

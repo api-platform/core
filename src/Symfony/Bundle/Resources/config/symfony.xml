@@ -53,7 +53,7 @@
 
         <service id="api_platform.listener.view.respond" class="ApiPlatform\Symfony\EventListener\RespondListener">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.symfony.iri_converter" />
+            <argument type="service" id="api_platform.symfony.iri_converter" on-invalid="null" />
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
 

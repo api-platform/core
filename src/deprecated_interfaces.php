@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 return [
     ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface::class,
-    ApiPlatform\Core\Metadata\Resource\ResourceNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface::class,
+    ApiPlatform\Core\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface::class => ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface::class,
     ApiPlatform\Core\Metadata\Extractor\ExtractorInterface::class => ApiPlatform\Metadata\Extractor\ResourceExtractorInterface::class,
 
     // Bridge\Doctrine => Doctrine
@@ -71,9 +71,6 @@ return [
 
     // Documentation
     ApiPlatform\Core\Documentation\DocumentationInterface::class => ApiPlatform\Documentation\DocumentationInterface::class,
-
-    // HttpCache
-    ApiPlatform\Core\HttpCache\PurgerInterface::class => ApiPlatform\HttpCache\PurgerInterface::class,
 
     // JsonLd
     ApiPlatform\Core\JsonLd\AnonymousContextBuilderInterface::class => ApiPlatform\JsonLd\AnonymousContextBuilderInterface::class,

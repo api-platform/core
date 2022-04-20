@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
+use ApiPlatform\Metadata\GraphQl\Operation;
+
 /**
  * Write stage of GraphQL resolvers.
  *
@@ -25,5 +27,5 @@ interface WriteStageInterface
      *
      * @return object|null
      */
-    public function __invoke($data, string $resourceClass, string $operationName, array $context);
+    public function __invoke($data, string $resourceClass, Operation $operation, array $context);
 }

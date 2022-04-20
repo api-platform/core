@@ -28,3 +28,5 @@ final class RangeFilter extends AbstractRangeFilter
 {
     use RangeFilterTrait;
 }
+
+class_alias(RangeFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\RangeFilter::class);

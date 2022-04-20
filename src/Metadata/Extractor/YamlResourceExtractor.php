@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Extractor;
 
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -98,7 +100,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'host' => $this->phpize($resource, 'host', 'string'),
             'condition' => $this->phpize($resource, 'condition', 'string'),
             'controller' => $this->phpize($resource, 'controller', 'string'),
-            'compositeIdentifier' => $this->phpize($resource, 'compositeIdentifier', 'bool'),
             'queryParameterValidationEnabled' => $this->phpize($resource, 'queryParameterValidationEnabled', 'bool'),
             'types' => $this->buildArrayValue($resource, 'types'),
             'cacheHeaders' => $this->buildArrayValue($resource, 'cacheHeaders'),
@@ -292,10 +293,19 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                     }
                 }
 
+                $collection = $this->phpize($operation, 'collection', 'bool', false);
+                if (Query::class === $class && $collection) {
+                    $class = QueryCollection::class;
+                }
+
+                $delete = $this->phpize($operation, 'delete', 'bool', false);
+                if (Mutation::class === $class && $delete) {
+                    $class = DeleteMutation::class;
+                }
+
                 $data[] = array_merge($datum, [
                     'graphql_operation_class' => $class,
                     'resolver' => $this->phpize($operation, 'resolver', 'string'),
-                    'collection' => $this->phpize($operation, 'collection', 'bool'),
                     'args' => $operation['args'] ?? null,
                     'class' => $this->phpize($operation, 'class', 'string'),
                     'read' => $this->phpize($operation, 'read', 'bool'),

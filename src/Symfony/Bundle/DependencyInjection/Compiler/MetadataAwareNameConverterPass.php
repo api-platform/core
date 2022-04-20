@@ -53,3 +53,5 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
         $container->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware');
     }
 }
+
+class_alias(MetadataAwareNameConverterPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass::class);

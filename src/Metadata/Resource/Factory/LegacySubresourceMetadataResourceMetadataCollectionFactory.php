@@ -16,9 +16,10 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -74,7 +75,7 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 }
 
                 $operationValue = $operation->{$methodName}();
-                if (null !== $operationValue && [] !== $operationValue) {
+                if (null !== $operationValue) {
                     continue;
                 }
 
@@ -103,12 +104,18 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
 
                 $identifiers = [];
                 // Removing the third tuple element
+                $previousParameterName = null;
                 foreach ($subresourceMetadata['identifiers'] as $parameterName => [$class, $property, $isPresent]) {
                     if (!$isPresent) {
                         continue;
                     }
 
-                    $identifiers[$parameterName] = (new Link())->withFromClass($class)->withIdentifiers([$property])->withParameterName($parameterName);
+                    $identifiers[$parameterName] = (new Link())->withFromClass($class)->withIdentifiers([$property])->withParameterName($parameterName)->withCompositeIdentifier(false);
+                    if ($previousParameterName) {
+                        $identifiers[$previousParameterName] = $identifiers[$previousParameterName]->withFromProperty($parameterName);
+                    }
+
+                    $previousParameterName = $parameterName;
                 }
 
                 $extraProperties = ['is_legacy_subresource' => true];
@@ -121,8 +128,8 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                     unset($subresourceMetadata['identifiers']);
                 }
 
-                $resource = (new ApiResource())->withExtraProperties($extraProperties)->withCompositeIdentifier(false)->withUriVariables($identifiers)->withStateless(false);
-                $operation = (new Get())->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']])->withCompositeIdentifier(false)->withUriVariables($identifiers);
+                $resource = (new ApiResource())->withExtraProperties($extraProperties)->withUriVariables($identifiers)->withStateless(false);
+                $operation = ($subresourceMetadata['collection'] ? new GetCollection() : new Get())->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']])->withUriVariables($identifiers);
 
                 if ($subresourceMetadata['path']) {
                     $resource = $resource->withUriTemplate($subresourceMetadata['path']);
@@ -137,10 +144,6 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 if ($subresourceMetadata['resource_class']) {
                     $resource = $resource->withClass($subresourceMetadata['resource_class']);
                     $operation = $operation->withClass($subresourceMetadata['resource_class']);
-                }
-
-                if ($subresourceMetadata['collection']) {
-                    $operation = $operation->withCollection($subresourceMetadata['collection']);
                 }
 
                 foreach ($subresourceMetadata as $key => $value) {
@@ -165,10 +168,10 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
     }
 
     /**
-     * @param Operation|GraphQlOperation|ApiResource $operation
-     * @param mixed                                  $value
+     * @param HttpOperation|GraphQlOperation|ApiResource $operation
+     * @param mixed                                      $value
      *
-     * @return Operation|GraphQlOperation|ApiResource
+     * @return HttpOperation|GraphQlOperation|ApiResource
      */
     private function setAttributeValue($operation, string $key, $value)
     {

@@ -39,3 +39,5 @@ final class TypeNotFoundException extends \InvalidArgumentException implements N
         return $this->typeId;
     }
 }
+
+class_alias(TypeNotFoundException::class, \ApiPlatform\Core\GraphQl\Type\TypeNotFoundException::class);

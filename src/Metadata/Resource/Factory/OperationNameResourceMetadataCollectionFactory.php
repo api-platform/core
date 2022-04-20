@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -55,7 +56,7 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
                     continue;
                 }
 
-                $newOperationName = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? Operation::METHOD_GET), $operation->isCollection() ? '_collection' : '');
+                $newOperationName = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
 
                 // TODO: remove in 3.0 this is used in the IRI converter to avoid a bc break
                 if (($extraProperties = $operation->getExtraProperties()) && isset($extraProperties['is_legacy_subresource'])) {

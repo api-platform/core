@@ -18,7 +18,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -36,45 +36,40 @@ final class ItemSubscriptionResolverFactory implements ResolverFactoryInterface
     private $readStage;
     private $securityStage;
     private $serializeStage;
-    private $resourceMetadataCollectionFactory;
     private $subscriptionManager;
     private $mercureSubscriptionIriGenerator;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SerializeStageInterface $serializeStage, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SubscriptionManagerInterface $subscriptionManager, ?MercureSubscriptionIriGeneratorInterface $mercureSubscriptionIriGenerator)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SerializeStageInterface $serializeStage, SubscriptionManagerInterface $subscriptionManager, ?MercureSubscriptionIriGeneratorInterface $mercureSubscriptionIriGenerator)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
         $this->serializeStage = $serializeStage;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->subscriptionManager = $subscriptionManager;
         $this->mercureSubscriptionIriGenerator = $mercureSubscriptionIriGenerator;
     }
 
-    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?string $operationName = null): callable
+    public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable
     {
-        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operationName) {
-            if (null === $resourceClass || null === $operationName) {
+        return function (?array $source, array $args, $context, ResolveInfo $info) use ($resourceClass, $rootClass, $operation) {
+            if (null === $resourceClass || null === $operation) {
                 return null;
             }
 
             $resolverContext = ['source' => $source, 'args' => $args, 'info' => $info, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
 
-            $item = ($this->readStage)($resourceClass, $rootClass, $operationName, $resolverContext);
+            $item = ($this->readStage)($resourceClass, $rootClass, $operation, $resolverContext);
             if (null !== $item && !\is_object($item)) {
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
-            ($this->securityStage)($resourceClass, $operationName, $resolverContext + [
+            ($this->securityStage)($resourceClass, $operation, $resolverContext + [
                 'extra_variables' => [
                     'object' => $item,
                 ],
             ]);
 
-            $result = ($this->serializeStage)($item, $resourceClass, $operationName, $resolverContext);
+            $result = ($this->serializeStage)($item, $resourceClass, $operation, $resolverContext);
 
             $subscriptionId = $this->subscriptionManager->retrieveSubscriptionId($resolverContext, $result);
-
-            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            $operation = $resourceMetadataCollection->getOperation($operationName);
 
             if ($subscriptionId && ($mercure = $operation->getMercure())) {
                 if (!$this->mercureSubscriptionIriGenerator) {

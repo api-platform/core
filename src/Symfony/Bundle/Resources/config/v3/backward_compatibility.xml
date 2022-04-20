@@ -22,17 +22,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.legacy_subresource_metadata.inner" />
         </service>
 
-        <service id="api_platform.legacy_data_provider_state" class="ApiPlatform\State\LegacyDataProviderState">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.item_data_provider" />
-            <argument type="service" id="api_platform.collection_data_provider" />
-            <argument type="service" id="api_platform.subresource_data_provider" />
-            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-
-            <tag name="api_platform.state_provider" priority="-1000" />
-        </service>
-
         <service id="api_platform.listener.view.write.legacy" class="ApiPlatform\Core\EventListener\WriteListener">
             <argument type="service" id="api_platform.data_persister" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -49,6 +38,8 @@
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.identifier.converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
+            <argument>null</argument>
+            <argument>%api_platform.metadata_backward_compatibility_layer%</argument>
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
+use ApiPlatform\Metadata\GraphQl\Operation;
 use GraphQL\Error\Error;
 
 /**
@@ -26,5 +27,5 @@ interface SecurityStageInterface
     /**
      * @throws Error
      */
-    public function __invoke(string $resourceClass, string $operationName, array $context): void;
+    public function __invoke(string $resourceClass, Operation $operation, array $context): void;
 }

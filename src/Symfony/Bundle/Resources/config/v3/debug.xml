@@ -11,13 +11,5 @@
             <argument type="service" id="debug.var_dumper.cloner" />
             <argument type="service" id="debug.var_dumper.cli_dumper" />
         </service>
-
-        <service id="debug.api_platform.provider" class="ApiPlatform\Symfony\Bundle\Provider\TraceableChainProvider" decorates="api_platform.state_provider">
-            <argument type="service" id="debug.api_platform.provider.inner" />
-        </service>
-
-        <service id="debug.api_platform.processor" class="ApiPlatform\Symfony\Bundle\Processor\TraceableChainProcessor" decorates="api_platform.state_processor">
-            <argument type="service" id="debug.api_platform.processor.inner" />
-        </service>
     </services>
 </container>

@@ -21,3 +21,5 @@ namespace ApiPlatform\Exception;
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
 }
+
+class_alias(RuntimeException::class, \ApiPlatform\Core\Exception\RuntimeException::class);

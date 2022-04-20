@@ -17,8 +17,8 @@ use ApiPlatform\Api\IdentifiersExtractor;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -48,7 +48,7 @@ class IdentifiersExtractorTest extends TestCase
             $propertyMetadataFactoryProphecy->reveal()
         );
 
-        $operation = $this->prophesize(Operation::class);
+        $operation = $this->prophesize(HttpOperation::class);
         $item = new Dummy();
         $resourceClass = Dummy::class;
         $context = [

@@ -54,3 +54,5 @@ final class ValidationException extends BaseValidationException implements Const
         return $message;
     }
 }
+
+class_alias(ValidationException::class, \ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException::class);

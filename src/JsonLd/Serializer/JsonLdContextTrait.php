@@ -59,3 +59,5 @@ trait JsonLdContextTrait
         return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null]);
     }
 }
+
+class_alias(JsonLdContextTrait::class, \ApiPlatform\Core\JsonLd\Serializer\JsonLdContextTrait::class);

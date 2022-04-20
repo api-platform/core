@@ -67,3 +67,5 @@ final class Contact
         return $clone;
     }
 }
+
+class_alias(Contact::class, \ApiPlatform\Core\OpenApi\Model\Contact::class);

@@ -44,11 +44,8 @@
         <xsd:attribute type="xsd:boolean" name="validate"/>
         <xsd:attribute type="xsd:boolean" name="write"/>
         <xsd:attribute type="xsd:boolean" name="serialize"/>
-        <!-- todo replace by queryParameterValidationEnabled? -->
-        <xsd:attribute type="xsd:boolean" name="queryParameterValidate"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
-        <xsd:attribute type="xsd:boolean" name="collection"/>
     </xsd:complexType>
 
     <xsd:complexType name="graphQlOperations">
@@ -74,7 +71,6 @@
         <xsd:attribute type="xsd:boolean" name="serialize"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
         <xsd:attribute type="xsd:string" name="name"/>
-        <xsd:attribute type="xsd:boolean" name="collection"/>
     </xsd:complexType>
 
     <xsd:complexType name="args">
@@ -346,6 +342,8 @@
         <xsd:attribute type="xsd:positiveInteger" name="paginationMaximumItemsPerPage"/>
         <xsd:attribute type="xsd:boolean" name="paginationPartial"/>
         <xsd:attribute type="xsd:string" name="paginationType"/>
+        <xsd:attribute type="xsd:string" name="processor"/>
+        <xsd:attribute type="xsd:string" name="provider"/>
         <xsd:attribute type="xsd:string" name="security"/>
         <xsd:attribute type="xsd:string" name="securityMessage"/>
         <xsd:attribute type="xsd:string" name="securityPostDenormalize"/>
@@ -365,6 +363,5 @@
         <xsd:attribute type="xsd:string" name="host"/>
         <xsd:attribute type="xsd:string" name="condition"/>
         <xsd:attribute type="xsd:string" name="controller"/>
-        <xsd:attribute type="xsd:boolean" name="compositeIdentifier"/>
     </xsd:attributeGroup>
 </xsd:schema>

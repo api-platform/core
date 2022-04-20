@@ -17,7 +17,7 @@ use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -46,8 +46,9 @@ final class CollectionProvider implements ProviderInterface
         $this->collectionExtensions = $collectionExtensions;
     }
 
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
+        $resourceClass = $operation->getClass();
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
@@ -59,19 +60,19 @@ final class CollectionProvider implements ProviderInterface
 
         $aggregationBuilder = $repository->createAggregationBuilder();
 
-        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operationName);
+        $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
+            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operation->getName(), $context);
 
-            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
             }
         }
 
         $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
         try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
+            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operation->getName());
             $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
         } catch (OperationNotFoundException $e) {
             $attribute = $resourceMetadata->getOperation(null, true)->getExtraProperties()['doctrine_mongodb'] ?? [];
@@ -79,20 +80,5 @@ final class CollectionProvider implements ProviderInterface
         $executeOptions = $attribute['execute_options'] ?? [];
 
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);
-    }
-
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
-    {
-        if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof DocumentManager) {
-            return false;
-        }
-
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-
-        if ($operation instanceof GraphQlOperation) {
-            return true;
-        }
-
-        return $operation->isCollection() ?? false;
     }
 }

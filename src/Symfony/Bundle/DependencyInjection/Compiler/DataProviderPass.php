@@ -61,3 +61,5 @@ final class DataProviderPass implements CompilerPassInterface
         }
     }
 }
+
+class_alias(DataProviderPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass::class);

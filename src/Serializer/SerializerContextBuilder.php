@@ -18,6 +18,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,7 +64,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             // TODO: 3.0 becomes true by default
             $context['skip_null_values'] = $context['skip_null_values'] ?? $this->shouldSkipNullValues($attributes['resource_class'], $context['operation_name']);
             // TODO: remove in 3.0, operation type will not exist anymore
-            $context['operation_type'] = $operation->isCollection() ? OperationType::COLLECTION : OperationType::ITEM;
+            $context['operation_type'] = $operation instanceof CollectionOperationInterface ? OperationType::COLLECTION : OperationType::ITEM;
             $context['iri_only'] = $context['iri_only'] ?? false;
             $context['request_uri'] = $request->getRequestUri();
             $context['uri'] = $request->getUri();
@@ -192,3 +193,5 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         return false;
     }
 }
+
+class_alias(SerializerContextBuilder::class, \ApiPlatform\Core\Serializer\SerializerContextBuilder::class);

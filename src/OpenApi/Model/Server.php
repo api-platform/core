@@ -67,3 +67,5 @@ final class Server
         return $clone;
     }
 }
+
+class_alias(Server::class, \ApiPlatform\Core\OpenApi\Model\Server::class);

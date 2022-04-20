@@ -107,3 +107,5 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         return $this->router->generate($name, $parameters, self::CONST_MAP[$referenceType ?? $this->urlGenerationStrategy]);
     }
 }
+
+class_alias(Router::class, \ApiPlatform\Core\Bridge\Symfony\Routing\Router::class);

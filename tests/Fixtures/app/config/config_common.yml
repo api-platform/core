@@ -62,10 +62,7 @@ api_platform:
         invalidation:
             enabled: true
             xkey: 
-                enabled: true
                 glue: ' '
-            http_tags: 
-                enabled: true
     openapi:
         backward_compatibility_layer: false
     defaults:
@@ -99,39 +96,41 @@ services:
         autowire: true
         autoconfigure: true
 
-    attribute_resources.state_provider:
+    ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider'
         public: false
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    related_questions.state_provider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
-        public: false
-        arguments: ['@doctrine']
-        tags:
-            -  { name: 'api_platform.state_provider' }
+    # related_questions.state_provider:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RelatedQuestionsProvider'
+    #     public: false
+    #     arguments: ['@doctrine']
+    #     tags:
+    #         -  { name: 'api_platform.state_provider' }
 
-    operation_resources.state_processor:
+    ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
         public: false
         arguments: [ '@doctrine' ]
         tags:
             - { name: 'api_platform.state_processor' }
 
-    contain_non_resource.state_provider:
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider'
         public: false
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    serializable.state_provider:
+    ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider'
         public: false
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    resource_interface.state_provider:
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ResourceInterfaceImplementationProvider'
         public: false
         tags:
@@ -273,17 +272,10 @@ services:
     api_platform.http_cache.purger:
         class: ApiPlatform\Tests\Fixtures\NullPurger
         
-    api_platform.http_cache.purger.xkey:
-        class: ApiPlatform\Tests\Fixtures\NullPurger
-
     test.api_platform.http_cache.purger:
         alias: api_platform.http_cache.purger
         public: true
         
-    test.api_platform.http_cache.purger.xkey:
-        alias: api_platform.http_cache.purger.xkey
-        public: true
-
     test.property_accessor:
         alias: property_accessor
         public: true
@@ -438,4 +430,3 @@ services:
         decorates: api_platform.swagger.normalizer.documentation
         public: false
         arguments: ['@app.serializer.normalizer.override_documentation.inner']
-

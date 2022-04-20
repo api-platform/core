@@ -54,7 +54,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     {
         $identifiers = [];
         $resourceClass = $this->getResourceClass($item, true);
-        $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName);
+        $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName, false, true);
 
         $links = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
         foreach ($links ?? [] as $link) {

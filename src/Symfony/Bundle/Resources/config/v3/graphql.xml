@@ -5,12 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="api_platform.graphql.resolver.stage.write" class="ApiPlatform\GraphQl\Resolver\Stage\WriteStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.state_processor" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
         </service>
         <service id="api_platform.graphql.resolver.stage.read" class="ApiPlatform\GraphQl\Resolver\Stage\ReadStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
             <argument type="service" id="api_platform.state_provider" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
@@ -35,6 +33,7 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.graphql.types_container" />
             <argument type="service" id="api_platform.graphql.type_builder" />
             <argument type="service" id="api_platform.graphql.type_converter" />
@@ -77,7 +76,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.security_post_denormalize" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.graphql.query_resolver_locator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="request_stack" />
         </service>
 
@@ -90,7 +88,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.write" />
             <argument type="service" id="api_platform.graphql.resolver.stage.validate" />
             <argument type="service" id="api_platform.graphql.mutation_resolver_locator" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.graphql.resolver.stage.security_post_validation" />
         </service>
 
@@ -98,7 +95,6 @@
             <argument type="service" id="api_platform.graphql.resolver.stage.read" />
             <argument type="service" id="api_platform.graphql.resolver.stage.security" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_manager" />
             <argument type="service" id="api_platform.graphql.subscription.mercure_iri_generator" on-invalid="ignore" />
         </service>
@@ -106,35 +102,29 @@
         <!-- Resolver Stages -->
 
         <service id="api_platform.graphql.resolver.stage.security" class="ApiPlatform\GraphQl\Resolver\Stage\SecurityStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.security_post_denormalize" class="ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.security_post_validation" class="ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.serialize" class="ApiPlatform\GraphQl\Resolver\Stage\SerializeStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
             <argument type="service" id="api_platform.pagination.next" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.deserialize" class="ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.graphql.serializer.context_builder" />
         </service>
 
         <service id="api_platform.graphql.resolver.stage.validate" class="ApiPlatform\GraphQl\Resolver\Stage\ValidateStage" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.validator" />
         </service>
 
@@ -179,6 +169,7 @@
             <argument type="service" id="api_platform.graphql.subscription.subscription_identifier_generator" />
             <argument type="service" id="api_platform.graphql.resolver.stage.serialize" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
         </service>
 
         <!-- Serializer -->

@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Messenger;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
@@ -67,28 +68,12 @@ final class Processor implements ProcessorInterface
         );
     }
 
-    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        if (\array_key_exists('operation', $context) && $context['operation']->isDelete()) {
+        if ($operation instanceof DeleteOperationInterface) {
             return $this->remove($data);
         }
 
         return $this->persist($data);
-    }
-
-    public function supports($data, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
-    {
-        try {
-            if (isset($context['operation'])) {
-                $operation = $context['operation'];
-            } else {
-                $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($context['resource_class'] ?? $this->getObjectClass($data));
-                $operation = $resourceMetadataCollection->getOperation($operationName);
-            }
-
-            return false !== ($operation->getMessenger() ?? false);
-        } catch (OperationNotFoundException $e) {
-            return false;
-        }
     }
 }

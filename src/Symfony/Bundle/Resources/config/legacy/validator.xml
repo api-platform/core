@@ -68,7 +68,7 @@
             <argument type="service" id="validator" />
             <argument type="service" id="service_container" />
         </service>
-        <service id="ApiPlatform\Symfony\EventListener\ValidatorInterface" alias="api_platform.validator" />
+        <service id="ApiPlatform\Validator\ValidatorInterface" alias="api_platform.validator" />
 
         <service id="api_platform.listener.view.validate" class="ApiPlatform\Symfony\EventListener\ValidateListener">
             <argument type="service" id="api_platform.validator" />

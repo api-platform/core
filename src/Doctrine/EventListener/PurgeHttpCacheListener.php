@@ -42,11 +42,8 @@ final class PurgeHttpCacheListener
     private $resourceClassResolver;
     private $propertyAccessor;
     private $tags = [];
-    private $xKeyPurger;
-    private $xkeyEnabled;
-    private $httpTagsEnabled;
 
-    public function __construct(PurgerInterface $purger, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, PurgerInterface $xKeyPurger = null, bool $xkeyEnabled = false, bool $httpTagsEnabled = true)
+    public function __construct(PurgerInterface $purger, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->purger = $purger;
         $this->iriConverter = $iriConverter;
@@ -56,9 +53,6 @@ final class PurgeHttpCacheListener
 
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
-        $this->xKeyPurger = $xKeyPurger;
-        $this->xkeyEnabled = $xkeyEnabled;
-        $this->httpTagsEnabled = $httpTagsEnabled;
     }
 
     /**
@@ -115,13 +109,7 @@ final class PurgeHttpCacheListener
             return;
         }
 
-        if ($this->httpTagsEnabled) {
-            $this->purger->purge(array_values($this->tags));
-        }
-
-        if ($this->xkeyEnabled && $this->xKeyPurger) {
-            $this->xKeyPurger->purge(array_values($this->tags));
-        }
+        $this->purger->purge(array_values($this->tags));
 
         $this->tags = [];
     }
@@ -181,3 +169,5 @@ final class PurgeHttpCacheListener
         }
     }
 }
+
+class_alias(PurgeHttpCacheListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener::class);

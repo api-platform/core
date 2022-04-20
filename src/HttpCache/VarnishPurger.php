@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache;
 
-use GuzzleHttp\ClientInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Purges Varnish.
@@ -31,7 +31,7 @@ final class VarnishPurger implements PurgerInterface
     private $maxHeaderLength;
 
     /**
-     * @param ClientInterface[] $clients
+     * @param HttpClientInterface[] $clients
      */
     public function __construct(array $clients, int $maxHeaderLength = self::DEFAULT_VARNISH_MAX_HEADER_LENGTH)
     {
@@ -83,6 +83,14 @@ final class VarnishPurger implements PurgerInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseHeaders(array $iris): array
+    {
+        return ['Cache-Tags' => implode(',', $iris)];
+    }
+
     private function purgeRequest(array $iris)
     {
         // Create the regex to purge all tags in just one request
@@ -131,3 +139,5 @@ final class VarnishPurger implements PurgerInterface
         yield from $this->chunkRegexParts($nextParts);
     }
 }
+
+class_alias(VarnishPurger::class, \ApiPlatform\Core\HttpCache\VarnishPurger::class);

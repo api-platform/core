@@ -100,3 +100,5 @@ class ItemNormalizer extends AbstractItemNormalizer
         }
     }
 }
+
+class_alias(ItemNormalizer::class, \ApiPlatform\Core\Serializer\ItemNormalizer::class);

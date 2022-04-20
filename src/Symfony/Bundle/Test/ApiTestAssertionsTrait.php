@@ -162,3 +162,5 @@ trait ApiTestAssertionsTrait
         return $schemaFactory;
     }
 }
+
+class_alias(ApiTestAssertionsTrait::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestAssertionsTrait::class);

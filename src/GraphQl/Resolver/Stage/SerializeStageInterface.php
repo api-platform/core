@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Resolver\Stage;
 
+use ApiPlatform\Metadata\GraphQl\Operation;
+
 /**
  * Serialize stage of GraphQL resolvers.
  *
@@ -23,5 +25,5 @@ interface SerializeStageInterface
     /**
      * @param object|iterable|null $itemOrCollection
      */
-    public function __invoke($itemOrCollection, string $resourceClass, string $operationName, array $context): ?array;
+    public function __invoke($itemOrCollection, string $resourceClass, Operation $operation, array $context): ?array;
 }

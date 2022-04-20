@@ -9,6 +9,7 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument>%api_platform.metadata_backward_compatibility_layer%</argument>
         </service>
 
         <service id="api_platform.identifiers_extractor.cached" class="ApiPlatform\Core\Api\CachedIdentifiersExtractor" decorates="api_platform.identifiers_extractor.legacy" public="false">

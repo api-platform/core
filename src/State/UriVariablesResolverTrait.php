@@ -18,7 +18,7 @@ use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Core\Identifier\ContextAwareIdentifierConverterInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 
 /**
  * @experimental
@@ -31,7 +31,7 @@ trait UriVariablesResolverTrait
     /**
      * Resolves an operation's UriVariables to their identifiers values.
      *
-     * @param Operation|null $operation
+     * @param HttpOperation|null $operation
      */
     private function getOperationUriVariables($operation, array $parameters, string $resourceClass): array
     {

@@ -97,3 +97,5 @@ trait BooleanFilterTrait
         return null;
     }
 }
+
+class_alias(BooleanFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class);

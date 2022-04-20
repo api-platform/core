@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -47,8 +48,9 @@ final class ItemProvider implements ProviderInterface
         $this->itemExtensions = $itemExtensions;
     }
 
-    public function provide(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
+        $resourceClass = $operation->getClass();
         /** @var EntityManagerInterface $manager */
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
 
@@ -66,27 +68,16 @@ final class ItemProvider implements ProviderInterface
         $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
-        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operationName);
+        $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operation);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operationName, $context);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operation->getName(), $context);
 
-            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
+                return $extension->getResult($queryBuilder, $resourceClass, $operation->getName(), $context);
             }
         }
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
-    }
-
-    public function supports(string $resourceClass, array $uriVariables = [], ?string $operationName = null, array $context = []): bool
-    {
-        if (!$this->managerRegistry->getManagerForClass($resourceClass) instanceof EntityManagerInterface) {
-            return false;
-        }
-
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
-
-        return !($operation->getExtraProperties()['is_legacy_subresource'] ?? false) && !($operation->isCollection() ?? false);
     }
 }

@@ -43,3 +43,5 @@ final class TermFilter extends AbstractSearchFilter
         return $termQuery;
     }
 }
+
+class_alias(TermFilter::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\TermFilter::class);

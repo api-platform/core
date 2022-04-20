@@ -183,3 +183,5 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         return null;
     }
 }
+
+class_alias(DoctrineExtractor::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyInfo\DoctrineExtractor::class);

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Symfony\Bundle\Command;
 
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Command\UpgradeApiResourceCommand;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -33,11 +34,13 @@ class UpgradeApiResourceCommandTest extends TestCase
 
     private function getCommandTester(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory): CommandTester
     {
+        $identifiersExtractor = $this->prophesize(IdentifiersExtractorInterface::class);
+
         $application = new Application();
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
 
-        $application->add(new UpgradeApiResourceCommand($resourceNameCollectionFactory, $resourceMetadataFactory, $subresourceOperationFactory, new SubresourceTransformer(), new AnnotationReader()));
+        $application->add(new UpgradeApiResourceCommand($resourceNameCollectionFactory, $resourceMetadataFactory, $subresourceOperationFactory, new SubresourceTransformer(), new AnnotationReader(), $identifiersExtractor->reveal()));
 
         $command = $application->find('api:upgrade-resource');
 

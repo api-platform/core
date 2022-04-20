@@ -180,3 +180,5 @@ final class Response implements ResponseInterface
         $this->info['error'] = 'Response has been canceled.';
     }
 }
+
+class_alias(Response::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\Response::class);

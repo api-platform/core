@@ -49,3 +49,5 @@ final class ConstantScoreFilterExtension extends AbstractFilterExtension
         return $requestBody;
     }
 }
+
+class_alias(ConstantScoreFilterExtension::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\ConstantScoreFilterExtension::class);

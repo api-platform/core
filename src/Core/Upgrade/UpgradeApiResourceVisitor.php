@@ -16,6 +16,7 @@ namespace ApiPlatform\Core\Upgrade;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Annotation\ApiResource as LegacyApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -23,6 +24,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -36,12 +38,16 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
     use RemoveAnnotationTrait;
 
     private LegacyApiResource $resourceAnnotation;
+    private IdentifiersExtractorInterface $identifiersExtractor;
     private bool $isAnnotation = false;
+    private string $resourceClass;
 
-    public function __construct(LegacyApiResource $resourceAnnotation, bool $isAnnotation = false)
+    public function __construct(LegacyApiResource $resourceAnnotation, bool $isAnnotation, IdentifiersExtractorInterface $identifiersExtractor, string $resourceClass)
     {
         $this->resourceAnnotation = $resourceAnnotation;
         $this->isAnnotation = $isAnnotation;
+        $this->identifiersExtractor = $identifiersExtractor;
+        $this->resourceClass = $resourceClass;
     }
 
     /**
@@ -60,6 +66,9 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
         return $this->resourceAnnotation->{$key} ?? $default;
     }
 
+    /**
+     * @return int|Node|null
+     */
     public function enterNode(Node $node)
     {
         // We don't go through every resources to remove ApiSubresource annotations, do this here as well if there are some
@@ -76,6 +85,10 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
                 $this->getOperationsNamespaces($this->getLegacyOperations(true), true),
                 $this->getGraphQlOperationsNamespaces($this->resourceAnnotation->graphql ?? [])
             ));
+
+            if (true === !($this->resourceAnnotation->attributes['composite_identifier'] ?? true)) {
+                $namespaces[] = Link::class;
+            }
 
             foreach ($node->stmts as $k => $stmt) {
                 if (!$stmt instanceof Node\Stmt\Use_) {
@@ -196,6 +209,40 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
                             new Node\Name('UrlGeneratorInterface'),
                             $currentUrlGeneratorConstant
                         );
+                    continue;
+                }
+
+                if ('compositeIdentifier' === $key) {
+                    if (false !== $value) {
+                        continue;
+                    }
+
+                    $identifiers = $this->identifiersExtractor->getIdentifiersFromResourceClass($this->resourceClass);
+                    $identifierNodeItems = [];
+                    foreach ($identifiers as $identifier) {
+                        $identifierNodes = [
+                            'compositeIdentifier' => new Node\Expr\ConstFetch(new Node\Name('false')),
+                            'fromClass' => new Node\Expr\ClassConstFetch(
+                                    new Node\Name(
+                                        'self'
+                                    ),
+                                    'class'
+                                ),
+                            'identifiers' => new Node\Expr\Array_(
+                                    [
+                                        new Node\Expr\ArrayItem(new Node\Scalar\String_($identifier)),
+                                    ],
+                                    ['kind' => Node\Expr\Array_::KIND_SHORT]
+                                ),
+                        ];
+
+                        $identifierNodeItems[] = new Node\Expr\ArrayItem(
+                            new Node\Expr\New_(new Node\Name('Link'), $this->arrayToArguments($identifierNodes)),
+                            new Node\Scalar\String_($identifier)
+                        );
+                    }
+
+                    $arguments['uriVariables'] = new Node\Expr\Array_($identifierNodeItems, ['kind' => Node\Expr\Array_::KIND_SHORT]);
                     continue;
                 }
 

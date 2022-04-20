@@ -84,3 +84,5 @@ trait OrderFilterTrait
         return $value;
     }
 }
+
+class_alias(OrderFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class);

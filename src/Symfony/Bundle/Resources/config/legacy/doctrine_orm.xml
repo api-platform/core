@@ -49,5 +49,16 @@
             <argument type="service" id="doctrine" />
             <argument type="service" id="api_platform.doctrine.orm.metadata.property.metadata_factory.legacy.inner" />
         </service>
+
+        <service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument>null</argument>
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$identifiersExtractor" type="service" id="api_platform.identifiers_extractor.cached" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
+        </service>
+        <service id="ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter" alias="api_platform.doctrine.orm.search_filter" />
     </services>
 </container>

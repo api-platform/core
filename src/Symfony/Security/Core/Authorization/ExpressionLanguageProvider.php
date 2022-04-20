@@ -34,3 +34,5 @@ final class ExpressionLanguageProvider implements ExpressionFunctionProviderInte
         ];
     }
 }
+
+class_alias(ExpressionLanguageProvider::class, \ApiPlatform\Core\Security\Core\Authorization\ExpressionLanguageProvider::class);

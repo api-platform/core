@@ -28,4 +28,11 @@ interface PurgerInterface
      * @param string[] $iris
      */
     public function purge(array $iris);
+
+    /**
+     * Get the response header containing purged tags.
+     *
+     * @param string[] $iris
+     */
+    public function getResponseHeaders(array $iris): array;
 }

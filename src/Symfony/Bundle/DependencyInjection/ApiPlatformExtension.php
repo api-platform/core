@@ -46,7 +46,6 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
-use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -54,6 +53,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mercure\Discovery;
 use Symfony\Component\Mercure\HubRegistry;
@@ -244,9 +244,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.vary', $config['defaults']['cache_headers']['vary'] ?? $config['http_cache']['vary']);
         $container->setParameter('api_platform.http_cache.public', $config['defaults']['cache_headers']['public'] ?? $config['http_cache']['public']);
         $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
-        $container->setParameter('api_platform.http_cache.invalidation.xkey.enabled', $config['defaults']['cache_headers']['invalidation']['xkey_enabled'] ?? $this->isConfigEnabled($container, $config['http_cache']['invalidation']['xkey']));
         $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
-        $container->setParameter('api_platform.http_cache.invalidation.http_tags.enabled', $config['defaults']['cache_headers']['invalidation']['http_tags_enabled'] ?? $this->isConfigEnabled($container, $config['http_cache']['invalidation']['http_tags']));
 
         $container->setAlias('api_platform.operation_path_resolver.default', $config['default_operation_path_resolver']);
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
@@ -299,18 +297,16 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
-        $loader->load('metadata/xml.xml');
-        $loader->load('metadata/property_name.xml');
         [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
+
+        $loader->load('metadata/resource_name.xml');
+        $loader->load('metadata/property_name.xml');
 
         if (!empty($config['resource_class_directories'])) {
             $container->setParameter('api_platform.resource_class_directories', array_merge(
                 $config['resource_class_directories'], $container->getParameter('api_platform.resource_class_directories')
             ));
         }
-
-        $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
-        $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 
         $loader->load('legacy/metadata.xml');
         $container->getDefinition('api_platform.metadata.extractor.xml.legacy')->replaceArgument(0, $xmlResources);
@@ -326,24 +322,37 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (class_exists(Yaml::class)) {
             $loader->load('legacy/metadata_yaml.xml');
             $container->getDefinition('api_platform.metadata.extractor.yaml.legacy')->replaceArgument(0, $yamlResources);
+
+            if ($config['metadata_backward_compatibility_layer']) {
+                $loader->load('legacy/metadata_yaml_backward_compatibility.xml');
+            }
         }
 
         // Load the legacy metadata as well
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('metadata/links.xml');
-            $loader->load('metadata/property.xml');
-            $loader->load('metadata/property_name.xml');
-            $loader->load('metadata/resource.xml');
-            $loader->load('metadata/resource_name.xml');
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/metadata_backward_compatibility.xml');
 
-            if (interface_exists(DocBlockFactoryInterface::class)) {
-                $loader->load('metadata/php_doc.xml');
-            }
+            return;
+        }
 
+        // V3 metadata
+        $loader->load('metadata/xml.xml');
+        $loader->load('metadata/links.xml');
+        $loader->load('metadata/property.xml');
+        $loader->load('metadata/resource.xml');
+        $loader->load('v3/metadata.xml');
+
+        $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
+        $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
+
+        if (interface_exists(DocBlockFactoryInterface::class)) {
+            $loader->load('metadata/php_doc.xml');
+        }
+
+        if (class_exists(Yaml::class)) {
             $loader->load('metadata/yaml.xml');
             $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
             $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
-            $loader->load('metadata/backward_compatibility.xml');
         }
     }
 
@@ -676,35 +685,29 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        if (!$this->isConfigEnabled($container, $config['http_cache']['invalidation']['xkey']) && !$this->isConfigEnabled($container, $config['http_cache']['invalidation']['http_tags'])) {
-            throw new RuntimeException('You can not set both xkey and http_tags to false.');
-        }
-
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_http_cache_purger.xml');
         }
 
-        $loader->load('http_cache_tags.xml');
+        $loader->load('http_cache_purger.xml');
 
         $definitions = [];
         foreach ($config['http_cache']['invalidation']['varnish_urls'] as $key => $url) {
-            $definition = new ChildDefinition('api_platform.http_cache.purger.varnish_client');
-            $definition->addArgument(['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']);
+            $definition = new Definition(ScopingHttpClient::class, [new Reference('http_client'), $url, ['base_uri' => $url] + $config['http_cache']['invalidation']['request_options']]);
+            $definition->setFactory([ScopingHttpClient::class, 'forBaseUri']);
 
             $definitions[] = $definition;
         }
 
-        if ($this->isConfigEnabled($container, $config['http_cache']['invalidation']['http_tags'])) {
-            $container->getDefinition('api_platform.http_cache.purger.varnish')->setArguments([$definitions,
-                $config['http_cache']['invalidation']['max_header_length'], ]);
-            $container->setAlias('api_platform.http_cache.purger', 'api_platform.http_cache.purger.varnish');
+        foreach (['api_platform.http_cache.purger.varnish.ban', 'api_platform.http_cache.purger.varnish.xkey'] as $serviceName) {
+            $container->findDefinition($serviceName)->setArguments([
+                $definitions,
+                $config['http_cache']['invalidation']['max_header_length'],
+            ]);
         }
 
-        if ($this->isConfigEnabled($container, $config['http_cache']['invalidation']['xkey'])) {
-            $container->getDefinition('api_platform.http_cache.purger.varnish.xkey')->setArguments([$definitions,
-                $config['http_cache']['invalidation']['max_header_length'], ]);
-            $container->setAlias('api_platform.http_cache.purger.xkey', 'api_platform.http_cache.purger.varnish.xkey');
-        }
+        $serviceName = $config['http_cache']['invalidation']['purger'];
+        $container->setAlias('api_platform.http_cache.purger', $serviceName);
     }
 
     /**
@@ -833,6 +836,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('messenger.xml');
+
+        if (!$config['metadata_backward_compatibility_layer']) {
+            $loader->load('v3/messenger.xml');
+        }
     }
 
     private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -846,6 +853,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
+
+        if (!$config['metadata_backward_compatibility_layer']) {
+            $loader->load('v3/elasticsearch.xml');
+        }
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
@@ -934,3 +945,5 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             : [true, $message];
     }
 }
+
+class_alias(ApiPlatformExtension::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension::class);

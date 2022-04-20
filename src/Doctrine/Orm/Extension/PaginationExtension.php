@@ -488,3 +488,6 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
         return false;
     }
 }
+
+class_alias(PaginationExtension::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\PaginationExtension::class);
+class_alias(PaginationExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\PaginationExtension::class);

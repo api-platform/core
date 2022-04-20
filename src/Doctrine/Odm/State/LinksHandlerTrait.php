@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Odm\State;
 use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTrait;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -24,13 +25,12 @@ trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
 
-    private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, ?string $operationName = null): void
+    private function handleLinks(Builder $aggregationBuilder, array $identifiers, array $context, string $resourceClass, Operation $operation): void
     {
         if (!$identifiers) {
             return;
         }
 
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName);
         $links = $this->getLinks($resourceClass, $operation, $context);
 
         if (!$links) {

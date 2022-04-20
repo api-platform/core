@@ -20,15 +20,12 @@ use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -72,8 +69,9 @@ class CollectionProviderTest extends TestCase
         $extensionProphecy = $this->prophesize(QueryCollectionExtensionInterface::class);
         $extensionProphecy->applyToCollection($queryBuilder, Argument::type(QueryNameGeneratorInterface::class), OperationResource::class, 'getCollection', [])->shouldBeCalled();
 
+        $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
         $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals([], $dataProvider->provide(OperationResource::class, [], 'getCollection'));
+        $this->assertEquals([], $dataProvider->provide($operation));
     }
 
     /**
@@ -105,7 +103,8 @@ class CollectionProviderTest extends TestCase
         $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['' => new GetCollection()]))]));
 
         $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertEquals([], $dataProvider->provide(OperationResource::class));
+        $operation = (new GetCollection())->withClass(OperationResource::class);
+        $this->assertEquals([], $dataProvider->provide($operation));
     }
 
     /**
@@ -127,60 +126,7 @@ class CollectionProviderTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
         $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal());
-        $this->assertEquals([], $dataProvider->provide(OperationResource::class));
-    }
-
-    /**
-     * @requires PHP 8.0
-     */
-    public function testSupportedClass()
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-
-        $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['getCollection' => new GetCollection()]))]));
-        $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($entityManagerProphecy->reveal())->shouldBeCalled();
-
-        $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
-
-        $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertTrue($dataProvider->supports(OperationResource::class, [], 'getCollection'));
-    }
-
-    /**
-     * @requires PHP 8.0
-     */
-    public function testUnsupportedClass()
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn(null)->shouldBeCalled();
-
-        $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
-
-        $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertFalse($dataProvider->supports(Dummy::class));
-    }
-
-    /**
-     * @requires PHP 8.0
-     */
-    public function testNotCollectionOperation()
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-
-        $resourceMetadataFactoryProphecy->create(OperationResource::class)->willReturn(new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations(['get' => new Get()]))]));
-        $managerRegistryProphecy->getManagerForClass(OperationResource::class)->willReturn($entityManagerProphecy->reveal())->shouldBeCalled();
-
-        $extensionProphecy = $this->prophesize(QueryResultCollectionExtensionInterface::class);
-
-        $dataProvider = new CollectionProvider($resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal(), [$extensionProphecy->reveal()]);
-        $this->assertFalse($dataProvider->supports(OperationResource::class, [], 'get'));
+        $operation = (new GetCollection())->withClass(OperationResource::class)->withName('getCollection');
+        $this->assertEquals([], $dataProvider->provide($operation));
     }
 }

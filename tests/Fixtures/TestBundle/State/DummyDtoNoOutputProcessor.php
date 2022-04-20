@@ -32,7 +32,7 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process($data, array $identifiers = [], ?string $operationName = null, array $context = [])
+    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
     {
         $isOrm = true;
         $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);
