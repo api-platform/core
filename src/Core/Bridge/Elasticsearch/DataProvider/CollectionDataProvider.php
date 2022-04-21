@@ -132,7 +132,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
             'body' => $body,
         ];
 
-        if (ElasticsearchVersion::supportsDocumentType()) {
+        if (ElasticsearchVersion::supportsMappingType()) {
             $params['type'] = $documentMetadata->getType();
         }
 

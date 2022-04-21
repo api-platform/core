@@ -58,7 +58,7 @@ final class ItemProvider implements ProviderInterface
                 'id' => (string) reset($uriVariables),
             ];
 
-            if (ElasticsearchVersion::supportsDocumentType()) {
+            if (ElasticsearchVersion::supportsMappingType()) {
                 $params['type'] = $documentMetadata->getType();
             }
 

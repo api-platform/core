@@ -98,7 +98,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
                 'id' => (string) $id,
             ];
 
-            if (ElasticsearchVersion::supportsDocumentType()) {
+            if (ElasticsearchVersion::supportsMappingType()) {
                 $params['type'] = $documentMetadata->getType();
             }
 

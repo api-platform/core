@@ -22,10 +22,15 @@ class ElasticsearchVersion
      */
     public const REGEX_PATTERN = '/\d(.*)/';
 
-    public static function supportsDocumentType(string $version = Client::VERSION): bool
+    /**
+     * Detect whether the current ES version supports passing mapping type as a search parameter.
+     *
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/7.17/removal-of-types.html#_schedule_for_removal_of_mapping_types
+     */
+    public static function supportsMappingType(string $version = Client::VERSION): bool
     {
         $matchResult = preg_match(self::REGEX_PATTERN, $version, $matches);
 
-        return is_int($matchResult) && $matchResult > 0 && (int) $matches[0] < 7;
+        return \is_int($matchResult) && $matchResult > 0 && (int) $matches[0] < 7;
     }
 }
