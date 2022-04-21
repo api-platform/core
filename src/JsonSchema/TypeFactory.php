@@ -169,10 +169,16 @@ final class TypeFactory implements TypeFactoryInterface
         }
 
         if (\array_key_exists('$ref', $jsonSchema)) {
-            return [
-                'nullable' => true,
-                'anyOf' => [$jsonSchema],
-            ];
+            $typeDefinition = ['anyOf' => [$jsonSchema]];
+
+            if ($schema && Schema::VERSION_JSON_SCHEMA === $schema->getVersion()) {
+                $typeDefinition['anyOf'][] = ['type' => 'null'];
+            } else {
+                // OpenAPI < 3.1
+                $typeDefinition['nullable'] = true;
+            }
+
+            return $typeDefinition;
         }
 
         if ($schema && Schema::VERSION_JSON_SCHEMA === $schema->getVersion()) {
