@@ -16,12 +16,13 @@ namespace ApiPlatform\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer as MessengerDataTransformer;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidValueException;
 use ApiPlatform\Exception\ItemNotFoundException;
@@ -110,6 +111,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $this->allowPlainIdentifiers = $allowPlainIdentifiers;
 
         $this->dataTransformers = $dataTransformers;
+
+        // Just skip our data transformer to trigger a proper deprecation
+        $customDataTransformers = array_filter(\is_array($dataTransformers) ? $dataTransformers : iterator_to_array($dataTransformers), function ($dataTransformer) {
+            return !$dataTransformer instanceof MessengerDataTransformer;
+        });
+
+        if (\count($customDataTransformers)) {
+            trigger_deprecation('api-platform/core', '2.7', 'The DataTransformer pattern is deprecated, use a Provider or a Processor and either use your input or return a new output there.');
+        }
+
         if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
         }

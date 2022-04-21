@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\DataTransformer;
+namespace ApiPlatform\Core\DataTransformer;
 
 interface DataTransformerInitializerInterface extends DataTransformerInterface
 {
