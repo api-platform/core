@@ -17,9 +17,6 @@ use Elasticsearch\Client;
 
 class ElasticsearchVersion
 {
-    /**
-     * @see https://regex101.com/r/EWxpuO/2
-     */
     public const REGEX_PATTERN = '/\d(.*)/';
 
     /**
