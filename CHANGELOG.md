@@ -7,6 +7,11 @@
 * Introduce `DeleteOperationInterface` instead of the `delete` flag (#4712)
 * The `compositeIdentifier` flag only lives under the `uriVariables` property (#4712)
 * The `provider` or `processor` property is specified within the `Operation` and we removed the chain pattern (#4712)
+* JSON Schema: fix nullable types validation using assertMatchesResourceItemJsonSchema (#4725)
+* Elasticsearch: verify whether mapping type is supported (#4726)
+* Deprecate Data Transformers (#4722)
+* Fix missing service declaration and BC breaks (#4721 #4716 #4717 #4718)
+* Hydra: add hydra view example values (#4681)
 
 ## 2.7.0-alpha.1
 
