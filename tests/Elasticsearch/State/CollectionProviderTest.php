@@ -108,7 +108,6 @@ final class CollectionProviderTest extends TestCase
             ->search(
                 Argument::allOf(
                     Argument::withEntry('index', 'foo'),
-                    Argument::withEntry('type', DocumentMetadata::DEFAULT_TYPE),
                     Argument::withEntry('body', Argument::allOf(
                         Argument::withEntry('size', 2),
                         Argument::withEntry('from', 0),
@@ -118,7 +117,7 @@ final class CollectionProviderTest extends TestCase
                         )),
                         Argument::size(3)
                     )),
-                    Argument::size(3)
+                    Argument::size(2)
                 )
             )
             ->willReturn($documents)

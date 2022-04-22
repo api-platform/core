@@ -15,6 +15,7 @@ namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
+use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Elasticsearch\Client;
@@ -52,11 +53,16 @@ final class ItemProvider implements ProviderInterface
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
         try {
-            $document = $this->client->get([
+            $params = [
                 'index' => $documentMetadata->getIndex(),
-                'type' => $documentMetadata->getType(),
                 'id' => (string) reset($uriVariables),
-            ]);
+            ];
+
+            if (ElasticsearchVersion::supportsMappingType()) {
+                $params['type'] = $documentMetadata->getType();
+            }
+
+            $document = $this->client->get($params);
         } catch (Missing404Exception $e) {
             return null;
         }

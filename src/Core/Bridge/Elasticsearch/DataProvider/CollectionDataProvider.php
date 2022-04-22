@@ -22,6 +22,7 @@ use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Pagination\Pagination;
@@ -126,11 +127,16 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName, $context);
         $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($resourceClass, $operationName, $context);
 
-        $documents = $this->client->search([
+        $params = [
             'index' => $documentMetadata->getIndex(),
-            'type' => $documentMetadata->getType(),
             'body' => $body,
-        ]);
+        ];
+
+        if (ElasticsearchVersion::supportsMappingType()) {
+            $params['type'] = $documentMetadata->getType();
+        }
+
+        $documents = $this->client->search($params);
 
         return new Paginator(
             $this->denormalizer,

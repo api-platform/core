@@ -21,6 +21,7 @@ use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Exception\NonUniqueIdentifierException;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
+use ApiPlatform\Elasticsearch\Util\ElasticsearchVersion;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -92,11 +93,16 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
 
         try {
-            $document = $this->client->get([
+            $params = [
                 'index' => $documentMetadata->getIndex(),
-                'type' => $documentMetadata->getType(),
                 'id' => (string) $id,
-            ]);
+            ];
+
+            if (ElasticsearchVersion::supportsMappingType()) {
+                $params['type'] = $documentMetadata->getType();
+            }
+
+            $document = $this->client->get($params);
         } catch (Missing404Exception $e) {
             return null;
         }

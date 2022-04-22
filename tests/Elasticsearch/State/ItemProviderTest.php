@@ -73,7 +73,7 @@ final class ItemProviderTest extends TestCase
         $foo->setBar('erèinissor');
 
         $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['index' => 'foo', 'type' => DocumentMetadata::DEFAULT_TYPE, 'id' => '1'])->willReturn($document)->shouldBeCalled();
+        $clientProphecy->get(['index' => 'foo', 'id' => '1'])->willReturn($document)->shouldBeCalled();
 
         $denormalizerProphecy = $this->prophesize(DenormalizerInterface::class);
         $denormalizerProphecy->denormalize($document, Foo::class, DocumentNormalizer::FORMAT, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true])->willReturn($foo)->shouldBeCalled();
@@ -89,7 +89,7 @@ final class ItemProviderTest extends TestCase
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $clientProphecy = $this->prophesize(Client::class);
-        $clientProphecy->get(['index' => 'foo', 'type' => DocumentMetadata::DEFAULT_TYPE, 'id' => '404'])->willThrow(new Missing404Exception())->shouldBeCalled();
+        $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willThrow(new Missing404Exception())->shouldBeCalled();
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
