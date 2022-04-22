@@ -387,29 +387,60 @@ class TypeFactoryTest extends TestCase
         $this->assertSame(['$ref' => 'ref'], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
     }
 
-    public function testGetClassTypeWithNullability(): void
+    /** @dataProvider classTypeWithNullabilityDataProvider */
+    public function testGetClassTypeWithNullability(array $expected, SchemaFactoryInterface $schemaFactory, Schema $schema): void
+    {
+        $typeFactory = new TypeFactory();
+        $typeFactory->setSchemaFactory($schemaFactory);
+
+        self::assertSame(
+            $expected,
+            $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], $schema)
+        );
+    }
+
+    public function classTypeWithNullabilityDataProvider(): iterable
+    {
+        $schemaFactory = $this->createSchemaFactoryMock($schema = new Schema());
+
+        yield 'JSON-Schema version' => [
+            [
+                'anyOf' => [
+                    ['$ref' => 'the-ref-name'],
+                    ['type' => 'null'],
+                ],
+            ],
+            $schemaFactory,
+            $schema,
+        ];
+
+        $schemaFactory = $this->createSchemaFactoryMock($schema = new Schema(Schema::VERSION_OPENAPI));
+
+        yield 'OpenAPI < 3.1 version' => [
+            [
+                'anyOf' => [
+                    ['$ref' => 'the-ref-name'],
+                ],
+                'nullable' => true,
+            ],
+            $schemaFactory,
+            $schema,
+        ];
+    }
+
+    private function createSchemaFactoryMock(Schema $schema): SchemaFactoryInterface
     {
         $schemaFactory = $this->createMock(SchemaFactoryInterface::class);
 
         $schemaFactory
             ->method('buildSchema')
-            ->willReturnCallback(static function (): Schema {
-                $schema = new Schema();
-
+            ->willReturnCallback(static function () use ($schema): Schema {
                 $schema['$ref'] = 'the-ref-name';
                 $schema['description'] = 'more stuff here';
 
                 return $schema;
             });
 
-        $typeFactory = new TypeFactory();
-        $typeFactory->setSchemaFactory($schemaFactory);
-
-        self::assertSame([
-            'nullable' => true,
-            'anyOf' => [
-                ['$ref' => 'the-ref-name'],
-            ],
-        ], $typeFactory->getType(new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class), 'jsonld', true, ['foo' => 'bar'], new Schema()));
+        return $schemaFactory;
     }
 }
