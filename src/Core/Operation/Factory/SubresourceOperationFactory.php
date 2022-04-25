@@ -50,8 +50,6 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
      */
     public function create(string $resourceClass): array
     {
-        trigger_deprecation('api-platform/core', '2.7', 'Subresources are deprecated, use alternate URLs instead.');
-
         $tree = [];
 
         try {
@@ -78,12 +76,13 @@ final class SubresourceOperationFactory implements SubresourceOperationFactoryIn
         }
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, ['deprecate' => false]);
 
             if (!$subresource = $propertyMetadata->getSubresource()) {
                 continue;
             }
 
+            trigger_deprecation('api-platform/core', '2.7', sprintf('A subresource is declared on "%s::%s". Subresources are deprecated, use another #[ApiResource] instead.', $resourceClass, $property));
             $subresourceClass = $subresource->getResourceClass();
             $subresourceMetadata = $this->resourceMetadataFactory->create($subresourceClass);
             $subresourceMetadata = $subresourceMetadata->withAttributes(($subresourceMetadata->getAttributes() ?: []) + ['identifiers' => !$this->identifiersExtractor ? [$property] : $this->identifiersExtractor->getIdentifiersFromResourceClass($subresourceClass)]);

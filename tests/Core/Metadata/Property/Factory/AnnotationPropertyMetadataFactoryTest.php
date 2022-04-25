@@ -24,13 +24,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPhp8;
 use Doctrine\Common\Annotations\Reader;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class AnnotationPropertyMetadataFactoryTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     /**
@@ -38,6 +39,7 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
      *
      * @param mixed $reader
      * @param mixed $decorated
+     * @group legacy
      */
     public function testCreateProperty($reader, $decorated, string $description)
     {
@@ -57,9 +59,11 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
 
     /**
      * @requires PHP 8.0
+     * @group legacy
      */
     public function testCreateAttribute()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: Decorating the legacy ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface is deprecated, use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface instead.');
         $factory = new AnnotationPropertyMetadataFactory();
 
         $metadata = $factory->create(DummyPhp8::class, 'id');
@@ -109,8 +113,12 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @group legacy
+     */
     public function testClassNotFound()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: Decorating the legacy ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface is deprecated, use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface instead.');
         $this->expectException(PropertyNotFoundException::class);
         $this->expectExceptionMessage('Property "foo" of class "\\DoNotExist" not found.');
 
@@ -118,8 +126,12 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
         $factory->create('\DoNotExist', 'foo');
     }
 
+    /**
+     * @group legacy
+     */
     public function testClassNotFoundButParentFound()
     {
+        $this->expectDeprecation('Since api-platform/core 2.7: Decorating the legacy ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface is deprecated, use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface instead.');
         $propertyMetadata = new PropertyMetadata();
 
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -127,5 +139,25 @@ class AnnotationPropertyMetadataFactoryTest extends TestCase
 
         $factory = new AnnotationPropertyMetadataFactory($this->prophesize(Reader::class)->reveal(), $decoratedProphecy->reveal());
         $this->assertEquals($propertyMetadata, $factory->create('\DoNotExist', 'foo'));
+    }
+
+    public function testSkipDeprecation()
+    {
+        $annotation = new ApiProperty();
+        $annotation->description = 'description';
+        $annotation->readable = true;
+        $annotation->writable = true;
+        $annotation->readableLink = false;
+        $annotation->writableLink = false;
+        $annotation->identifier = false;
+        $annotation->required = true;
+        $annotation->iri = 'foo';
+        $annotation->attributes = ['foo' => 'bar'];
+
+        $propertyReaderProphecy = $this->prophesize(Reader::class);
+        $propertyReaderProphecy->getPropertyAnnotation(Argument::type(\ReflectionProperty::class), ApiProperty::class)->willReturn($annotation)->shouldBeCalled();
+
+        $factory = new AnnotationPropertyMetadataFactory($propertyReaderProphecy->reveal());
+        $metadata = $factory->create(Dummy::class, 'name', ['deprecate' => false]);
     }
 }
