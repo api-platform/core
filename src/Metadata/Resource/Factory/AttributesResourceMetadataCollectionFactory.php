@@ -18,7 +18,6 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\DeleteMutation;
@@ -207,10 +206,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
             if ($operation instanceof Mutation) {
                 $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
-            }
-
-            if ($operation instanceof DeleteOperationInterface) {
-                $operation = $operation->withDescription(ucfirst("Deletes a {$resource->getShortName()}."));
             }
 
             return [$operation->getName(), $operation];
