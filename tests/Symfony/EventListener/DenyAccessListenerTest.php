@@ -96,6 +96,27 @@ class DenyAccessListenerTest extends TestCase
         $listener->onSecurity($event);
     }
 
+    public function testPreReadIsGranted()
+    {
+        $data = new \stdClass();
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get', 'data' => $data]);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security_pre_read' => 'is_granted("ROLE_ADMIN")']);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
+
+        $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessCheckerProphecy->isGranted('Foo', 'is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(true)->shouldBeCalled();
+
+        $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
+        $listener->onSecurityPreRead($event);
+    }
+
     /**
      * @group legacy
      */
@@ -163,6 +184,29 @@ class DenyAccessListenerTest extends TestCase
 
         $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
         $listener->onSecurity($event);
+    }
+
+    public function testSecurityPreReadMessage()
+    {
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('You are not admin.');
+
+        $request = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']);
+
+        $eventProphecy = $this->prophesize(RequestEvent::class);
+        $eventProphecy->getRequest()->willReturn($request)->shouldBeCalled();
+        $event = $eventProphecy->reveal();
+
+        $resourceMetadata = new ResourceMetadata(null, null, null, null, null, ['security_pre_read' => 'is_granted("ROLE_ADMIN")', 'security_pre_read_message' => 'You are not admin.']);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn($resourceMetadata)->shouldBeCalled();
+
+        $resourceAccessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessCheckerProphecy->isGranted('Foo', 'is_granted("ROLE_ADMIN")', Argument::type('array'))->willReturn(false)->shouldBeCalled();
+
+        $listener = $this->getListener($resourceMetadataFactoryProphecy->reveal(), $resourceAccessCheckerProphecy->reveal());
+        $listener->onSecurityPreRead($event);
     }
 
     /**

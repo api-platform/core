@@ -65,6 +65,8 @@ use ApiPlatform\Exception\InvalidArgumentException;
  *     @Attribute("securityPostDenormalizeMessage", type="string"),
  *     @Attribute("securityPostValidation", type="string"),
  *     @Attribute("securityPostValidationMessage", type="string"),
+ *     @Attribute("securityPreRead", type="string"),
+ *     @Attribute("securityPreReadMessage", type="string"),
  *     @Attribute("shortName", type="string"),
  *     @Attribute("stateless", type="bool"),
  *     @Attribute("subresourceOperations", type="array"),
@@ -171,6 +173,8 @@ final class ApiResource
      * @param string       $securityPostDenormalizeMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string       $securityPostValidation          https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validation
      * @param string       $securityPostValidationMessage   https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string       $securityPreRead                 https://api-platform.com/docs/core/security/
+     * @param string       $securityPreReadMessage          https://api-platform.com/docs/core/security/
      * @param bool         $stateless
      * @param string       $sunset                          https://api-platform.com/docs/core/deprecations/#setting-the-sunset-http-header-to-indicate-when-a-resource-or-an-operation-will-be-removed
      * @param array        $swaggerContext                  https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
@@ -224,6 +228,8 @@ final class ApiResource
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?string $securityPreRead = null,
+        ?string $securityPreReadMessage = null,
         ?bool $stateless = null,
         ?string $sunset = null,
         ?array $swaggerContext = null,

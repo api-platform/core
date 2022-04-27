@@ -20,6 +20,8 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory"></argument>
             <argument type="service" id="api_platform.security.resource_access_checker" />
 
+            <!-- This method is be executed before the current object is available -->
+            <tag name="kernel.event_listener" event="kernel.request" method="onSecurityPreRead" priority="5" />
             <!-- This method must be executed only when the current object is available, before deserialization -->
             <tag name="kernel.event_listener" event="kernel.request" method="onSecurity" priority="3" />
             <!-- This method must be executed only when the current object is available, after deserialization -->

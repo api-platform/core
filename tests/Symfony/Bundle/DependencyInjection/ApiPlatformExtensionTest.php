@@ -1617,6 +1617,7 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.security.expression_language_provider', ['security.expression_language_provider']);
 
         $this->assertSame([
+            ['event' => 'kernel.request', 'method' => 'onSecurityPreRead', 'priority' => 5],
             ['event' => 'kernel.request', 'method' => 'onSecurity', 'priority' => 3],
             ['event' => 'kernel.request', 'method' => 'onSecurityPostDenormalize', 'priority' => 1],
             ['event' => 'kernel.view', 'method' => 'onSecurityPostValidation', 'priority' => 63],

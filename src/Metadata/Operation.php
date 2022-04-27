@@ -40,6 +40,8 @@ abstract class Operation
     protected $securityPostDenormalizeMessage;
     protected $securityPostValidation;
     protected $securityPostValidationMessage;
+    protected $securityPreRead;
+    protected $securityPreReadMessage;
     protected $deprecationReason;
     /**
      * @var string[]
@@ -107,6 +109,8 @@ abstract class Operation
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?string $securityPreRead = null,
+        ?string $securityPreReadMessage = null,
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,
@@ -152,6 +156,8 @@ abstract class Operation
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
         $this->securityPostValidation = $securityPostValidation;
         $this->securityPostValidationMessage = $securityPostValidationMessage;
+        $this->securityPreRead = $securityPreRead;
+        $this->securityPreReadMessage = $securityPreReadMessage;
         $this->deprecationReason = $deprecationReason;
         $this->filters = $filters;
         $this->validationContext = $validationContext;
@@ -475,6 +481,32 @@ abstract class Operation
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;
+
+        return $self;
+    }
+
+    public function getSecurityPreRead(): ?string
+    {
+        return $this->securityPreRead;
+    }
+
+    public function withSecurityPreRead(?string $securityPreRead = null): self
+    {
+        $self = clone $this;
+        $self->securityPreRead = $securityPreRead;
+
+        return $self;
+    }
+
+    public function getSecurityPreReadMessage(): ?string
+    {
+        return $this->securityPreReadMessage;
+    }
+
+    public function withSecurityPreReadMessage(?string $securityPreReadMessage = null): self
+    {
+        $self = clone $this;
+        $self->securityPreReadMessage = $securityPreReadMessage;
 
         return $self;
     }

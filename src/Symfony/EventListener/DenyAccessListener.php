@@ -78,6 +78,11 @@ final class DenyAccessListener
         $this->checkSecurity($event->getRequest(), 'security', false);
     }
 
+    public function onSecurityPreRead(RequestEvent $event): void
+    {
+        $this->checkSecurity($event->getRequest(), 'security_pre_read', false);
+    }
+
     public function onSecurityPostDenormalize(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -134,6 +139,10 @@ final class DenyAccessListener
                 case 'security_post_validation':
                     $isGranted = $operation->getSecurityPostValidation();
                     $message = $operation->getSecurityPostValidationMessage();
+                    break;
+                case 'security_pre_read':
+                    $isGranted = $operation->getSecurityPreRead();
+                    $message = $operation->getSecurityPreReadMessage();
                     break;
                 default:
                     $isGranted = $operation->getSecurity();

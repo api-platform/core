@@ -145,6 +145,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'securityPostDenormalizeMessage' => $this->phpize($resource, 'securityPostDenormalizeMessage', 'string'),
             'securityPostValidation' => $this->phpize($resource, 'securityPostValidation', 'string'),
             'securityPostValidationMessage' => $this->phpize($resource, 'securityPostValidationMessage', 'string'),
+            'securityPreRead' => $this->phpize($resource, 'securityPreRead', 'string'),
+            'securityPreReadMessage' => $this->phpize($resource, 'securityPreReadMessage', 'string'),
             'input' => $this->phpize($resource, 'input', 'string'),
             'output' => $this->phpize($resource, 'output', 'string'),
             'normalizationContext' => $this->buildArrayValue($resource, 'normalizationContext'),

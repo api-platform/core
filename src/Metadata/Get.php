@@ -70,6 +70,8 @@ final class Get extends HttpOperation
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?string $securityPreRead = null,
+        ?string $securityPreReadMessage = null,
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,

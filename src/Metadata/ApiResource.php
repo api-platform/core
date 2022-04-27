@@ -107,6 +107,8 @@ class ApiResource
     protected $securityPostDenormalizeMessage;
     protected $securityPostValidation;
     protected $securityPostValidationMessage;
+    protected $securityPreRead;
+    protected $securityPreReadMessage;
     protected $compositeIdentifier;
     protected $exceptionToStatus;
     protected $queryParameterValidationEnabled;
@@ -162,6 +164,8 @@ class ApiResource
      * @param string|null       $securityPostDenormalizeMessage https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param string            $securityPostValidation         https://api-platform.com/docs/core/security/#executing-access-control-rules-after-validtion
      * @param string            $securityPostValidationMessage  https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string            $securityPreRead                https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
+     * @param string            $securityPreReadMessage         https://api-platform.com/docs/core/security/#configuring-the-access-control-error-message
      * @param mixed|null        $provider
      * @param mixed|null        $processor
      */
@@ -222,6 +226,8 @@ class ApiResource
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?string $securityPreRead = null,
+        ?string $securityPreReadMessage = null,
         ?bool $compositeIdentifier = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -286,6 +292,8 @@ class ApiResource
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
         $this->securityPostValidation = $securityPostValidation;
         $this->securityPostValidationMessage = $securityPostValidationMessage;
+        $this->securityPreRead = $securityPreRead;
+        $this->securityPreReadMessage = $securityPreReadMessage;
         $this->compositeIdentifier = $compositeIdentifier;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
@@ -1055,6 +1063,32 @@ class ApiResource
     {
         $self = clone $this;
         $self->securityPostValidationMessage = $securityPostValidationMessage;
+
+        return $self;
+    }
+
+    public function getSecurityPreRead(): ?string
+    {
+        return $this->securityPreRead;
+    }
+
+    public function withSecurityPreRead(?string $securityPreRead = null): self
+    {
+        $self = clone $this;
+        $self->securityPreRead = $securityPreRead;
+
+        return $self;
+    }
+
+    public function getSecurityPreReadMessage(): ?string
+    {
+        return $this->securityPreReadMessage;
+    }
+
+    public function withSecurityPreReadMessage(?string $securityPreReadMessage = null): self
+    {
+        $self = clone $this;
+        $self->securityPreReadMessage = $securityPreReadMessage;
 
         return $self;
     }

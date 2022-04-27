@@ -173,6 +173,8 @@ class HttpOperation extends Operation
         ?string $securityPostDenormalizeMessage = null,
         ?string $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
+        ?string $securityPreRead = null,
+        ?string $securityPreReadMessage = null,
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,
@@ -252,6 +254,8 @@ class HttpOperation extends Operation
         $this->securityPostDenormalizeMessage = $securityPostDenormalizeMessage;
         $this->securityPostValidation = $securityPostValidation;
         $this->securityPostValidationMessage = $securityPostValidationMessage;
+        $this->securityPreRead = $securityPreRead;
+        $this->securityPreReadMessage = $securityPreReadMessage;
         $this->exceptionToStatus = $exceptionToStatus;
         $this->queryParameterValidationEnabled = $queryParameterValidationEnabled;
         $this->read = $read;

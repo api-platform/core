@@ -61,6 +61,8 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'securityPostDenormalizeMessage',
         'securityPostValidation',
         'securityPostValidationMessage',
+        'securityPreRead',
+        'securityPreReadMessage',
         'queryParameterValidationEnabled',
     ];
 
