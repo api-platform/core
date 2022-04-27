@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
-use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 use Symfony\Component\PropertyInfo\Type;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * ApiProperty annotation.
@@ -26,8 +23,6 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class ApiProperty
 {
-    use DeprecationMetadataTrait;
-
     /**
      * @var string
      */
@@ -96,6 +91,7 @@ final class ApiProperty
 
     private $schema;
     private $initializable;
+    private $iri;
 
     /**
      * @var array
@@ -103,20 +99,21 @@ final class ApiProperty
     private $extraProperties;
 
     /**
-     * @param bool|null   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null   $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
-     * @param bool|null   $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param string|null $default
-     * @param string|null $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string|null $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param bool|null   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
-     * @param array|null  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
-     * @param array|null  $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param bool|null   $push                    https://api-platform.com/docs/core/push-relations/
-     * @param string|null $security                https://api-platform.com/docs/core/security
-     * @param string|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param array|null  $types                   the RDF types of this property
+     * @param bool|null        $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null        $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null        $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool|null        $identifier              https://api-platform.com/docs/core/identifiers/
+     * @param string|null      $default
+     * @param string|null      $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string|null      $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param bool|null        $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array|null       $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array|null       $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|null        $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string|null      $security                https://api-platform.com/docs/core/security
+     * @param string|null      $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param array|null       $types                   the RDF types of this property
+     * @param bool|string|null $iri                     the IRI representing the property, can be `false` to remove the generated "@id"
      */
     public function __construct(
         ?string $description = null,
@@ -144,6 +141,8 @@ final class ApiProperty
         ?array $schema = null,
         ?bool $initializable = null,
 
+        $iri = null,
+
         // attributes
         array $extraProperties = []
     ) {
@@ -169,6 +168,7 @@ final class ApiProperty
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
+        $this->iri = $iri;
         $this->extraProperties = $extraProperties;
     }
 
@@ -468,168 +468,22 @@ final class ApiProperty
     }
 
     /**
-     * @deprecated since 2.7, to be removed in 3.0
-     */
-    public function withSubresource(SubresourceMetadata $subresourceMetadata): self
-    {
-        trigger_deprecation('api-platform/core', '2.7', 'Declaring a subresource on a property is deprecated, use alternate URLs instead.');
-        $self = clone $this;
-        $self->extraProperties['subresource'] = $subresourceMetadata;
-
-        return $self;
-    }
-
-    /**
-     * @deprecated since 2.7, to be removed in 3.0
-     */
-    public function getSubresource(): ?SubresourceMetadata
-    {
-        return $this->extraProperties['subresource'] ?? null;
-    }
-
-    /**
-     * Represents whether the property has a subresource.
-     *
-     * @deprecated since 2.7, to be removed in 3.0
-     */
-    public function hasSubresource(): bool
-    {
-        return isset($this->extraProperties['subresource']);
-    }
-
-    /**
-     * @deprecated since 2.6, to be removed in 3.0
-     */
-    public function getChildInherited(): ?string
-    {
-        return $this->extraProperties['childInherited'] ?? null;
-    }
-
-    /**
-     * @deprecated since 2.6, to be removed in 3.0
-     */
-    public function hasChildInherited(): bool
-    {
-        return isset($this->extraProperties['childInherited']);
-    }
-
-    /**
-     * @deprecated since 2.4, to be removed in 3.0
-     */
-    public function isChildInherited(): ?string
-    {
-        trigger_deprecation('api-platform/core', '2.4', sprintf('"%s::%s" is deprecated since 2.4 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        return $this->getChildInherited();
-    }
-
-    /**
-     * @deprecated since 2.6, to be removed in 3.0
-     */
-    public function withChildInherited(string $childInherited): self
-    {
-        trigger_deprecation('api-platform/core', '2.6', sprintf('"%s::%s" is deprecated since 2.6 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        $metadata = clone $this;
-        $metadata->extraProperties['childInherited'] = $childInherited;
-
-        return $metadata;
-    }
-
-    /**
      * Gets IRI of this property.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, use getTypes instead
      */
-    public function getIri(): ?string
+    public function getIri()
     {
-        return $this->types[0] ?? null;
+        return $this->iri;
     }
 
     /**
      * Returns a new instance with the given IRI.
      *
-     * @deprecated since 2.7, to be removed in 3.0, use withTypes instead
+     * @param mixed $iri
      */
-    public function withIri(string $iri = null): self
+    public function withIri($iri): self
     {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0, use Type instead.', __CLASS__, __METHOD__));
-
         $metadata = clone $this;
-        $metadata->types = [$iri];
-
-        return $metadata;
-    }
-
-    /**
-     * Gets an attribute.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, use getExtraProperties instead
-     *
-     * @param mixed|null $defaultValue
-     */
-    public function getAttribute(string $key, $defaultValue = null)
-    {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        if (!$this->camelCaseToSnakeCaseNameConverter) {
-            $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
-        }
-
-        $propertyName = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);
-
-        if (isset($this->{$propertyName})) {
-            return $this->{$propertyName} ?? $defaultValue;
-        }
-
-        return $this->extraProperties[$key] ?? $defaultValue;
-    }
-
-    /**
-     * Gets attributes.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as getExtraProperties
-     */
-    public function getAttributes(): ?array
-    {
-        return $this->extraProperties;
-    }
-
-    /**
-     * Returns a new instance with the given attribute.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as withExtraProperties
-     */
-    public function withAttributes(array $attributes): self
-    {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0.', __CLASS__, __METHOD__));
-
-        $metadata = clone $this;
-
-        return $this->withDeprecatedAttributes($metadata, $attributes);
-    }
-
-    /**
-     * Gets type.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as getBuiltinTypes
-     */
-    public function getType(): ?Type
-    {
-        return $this->builtinTypes[0] ?? null;
-    }
-
-    /**
-     * Returns a new instance with the given type.
-     *
-     * @deprecated since 2.7, to be removed in 3.0, renamed as withBuiltinTypes
-     */
-    public function withType(Type $type): self
-    {
-        trigger_deprecation('api-platform/core', '2.7', sprintf('"%s::%s" is deprecated since 2.7 and will be removed in 3.0, use builtinTypes instead.', __CLASS__, __METHOD__));
-
-        $metadata = clone $this;
-        $metadata->builtinTypes = [$type];
+        $metadata->iri = $iri;
 
         return $metadata;
     }

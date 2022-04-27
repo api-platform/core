@@ -161,18 +161,14 @@ class ContextBuilderTest extends TestCase
 
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
 
-        $iri = '_:'.(\function_exists('spl_object_id') ? spl_object_id($dummy) : spl_object_hash($dummy));
-        $expected = [
-            '@context' => [
-                '@vocab' => '#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'dummyPropertyA' => 'Dummy/dummyPropertyA',
-            ],
-            '@id' => $iri,
-            '@type' => 'Dummy',
-        ];
-
-        $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($dummy));
+        $context = $contextBuilder->getAnonymousResourceContext($dummy);
+        $this->assertEquals('Dummy', $context['@type']);
+        $this->assertStringStartsWith('/.well-known/genid', $context['@id']);
+        $this->assertEquals([
+            '@vocab' => '#',
+            'hydra' => 'http://www.w3.org/ns/hydra/core#',
+            'dummyPropertyA' => 'Dummy/dummyPropertyA',
+        ], $context['@context']);
     }
 
     public function testAnonymousResourceContextWithIri()
