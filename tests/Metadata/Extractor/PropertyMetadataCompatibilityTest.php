@@ -71,6 +71,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'extraProperties' => [
             'custom_property' => 'Lorem ipsum dolor sit amet',
         ],
+        'iri' => false,
     ];
 
     /**

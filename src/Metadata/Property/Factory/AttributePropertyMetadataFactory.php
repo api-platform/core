@@ -105,7 +105,6 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
                 'getAttribute' !== $method &&
                 'isChildInherited' !== $method &&
                 'getSubresource' !== $method &&
-                'getIri' !== $method &&
                 'getAttributes' !== $method &&
                 // end of deprecated methods
 

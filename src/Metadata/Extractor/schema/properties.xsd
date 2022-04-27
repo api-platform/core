@@ -41,6 +41,7 @@
         <xsd:attribute name="security" type="xsd:string"/>
         <xsd:attribute name="securityPostDenormalize" type="xsd:string"/>
         <xsd:attribute name="initializable" type="xsd:boolean"/>
+        <xsd:attribute name="iri" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="types">

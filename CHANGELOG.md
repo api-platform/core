@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0-alpha.3
+
+* Implements Skolem IRIs instead of blank nodes, can be disabled using `iri: false` (#4731)
+
 ## 2.7.0-alpha.2
 
 * Review interfaces (ProcessorInterface, ProviderInterface, TypeConverterInterface, ResolverFactoryInterface etc.) to use `ApiPlatform\Metadata\Operation` instead of `operationName` (#4712)
