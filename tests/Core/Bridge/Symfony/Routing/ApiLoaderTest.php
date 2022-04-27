@@ -275,8 +275,8 @@ class ApiLoaderTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(RelatedDummyEntity::class)->willReturn(new PropertyNameCollection(['id', 'recursivesubresource', 'secondrecursivesubresource']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->willReturn(new PropertyMetadata());
-        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'id')->willReturn(new PropertyMetadata());
+        $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id', Argument::type('array'))->willReturn(new PropertyMetadata());
+        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'id', Argument::type('array'))->willReturn(new PropertyMetadata());
 
         $relatedType = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummyEntity::class);
 
@@ -285,21 +285,21 @@ class ApiLoaderTest extends TestCase
                                         ->withType(new Type(Type::BUILTIN_TYPE_ARRAY, false, \ArrayObject::class, true, null, $relatedType));
 
         if (false === $recursiveSubresource) {
-            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')->willReturn(new PropertyMetadata());
-            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')->willReturn(new PropertyMetadata());
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource', Argument::type('array'))->willReturn(new PropertyMetadata());
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource', Argument::type('array'))->willReturn(new PropertyMetadata());
         } else {
             $dummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, DummyEntity::class);
-            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource')
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'recursivesubresource', Argument::type('array'))
                 ->willReturn((new PropertyMetadata())
                 ->withSubresource(new SubresourceMetadata(DummyEntity::class, false))
                 ->withType($dummyType));
-            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource')
+            $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'secondrecursivesubresource', Argument::type('array'))
                 ->willReturn((new PropertyMetadata())
                 ->withSubresource(new SubresourceMetadata(DummyEntity::class, false))
                 ->withType($dummyType));
         }
 
-        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource')->willReturn($subResourcePropertyMetadata);
+        $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'subresource', Argument::type('array'))->willReturn($subResourcePropertyMetadata);
 
         $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
 

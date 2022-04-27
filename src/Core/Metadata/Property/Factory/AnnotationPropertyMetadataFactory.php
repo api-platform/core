@@ -40,7 +40,7 @@ final class AnnotationPropertyMetadataFactory implements PropertyMetadataFactory
      */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        if (false === ($options['deprecate'] ?? null)) {
+        if (null === ($options['deprecate'] ?? null)) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Decorating the legacy %s is deprecated, use %s instead.', PropertyMetadataFactoryInterface::class, \ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface::class));
         }
 
