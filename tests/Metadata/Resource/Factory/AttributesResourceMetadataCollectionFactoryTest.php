@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
@@ -30,6 +31,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,14 +42,14 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private function getDefaultGraphqlOperations(string $shortName, string $class): array
+    private function getDefaultGraphqlOperations(string $shortName, string $class, mixed $provider = null): array
     {
         return [
-            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true]),
-            'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true]),
-            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName."),
-            'delete' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], delete: true, name: 'delete', description: "Deletes a $shortName."),
-            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName."),
+            'collection_query' => new QueryCollection(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
+            'item_query' => new Query(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], provider: $provider),
+            'update' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'update', description: "Updates a $shortName.", provider: $provider),
+            'delete' => new DeleteMutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'delete', description: "Deletes a $shortName.", provider: $provider),
+            'create' => new Mutation(shortName: $shortName, class: $class, normalizationContext: ['skip_null_values' => true], name: 'create', description: "Creates a $shortName.", provider: $provider),
         ];
     }
 
@@ -60,18 +63,19 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     normalizationContext: ['skip_null_values' => true],
                     class: AttributeResource::class,
+                    provider: AttributeResourceProvider::class,
                     operations: [
                         '_api_AttributeResource_get' => new Get(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 1
+                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
                         ),
                         '_api_AttributeResource_put' => new Put(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 2
+                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
                         ),
                         '_api_AttributeResource_delete' => new Delete(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 3
+                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 3, provider: AttributeResourceProvider::class,
                         ),
                     ],
-                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class)
+                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class, AttributeResourceProvider::class)
                 ),
                 new ApiResource(
                     shortName: 'AttributeResource',
@@ -84,7 +88,9 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             shortName: 'AttributeResource',
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 4,
-                            status: 301
+                            status: 301,
+                            provider: AttributeResourceProvider::class,
+                            processor: [AttributeResourceProcessor::class, 'process']
                         ),
                         '_api_/dummy/{dummyId}/attribute_resources/{identifier}.{_format}_patch' => new Patch(
                             class: AttributeResource::class,
@@ -92,11 +98,15 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                             shortName: 'AttributeResource',
                             inputFormats: ['json' => ['application/merge-patch+json']],
                             priority: 5,
-                            status: 301
+                            status: 301,
+                            provider: AttributeResourceProvider::class,
+                            processor: [AttributeResourceProcessor::class, 'process']
                         ),
                     ],
                     inputFormats: ['json' => ['application/merge-patch+json']],
-                    status: 301
+                    status: 301,
+                    provider: AttributeResourceProvider::class,
+                    processor: [AttributeResourceProcessor::class, 'process']
                 ),
             ]),
             $attributeResourceMetadataCollectionFactory->create(AttributeResource::class)
@@ -109,15 +119,16 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResources',
                     normalizationContext: ['skip_null_values' => true],
                     class: AttributeResources::class,
+                    provider: AttributeResourceProvider::class,
                     operations: [
                         '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1
+                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
                         ),
                         '_api_/attribute_resources.{_format}_post' => new Post(
-                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2
+                            shortName: 'AttributeResources', class: AttributeResources::class, uriTemplate: '/attribute_resources.{_format}', normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
                         ),
                     ],
-                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class)
+                    graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResources', AttributeResources::class, AttributeResourceProvider::class)
                 ),
             ]),
             $attributeResourceMetadataCollectionFactory->create(AttributeResources::class)
@@ -128,7 +139,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['attributes' => ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']]);
 
-        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, collection: false, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10);
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',

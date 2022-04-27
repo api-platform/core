@@ -66,8 +66,8 @@ final class Subscription extends Operation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(...\func_get_args());

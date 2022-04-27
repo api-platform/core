@@ -117,6 +117,8 @@ class HttpOperation extends Operation
      * @param bool|null         $validate                       https://api-platform.com/docs/core/events/#the-event-system
      * @param bool|null         $write                          https://api-platform.com/docs/core/events/#the-event-system
      * @param bool|null         $serialize                      https://api-platform.com/docs/core/events/#the-event-system
+     * @param mixed|null        $provider
+     * @param mixed|null        $processor
      */
     public function __construct(
         string $method = self::METHOD_GET,
@@ -189,8 +191,8 @@ class HttpOperation extends Operation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         $this->method = $method;

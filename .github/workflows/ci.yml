@@ -156,6 +156,9 @@ jobs:
           else
             vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
           fi
+      - name: Run PHPUnit 8.1+ tests
+        if: (startsWith(matrix.php, '8.1'))
+        run: ./vendor/bin/simple-phpunit --stop-on-failure tests/Metadata/Resource/Factory/
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v1

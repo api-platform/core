@@ -16,7 +16,7 @@ namespace ApiPlatform\Metadata\GraphQl;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class DeleteMutation extends Operation implements DeleteOperationInterface
+class DeleteMutation extends Mutation implements DeleteOperationInterface
 {
     /**
      * {@inheritdoc}
@@ -68,8 +68,8 @@ class DeleteMutation extends Operation implements DeleteOperationInterface
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
 ) {
         parent::__construct(...\func_get_args());

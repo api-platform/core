@@ -115,10 +115,10 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     operations: [
-                        '_api_/attribute_resources/{id}.{_format}_get' => new Get(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')]),
-                        '_api_/attribute_resources/{id}.{_format}_put' => new Put(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')]),
-                        '_api_/attribute_resources/{id}.{_format}_delete' => new Delete(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')]),
-                        '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(uriTemplate: '/attribute_resources.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder'),
+                        '_api_/attribute_resources/{id}.{_format}_get' => new Get(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')], name: '_api_/attribute_resources/{id}.{_format}_get'),
+                        '_api_/attribute_resources/{id}.{_format}_put' => new Put(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')], name: '_api_/attribute_resources/{id}.{_format}_put'),
+                        '_api_/attribute_resources/{id}.{_format}_delete' => new Delete(uriTemplate: '/attribute_resources/{id}.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', uriVariables: ['id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')], name: '_api_/attribute_resources/{id}.{_format}_delete'),
+                        '_api_/attribute_resources.{_format}_get_collection' => new GetCollection(uriTemplate: '/attribute_resources.{_format}', shortName: 'AttributeResource', class: AttributeResource::class, controller: 'api_platform.action.placeholder', name: '_api_/attribute_resources.{_format}_get_collection'),
                     ]
                 ),
                 new ApiResource(
@@ -132,7 +132,8 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                             uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
                             shortName: 'AttributeResource',
                             uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
-                            extraProperties: ['user_defined_uri_template' => true]
+                            extraProperties: ['user_defined_uri_template' => true],
+                            name: '_api_/dummy/{dummyId}/attribute_resources/{id}_get'
                         ),
                     ]
                 ),
@@ -154,7 +155,7 @@ class UriTemplateResourceMetadataCollectionFactoryTest extends TestCase
                     shortName: 'AttributeResource',
                     class: AttributeResource::class,
                     uriTemplate: '/dummy/{dummyId}/attribute_resources/{id}',
-                    uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: ['id'], parameterName: 'dummyId'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: ['id'], parameterName: 'id')],
+                    uriVariables: ['dummyId' => new Link(fromClass: Dummy::class, identifiers: [], parameterName: 'dummyId', fromProperty: 'id'), 'id' => new Link(fromClass: AttributeResource::class, identifiers: [], parameterName: 'id', fromProperty: 'id')],
                     operations: [],
                 ),
                 new ApiResource(

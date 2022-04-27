@@ -88,8 +88,8 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_GET, ...\func_get_args());

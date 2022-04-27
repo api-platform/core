@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -207,10 +208,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
             }
 
-            // if ('delete' === $operation->getName()) {
-            //     $operation = $operation->withDelete(true);
-            // }
-
             return [$operation->getName(), $operation];
         }
 
@@ -293,7 +290,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
         $graphQlOperations = [];
-        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new Mutation())->withName('delete'), (new Mutation())->withName('create')] as $i => $operation) {
+        foreach ([new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')] as $i => $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
             $graphQlOperations[$key] = $operation;
         }

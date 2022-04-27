@@ -88,8 +88,8 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_DELETE, ...\func_get_args());
