@@ -89,8 +89,8 @@ final class Patch extends HttpOperation
         ?bool $forceEager = null,
         ?int $priority = null,
         ?string $name = null,
-        ?string $provider = null,
-        ?string $processor = null,
+        $provider = null,
+        $processor = null,
         array $extraProperties = []
     ) {
         parent::__construct(self::METHOD_PATCH, ...\func_get_args());

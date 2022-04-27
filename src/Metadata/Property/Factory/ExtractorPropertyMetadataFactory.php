@@ -87,11 +87,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             $apiProperty = $this->withDeprecatedAttributes($apiProperty, $propertyMetadata['attributes']);
         }
 
-        if (isset($propertyMetadata['iri'])) {
-            trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');
-            $apiProperty = $apiProperty->withTypes([$propertyMetadata['iri']]);
-        }
-
         return $apiProperty;
     }
 
@@ -134,11 +129,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         if (isset($metadata['attributes'])) {
             $propertyMetadata = $this->withDeprecatedAttributes($propertyMetadata, $metadata['attributes']);
-        }
-
-        if (isset($metadata['iri'])) {
-            trigger_deprecation('api-platform', '2.7', 'Using "iri" is deprecated, use "types" instead.');
-            $propertyMetadata = $propertyMetadata->withTypes([$metadata['iri']]);
         }
 
         return $propertyMetadata;

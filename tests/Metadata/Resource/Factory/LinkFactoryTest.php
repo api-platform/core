@@ -54,7 +54,7 @@ final class LinkFactoryTest extends TestCase
 
         self::assertEquals(
             $expectedLinks,
-            $linkFactory->createLinksFromIdentifiers((new Get())->withClass(AttributeResource::class)->withCompositeIdentifier($compositeIdentifier))
+            $linkFactory->createLinksFromIdentifiers((new Get())->withClass(AttributeResource::class))
         );
     }
 
