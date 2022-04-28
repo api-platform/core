@@ -395,7 +395,6 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
             if (
                 ($resourceMetadata->getAttributes()['extra_properties']['is_legacy_subresource'] ?? false) ||
-                ($resourceMetadata->getAttributes()['extra_properties']['legacy_subresource_behavior'] ?? false) ||
                 ($resourceMetadata->getAttributes()['extra_properties']['is_alternate_resource_metadata'] ?? false)) {
                 // Avoid duplicates parameters when there is a filter on a subresource identifier
                 $parametersMemory = [];

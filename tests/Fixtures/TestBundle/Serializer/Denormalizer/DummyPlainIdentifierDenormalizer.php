@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
@@ -65,20 +66,18 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
             return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
         }
 
-        $iriConverterContext = ['force_collection' => false, 'operation' => null] + $context;
-
         $relatedDummyClass = DummyEntity::class === $class ? RelatedDummyEntity::class : RelatedDummyDocument::class;
         if (!empty($data['relatedDummy'])) {
-            $data['relatedDummy'] = $this->iriConverter->getIriFromResourceClass($relatedDummyClass, null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => [
+            $data['relatedDummy'] = $this->iriConverter->getIriFromItem(null, (new Get())->withClass($relatedDummyClass), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => [
                 'id' => $data['relatedDummy'],
-            ]] + $iriConverterContext);
+            ]] + $context);
         }
 
         if (!empty($data['relatedDummies'])) {
             foreach ($data['relatedDummies'] as $k => $v) {
-                $data['relatedDummies'][$k] = $this->iriConverter->getIriFromResourceClass($relatedDummyClass, null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => [
+                $data['relatedDummies'][$k] = $this->iriConverter->getIriFromItem(null, (new Get())->withClass($relatedDummyClass), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => [
                     'id' => $v,
-                ]] + $iriConverterContext);
+                ]] + $context);
             }
         }
 

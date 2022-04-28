@@ -27,7 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
  * collectionOperations={
  *     "get",
  *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies"},
- *     "custom_denormalization"={"route_name"="custom_denormalization", "method"="GET"},
+ *     "custom_denormalization"={"route_name"="custom_denormalization", "method"="POST"},
  *     "short_custom_denormalization"={"route_name"="short_custom_denormalization", "method"="GET"},
  * })
  *

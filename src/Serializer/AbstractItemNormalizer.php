@@ -185,7 +185,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['iri'])) {
             $iri = $context['iri'];
         } else {
-            $iri = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromItem($object, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_URL, $context) : $this->iriConverter->getIriFromItem($object);
+            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromItem($object, $context['operation'] ?? null, UrlGeneratorInterface::ABS_URL, $context);
         }
 
         $context['iri'] = $iri;
@@ -744,7 +744,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
             }
-            unset($childContext['iri']);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -764,7 +764,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
             }
-            unset($childContext['iri']);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -777,7 +777,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
-            unset($childContext['iri']);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             if (null !== ($propertyIri = $propertyMetadata->getIri())) {
                 $childContext['output']['iri'] = $propertyIri;

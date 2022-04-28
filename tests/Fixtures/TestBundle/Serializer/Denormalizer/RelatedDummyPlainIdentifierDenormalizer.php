@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy as RelatedDummyEntity;
@@ -57,11 +58,11 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
             return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
         }
 
-        $iriConverterContext = ['identifiers_values' => ['id' => $data['thirdLevel']], 'force_collection' => false, 'operation' => null] + $context;
+        $iriConverterContext = ['uri_variables' => ['id' => $data['thirdLevel']]] + $context;
 
-        $data['thirdLevel'] = $this->iriConverter->getIriFromResourceClass(
-            RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class,
+        $data['thirdLevel'] = $this->iriConverter->getIriFromItem(
             null,
+            (new Get())->withClass(RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class),
             UrlGeneratorInterface::ABS_PATH,
             $iriConverterContext
         );

@@ -16,6 +16,7 @@ namespace ApiPlatform\Api;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Converts item and resources to IRI and vice versa.
@@ -32,7 +33,7 @@ interface IriConverterInterface
      *
      * @return object
      */
-    public function getItemFromIri(string $iri, array $context = []);
+    public function getItemFromIri(string $iri, array $context = [], ?Operation $operation = null);
 
     /**
      * Gets the IRI associated with the given item.
@@ -42,12 +43,5 @@ interface IriConverterInterface
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromItem($item, string $operationName = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
-
-    /**
-     * Gets the IRI associated with the given resource collection.
-     *
-     * @throws InvalidArgumentException
-     */
-    public function getIriFromResourceClass(string $resourceClass, string $operationName = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string;
+    public function getIriFromItem($item = null, ?Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string;
 }

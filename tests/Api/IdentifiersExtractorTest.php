@@ -51,14 +51,11 @@ class IdentifiersExtractorTest extends TestCase
         $operation = $this->prophesize(HttpOperation::class);
         $item = new Dummy();
         $resourceClass = Dummy::class;
-        $context = [
-            'operation' => $operation->reveal(),
-        ];
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
         $operation->getUriVariables()->willReturn([]);
 
-        $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, 'operation', $context));
+        $this->assertEquals([], $identifiersExtractor->getIdentifiersFromItem($item, $operation->reveal()));
     }
 
     public function testGetIdentifiersFromItemWithId()
@@ -81,12 +78,9 @@ class IdentifiersExtractorTest extends TestCase
         $item = new Dummy();
         $item->setId(1);
         $resourceClass = Dummy::class;
-        $context = [
-            'operation' => $operation,
-        ];
 
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
 
-        $this->assertEquals(['id' => '1'], $identifiersExtractor->getIdentifiersFromItem($item, 'operation', $context));
+        $this->assertEquals(['id' => '1'], $identifiersExtractor->getIdentifiersFromItem($item, $operation));
     }
 }

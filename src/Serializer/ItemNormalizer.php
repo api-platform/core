@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -75,10 +74,7 @@ class ItemNormalizer extends AbstractItemNormalizer
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
-            if ($this->iriConverter instanceof IriConverterInterface) {
-                $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
-                $iri = $this->iriConverter->getIriFromResourceClass($context['resource_class'], $operation->getName(), UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => ['id' => $data['id']]]);
-            } else {
+            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
                 // remove in 3.0
                 $identifier = null;
                 $options = $this->getFactoryOptions($context);
@@ -94,6 +90,9 @@ class ItemNormalizer extends AbstractItemNormalizer
                     throw $e;
                 }
                 $iri = sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]);
+            } else {
+                $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
+                $iri = $this->iriConverter->getIriFromItem(null, $operation, UrlGeneratorInterface::ABS_PATH, ['uri_variables' => ['id' => $data['id']]]);
             }
 
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]);

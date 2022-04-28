@@ -20,6 +20,7 @@ use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -118,7 +119,7 @@ final class PurgeHttpCacheListener
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
-            $iri = $this->iriConverter->getIriFromResourceClass($resourceClass);
+            $iri = $this->iriConverter->getIriFromItem(null, (new GetCollection())->withClass($resourceClass));
             $this->tags[$iri] = $iri;
 
             if ($purgeItem) {

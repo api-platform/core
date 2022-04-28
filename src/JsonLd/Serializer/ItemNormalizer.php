@@ -90,10 +90,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             unset($context['operation'], $context['operation_name']);
         }
 
-        if ($this->iriConverter instanceof IriConverterInterface) {
-            $iri = $this->iriConverter->getIriFromItem($object, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
-        } else {
+        if ($this->iriConverter instanceof LegacyIriConverterInterface) {
             $iri = $this->iriConverter->getIriFromItem($object);
+        } else {
+            $iri = $this->iriConverter->getIriFromItem($object, $context['operation'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
         }
 
         $context['iri'] = $iri;

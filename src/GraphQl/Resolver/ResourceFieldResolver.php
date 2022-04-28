@@ -16,6 +16,7 @@ namespace ApiPlatform\GraphQl\Resolver;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Util\ClassInfoTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -39,7 +40,8 @@ final class ResourceFieldResolver
     {
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
-            return $this->iriConverter->getIriFromResourceClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], 'force_collection' => false]);
+            // In graphql we use Http operations to retrieve an IRI
+            return $this->iriConverter->getIriFromItem(null, (new Get())->withClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]]);
         }
 
         if ('_id' === $info->fieldName && !isset($source['_id']) && isset($source['id'])) {
