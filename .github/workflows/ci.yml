@@ -818,8 +818,11 @@ jobs:
       - name: Convert metadata to API Platform 3
         run: |
             tests/Fixtures/app/console api:upgrade-resource -f
-      - name: Clear test app cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Apply behat features patch (IRIs update)
+        run: |
+            git apply .github/patch/v3_features.patch
+      - name: clear test app cache
+        run: rm -rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
@@ -901,6 +904,9 @@ jobs:
       - name: Convert metadata to API Platform 3
         run: |
             tests/Fixtures/app/console api:upgrade-resource -f
+      - name: Apply behat features patch (IRIs update)
+        run: |
+            git apply .github/patch/v3_features.patch
       - name: Clear test app cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Run Behat tests
