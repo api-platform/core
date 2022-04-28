@@ -33,7 +33,7 @@ class ResourceFieldResolverTest extends TestCase
     public function testId()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem(null, (new Get())->withClass(Dummy::class), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => ['id' => 1]])->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromItem([], (new Get())->withClass(Dummy::class), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => ['id' => 1]])->willReturn('/dummies/1')->shouldBeCalled();
 
         $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 

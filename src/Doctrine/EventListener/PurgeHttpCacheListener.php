@@ -119,7 +119,7 @@ final class PurgeHttpCacheListener
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
-            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass) : $this->iriConverter->getIriFromItem(null, (new GetCollection())->withClass($resourceClass));
+            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass) : $this->iriConverter->getIriFromItem([], (new GetCollection())->withClass($resourceClass));
             $this->tags[$iri] = $iri;
 
             if ($purgeItem) {

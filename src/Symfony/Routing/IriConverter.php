@@ -113,7 +113,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item = null, Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string
+    public function getIriFromItem($item, Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string
     {
         if (!$item && !$operation) {
             throw new RuntimeException('Provide an item or an operation');
@@ -155,7 +155,7 @@ final class IriConverter implements IriConverterInterface
             $identifiers = [];
         }
 
-        if ($item) {
+        if (\is_object($item)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
             } catch (RuntimeException $e) {

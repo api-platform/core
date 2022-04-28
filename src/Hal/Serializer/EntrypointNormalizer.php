@@ -90,7 +90,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
                     }
 
                     try {
-                        $href = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass) : $this->iriConverter->getIriFromItem(null, $operation);
+                        $href = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass) : $this->iriConverter->getIriFromItem([], $operation);
                         $entrypoint['_links'][lcfirst($operation->getShortName())]['href'] = $href;
                     } catch (InvalidArgumentException $ex) {
                         // Ignore resources without GET operations

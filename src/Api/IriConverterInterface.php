@@ -38,10 +38,10 @@ interface IriConverterInterface
     /**
      * Gets the IRI associated with the given item.
      *
-     * @param object $item
+     * @param object|array $item
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromItem($item = null, ?Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string;
+    public function getIriFromItem($item, ?Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string;
 }

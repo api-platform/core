@@ -89,7 +89,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             // TODO: remove in 3.0
             $data['@id'] = isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] ? $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
         } else {
-            $data['@id'] = $this->iriConverter->getIriFromItem(null, $context['operation'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
+            $data['@id'] = $this->iriConverter->getIriFromItem([], $context['operation'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
         }
 
         $data['@type'] = 'hydra:Collection';

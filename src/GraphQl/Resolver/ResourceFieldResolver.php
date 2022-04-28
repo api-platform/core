@@ -41,7 +41,7 @@ final class ResourceFieldResolver
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
             // In graphql we use Http operations to retrieve an IRI
-            return $this->iriConverter->getIriFromItem(null, (new Get())->withClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]]);
+            return $this->iriConverter->getIriFromItem([], (new Get())->withClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY]), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]]);
         }
 
         if ('_id' === $info->fieldName && !isset($source['_id']) && isset($source['id'])) {
