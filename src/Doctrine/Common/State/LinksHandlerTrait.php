@@ -89,11 +89,11 @@ trait LinksHandlerTrait
     private function getOperationLinks(?Operation $operation = null): array
     {
         if ($operation instanceof GraphQlOperation) {
-            return $operation->getLinks();
+            return $operation->getLinks() ?? [];
         }
 
         if ($operation instanceof HttpOperation) {
-            return $operation->getUriVariables();
+            return $operation->getUriVariables() ?? [];
         }
 
         return [];
