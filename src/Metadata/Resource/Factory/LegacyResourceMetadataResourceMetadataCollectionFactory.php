@@ -120,18 +120,19 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
         foreach ($resourceMetadata->getGraphql() as $operationName => $operation) {
             if (false !== strpos($operationName, 'query') || isset($operation['item_query']) || isset($operation['collection_query'])) {
                 $graphQlOperation = isset($operation['collection_query']) || false !== strpos($operationName, 'collection') ? new QueryCollection() : new Query();
+                /** @var GraphQlOperation $graphQlOperation */
                 $graphQlOperation = $graphQlOperation->withName($operationName);
             } else {
+                /** @var GraphQlOperation $graphQlOperation */
                 $graphQlOperation = (new Mutation())
                     ->withDescription(ucfirst("{$operationName}s a {$resourceMetadata->getShortName()}."))
                     ->withName($operationName);
             }
 
-            /** @phpstan-ignore-next-line */
             $graphQlOperation = $graphQlOperation
                 ->withArgs($operation['args'] ?? null)
-                ->withClass($resourceClass)
-                ->withResolver($operation['item_query'] ?? $operation['collection_query'] ?? $operation['mutation'] ?? null);
+                ->withResolver($operation['item_query'] ?? $operation['collection_query'] ?? $operation['mutation'] ?? null)
+                ->withClass($resourceClass);
 
             foreach ($operation as $key => $value) {
                 $graphQlOperation = $this->setAttributeValue($graphQlOperation, $key, $value);

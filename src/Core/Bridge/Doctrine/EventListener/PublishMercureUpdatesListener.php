@@ -23,7 +23,6 @@ use ApiPlatform\Core\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterfa
 use ApiPlatform\Core\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Util\ResourceClassInfoTrait;
-use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
@@ -43,7 +42,6 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 final class PublishMercureUpdatesListener
 {
-    use ClassInfoTrait;
     use DispatchTrait;
     use ResourceClassInfoTrait;
 
@@ -282,7 +280,6 @@ final class PublishMercureUpdatesListener
         }
 
         // Mercure Component < 0.4.
-        /* @phpstan-ignore-next-line */
-        return new Update($iri, $data, $options);
+        return new Update($iri, $data, $options); // @phpstan-ignore-line
     }
 }
