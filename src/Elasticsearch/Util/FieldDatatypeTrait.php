@@ -63,14 +63,20 @@ trait FieldDatatypeTrait
         }
 
         try {
-            /** @var ApiProperty|PropertyMetadata */
+            /** @var ApiProperty|PropertyMetadata $propertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
         } catch (PropertyNotFoundException $e) {
             return null;
         }
 
         // TODO: 3.0 this is the default + allow multiple types
-        $type = $propertyMetadata instanceof ApiProperty ? ($propertyMetadata->getBuiltinTypes()[0] ?? null) : $propertyMetadata->getType();
+        if ($propertyMetadata instanceof ApiProperty) { // @phpstan-ignore-line
+            $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        }
+
+        if ($propertyMetadata instanceof PropertyMetadata) {
+            $type = $propertyMetadata->getType();
+        }
 
         if (null === $type) {
             return null;

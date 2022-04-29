@@ -6,8 +6,8 @@ parameters:
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
 	symfony:
-		container_xml_path: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
-		constant_hassers: false
+		containerXmlPath: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
+		constantHassers: false
 	doctrine:
 		objectManagerLoader: tests/Fixtures/app/object-manager.php
 	bootstrapFiles:
@@ -16,6 +16,7 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Class ... extends final class cannot be ignored...
 		- src/Core/Action/EntrypointAction.php
 		- src/Core/Action/ExceptionAction.php
@@ -93,6 +94,7 @@ parameters:
 		- src/Core/Bridge/Symfony/Bundle/SwaggerUi/SwaggerUiAction.php
 		- src/Core/Bridge/Symfony/Bundle/SwaggerUi/SwaggerUiContext.php
 		- src/Core/Bridge/Symfony/Bundle/Test/Client.php
+		- src/Core/Bridge/Symfony/Bundle/Test/Response.php
 		- src/Core/Bridge/Symfony/Identifier/Normalizer/UuidNormalizer.php
 		- src/Core/Bridge/Symfony/Messenger/ContextStamp.php
 		- src/Core/Bridge/Symfony/Messenger/RemoveStamp.php
@@ -305,10 +307,6 @@ parameters:
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: tests/GraphQl/Type/TypeBuilderTest.php
-		# https://github.com/phpstan/phpstan-doctrine/issues/115
-		-
-			message: '#Property ApiPlatform\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<object>\.#'
-			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
@@ -367,3 +365,10 @@ parameters:
 		-
 			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
 			path: src
+		# Skipped tests, we do this on purpose
+		- 
+			message: "#^Unreachable statement - code above always terminates.$#"
+			path: tests
+		-
+			message: "#Access to an undefined static property static\\([^)]+\\)::\\$container.$#"
+			path: tests

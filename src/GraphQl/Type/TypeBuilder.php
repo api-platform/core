@@ -183,7 +183,6 @@ final class TypeBuilder implements TypeBuilderInterface
      */
     public function getNodeInterface(): InterfaceType
     {
-        /* @phpstan-ignore-next-line */
         if ($this->typesContainer->has('Node')) {
             $nodeInterface = $this->typesContainer->get('Node');
             if (!$nodeInterface instanceof InterfaceType) {

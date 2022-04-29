@@ -66,8 +66,7 @@ trait ResourceClassInfoTrait
             return $this->resourceClassResolver->isResourceClass($class);
         }
 
-        // @phpstan-ingore-next-line
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) { // @phpstan-ignore-line
             return \count($this->resourceMetadataFactory->create($class)) > 0 ? true : false;
         }
 

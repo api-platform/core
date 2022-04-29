@@ -19,10 +19,11 @@ use ApiPlatform\Core\Bridge\Symfony\Routing\Router;
 
 class BookTestDeprecatedClient extends ApiTestCase
 {
-    private Client $client; /** @phpstan-ignore-line */
+    /** @phpstan-ignore-next-line */
+    private Client $client;
+    /** @phpstan-ignore-next-line */
     private Router $router;
 
-    /** @phpstan-ignore-line */
     protected function setup(): void
     {
         $this->client = static::createClient();

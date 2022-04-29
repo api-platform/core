@@ -31,7 +31,6 @@ class WriteStageTest extends TestCase
 
     /** @var WriteStage */
     private $writeStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $processorProphecy;
     private $serializerContextBuilderProphecy;
 
