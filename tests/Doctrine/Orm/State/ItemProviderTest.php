@@ -273,7 +273,7 @@ class ItemProviderTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
-        $queryBuilderProphecy->join(Employee::class, 'm_a1', 'with', 'o.id = m_a1.company')->shouldBeCalled();
+        $queryBuilderProphecy->join(Employee::class, 'm_a1', 'WITH', 'o.id = m_a1.company')->shouldBeCalled();
         $queryBuilderProphecy->getQuery()->willReturn($queryProphecy->reveal())->shouldBeCalled();
         $queryBuilderProphecy->getRootAliases()->shouldBeCalled()->willReturn(['o']);
         $queryBuilderProphecy->andWhere('m_a1.id = :id_p1')->shouldBeCalled();

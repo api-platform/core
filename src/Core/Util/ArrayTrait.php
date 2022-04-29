@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\ArrayTrait::class);
 
 if (false) {
-    class ArrayTrait extends \ApiPlatform\Util\ArrayTrait
+    trait ArrayTrait
     {
+        use \ApiPlatform\Util\ArrayTrait;
     }
 }

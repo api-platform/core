@@ -24,6 +24,7 @@ use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -88,13 +89,15 @@ final class IriConverter implements IriConverterInterface
 
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
-        try {
-            $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
-        } catch (InvalidIdentifierException $e) {
-            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+        if ($operation instanceof HttpOperation) {
+            try {
+                $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
+            } catch (InvalidIdentifierException $e) {
+                throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
-        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
+        if ($item = $this->provider->provide($operation, $uriVariables ?? [], $context)) {
             return $item;
         }
 

@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Serializer;
 class_exists(\ApiPlatform\Serializer\InputOutputMetadataTrait::class);
 
 if (false) {
-    class InputOutputMetadataTrait extends \ApiPlatform\Serializer\InputOutputMetadataTrait
+    trait InputOutputMetadataTrait
     {
+        use \ApiPlatform\Serializer\InputOutputMetadataTrait;
     }
 }

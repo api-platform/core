@@ -21,6 +21,7 @@ use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -83,6 +84,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
 
             foreach ($resourceMetadata as $resource) {
                 foreach ($resource->getOperations() as $operationName => $operation) {
+                    /** @var Operation $operation */
                     if (!$operation instanceof CollectionOperationInterface) {
                         continue;
                     }

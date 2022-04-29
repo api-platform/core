@@ -1006,7 +1006,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([
             'o' => [
-                new Join($joinType, 'o.relatedDummy', 'existing_join_alias'),
+                new Join($joinType, 'o.relatedDummy', 'existing_join_alias'), // @phpstan-ignore-line
             ],
         ]);
         $queryBuilderProphecy->getDQLPart('select')->willReturn([]);

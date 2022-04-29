@@ -30,6 +30,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -286,6 +287,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         } else {
             $classes[$resourceClass] = true;
             foreach ($resourceMetadata->getOperations() as $operation) {
+                /** @var Operation $operation */
                 if (!$operation instanceof CollectionOperationInterface) {
                     continue;
                 }

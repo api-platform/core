@@ -6,8 +6,8 @@ parameters:
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
 	symfony:
-		container_xml_path: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
-		constant_hassers: false
+		containerXmlPath: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
+		constantHassers: false
 	doctrine:
 		objectManagerLoader: tests/Fixtures/app/object-manager.php
 	bootstrapFiles:
@@ -16,6 +16,222 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
+		# Class ... extends final class cannot be ignored...
+		- src/Core/Action/EntrypointAction.php
+		- src/Core/Action/ExceptionAction.php
+		- src/Core/Action/NotFoundAction.php
+		- src/Core/Action/PlaceholderAction.php
+		- src/Core/Api/Entrypoint.php
+		- src/Core/Api/FormatMatcher.php
+		- src/Core/Api/ResourceClassResolver.php
+		- src/Core/Bridge/Doctrine/EventListener/PurgeHttpCacheListener.php
+		- src/Core/Bridge/Doctrine/EventListener/WriteListener.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Extension/PaginationExtension.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Extension/FilterExtension.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Extension/OrderExtension.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Extension/FilterEagerLoadingExtension.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Filter/AbstractFilter.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Filter/BooleanFilter.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Filter/ExistsFilter.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Filter/NumericFilter.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Filter/OrderFilter.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Filter/RangeFilter.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/Paginator.php
+		- src/Core/Bridge/Doctrine/MongoDbOdm/PropertyInfo/DoctrineExtractor.php
+		- src/Core/Bridge/Doctrine/Orm/Extension/EagerLoadingExtension.php
+		- src/Core/Bridge/Doctrine/Orm/Extension/FilterEagerLoadingExtension.php
+		- src/Core/Bridge/Doctrine/Orm/Extension/FilterExtension.php
+		- src/Core/Bridge/Doctrine/Orm/Extension/OrderExtension.php
+		- src/Core/Bridge/Doctrine/Orm/Extension/PaginationExtension.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/AbstractContextAwareFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/AbstractFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/BooleanFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/DateFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/ExistsFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/NumericFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/OrderFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Filter/RangeFilter.php
+		- src/Core/Bridge/Doctrine/Orm/Paginator.php
+		- src/Core/Bridge/Doctrine/Orm/Util/QueryBuilderHelper.php
+		- src/Core/Bridge/Doctrine/Orm/Util/QueryChecker.php
+		- src/Core/Bridge/Doctrine/Orm/Util/QueryJoinParser.php
+		- src/Core/Bridge/Doctrine/Orm/Util/QueryNameGenerator.php
+		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/AbstractFilterExtension.php
+		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/ConstantScoreFilterExtension.php
+		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/SortExtension.php
+		- src/Core/Bridge/Elasticsearch/DataProvider/Extension/SortFilterExtension.php
+		- src/Core/Bridge/Elasticsearch/DataProvider/Paginator.php
+		- src/Core/Bridge/Elasticsearch/Exception/IndexNotFoundException.php
+		- src/Core/Bridge/Elasticsearch/Exception/NonUniqueIdentifierException.php
+		- src/Core/Bridge/Elasticsearch/Metadata/Document/DocumentMetadata.php
+		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/AttributeDocumentMetadataFactory.php
+		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/CachedDocumentMetadataFactory.php
+		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/CatDocumentMetadataFactory.php
+		- src/Core/Bridge/Elasticsearch/Metadata/Document/Factory/ConfiguredDocumentMetadataFactory.php
+		- src/Core/Bridge/Elasticsearch/Serializer/DocumentNormalizer.php
+		- src/Core/Bridge/Elasticsearch/Serializer/ItemNormalizer.php
+		- src/Core/Bridge/Elasticsearch/Serializer/NameConverter/InnerFieldsNameConverter.php
+		- src/Core/Bridge/RamseyUuid/Serializer/UuidDenormalizer.php
+		- src/Core/Bridge/Symfony/Bundle/ApiPlatformBundle.php
+		- src/Core/Bridge/Symfony/Bundle/ArgumentResolver/PayloadArgumentResolver.php
+		- src/Core/Bridge/Symfony/Bundle/Command/OpenApiCommand.php
+		- src/Core/Bridge/Symfony/Bundle/CacheWarmer/CachePoolClearerCacheWarmer.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/ApiPlatformExtension.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Configuration.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AnnotationFilterPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/AuthenticatorManagerPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/DataProviderPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/DeprecateMercurePublisherPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/FilterPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/ElasticsearchClientPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/GraphQlQueryResolverPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/GraphQlTypePass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/GraphQlMutationResolverPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/MetadataAwareNameConverterPass.php
+		- src/Core/Bridge/Symfony/Bundle/DependencyInjection/Compiler/TestClientPass.php
+		- src/Core/Bridge/Symfony/Bundle/EventListener/SwaggerUiListener.php
+		- src/Core/Bridge/Symfony/Bundle/SwaggerUi/SwaggerUiAction.php
+		- src/Core/Bridge/Symfony/Bundle/SwaggerUi/SwaggerUiContext.php
+		- src/Core/Bridge/Symfony/Bundle/Test/Client.php
+		- src/Core/Bridge/Symfony/Bundle/Test/Response.php
+		- src/Core/Bridge/Symfony/Identifier/Normalizer/UuidNormalizer.php
+		- src/Core/Bridge/Symfony/Messenger/ContextStamp.php
+		- src/Core/Bridge/Symfony/Messenger/RemoveStamp.php
+		- src/Core/Bridge/Symfony/PropertyInfo/Metadata/Property/PropertyInfoPropertyNameCollectionFactory.php
+		- src/Core/Bridge/Symfony/Routing/ApiLoader.php
+		- src/Core/Bridge/Symfony/Routing/Router.php
+		- src/Core/Bridge/Symfony/Validator/EventListener/ValidationExceptionListener.php
+		- src/Core/Bridge/Symfony/Validator/Exception/ValidationException.php
+		- src/Core/Bridge/Symfony/Validator/Validator.php
+		- src/Core/DataProvider/ArrayPaginator.php
+		- src/Core/DataProvider/PaginationOptions.php
+		- src/Core/DataProvider/TraversablePaginator.php
+		- src/Core/Documentation/Action/DocumentationAction.php
+		- src/Core/Documentation/Documentation.php
+		- src/Core/EventListener/AddFormatListener.php
+		- src/Core/EventListener/DeserializeListener.php
+		- src/Core/EventListener/EventPriorities.php
+		- src/Core/EventListener/ExceptionListener.php
+		- src/Core/EventListener/QueryParameterValidateListener.php
+		- src/Core/EventListener/RespondListener.php
+		- src/Core/EventListener/SerializeListener.php
+		- src/Core/Exception/FilterValidationException.php
+		- src/Core/Exception/InvalidIdentifierException.php
+		- src/Core/Filter/Validator/ArrayItems.php
+		- src/Core/Filter/Validator/Bounds.php
+		- src/Core/Filter/Validator/Enum.php
+		- src/Core/Filter/Validator/Length.php
+		- src/Core/Filter/Validator/MultipleOf.php
+		- src/Core/Filter/Validator/Pattern.php
+		- src/Core/Filter/Validator/Required.php
+		- src/Core/GraphQl/Action/EntrypointAction.php
+		- src/Core/GraphQl/Action/GraphQlPlaygroundAction.php
+		- src/Core/GraphQl/Action/GraphiQlAction.php
+		- src/Core/GraphQl/Error/ErrorHandler.php
+		- src/Core/GraphQl/Executor.php
+		- src/Core/GraphQl/Type/Definition/IterableType.php
+		- src/Core/GraphQl/Type/Definition/UploadType.php
+		- src/Core/GraphQl/Type/TypeNotFoundException.php
+		- src/Core/GraphQl/Type/TypesContainer.php
+		- src/Core/GraphQl/Type/TypesFactory.php
+		- src/Core/Hal/JsonSchema/SchemaFactory.php
+		- src/Core/Hal/Serializer/CollectionNormalizer.php
+		- src/Core/Hal/Serializer/EntrypointNormalizer.php
+		- src/Core/Hal/Serializer/ItemNormalizer.php
+		- src/Core/Hal/Serializer/ObjectNormalizer.php
+		- src/Core/HttpCache/EventListener/AddHeadersListener.php
+		- src/Core/HttpCache/EventListener/AddTagsListener.php
+		- src/Core/HttpCache/VarnishPurger.php
+		- src/Core/HttpCache/VarnishXKeyPurger.php
+		- src/Core/Hydra/EventListener/AddLinkHeaderListener.php
+		- src/Core/Hydra/JsonSchema/SchemaFactory.php
+		- src/Core/Hydra/Serializer/CollectionFiltersNormalizer.php
+		- src/Core/Hydra/Serializer/CollectionNormalizer.php
+		- src/Core/Hydra/Serializer/ConstraintViolationListNormalizer.php
+		- src/Core/Hydra/Serializer/DocumentationNormalizer.php
+		- src/Core/Hydra/Serializer/EntrypointNormalizer.php
+		- src/Core/Hydra/Serializer/ErrorNormalizer.php
+		- src/Core/Hydra/Serializer/PartialCollectionViewNormalizer.php
+		- src/Core/JsonApi/EventListener/TransformFieldsetsParametersListener.php
+		- src/Core/JsonApi/EventListener/TransformFilteringParametersListener.php
+		- src/Core/JsonApi/EventListener/TransformPaginationParametersListener.php
+		- src/Core/JsonApi/EventListener/TransformSortingParametersListener.php
+		- src/Core/JsonApi/Serializer/CollectionNormalizer.php
+		- src/Core/JsonApi/Serializer/ConstraintViolationListNormalizer.php
+		- src/Core/JsonApi/Serializer/EntrypointNormalizer.php
+		- src/Core/JsonApi/Serializer/ErrorNormalizer.php
+		- src/Core/JsonApi/Serializer/ItemNormalizer.php
+		- src/Core/JsonApi/Serializer/ObjectNormalizer.php
+		- src/Core/JsonApi/Serializer/ReservedAttributeNameConverter.php
+		- src/Core/JsonLd/Action/ContextAction.php
+		- src/Core/JsonLd/ContextBuilder.php
+		- src/Core/JsonLd/Serializer/ItemNormalizer.php
+		- src/Core/JsonLd/Serializer/ObjectNormalizer.php
+		- src/Core/JsonSchema/Command/JsonSchemaGenerateCommand.php
+		- src/Core/JsonSchema/Schema.php
+		- src/Core/JsonSchema/SchemaFactory.php
+		- src/Core/JsonSchema/TypeFactory.php
+		- src/Core/Mercure/EventListener/AddLinkHeaderListener.php
+		- src/Core/Metadata/Property/Factory/CachedPropertyNameCollectionFactory.php
+		- src/Core/Metadata/Property/Factory/ExtractorPropertyNameCollectionFactory.php
+		- src/Core/Metadata/Property/PropertyNameCollection.php
+		- src/Core/OpenApi/Model/Components.php
+		- src/Core/OpenApi/Model/Contact.php
+		- src/Core/OpenApi/Model/Encoding.php
+		- src/Core/OpenApi/Model/ExternalDocumentation.php
+		- src/Core/OpenApi/Model/Info.php
+		- src/Core/OpenApi/Model/License.php
+		- src/Core/OpenApi/Model/Link.php
+		- src/Core/OpenApi/Model/MediaType.php
+		- src/Core/OpenApi/Model/OAuthFlow.php
+		- src/Core/OpenApi/Model/OAuthFlows.php
+		- src/Core/OpenApi/Model/Operation.php
+		- src/Core/OpenApi/Model/Parameter.php
+		- src/Core/OpenApi/Model/PathItem.php
+		- src/Core/OpenApi/Model/Paths.php
+		- src/Core/OpenApi/Model/RequestBody.php
+		- src/Core/OpenApi/Model/Response.php
+		- src/Core/OpenApi/Model/Schema.php
+		- src/Core/OpenApi/Model/SecurityScheme.php
+		- src/Core/OpenApi/Model/Server.php
+		- src/Core/OpenApi/OpenApi.php
+		- src/Core/OpenApi/Options.php
+		- src/Core/OpenApi/Serializer/OpenApiNormalizer.php
+		- src/Core/Operation/DashPathSegmentNameGenerator.php
+		- src/Core/Operation/UnderscorePathSegmentNameGenerator.php
+		- src/Core/PathResolver/CustomOperationPathResolver.php
+		- src/Core/PathResolver/OperationPathResolver.php
+		- src/Core/Problem/Serializer/ConstraintViolationListNormalizer.php
+		- src/Core/Problem/Serializer/ErrorNormalizer.php
+		- src/Core/Security/Core/Authorization/ExpressionLanguageProvider.php
+		- src/Core/Security/EventListener/DenyAccessListener.php
+		- src/Core/Security/ResourceAccessChecker.php
+		- src/Core/Serializer/AbstractItemNormalizer.php
+		- src/Core/Serializer/AbstractCollectionNormalizer.php
+		- src/Core/Serializer/AbstractConstraintViolationListNormalizer.php
+		- src/Core/Serializer/Filter/GroupFilter.php
+		- src/Core/Serializer/Filter/PropertyFilter.php
+		- src/Core/Serializer/JsonEncoder.php
+		- src/Core/Serializer/Mapping/Factory/ClassMetadataFactory.php
+		- src/Core/Serializer/SerializerContextBuilder.php
+		- src/Core/Serializer/SerializerFilterContextBuilder.php
+		- src/Core/Swagger/Serializer/ApiGatewayNormalizer.php
+		- src/Core/Swagger/Serializer/DocumentationNormalizer.php
+		- src/Core/Test/DoctrineMongoDbOdmFilterTestCase.php
+		- src/Core/Test/DoctrineOrmFilterTestCase.php
+		- src/Core/Upgrade/SubresourceTransformer.php
+		- src/Core/Upgrade/UpgradeApiResourceVisitor.php
+		- src/Core/Upgrade/UpgradeApiSubresourceVisitor.php
+		- src/Core/Util/AttributesExtractor.php
+		- src/Core/Util/ErrorFormatGuesser.php
+		- src/Core/Util/Inflector.php
+		- src/Core/Util/IriHelper.php
+		- src/Core/Util/Reflection.php
+		- src/Core/Util/ReflectionClassRecursiveIterator.php
+		- src/Core/Util/RequestAttributesExtractor.php
+		- src/Core/Util/RequestParser.php
+		- src/Core/Validator/EventListener/ValidateListener.php
 		# Symfony cache
 		- tests/Fixtures/app/var/cache
 		# Deprecated integrations (will be removed in API Platform 3)
@@ -91,10 +307,6 @@ parameters:
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: tests/GraphQl/Type/TypeBuilderTest.php
-		# https://github.com/phpstan/phpstan-doctrine/issues/115
-		-
-			message: '#Property ApiPlatform\\Test\\DoctrineMongoDbOdmFilterTestCase::\$repository \(Doctrine\\ODM\\MongoDB\\Repository\\DocumentRepository\) does not accept Doctrine\\ORM\\EntityRepository<object>\.#'
-			path: src/Test/DoctrineMongoDbOdmFilterTestCase.php
 		# https://github.com/phpstan/phpstan-phpunit/issues/62
 		-
 			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
@@ -128,6 +340,9 @@ parameters:
 		- '#Method ApiPlatform\\Doctrine\\Orm\\Filter\\(Abstract|Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Doctrine\\Orm\\Filter\\(AbstractFilter|FilterInterface)::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
+		- 
+			message: '#If condition is always false.#'
+			path: src/Core
 
 		# Expected, due to backward compatibility
 		-
@@ -150,3 +365,13 @@ parameters:
 		-
 			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
 			path: src
+		# Skipped tests, we do this on purpose
+		- 
+			message: "#^Unreachable statement - code above always terminates.$#"
+			path: tests
+		- 
+			message: "#^Unreachable statement - code above always terminates.$#"
+			path: src/Core/Bridge/Doctrine/EventListener/PublishMercureUpdatesListener.php
+		-
+			message: "#Access to an undefined static property static\\([^)]+\\)::\\$container.$#"
+			path: tests

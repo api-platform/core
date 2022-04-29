@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\AnnotationFilterExtractorTrait::class);
 
 if (false) {
-    class AnnotationFilterExtractorTrait extends \ApiPlatform\Util\AnnotationFilterExtractorTrait
+    trait AnnotationFilterExtractorTrait
     {
+        use \ApiPlatform\Util\AnnotationFilterExtractorTrait;
     }
 }

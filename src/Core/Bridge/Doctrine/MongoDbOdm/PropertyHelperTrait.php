@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 class_exists(\ApiPlatform\Doctrine\Odm\PropertyHelperTrait::class);
 
 if (false) {
-    class PropertyHelperTrait extends \ApiPlatform\Doctrine\Odm\PropertyHelperTrait
+    trait PropertyHelperTrait
     {
+        use \ApiPlatform\Doctrine\Odm\PropertyHelperTrait;
     }
 }

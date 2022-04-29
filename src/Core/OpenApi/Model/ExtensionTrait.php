@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\OpenApi\Model;
 class_exists(\ApiPlatform\OpenApi\Model\ExtensionTrait::class);
 
 if (false) {
-    class ExtensionTrait extends \ApiPlatform\OpenApi\Model\ExtensionTrait
+    trait ExtensionTrait
     {
+        use \ApiPlatform\OpenApi\Model\ExtensionTrait;
     }
 }

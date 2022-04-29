@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Elasticsearch\Util;
 class_exists(\ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait::class);
 
 if (false) {
-    class FieldDatatypeTrait extends \ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait
+    trait FieldDatatypeTrait
     {
+        use \ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
     }
 }

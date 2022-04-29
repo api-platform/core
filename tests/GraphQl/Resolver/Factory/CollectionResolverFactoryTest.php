@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\CollectionResolverFactory;
@@ -226,7 +226,7 @@ class CollectionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'collection_query';
-        $operation = (new QueryCollection())->withName($operationName)->withResolver('query_resolver_id');
+        $operation = (new QueryCollection())->withResolver('query_resolver_id')->withName($operationName);
         $source = null;
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();

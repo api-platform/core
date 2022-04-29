@@ -24,13 +24,11 @@ use ApiPlatform\Metadata\Operation;
 trait LinksHandlerTrait
 {
     /**
-     * @param HttpOperation|GraphQlOperation $operation
-     *
      * @return Link[]
      */
     private function getLinks(string $resourceClass, Operation $operation, array $context): array
     {
-        $links = ($operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables()) ?? [];
+        $links = $this->getOperationLinks($operation);
 
         if (!($linkClass = $context['linkClass'] ?? false)) {
             return $links;
@@ -63,7 +61,7 @@ trait LinksHandlerTrait
             }
         }
 
-        foreach ($linkedOperation instanceof GraphQlOperation ? $linkedOperation->getLinks() : $linkedOperation->getUriVariables() as $link) {
+        foreach ($this->getOperationLinks($linkedOperation ?? null) as $link) {
             if ($resourceClass === $link->getToClass()) {
                 $newLinks[] = $link;
             }
@@ -86,5 +84,18 @@ trait LinksHandlerTrait
         }
 
         return array_shift($identifiers);
+    }
+
+    private function getOperationLinks(?Operation $operation = null): array
+    {
+        if ($operation instanceof GraphQlOperation) {
+            return $operation->getLinks() ?? [];
+        }
+
+        if ($operation instanceof HttpOperation) {
+            return $operation->getUriVariables() ?? [];
+        }
+
+        return [];
     }
 }

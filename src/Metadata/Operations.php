@@ -23,7 +23,7 @@ final class Operations implements \IteratorAggregate, \Countable
     private $operations;
 
     /**
-     * @param array<string|int, HttpOperation> $operations
+     * @param array<string|int, Operation> $operations
      */
     public function __construct(array $operations = [])
     {

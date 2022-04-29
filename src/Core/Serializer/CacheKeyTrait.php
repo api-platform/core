@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Serializer;
 class_exists(\ApiPlatform\Serializer\CacheKeyTrait::class);
 
 if (false) {
-    class CacheKeyTrait extends \ApiPlatform\Serializer\CacheKeyTrait
+    trait CacheKeyTrait
     {
+        use \ApiPlatform\Serializer\CacheKeyTrait;
     }
 }

@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Messenger;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use Symfony\Component\Messenger\Envelope;
@@ -28,14 +26,8 @@ final class Processor implements ProcessorInterface
     use ClassInfoTrait;
     use DispatchTrait;
 
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface
-     */
-    private $resourceMetadataCollectionFactory;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, MessageBusInterface $messageBus)
+    public function __construct(MessageBusInterface $messageBus)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->messageBus = $messageBus;
     }
 

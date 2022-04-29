@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
@@ -250,7 +250,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'create';
-        $operation = (new Mutation())->withName($operationName)->withResolver('query_resolver_id');
+        $operation = (new Mutation())->withResolver('query_resolver_id')->withName($operationName);
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -299,7 +299,7 @@ class ItemMutationResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'create';
-        $operation = (new Mutation())->withName($operationName)->withShortName('shortName')->withResolver('query_resolver_id');
+        $operation = (new Mutation())->withResolver('query_resolver_id')->withName($operationName)->withShortName('shortName');
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();

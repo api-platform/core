@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 class_exists(\ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait::class);
 
 if (false) {
-    class OrderFilterTrait extends \ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait
+    trait OrderFilterTrait
     {
+        use \ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
     }
 }

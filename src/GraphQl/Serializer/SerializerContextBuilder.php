@@ -65,7 +65,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         if ($normalization) {
-            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation, $resolverContext, $context);
+            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation instanceof Operation ? $operation : null, $resolverContext, $context);
         }
 
         return $context;

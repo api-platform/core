@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\GraphQl\Resolver\Util;
 class_exists(\ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait::class);
 
 if (false) {
-    class IdentifierTrait extends \ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait
+    trait IdentifierTrait
     {
+        use \ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
     }
 }

@@ -32,6 +32,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $manager;
     private $schemaTool;
     private $env;
+    private $legacy;
 
     protected function setUp(): void
     {

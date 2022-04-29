@@ -266,7 +266,7 @@ class HttpOperation extends Operation
         $this->extraProperties = $extraProperties;
     }
 
-    public function getMethod(): string
+    public function getMethod(): ?string
     {
         return $this->method;
     }

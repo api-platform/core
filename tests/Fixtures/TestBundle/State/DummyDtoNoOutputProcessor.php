@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto as InputDtoDocument;
@@ -32,7 +33,7 @@ class DummyDtoNoOutputProcessor implements ProcessorInterface
     /**
      * {@inheritDoc}
      */
-    public function process($data, array $uriVariables = [], ?string $operationName = null, array $context = [])
+    public function process($data, Operation $operation = null, array $uriVariables = [], array $context = [])
     {
         $isOrm = true;
         $em = $this->registry->getManagerForClass(DummyDtoNoOutput::class);

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Elasticsearch\State;
+namespace ApiPlatform\Tests\Elasticsearch\State;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
@@ -44,8 +44,7 @@ final class ItemProviderTest extends TestCase
             new ItemProvider(
                 $this->prophesize(Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(DenormalizerInterface::class)->reveal(),
-                $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()
+                $this->prophesize(DenormalizerInterface::class)->reveal()
             )
         );
     }

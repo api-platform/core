@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 class_exists(\ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait::class);
 
 if (false) {
-    class SearchFilterTrait extends \ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait
+    trait SearchFilterTrait
     {
+        use \ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
     }
 }

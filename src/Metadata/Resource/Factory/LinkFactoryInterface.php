@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * @internal
@@ -26,7 +25,7 @@ interface LinkFactoryInterface
     /**
      * Create Links by using the resource class identifiers.
      *
-     * @param ApiResource|HttpOperation|GraphQlOperation $operation
+     * @param ApiResource|Operation $operation
      *
      * @return Link[]
      */
@@ -35,7 +34,7 @@ interface LinkFactoryInterface
     /**
      * Create Links from the relations metadata information.
      *
-     * @param ApiResource|HttpOperation|GraphQlOperation $operation
+     * @param ApiResource|Operation $operation
      *
      * @return Link[]
      */
@@ -44,7 +43,7 @@ interface LinkFactoryInterface
     /**
      * Create Links by using PHP attribute Links found on properties.
      *
-     * @param ApiResource|HttpOperation|GraphQlOperation $operation
+     * @param ApiResource|Operation $operation
      *
      * @return Link[]
      */

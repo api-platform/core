@@ -25,8 +25,6 @@ use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
@@ -51,8 +49,6 @@ final class RequestDataCollector extends DataCollector
     private $itemDataProvider;
     private $subresourceDataProvider;
     private $dataPersister;
-    private $provider;
-    private $processor;
 
     public function __construct(
         $metadataFactory,
@@ -60,9 +56,7 @@ final class RequestDataCollector extends DataCollector
         CollectionDataProviderInterface $collectionDataProvider = null,
         ItemDataProviderInterface $itemDataProvider = null,
         SubresourceDataProviderInterface $subresourceDataProvider = null,
-        DataPersisterInterface $dataPersister = null,
-        ProviderInterface $provider = null,
-        ProcessorInterface $processor = null
+        DataPersisterInterface $dataPersister = null
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->filterLocator = $filterLocator;
@@ -70,8 +64,6 @@ final class RequestDataCollector extends DataCollector
         $this->itemDataProvider = $itemDataProvider;
         $this->subresourceDataProvider = $subresourceDataProvider;
         $this->dataPersister = $dataPersister;
-        $this->provider = $provider;
-        $this->processor = $processor;
 
         if (!$metadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
@@ -113,8 +105,6 @@ final class RequestDataCollector extends DataCollector
             'dataProviders' => [],
             'dataPersisters' => ['responses' => []],
             'request_attributes' => $requestAttributes,
-            'providers' => ['responses' => []],
-            'processors' => ['responses' => []],
         ];
 
         if ($this->collectionDataProvider instanceof TraceableChainCollectionDataProvider) {

@@ -17,6 +17,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStage;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +31,6 @@ class WriteStageTest extends TestCase
 
     /** @var WriteStage */
     private $writeStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $processorProphecy;
     private $serializerContextBuilderProphecy;
 
@@ -52,6 +52,7 @@ class WriteStageTest extends TestCase
     {
         $resourceClass = 'myResource';
         $operationName = 'item_query';
+        /** @var Operation $operation */
         $operation = (new Query())->withName('item_query');
 
         $result = ($this->writeStage)(null, $resourceClass, $operation, []);
@@ -63,6 +64,7 @@ class WriteStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withName('item_query')->withWrite(false);
 
         $data = new \stdClass();
@@ -76,6 +78,7 @@ class WriteStageTest extends TestCase
         $operationName = 'create';
         $resourceClass = 'myResource';
         $context = [];
+        /** @var Operation $operation */
         $operation = (new Mutation())->withName($operationName);
 
         $denormalizationContext = ['denormalization' => true];

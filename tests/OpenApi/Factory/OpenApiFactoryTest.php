@@ -65,9 +65,9 @@ class OpenApiFactoryTest extends TestCase
 
     public function testInvoke(): void
     {
-        $baseOperation = (new HttpOperation())->withShortName('Dummy')->withDescription('This is a dummy')->withTypes(['http://schema.example.com/Dummy'])->withClass(Dummy::class)->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withOutput([
+        $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withOutput([
             'class' => OutputDto::class,
-        ])->withPaginationClientItemsPerPage(true);
+        ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
         $dummyResource = (new ApiResource())->withOperations(new Operations([
             'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
             'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),

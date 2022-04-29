@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Type;
+namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
@@ -325,7 +325,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection empty overridden args and add fields' => [
-                'resourceClass', (new QueryCollection())->withName('action')->withShortName('ShortName')->withArgs([]), ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
+                'resourceClass', (new QueryCollection())->withArgs([])->withName('action')->withShortName('ShortName'), ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection'])), $resolver = function () {
                 },
                 [
                     'actionShortNames' => [
@@ -865,7 +865,9 @@ class FieldsBuilderTest extends TestCase
 
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
 
-        $args = $this->fieldsBuilder->resolveResourceArgs($args, (new Operation())->withName('operation')->withShortName('shortName'));
+        /** @var Operation */
+        $operation = (new Query())->withName('operation')->withShortName('shortName');
+        $args = $this->fieldsBuilder->resolveResourceArgs($args, $operation);
 
         $this->assertSame($expectedResolvedArgs, $args);
     }

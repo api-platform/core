@@ -20,6 +20,7 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -139,6 +140,7 @@ class ExceptionActionTest extends TestCase
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn('');
 
+        /** @var HttpOperation $operation */
         $operation = (new Get())->withShortName('Foo');
         $resource = (new ApiResource())->withShortName('Foo');
         if ($resourceExceptionToStatus) {

@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\JsonLd\Serializer;
 class_exists(\ApiPlatform\JsonLd\Serializer\JsonLdContextTrait::class);
 
 if (false) {
-    class JsonLdContextTrait extends \ApiPlatform\JsonLd\Serializer\JsonLdContextTrait
+    trait JsonLdContextTrait
     {
+        use \ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
     }
 }

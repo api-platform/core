@@ -55,7 +55,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 
     public function testCreate(): void
     {
-        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
 
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [

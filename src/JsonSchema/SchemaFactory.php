@@ -100,7 +100,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         $version = $schema->getVersion();
         $definitionName = $this->buildDefinitionName($className, $format, $inputOrOutputClass, $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata : $operation, $serializerContext);
 
-        $method = $operation ? $operation->getMethod() : 'GET';
+        $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
         if (!$operation && (null === $operationType || null === $operationName)) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
         } elseif ($resourceMetadata instanceof ResourceMetadata) {
@@ -160,12 +160,12 @@ final class SchemaFactory implements SchemaFactoryInterface
         // See https://json-schema.org/latest/json-schema-core.html#rfc.section.6.4
         if ($resourceMetadata instanceof ResourceMetadata && $resourceMetadata->getIri()) {
             $definition['externalDocs'] = ['url' => $resourceMetadata->getIri()];
-        } elseif ($operation && ($operation->getTypes()[0] ?? null)) {
+        } elseif ($operation instanceof HttpOperation && ($operation->getTypes()[0] ?? null)) {
             $definition['externalDocs'] = ['url' => $operation->getTypes()[0]];
         }
 
         // TODO: getFactoryOptions should be refactored because Item & Collection Operations don't exist anymore (API Platform 3.0)
-        $options = $this->getFactoryOptions($serializerContext, $validationGroups, $operationType, $operationName, $operation);
+        $options = $this->getFactoryOptions($serializerContext, $validationGroups, $operationType, $operationName, $operation instanceof HttpOperation ? $operation : null);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
             if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {

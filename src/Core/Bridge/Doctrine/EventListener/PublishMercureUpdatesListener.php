@@ -44,6 +44,7 @@ final class PublishMercureUpdatesListener
 {
     use DispatchTrait;
     use ResourceClassInfoTrait;
+
     private const ALLOWED_KEYS = [
         'topics' => true,
         'data' => true,
@@ -279,7 +280,6 @@ final class PublishMercureUpdatesListener
         }
 
         // Mercure Component < 0.4.
-        /* @phpstan-ignore-next-line */
-        return new Update($iri, $data, $options);
+        return new Update($iri, $data, $options); // @phpstan-ignore-line
     }
 }

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
+namespace ApiPlatform\Tests\GraphQl\Serializer\Exception;
 
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use GraphQL\Error\Error;
@@ -56,7 +56,7 @@ class HttpExceptionNormalizerTest extends TestCase
 
         return [
             'client error' => [new BadRequestHttpException($exceptionMessage), $exceptionMessage, 400, 'user'],
-            'server error' => [new ServiceUnavailableHttpException(null, $exceptionMessage), $exceptionMessage, 503, Error::CATEGORY_INTERNAL], // @phpstan-ignore-line
+            'server error' => [new ServiceUnavailableHttpException(null, $exceptionMessage), $exceptionMessage, 503, Error::CATEGORY_INTERNAL],
         ];
     }
 

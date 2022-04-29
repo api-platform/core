@@ -162,7 +162,7 @@ final class TypeConverter implements TypeConverterInterface
         // We're retrieving the type of a property which is a relation to the rootResource
         if ($resourceClass !== $rootResource && $property && $rootOperation instanceof Query) {
             $isCollection = $this->typeBuilder->isCollection($type);
-            $operationName = $isCollection ? 'collection_query' : 'query';
+            $operationName = $isCollection ? 'collection_query' : 'item_query';
         }
 
         try {

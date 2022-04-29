@@ -92,7 +92,7 @@ class QueryJoinParserTest extends TestCase
      */
     public function testGetJoinRelationshipWithJoin()
     {
-        $join = new Join('INNER_JOIN', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
+        $join = new Join('INNER', 'a_1.relatedDummy', 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1.relatedDummy', QueryJoinParser::getJoinRelationship($join));
     }
 
@@ -102,7 +102,7 @@ class QueryJoinParserTest extends TestCase
      */
     public function testGetJoinRelationshipWithClassJoin()
     {
-        $join = new Join('INNER_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
+        $join = new Join('INNER', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals(RelatedDummy::class, QueryJoinParser::getJoinRelationship($join));
     }
 
@@ -112,7 +112,7 @@ class QueryJoinParserTest extends TestCase
      */
     public function testGetJoinAliasWithJoin()
     {
-        $join = new Join('INNER_JOIN', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
+        $join = new Join('INNER', 'relatedDummy', 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 
@@ -122,7 +122,7 @@ class QueryJoinParserTest extends TestCase
      */
     public function testGetJoinAliasWithClassJoin()
     {
-        $join = new Join('LEFT_JOIN', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
+        $join = new Join('LEFT', RelatedDummy::class, 'a_1', null, 'a_1.name = r.name');
         $this->assertEquals('a_1', QueryJoinParser::getJoinAlias($join));
     }
 

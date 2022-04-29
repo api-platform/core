@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -21,6 +21,7 @@ use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\State\ProviderInterface;
@@ -69,6 +70,7 @@ class ReadStageTest extends TestCase
     public function testApplyDisabled(array $context, $expectedResult): void
     {
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withRead(false)->withName('item_query')->withClass($resourceClass);
 
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
@@ -112,7 +114,9 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
-        $result = ($this->readStage)($resourceClass, null, (new Query())->withName($operationName), $context);
+        /** @var Operation $operation */
+        $operation = (new Query())->withName($operationName);
+        $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -160,7 +164,9 @@ class ReadStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        $result = ($this->readStage)($resourceClass, null, (new Mutation())->withName($operationName)->withShortName('shortName'), $context);
+        /** @var Operation $operation */
+        $operation = (new Mutation())->withName($operationName)->withShortName('shortName');
+        $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -200,6 +206,7 @@ class ReadStageTest extends TestCase
 
         $collectionOperation = (new GetCollection())->withFilters($expectedFilters);
 
+        /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
         $normalizationContext = ['normalization' => true, 'operation' => $operation];
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
@@ -233,6 +240,7 @@ class ReadStageTest extends TestCase
             'source' => null,
         ];
         $collectionOperation = (new GetCollection());
+        /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
@@ -295,6 +303,7 @@ class ReadStageTest extends TestCase
             'source' => null,
         ];
         $filters = ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']];
+        /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName)->withClass($resourceClass)->withFilters($filters);
 
         $normalizationContext = ['normalization' => true, 'operation' => $operation];

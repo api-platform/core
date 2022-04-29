@@ -191,7 +191,7 @@ class IriConverterTest extends TestCase
     {
         $item = new Dummy();
         $operationName = 'operation_name';
-        $operation = (new Get())->withName($operationName)->withUriVariables(['id' => new Link()]);
+        $operation = (new Get())->withUriVariables(['id' => new Link()])->withName($operationName);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
             '_api_resource_class' => Dummy::class,
@@ -213,7 +213,7 @@ class IriConverterTest extends TestCase
     {
         $this->expectExceptionMessage('Item not found for "/dummies/1"');
         $operationName = 'operation_name';
-        $operation = (new Get())->withName($operationName)->withUriVariables(['id' => new Link()]);
+        $operation = (new Get())->withUriVariables(['id' => new Link()])->withName($operationName);
         $routerProphecy = $this->prophesize(RouterInterface::class);
         $routerProphecy->match('/dummies/1')->shouldBeCalled()->willReturn([
             '_api_resource_class' => Dummy::class,
@@ -265,6 +265,6 @@ class IriConverterTest extends TestCase
 
         $iriConverter = $this->prophesize(IriConverterInterface::class);
 
-        return new IriConverter($stateProviderProphecy->reveal(), $routerProphecy->reveal(), $identifiersExtractorProphecy->reveal(), $this->getResourceClassResolver(), $resourceMetadataCollectionFactoryProphecy->reveal(), $uriVariablesConverter, $iriConverter->reveal());
+        return new IriConverter($stateProviderProphecy->reveal(), $routerProphecy->reveal(), $identifiersExtractorProphecy->reveal(), $this->getResourceClassResolver(), $resourceMetadataCollectionFactoryProphecy->reveal(), $uriVariablesConverter);
     }
 }

@@ -62,7 +62,9 @@ class VarnishPurgerTest extends TestCase
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();
 
-        $purger = new VarnishPurger([$clientProphecy1->reveal()]);
+        /** @var HttpClientInterface $client */
+        $client = $clientProphecy1->reveal();
+        $purger = new VarnishPurger([$client]);
         $purger->purge([]);
     }
 
@@ -71,6 +73,7 @@ class VarnishPurgerTest extends TestCase
      */
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $regexesToSend)
     {
+        /** @var HttpClientInterface $client */
         $client = new class() implements ClientInterface {
             public $sentRegexes = [];
 
@@ -105,7 +108,7 @@ class VarnishPurgerTest extends TestCase
         $purger = new VarnishPurger([$client], $maxHeaderLength);
         $purger->purge($iris);
 
-        self::assertSame($regexesToSend, $client->sentRegexes);
+        self::assertSame($regexesToSend, $client->sentRegexes); // @phpstan-ignore-line
     }
 
     public function provideChunkHeaderCases()

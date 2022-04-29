@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -144,7 +145,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $resources[$index] = $resources[$index]->withOperations(new Operations($operations));
             $graphQlOperations = $resource->getGraphQlOperations();
 
-            if ([] === $graphQlOperations) {
+            if ([] === $graphQlOperations || !$this->graphQlEnabled) {
                 continue;
             }
 
@@ -168,10 +169,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         return $resources;
     }
 
-    /**
-     * @param HttpOperation|GraphQlOperation $operation
-     */
-    private function getOperationWithDefaults(ApiResource $resource, $operation): array
+    private function getOperationWithDefaults(ApiResource $resource, Operation $operation): array
     {
         // Inherit from resource defaults
         foreach (get_class_methods($resource) as $methodName) {
@@ -211,7 +209,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             return [$operation->getName(), $operation];
         }
 
-        if ($operation->getRouteName()) {
+        if ($operation instanceof HttpOperation && $operation->getRouteName()) {
             $operation = $operation->withName($operation->getRouteName());
         }
 

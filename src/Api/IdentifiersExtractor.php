@@ -16,6 +16,7 @@ namespace ApiPlatform\Api;
 use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -56,7 +57,12 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         $resourceClass = $this->getResourceClass($item, true);
         $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName, false, true);
 
-        $links = $operation instanceof GraphQlOperation ? $operation->getLinks() : $operation->getUriVariables();
+        if ($operation instanceof HttpOperation) {
+            $links = $operation->getUriVariables();
+        } elseif ($operation instanceof GraphQlOperation) {
+            $links = $operation->getLinks();
+        }
+
         foreach ($links ?? [] as $link) {
             if (1 < \count($link->getIdentifiers())) {
                 $compositeIdentifiers = [];
@@ -136,7 +142,14 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
             trigger_deprecation('api-platform/core', '2.7', 'Using a resource class as identifier is deprecated, please make this identifier Stringable');
             $relatedOperation = $this->resourceMetadataFactory->create($relatedResourceClass)->getOperation();
-            $relatedLinks = $relatedOperation instanceof GraphQlOperation ? $relatedOperation->getLinks() : $relatedOperation->getUriVariables();
+
+            $relatedLinks = [];
+            if ($relatedOperation instanceof GraphQlOperation) {
+                $relatedLinks = $relatedOperation->getLinks();
+            } elseif ($relatedOperation instanceof HttpOperation) {
+                $relatedLinks = $relatedOperation->getUriVariables();
+            }
+
             if (1 === \count($relatedLinks)) {
                 $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedLinks)->getIdentifiers()[0], $parameterName);
 

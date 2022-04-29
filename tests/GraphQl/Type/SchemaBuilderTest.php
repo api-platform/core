@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Type;
+namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
@@ -145,7 +145,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'custom item query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_item_query' => (new Query())->withName('custom_item_query')->withResolver('item_query_resolver')])]),
+            'custom item query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_item_query' => (new Query())->withResolver('item_query_resolver')->withName('custom_item_query')])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
@@ -154,7 +154,7 @@ class SchemaBuilderTest extends TestCase
                     ],
                 ]), null, null,
             ],
-            'custom collection query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_collection_query' => (new QueryCollection())->withName('custom_collection_query')->withResolver('collection_query_resolver')])]),
+            'custom collection query' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['custom_collection_query' => (new QueryCollection())->withResolver('collection_query_resolver')->withName('custom_collection_query')])]),
                 new ObjectType([
                     'name' => 'Query',
                     'fields' => [
