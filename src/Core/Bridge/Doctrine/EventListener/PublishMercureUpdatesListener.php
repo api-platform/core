@@ -45,8 +45,8 @@ final class PublishMercureUpdatesListener
 {
     use ClassInfoTrait;
     use DispatchTrait;
+    use ResourceClassInfoTrait;
 
-    // use ResourceClassInfoTrait;
     private const ALLOWED_KEYS = [
         'topics' => true,
         'data' => true,
@@ -59,8 +59,6 @@ final class PublishMercureUpdatesListener
         'enable_async_update' => true,
     ];
 
-    private $resourceClassResolver;
-    private $resourceMetadataFactory;
     private $iriConverter;
     private $serializer;
     private $hubRegistry;
@@ -158,7 +156,7 @@ final class PublishMercureUpdatesListener
      */
     private function storeObjectToPublish($object, string $property): void
     {
-        if ($resourceClass = $this->resourceClassResolver->getResourceClass($object)) {
+        if (null === $resourceClass = $this->getResourceClass($object)) {
             return;
         }
 
