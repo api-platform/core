@@ -235,7 +235,7 @@ class ItemDataProviderTest extends TestCase
     public function testCannotCreateAggregationBuilder()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The repository for "ApiPlatform\Core\Tests\Fixtures\TestBundle\Document\Dummy" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
+        $this->expectExceptionMessage('The repository for "ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy" must be an instance of "Doctrine\ODM\MongoDB\Repository\DocumentRepository".');
 
         $repositoryProphecy = $this->prophesize(ObjectRepository::class);
 
