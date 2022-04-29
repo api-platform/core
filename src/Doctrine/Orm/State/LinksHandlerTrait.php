@@ -98,7 +98,7 @@ trait LinksHandlerTrait
                     $queryBuilder->join(
                         $link->getFromClass(),
                         $joinAlias,
-                        'with',
+                        'WITH',
                         "$previousAlias.{$previousJoinProperties[0]} = $joinAlias.{$associationMapping['fieldName']}"
                     );
                 }

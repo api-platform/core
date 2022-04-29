@@ -44,7 +44,7 @@ final class ItemProviderTest extends TestCase
             new ItemProvider(
                 $this->prophesize(Client::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal(),
-                $this->prophesize(DenormalizerInterface::class)->reveal(),
+                $this->prophesize(DenormalizerInterface::class)->reveal()
             )
         );
     }

@@ -43,9 +43,9 @@ final class QueryBuilderHelper
         $query = "$alias.$association";
 
         if (Join::LEFT_JOIN === $joinType || QueryChecker::hasLeftJoin($queryBuilder)) {
-            $queryBuilder->leftJoin($query, $associationAlias, $conditionType, $condition);
+            $queryBuilder->leftJoin($query, $associationAlias, $conditionType, $condition); // @phpstan-ignore-line
         } else {
-            $queryBuilder->innerJoin($query, $associationAlias, $conditionType, $condition);
+            $queryBuilder->innerJoin($query, $associationAlias, $conditionType, $condition); // @phpstan-ignore-line
         }
 
         return $associationAlias;
