@@ -46,14 +46,14 @@ final class UpgradeApiResourceCommand extends Command
     private $identifiersExtractor;
     private $localCache = [];
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory, SubresourceTransformer $subresourceTransformer, AnnotationReader $reader, IdentifiersExtractorInterface $identifiersExtractor)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory, SubresourceTransformer $subresourceTransformer, IdentifiersExtractorInterface $identifiersExtractor, AnnotationReader $reader = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->subresourceTransformer = $subresourceTransformer;
-        $this->reader = $reader;
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->reader = $reader;
 
         parent::__construct();
     }
@@ -246,6 +246,10 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
 
         if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionClass->getAttributes(ApiResource::class)) {
             return [$attributes[0]->newInstance(), false];
+        }
+
+        if (null === $this->reader) {
+            throw new \RuntimeException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
         return [$this->reader->getClassAnnotation($reflectionClass, ApiResource::class), true];
