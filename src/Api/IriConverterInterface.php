@@ -38,7 +38,7 @@ interface IriConverterInterface
     /**
      * Gets the IRI associated with the given item.
      *
-     * @param object|array $item
+     * @param object|iterable $item
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
