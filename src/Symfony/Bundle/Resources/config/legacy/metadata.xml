@@ -50,16 +50,6 @@
             <argument type="service" id="api_platform.resource_class_resolver" />
         </service>
 
-        <service id="api_platform.metadata.subresource.metadata_factory.annotation.legacy" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationSubresourceMetadataFactory" decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="30" public="false">
-            <argument type="service" id="annotation_reader" />
-            <argument type="service" id="api_platform.metadata.subresource.metadata_factory.annotation.legacy.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.metadata_factory.annotation.legacy" class="ApiPlatform\Core\Metadata\Property\Factory\AnnotationPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="20" public="false">
-            <argument type="service" id="annotation_reader" />
-            <argument type="service" id="api_platform.metadata.property.metadata_factory.annotation.legacy.inner" />
-        </service>
-
         <service id="api_platform.metadata.property.metadata_factory.cached.legacy" class="ApiPlatform\Core\Metadata\Property\Factory\CachedPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="-10" public="false">
             <argument type="service" id="api_platform.cache.metadata.property.legacy" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.cached.legacy.inner" />
