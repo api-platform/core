@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 class_exists(\ApiPlatform\Symfony\Messenger\DispatchTrait::class);
 
 if (false) {
-    class DispatchTrait extends \ApiPlatform\Symfony\Messenger\DispatchTrait
+    trait DispatchTrait
     {
+        use \ApiPlatform\Symfony\Messenger\DispatchTrait;
     }
 }

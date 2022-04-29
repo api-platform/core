@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common;
 class_exists(\ApiPlatform\Doctrine\Common\PropertyHelperTrait::class);
 
 if (false) {
-    class PropertyHelperTrait extends \ApiPlatform\Doctrine\Common\PropertyHelperTrait
+    trait PropertyHelperTrait
     {
+        use \ApiPlatform\Doctrine\Common\PropertyHelperTrait;
     }
 }

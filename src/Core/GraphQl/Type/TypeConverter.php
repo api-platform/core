@@ -41,7 +41,7 @@ final class TypeConverter implements TypeConverterInterface
     /** @var TypesContainerLegacyInterface|TypesContainerInterface */
     private $typesContainer;
     private $resourceMetadataFactory;
-    /** @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface */
+    /** @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface|null */
     private $propertyMetadataFactory;
 
     public function __construct(TypeBuilderInterface $typeBuilder, $typesContainer, ResourceMetadataFactoryInterface $resourceMetadataFactory, $propertyMetadataFactory = null)

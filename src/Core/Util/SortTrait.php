@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\SortTrait::class);
 
 if (false) {
-    class SortTrait extends \ApiPlatform\Util\SortTrait
+    trait SortTrait
     {
+        use \ApiPlatform\Util\SortTrait;
     }
 }

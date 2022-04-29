@@ -174,8 +174,6 @@ $deprecatedClassesWithAliases = [
 
     ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class => ApiPlatform\Symfony\Bundle\EventListener\SwaggerUiListener::class,
 
-    ApiPlatform\Core\Bridge\Symfony\Bundle\Processor\TraceableChainProcessor::class => ApiPlatform\Symfony\Bundle\Processor\TraceableChainProcessor::class,
-
     ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class => ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction::class,
     ApiPlatform\Core\Bridge\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class => ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext::class,
 
@@ -405,7 +403,6 @@ $deprecatedClassesWithoutAliases = [
     ApiPlatform\Core\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory::class,
     ApiPlatform\Core\Metadata\Property\Factory\DefaultPropertyMetadataFactory::class => ApiPlatform\Metadata\Property\Factory\DefaultPropertyMetadataFactory::class,
 
-    ApiPlatform\Core\Metadata\Extractor\AbstractExtractor::class => ApiPlatform\Metadata\Extractor\AbstractResourceExtractor::class,
     ApiPlatform\Core\Metadata\Extractor\XmlExtractor::class => ApiPlatform\Metadata\Extractor\XmlResourceExtractor::class,
     ApiPlatform\Core\Metadata\Extractor\YamlExtractor::class => ApiPlatform\Metadata\Extractor\YamlResourceExtractor::class,
     ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory::class => ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory::class,
@@ -426,7 +423,6 @@ $deprecatedClassesWithoutAliases = [
     ApiPlatform\Core\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory::class => ApiPlatform\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory::class,
     ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityStage::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityStage::class,
     ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage::class,
-    ApiPlatform\Core\GraphQl\Resolver\Stage\SecurityPostValidationStage::class => ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStage::class,
     ApiPlatform\Core\GraphQl\Resolver\Stage\SerializeStage::class => ApiPlatform\GraphQl\Resolver\Stage\SerializeStage::class,
     ApiPlatform\Core\GraphQl\Resolver\Stage\DeserializeStage::class => ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage::class,
     ApiPlatform\Core\GraphQl\Resolver\Stage\ValidateStage::class => ApiPlatform\GraphQl\Resolver\Stage\ValidateStage::class,

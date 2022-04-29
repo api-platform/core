@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 class_exists(\ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait::class);
 
 if (false) {
-    class NumericFilterTrait extends \ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait
+    trait NumericFilterTrait
     {
+        use \ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait;
     }
 }

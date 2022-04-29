@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 class_exists(\ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait::class);
 
 if (false) {
-    class BooleanFilterTrait extends \ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait
+    trait BooleanFilterTrait
     {
+        use \ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait;
     }
 }

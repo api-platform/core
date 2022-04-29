@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\CloneTrait::class);
 
 if (false) {
-    class CloneTrait extends \ApiPlatform\Util\CloneTrait
+    trait CloneTrait
     {
+        use \ApiPlatform\Util\CloneTrait;
     }
 }

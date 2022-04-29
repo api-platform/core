@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\ValidateStage;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
@@ -31,7 +32,6 @@ class ValidateStageTest extends TestCase
 
     /** @var ValidateStage */
     private $validateStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $validatorProphecy;
 
     /**
@@ -49,6 +49,7 @@ class ValidateStageTest extends TestCase
     public function testApplyDisabled(): void
     {
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withValidate(false)->withName('item_query');
 
         $this->validatorProphecy->validate(Argument::cetera())->shouldNotBeCalled();
@@ -60,6 +61,7 @@ class ValidateStageTest extends TestCase
     {
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
+        /** @var Operation $operation */
         $operation = (new Query())->withName('item_query')->withValidationContext(['groups' => $validationGroups]);
 
         $object = new \stdClass();
@@ -72,6 +74,7 @@ class ValidateStageTest extends TestCase
     {
         $resourceClass = 'myResource';
         $validationGroups = ['group'];
+        /** @var Operation $operation */
         $operation = (new Query())->withValidationContext(['groups' => $validationGroups])->withName('item_query');
         $info = $this->prophesize(ResolveInfo::class)->reveal();
         $context = ['info' => $info];

@@ -11,13 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
@@ -57,6 +58,7 @@ class SerializeStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withSerialize(false);
 
         $result = ($this->createSerializeStage($paginationEnabled))(null, $resourceClass, $operation, $context);
@@ -92,6 +94,7 @@ class SerializeStageTest extends TestCase
             $operation = new QueryCollection();
         }
 
+        /** @var Operation $operation */
         $operation = $operation->withShortName('shortName')->withName($operationName)->withClass($resourceClass);
 
         $normalizationContext = ['normalization' => true];
@@ -135,6 +138,7 @@ class SerializeStageTest extends TestCase
             'info' => $this->prophesize(ResolveInfo::class)->reveal(),
         ];
 
+        /** @var Operation $operation */
         $operation = (new QueryCollection())->withShortName('shortName')->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
@@ -179,6 +183,7 @@ class SerializeStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $context = ['is_collection' => false, 'is_mutation' => false, 'is_subscription' => false, 'args' => [], 'info' => $this->prophesize(ResolveInfo::class)->reveal()];
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Factory;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ItemSubscriptionResolverFactory;
@@ -20,6 +20,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +37,6 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
     private $readStageProphecy;
     private $securityStageProphecy;
     private $serializeStageProphecy;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $subscriptionManagerProphecy;
     private $mercureSubscriptionIriGeneratorProphecy;
 
@@ -164,6 +164,7 @@ class ItemSubscriptionResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'update';
+        /** @var Operation $operation */
         $operation = (new Subscription())->withName($operationName)->withMercure(true);
         $source = ['source'];
         $args = ['args'];

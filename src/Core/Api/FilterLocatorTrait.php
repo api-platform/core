@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Api;
 class_exists(\ApiPlatform\Api\FilterLocatorTrait::class);
 
 if (false) {
-    class FilterLocatorTrait extends \ApiPlatform\Api\FilterLocatorTrait
+    trait FilterLocatorTrait
     {
+        use \ApiPlatform\Api\FilterLocatorTrait;
     }
 }

@@ -129,9 +129,12 @@ final class LegacySubresourceMetadataResourceMetadataCollectionFactory implement
                 }
 
                 $resource = (new ApiResource())->withExtraProperties($extraProperties)->withUriVariables($identifiers)->withStateless(false);
-                $operation = ($subresourceMetadata['collection'] ? new GetCollection() : new Get())->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']])->withUriVariables($identifiers);
+                /* @var HttpOperation $operation */
+                $operation = ($subresourceMetadata['collection'] ? new GetCollection() : new Get());
+                $operation = $operation->withUriVariables($identifiers);
+                $operation = $operation->withExtraProperties($extraProperties + ['legacy_subresource_operation_name' => $subresourceMetadata['route_name']]);
 
-                if ($subresourceMetadata['path']) {
+                if ($subresourceMetadata['path'] && $operation instanceof HttpOperation) {
                     $resource = $resource->withUriTemplate($subresourceMetadata['path']);
                     $operation = $operation->withUriTemplate($subresourceMetadata['path']);
                 }

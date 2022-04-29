@@ -127,6 +127,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
                     ->withName($operationName);
             }
 
+            /** @phpstan-ignore-next-line */
             $graphQlOperation = $graphQlOperation
                 ->withArgs($operation['args'] ?? null)
                 ->withClass($resourceClass)
@@ -175,7 +176,7 @@ final class LegacyResourceMetadataResourceMetadataCollectionFactory implements R
 
             $newOperation = $newOperation->withResource($resource);
 
-            if ($newOperation instanceof CollectionOperationInterface) {
+            if ($newOperation instanceof CollectionOperationInterface && $newOperation instanceof HttpOperation) {
                 $newOperation = $newOperation->withUriVariables([]);
             }
 

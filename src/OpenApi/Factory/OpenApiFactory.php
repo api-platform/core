@@ -22,6 +22,7 @@ use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -198,6 +199,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if ($operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $method) {
+                /* @phpstan-ignore-next-line phpstan looses the Operation type */
                 foreach (array_merge($this->getPaginationParameters($operation), $this->getFiltersParameters($operation)) as $parameter) {
                     if ($this->hasParameter($parameter, $parameters)) {
                         continue;
@@ -303,8 +305,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $requestFormats = $operation->getInputFormats() ?: [];
         $responseFormats = $operation->getOutputFormats() ?: [];
 
-        $requestMimeTypes = $this->flattenMimeTypes($requestFormats ?? []);
-        $responseMimeTypes = $this->flattenMimeTypes($responseFormats ?? []);
+        $requestMimeTypes = $this->flattenMimeTypes($requestFormats);
+        $responseMimeTypes = $this->flattenMimeTypes($responseFormats);
 
         return [$requestMimeTypes, $responseMimeTypes];
     }
@@ -373,11 +375,16 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $links = new \ArrayObject();
 
         // Only compute get links for now
-        /** @var ApiResource[] $resourceMetadataCollection */
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
                 $parameters = [];
-                if ($operationName === $operation->getName() || isset($links[$operationName]) || $operation instanceof CollectionOperationInterface || HttpOperation::METHOD_GET !== ($operation->getMethod() ?: HttpOperation::METHOD_GET)) {
+                $method = $operation instanceof HttpOperation ? $operation->getMethod() : HttpOperation::METHOD_GET;
+                if (
+                    $operationName === $operation->getName() ||
+                    isset($links[$operationName]) ||
+                    $operation instanceof CollectionOperationInterface ||
+                    HttpOperation::METHOD_GET !== ($method ?? null)
+                ) {
                     continue;
                 }
 
@@ -455,7 +462,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $parameters;
     }
 
-    private function getPaginationParameters(HttpOperation $operation): array
+    private function getPaginationParameters(Operation $operation): array
     {
         if (!$this->paginationOptions->isPaginationEnabled()) {
             return [];

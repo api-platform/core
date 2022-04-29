@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\ResponseTrait::class);
 
 if (false) {
-    class ResponseTrait extends \ApiPlatform\Util\ResponseTrait
+    trait ResponseTrait
     {
+        use \ApiPlatform\Util\ResponseTrait;
     }
 }

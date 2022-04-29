@@ -238,7 +238,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
     }
 
     /**
-     * @return [ApiResource, bool]
+     * @return array[ApiResource, bool]
      */
     private function readApiResource(string $resourceClass): array
     {

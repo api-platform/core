@@ -20,7 +20,6 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -43,16 +42,14 @@ final class ItemResolverFactory implements ResolverFactoryInterface
     private $securityPostDenormalizeStage;
     private $serializeStage;
     private $queryResolverLocator;
-    private $resourceMetadataCollectionFactory;
 
-    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
+    public function __construct(ReadStageInterface $readStage, SecurityStageInterface $securityStage, SecurityPostDenormalizeStageInterface $securityPostDenormalizeStage, SerializeStageInterface $serializeStage, ContainerInterface $queryResolverLocator)
     {
         $this->readStage = $readStage;
         $this->securityStage = $securityStage;
         $this->securityPostDenormalizeStage = $securityPostDenormalizeStage;
         $this->serializeStage = $serializeStage;
         $this->queryResolverLocator = $queryResolverLocator;
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null): callable

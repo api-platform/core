@@ -256,8 +256,11 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
         $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
 
-        $baseOperation = (new HttpOperation())->withClass(Dummy::class)->withShortName('Dummy')->withDescription('This is a dummy.')->withTypes(['http://schema.example.com/Dummy'])
-            ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
+        $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])
+                                              ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
+                                              ->withClass(Dummy::class)
+                                              ->withShortName('Dummy')
+                                              ->withDescription('This is a dummy.');
 
         $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withOperations(new Operations(
@@ -271,8 +274,12 @@ class OpenApiNormalizerTest extends TestCase
             )),
         ]);
 
-        $zorroBaseOperation = (new HttpOperation())->withClass('Zorro')->withShortName('Zorro')->withDescription('This is zorro.')->withTypes(['http://schema.example.com/Zorro'])
-            ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats']);
+        $zorroBaseOperation = (new HttpOperation())
+            ->withTypes(['http://schema.example.com/Zorro'])
+            ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
+            ->withClass('Zorro')
+            ->withShortName('Zorro')
+            ->withDescription('This is zorro.');
 
         $zorroMetadata = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withOperations(new Operations(

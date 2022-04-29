@@ -1086,7 +1086,7 @@ class ApiResource
     }
 
     /**
-     * @return GraphQlOperation
+     * @return GraphQlOperation[]
      */
     public function getGraphQlOperations(): ?array
     {

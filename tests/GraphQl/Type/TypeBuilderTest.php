@@ -89,6 +89,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Query())->withShortName('shortName')->withDescription('description');
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadataCollection, $operation, false);
@@ -112,6 +113,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Query())->withShortName('shortName')->withDescription('description')->withOutput(['class' => 'outputClass']);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
@@ -178,6 +180,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Mutation())->withName('custom')->withShortName('shortName')->withDescription('description');
         /** @var NonNull $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, true);
@@ -203,6 +206,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Mutation())->withName('custom')->withShortName('shortName')->withDescription('description');
         /** @var NonNull $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, true, false, 1);
@@ -228,7 +232,8 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
-        $operation = (new Mutation())->withName('custom')->withShortName('shortName')->withDescription('description')->withArgs([]);
+        /** @var Operation $operation */
+        $operation = (new Mutation())->withArgs([])->withName('custom')->withShortName('shortName')->withDescription('description');
         /** @var NonNull $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, true);
         /** @var InputObjectType $wrappedType */
@@ -259,6 +264,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description');
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
@@ -290,6 +296,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['create']]);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
@@ -331,6 +338,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Mutation())->withName('create')->withShortName('shortName')->withDescription('description');
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false, false, 1);
@@ -358,6 +366,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withMercure(true);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
@@ -391,6 +400,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withNormalizationContext(['groups' => ['update']]);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
@@ -433,6 +443,7 @@ class TypeBuilderTest extends TestCase
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
+        /** @var Operation $operation */
         $operation = (new Subscription())->withName('update')->withShortName('shortName')->withDescription('description')->withMercure(true);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false, false, 1);

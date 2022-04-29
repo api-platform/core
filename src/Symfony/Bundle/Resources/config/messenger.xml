@@ -15,7 +15,6 @@
         </service>
 
         <service id="ApiPlatform\Symfony\Messenger\Processor" class="ApiPlatform\Symfony\Messenger\Processor" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.message_bus" />
 
             <tag name="api_platform.state_processor" priority="-900" />

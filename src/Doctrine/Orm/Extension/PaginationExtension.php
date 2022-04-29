@@ -111,7 +111,9 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             }
         } elseif (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
             throw new InvalidArgumentException(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', ResourceMetadataFactoryInterface::class));
-        } elseif (!$pagination instanceof Pagination && !$pagination instanceof LegacyPagination) {
+            // @phpstan-ignore-next-line
+        }
+        if (!$pagination instanceof Pagination && !$pagination instanceof LegacyPagination) {
             throw new InvalidArgumentException(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class, "%s" given.', Pagination::class, \get_class($pagination)));
         }
 

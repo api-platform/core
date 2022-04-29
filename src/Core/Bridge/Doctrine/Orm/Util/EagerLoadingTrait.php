@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Util;
 class_exists(\ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait::class);
 
 if (false) {
-    class EagerLoadingTrait extends \ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait
+    trait EagerLoadingTrait
     {
+        use \ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait;
     }
 }

@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\ClientTrait::class);
 
 if (false) {
-    class ClientTrait extends \ApiPlatform\Util\ClientTrait
+    trait ClientTrait
     {
+        use \ApiPlatform\Util\ClientTrait;
     }
 }

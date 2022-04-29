@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 class_exists(\ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait::class);
 
 if (false) {
-    class RangeFilterTrait extends \ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait
+    trait RangeFilterTrait
     {
+        use \ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
     }
 }

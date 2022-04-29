@@ -17,7 +17,6 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Exception\InvalidResourceException;
-use ApiPlatform\Metadata\ApiProperty as ApiPropertyMetadata;
 use ApiPlatform\Util\Reflection;
 use Doctrine\Common\Annotations\Reader;
 use Symfony\Component\PropertyInfo\Type;
@@ -43,7 +42,6 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
      */
     public function create(string $resourceClass, string $property, array $options = []): PropertyMetadata
     {
-        /** @var ApiPropertyMetadata|PropertyMetadata */
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
         try {
@@ -90,15 +88,10 @@ final class AnnotationSubresourceMetadataFactory implements PropertyMetadataFact
         return $propertyMetadata;
     }
 
-    /**
-     * @param ApiPropertyMetadata|PropertyMetadata $propertyMetadata
-     *
-     * @return ApiPropertyMetadata|PropertyMetadata
-     */
-    private function updateMetadata(ApiSubresource $annotation, $propertyMetadata, string $originResourceClass, string $propertyName)
+    private function updateMetadata(ApiSubresource $annotation, PropertyMetadata $propertyMetadata, string $originResourceClass, string $propertyName): PropertyMetadata
     {
         // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        $type = $propertyMetadata->getType();
         if (null === $type) {
             throw new InvalidResourceException(sprintf('Property "%s" on resource "%s" is declared as a subresource, but its type could not be determined.', $propertyName, $originResourceClass));
         }

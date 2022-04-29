@@ -22,6 +22,7 @@ use LogicException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -46,11 +47,19 @@ class VarnishXKeyPurgerTest extends TestCase
         $clientProphecy4 = $this->prophesize(ClientInterface::class);
         $clientProphecy4->request('PURGE', '', ['headers' => ['xkey' => '/foo /bar']])->willReturn(new Response())->shouldBeCalled();
 
-        $purger = new VarnishXKeyPurger([$clientProphecy1->reveal(), $clientProphecy2->reveal()]);
+        /** @var HttpClientInterface $client1 */
+        $client1 = $clientProphecy1->reveal();
+        /** @var HttpClientInterface $client2 */
+        $client2 = $clientProphecy2->reveal();
+        $purger = new VarnishXKeyPurger([$client1, $client2]);
         $purger->purge(['/foo']);
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
 
-        $purger = new VarnishXKeyPurger([$clientProphecy3->reveal(), $clientProphecy4->reveal()], 12);
+        /** @var HttpClientInterface $client3 */
+        $client3 = $clientProphecy3->reveal();
+        /** @var HttpClientInterface $client4 */
+        $client4 = $clientProphecy4->reveal();
+        $purger = new VarnishXKeyPurger([$client3, $client4], 12);
         $purger->purge(['/foo' => '/foo', '/bar' => '/bar']);
     }
 
@@ -59,7 +68,9 @@ class VarnishXKeyPurgerTest extends TestCase
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();
 
-        $purger = new VarnishXKeyPurger([$clientProphecy1->reveal()]);
+        /** @var HttpClientInterface $client1 */
+        $client1 = $clientProphecy1->reveal();
+        $purger = new VarnishXKeyPurger([$client1]);
         $purger->purge([]);
     }
 
@@ -70,7 +81,9 @@ class VarnishXKeyPurgerTest extends TestCase
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foobar-long-foobar-toolong-foofoo-barbar']])->willReturn(new Response())->shouldNotBeCalled();
 
-        $purger = new VarnishXKeyPurger([$clientProphecy1->reveal()], 20);
+        /** @var HttpClientInterface $client1 */
+        $client1 = $clientProphecy1->reveal();
+        $purger = new VarnishXKeyPurger([$client1], 20);
         $purger->purge(['/foobar-long-foobar-toolong-foofoo-barbar']);
     }
 
@@ -79,7 +92,9 @@ class VarnishXKeyPurgerTest extends TestCase
         $clientProphecy1 = $this->prophesize(ClientInterface::class);
         $clientProphecy1->request('PURGE', '', ['headers' => ['xkey' => '/foo,/bar,/baz']])->willReturn(new Response())->shouldBeCalled();
 
-        $purger = new VarnishXKeyPurger([$clientProphecy1->reveal()], 50, ',');
+        /** @var HttpClientInterface $client1 */
+        $client1 = $clientProphecy1->reveal();
+        $purger = new VarnishXKeyPurger([$client1], 50, ',');
         $purger->purge(['/foo', '/bar', '/baz']);
     }
 
@@ -88,6 +103,7 @@ class VarnishXKeyPurgerTest extends TestCase
      */
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend)
     {
+        /** @var HttpClientInterface */
         $client = new class() implements ClientInterface {
             public $sentKeys = [];
 
@@ -122,7 +138,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger = new VarnishXKeyPurger([$client], $maxHeaderLength);
         $purger->purge($iris);
 
-        self::assertSame($keysToSend, $client->sentKeys);
+        self::assertSame($keysToSend, $client->sentKeys); // @phpstan-ignore-line
     }
 
     public function provideChunkHeaderCases()

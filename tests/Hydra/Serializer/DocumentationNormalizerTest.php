@@ -66,12 +66,12 @@ class DocumentationNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [
             (new ApiResource())->withShortName('dummy')->withDescription('dummy')->withTypes(['#dummy'])->withOperations(new Operations([
-                'get' => (new Get())->withHydraContext(['hydra:foo' => 'bar', 'hydra:title' => 'foobar'])->withShortName('dummy')->withTypes(['#dummy']),
+                'get' => (new Get())->withHydraContext(['hydra:foo' => 'bar', 'hydra:title' => 'foobar'])->withTypes(['#dummy'])->withShortName('dummy'),
                 'put' => (new Put())->withShortName('dummy'),
                 'get_collection' => (new GetCollection())->withShortName('dummy'),
                 'post' => (new Post())->withShortName('dummy'),
             ])),
-            (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withShortName('relatedDummy')->withTypes(['#relatedDummy'])])),
+            (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withTypes(['#relatedDummy'])->withShortName('relatedDummy')])),
         ]));
         $resourceMetadataFactoryProphecy->create('relatedDummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('relatedDummy', [
             (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withShortName('relatedDummy')])),

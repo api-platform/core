@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Subscription;
+namespace ApiPlatform\Tests\GraphQl\Subscription;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
@@ -42,6 +42,7 @@ class SubscriptionManagerTest extends TestCase
     private $serializeStageProphecy;
     private $iriConverterProphecy;
     private $subscriptionManager;
+    private $resourceMetadataCollectionFactory;
 
     /**
      * {@inheritdoc}

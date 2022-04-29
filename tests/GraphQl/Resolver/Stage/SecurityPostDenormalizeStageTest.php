@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -63,6 +64,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
+        /** @var Operation $operation */
         $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
@@ -93,6 +95,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
+        /** @var Operation $operation */
         $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(false);
@@ -115,6 +118,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
+        /** @var Operation $operation */
         $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
 
         $this->expectException(\LogicException::class);
@@ -128,6 +132,7 @@ class SecurityPostDenormalizeStageTest extends TestCase
 
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName);
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::any())->shouldNotBeCalled();

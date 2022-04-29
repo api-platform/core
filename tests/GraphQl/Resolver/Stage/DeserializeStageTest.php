@@ -11,12 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -55,6 +56,7 @@ class DeserializeStageTest extends TestCase
     public function testApplyDisabled($objectToPopulate): void
     {
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withName('item_query')->withClass($resourceClass)->withDeserialize(false);
         $result = ($this->deserializeStage)($objectToPopulate, $resourceClass, $operation, []);
 
@@ -70,6 +72,7 @@ class DeserializeStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName)->withClass($resourceClass);
         $context = ['args' => ['input' => 'myInput']];
 

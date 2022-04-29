@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Problem\Serializer;
 class_exists(\ApiPlatform\Problem\Serializer\ErrorNormalizerTrait::class);
 
 if (false) {
-    class ErrorNormalizerTrait extends \ApiPlatform\Problem\Serializer\ErrorNormalizerTrait
+    trait ErrorNormalizerTrait
     {
+        use \ApiPlatform\Problem\Serializer\ErrorNormalizerTrait;
     }
 }

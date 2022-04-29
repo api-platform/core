@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Serializer;
 class_exists(\ApiPlatform\Serializer\ContextTrait::class);
 
 if (false) {
-    class ContextTrait extends \ApiPlatform\Serializer\ContextTrait
+    trait ContextTrait
     {
+        use \ApiPlatform\Serializer\ContextTrait;
     }
 }

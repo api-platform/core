@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\Command;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -64,6 +65,7 @@ final class DebugResourceCommand extends Command
 
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
 
+        /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
 
         $resources = [];

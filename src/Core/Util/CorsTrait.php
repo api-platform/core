@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\CorsTrait::class);
 
 if (false) {
-    class CorsTrait extends \ApiPlatform\Util\CorsTrait
+    trait CorsTrait
     {
+        use \ApiPlatform\Util\CorsTrait;
     }
 }

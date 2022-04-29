@@ -477,7 +477,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
-            'get' => (new Get())->withMercure(1),
+            'get' => (new Get())->withMercure(true),
         ]))]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -520,7 +520,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
-            'get' => (new Get())->withMercure(1),
+            'get' => (new Get())->withMercure(true),
         ]))]));
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);

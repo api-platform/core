@@ -14,10 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Util;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -32,7 +33,7 @@ use Symfony\Component\PropertyInfo\Type;
 trait FieldDatatypeTrait
 {
     /**
-     * @var PropertyMetadataFactoryInterface
+     * @var PropertyMetadataFactoryInterface|LegacyPropertyMetadataFactoryInterface
      */
     private $propertyMetadataFactory;
 

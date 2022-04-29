@@ -118,7 +118,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
                 $type = self::SCHEMA_MAPPED_CONSTRAINTS[\get_class($constraint)] ?? null;
 
-                if ($type && !\in_array($type, $types ?? [], true)) {
+                if ($type && !\in_array($type, $types, true)) {
                     $types[] = $type;
                 }
 

@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Doctrine\Common\Filter;
 class_exists(\ApiPlatform\Doctrine\Common\Filter\DateFilterTrait::class);
 
 if (false) {
-    class DateFilterTrait extends \ApiPlatform\Doctrine\Common\Filter\DateFilterTrait
+    trait DateFilterTrait
     {
+        use \ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
     }
 }

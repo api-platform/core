@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactory;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -25,6 +26,7 @@ use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -59,8 +61,8 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     /**
      * @TODO move $fetchPartial after $forceEager (@soyuka) in 3.0
      *
-     * @param mixed $resourceMetadataFactory
-     * @param mixed $propertyMetadataFactory
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param PropertyMetadataFactoryInterface|LegacyPropertyMetadataFactory              $propertyMetadataFactory
      */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
@@ -219,9 +221,11 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
+            $fetchEager = null;
             if ($propertyMetadata instanceof ApiProperty) {
                 $fetchEager = $propertyMetadata->getFetchEager();
             } elseif (
+                $propertyMetadata instanceof PropertyMetadata &&
                 (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
                 (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
             ) {

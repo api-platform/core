@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Cache;
 class_exists(\ApiPlatform\Util\CachedTrait::class);
 
 if (false) {
-    class CachedTrait extends \ApiPlatform\Util\CachedTrait
+    trait CachedTrait
     {
+        use \ApiPlatform\Util\CachedTrait;
     }
 }

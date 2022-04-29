@@ -20,7 +20,6 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Query;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -40,7 +39,6 @@ class ItemResolverFactoryTest extends TestCase
     private $securityPostDenormalizeStageProphecy;
     private $serializeStageProphecy;
     private $queryResolverLocatorProphecy;
-    private $resourceMetadataCollectionFactoryProphecy;
 
     /**
      * {@inheritdoc}
@@ -52,15 +50,13 @@ class ItemResolverFactoryTest extends TestCase
         $this->securityPostDenormalizeStageProphecy = $this->prophesize(SecurityPostDenormalizeStageInterface::class);
         $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
         $this->queryResolverLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $this->itemResolverFactory = new ItemResolverFactory(
             $this->readStageProphecy->reveal(),
             $this->securityStageProphecy->reveal(),
             $this->securityPostDenormalizeStageProphecy->reveal(),
             $this->serializeStageProphecy->reveal(),
-            $this->queryResolverLocatorProphecy->reveal(),
-            $this->resourceMetadataCollectionFactoryProphecy->reveal()
+            $this->queryResolverLocatorProphecy->reveal()
         );
     }
 
@@ -191,7 +187,7 @@ class ItemResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'custom_query';
-        $operation = (new Query())->withName($operationName)->withResolver('query_resolver_id');
+        $operation = (new Query())->withResolver('query_resolver_id')->withName($operationName);
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();
@@ -229,7 +225,7 @@ class ItemResolverFactoryTest extends TestCase
         $resourceClass = 'stdClass';
         $rootClass = 'rootClass';
         $operationName = 'custom_query';
-        $operation = (new Query())->withName($operationName)->withResolver('query_resolver_id');
+        $operation = (new Query())->withResolver('query_resolver_id')->withName($operationName);
         $source = ['source'];
         $args = ['args'];
         $info = $this->prophesize(ResolveInfo::class)->reveal();

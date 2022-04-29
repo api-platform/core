@@ -49,6 +49,8 @@ class SlugParentDummy
     /**
      * @ODM\ReferenceMany(targetDocument=SlugChildDummy::class, mappedBy="parentDummy")
      *
+     * @var Collection<int, SlugChildDummy>
+     *
      * @ApiSubresource
      */
     private $childDummies;
@@ -74,7 +76,7 @@ class SlugParentDummy
     }
 
     /**
-     * @return Collection|SlugChildDummy[]
+     * @return Collection<int, SlugChildDummy>|SlugChildDummy[]
      */
     public function getChildDummies(): Collection
     {

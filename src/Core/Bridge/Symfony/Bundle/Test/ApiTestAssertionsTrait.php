@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Bridge\Symfony\Bundle\Test;
 class_exists(\ApiPlatform\Symfony\Bundle\Test\ApiTestAssertionsTrait::class);
 
 if (false) {
-    class ApiTestAssertionsTrait extends \ApiPlatform\Symfony\Bundle\Test\ApiTestAssertionsTrait
+    trait ApiTestAssertionsTrait
     {
+        use \ApiPlatform\Symfony\Bundle\Test\ApiTestAssertionsTrait;
     }
 }

@@ -103,7 +103,7 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface
             return $this->roleHierarchy->getReachableRoleNames($token->getRoleNames());
         }
 
-        return array_map(static function (Role $role): string { // @phpstan-ignore-line
+        return array_map(static function (Role $role): string {
             return $role->getRole(); // @phpstan-ignore-line
         }, $this->roleHierarchy->getReachableRoles($token->getRoles())); // @phpstan-ignore-line
     }

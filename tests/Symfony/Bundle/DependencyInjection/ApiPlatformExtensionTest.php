@@ -19,9 +19,9 @@ use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
+use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
@@ -35,6 +35,9 @@ use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\State\CollectionProvider as ElasticsearchCollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider as ElasticsearchItemProvider;
+use ApiPlatform\Exception\ExceptionInterface;
+use ApiPlatform\Exception\FilterValidationException;
+use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
@@ -44,7 +47,10 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Symfony\Messenger\Processor as MessengerProcessor;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\ORM\OptimisticLockException;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
@@ -620,7 +626,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.filter_metadata_factory.annotation',
         ];
 
-        $this->assertContainerHas($services, [], []);
+        $this->assertContainerHas($services, []);
     }
 
     public function testMetadataConfigurationDocBlockFactoryInterface()
@@ -640,7 +646,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.metadata_collection_factory.php_doc',
         ];
 
-        $this->assertContainerHas($services, [], []);
+        $this->assertContainerHas($services, []);
     }
 
     public function testMetadataConfigurationYaml()
@@ -660,7 +666,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.metadata.resource.name_collection_factory.yaml.legacy',
         ];
 
-        $this->assertContainerHas($services, [], []);
+        $this->assertContainerHas($services, []);
     }
 
     public function testSwaggerConfiguration()
@@ -1036,9 +1042,12 @@ class ApiPlatformExtensionTest extends TestCase
         $config['api_platform']['enable_fos_user'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
 
+        $bundles = $this->container->getParameter('kernel.bundles');
+
         if (!isset($bundles['FOSUserBundle'])) {
             $this->markTestSkipped('bundle FOSUserBundle does not exist');
         }
+
         $services = [
             // fos_user.xml
             'api_platform.fos_user.event_listener',
@@ -1055,6 +1064,8 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['enable_nelmio_api_doc'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
+
+        $bundles = $this->container->getParameter('kernel.bundles');
 
         if (!isset($bundles['NelmioApiDocBundle'])) {
             $this->markTestSkipped('bundle NelmioApiDocBundle does not exist');

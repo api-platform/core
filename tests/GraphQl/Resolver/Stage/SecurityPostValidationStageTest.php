@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStage;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -32,7 +33,6 @@ class SecurityPostValidationStageTest extends TestCase
 
     /** @var SecurityPostValidationStage */
     private $securityPostValidationStage;
-    private $resourceMetadataCollectionFactoryProphecy;
     private $resourceAccessCheckerProphecy;
 
     /**
@@ -51,6 +51,7 @@ class SecurityPostValidationStageTest extends TestCase
     {
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName)->withClass($resourceClass);
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::cetera())->shouldNotBeCalled();
@@ -65,6 +66,7 @@ class SecurityPostValidationStageTest extends TestCase
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
 
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName)->withClass($resourceClass)->withSecurityPostValidation($isGranted);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
@@ -78,6 +80,7 @@ class SecurityPostValidationStageTest extends TestCase
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
         $extraVariables = ['extra' => false];
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName)->withClass($resourceClass)->withSecurityPostValidation($isGranted);
 
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(false);
@@ -100,6 +103,7 @@ class SecurityPostValidationStageTest extends TestCase
         $operationName = 'item_query';
         $resourceClass = 'myResource';
         $isGranted = 'not_granted';
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName)->withClass($resourceClass)->withSecurityPostValidation($isGranted);
 
         $this->expectException(\LogicException::class);
@@ -113,6 +117,7 @@ class SecurityPostValidationStageTest extends TestCase
 
         $operationName = 'item_query';
         $resourceClass = 'myResource';
+        /** @var Operation $operation */
         $operation = (new Query())->withName($operationName)->withClass($resourceClass);
 
         $this->resourceAccessCheckerProphecy->isGranted(Argument::any())->shouldNotBeCalled();

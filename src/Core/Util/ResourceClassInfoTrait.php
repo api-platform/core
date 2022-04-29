@@ -16,7 +16,8 @@ namespace ApiPlatform\Core\Util;
 class_exists(\ApiPlatform\Util\ResourceClassInfoTrait::class);
 
 if (false) {
-    class ResourceClassInfoTrait extends \ApiPlatform\Util\ResourceClassInfoTrait
+    trait ResourceClassInfoTrait
     {
+        use \ApiPlatform\Util\ResourceClassInfoTrait;
     }
 }

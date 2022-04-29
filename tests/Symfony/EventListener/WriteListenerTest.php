@@ -143,7 +143,7 @@ class WriteListenerTest extends TestCase
 
         $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])])->withProcessor('processor'),
+            '_api_OperationResource_delete' => (new Delete())->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])])->withProcessor('processor')->withName('_api_OperationResource_delete'),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
@@ -281,7 +281,7 @@ class WriteListenerTest extends TestCase
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_delete' => (new Delete())->withName('_api_OperationResource_delete')->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])])->withProcessor('processor'),
+            '_api_OperationResource_delete' => (new Delete())->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])])->withProcessor('processor')->withName('_api_OperationResource_delete'),
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
