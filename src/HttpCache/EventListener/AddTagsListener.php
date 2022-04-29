@@ -48,9 +48,9 @@ final class AddTagsListener
     private $purger;
 
     /**
-     * @param LegacyPurgerInterface|PurgerInterface|null $purger
+     * @param LegacyPurgerInterface|PurgerInterface|null        $purger
      * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
-     * @param mixed|null                            $purger
+     * @param mixed|null                                        $purger
      */
     public function __construct($iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $purger = null)
     {
