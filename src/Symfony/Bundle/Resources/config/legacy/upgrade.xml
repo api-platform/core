@@ -12,8 +12,8 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.subresource_operation_factory" />
             <argument type="service" id="api_platform.upgrade.subresource_transformer" />
-            <argument type="service" id="annotations.reader" />
             <argument type="service" id="api_platform.identifiers_extractor.legacy" />
+            <argument type="service" id="annotations.reader" on-invalid="ignore" />
         </service>
     </services>
 
