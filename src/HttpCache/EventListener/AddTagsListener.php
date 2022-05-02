@@ -84,7 +84,7 @@ final class AddTagsListener
             if ($this->iriConverter instanceof LegacyIriConverterInterface) {
                 $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
             } else {
-                $iri = $this->iriConverter->getIriFromItem([], $operation, UrlGeneratorInterface::ABS_PATH, ['uri_variables' => $uriVariables]);
+                $iri = $this->iriConverter->getIriFromResource($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
             }
 
             $resources[$iri] = $iri;

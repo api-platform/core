@@ -80,7 +80,7 @@ class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context): void
     {
         try {
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
             if ($this->iriConverter instanceof LegacyIriConverterInterface) {
                 // remove in 3.0
@@ -101,10 +101,10 @@ class ItemNormalizer extends AbstractItemNormalizer
             } else {
                 $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
                 // todo: we could guess uri variables with the operation and the data instead of hardcoding id
-                $iri = $this->iriConverter->getIriFromItem($data, $operation, UrlGeneratorInterface::ABS_PATH, ['uri_variables' => ['id' => $data['id']]]);
+                $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
         }
     }
 }

@@ -60,10 +60,10 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
 
         $iriConverterContext = ['uri_variables' => ['id' => $data['thirdLevel']]] + $context;
 
-        $data['thirdLevel'] = $this->iriConverter->getIriFromItem(
-            $data['thirdLevel'],
-            (new Get())->withClass(RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class),
+        $data['thirdLevel'] = $this->iriConverter->getIriFromResource(
+            RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class,
             UrlGeneratorInterface::ABS_PATH,
+            new Get(),
             $iriConverterContext
         );
 

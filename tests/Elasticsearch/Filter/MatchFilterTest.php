@@ -71,7 +71,7 @@ class MatchFilterTest extends TestCase
         $foo->setBar('Thévenard');
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getItemFromIri('/foos/1', ['fetch_data' => false])->willReturn($foo)->shouldBeCalled();
+        $iriConverterProphecy->getResourceFromIri('/foos/1', ['fetch_data' => false])->willReturn($foo)->shouldBeCalled();
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->getValue($foo, 'id')->willReturn(1)->shouldBeCalled();
@@ -145,7 +145,7 @@ class MatchFilterTest extends TestCase
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getItemFromIri('/invalid_iri_foos/1', ['fetch_data' => false])->willThrow(new InvalidArgumentException())->shouldBeCalled();
+        $iriConverterProphecy->getResourceFromIri('/invalid_iri_foos/1', ['fetch_data' => false])->willThrow(new InvalidArgumentException())->shouldBeCalled();
 
         $matchFilter = new MatchFilter(
             $propertyNameCollectionFactoryProphecy->reveal(),

@@ -93,7 +93,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if ($this->iriConverter instanceof LegacyIriConverterInterface) {
             $iri = $this->iriConverter->getIriFromItem($object);
         } else {
-            $iri = $this->iriConverter->getIriFromItem($object, $context['operation'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
+            $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         }
 
         $context['iri'] = $iri;
@@ -144,7 +144,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($data['@id'], $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true]);
         }
 
         return parent::denormalize($data, $class, $format, $context);

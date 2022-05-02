@@ -70,7 +70,7 @@ class WriteListenerTest extends TestCase
     {
         $operationResource = new OperationResource(1, 'foo');
 
-        $this->iriConverterProphecy->getIriFromItem($operationResource)->willReturn('/operation_resources/1')->shouldBeCalled();
+        $this->iriConverterProphecy->getIriFromResource($operationResource)->willReturn('/operation_resources/1')->shouldBeCalled();
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
         $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
 
@@ -110,7 +110,7 @@ class WriteListenerTest extends TestCase
 
         $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
 
-        $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
+        $this->iriConverterProphecy->getIriFromResource($operationResource)->shouldNotBeCalled();
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->willReturn(true);
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
@@ -141,7 +141,7 @@ class WriteListenerTest extends TestCase
 
         $this->processorProphecy->process($operationResource, Argument::type(Operation::class), ['identifier' => 1], Argument::type('array'))->willReturn($operationResource)->shouldBeCalled();
 
-        $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
+        $this->iriConverterProphecy->getIriFromResource($operationResource)->shouldNotBeCalled();
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
             '_api_OperationResource_delete' => (new Delete())->withUriVariables(['identifier' => (new Link())->withFromClass(OperationResource::class)->withIdentifiers(['identifier'])])->withProcessor('processor')->withName('_api_OperationResource_delete'),
         ]))]);
@@ -170,7 +170,7 @@ class WriteListenerTest extends TestCase
 
         $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], Argument::type('array'))->willReturn($operationResource)->shouldNotBeCalled();
 
-        $this->iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
+        $this->iriConverterProphecy->getIriFromResource($operationResource)->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
             '_api_OperationResource_get' => (new Get())->withName('_api_OperationResource_get'),
@@ -250,7 +250,7 @@ class WriteListenerTest extends TestCase
         $this->processorProphecy->process(Argument::cetera())->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($operationResource)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($operationResource)->shouldNotBeCalled();
 
         $request = new Request();
         $request->setMethod('POST');
@@ -277,7 +277,7 @@ class WriteListenerTest extends TestCase
 
         $this->processorProphecy->process($attributeResource, Argument::type(Operation::class), ['slug' => 'test'], Argument::type('array'))->shouldNotBeCalled();
 
-        $this->iriConverterProphecy->getIriFromItem($attributeResource)->shouldNotBeCalled();
+        $this->iriConverterProphecy->getIriFromResource($attributeResource)->shouldNotBeCalled();
         $this->resourceClassResolver->isResourceClass(Argument::type('string'))->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([

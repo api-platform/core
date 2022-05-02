@@ -107,7 +107,7 @@ final class ReadStage implements ReadStageInterface
         }
 
         try {
-            $item = $this->iriConverter->getItemFromIri($identifier, $normalizationContext);
+            $item = $this->iriConverter->getResourceFromIri($identifier, $normalizationContext);
         } catch (ItemNotFoundException $e) {
             return null;
         }

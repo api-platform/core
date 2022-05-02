@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -99,7 +100,9 @@ abstract class ApiTestCase extends KernelTestCase
             return null;
         }
 
-        return $container->get('api_platform.iri_converter')->getIriFromItem($item);
+        $iriConverter = $container->get('api_platform.iri_converter');
+
+        return $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getIriFromItem($item) : $iriConverter->getIriFromResource($item);
     }
 }
 

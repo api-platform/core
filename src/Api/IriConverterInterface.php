@@ -33,15 +33,15 @@ interface IriConverterInterface
      *
      * @return object
      */
-    public function getItemFromIri(string $iri, array $context = [], ?Operation $operation = null);
+    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null);
 
     /**
      * Gets the IRI associated with the given item.
      *
-     * @param object|iterable $item
+     * @param object|class-string $resource
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromItem($item, ?Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string;
+    public function getIriFromResource($resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string;
 }

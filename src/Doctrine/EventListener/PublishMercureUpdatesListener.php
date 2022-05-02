@@ -100,7 +100,7 @@ final class PublishMercureUpdatesListener
                 new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
                     return sprintf('iri(%s, %d)', $apiResource, $referenceType);
                 }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
-                    return $iriConverter->getIriFromItem($apiResource, null, $referenceType);
+                    return $iriConverter->getIriFromResource($apiResource, $referenceType);
                 })
             );
         }
@@ -245,8 +245,8 @@ final class PublishMercureUpdatesListener
 
         if ('deletedObjects' === $property) {
             $this->deletedObjects[(object) [
-                'id' => $this->iriConverter->getIriFromItem($object),
-                'iri' => $this->iriConverter->getIriFromItem($object, null, UrlGeneratorInterface::ABS_URL),
+                'id' => $this->iriConverter->getIriFromResource($object),
+                'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL),
             ]] = $options;
 
             return;
@@ -271,7 +271,7 @@ final class PublishMercureUpdatesListener
             $resourceClass = $this->getObjectClass($object);
             $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext() ?? [];
 
-            $iri = $options['topics'] ?? $this->iriConverter->getIriFromItem($object, null, UrlGeneratorInterface::ABS_URL);
+            $iri = $options['topics'] ?? $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL);
             $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
         }
 

@@ -18,7 +18,6 @@ use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\ObjectType;
@@ -33,7 +32,7 @@ class ResourceFieldResolverTest extends TestCase
     public function testId()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem([], (new Get())->withClass(Dummy::class), UrlGeneratorInterface::ABS_PATH, ['uri_variables' => ['id' => 1]])->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, null, ['uri_variables' => ['id' => 1]])->willReturn('/dummies/1')->shouldBeCalled();
 
         $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
@@ -65,7 +64,7 @@ class ResourceFieldResolverTest extends TestCase
     {
         $dummy = new Dummy();
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1')->shouldNotBeCalled();
 
         $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 

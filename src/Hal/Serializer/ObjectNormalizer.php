@@ -81,7 +81,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
         $metadata = [
             '_links' => [
                 'self' => [
-                    'href' => $this->iriConverter->getIriFromItem($originalResource),
+                    'href' => $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromResource($originalResource),
                 ],
             ],
         ];

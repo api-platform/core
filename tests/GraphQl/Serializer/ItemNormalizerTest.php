@@ -86,7 +86,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy, Argument::any(), UrlGeneratorInterface::ABS_URL, Argument::type('array'))->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_URL, Argument::any(), Argument::type('array'))->willReturn('/dummies/1');
 
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifiersExtractorProphecy->getIdentifiersFromItem($dummy)->willReturn(['id' => 1])->shouldBeCalled();
@@ -142,7 +142,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy, Argument::any(), UrlGeneratorInterface::ABS_URL, Argument::type('array'))->willReturn('/dummies/1');
+        $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_URL, Argument::any(), Argument::type('array'))->willReturn('/dummies/1');
 
         $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
 

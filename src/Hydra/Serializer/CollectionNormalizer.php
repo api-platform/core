@@ -89,7 +89,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
             // TODO: remove in 3.0
             $data['@id'] = isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] ? $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
         } else {
-            $data['@id'] = $this->iriConverter->getIriFromItem([], $context['operation'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
+            $data['@id'] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         }
 
         $data['@type'] = 'hydra:Collection';
@@ -99,7 +99,7 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
 
         foreach ($object as $obj) {
             if ($iriOnly) {
-                $data['hydra:member'][] = $this->iriConverter->getIriFromItem($obj);
+                $data['hydra:member'][] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($obj) : $this->iriConverter->getIriFromResource($obj);
             } else {
                 $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
             }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
@@ -81,7 +82,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter->getIriFromItem($object);
+        $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 
@@ -145,7 +146,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri(
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri(
+                $data['data']['id'],
+                $context + ['fetch_data' => false]
+            ) : $this->iriConverter->getResourceFromIri(
                 $data['data']['id'],
                 $context + ['fetch_data' => false]
             );
@@ -198,7 +202,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         try {
-            return $this->iriConverter->getItemFromIri($value['id'], $context + ['fetch_data' => true]);
+            return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($value['id'], $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($value['id'], $context + ['fetch_data' => true]);
         } catch (ItemNotFoundException $e) {
             throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
@@ -214,7 +218,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     protected function normalizeRelation($propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
     {
         if (null !== $relatedObject) {
-            $iri = $this->iriConverter->getIriFromItem($relatedObject);
+            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($relatedObject) : $this->iriConverter->getIriFromResource($relatedObject);
             $context['iri'] = $iri;
 
             if (isset($context['resources'])) {

@@ -69,7 +69,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemFromIri(string $iri, array $context = [], ?Operation $operation = null)
+    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
     {
         try {
             $parameters = $this->router->match($iri);
@@ -113,13 +113,13 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, Operation $operation = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): ?string
+    public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
-        if (!$item && !$operation) {
-            throw new RuntimeException('Provide an item or an operation');
+        try {
+            $resourceClass = \is_string($item) ? $item : $this->getResourceClass($item, true);
+        } catch (InvalidArgumentException $e) {
+            return null;
         }
-
-        $resourceClass = $operation ? $operation->getClass() : $this->getResourceClass($item, true);
 
         if (!$operation) {
             $operation = (new Get())->withClass($resourceClass);

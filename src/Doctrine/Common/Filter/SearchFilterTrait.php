@@ -30,6 +30,9 @@ trait SearchFilterTrait
 {
     use PropertyHelperTrait;
 
+    /**
+     * @var LegacyIriConverterInterface|IriConverterInterface
+     */
     protected $iriConverter;
     protected $propertyAccessor;
     protected $identifiersExtractor;
@@ -124,7 +127,8 @@ trait SearchFilterTrait
     protected function getIdFromValue(string $value)
     {
         try {
-            $item = $this->getIriConverter()->getItemFromIri($value, ['fetch_data' => false]);
+            $iriConverter = $this->getIriConverter();
+            $item = $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getItemFromIri($value, ['fetch_data' => false]) : $this->iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
 
             return $this->getPropertyAccessor()->getValue($item, 'id');
         } catch (InvalidArgumentException $e) {

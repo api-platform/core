@@ -49,7 +49,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummy/1')->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
@@ -85,7 +85,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->persist($dummy, Argument::type('array'))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1');
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummy/1');
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class]);
 
@@ -124,7 +124,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy2);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy2)->willReturn('/dummy/2');
+        $iriConverterProphecy->getIriFromResource($dummy2)->willReturn('/dummy/2');
 
         $writeListener = new WriteListener($dataPersisterProphecy->reveal(), $iriConverterProphecy->reveal());
 
@@ -158,7 +158,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->supports($dummy, Argument::type('array'))->willReturn(true)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->shouldNotBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['output' => ['class' => null]]));
@@ -189,7 +189,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->shouldNotBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'delete']);
         $request->setMethod('DELETE');
@@ -216,7 +216,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->shouldNotBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'head']);
         $request->setMethod('HEAD');
@@ -331,7 +331,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->shouldNotBeCalled();
 
         $request = new Request();
         $request->setMethod('POST');
@@ -356,7 +356,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->persist($dummy, Argument::type('array'))->willReturn($dummy)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummy/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummy/1')->shouldBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => ConcreteDummy::class, '_api_item_operation_name' => 'put', '_api_persist' => true]);
         $request->setMethod('PUT');
@@ -383,7 +383,7 @@ class WriteListenerTest extends TestCase
         $dataPersisterProphecy->remove($dummy, Argument::type('array'))->shouldNotBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->shouldNotBeCalled();
 
         $request = new Request([], [], ['_api_resource_class' => 'Dummy', '_api_collection_operation_name' => 'post']);
         $request->setMethod('POST');

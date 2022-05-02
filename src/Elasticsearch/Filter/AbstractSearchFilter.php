@@ -158,7 +158,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
     protected function getIdentifierValue(string $iri, string $property)
     {
         try {
-            if ($item = $this->iriConverter->getItemFromIri($iri, ['fetch_data' => false])) {
+            if ($item = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => false])) {
                 return $this->propertyAccessor->getValue($item, $property);
             }
         } catch (InvalidArgumentException $e) {

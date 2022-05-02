@@ -86,7 +86,7 @@ final class SubscriptionManager implements SubscriptionManagerInterface
      */
     public function getPushPayloads($object): array
     {
-        $iri = $this->iriConverter->getIriFromItem($object);
+        $iri = $this->iriConverter->getIriFromResource($object);
         $subscriptions = $this->getSubscriptionsFromIri($iri);
 
         $resourceClass = $this->getObjectClass($object);
