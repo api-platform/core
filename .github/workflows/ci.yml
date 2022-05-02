@@ -89,7 +89,6 @@ jobs:
           SYMFONY_PHPUNIT_VERSION: '9.5'
         run: |
           ./vendor/bin/phpstan --version
-          # rm src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
   phpunit:
