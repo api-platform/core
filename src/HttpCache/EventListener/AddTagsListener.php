@@ -15,6 +15,7 @@ namespace ApiPlatform\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\HttpCache\PurgerInterface as LegacyPurgerInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -47,9 +48,9 @@ final class AddTagsListener
     private $purger;
 
     /**
-     * @param LegacyPurgerInterface|PurgerInterface $purger
-     * @param mixed                                 $iriConverter
-     * @param mixed|null                            $purger
+     * @param LegacyPurgerInterface|PurgerInterface|null        $purger
+     * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
+     * @param mixed|null                                        $purger
      */
     public function __construct($iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $purger = null)
     {
@@ -79,7 +80,13 @@ final class AddTagsListener
         if (isset($attributes['collection_operation_name']) || ($attributes['subresource_context']['collection'] ?? false) || ($operation && $operation instanceof CollectionOperationInterface)) {
             // Allows to purge collections
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
-            $iri = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], $attributes['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $uriVariables]) : $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
+
+            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
+                $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
+            } else {
+                $iri = $this->iriConverter->getIriFromResource($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
+            }
+
             $resources[$iri] = $iri;
         }
 

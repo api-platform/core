@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\HttpCache\PurgerInterface;
@@ -146,8 +148,9 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddCollectionIri()
     {
+        $operation = (new GetCollection());
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $response = new Response();
         $response->setPublic();
@@ -155,7 +158,7 @@ class AddTagsListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']),
+            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_operation' => $operation]),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
@@ -168,8 +171,9 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddCollectionIriWhenCollectionIsEmpty()
     {
+        $operation = (new GetCollection());
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $response = new Response();
         $response->setPublic();
@@ -177,7 +181,7 @@ class AddTagsListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_collection_operation_name' => 'get']),
+            new Request([], [], ['_resources' => [], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_operation' => $operation]),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
@@ -190,8 +194,8 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddSubResourceCollectionIri()
     {
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy = $this->prophesize(LegacyIriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies')->shouldBeCalled();
 
         $response = new Response();
         $response->setPublic();
@@ -212,11 +216,12 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddTagsWithXKey()
     {
+        $operation = (new GetCollection());
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, 'get', 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => new GetCollection()]))]);
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => $operation]))]);
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $response = new Response();
@@ -241,11 +246,12 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddTagsWithoutHeader()
     {
+        $operation = (new GetCollection());
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, 'get', 1, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => new GetCollection()]))]);
+        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => $operation]))]);
         $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
 
         $response = new Response();

@@ -169,7 +169,7 @@ Feature: Uri Variables
     """
     {
         "@context": "/contexts/Company",
-        "@id": "/companies/1",
+        "@id": "/employees/1/company",
         "@type": "Company",
         "id": 1,
         "name": "Foo Company 1",

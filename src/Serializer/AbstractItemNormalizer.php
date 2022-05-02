@@ -71,6 +71,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
      */
     protected $propertyMetadataFactory;
+    /**
+     * @var LegacyIriConverterInterface|IriConverterInterface
+     */
     protected $iriConverter;
     protected $resourceClassResolver;
     protected $resourceAccessChecker;
@@ -84,7 +87,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
-                return $this->iriConverter->getIriFromItem($object);
+                return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object);
             };
         }
         if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($this, 'setCircularReferenceHandler')) {
@@ -185,7 +188,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['iri'])) {
             $iri = $context['iri'];
         } else {
-            $iri = $this->iriConverter instanceof IriConverterInterface ? $this->iriConverter->getIriFromItem($object, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_URL, $context) : $this->iriConverter->getIriFromItem($object);
+            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
         }
 
         $context['iri'] = $iri;
@@ -282,7 +285,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (\is_string($data)) {
             try {
-                return $this->iriConverter->getItemFromIri($data, $context + ['fetch_data' => true]);
+                return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($data, $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
                 if (!$supportsPlainIdentifiers) {
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
@@ -599,7 +602,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (\is_string($value)) {
             try {
-                return $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]);
+                return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
                 if (!$supportsPlainIdentifiers) {
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
@@ -744,7 +747,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
             }
-            unset($childContext['iri']);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -764,7 +767,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
                 $childContext['operation'] = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
             }
-            unset($childContext['iri']);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
         }
@@ -777,7 +780,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($type && $type->getClassName()) {
             $childContext = $this->createChildContext($context, $attribute, $format);
-            unset($childContext['iri']);
+            unset($childContext['iri'], $childContext['uri_variables']);
 
             if (null !== ($propertyIri = $propertyMetadata->getIri())) {
                 $childContext['output']['iri'] = $propertyIri;
@@ -838,7 +841,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $normalizedRelatedObject;
         }
 
-        $iri = $this->iriConverter->getIriFromItem($relatedObject);
+        $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($relatedObject) : $this->iriConverter->getIriFromResource($relatedObject);
 
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;

@@ -1,0 +1,141 @@
+diff --git a/features/jsonld/input_output.feature b/features/jsonld/input_output.feature
+index ad7ee0344..f05fef8bf 100644
+--- a/features/jsonld/input_output.feature
++++ b/features/jsonld/input_output.feature
+@@ -65,7 +65,7 @@ Feature: JSON-LD DTO input and output
+     """
+     {
+       "@context": "/contexts/DummyDtoCustom",
+-      "@id": "/dummy_dto_customs",
++      "@id": "/dummy_dto_custom_output",
+       "@type": "hydra:Collection",
+       "hydra:member": [
+         {
+diff --git a/features/main/custom_identifier_with_subresource.feature b/features/main/custom_identifier_with_subresource.feature
+index cf18a15a3..773dd8728 100644
+--- a/features/main/custom_identifier_with_subresource.feature
++++ b/features/main/custom_identifier_with_subresource.feature
+@@ -84,7 +84,7 @@ Feature: Using custom parent identifier for subresources
+     """
+     {
+       "@context": "/contexts/SlugParentDummy",
+-      "@id": "/slug_parent_dummies/parent-dummy",
++      "@id": "/slug_child_dummies/child-dummy/parent_dummy",
+       "@type": "SlugParentDummy",
+       "id": 1,
+       "slug": "parent-dummy",
+diff --git a/features/main/custom_operation.feature b/features/main/custom_operation.feature
+index 6b8e4a7bc..9fa829ec5 100644
+--- a/features/main/custom_operation.feature
++++ b/features/main/custom_operation.feature
+@@ -64,7 +64,7 @@ Feature: Custom operation
+     """
+     {
+         "@context": "/contexts/CustomActionDummy",
+-        "@id": "/custom_action_dummies/1",
++        "@id": "/custom_action_collection_dummies/1",
+         "@type": "CustomActionDummy",
+         "id": 1,
+         "foo": "custom!"
+diff --git a/features/main/default_order.feature b/features/main/default_order.feature
+index 1bc97ab37..912110143 100644
+--- a/features/main/default_order.feature
++++ b/features/main/default_order.feature
+@@ -127,7 +127,7 @@ Feature: Default order
+     """
+     {
+       "@context": "/contexts/Foo",
+-      "@id": "/foos",
++      "@id": "/custom_collection_asc_foos",
+       "@type": "hydra:Collection",
+       "hydra:member": [
+         {
+@@ -183,7 +183,7 @@ Feature: Default order
+     """
+     {
+       "@context": "/contexts/Foo",
+-      "@id": "/foos",
++      "@id": "/custom_collection_desc_foos",
+       "@type": "hydra:Collection",
+       "hydra:member": [
+         {
+diff --git a/features/main/operation.feature b/features/main/operation.feature
+index 24dda9b87..8786f6b04 100644
+--- a/features/main/operation.feature
++++ b/features/main/operation.feature
+@@ -47,7 +47,7 @@ Feature: Operation support
+     """
+     {
+       "@context": "/contexts/EmbeddedDummy",
+-      "@id": "/embedded_dummies/1",
++      "@id": "/embedded_dummies_groups/1",
+       "@type": "EmbeddedDummy",
+       "name": "Dummy #1",
+       "embeddedDummy": {
+@@ -76,7 +76,7 @@ Feature: Operation support
+     """
+     {
+         "@context": "/contexts/Book",
+-        "@id": "/books/1",
++        "@id": "/books/by_isbn/9780451524935",
+         "@type": "Book",
+         "name": "1984",
+         "isbn": "9780451524935",
+diff --git a/features/main/subresource.feature b/features/main/subresource.feature
+index ae4969a5a..2fd278ea0 100644
+--- a/features/main/subresource.feature
++++ b/features/main/subresource.feature
+@@ -13,7 +13,7 @@ Feature: Subresource support
+     """
+     {
+       "@context": "/contexts/Answer",
+-      "@id": "/answers/1",
++      "@id": "/questions/1/answer",
+       "@type": "Answer",
+       "id": 1,
+       "content": "42",
+@@ -234,7 +234,7 @@ Feature: Subresource support
+     """
+     {
+       "@context": "/contexts/RelatedDummy",
+-      "@id": "/related_dummies/2",
++      "@id": "/dummies/1/related_dummies/2",
+       "@type": "https://schema.org/Product",
+       "id": 2,
+       "name": null,
+@@ -274,7 +274,7 @@ Feature: Subresource support
+     """
+     {
+       "@context": "/contexts/ThirdLevel",
+-      "@id": "/third_levels/1",
++      "@id": "/dummies/1/related_dummies/1/third_level",
+       "@type": "ThirdLevel",
+       "fourthLevel": "/fourth_levels/1",
+       "badFourthLevel": null,
+@@ -293,7 +293,7 @@ Feature: Subresource support
+     """
+     {
+       "@context": "/contexts/FourthLevel",
+-      "@id": "/fourth_levels/1",
++      "@id": "/dummies/1/related_dummies/1/third_level/fourth_level",
+       "@type": "FourthLevel",
+       "badThirdLevel": [],
+       "id": 1,
+@@ -411,7 +411,7 @@ Feature: Subresource support
+     """
+     {
+       "@context": "/contexts/Dummy",
+-      "@id": "/dummies/1",
++      "@id": "/related_owned_dummies/1/owning_dummy",
+       "@type": "Dummy",
+       "description": null,
+       "dummy": null,
+@@ -444,7 +444,7 @@ Feature: Subresource support
+     """
+     {
+       "@context": "/contexts/Dummy",
+-      "@id": "/dummies/1",
++      "@id": "/related_owning_dummies/1/owned_dummy",
+       "@type": "Dummy",
+       "description": null,
+       "dummy": null,

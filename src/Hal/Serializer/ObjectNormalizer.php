@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -82,7 +81,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
         $metadata = [
             '_links' => [
                 'self' => [
-                    'href' => $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromItem($originalResource, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, $context),
+                    'href' => $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromResource($originalResource),
                 ],
             ],
         ];

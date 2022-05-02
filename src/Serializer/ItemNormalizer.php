@@ -15,6 +15,7 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -35,6 +36,12 @@ class ItemNormalizer extends AbstractItemNormalizer
 {
     private $logger;
 
+    /**
+     * @param mixed                                             $propertyMetadataFactory
+     * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
+     * @param mixed                                             $resourceClassResolver
+     * @param mixed|null                                        $resourceMetadataFactory
+     */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers, [], $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
@@ -73,12 +80,9 @@ class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context): void
     {
         try {
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
-            if ($this->iriConverter instanceof IriConverterInterface) {
-                $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
-                $iri = $this->iriConverter->getIriFromResourceClass($context['resource_class'], $operation->getName(), UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => ['id' => $data['id']]]);
-            } else {
+            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
                 // remove in 3.0
                 $identifier = null;
                 $options = $this->getFactoryOptions($context);
@@ -94,9 +98,13 @@ class ItemNormalizer extends AbstractItemNormalizer
                     throw $e;
                 }
                 $iri = sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]);
+            } else {
+                $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
+                // todo: we could guess uri variables with the operation and the data instead of hardcoding id
+                $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
         }
     }
 }

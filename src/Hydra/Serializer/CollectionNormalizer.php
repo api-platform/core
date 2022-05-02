@@ -85,21 +85,21 @@ final class CollectionNormalizer implements NormalizerInterface, NormalizerAware
         $context = $this->initContext($resourceClass, $context);
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        if ($this->iriConverter instanceof IriConverterInterface) {
-            $data['@id'] = $this->iriConverter->getIriFromResourceClass($resourceClass, $context['operation_name'] ?? null, UrlGeneratorInterface::ABS_PATH, $context);
-        } else {
+        if ($this->iriConverter instanceof LegacyIriConverterInterface) {
             // TODO: remove in 3.0
             $data['@id'] = isset($context['operation_type']) && OperationType::SUBRESOURCE === $context['operation_type'] ? $this->iriConverter->getSubresourceIriFromResourceClass($resourceClass, $context) : $this->iriConverter->getIriFromResourceClass($resourceClass);
+        } else {
+            $data['@id'] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         }
 
         $data['@type'] = 'hydra:Collection';
         $data['hydra:member'] = [];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
-        unset($context['operation'], $context['operation_name']);
+        unset($context['operation'], $context['operation_name'], $context['uri_variables']);
 
         foreach ($object as $obj) {
             if ($iriOnly) {
-                $data['hydra:member'][] = $this->iriConverter->getIriFromItem($obj);
+                $data['hydra:member'][] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($obj) : $this->iriConverter->getIriFromResource($obj);
             } else {
                 $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context);
             }

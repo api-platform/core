@@ -178,7 +178,7 @@ class SubscriptionManagerTest extends TestCase
             (new ApiResource())->withOperations(new Operations([(new Get())->withShortName('Dummy')])),
         ]));
 
-        $this->iriConverterProphecy->getIriFromItem($object)->willReturn('/dummies/2');
+        $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false);
@@ -195,7 +195,7 @@ class SubscriptionManagerTest extends TestCase
             (new ApiResource())->withOperations(new Operations([(new Get())->withShortName('Dummy')])),
         ]));
 
-        $this->iriConverterProphecy->getIriFromItem($object)->willReturn('/dummies/2');
+        $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(true);

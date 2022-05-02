@@ -17,10 +17,12 @@ use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ResourceClassInfoTrait;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -51,11 +53,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
      *
      * TODO: 3.0 identifiers should be stringable?
      */
-    public function getIdentifiersFromItem($item, string $operationName = null, array $context = []): array
+    public function getIdentifiersFromItem($item, Operation $operation = null, array $context = []): array
     {
         $identifiers = [];
         $resourceClass = $this->getResourceClass($item, true);
-        $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($operationName, false, true);
+        $operation = $operation ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
 
         if ($operation instanceof HttpOperation) {
             $links = $operation->getUriVariables();
@@ -100,16 +102,20 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            if ($type->isCollection()) {
-                $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+            try {
+                if ($type->isCollection()) {
+                    $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
 
-                if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
-                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+                    if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
+                        return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+                    }
                 }
-            }
 
-            if ($type->getClassName() === $class) {
-                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
+                if ($type->getClassName() === $class) {
+                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
+                }
+            } catch (NoSuchPropertyException $e) {
+                throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
             }
         }
 

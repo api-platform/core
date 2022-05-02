@@ -109,9 +109,9 @@ class ReadStageTest extends TestCase
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
+            $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
         } else {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
+            $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
         /** @var Operation $operation */
@@ -154,9 +154,9 @@ class ReadStageTest extends TestCase
         $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
+            $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
         } else {
-            $this->iriConverterProphecy->getItemFromIri($identifier, $normalizationContext)->willReturn($item);
+            $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
         if ($expectedExceptionClass) {

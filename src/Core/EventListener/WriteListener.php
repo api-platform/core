@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as IriConverterLegacyInterface;
+use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -43,7 +43,7 @@ final class WriteListener
     public const OPERATION_ATTRIBUTE_KEY = 'write';
 
     private $dataPersister;
-    /** @var IriConverterLegacyInterface|IriConverterInterface|null */
+    /** @var LegacyIriConverterInterface|IriConverterInterface|null */
     private $iriConverter;
     private $metadataBackwardCompatibilityLayer;
 
@@ -121,7 +121,7 @@ final class WriteListener
                 }
 
                 if ($this->isResourceClass($this->getObjectClass($controllerResult))) {
-                    $request->attributes->set('_api_write_item_iri', $this->iriConverter->getIriFromItem($controllerResult));
+                    $request->attributes->set('_api_write_item_iri', $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($controllerResult) : $this->iriConverter->getIriFromResource($controllerResult));
                 }
 
                 break;

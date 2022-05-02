@@ -24,7 +24,10 @@ use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -66,7 +69,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getItemFromIri(string $iri, array $context = [])
+    public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null)
     {
         try {
             $parameters = $this->router->match($iri);
@@ -81,12 +84,15 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        $context['operation'] = $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
+        $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
         if ($operation instanceof CollectionOperationInterface) {
             throw new InvalidArgumentException(sprintf('The iri "%s" references a collection not an item.', $iri));
         }
 
+        if (!$operation instanceof HttpOperation) {
+            throw new RuntimeException(sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
+        }
         $attributes = AttributesExtractor::extractAttributes($parameters);
 
         if ($operation instanceof HttpOperation) {
@@ -97,7 +103,7 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        if ($item = $this->provider->provide($operation, $uriVariables ?? [], $context)) {
+        if ($item = $this->provider->provide($operation, $uriVariables, $context)) {
             return $item;
         }
 
@@ -107,89 +113,68 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromItem($item, string $operationName = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string
+    public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
-        $resourceClass = $this->getResourceClass($item, true);
-        $operationName = $context['operation_name'] ?? $operationName;
+        try {
+            $resourceClass = \is_string($item) ? $item : $this->getResourceClass($item, true);
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
 
-        // These are special cases were we want to find the related operation
-        // `ResourceMetadataCollection::getOperation` retrieves the first safe operation if no $operationName is given
-        if (isset($context['operation'])) {
-            $operation = $context['operation'];
-            if (
-                ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) ||
-                ($operation->getExtraProperties()['user_defined_uri_template'] ?? false) ||
-                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) ||
-                ($operation->getExtraProperties()['legacy_subresource_behavior'] ?? false) ||
-                // When we want the Iri from an object, we don't want the collection uriTemplate, for this we use getIriFromResourceClass
-                $operation instanceof CollectionOperationInterface || $operation instanceof Post
-            ) {
-                unset($context['operation']);
-                $operationName = null;
+        if (!$operation) {
+            $operation = (new Get())->withClass($resourceClass);
+        }
+
+        if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
+            $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operation->getClass());
+            unset($context['uri_variables']);
+        }
+
+        // Legacy subresources had bad IRIs but we don't want to break these, remove this in 3.0
+        $isLegacySubresource = ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) && !$operation instanceof CollectionOperationInterface;
+        // Custom resources should have the same IRI as requested, it was not the case pre 2.7
+        $isLegacyCustomResource = ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false);
+
+        // In symfony the operation name is the route name, try to find one if none provided
+        if (
+            !$operation->getName()
+            || $operation instanceof Post
+            || $isLegacySubresource
+            || $isLegacyCustomResource
+        ) {
+            $forceCollection = $operation instanceof CollectionOperationInterface;
+            try {
+                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, $forceCollection, true);
+            } catch (OperationNotFoundException $e) {
             }
         }
 
-        try {
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName, false, true);
-        } catch (OperationNotFoundException $e) {
-            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            foreach ($resourceMetadataCollection as $resource) {
-                foreach ($resource->getOperations() as $name => $operation) {
-                    if ($operationName === $name && !$operation instanceof CollectionOperationInterface) {
-                        break 2;
-                    }
+        $identifiers = $context['uri_variables'] ?? [];
+
+        if ($isLegacySubresource || $isLegacyCustomResource) {
+            $identifiers = [];
+        }
+
+        if (\is_object($item)) {
+            try {
+                $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
+            } catch (RuntimeException $e) {
+                // We can try using context uri variables if any
+                if (!$identifiers) {
+                    throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
                 }
             }
+        }
 
-            if (!isset($operation)) {
-                throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
-            }
+        // TODO: call the Skolem IRI generator
+        if (!$operation->getName()) {
+            return null;
         }
 
         try {
-            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation->getName(), ['operation' => $operation]);
-
             return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-        } catch (RuntimeException|RoutingExceptionInterface $e) {
+        } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIriFromResourceClass(string $resourceClass, string $operationName = null, int $referenceType = UrlGeneratorInterface::ABS_PATH, array $context = []): string
-    {
-        // TODO: 3.0 remove the condition
-        if ($context['extra_properties']['is_legacy_subresource'] ?? false) {
-            trigger_deprecation('api-platform/core', '2.7', 'The IRI will change and match the first operation of the resource. Switch to an alternate resource when possible instead of using subresources.');
-            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['extra_properties']['legacy_subresource_operation_name']);
-        }
-
-        $operation = $context['operation'] ?? $operation ?? null;
-
-        if ($operation) {
-            // TODO: 2.7 should we deprecate this behavior ? example : Entity\Foo.php should take it's own operation? As it's a custom operation can we now?
-            if ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) {
-                trigger_deprecation('api-platform/core', '2.7', 'The IRI will change and match the first operation of the resource. Switch to an alternate resource when possible instead of using subresources.');
-                $operationName = $operation->getExtraProperties()['legacy_subresource_operation_name'];
-                $operation = null;
-            } elseif (!($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false)) {
-                $operation = null;
-                $operationName = null;
-            }
-        }
-
-        try {
-            if (!$operation) {
-                $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($operationName, $context['force_collection'] ?? true);
-            }
-
-            $identifiers = $context['identifiers_values'] ?? [];
-
-            return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
-        } catch (RoutingExceptionInterface|OperationNotFoundException $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for "%s".', $resourceClass), $e->getCode(), $e);
         }
     }
 }

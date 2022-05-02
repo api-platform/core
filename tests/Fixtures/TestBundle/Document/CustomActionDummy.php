@@ -27,7 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * collectionOperations={
  *     "get",
  *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies"},
- *     "custom_denormalization"={"method"="GET", "route_name"="custom_denormalization"},
+ *     "custom_denormalization"={"method"="POST", "route_name"="custom_denormalization"},
  *     "short_custom_denormalization"={"method"="GET", "route_name"="short_custom_denormalization"},
  * })
  *

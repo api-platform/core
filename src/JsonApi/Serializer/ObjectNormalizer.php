@@ -97,7 +97,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         if (isset($originalResource)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($originalResource);
             $resourceData = [
-                'id' => $this->iriConverter->getIriFromItem($originalResource),
+                'id' => $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromResource($originalResource),
                 'type' => $this->getResourceShortName($resourceClass),
             ];
         } else {

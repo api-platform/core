@@ -39,7 +39,7 @@ final class ResourceFieldResolver
     {
         $property = null;
         if ('id' === $info->fieldName && !isset($source['_id']) && isset($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY])) {
-            return $this->iriConverter->getIriFromResourceClass($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY], 'force_collection' => false]);
+            return $this->iriConverter->getIriFromResource($source[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY], UrlGeneratorInterface::ABS_PATH, null, ['uri_variables' => $source[ItemNormalizer::ITEM_IDENTIFIERS_KEY]]);
         }
 
         if ('_id' === $info->fieldName && !isset($source['_id']) && isset($source['id'])) {

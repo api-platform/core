@@ -32,7 +32,7 @@ class ResourceFieldResolverTest extends TestCase
     public function testId()
     {
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, null, UrlGeneratorInterface::ABS_PATH, ['identifiers_values' => ['id' => 1], 'force_collection' => false])->willReturn('/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, null, ['uri_variables' => ['id' => 1]])->willReturn('/dummies/1')->shouldBeCalled();
 
         $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
@@ -64,7 +64,7 @@ class ResourceFieldResolverTest extends TestCase
     {
         $dummy = new Dummy();
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromItem($dummy)->willReturn('/dummies/1')->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource($dummy)->willReturn('/dummies/1')->shouldNotBeCalled();
 
         $resolveInfo = new ResolveInfo(FieldDefinition::create(['name' => 'id', 'type' => new ObjectType(['name' => ''])]), [], new ObjectType(['name' => '']), [], new Schema([]), [], null, null, []);
 
