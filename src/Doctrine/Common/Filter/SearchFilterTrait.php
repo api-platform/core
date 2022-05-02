@@ -128,7 +128,7 @@ trait SearchFilterTrait
     {
         try {
             $iriConverter = $this->getIriConverter();
-            $item = $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getItemFromIri($value, ['fetch_data' => false]) : $this->iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
+            $item = $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getItemFromIri($value, ['fetch_data' => false]) : $iriConverter->getResourceFromIri($value, ['fetch_data' => false]); // @phpstan-ignore-line bc-compatibility inside a trait
 
             return $this->getPropertyAccessor()->getValue($item, 'id');
         } catch (InvalidArgumentException $e) {
