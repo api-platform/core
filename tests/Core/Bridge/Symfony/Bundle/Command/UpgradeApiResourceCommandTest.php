@@ -40,7 +40,7 @@ class UpgradeApiResourceCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
 
-        $application->add(new UpgradeApiResourceCommand($resourceNameCollectionFactory, $resourceMetadataFactory, $subresourceOperationFactory, new SubresourceTransformer(), new AnnotationReader(), $identifiersExtractor->reveal()));
+        $application->add(new UpgradeApiResourceCommand($resourceNameCollectionFactory, $resourceMetadataFactory, $subresourceOperationFactory, new SubresourceTransformer(), $identifiersExtractor->reveal(), new AnnotationReader()));
 
         $command = $application->find('api:upgrade-resource');
 
