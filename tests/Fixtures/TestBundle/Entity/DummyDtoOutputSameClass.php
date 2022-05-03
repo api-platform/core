@@ -13,17 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy InputOutput.
  *
  * @author Daniel West <daniel@silverback.is>
- *
- * @ApiResource(attributes={"output"=DummyDtoOutputSameClass::class})
  * @ORM\Entity
  */
+#[ApiResource(output: DummyDtoOutputSameClass::class)]
 class DummyDtoOutputSameClass
 {
     /**
@@ -34,14 +33,12 @@ class DummyDtoOutputSameClass
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string
      *
      * @ORM\Column
      */
     public $lorem;
-
     /**
      * @var string
      *

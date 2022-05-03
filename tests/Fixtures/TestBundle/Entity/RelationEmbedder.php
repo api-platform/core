@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -21,24 +26,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Relation Embedder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"barcelona"}},
- *         "denormalization_context"={"groups"={"chicago"}},
- *         "hydra_context"={"@type"="hydra:Operation", "hydra:title"="A custom operation", "returns"="xmls:string"}
- *     },
- *     itemOperations={
- *         "get",
- *         "put"={},
- *         "delete",
- *         "custom_get"={"route_name"="relation_embedded.custom_get", "method"="GET"},
- *         "custom1"={"path"="/api/custom-call/{id}", "method"="GET"},
- *         "custom2"={"path"="/api/custom-call/{id}", "method"="PUT"},
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(routeName: 'relation_embedded.custom_get'), new Get(uriTemplate: '/api/custom-call/{id}'), new Put(uriTemplate: '/api/custom-call/{id}'), new Post(), new GetCollection()], normalizationContext: ['groups' => ['barcelona']], denormalizationContext: ['groups' => ['chicago']], hydraContext: ['@type' => 'hydra:Operation', 'hydra:title' => 'A custom operation', 'returns' => 'xmls:string'])]
 class RelationEmbedder
 {
     /**
@@ -47,25 +37,21 @@ class RelationEmbedder
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
-
     /**
      * @ORM\Column
      * @Groups({"chicago"})
      */
     public $paris = 'Paris';
-
     /**
      * @ORM\Column
      * @Groups({"barcelona", "chicago"})
      */
     public $krondstadt = 'Krondstadt';
-
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy", cascade={"persist"})
      * @Groups({"chicago", "barcelona"})
      */
     public $anotherRelated;
-
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      * @Groups({"barcelona", "chicago"})

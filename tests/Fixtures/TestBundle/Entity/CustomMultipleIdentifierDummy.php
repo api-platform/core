@@ -13,15 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom Identifier Dummy.
  *
- * @ApiResource(compositeIdentifier=false)
  * @ORM\Entity
  */
+#[ApiResource(uriVariables: ['firstId' => new Link(compositeIdentifier: false, fromClass: self::class, identifiers: ['firstId']), 'secondId' => new Link(compositeIdentifier: false, fromClass: self::class, identifiers: ['secondId'])])]
 class CustomMultipleIdentifierDummy
 {
     /**
@@ -31,7 +32,6 @@ class CustomMultipleIdentifierDummy
      * @ORM\Id
      */
     private $firstId;
-
     /**
      * @var int The custom identifier
      *
@@ -39,7 +39,6 @@ class CustomMultipleIdentifierDummy
      * @ORM\Id
      */
     private $secondId;
-
     /**
      * @var string The dummy name
      *

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,17 +23,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @ORM\Entity
  *
- * @ApiResource(
- *     attributes={
- *         "filters"={"my_dummy.property"}
- *     },
- *     normalizationContext={
- *         "groups"={"contain_non_resource"}
- *     }
- * )
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(filters: ['my_dummy.property'], normalizationContext: ['groups' => ['contain_non_resource']])]
 class ContainNonResource
 {
     /**
@@ -44,14 +36,12 @@ class ContainNonResource
      * @Groups("contain_non_resource")
      */
     public $id;
-
     /**
      * @var ContainNonResource
      *
      * @Groups("contain_non_resource")
      */
     public $nested;
-
     /**
      * @var NotAResource
      *

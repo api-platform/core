@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Composite Primitive Item.
  *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class CompositePrimitiveItem
 {
     /**
@@ -29,13 +29,11 @@ class CompositePrimitiveItem
      * @ORM\Column(type="string")
      */
     private $name;
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
      */
     private $year;
-
     /**
      * @ORM\Column(type="text")
      */

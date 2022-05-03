@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class Customer
 {
     /**
@@ -33,13 +33,11 @@ class Customer
      * @Groups({"order_read"})
      */
     private $id;
-
     /**
      * @ORM\Column(type="string")
      * @Groups({"order_read"})
      */
     public $name;
-
     /**
      * @ORM\ManyToMany(targetEntity="Address")
      * @ORM\JoinColumn(nullable=false)

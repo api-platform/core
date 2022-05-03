@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class WritableId
 {
     /**
@@ -31,7 +30,6 @@ class WritableId
      * @ORM\Column(type="guid")
      */
     public $id;
-
     /**
      * @ORM\Column
      */

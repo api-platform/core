@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource
  * @ORM\Entity
- * @ApiFilter(SearchFilter::class, properties={"nameConverted.nameConverted"="partial"})
+ * @ApiFilter (SearchFilter::class, properties={"nameConverted.nameConverted"="partial"})
  */
+#[ApiResource]
 class ConvertedOwner
 {
     /**
@@ -33,7 +33,6 @@ class ConvertedOwner
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var ConvertedRelated|null
      *

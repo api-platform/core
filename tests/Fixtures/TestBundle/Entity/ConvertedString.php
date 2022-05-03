@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource
  * @ORM\Entity
- * @ApiFilter(ExistsFilter::class, properties={"nameConverted"})
+ * @ApiFilter (ExistsFilter::class, properties={"nameConverted"})
  */
+#[ApiResource]
 class ConvertedString
 {
     /**
@@ -33,7 +33,6 @@ class ConvertedString
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string|null
      *

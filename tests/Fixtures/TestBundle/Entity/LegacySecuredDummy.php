@@ -13,7 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,26 +27,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Secured resource with legacy access_control attribute.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ApiResource(
- *     attributes={"access_control"="is_granted('ROLE_USER')"},
- *     collectionOperations={
- *         "get",
- *         "post"={"access_control"="is_granted('ROLE_ADMIN')"}
- *     },
- *     itemOperations={
- *         "get"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
- *         "put"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
- *     },
- *     graphql={
- *         "item_query"={"access_control"="is_granted('ROLE_USER') and object.getOwner() == user"},
- *         "delete"={},
- *         "update"={"access_control"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
- *         "create"={"access_control"="is_granted('ROLE_ADMIN')", "access_control_message"="Only admins can create a secured dummy."}
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Put(security: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new GetCollection(), new Post(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Mutation(name: 'delete'), new Mutation(name: 'update', security: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.')], security: 'is_granted(\'ROLE_USER\')')]
 class LegacySecuredDummy
 {
     /**
@@ -51,7 +40,6 @@ class LegacySecuredDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The title
      *
@@ -59,14 +47,12 @@ class LegacySecuredDummy
      * @Assert\NotBlank
      */
     private $title;
-
     /**
      * @var string The description
      *
      * @ORM\Column
      */
     private $description = '';
-
     /**
      * @var string The owner
      *

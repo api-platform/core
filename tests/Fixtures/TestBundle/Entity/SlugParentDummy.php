@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,9 +24,11 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Custom Identifier Dummy With Subresource.
  *
- * @ApiResource(attributes={"identifiers"="slug"})
  * @ORM\Entity
  */
+#[ApiResource(uriVariables: 'slug')]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies/{childDummies}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], toProperty: 'parentDummy'), 'childDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
 class SlugParentDummy
 {
     /**
@@ -38,7 +41,6 @@ class SlugParentDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The slug used a API identifier
      *
@@ -47,12 +49,9 @@ class SlugParentDummy
      * @ORM\Column(type="string", length=255, unique=true)
      */
     private $slug;
-
     /**
-     * @var Collection<int, SlugChildDummy>
+     * @var \Collection<int,\SlugChildDummy>
      * @ORM\OneToMany(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugChildDummy", mappedBy="parentDummy")
-     *
-     * @ApiSubresource
      */
     private $childDummies;
 

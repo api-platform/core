@@ -13,26 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ApiResource(itemOperations={
- *     "get",
- *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies/{id}"},
- *     "custom_normalization"={"route_name"="custom_normalization", "method"="GET"},
- *     "short_custom_normalization"={"route_name"="short_custom_normalization", "method"="GET"},
- * },
- * collectionOperations={
- *     "get",
- *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies"},
- *     "custom_denormalization"={"route_name"="custom_denormalization", "method"="POST"},
- *     "short_custom_denormalization"={"route_name"="short_custom_denormalization", "method"="GET"},
- * })
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(operations: [new Get(), new Get(uriTemplate: 'custom_action_collection_dummies/{id}'), new Get(routeName: 'custom_normalization'), new Get(routeName: 'short_custom_normalization'), new GetCollection(), new GetCollection(uriTemplate: 'custom_action_collection_dummies'), new Post(routeName: 'custom_denormalization'), new GetCollection(routeName: 'short_custom_denormalization')])]
 class CustomActionDummy
 {
     /**
@@ -43,7 +35,6 @@ class CustomActionDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string
      *

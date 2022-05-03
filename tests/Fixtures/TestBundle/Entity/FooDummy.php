@@ -13,24 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "order"={"dummy.name"}
- *     },
- *     graphql={
- *         "collection_query"={"pagination_type"="page"}
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
 class FooDummy
 {
     /**
@@ -41,14 +34,12 @@ class FooDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The foo name
      *
      * @ORM\Column
      */
     private $name;
-
     /**
      * @var Dummy|null The foo dummy
      *

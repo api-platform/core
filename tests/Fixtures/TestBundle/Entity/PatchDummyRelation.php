@@ -13,25 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"chicago"}},
- *         "denormalization_context"={"groups"={"chicago"}},
- *     },
- *     itemOperations={
- *         "get",
- *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()], normalizationContext: ['groups' => ['chicago']], denormalizationContext: ['groups' => ['chicago']])]
 class PatchDummyRelation
 {
     /**
@@ -40,7 +34,6 @@ class PatchDummyRelation
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
-
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      * @Groups({"chicago"})

@@ -13,25 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(
- *     attributes={"security"="is_granted('ROLE_ADMIN')"},
- *     collectionOperations={
- *         "get"={"security"="is_granted('ROLE_ADMIN')"},
- *     },
- *     itemOperations={
- *         "get"={"security"="is_granted('ROLE_ADMIN')"},
- *     },
- *     graphql={
- *         "item_query"={"security"="is_granted('ROLE_ADMIN')"},
- *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_ADMIN\')'), new GetCollection(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_ADMIN\')'), new QueryCollection(name: 'collection_query', security: 'is_granted(\'ROLE_ADMIN\')')], security: 'is_granted(\'ROLE_ADMIN\')')]
 class RelatedSecuredDummy
 {
     /**

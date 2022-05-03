@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -23,34 +27,9 @@ use Doctrine\ORM\Mapping as ORM;
  * DummyDtoNoInput.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
  * @ORM\Entity
- *
- * @ApiResource(
- *     attributes={
- *         "input"=false,
- *         "output"=OutputDto::class
- *     },
- *     collectionOperations={
- *         "post"={
- *             "method"="POST",
- *             "path"="/dummy_dto_no_inputs",
- *             "controller"=CreateItemAction::class,
- *         },
- *         "get",
- *     },
- *     itemOperations={
- *         "get",
- *         "delete",
- *         "post_double_bat"={
- *             "method"="POST",
- *             "path"="/dummy_dto_no_inputs/{id}/double_bat",
- *             "controller"=DoubleBatAction::class,
- *             "status"=200,
- *         },
- *     },
- * )
  */
+#[ApiResource(operations: [new Get(), new Delete(), new Post(uriTemplate: '/dummy_dto_no_inputs/{id}/double_bat', controller: DoubleBatAction::class, status: 200), new Post(uriTemplate: '/dummy_dto_no_inputs', controller: CreateItemAction::class), new GetCollection()], input: false, output: OutputDto::class)]
 class DummyDtoNoInput
 {
     /**
@@ -61,14 +40,12 @@ class DummyDtoNoInput
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string
      *
      * @ORM\Column
      */
     public $lorem;
-
     /**
      * @var float
      *

@@ -13,19 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"order_read"}}},
- *     forceEager=false
- * )
  * @ORM\Entity
- * @ORM\Table(name="`order`")
+ * @ORM\Table (name="`order`")
  */
+#[ApiResource(normalizationContext: ['groups' => ['order_read']], forceEager: false)]
 class Order
 {
     /**
@@ -37,14 +34,12 @@ class Order
      * @Groups({"order_read"})
      */
     private $id;
-
     /**
      * @ORM\ManyToOne(targetEntity="Customer")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"order_read"})
      */
     public $customer;
-
     /**
      * @ORM\ManyToOne(targetEntity="Customer")
      * @ORM\JoinColumn(nullable=false)
