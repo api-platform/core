@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -22,29 +22,24 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource(iri="https://schema.org/Product")
  * @ODM\Document
  */
+#[ApiResource(types: ['https://schema.org/Product'])]
 class RelatedOwnedDummy
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string|null A name
      *
      * @ODM\Field(type="string")
      */
     public $name;
-
     /**
-     * @var Dummy|null
-     *
+     * @var \Dummy|null
      * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, inversedBy="relatedOwnedDummy", storeAs="id")
-     * @ApiSubresource
      */
     public $owningDummy;
 

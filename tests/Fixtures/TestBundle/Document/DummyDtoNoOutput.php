@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
@@ -21,16 +21,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * DummyDtoNoOutput.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
  * @ODM\Document
- *
- * @ApiResource(
- *     attributes={
- *         "input"=InputDto::class,
- *         "output"=false
- *     }
- * )
  */
+#[ApiResource(input: InputDto::class, output: false)]
 class DummyDtoNoOutput
 {
     /**
@@ -39,14 +32,12 @@ class DummyDtoNoOutput
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string
      *
      * @ODM\Field
      */
     public $lorem;
-
     /**
      * @var string
      *

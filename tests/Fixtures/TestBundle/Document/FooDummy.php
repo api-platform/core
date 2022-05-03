@@ -13,24 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "order"={"dummy.name"}
- *     },
- *     graphql={
- *         "collection_query"={"pagination_type"="page"}
- *     }
- * )
  * @ODM\Document
  */
+#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
 class FooDummy
 {
     /**
@@ -39,14 +32,12 @@ class FooDummy
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string The foo name
      *
      * @ODM\Field
      */
     private $name;
-
     /**
      * @var Dummy The foo dummy
      *

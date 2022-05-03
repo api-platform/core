@@ -13,25 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @author Daniel West <daniel@silverback.is>
  *
  * Resource with an ID that will be URL encoded
- *
  * @ODM\Document
- *
- * @ApiResource(
- *     itemOperations={
- *         "get"={
- *             "method"="GET",
- *             "requirements"={"id"=".+"}
- *         }
- *     }
- * )
  */
+#[ApiResource(operations: [new Get(requirements: ['id' => '.+']), new Post(), new GetCollection()])]
 class UrlEncodedId
 {
     /**

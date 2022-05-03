@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class VoDummyInsuranceCompany
 {
     use VoDummyIdAwareTrait;
-
     /**
      * @var string
      *

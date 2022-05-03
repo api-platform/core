@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Jsonld Context Dummy.
  *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class JsonldContextDummy
 {
     /**
@@ -32,7 +32,6 @@ class JsonldContextDummy
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string The dummy person
      *

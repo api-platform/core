@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -25,13 +25,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related to Normalized Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"related_output", "output"}},
- *     "denormalization_context"={"groups"={"related_input", "input"}}
- * })
  * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['related_output', 'output']], denormalizationContext: ['groups' => ['related_input', 'input']])]
 class RelatedNormalizedDummy
 {
     /**
@@ -41,7 +37,6 @@ class RelatedNormalizedDummy
      * @Groups({"related_output", "related_input"})
      */
     private $id;
-
     /**
      * @var string|null The dummy name
      *
@@ -51,7 +46,6 @@ class RelatedNormalizedDummy
      * @Groups({"related_output", "related_input"})
      */
     private $name;
-
     /**
      * @var iterable Several Normalized dummies
      *

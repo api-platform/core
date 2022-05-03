@@ -13,30 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/people/{id}/sent_greetings.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
 class Greeting
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @ODM\Field
      */
     public $message = '';
-
     /**
      * @ODM\ReferenceOne(targetDocument=Person::class, inversedBy="sentGreetings", storeAs="id")
      */
     public $sender;
-
     /**
      * @ODM\ReferenceOne(targetDocument=Person::class)
      */

@@ -13,17 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Dummy InputOutput.
  *
  * @author Daniel West <daniel@silverback.is>
- *
- * @ApiResource(attributes={"output"=DummyDtoOutputSameClass::class})
  * @ODM\Document
  */
+#[ApiResource(output: DummyDtoOutputSameClass::class)]
 class DummyDtoOutputSameClass
 {
     /**
@@ -32,14 +31,12 @@ class DummyDtoOutputSameClass
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     private $id;
-
     /**
      * @var string
      *
      * @ODM\Field
      */
     public $lorem;
-
     /**
      * @var string
      *

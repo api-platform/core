@@ -13,19 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"car_read"}},
- *     "denormalization_context"={"groups"={"car_write"}}
- * })
  * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['car_read']], denormalizationContext: ['groups' => ['car_write']])]
 class VoDummyCar extends VoDummyVehicle
 {
     /**
@@ -35,7 +32,6 @@ class VoDummyCar extends VoDummyVehicle
      * @Groups({"car_read", "car_write"})
      */
     private $mileage;
-
     /**
      * @var string
      *
@@ -43,7 +39,6 @@ class VoDummyCar extends VoDummyVehicle
      * @Groups({"car_read", "car_write"})
      */
     private $bodyType;
-
     /**
      * @var VoDummyInspection[]|Collection
      *
@@ -52,13 +47,8 @@ class VoDummyCar extends VoDummyVehicle
      */
     private $inspections;
 
-    public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
-        array $drivers,
-        int $mileage,
-        string $bodyType = 'coupe'
-    ) {
+    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, int $mileage, string $bodyType = 'coupe')
+    {
         parent::__construct($make, $insuranceCompany, $drivers);
         $this->mileage = $mileage;
         $this->bodyType = $bodyType;

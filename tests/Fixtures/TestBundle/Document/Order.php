@@ -13,18 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"order_read"}}},
- *     forceEager=false
- * )
  * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['order_read']], forceEager: false)]
 class Order
 {
     /**
@@ -34,13 +31,11 @@ class Order
      * @Groups({"order_read"})
      */
     private $id;
-
     /**
      * @ODM\ReferenceOne(targetDocument=Customer::class)
      * @Groups({"order_read"})
      */
     public $customer;
-
     /**
      * @ODM\ReferenceOne(targetDocument=Customer::class)
      * @Assert\NotNull

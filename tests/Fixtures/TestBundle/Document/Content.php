@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\ContentStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,14 +22,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource(
- *     normalizationContext={
- *         "groups"={"get_content"},
- *     },
- * )
- *
  * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['get_content']])]
 class Content implements \JsonSerializable
 {
     /**
@@ -37,14 +33,12 @@ class Content implements \JsonSerializable
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string|null
      *
      * @ODM\Field(type="string")
      */
     private $contentType;
-
     /**
      * @var Collection<Field>
      *
@@ -56,7 +50,6 @@ class Content implements \JsonSerializable
      * )
      */
     private $fields;
-
     /**
      * @var string
      *
@@ -109,7 +102,6 @@ class Content implements \JsonSerializable
         if ($this->hasField($field->getName())) {
             throw new \InvalidArgumentException(sprintf("Content already has '%s' field", $field->getName()));
         }
-
         $this->fields[$field->getName()] = $field;
         $field->setContent($this);
     }
@@ -117,7 +109,6 @@ class Content implements \JsonSerializable
     public function removeField(Field $field): void
     {
         unset($this->fields[$field->getName()]);
-
         // set the owning side to null (unless already changed)
         if ($field->getContent() === $this) {
             $field->setContent(null);
@@ -153,10 +144,6 @@ class Content implements \JsonSerializable
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
-        return [
-            'id' => $this->id,
-            'contentType' => $this->contentType,
-            'fields' => $this->fields,
-        ];
+        return ['id' => $this->id, 'contentType' => $this->contentType, 'fields' => $this->fields];
     }
 }

@@ -14,16 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class DummyCarColor
 {
     /**
@@ -32,7 +32,6 @@ class DummyCarColor
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var DummyCar
      *
@@ -40,7 +39,6 @@ class DummyCarColor
      * @Assert\NotBlank
      */
     private $car;
-
     /**
      * @var string
      *

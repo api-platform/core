@@ -13,30 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ApiResource(filters={"dummy_travel.property"})
  * @ODM\Document
  */
+#[ApiResource(filters: ['dummy_travel.property'])]
 class DummyTravel
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @ODM\ReferenceOne(targetDocument=DummyCar::class)
      */
     public $car;
-
     /**
      * @ODM\Field(type="bool")
      */
     public $confirmed;
-
     /**
      * @ODM\ReferenceOne(targetDocument=DummyPassenger::class)
      */
