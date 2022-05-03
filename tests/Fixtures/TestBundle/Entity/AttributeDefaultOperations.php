@@ -19,14 +19,8 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource(paginationItemsPerPage: 10, graphQlOperations: [])]
 final class AttributeDefaultOperations
 {
-    #[ApiProperty(identifier: true)]
-    private $identifier;
-    private $name;
-
-    public function __construct(int $identifier, string $name)
+    public function __construct(#[ApiProperty(identifier: true)] private readonly int $identifier, private readonly string $name)
     {
-        $this->identifier = $identifier;
-        $this->name = $name;
     }
 
     public function getIdentifier()

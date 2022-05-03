@@ -24,9 +24,9 @@ use Doctrine\ORM\Mapping as ORM;
  * Dummy InputOutput.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(input: InputDto::class, output: OutputDto::class)]
+#[ORM\Entity]
 class DummyDtoInputOutput
 {
     public function __construct()
@@ -35,24 +35,24 @@ class DummyDtoInputOutput
     }
     /**
      * @var int The id
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
     /**
      * @var string
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     public $str;
     /**
      * @var float
-     * @ORM\Column(type="float")
      */
+    #[ORM\Column(type: 'float')]
     public $num;
     /**
      * @var Collection<RelatedDummy>
-     * @ORM\ManyToMany(targetEntity="RelatedDummy")
      */
+    #[ORM\ManyToMany(targetEntity: 'RelatedDummy')]
     public $relatedDummies;
 }

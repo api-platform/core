@@ -41,7 +41,7 @@ class DummyDate
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var \DateTime|null The dummy date
      *

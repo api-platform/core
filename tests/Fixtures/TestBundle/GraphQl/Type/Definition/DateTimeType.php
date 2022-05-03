@@ -29,7 +29,7 @@ final class DateTimeType extends ScalarType implements TypeInterface
 {
     public function __construct()
     {
-        $this->name = 'DateTime';
+        $this->name = \DateTime::class;
         $this->description = 'The `DateTime` scalar type represents time data.';
 
         parent::__construct();

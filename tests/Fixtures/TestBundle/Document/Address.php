@@ -24,16 +24,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Address
 {
     /**
-     * @var int
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"order_read"})
      */
-    private $id;
+    #[Groups(['order_read'])]
+    private ?int $id = null;
     /**
      * @ODM\Field(type="string")
-     * @Groups({"order_read"})
      */
+    #[Groups(['order_read'])]
     public $name;
 
     public function getId()

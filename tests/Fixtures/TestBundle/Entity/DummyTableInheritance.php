@@ -17,45 +17,30 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- * @ORM\InheritanceType ("JOINED")
- * @ORM\DiscriminatorColumn (name="discr", type="string")
- * @ORM\DiscriminatorMap ({
- *     "dummyTableInheritance"="DummyTableInheritance",
- *     "dummyTableInheritanceChild"="DummyTableInheritanceChild",
- *     "dummyTableInheritanceDifferentChild"="DummyTableInheritanceDifferentChild",
- *     "dummyTableInheritanceNotApiResourceChild"="DummyTableInheritanceNotApiResourceChild"
- * })
- */
 #[ApiResource]
+#[ORM\Entity]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
+#[ORM\DiscriminatorMap(['dummyTableInheritance' => 'DummyTableInheritance', 'dummyTableInheritanceChild' => 'DummyTableInheritanceChild', 'dummyTableInheritanceDifferentChild' => 'DummyTableInheritanceDifferentChild', 'dummyTableInheritanceNotApiResourceChild' => 'DummyTableInheritanceNotApiResourceChild'])]
 class DummyTableInheritance
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     *
-     * @Groups({"default"})
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['default'])]
+    private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     *
-     * @Groups({"default"})
      */
-    private $name;
-    /**
-     * @var DummyTableInheritanceRelated|null
-     *
-     * @ORM\ManyToOne(targetEntity="DummyTableInheritanceRelated", inversedBy="children")
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
-     */
-    private $parent;
+    #[ORM\Column]
+    #[Groups(['default'])]
+    private ?string $name = null;
+    #[ORM\ManyToOne(targetEntity: 'DummyTableInheritanceRelated', inversedBy: 'children')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated $parent = null;
 
     public function getName(): ?string
     {

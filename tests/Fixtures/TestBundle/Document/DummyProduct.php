@@ -37,12 +37,11 @@ class DummyProduct
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var \Collection
      * @ODM\ReferenceMany(targetDocument=DummyAggregateOffer::class, mappedBy="product", cascade={"persist"})
      */
-    private $offers;
+    private \Doctrine\Common\Collections\Collection $offers;
     /**
      * @var string The tour name
      *
@@ -50,10 +49,9 @@ class DummyProduct
      */
     private $name;
     /**
-     * @var \Collection
      * @ODM\ReferenceMany(targetDocument=DummyProduct::class, mappedBy="parent")
      */
-    private $relatedProducts;
+    private \Doctrine\Common\Collections\Collection $relatedProducts;
     /**
      * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="relatedProducts")
      */

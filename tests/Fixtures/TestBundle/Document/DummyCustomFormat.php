@@ -33,8 +33,8 @@ class DummyCustomFormat
      * @var string
      *
      * @ODM\Field
-     * @Assert\NotBlank
      */
+    #[Assert\NotBlank]
     private $name;
 
     public function getId()

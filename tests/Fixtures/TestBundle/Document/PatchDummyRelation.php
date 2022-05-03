@@ -34,8 +34,8 @@ class PatchDummyRelation
     public $id;
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
-     * @Groups({"chicago"})
      */
+    #[Groups(['chicago'])]
     protected $related;
 
     public function getRelated()

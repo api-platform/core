@@ -19,25 +19,20 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
  * @ApiFilter (SearchFilter::class, properties={"nameConverted.nameConverted"="partial"})
  */
 #[ApiResource]
+#[ORM\Entity]
 class ConvertedOwner
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var ConvertedRelated|null
-     *
-     * @ORM\ManyToOne(targetEntity="ConvertedRelated")
      */
+    #[ORM\ManyToOne(targetEntity: 'ConvertedRelated')]
     public $nameConverted;
 
     public function getId()

@@ -31,9 +31,9 @@ class EmbeddableDummy
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
-     * @Groups({"embed"})
      */
-    private $dummyName;
+    #[Groups(['embed'])]
+    private ?string $dummyName = null;
 
     /**
      * @var bool|null A dummy boolean
@@ -46,8 +46,8 @@ class EmbeddableDummy
      * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date")
-     * @Assert\DateTime
      */
+    #[Assert\DateTime]
     public $dummyDate;
 
     /**
@@ -66,8 +66,8 @@ class EmbeddableDummy
 
     /**
      * @ODM\Field(type="string")
-     * @Groups({"barcelona", "chicago"})
      */
+    #[Groups(['barcelona', 'chicago'])]
     protected $symfony;
 
     public static function staticMethod(): void

@@ -26,11 +26,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class ConvertedDate
 {
     /**
-     * @var int
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var \DateTime
      *

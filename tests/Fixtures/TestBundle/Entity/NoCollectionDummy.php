@@ -22,20 +22,18 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * No Collection Dummy.
- *
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete()])]
+#[ORM\Entity]
 class NoCollectionDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     public function getId()
     {

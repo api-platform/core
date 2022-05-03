@@ -27,9 +27,8 @@ class DummyTableInheritanceDifferentChild extends DummyTableInheritance
      * @var string The dummy email
      *
      * @ODM\Field
-     *
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $email;
 
     public function getEmail()

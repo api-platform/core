@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ODM\Document
  */
 #[ApiResource]
-class CompositeItem
+class CompositeItem implements \Stringable
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
@@ -31,13 +31,13 @@ class CompositeItem
     private $id;
     /**
      * @ODM\Field(type="string", nullable=true)
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $field1;
     /**
      * @ODM\ReferenceMany(targetDocument=CompositeRelation::class, mappedBy="compositeItem")
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $compositeValues;
 
     /**
@@ -74,7 +74,7 @@ class CompositeItem
         return $this->compositeValues;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

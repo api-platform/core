@@ -13,40 +13,32 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Jsonld Context Dummy.
- *
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class JsonldContextDummy
 {
     /**
      * @var int The id
-     *
-     * @ApiProperty(identifier=true)
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ApiProperty(identifier: true)]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+
     /**
      * @var string The dummy person
-     *
-     * @ApiProperty(
-     *     attributes={
-     *         "jsonld_context"={
-     *             "@id"="http://example.com/id",
-     *             "@type"="@id",
-     *             "foo"="bar"
-     *         }
-     *     },
-     * )
      */
+    #[ApiProperty(
+        jsonldContext: ['@id' => 'https://example.com/id', '@type' => '@id', 'foo' => 'bar']
+    )]
     private $person;
 
     public function getId()

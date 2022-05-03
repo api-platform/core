@@ -28,30 +28,27 @@ use Doctrine\ORM\Mapping as ORM;
  * Foo.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new GetCollection(uriTemplate: 'custom_collection_desc_foos', order: ['name' => 'DESC']), new GetCollection(uriTemplate: 'custom_collection_asc_foos', order: ['name' => 'ASC'])], graphQlOperations: [new Query(name: 'item_query'), new QueryCollection(name: 'collection_query', paginationEnabled: false), new Mutation(name: 'create'), new Mutation(name: 'delete')], order: ['bar', 'name' => 'DESC'])]
+#[ORM\Entity]
 class Foo
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
     /**
      * @var string The foo bar
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $bar;
 
     public function getId()

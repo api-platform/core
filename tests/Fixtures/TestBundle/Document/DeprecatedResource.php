@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
@@ -29,11 +29,12 @@ class DeprecatedResource
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     public $id;
+
     /**
      * @var string
      *
-     * @ApiProperty(attributes={"deprecation_reason"="This field is deprecated"})
      * @ODM\Field
      */
+    #[ApiProperty(deprecationReason: 'This field is deprecated')]
     public $deprecatedField;
 }

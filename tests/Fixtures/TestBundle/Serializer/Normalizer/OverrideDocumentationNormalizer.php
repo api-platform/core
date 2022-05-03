@@ -21,11 +21,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class OverrideDocumentationNormalizer implements NormalizerInterface
 {
-    private $documentationNormalizer;
-
-    public function __construct(NormalizerInterface $documentationNormalizer)
+    public function __construct(private readonly NormalizerInterface $documentationNormalizer)
     {
-        $this->documentationNormalizer = $documentationNormalizer;
     }
 
     /**

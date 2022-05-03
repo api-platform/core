@@ -16,15 +16,11 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class ExternalUser extends AbstractUser
 {
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     private $externalId;
 
     public function getExternalId(): ?string

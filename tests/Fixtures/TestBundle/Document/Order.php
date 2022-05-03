@@ -25,22 +25,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Order
 {
     /**
-     * @var int
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"order_read"})
      */
-    private $id;
+    #[Groups(['order_read'])]
+    private ?int $id = null;
     /**
      * @ODM\ReferenceOne(targetDocument=Customer::class)
-     * @Groups({"order_read"})
      */
+    #[Groups(['order_read'])]
     public $customer;
     /**
      * @ODM\ReferenceOne(targetDocument=Customer::class)
-     * @Assert\NotNull
-     * @Groups({"order_read"})
      */
+    #[Assert\NotNull]
+    #[Groups(['order_read'])]
     public $recipient;
 
     public function getId()

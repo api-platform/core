@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator;
 
-class Uuid implements \JsonSerializable
+class Uuid implements \JsonSerializable, \Stringable
 {
     private $id;
 
@@ -22,7 +22,7 @@ class Uuid implements \JsonSerializable
         $this->id = 'foo';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->id;
     }

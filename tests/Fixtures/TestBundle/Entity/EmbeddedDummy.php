@@ -27,45 +27,40 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Embedded Dummy.
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(uriTemplate: '/embedded_dummies_groups/{id}', normalizationContext: ['groups' => ['embed']]), new Post(), new GetCollection()], filters: ['my_dummy.search', 'my_dummy.order', 'my_dummy.date', 'my_dummy.range', 'my_dummy.boolean', 'my_dummy.numeric'])]
+#[ORM\Entity]
 class EmbeddedDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"embed"})
      */
-    private $name;
+    #[ORM\Column(nullable: true)]
+    #[Groups(['embed'])]
+    private ?string $name = null;
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Assert\DateTime]
     public $dummyDate;
     /**
      * @var EmbeddableDummy
-     *
-     * @ORM\Embedded(class="EmbeddableDummy")
-     * @Groups({"embed"})
      */
+    #[ORM\Embedded(class: 'EmbeddableDummy')]
+    #[Groups(['embed'])]
     public $embeddedDummy;
     /**
      * @var RelatedDummy|null A related dummy
-     *
-     * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */
+    #[ORM\ManyToOne(targetEntity: 'RelatedDummy')]
     public $relatedDummy;
 
     public static function staticMethod()

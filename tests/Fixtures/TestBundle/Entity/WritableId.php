@@ -19,19 +19,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class WritableId
 {
-    /**
-     * @ORM\Id
-     * @Assert\Uuid
-     * @ORM\Column(type="guid")
-     */
+    #[ORM\Id]
+    #[Assert\Uuid]
+    #[ORM\Column(type: 'guid')]
     public $id;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     public $name;
 }

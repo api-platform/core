@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
@@ -30,19 +30,19 @@ class SlugChildDummy
     /**
      * @var int The identifier
      *
-     * @ApiProperty(identifier=false)
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    #[ApiProperty(identifier: false)]
+    private ?int $id = null;
+
     /**
      * @var string The slug used as API identifier
      *
-     * @ApiProperty(identifier=true)
-     *
      * @ODM\Field
      */
-    private $slug;
+    #[ApiProperty(identifier: true)]
+    private ?string $slug = null;
+
     /**
      * @ODM\ReferenceOne(targetDocument=SlugParentDummy::class, inversedBy="childDummies", storeAs="id")
      */

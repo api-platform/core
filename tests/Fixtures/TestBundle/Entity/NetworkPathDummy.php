@@ -19,22 +19,16 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::NET_PATH)]
 #[ApiResource(uriTemplate: '/network_path_relation_dummies/{id}/network_path_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy::class, identifiers: ['id'], toProperty: 'networkPathRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::NET_PATH, operations: [new GetCollection()])]
+#[ORM\Entity]
 class NetworkPathDummy
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
-    /**
-     * @ORM\ManyToOne(targetEntity="NetworkPathRelationDummy", inversedBy="networkPathDummies")
-     */
+    #[ORM\ManyToOne(targetEntity: 'NetworkPathRelationDummy', inversedBy: 'networkPathDummies')]
     public $networkPathRelationDummy;
 
     public function getId()

@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @ODM\Document
  */
 #[ApiResource]
-class CompositeLabel
+class CompositeLabel implements \Stringable
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
@@ -31,8 +31,8 @@ class CompositeLabel
     private $id;
     /**
      * @ODM\Field(type="string", nullable=true)
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $value;
 
     /**
@@ -61,7 +61,7 @@ class CompositeLabel
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

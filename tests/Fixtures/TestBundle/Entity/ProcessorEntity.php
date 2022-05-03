@@ -21,30 +21,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * ProcessorEntity.
- *
- * @ORM\Entity
  */
 #[ApiResource]
 #[Get]
 #[Post]
+#[ORM\Entity]
 class ProcessorEntity
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
-     */
-    private $foo;
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    private ?string $foo = null;
 
     /**
      * @return int

@@ -24,25 +24,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class VoDummyDriver
 {
     use VoDummyIdAwareTrait;
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $firstName;
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $lastName;
 
-    public function __construct(string $firstName, string $lastName)
-    {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
+    public function __construct(
+        /**
+         * @ODM\Field
+         */
+        #[Groups(['car_read', 'car_write'])] private readonly string $firstName,
+        /**
+         * @ODM\Field
+         */
+        #[Groups(['car_read', 'car_write'])] private readonly string $lastName
+    ) {
     }
 
     public function getFirstName()

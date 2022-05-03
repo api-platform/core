@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Metadata\Get;
@@ -35,14 +34,8 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
 {
     use DenormalizerAwareTrait;
 
-    /**
-     * @var IriConverterInterface|LegacyIriConverterInterface
-     */
-    private $iriConverter;
-
-    public function __construct($iriConverter)
+    public function __construct(private $iriConverter)
     {
-        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -63,7 +56,7 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
                 }
             }
 
-            return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
+            return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);
         }
 
         $relatedDummyClass = DummyEntity::class === $class ? RelatedDummyEntity::class : RelatedDummyDocument::class;
@@ -81,7 +74,7 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
             }
         }
 
-        return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
+        return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);
     }
 
     /**
@@ -92,6 +85,6 @@ class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterf
         return 'json' === $format
             && (is_a($type, DummyEntity::class, true) || is_a($type, DummyDocument::class, true))
             && ('1' === ($data['relatedDummy'] ?? null) || ['1'] === ($data['relatedDummies'] ?? null))
-            && !isset($context[__CLASS__]);
+            && !isset($context[self::class]);
     }
 }

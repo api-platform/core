@@ -18,23 +18,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class Relation3
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
     public $id;
     /**
      * @var Collection<int, Relation2>
-     * @ORM\ManyToMany(targetEntity="Relation2", orphanRemoval=true)
      */
-    private $relation2s;
+    #[ORM\ManyToMany(targetEntity: 'Relation2', orphanRemoval: true)]
+    private readonly \Doctrine\Common\Collections\Collection $relation2s;
 
     public function __construct()
     {

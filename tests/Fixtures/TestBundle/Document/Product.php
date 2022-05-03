@@ -23,25 +23,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Product implements ProductInterface
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string|null
-     *
      * @ODM\Field(type="string")
      */
-    private $code;
+    private ?string $code = null;
 
     /**
-     * @var Taxon|null
-     *
      * @ODM\ReferenceOne(targetDocument=Taxon::class)
      */
-    private $mainTaxon;
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon $mainTaxon = null;
 
     /**
      * {@inheritdoc}

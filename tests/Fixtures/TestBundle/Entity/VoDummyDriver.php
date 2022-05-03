@@ -17,32 +17,14 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class VoDummyDriver
 {
     use VoDummyIdAwareTrait;
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
-     */
-    private $firstName;
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
-     */
-    private $lastName;
 
-    public function __construct(string $firstName, string $lastName)
+    public function __construct(#[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $firstName, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $lastName)
     {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
     }
 
     public function getFirstName()

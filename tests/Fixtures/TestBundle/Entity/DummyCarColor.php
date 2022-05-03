@@ -20,38 +20,28 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class DummyCarColor
 {
     /**
      * @var int The entity Id
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
      */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+    #[ORM\ManyToOne(targetEntity: 'DummyCar', inversedBy: 'colors')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE', referencedColumnName: 'id_id')]
+    #[Assert\NotBlank]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar $car = null;
     /**
-     * @var DummyCar
-     *
-     * @ORM\ManyToOne(targetEntity="DummyCar", inversedBy="colors")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", referencedColumnName="id_id")
-     * @Assert\NotBlank
-     */
-    private $car;
-    /**
-     * @var string
-     *
-     * @ORM\Column(nullable=false)
      * @ApiFilter(SearchFilter::class)
-     * @Assert\NotBlank
-     *
-     * @Serializer\Groups({"colors"})
      */
-    private $prop = '';
+    #[ORM\Column(nullable: false)]
+    #[Assert\NotBlank]
+    #[Serializer\Groups(['colors'])]
+    private string $prop = '';
 
     public function getId()
     {

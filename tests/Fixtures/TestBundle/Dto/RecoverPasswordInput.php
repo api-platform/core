@@ -19,7 +19,7 @@ class RecoverPasswordInput
 {
     /**
      * @var \ApiPlatform\Tests\Fixtures\TestBundle\Entity\User
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
     public $user;
 }

@@ -19,31 +19,25 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(normalizationContext: ['groups' => ['default']], denormalizationContext: ['groups' => ['default']])]
+#[ORM\Entity]
 class DummyTableInheritanceRelated
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     *
-     * @Groups({"default"})
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['default'])]
+    private ?int $id = null;
     /**
      * @var Collection<int, DummyTableInheritance> Related children
-     *
-     * @ORM\OneToMany(targetEntity="DummyTableInheritance", mappedBy="parent")
-     * @ORM\OrderBy({"id"="ASC"})
-     *
-     * @Groups({"default"})
      */
-    private $children;
+    #[ORM\OneToMany(targetEntity: 'DummyTableInheritance', mappedBy: 'parent')]
+    #[ORM\OrderBy(['id' => 'ASC'])]
+    #[Groups(['default'])]
+    private \Doctrine\Common\Collections\Collection $children;
 
     public function __construct()
     {

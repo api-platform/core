@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -40,14 +40,14 @@ abstract class AbstractDummy
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string The dummy name
      *
      * @ODM\Field
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
      */
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Assert\NotBlank]
     private $name;
 
     public function getId()

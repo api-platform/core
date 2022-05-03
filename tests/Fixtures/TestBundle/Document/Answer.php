@@ -37,23 +37,23 @@ class Answer
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Serializer\Groups({"foobar"})
      */
+    #[Serializer\Groups(['foobar'])]
     private $id;
     /**
      * @ODM\Field(nullable=false)
-     * @Serializer\Groups({"foobar"})
      */
+    #[Serializer\Groups(['foobar'])]
     private $content;
     /**
      * @ODM\ReferenceOne(targetDocument=Question::class, mappedBy="answer")
-     * @Serializer\Groups({"foobar"})
      */
+    #[Serializer\Groups(['foobar'])]
     private $question;
     /**
      * @ODM\ReferenceMany(targetDocument=Question::class, mappedBy="answer")
-     * @Serializer\Groups({"foobar"})
      */
+    #[Serializer\Groups(['foobar'])]
     private $relatedQuestions;
 
     public function __construct()

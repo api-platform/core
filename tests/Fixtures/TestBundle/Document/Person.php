@@ -33,15 +33,15 @@ class Person
     private $id;
     /**
      * @ODM\Field(type="string")
-     * @Groups({"people.pets"})
      */
+    #[Groups(['people.pets'])]
     public $name;
     /**
      * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="person")
-     * @Groups({"people.pets"})
      *
      * @var ArrayCollection
      */
+    #[Groups(['people.pets'])]
     public $pets;
     /**
      * @ODM\ReferenceMany(targetDocument=Greeting::class, mappedBy="sender")

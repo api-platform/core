@@ -21,32 +21,24 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Field implements \JsonSerializable
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var Content|null
-     *
      * @ODM\ReferenceOne(targetDocument=Content::class, inversedBy="fields")
      */
-    private $content;
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Content $content = null;
 
     /**
-     * @var string|null
-     *
      * @ODM\Field(type="string")
      */
-    private $name;
+    private ?string $name = null;
 
     /**
-     * @var string|null
-     *
      * @ODM\Field(type="string")
      */
-    private $value;
+    private ?string $value = null;
 
     public function getId(): ?int
     {

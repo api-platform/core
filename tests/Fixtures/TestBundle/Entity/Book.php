@@ -21,24 +21,18 @@ use Doctrine\ORM\Mapping as ORM;
  * Book.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}.{_format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
+#[ORM\Entity]
 class Book
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     public $name;
-    /**
-     * @ORM\Column(unique=true)
-     */
+    #[ORM\Column(unique: true)]
     public $isbn;
 
     public function getId()

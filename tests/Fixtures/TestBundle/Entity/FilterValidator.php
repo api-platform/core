@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter;
@@ -29,26 +29,22 @@ use Doctrine\ORM\Mapping as ORM;
  * Filter Validator entity.
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(filters: [ArrayItemsFilter::class, BoundsFilter::class, EnumFilter::class, LengthFilter::class, MultipleOfFilter::class, PatternFilter::class, RequiredFilter::class, RequiredAllowEmptyFilter::class])]
+#[ORM\Entity]
 class FilterValidator
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-    /**
-     * @var string A name
-     *
-     * @ORM\Column
-     * @ApiProperty(iri="http://schema.org/name")
-     */
-    private $name;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    
+    #[ApiProperty(types: ["http://schema.org/name"])
+    #[ORM\Column]
+    private string $name;
 
     public function getId()
     {

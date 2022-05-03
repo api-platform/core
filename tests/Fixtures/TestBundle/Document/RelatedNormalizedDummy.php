@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -34,24 +34,25 @@ class RelatedNormalizedDummy
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"related_output", "related_input"})
      */
-    private $id;
+    #[Groups(['related_output', 'related_input'])]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
      *
      * @ODM\Field
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"related_output", "related_input"})
      */
-    private $name;
+    #[Assert\NotBlank]
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Groups(['related_output', 'related_input'])]
+    private ?string $name = null;
+
     /**
      * @var iterable Several Normalized dummies
      *
      * @ODM\ReferenceMany(targetDocument=CustomNormalizedDummy::class)
-     * @Groups({"related_output", "related_input"})
      */
+    #[Groups(['related_output', 'related_input'])]
     public $customNormalizedDummy;
 
     public function __construct()

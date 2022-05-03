@@ -26,39 +26,35 @@ use Doctrine\ORM\Mapping as ORM;
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/related_products.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
+#[ORM\Entity]
 class DummyProduct
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var \Collection<int,\DummyAggregateOffer>
-     * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
      */
-    private $offers;
+    #[ORM\OneToMany(targetEntity: 'DummyAggregateOffer', mappedBy: 'product', cascade: ['persist'])]
+    private \Collection $offers;
     /**
      * @var string The tour name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
     /**
      * @var \Collection<int,\DummyProduct>
-     * @ORM\OneToMany(targetEntity="DummyProduct", mappedBy="parent")
      */
-    private $relatedProducts;
-    /**
-     * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="relatedProducts")
-     */
+    #[ORM\OneToMany(targetEntity: 'DummyProduct', mappedBy: 'parent')]
+    private \Collection $relatedProducts;
+    #[ORM\ManyToOne(targetEntity: 'DummyProduct', inversedBy: 'relatedProducts')]
     private $parent;
 
     public function __construct()

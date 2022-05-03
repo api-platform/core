@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
@@ -28,14 +28,15 @@ class ReadableOnlyProperty
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
+
     /**
      * @var string The foo name
      *
      * @ODM\Field
-     * @ApiProperty(writable=false)
      */
-    private $name;
+    #[ApiProperty(writable: false)]
+    private readonly string $name;
 
     public function __construct()
     {
@@ -47,7 +48,7 @@ class ReadableOnlyProperty
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): never
     {
         throw new \Exception('Can not write name.');
     }

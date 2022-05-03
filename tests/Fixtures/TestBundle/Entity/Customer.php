@@ -18,31 +18,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class Customer
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"order_read"})
-     */
-    private $id;
-    /**
-     * @ORM\Column(type="string")
-     * @Groups({"order_read"})
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['order_read'])]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string')]
+    #[Groups(['order_read'])]
     public $name;
-    /**
-     * @ORM\ManyToMany(targetEntity="Address")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"order_read"})
-     */
+    #[ORM\ManyToMany(targetEntity: 'Address')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order_read'])]
     public $addresses;
 
     public function __construct()

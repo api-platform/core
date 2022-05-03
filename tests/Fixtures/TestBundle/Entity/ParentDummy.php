@@ -20,17 +20,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Parent Dummy.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 class ParentDummy
 {
     /**
      * @var int|null The age
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"friends"})
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['friends'])]
     private $age;
 
     public function getAge()

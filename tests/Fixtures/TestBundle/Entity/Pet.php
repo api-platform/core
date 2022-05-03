@@ -23,27 +23,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Pet.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class Pet
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-    /**
-     * @ORM\Column(type="string")
-     * @Groups({"people.pets"})
-     */
+    #[ORM\Column(type: 'string')]
+    #[Groups(['people.pets'])]
     public $name;
     /**
-     * @ORM\OneToMany(targetEntity="PersonToPet", mappedBy="pet")
-     *
      * @var Collection<int, PersonToPet>
      */
+    #[ORM\OneToMany(targetEntity: 'PersonToPet', mappedBy: 'pet')]
     public $people;
 
     public function __construct()

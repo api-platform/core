@@ -38,7 +38,7 @@ class Foo
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string The foo name
      *

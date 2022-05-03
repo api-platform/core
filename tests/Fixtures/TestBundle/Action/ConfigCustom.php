@@ -24,11 +24,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConfigCustom
 {
-    private $dataProvider;
-
-    public function __construct(ItemDataProviderInterface $dataProvider)
+    public function __construct(private readonly ItemDataProviderInterface $dataProvider)
     {
-        $this->dataProvider = $dataProvider;
     }
 
     public function __invoke(Request $request, $id)

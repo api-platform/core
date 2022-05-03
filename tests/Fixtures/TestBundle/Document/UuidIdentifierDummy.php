@@ -29,13 +29,13 @@ class UuidIdentifierDummy
      *
      * @ODM\Id(strategy="UUID")
      */
-    private $uuid;
+    private ?string $uuid = null;
     /**
      * @var string The dummy name
      *
      * @ODM\Field
      */
-    private $name;
+    private ?string $name = null;
 
     public function getUuid(): string
     {

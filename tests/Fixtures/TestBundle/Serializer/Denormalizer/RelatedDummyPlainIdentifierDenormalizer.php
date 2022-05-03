@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer;
 
-use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Metadata\Get;
@@ -35,14 +34,8 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
 {
     use DenormalizerAwareTrait;
 
-    /**
-     * @var IriConverterInterface|LegacyIriConverterInterface
-     */
-    private $iriConverter;
-
-    public function __construct($iriConverter)
+    public function __construct(private $iriConverter)
     {
-        $this->iriConverter = $iriConverter;
     }
 
     /**
@@ -55,7 +48,7 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
         if ($this->iriConverter instanceof LegacyIriConverterInterface) {
             $data['thirdLevel'] = '/third_levels/'.$data['thirdLevel'];
 
-            return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
+            return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);
         }
 
         $iriConverterContext = ['uri_variables' => ['id' => $data['thirdLevel']]] + $context;
@@ -67,7 +60,7 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
             $iriConverterContext
         );
 
-        return $this->denormalizer->denormalize($data, $class, $format, $context + [__CLASS__ => true]);
+        return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);
     }
 
     /**
@@ -78,6 +71,6 @@ class RelatedDummyPlainIdentifierDenormalizer implements ContextAwareDenormalize
         return 'json' === $format
             && (is_a($type, RelatedDummyEntity::class, true) || is_a($type, RelatedDummyDocument::class, true))
             && '1' === ($data['thirdLevel'] ?? null)
-            && !isset($context[__CLASS__]);
+            && !isset($context[self::class]);
     }
 }

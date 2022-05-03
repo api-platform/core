@@ -16,29 +16,17 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class VoidPayment
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    /**
-     * @ORM\OneToOne(targetEntity=Payment::class, inversedBy="voidPayment")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $payment;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    public function __construct(Payment $payment)
+    public function __construct(#[ORM\OneToOne(targetEntity: Payment::class, inversedBy: 'voidPayment')] #[ORM\JoinColumn(nullable: false)] private readonly Payment $payment)
     {
-        $this->payment = $payment;
     }
 
     public function getId(): ?int

@@ -22,41 +22,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Dummy with a custom GraphQL mutation resolver.
  *
- * @ORM\Entity
- *
  * @author Raoul Clais <raoul.clais@gmail.com>
  */
 #[ApiResource(graphQlOperations: [new Mutation(name: 'sum', resolver: 'app.graphql.mutation_resolver.dummy_custom', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']]), new Mutation(name: 'sumNotPersisted', resolver: 'app.graphql.mutation_resolver.dummy_custom_not_persisted', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']]), new Mutation(name: 'sumNoWriteCustomResult', resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']], write: false), new Mutation(name: 'sumOnlyPersist', resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']], read: false, deserialize: false, validate: false, serialize: false), new Mutation(name: 'testCustomArguments', resolver: 'app.graphql.mutation_resolver.dummy_custom', args: ['operandC' => ['type' => 'Int!']]), new Mutation(name: 'testOutput', resolver: 'app.graphql.mutation_resolver.dummy_custom', output: OutputDto::class)])]
+#[ORM\Entity]
 class DummyCustomMutation
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $operandA;
-    /**
-     * @var int|null
-     *
-     * @Groups({"sum"})
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $operandB;
-    /**
-     * @var int|null
-     *
-     * @Groups({"result"})
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $result;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $operandA = null;
+    #[Groups(['sum'])]
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $operandB = null;
+    #[Groups(['result'])]
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $result = null;
 
     public function getId(): ?int
     {

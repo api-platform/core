@@ -31,20 +31,18 @@ class CompositePrimitiveItem
     /**
      * @ODM\Field(type="string")
      */
-    private $name;
-    /**
-     * @ODM\Field(type="int")
-     */
-    private $year;
-    /**
-     * @ODM\Field(type="string")
-     */
     private $description;
 
-    public function __construct(string $name, int $year)
-    {
-        $this->name = $name;
-        $this->year = $year;
+    public function __construct(
+        /**
+         * @ODM\Field(type="string")
+         */
+        private readonly string $name,
+        /**
+         * @ODM\Field(type="int")
+         */
+        private readonly int $year
+    ) {
     }
 
     /**

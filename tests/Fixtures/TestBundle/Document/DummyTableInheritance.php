@@ -35,24 +35,20 @@ class DummyTableInheritance
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
-     * @Groups({"default"})
      */
-    private $id;
+    #[Groups(['default'])]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
      *
      * @ODM\Field
-     *
-     * @Groups({"default"})
      */
-    private $name;
+    #[Groups(['default'])]
+    private ?string $name = null;
     /**
-     * @var DummyTableInheritanceRelated|null
-     *
      * @ODM\ReferenceOne(targetDocument=DummyTableInheritanceRelated::class, inversedBy="children")
      */
-    private $parent;
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceRelated $parent = null;
 
     public function getName(): ?string
     {

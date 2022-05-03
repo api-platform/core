@@ -31,7 +31,7 @@ class FooDummy
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string The foo name
      *
@@ -43,7 +43,7 @@ class FooDummy
      *
      * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, storeAs="id")
      */
-    private $dummy;
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy $dummy = null;
 
     public function getId()
     {

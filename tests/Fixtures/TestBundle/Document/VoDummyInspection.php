@@ -26,34 +26,20 @@ class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
     /**
-     * @var bool
-     *
-     * @ODM\Field(type="bool")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $accepted;
-    /**
-     * @var VoDummyCar
-     *
-     * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
-     * @Groups({"inspection_read", "inspection_write"})
-     */
-    private $car;
-    /**
-     * @var DateTime
-     *
      * @ODM\Field(type="date")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
      */
-    private $performed;
-    private $attributeWithoutConstructorEquivalent;
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    private \DateTime $performed;
 
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(/**
+     * @ODM\Field(type="bool")
+     */
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private readonly bool $accepted, /**
+     * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
+     */
+    #[Groups(['inspection_read', 'inspection_write'])] private readonly VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
     {
-        $this->accepted = $accepted;
-        $this->car = $car;
         $this->performed = $performed ?: new DateTime();
-        $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
     public function isAccepted()

@@ -29,18 +29,16 @@ class DummyTableInheritanceRelated
      * @var int The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
-     * @Groups({"default"})
      */
-    private $id;
+    #[Groups(['default'])]
+    private ?int $id = null;
     /**
      * @var Collection Related children
      *
      * @ODM\ReferenceMany(targetDocument=DummyTableInheritance::class, mappedBy="parent")
-     *
-     * @Groups({"default"})
      */
-    private $children;
+    #[Groups(['default'])]
+    private \Doctrine\Common\Collections\Collection $children;
 
     public function __construct()
     {

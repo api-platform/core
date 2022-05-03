@@ -20,24 +20,22 @@ use Doctrine\ORM\Mapping as ORM;
  * UpperCaseIdentifier dummy.
  *
  * @author Exploit.cz <insekticid@exploit.cz>
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class UpperCaseIdentifierDummy
 {
     /**
      * @var string The custom identifier
-     *
-     * @ORM\Column(type="guid")
-     * @ORM\Id
      */
-    private $Uuid;
+    #[ORM\Column(type: 'guid')]
+    #[ORM\Id]
+    private ?string $Uuid = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private ?string $name = null;
 
     public function getUuid(): string
     {

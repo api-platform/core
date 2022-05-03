@@ -21,31 +21,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Resource linked to a standard object.
  *
- * @ORM\Entity
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(filters: ['my_dummy.property'], normalizationContext: ['groups' => ['contain_non_resource']])]
+#[ORM\Entity]
 class ContainNonResource
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     *
-     * @Groups("contain_non_resource")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups('contain_non_resource')]
     public $id;
     /**
      * @var ContainNonResource
-     *
-     * @Groups("contain_non_resource")
      */
+    #[Groups('contain_non_resource')]
     public $nested;
     /**
      * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
      */
+    #[Groups('contain_non_resource')]
     public $notAResource;
 }

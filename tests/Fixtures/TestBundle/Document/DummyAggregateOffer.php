@@ -37,18 +37,17 @@ class DummyAggregateOffer
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var \ArrayCollection
      * @ODM\ReferenceMany(targetDocument=DummyOffer::class, mappedBy="aggregate", cascade={"persist"})
      */
-    private $offers;
+    private \Doctrine\Common\Collections\ArrayCollection $offers;
     /**
      * @var DummyProduct The dummy product
      *
      * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="offers", storeAs="id")
      */
-    private $product;
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct $product = null;
     /**
      * @var int The dummy aggregate offer value
      *

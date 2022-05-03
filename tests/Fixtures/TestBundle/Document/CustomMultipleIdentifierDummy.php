@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -31,20 +31,22 @@ class CustomMultipleIdentifierDummy
      *
      * @ODM\Id(strategy="NONE", type="int")
      */
-    private $firstId;
+    private ?int $firstId = null;
+
     /**
      * @var int The custom identifier
      *
-     * @ApiProperty(identifier=true)
      * @ODM\Field(type="int")
      */
-    private $secondId;
+     #[ApiProperty(identifier: true)
+    private ?int $secondId = null;
+
     /**
      * @var string The dummy name
      *
      * @ODM\Field(type="string")
      */
-    private $name;
+    private ?string $name = null;
 
     public function getFirstId(): int
     {

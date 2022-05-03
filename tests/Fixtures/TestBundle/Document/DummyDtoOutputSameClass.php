@@ -30,7 +30,7 @@ class DummyDtoOutputSameClass
      *
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string
      *

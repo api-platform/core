@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\ContentStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -28,17 +27,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Content implements \JsonSerializable
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var string|null
-     *
      * @ODM\Field(type="string")
      */
-    private $contentType;
+    private ?string $contentType = null;
     /**
      * @var Collection<Field>
      *
@@ -49,13 +44,11 @@ class Content implements \JsonSerializable
      *     cascade={"persist"},
      * )
      */
-    private $fields;
+    private \Doctrine\Common\Collections\Collection & iterable $fields;
     /**
-     * @var string
-     *
      * @ODM\Field(type="string")
      */
-    private $status;
+    private readonly string $status;
 
     public function __construct()
     {
@@ -63,17 +56,13 @@ class Content implements \JsonSerializable
         $this->status = ContentStatus::DRAFT;
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getContentType(): ?string
     {
         return $this->contentType;
@@ -115,9 +104,7 @@ class Content implements \JsonSerializable
         }
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getFieldValues(): array
     {
         $fieldValues = [];
@@ -128,9 +115,7 @@ class Content implements \JsonSerializable
         return $fieldValues;
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getStatus(): ContentStatus
     {
         return new ContentStatus($this->status);

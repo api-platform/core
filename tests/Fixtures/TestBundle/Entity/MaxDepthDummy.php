@@ -13,40 +13,33 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
- * *
- *
- * @ORM\Entity
- *
  * @author Brian Fox <brian@brianfox.fr>
  */
 #[ApiResource(normalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], denormalizationContext: ['groups' => ['default'], 'enable_max_depth' => true])]
+#[ORM\Entity]
 class MaxDepthDummy
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"default"})
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['default'])]
     private $id;
-    /**
-     * @ORM\Column(name="name", type="string", length=30)
-     * @Groups({"default"})
-     */
+
+    #[ORM\Column(name: 'name', type: 'string', length: 30)]
+    #[Groups(['default'])]
     public $name;
-    /**
-     * @ORM\ManyToOne(targetEntity="MaxDepthDummy", cascade={"persist"})
-     * @ApiProperty(attributes={"fetch_eager"=false})
-     * @Groups({"default"})
-     * @MaxDepth(1)
-     */
+
+    #[ApiProperty(fetchEager: false)]
+    #[ORM\ManyToOne(targetEntity: 'MaxDepthDummy', cascade: ['persist'])]
+    #[Groups(['default'])]
+    #[MaxDepth(1)]
     public $child;
 
     public function getId()

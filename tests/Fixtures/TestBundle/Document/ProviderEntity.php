@@ -32,19 +32,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 class ProviderEntity
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string
-     *
      * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $foo;
+    #[Assert\NotBlank]
+    private ?string $foo = null;
 
     /**
      * @return int

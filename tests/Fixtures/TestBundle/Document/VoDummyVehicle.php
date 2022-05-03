@@ -24,38 +24,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
-
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $make;
-
-    /**
-     * @var VoDummyInsuranceCompany
-     *
-     * @ODM\ReferenceOne(targetDocument=VoDummyInsuranceCompany::class, cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $insuranceCompany;
-
     /**
      * @var VoDummyDriver[]|Collection
      *
      * @ODM\ReferenceMany(targetDocument=VoDummyDriver::class, cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
      */
-    private $drivers;
+    #[Groups(['car_read', 'car_write'])]
+    private readonly array|\Doctrine\Common\Collections\Collection $drivers;
 
     public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
+        /**
+         * @ODM\Field
+         */
+        #[Groups(['car_read', 'car_write'])] private readonly string $make,
+        /**
+         * @ODM\ReferenceOne(targetDocument=VoDummyInsuranceCompany::class, cascade={"persist"})
+         */
+        #[Groups(['car_read', 'car_write'])] private readonly VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
-        $this->make = $make;
-        $this->insuranceCompany = $insuranceCompany;
         $this->drivers = new ArrayCollection($drivers);
     }
 

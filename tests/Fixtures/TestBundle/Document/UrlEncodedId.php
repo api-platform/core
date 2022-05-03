@@ -31,7 +31,7 @@ class UrlEncodedId
     /**
      * @ODM\Id(strategy="none")
      */
-    private $id = '%encode:id';
+    private string $id = '%encode:id';
 
     public function getId()
     {

@@ -27,23 +27,16 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Payment
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-    /**
-     * @var string|null
-     */
-    private $amount;
+    private ?int $id = null;
     /**
      * @ODM\ReferenceOne(targetDocument=VoidPayment::class, mappedBy="payment")
      */
     private $voidPayment;
 
-    public function __construct(string $amount)
+    public function __construct(private readonly ?string $amount)
     {
-        $this->amount = $amount;
     }
 
     public function getId(): ?int

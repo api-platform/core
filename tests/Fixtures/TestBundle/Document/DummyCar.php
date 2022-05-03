@@ -45,71 +45,62 @@ class DummyCar
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
+    #[Serializer\Groups(['colors'])]
     private $colors;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
-    private $secondColors;
+    #[Serializer\Groups(['colors'])]
+    private ?mixed $secondColors = null;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
-    private $thirdColors;
+    #[Serializer\Groups(['colors'])]
+    private ?mixed $thirdColors = null;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=UuidIdentifierDummy::class)
      *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
-    private $uuid;
+    #[Serializer\Groups(['colors'])]
+    private ?mixed $uuid = null;
     /**
-     * @var string
-     *
      * @ODM\Field(type="string")
      * @ApiFilter(SearchFilter::class, strategy="partial")
      */
-    private $name;
+    private ?string $name = null;
     /**
-     * @var bool
-     *
      * @ODM\Field(type="bool")
      */
-    private $canSell;
+    private ?bool $canSell = null;
     /**
-     * @var \DateTime
-     *
      * @ODM\Field(type="date")
      */
-    private $availableAt;
+    private ?\DateTime $availableAt = null;
     /**
-     * @var string
-     *
-     * @Serializer\Groups({"colors"})
-     * @Serializer\SerializedName("carBrand")
-     *
      * @ODM\Field
      */
-    private $brand = 'DummyBrand';
+    #[Serializer\Groups(['colors'])]
+    #[Serializer\SerializedName('carBrand')]
+    private string $brand = 'DummyBrand';
 
     public function __construct()
     {
