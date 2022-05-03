@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\AbstractPaginator;
 use ApiPlatform\Doctrine\Orm\Extension\ContextAwareQueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\PaginationExtension;

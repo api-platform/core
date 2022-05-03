@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Hydra\Serializer;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\JsonLd\ContextBuilderInterface;

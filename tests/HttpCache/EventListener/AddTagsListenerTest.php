@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\HttpCache\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\ApiResource;

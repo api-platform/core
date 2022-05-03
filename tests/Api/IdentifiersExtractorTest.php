@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Api;
 
 use ApiPlatform\Api\IdentifiersExtractor;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;

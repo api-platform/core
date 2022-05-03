@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\GraphQl\Type\TypesFactory;
 use PHPUnit\Framework\TestCase;

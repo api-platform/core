@@ -15,7 +15,7 @@ namespace ApiPlatform\Core\Tests\GraphQl\Resolver;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

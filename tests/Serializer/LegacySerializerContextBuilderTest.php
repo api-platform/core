@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Serializer;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use PHPUnit\Framework\TestCase;

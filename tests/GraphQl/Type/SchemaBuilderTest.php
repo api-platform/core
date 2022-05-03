@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;

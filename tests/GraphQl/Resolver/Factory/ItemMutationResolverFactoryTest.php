@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
