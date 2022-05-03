@@ -64,8 +64,10 @@ class JsonEncoderTest extends TestCase
 
     public function testUTF8MalformedHandlingEncoding()
     {
-        $data = ['foo' => pack('H*', 'B11111')];
+        if (\PHP_VERSION_ID >= 70200) {
+            $data = ['foo' => pack('H*', 'B11111')];
 
-        $this->assertEquals('{"foo":"\u0011\u0011"}', $this->encoder->encode($data, 'json'));
+            $this->assertEquals('{"foo":"\u0011\u0011"}', $this->encoder->encode($data, 'json'));
+        }
     }
 }
