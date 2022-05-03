@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\EventListener;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\EventListener\WriteListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\Persistence\ManagerRegistry;

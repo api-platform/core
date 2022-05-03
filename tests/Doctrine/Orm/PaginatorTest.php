@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Tests\Fixtures\Query;

@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Elasticsearch\Filter;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Elasticsearch\Filter\SortFilterInterface;
 use ApiPlatform\Metadata\ApiProperty;

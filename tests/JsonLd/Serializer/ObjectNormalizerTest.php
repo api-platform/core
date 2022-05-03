@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\JsonLd\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

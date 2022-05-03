@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Action;
 use ApiPlatform\Core\Bridge\Symfony\Bundle\Action\SwaggerUiAction;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;

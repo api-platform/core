@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\OpenApi\Factory;
 
 use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactory;

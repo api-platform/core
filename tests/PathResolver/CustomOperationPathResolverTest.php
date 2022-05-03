@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\PathResolver;
 
 use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\PathResolver\CustomOperationPathResolver;
 use ApiPlatform\PathResolver\OperationPathResolverInterface;
 use PHPUnit\Framework\TestCase;
