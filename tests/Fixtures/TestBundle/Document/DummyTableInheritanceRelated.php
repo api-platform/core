@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -21,13 +21,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ODM\Document
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"default"}},
- *         "denormalization_context"={"groups"={"default"}}
- *     }
- * )
  */
+#[ApiResource(normalizationContext: ['groups' => ['default']], denormalizationContext: ['groups' => ['default']])]
 class DummyTableInheritanceRelated
 {
     /**
@@ -38,7 +33,6 @@ class DummyTableInheritanceRelated
      * @Groups({"default"})
      */
     private $id;
-
     /**
      * @var Collection Related children
      *

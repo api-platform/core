@@ -13,25 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithoutConstructor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Dummy entity built with constructor.
+ *
  * https://github.com/api-platform/core/issues/1747.
  *
  * @author Maxime Veber <maxime.veber@nekland.fr>
- *
- * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "put"={"denormalization_context"={"groups"={"put"}}}
- *     }
- * )
  * @ODM\Document
  */
+#[ApiResource(operations: [new Get(), new Put(denormalizationContext: ['groups' => ['put']]), new Post(), new GetCollection()])]
 class DummyEntityWithConstructor
 {
     /**
@@ -40,21 +39,18 @@ class DummyEntityWithConstructor
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string
      *
      * @ODM\Field
      */
     private $foo;
-
     /**
      * @var string
      *
      * @ODM\Field
      */
     private $bar;
-
     /**
      * @var string|null
      *
@@ -62,7 +58,6 @@ class DummyEntityWithConstructor
      * @Groups({"put"})
      */
     private $baz;
-
     /**
      * @var DummyObjectWithoutConstructor[]
      */

@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,10 +25,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class DummyFriend
 {
     /**
@@ -36,7 +36,6 @@ class DummyFriend
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string|null The dummy name
      *

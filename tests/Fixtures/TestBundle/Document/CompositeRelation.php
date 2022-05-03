@@ -13,35 +13,32 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Relation.
  *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class CompositeRelation
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @ODM\Field(type="string", nullable=true)
      * @Groups({"default"})
      */
     private $value;
-
     /**
      * @ODM\ReferenceOne(targetDocument=CompositeItem::class, inversedBy="compositeValues")
      * @Groups({"default"})
      */
     private $compositeItem;
-
     /**
      * @ODM\ReferenceOne(targetDocument=CompositeLabel::class)
      * @Groups({"default"})

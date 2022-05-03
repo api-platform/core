@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -21,30 +24,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * DummyProperty.
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
- *
  * @ODM\Document
- *
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"dummy_read"}},
- *         "denormalization_context"={"groups"={"dummy_write"}},
- *         "filters"={
- *             "dummy_property.property",
- *             "dummy_property.whitelist_property",
- *             "dummy_property.whitelisted_properties"
- *         }
- *     },
- *     graphql={
- *         "item_query",
- *         "collection_query",
- *         "update",
- *         "delete",
- *         "create"={
- *             "normalization_context"={"groups"={"dummy_graphql_read"}},
- *         }
- *     }
- * )
  */
+#[ApiResource(graphQlOperations: [new Query(name: 'item_query'), new QueryCollection(name: 'collection_query'), new Mutation(name: 'update'), new Mutation(name: 'delete'), new Mutation(name: 'create', normalizationContext: ['groups' => ['dummy_graphql_read']])], normalizationContext: ['groups' => ['dummy_read']], denormalizationContext: ['groups' => ['dummy_write']], filters: ['dummy_property.property', 'dummy_property.whitelist_property', 'dummy_property.whitelisted_properties'])]
 class DummyProperty
 {
     /**
@@ -55,7 +37,6 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_graphql_read"})
      */
     private $id;
-
     /**
      * @var string|null
      *
@@ -64,7 +45,6 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $foo;
-
     /**
      * @var string|null
      *
@@ -73,7 +53,6 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $bar;
-
     /**
      * @var string|null
      *
@@ -82,7 +61,6 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $baz;
-
     /**
      * @var DummyGroup|null
      *
@@ -91,7 +69,6 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $group;
-
     /**
      * @var DummyGroup[]|null
      *
@@ -99,7 +76,6 @@ class DummyProperty
      * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
     public $groups;
-
     /**
      * @var string|null
      *

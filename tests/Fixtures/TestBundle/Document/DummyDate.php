@@ -14,9 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -24,19 +25,15 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource(attributes={
- *     "filters"={"my_dummy_date.mongodb.date"}
- * })
- * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
- * @ApiFilter(DateFilter::class, properties={
+ * @ApiFilter (SearchFilter::class, properties={"dummyDate"})
+ * @ApiFilter (DateFilter::class, properties={
  *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
  *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
  * })
- *
  * @ODM\Document
  */
+#[ApiResource(filters: ['my_dummy_date.mongodb.date'])]
 class DummyDate
 {
     /**
@@ -45,28 +42,24 @@ class DummyDate
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var \DateTime|null The dummy date
      *
      * @ODM\Field(type="date")
      */
     public $dummyDate;
-
     /**
      * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
     public $dateIncludeNullAfter;
-
     /**
      * @var \DateTime|null
      *
      * @ODM\Field(type="date")
      */
     public $dateIncludeNullBefore;
-
     /**
      * @var \DateTime|null
      *

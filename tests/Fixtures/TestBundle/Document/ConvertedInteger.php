@@ -14,19 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\NumericFilter;
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ApiResource
  * @ODM\Document
- * @ApiFilter(NumericFilter::class, properties={"nameConverted"})
- * @ApiFilter(RangeFilter::class, properties={"nameConverted"})
- * @ApiFilter(OrderFilter::class, properties={"nameConverted"})
+ * @ApiFilter (NumericFilter::class, properties={"nameConverted"})
+ * @ApiFilter (RangeFilter::class, properties={"nameConverted"})
+ * @ApiFilter (OrderFilter::class, properties={"nameConverted"})
  */
+#[ApiResource]
 class ConvertedInteger
 {
     /**
@@ -35,7 +35,6 @@ class ConvertedInteger
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var int
      *

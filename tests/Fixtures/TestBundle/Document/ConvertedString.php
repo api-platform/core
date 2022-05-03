@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ApiResource
  * @ODM\Document
- * @ApiFilter(ExistsFilter::class, properties={"nameConverted"})
+ * @ApiFilter (ExistsFilter::class, properties={"nameConverted"})
  */
+#[ApiResource]
 class ConvertedString
 {
     /**
@@ -31,7 +31,6 @@ class ConvertedString
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string|null
      *

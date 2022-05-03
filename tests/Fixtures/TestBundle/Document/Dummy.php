@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -26,26 +27,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
- *
- * @ApiResource(attributes={
- *     "doctrine_mongodb"={
- *         "execute_options"={
- *             "allowDiskUse"=true
- *         }
- *     },
- *     "filters"={
- *         "my_dummy.mongodb.boolean",
- *         "my_dummy.mongodb.date",
- *         "my_dummy.mongodb.exists",
- *         "my_dummy.mongodb.numeric",
- *         "my_dummy.mongodb.order",
- *         "my_dummy.mongodb.range",
- *         "my_dummy.mongodb.search",
- *         "my_dummy.property"
- *     }
- * })
  * @ODM\Document
  */
+#[ApiResource(extraProperties: ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]]], filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()])]
 class Dummy
 {
     /**
@@ -54,7 +40,6 @@ class Dummy
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     private $id;
-
     /**
      * @var string|null The dummy name
      *
@@ -63,7 +48,6 @@ class Dummy
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
-
     /**
      * @var string|null The dummy name alias
      *
@@ -71,12 +55,10 @@ class Dummy
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
-
     /**
      * @var array|null foo
      */
     private $foo;
-
     /**
      * @var string|null A short description of the item
      *
@@ -84,21 +66,18 @@ class Dummy
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
-
     /**
      * @var string|null A dummy
      *
      * @ODM\Field(nullable=true)
      */
     public $dummy;
-
     /**
      * @var bool|null A dummy boolean
      *
      * @ODM\Field(type="bool", nullable=true)
      */
     public $dummyBoolean;
-
     /**
      * @var \DateTime|null A dummy date
      *
@@ -106,64 +85,53 @@ class Dummy
      * @ApiProperty(iri="http://schema.org/DateTime")
      */
     public $dummyDate;
-
     /**
      * @var float|null A dummy float
      *
      * @ODM\Field(type="float", nullable=true)
      */
     public $dummyFloat;
-
     /**
      * @var float|null A dummy price
      *
      * @ODM\Field(type="float", nullable=true)
      */
     public $dummyPrice;
-
     /**
      * @var RelatedDummy|null A related dummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
     public $relatedDummy;
-
     /**
-     * @var Collection Several dummies
-     *
+     * @var \Collection Several dummies
      * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
-     * @ApiSubresource
      */
     public $relatedDummies;
-
     /**
      * @var array serialize data
      *
      * @ODM\Field(type="hash", nullable=true)
      */
     public $jsonData;
-
     /**
      * @var array
      *
      * @ODM\Field(type="collection", nullable=true)
      */
     public $arrayData;
-
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
      */
     public $nameConverted;
-
     /**
      * @var RelatedOwnedDummy|null
      *
      * @ODM\ReferenceOne(targetDocument=RelatedOwnedDummy::class, cascade={"persist"}, mappedBy="owningDummy", nullable=true)
      */
     public $relatedOwnedDummy;
-
     /**
      * @var RelatedOwningDummy|null
      *
@@ -297,7 +265,6 @@ class Dummy
     public function setRelatedOwnedDummy(RelatedOwnedDummy $relatedOwnedDummy)
     {
         $this->relatedOwnedDummy = $relatedOwnedDummy;
-
         if ($this !== $this->relatedOwnedDummy->getOwningDummy()) {
             $this->relatedOwnedDummy->setOwningDummy($this);
         }

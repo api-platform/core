@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -22,24 +22,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Circular Reference.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(attributes={"normalization_context"={"groups"={"circular"}}})
  * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['circular']])]
 class CircularReference
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     public $id;
-
     /**
      * @ODM\ReferenceOne(targetDocument=CircularReference::class, inversedBy="children")
      *
      * @Groups({"circular"})
      */
     public $parent;
-
     /**
      * @ODM\ReferenceMany(targetDocument=CircularReference::class, mappedBy="parent")
      *

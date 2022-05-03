@@ -13,32 +13,29 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Composite Primitive Item.
  *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class CompositePrimitiveItem
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @ODM\Field(type="string")
      */
     private $name;
-
     /**
      * @ODM\Field(type="int")
      */
     private $year;
-
     /**
      * @ODM\Field(type="string")
      */

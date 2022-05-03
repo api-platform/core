@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,10 +21,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Concrete Dummy.
  *
  * @author Jérémy Derusse <jeremy@derusse.com>
- *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class ConcreteDummy extends AbstractDummy
 {
     /**

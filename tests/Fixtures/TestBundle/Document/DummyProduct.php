@@ -13,21 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Dummy Product.
+ *
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
 class DummyProduct
 {
     /**
@@ -36,30 +38,22 @@ class DummyProduct
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
-     * @var Collection
-     *
-     * @ApiSubresource
+     * @var \Collection
      * @ODM\ReferenceMany(targetDocument=DummyAggregateOffer::class, mappedBy="product", cascade={"persist"})
      */
     private $offers;
-
     /**
      * @var string The tour name
      *
      * @ODM\Field
      */
     private $name;
-
     /**
-     * @var Collection
-     *
-     * @ApiSubresource
+     * @var \Collection
      * @ODM\ReferenceMany(targetDocument=DummyProduct::class, mappedBy="parent")
      */
     private $relatedProducts;
-
     /**
      * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="relatedProducts")
      */

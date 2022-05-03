@@ -14,14 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugParentDummy::class, identifiers: ['slug'], toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], fromProperty: 'parentDummy'), 'parentDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugParentDummy::class, identifiers: [], expandedValue: 'parent_dummy', toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
 class SlugChildDummy
 {
     /**
@@ -32,7 +35,6 @@ class SlugChildDummy
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @var string The slug used as API identifier
      *
@@ -41,11 +43,8 @@ class SlugChildDummy
      * @ODM\Field
      */
     private $slug;
-
     /**
      * @ODM\ReferenceOne(targetDocument=SlugParentDummy::class, inversedBy="childDummies", storeAs="id")
-     *
-     * @ApiSubresource
      */
     private $parentDummy;
 

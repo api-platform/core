@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,23 +22,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Person.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(attributes={"normalization_context"={"groups"={"people.pets"}}})
  * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['people.pets']])]
 class Person
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $id;
-
     /**
      * @ODM\Field(type="string")
      * @Groups({"people.pets"})
      */
     public $name;
-
     /**
      * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="person")
      * @Groups({"people.pets"})
@@ -47,9 +43,7 @@ class Person
      * @var ArrayCollection
      */
     public $pets;
-
     /**
-     * @ApiSubresource
      * @ODM\ReferenceMany(targetDocument=Greeting::class, mappedBy="sender")
      */
     public $sentGreetings;

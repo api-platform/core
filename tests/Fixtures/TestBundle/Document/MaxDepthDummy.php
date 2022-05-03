@@ -13,20 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
-/** *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"default"}, "enable_max_depth"=true},
- *     "denormalization_context"={"groups"={"default"}, "enable_max_depth"=true}
- * })
+/**
+ * *
+ *
  * @ODM\Document
  *
  * @author Brian Fox <brian@brianfox.fr>
  */
+#[ApiResource(normalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], denormalizationContext: ['groups' => ['default'], 'enable_max_depth' => true])]
 class MaxDepthDummy
 {
     /**
@@ -34,13 +33,11 @@ class MaxDepthDummy
      * @Groups({"default"})
      */
     private $id;
-
     /**
      * @ODM\Field(name="name", type="string")
      * @Groups({"default"})
      */
     public $name;
-
     /**
      * @ODM\ReferenceOne(targetDocument=MaxDepthDummy::class, cascade={"persist"})
      * @Groups({"default"})

@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Identifier Dummy.
  *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class CustomIdentifierDummy
 {
     /**
@@ -30,7 +30,6 @@ class CustomIdentifierDummy
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
     private $customId;
-
     /**
      * @var string The dummy name
      *

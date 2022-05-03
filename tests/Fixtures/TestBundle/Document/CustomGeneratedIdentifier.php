@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom identifier.
  *
- * @ApiResource
  * @ODM\Document
  */
+#[ApiResource]
 class CustomGeneratedIdentifier
 {
     /**
