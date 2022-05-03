@@ -14,7 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,39 +28,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Overridden Operation Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"overridden_operation_dummy_read"}},
- *         "denormalization_context"={"groups"={"overridden_operation_dummy_write"}}
- *     },
- *     collectionOperations={
- *         "get"={"method"="GET"},
- *         "post"={"method"="POST"},
- *         "swagger"={
- *             "path"="/override/swagger",
- *             "method"="GET",
- *         }
- *     },
- *     itemOperations={
- *         "swagger"={
- *             "method"="GET",
- *         },
- *         "get"={
- *             "method"="GET",
- *             "normalization_context"={"groups"={"overridden_operation_dummy_get"}},
- *             "denormalization_context"={"groups"={"overridden_operation_dummy_get"}}
- *         },
- *         "put"={
- *             "method"="PUT",
- *             "normalization_context"={"groups"={"overridden_operation_dummy_put"}},
- *             "denormalization_context"={"groups"={"overridden_operation_dummy_put"}}
- *         },
- *         "delete"={"method"="DELETE"}
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Get(normalizationContext: ['groups' => ['overridden_operation_dummy_get']], denormalizationContext: ['groups' => ['overridden_operation_dummy_get']]), new Put(normalizationContext: ['groups' => ['overridden_operation_dummy_put']], denormalizationContext: ['groups' => ['overridden_operation_dummy_put']]), new Delete(), new GetCollection(), new Post(), new GetCollection(uriTemplate: '/override/swagger')], normalizationContext: ['groups' => ['overridden_operation_dummy_read']], denormalizationContext: ['groups' => ['overridden_operation_dummy_write']])]
 class OverriddenOperationDummy
 {
     /**
@@ -66,7 +41,6 @@ class OverriddenOperationDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The dummy name
      *
@@ -76,7 +50,6 @@ class OverriddenOperationDummy
      * @ApiProperty(iri="http://schema.org/name")
      */
     private $name;
-
     /**
      * @var string|null The dummy name alias
      *
@@ -85,7 +58,6 @@ class OverriddenOperationDummy
      * @ApiProperty(iri="https://schema.org/alternateName")
      */
     private $alias;
-
     /**
      * @var string|null A short description of the item
      *
@@ -94,7 +66,6 @@ class OverriddenOperationDummy
      * @ApiProperty(iri="https://schema.org/description")
      */
     public $description;
-
     /**
      * @ORM\Column(nullable=true)
      * @Groups({"overridden_operation_dummy_write"})

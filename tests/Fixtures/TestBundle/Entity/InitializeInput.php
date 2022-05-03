@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(input=InitializeInputDto::class)
  * @ORM\Entity
  */
+#[ApiResource(input: InitializeInputDto::class)]
 class InitializeInput
 {
     /**
@@ -28,12 +28,10 @@ class InitializeInput
      * @ORM\Column(type="integer")
      */
     public $id;
-
     /**
      * @ORM\Column
      */
     public $manager;
-
     /**
      * @ORM\Column
      */

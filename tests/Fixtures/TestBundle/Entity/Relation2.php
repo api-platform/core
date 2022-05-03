@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource
  * @ORM\Entity
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource]
 class Relation2
 {
     /**
@@ -31,7 +31,6 @@ class Relation2
      * @ORM\GeneratedValue
      */
     public $id;
-
     /**
      * @ORM\OneToMany(targetEntity="Relation1", mappedBy="relation2")
      */

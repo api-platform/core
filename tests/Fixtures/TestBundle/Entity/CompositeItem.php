@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -21,9 +21,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Composite Item.
  *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class CompositeItem
 {
     /**
@@ -32,13 +32,11 @@ class CompositeItem
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @ORM\Column(type="string", nullable=true)
      * @Groups({"default"})
      */
     private $field1;
-
     /**
      * @ORM\OneToMany(targetEntity="CompositeRelation", mappedBy="compositeItem", fetch="EAGER")
      * @Groups({"default"})

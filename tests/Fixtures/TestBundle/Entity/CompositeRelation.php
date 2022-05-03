@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Relation.
  *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class CompositeRelation
 {
     /**
@@ -30,7 +30,6 @@ class CompositeRelation
      * @Groups({"default"})
      */
     private $value;
-
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="CompositeItem", inversedBy="compositeValues")
@@ -38,7 +37,6 @@ class CompositeRelation
      * @Groups({"default"})
      */
     private $compositeItem;
-
     /**
      * @ORM\Id
      * @ORM\ManyToOne(targetEntity="CompositeLabel")

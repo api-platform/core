@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="discr", type="string")
- * @ORM\DiscriminatorMap({
+ * @ORM\InheritanceType ("JOINED")
+ * @ORM\DiscriminatorColumn (name="discr", type="string")
+ * @ORM\DiscriminatorMap ({
  *     "dummyTableInheritance"="DummyTableInheritance",
  *     "dummyTableInheritanceChild"="DummyTableInheritanceChild",
  *     "dummyTableInheritanceDifferentChild"="DummyTableInheritanceDifferentChild",
  *     "dummyTableInheritanceNotApiResourceChild"="DummyTableInheritanceNotApiResourceChild"
  * })
- * @ApiResource
  */
+#[ApiResource]
 class DummyTableInheritance
 {
     /**
@@ -41,7 +41,6 @@ class DummyTableInheritance
      * @Groups({"default"})
      */
     private $id;
-
     /**
      * @var string The dummy name
      *
@@ -50,7 +49,6 @@ class DummyTableInheritance
      * @Groups({"default"})
      */
     private $name;
-
     /**
      * @var DummyTableInheritanceRelated|null
      *

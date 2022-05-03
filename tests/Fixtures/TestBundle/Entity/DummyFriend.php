@@ -14,7 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,10 +24,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Dummy Friend.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class DummyFriend
 {
     /**
@@ -37,7 +37,6 @@ class DummyFriend
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The dummy name
      *

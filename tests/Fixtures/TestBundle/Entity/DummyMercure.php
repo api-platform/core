@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ApiResource(mercure=true)
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(mercure: true)]
 class DummyMercure
 {
     /**
@@ -30,17 +30,14 @@ class DummyMercure
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
-
     /**
      * @ORM\Column
      */
     public $name;
-
     /**
      * @ORM\Column
      */
     public $description;
-
     /**
      * @ORM\ManyToOne(targetEntity="RelatedDummy")
      */

@@ -9,20 +9,25 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare (strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
-
 /**
  * @ORM\Entity
  */
-#[ApiResource(description: "Hey PHP 8")]
+#[ApiResource(description: 'Hey PHP 8')]
 class DummyPhp8
 {
     /**
@@ -31,15 +36,13 @@ class DummyPhp8
      */
     #[ApiProperty(identifier: true, description: 'the identifier')]
     public $id;
-
     /**
      * @ORM\Column
      */
     #[ApiFilter(SearchFilter::class)]
     public $filtered;
-
     #[ApiProperty(description: 'a foo')]
-    public function getFoo(): int
+    public function getFoo() : int
     {
         return 0;
     }

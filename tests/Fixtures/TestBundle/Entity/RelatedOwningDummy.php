@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Related Owning Dummy.
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
- *
- * @ApiResource(iri="https://schema.org/Product")
  * @ORM\Entity
  */
+#[ApiResource(types: ['https://schema.org/Product'])]
 class RelatedOwningDummy
 {
     /**
@@ -33,19 +32,15 @@ class RelatedOwningDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string|null A name
      *
      * @ORM\Column(nullable=true)
      */
     public $name;
-
     /**
-     * @var Dummy|null
-     *
+     * @var \Dummy|null
      * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, mappedBy="relatedOwningDummy")
-     * @ApiSubresource
      */
     public $ownedDummy;
 
@@ -85,7 +80,6 @@ class RelatedOwningDummy
     public function setOwnedDummy(Dummy $ownedDummy)
     {
         $this->ownedDummy = $ownedDummy;
-
         if ($this !== $this->ownedDummy->getRelatedOwningDummy()) {
             $this->ownedDummy->setRelatedOwningDummy($this);
         }

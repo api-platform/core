@@ -14,16 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class DummyCarColor
 {
     /**
@@ -34,7 +34,6 @@ class DummyCarColor
      * @ORM\Column(type="integer")
      */
     private $id;
-
     /**
      * @var DummyCar
      *
@@ -43,7 +42,6 @@ class DummyCarColor
      * @Assert\NotBlank
      */
     private $car;
-
     /**
      * @var string
      *

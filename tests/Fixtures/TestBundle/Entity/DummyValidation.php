@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
- * @ApiResource(
- *     collectionOperations={
- *         "get"={"method"="GET"},
- *         "post"={"path"="dummy_validation.{_format}", "method"="POST"},
- *         "post_validation_groups"={"route_name"="post_validation_groups", "validation_groups"={"a"}, "method"="GET"},
- *         "post_validation_sequence"={"route_name"="post_validation_sequence", "validation_groups"="app.dummy_validation.group_generator", "method"="GET"}
- *     }
- * )
  */
+#[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new Post(uriTemplate: 'dummy_validation.{_format}'), new GetCollection(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]), new GetCollection(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator'])])]
 class DummyValidation
 {
     /**
@@ -38,7 +37,6 @@ class DummyValidation
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string|null The dummy name
      *
@@ -46,7 +44,6 @@ class DummyValidation
      * @Assert\NotNull(groups={"a"})
      */
     private $name;
-
     /**
      * @var string|null The dummy title
      *
@@ -54,7 +51,6 @@ class DummyValidation
      * @Assert\NotNull(groups={"b"})
      */
     private $title;
-
     /**
      * @var string The dummy code
      * @ORM\Column

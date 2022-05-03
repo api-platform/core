@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(deprecationReason="This resource is deprecated")
  * @ORM\Entity
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(deprecationReason: 'This resource is deprecated')]
 class DeprecatedResource
 {
     /**
@@ -30,7 +30,6 @@ class DeprecatedResource
      * @ORM\Column
      */
     public $id;
-
     /**
      * @var string
      *

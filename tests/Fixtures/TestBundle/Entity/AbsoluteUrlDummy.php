@@ -14,13 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::ABS_URL)
  * @ORM\Entity
  */
+#[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
+#[ApiResource(uriTemplate: '/absolute_url_relation_dummies/{id}/absolute_url_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbsoluteUrlRelationDummy::class, identifiers: ['id'], toProperty: 'absoluteUrlRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::ABS_URL, operations: [new GetCollection()])]
 class AbsoluteUrlDummy
 {
     /**
@@ -29,7 +32,6 @@ class AbsoluteUrlDummy
      * @ORM\Column(type="integer")
      */
     private $id;
-
     /**
      * @ORM\ManyToOne(targetEntity="AbsoluteUrlRelationDummy", inversedBy="absoluteUrlDummies")
      */

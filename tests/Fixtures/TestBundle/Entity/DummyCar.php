@@ -14,10 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,20 +30,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
- * @ApiResource(
- *     itemOperations={"get"={"swagger_context"={"tags"={}}, "openapi_context"={"tags"={}}}, "put", "delete"},
- *     attributes={
- *         "sunset"="2050-01-01",
- *         "normalization_context"={"groups"={"colors"}}
- *     }
- * )
  * @ORM\Entity
- * @ApiFilter(DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
- * @ApiFilter(BooleanFilter::class)
- * @ApiFilter(PropertyFilter::class, arguments={"parameterName"="foobar"})
- * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups"})
- * @ApiFilter(GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
+ * @ApiFilter (DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
+ * @ApiFilter (BooleanFilter::class)
+ * @ApiFilter (PropertyFilter::class, arguments={"parameterName"="foobar"})
+ * @ApiFilter (GroupFilter::class, arguments={"parameterName"="foobargroups"})
+ * @ApiFilter (GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
  */
+#[ApiResource(operations: [new Get(openapiContext: ['tags' => []]), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
 class DummyCar
 {
     /**
@@ -48,7 +47,6 @@ class DummyCar
      * @ORM\OneToOne(targetEntity="DummyCarIdentifier", cascade={"persist"})
      */
     private $id;
-
     /**
      * @var mixed Something else
      *
@@ -58,7 +56,6 @@ class DummyCar
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
     private $colors;
-
     /**
      * @var mixed Something else
      *
@@ -68,7 +65,6 @@ class DummyCar
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $secondColors;
-
     /**
      * @var mixed Something else
      *
@@ -78,7 +74,6 @@ class DummyCar
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $thirdColors;
-
     /**
      * @var mixed Something else
      *
@@ -91,7 +86,6 @@ class DummyCar
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
     private $uuid;
-
     /**
      * @var string
      *
@@ -99,21 +93,18 @@ class DummyCar
      * @ApiFilter(SearchFilter::class, strategy="partial")
      */
     private $name;
-
     /**
      * @var bool
      *
      * @ORM\Column(type="boolean")
      */
     private $canSell;
-
     /**
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
      */
     private $availableAt;
-
     /**
      * @var string
      *
@@ -123,7 +114,6 @@ class DummyCar
      * @ORM\Column
      */
     private $brand = 'DummyBrand';
-
     /**
      * @var DummyCarInfo
      *

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\EnumFilter;
@@ -29,21 +29,9 @@ use Doctrine\ORM\Mapping as ORM;
  * Filter Validator entity.
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
- *
- * @ApiResource(attributes={
- *     "filters"={
- *         ArrayItemsFilter::class,
- *         BoundsFilter::class,
- *         EnumFilter::class,
- *         LengthFilter::class,
- *         MultipleOfFilter::class,
- *         PatternFilter::class,
- *         RequiredFilter::class,
- *         RequiredAllowEmptyFilter::class
- *     }
- * })
  * @ORM\Entity
  */
+#[ApiResource(filters: [ArrayItemsFilter::class, BoundsFilter::class, EnumFilter::class, LengthFilter::class, MultipleOfFilter::class, PatternFilter::class, RequiredFilter::class, RequiredAllowEmptyFilter::class])]
 class FilterValidator
 {
     /**
@@ -54,7 +42,6 @@ class FilterValidator
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string A name
      *

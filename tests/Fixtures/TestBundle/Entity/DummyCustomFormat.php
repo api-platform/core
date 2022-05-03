@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource(attributes={"formats"={"xml", "jsonld", "csv"={"text/csv"}, "pdf"="application/pdf"}})
  * @ORM\Entity
  */
+#[ApiResource(formats: ['xml', 'jsonld', 'csv' => ['text/csv'], 'pdf' => 'application/pdf'])]
 class DummyCustomFormat
 {
     /**
@@ -31,7 +31,6 @@ class DummyCustomFormat
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string
      *

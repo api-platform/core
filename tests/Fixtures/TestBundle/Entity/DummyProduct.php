@@ -13,21 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy Product.
+ *
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/dummy_products/{id}/related_products.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
 class DummyProduct
 {
     /**
@@ -38,30 +40,22 @@ class DummyProduct
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
-     * @var Collection<int, DummyAggregateOffer>
-     *
-     * @ApiSubresource
+     * @var \Collection<int,\DummyAggregateOffer>
      * @ORM\OneToMany(targetEntity="DummyAggregateOffer", mappedBy="product", cascade={"persist"})
      */
     private $offers;
-
     /**
      * @var string The tour name
      *
      * @ORM\Column
      */
     private $name;
-
     /**
-     * @var Collection<int, DummyProduct>
-     *
-     * @ApiSubresource
+     * @var \Collection<int,\DummyProduct>
      * @ORM\OneToMany(targetEntity="DummyProduct", mappedBy="parent")
      */
     private $relatedProducts;
-
     /**
      * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="relatedProducts")
      */

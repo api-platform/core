@@ -14,13 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::NET_PATH)
  * @ORM\Entity
  */
+#[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::NET_PATH)]
+#[ApiResource(uriTemplate: '/network_path_relation_dummies/{id}/network_path_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\NetworkPathRelationDummy::class, identifiers: ['id'], toProperty: 'networkPathRelationDummy')], status: 200, urlGenerationStrategy: UrlGeneratorInterface::NET_PATH, operations: [new GetCollection()])]
 class NetworkPathDummy
 {
     /**
@@ -29,7 +32,6 @@ class NetworkPathDummy
      * @ORM\Column(type="integer")
      */
     private $id;
-
     /**
      * @ORM\ManyToOne(targetEntity="NetworkPathRelationDummy", inversedBy="networkPathDummies")
      */
