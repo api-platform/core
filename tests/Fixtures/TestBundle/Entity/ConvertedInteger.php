@@ -13,35 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ApiFilter (NumericFilter::class, properties={"nameConverted"})
- * @ApiFilter (RangeFilter::class, properties={"nameConverted"})
- * @ApiFilter (OrderFilter::class, properties={"nameConverted"})
- */
+#[ApiFilter(NumericFilter::class, properties: ['nameConverted'])]
+#[ApiFilter(RangeFilter::class, properties: ['nameConverted'])]
+#[ApiFilter(OrderFilter::class, properties: ['nameConverted'])]
 #[ApiResource]
+#[ORM\Entity]
 class ConvertedInteger
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var int
-     *
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     public $nameConverted;
 
     public function getId()

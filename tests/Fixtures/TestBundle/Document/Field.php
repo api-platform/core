@@ -15,38 +15,17 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
+#[ODM\Document]
 class Field implements \JsonSerializable
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
-    /**
-     * @var Content|null
-     *
-     * @ODM\ReferenceOne(targetDocument=Content::class, inversedBy="fields")
-     */
-    private $content;
-
-    /**
-     * @var string|null
-     *
-     * @ODM\Field(type="string")
-     */
-    private $name;
-
-    /**
-     * @var string|null
-     *
-     * @ODM\Field(type="string")
-     */
-    private $value;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[ODM\ReferenceOne(targetDocument: Content::class, inversedBy: 'fields')]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Content $content = null;
+    #[ODM\Field(type: 'string')]
+    private ?string $name = null;
+    #[ODM\Field(type: 'string')]
+    private ?string $value = null;
 
     public function getId(): ?int
     {

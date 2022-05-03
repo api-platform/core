@@ -25,37 +25,34 @@ use Doctrine\ORM\Mapping as ORM;
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
+#[ORM\Entity]
 class DummyAggregateOffer
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var \Collection<int,\DummyOffer>
-     * @ORM\OneToMany(targetEntity="DummyOffer", mappedBy="aggregate", cascade={"persist"})
      */
-    private $offers;
+    #[ORM\OneToMany(targetEntity: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
+    private \Collection $offers;
     /**
      * @var DummyProduct|null The dummy product
-     *
-     * @ORM\ManyToOne(targetEntity="DummyProduct", inversedBy="offers")
      */
-    private $product;
+    #[ORM\ManyToOne(targetEntity: DummyProduct::class, inversedBy: 'offers')]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct $product = null;
     /**
      * @var int The dummy aggregate offer value
-     *
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: 'integer')]
     private $value;
 
     public function __construct()

@@ -18,26 +18,23 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom Identifier Dummy.
- *
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class CustomIdentifierDummy
 {
     /**
      * @var int The custom identifier
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $customId;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $customId = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private ?string $name = null;
 
     public function getCustomId(): int
     {

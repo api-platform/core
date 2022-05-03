@@ -20,34 +20,19 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Payment\VoidPaymentAction;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(operations: [new Get(), new Post(uriTemplate: '/payments/{id}/void', controller: VoidPaymentAction::class, deserialize: false), new Post(), new GetCollection()])]
+#[ORM\Entity]
 class Payment
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="decimal", precision=6, scale=2)
-     */
-    private $amount;
-    /**
-     * @ORM\OneToOne(targetEntity=VoidPayment::class, mappedBy="payment")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\OneToOne(targetEntity: VoidPayment::class, mappedBy: 'payment')]
     private $voidPayment;
 
-    public function __construct(string $amount)
+    public function __construct(#[ORM\Column(type: 'decimal', precision: 6, scale: 2)] private readonly string $amount)
     {
-        $this->amount = $amount;
     }
 
     public function getId(): ?int

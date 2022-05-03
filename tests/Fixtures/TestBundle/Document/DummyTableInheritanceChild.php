@@ -13,23 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- * @ApiResource
- */
+#[ApiResource]
+#[ODM\Document]
 class DummyTableInheritanceChild extends DummyTableInheritance
 {
     /**
      * @var string The dummy nickname
-     *
-     * @ODM\Field
-     *
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
+    #[ODM\Field]
     private $nickname;
 
     public function getNickname()

@@ -19,25 +19,22 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy Immutable Date.
- *
- * @ORM\Entity
  */
 #[ApiResource(filters: ['my_dummy_immutable_date.date'])]
+#[ORM\Entity]
 class DummyImmutableDate
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var \DateTimeImmutable The dummy date
-     *
-     * @ORM\Column(type="date_immutable")
      */
+    #[ORM\Column(type: 'date_immutable')]
     public $dummyDate;
 
     /**

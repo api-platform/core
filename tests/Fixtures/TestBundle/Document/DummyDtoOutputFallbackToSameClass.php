@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDtoDummy;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
@@ -21,31 +21,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy InputOutput.
  *
  * @author Daniel West <daniel@silverback.is>
- *
- * @ApiResource(attributes={"output"=OutputDtoDummy::class})
- * @ODM\Document
  */
+#[ApiResource(output: OutputDtoDummy::class)]
+#[ODM\Document]
 class DummyDtoOutputFallbackToSameClass
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
+    private ?int $id = null;
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $lorem;
-
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $ipsum;
 
     public function getId()

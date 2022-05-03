@@ -24,34 +24,31 @@ use Doctrine\ORM\Mapping as ORM;
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummy_aggregate_offers/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
+#[ORM\Entity]
 class DummyOffer
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var int The dummy aggregate offer value
-     *
-     * @ORM\Column(type="integer")
      */
-    private $value;
+    #[ORM\Column(type: 'integer')]
+    private ?int $value = null;
     /**
      * @var DummyAggregateOffer|null The dummy aggregate offer value
-     *
-     * @ORM\ManyToOne(targetEntity="DummyAggregateOffer", inversedBy="offers")
      */
-    private $aggregate;
+    #[ORM\ManyToOne(targetEntity: DummyAggregateOffer::class, inversedBy: 'offers')]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer $aggregate = null;
 
     public function getId()
     {

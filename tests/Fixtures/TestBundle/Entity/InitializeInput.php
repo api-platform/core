@@ -17,23 +17,15 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(input: InitializeInputDto::class)]
+#[ORM\Entity]
 class InitializeInput
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
     public $id;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     public $manager;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     public $name;
 }

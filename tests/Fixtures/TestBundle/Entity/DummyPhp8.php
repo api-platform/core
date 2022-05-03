@@ -20,26 +20,20 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
-/**
- * @ORM\Entity
- */
 #[ApiResource(description: 'Hey PHP 8')]
+#[ORM\Entity]
 class DummyPhp8
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
     #[ApiProperty(identifier: true, description: 'the identifier')]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
     public $id;
-    /**
-     * @ORM\Column
-     */
     #[ApiFilter(SearchFilter::class)]
+    #[ORM\Column]
     public $filtered;
     #[ApiProperty(description: 'a foo')]
     public function getFoo() : int

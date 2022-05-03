@@ -16,26 +16,19 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class ResourceWithInteger
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     */
-    private $myIntegerField = 0;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'integer')]
+    private int $myIntegerField = 0;
 
     public function getId()
     {

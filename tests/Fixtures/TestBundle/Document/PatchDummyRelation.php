@@ -13,36 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"chicago"}},
- *         "denormalization_context"={"groups"={"chicago"}},
- *     },
- *     itemOperations={
- *         "get",
- *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
- *     }
- * )
- * @ODM\Document
  */
+#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()], normalizationContext: ['groups' => ['chicago']], denormalizationContext: ['groups' => ['chicago']])]
+#[ODM\Document]
 class PatchDummyRelation
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
-     * @Groups({"chicago"})
-     */
+    #[Groups(['chicago'])]
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class)]
     protected $related;
 
     public function getRelated()

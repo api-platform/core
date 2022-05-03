@@ -13,24 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom identifier.
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ODM\Document]
 class CustomGeneratedIdentifier
 {
-    /**
-     * @var Uuid
-     *
-     * @ODM\Id(strategy="CUSTOM", type="string", options={"class"="ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator"})
-     */
-    private $id;
+    #[ODM\Id(strategy: 'CUSTOM', type: 'string', options: ['class' => \ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator::class])]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid $id = null;
 
     public function getId()
     {

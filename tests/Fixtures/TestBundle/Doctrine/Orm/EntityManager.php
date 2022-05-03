@@ -24,13 +24,9 @@ final class EntityManager extends EntityManagerDecorator
 {
     public static $dql;
 
-    private $repositoryFactory;
-
-    public function __construct(EntityManagerInterface $wrapped, RepositoryFactory $repositoryFactory)
+    public function __construct(EntityManagerInterface $wrapped, private readonly RepositoryFactory $repositoryFactory)
     {
         parent::__construct($wrapped);
-
-        $this->repositoryFactory = $repositoryFactory;
     }
 
     public function getRepository($className): ObjectRepository

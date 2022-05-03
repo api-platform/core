@@ -30,42 +30,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * A User.
  *
- * @ORM\Entity
- * @ORM\Table (name="user_test")
- *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}'), new Post(), new GetCollection(), new Post(uriTemplate: '/users/password_reset_request', messenger: 'input', input: PasswordResetRequest::class, output: PasswordResetRequestResult::class, normalizationContext: ['groups' => ['user_password_reset_request']], denormalizationContext: ['groups' => ['user_password_reset_request']])], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
+#[ORM\Entity]
+#[ORM\Table(name: 'user_test')]
 class User extends AbstractSecurityUser
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    /**
-     * @var string|null
-     *
-     * @Groups({"user"})
-     */
-    private $email;
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user"})
-     */
-    private $fullname;
-    /**
-     * @var string|null
-     *
-     * @Groups({"user-write"})
-     */
-    private $plainPassword;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[Groups(['user'])]
+    private ?string $email = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user'])]
+    private ?string $fullname = null;
+    #[Groups(['user-write'])]
+    private ?string $plainPassword = null;
 
     public function getId(): ?int
     {

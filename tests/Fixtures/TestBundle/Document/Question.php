@@ -13,30 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- * @ApiResource
- */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/answers/{id}/related_questions.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Answer::class, identifiers: ['id'], toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/questions/{id}/answer/related_questions.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], fromProperty: 'answer'), 'answer' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Answer::class, identifiers: [], expandedValue: 'answer', toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class Question
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\Field(nullable=true)
-     */
+    #[ODM\Field(nullable: true)]
     private $content;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=Answer::class, inversedBy="question", storeAs="id")
-     * @ApiSubresource
-     */
+    #[ODM\ReferenceOne(targetDocument: Answer::class, inversedBy: 'question', storeAs: 'id')]
     private $answer;
 
     /**

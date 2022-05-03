@@ -20,26 +20,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * PersonToPet.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
+#[ORM\Entity]
 class PersonToPet
 {
     /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Pet")
-     * @ORM\JoinColumn(referencedColumnName="id")
-     * @Groups({"people.pets"})
-     *
      * @var Pet
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Pet::class)]
+    #[ORM\JoinColumn(referencedColumnName: 'id')]
+    #[Groups(['people.pets'])]
     public $pet;
-
     /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="Person")
-     * @ORM\JoinColumn(referencedColumnName="id")
-     *
      * @var Person
      */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: Person::class)]
+    #[ORM\JoinColumn(referencedColumnName: 'id')]
     public $person;
 }

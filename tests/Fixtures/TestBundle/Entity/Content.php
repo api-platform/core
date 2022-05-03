@@ -14,52 +14,30 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\ContentStatus;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(normalizationContext: ['groups' => ['get_content']])]
+#[ORM\Entity]
 class Content implements \JsonSerializable
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $contentType;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string')]
+    private ?string $contentType = null;
     /**
      * @var Collection<Field>
-     *
-     * @ORM\OneToMany(
-     *     targetEntity=Field::class,
-     *     mappedBy="content",
-     *     cascade={"persist"},
-     *     orphanRemoval=true,
-     *     indexBy="name",
-     * )
-     * @ORM\OrderBy({"id"="ASC"})
      */
-    private $fields;
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $status;
+    #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'content', cascade: ['persist'], orphanRemoval: true, indexBy: 'name')]
+    #[ORM\OrderBy(['id' => 'ASC'])]
+    private \Doctrine\Common\Collections\Collection $fields;
+    #[ORM\Column(type: 'string')]
+    private readonly string $status;
 
     public function __construct()
     {
@@ -67,17 +45,13 @@ class Content implements \JsonSerializable
         $this->status = ContentStatus::DRAFT;
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getContentType(): ?string
     {
         return $this->contentType;
@@ -119,9 +93,7 @@ class Content implements \JsonSerializable
         }
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getFieldValues(): array
     {
         $fieldValues = [];
@@ -132,9 +104,7 @@ class Content implements \JsonSerializable
         return $fieldValues;
     }
 
-    /**
-     * @Groups({"get_content"})
-     */
+    #[Groups(['get_content'])]
     public function getStatus(): ContentStatus
     {
         return new ContentStatus($this->status);

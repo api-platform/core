@@ -13,27 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Label.
- *
- * @ApiResource
- * @ODM\Document
  */
-class CompositeLabel
+#[ApiResource]
+#[ODM\Document]
+class CompositeLabel implements \Stringable
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     * @Groups({"default"})
-     */
+    #[Groups(['default'])]
+    #[ODM\Field(type: 'string', nullable: true)]
     private $value;
 
     /**
@@ -62,7 +56,7 @@ class CompositeLabel
         $this->value = $value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

@@ -13,30 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Writable Identifier Dummy.
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ODM\Document]
 class CustomWritableIdentifierDummy
 {
     /**
      * @var string The special identifier
-     *
-     * @ODM\Id(strategy="NONE", type="string")
      */
-    private $slug;
-
+    #[ODM\Id(strategy: 'NONE', type: 'string')]
+    private ?string $slug = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field(name="name", type="string")
      */
-    private $name;
+    #[ODM\Field(name: 'name', type: 'string')]
+    private ?string $name = null;
 
     /**
      * @param string $slug

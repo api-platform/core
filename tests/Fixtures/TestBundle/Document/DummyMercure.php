@@ -13,34 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ODM\Document
- * @ApiResource(mercure=true)
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(mercure: true)]
+#[ODM\Document]
 class DummyMercure
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     public $name;
-
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     public $description;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
-     */
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public $relatedDummy;
 }

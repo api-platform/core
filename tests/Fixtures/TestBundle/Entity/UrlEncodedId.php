@@ -23,16 +23,14 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Daniel West <daniel@silverback.is>
  *
  * Resource with an ID that will be URL encoded
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(requirements: ['id' => '.+']), new Post(), new GetCollection()])]
+#[ORM\Entity]
 class UrlEncodedId
 {
-    /**
-     * @ORM\Column(type="string")
-     * @ORM\Id
-     */
-    private $id = '%encode:id';
+    #[ORM\Column(type: 'string')]
+    #[ORM\Id]
+    private string $id = '%encode:id';
 
     public function getId()
     {

@@ -20,8 +20,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * ProviderEntity.
- *
- * @ORM\Entity
  */
 #[ApiResource]
 #[Get]
@@ -30,16 +28,13 @@ use Doctrine\ORM\Mapping as ORM;
     paginationItemsPerPage: 5,
     paginationMaximumItemsPerPage: 30
 )]
+#[ORM\Entity]
 class PaginationEntity
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * @return int

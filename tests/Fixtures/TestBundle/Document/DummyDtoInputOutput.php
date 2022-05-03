@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,38 +24,33 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy InputOutput.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(attributes={"input"=InputDto::class, "output"=OutputDto::class})
- * @ODM\Document
  */
+#[ApiResource(input: InputDto::class, output: OutputDto::class)]
+#[ODM\Document]
 class DummyDtoInputOutput
 {
     public function __construct()
     {
         $this->relatedDummies = new ArrayCollection();
     }
-
     /**
      * @var int The id
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
     public $id;
-
     /**
      * @var string
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $str;
-
     /**
      * @var int
-     * @ODM\Field(type="float")
      */
+    #[ODM\Field(type: 'float')]
     public $num;
-
     /**
      * @var Collection<RelatedDummy>
-     * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public $relatedDummies;
 }

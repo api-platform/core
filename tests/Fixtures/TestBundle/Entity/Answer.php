@@ -27,37 +27,30 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
  * Answer.
- *
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(normalizationContext: ['groups' => ['foobar']])])]
 #[ApiResource(uriTemplate: '/answers/{id}/related_questions/{relatedQuestions}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], toProperty: 'answer'), 'relatedQuestions' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
 #[ApiResource(uriTemplate: '/questions/{id}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
+#[ORM\Entity]
 class Answer
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Groups({"foobar"})
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Serializer\Groups(['foobar'])]
     private $id;
-    /**
-     * @ORM\Column(nullable=false)
-     * @Serializer\Groups({"foobar"})
-     */
+    #[ORM\Column(nullable: false)]
+    #[Serializer\Groups(['foobar'])]
     private $content;
-    /**
-     * @ORM\OneToOne(targetEntity="Question", mappedBy="answer")
-     * @Serializer\Groups({"foobar"})
-     */
+    #[ORM\OneToOne(targetEntity: Question::class, mappedBy: 'answer')]
+    #[Serializer\Groups(['foobar'])]
     private $question;
     /**
      * @var \Collection<int,\Question>
-     * @ORM\OneToMany(targetEntity="Question", mappedBy="answer")
-     * @Serializer\Groups({"foobar"})
      */
-    private $relatedQuestions;
+    #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'answer')]
+    #[Serializer\Groups(['foobar'])]
+    private readonly \Collection $relatedQuestions;
 
     public function __construct()
     {
@@ -94,8 +87,6 @@ class Answer
 
     /**
      * Set question.
-     *
-     * @param Question $question
      */
     public function setQuestion(Question $question = null): self
     {

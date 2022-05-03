@@ -18,34 +18,24 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- * @ORM\Table (name="`order`")
- */
 #[ApiResource(normalizationContext: ['groups' => ['order_read']], forceEager: false)]
+#[ORM\Entity]
+#[ORM\Table(name: '`order`')]
 class Order
 {
-    /**
-     * @var int
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"order_read"})
-     */
-    private $id;
-    /**
-     * @ORM\ManyToOne(targetEntity="Customer")
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"order_read"})
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['order_read'])]
+    private ?int $id = null;
+    #[ORM\ManyToOne(targetEntity: Customer::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['order_read'])]
     public $customer;
-    /**
-     * @ORM\ManyToOne(targetEntity="Customer")
-     * @ORM\JoinColumn(nullable=false)
-     * @Assert\NotNull
-     * @Groups({"order_read"})
-     */
+    #[ORM\ManyToOne(targetEntity: Customer::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull]
+    #[Groups(['order_read'])]
     public $recipient;
 
     public function getId()

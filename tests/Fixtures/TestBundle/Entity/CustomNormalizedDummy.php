@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,37 +23,36 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Custom Normalized Dummy.
  *
  * @author Mikaël Labrut <labrut@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(normalizationContext: ['groups' => ['output']], denormalizationContext: ['groups' => ['input']])]
+#[ORM\Entity]
 class CustomNormalizedDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"input", "output"})
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['input', 'output'])]
+    private ?int $id = null;
+
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"input", "output"})
      */
-    private $name;
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['input', 'output'])]
+    private ?string $name = null;
+
     /**
      * @var string|null The dummy name alias
-     *
-     * @ORM\Column(nullable=true)
-     * @ApiProperty(iri="https://schema.org/alternateName")
-     * @Groups({"input", "output"})
      */
-    private $alias;
+    #[ApiProperty(types: ['http://schema.org/alternateName'])]
+    #[ORM\Column(nullable: true)]
+    #[Groups(['input', 'output'])]
+    private ?string $alias = null;
 
     public function getId(): ?int
     {

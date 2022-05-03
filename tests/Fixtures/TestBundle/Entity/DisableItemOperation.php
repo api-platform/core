@@ -19,25 +19,21 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(operations: [new Get(controller: NotFoundAction::class, read: false, output: false), new GetCollection()])]
+#[ORM\Entity]
 class DisableItemOperation
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $name;
 
     public function getId()

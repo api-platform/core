@@ -21,31 +21,28 @@ use Doctrine\ORM\Mapping as ORM;
  * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
+#[ORM\Entity]
 class FooDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
     /**
      * @var Dummy|null The foo dummy
-     *
-     * @ORM\ManyToOne(targetEntity="Dummy", cascade={"persist"})
      */
-    private $dummy;
+    #[ORM\ManyToOne(targetEntity: Dummy::class, cascade: ['persist'])]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy $dummy = null;
 
     public function getId()
     {

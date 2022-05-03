@@ -18,42 +18,18 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(graphQlOperations: [], normalizationContext: ['groups' => ['inspection_read']], denormalizationContext: ['groups' => ['inspection_write']])]
+#[ORM\Entity]
 class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $accepted;
-    /**
-     * @var VoDummyCar|null
-     *
-     * @ORM\ManyToOne(targetEntity="VoDummyCar", inversedBy="inspections")
-     * @Groups({"inspection_read", "inspection_write"})
-     */
-    private $car;
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(type="datetime")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $performed;
-    private $attributeWithoutConstructorEquivalent;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    private \DateTime $performed;
 
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(#[ORM\Column(type: 'boolean')] #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private readonly bool $accepted, #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')] #[Groups(['inspection_read', 'inspection_write'])] private readonly ?VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
     {
-        $this->accepted = $accepted;
-        $this->car = $car;
         $this->performed = $performed ?: new DateTime();
-        $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
     public function isAccepted()

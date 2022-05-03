@@ -23,39 +23,34 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new Post(uriTemplate: 'dummy_validation.{_format}'), new GetCollection(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]), new GetCollection(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator'])])]
+#[ORM\Entity]
 class DummyValidation
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ORM\Column(nullable=true)
-     * @Assert\NotNull(groups={"a"})
      */
-    private $name;
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(groups: ['a'])]
+    private ?string $name = null;
     /**
      * @var string|null The dummy title
-     *
-     * @ORM\Column(nullable=true)
-     * @Assert\NotNull(groups={"b"})
      */
-    private $title;
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(groups: ['b'])]
+    private ?string $title = null;
     /**
      * @var string The dummy code
-     * @ORM\Column
      */
-    private $code;
+    #[ORM\Column]
+    private ?string $code = null;
 
     public function getId(): ?int
     {

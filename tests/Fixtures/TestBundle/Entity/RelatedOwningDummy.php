@@ -21,27 +21,24 @@ use Doctrine\ORM\Mapping as ORM;
  * Related Owning Dummy.
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
- * @ORM\Entity
  */
 #[ApiResource(types: ['https://schema.org/Product'])]
+#[ORM\Entity]
 class RelatedOwningDummy
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
     /**
      * @var string|null A name
-     *
-     * @ORM\Column(nullable=true)
      */
+    #[ORM\Column(nullable: true)]
     public $name;
     /**
      * @var \Dummy|null
-     * @ORM\OneToOne(targetEntity="Dummy", cascade={"persist"}, mappedBy="relatedOwningDummy")
      */
+    #[ORM\OneToOne(targetEntity: Dummy::class, cascade: ['persist'], mappedBy: 'relatedOwningDummy')]
     public $ownedDummy;
 
     public function getId()

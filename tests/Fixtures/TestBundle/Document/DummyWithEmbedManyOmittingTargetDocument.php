@@ -13,30 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource
- * @ODM\Document
- */
+#[ApiResource]
+#[ODM\Document]
 class DummyWithEmbedManyOmittingTargetDocument
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var EmbeddableDummy[]|Collection
-     *
-     * @ODM\EmbedMany
      */
-    private $embeddedDummies;
+    #[ODM\EmbedMany]
+    private readonly array|\Doctrine\Common\Collections\Collection $embeddedDummies;
 
     public function __construct()
     {

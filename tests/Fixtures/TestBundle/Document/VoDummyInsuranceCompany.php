@@ -13,29 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource
- * @ODM\Document
- */
+#[ApiResource]
+#[ODM\Document]
 class VoDummyInsuranceCompany
 {
     use VoDummyIdAwareTrait;
 
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $name;
-
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $name
+    ) {
     }
 
     public function getName()

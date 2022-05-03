@@ -23,7 +23,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Fourth Level.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ORM\Entity
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel'), 'thirdLevel' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel::class, identifiers: [], expandedValue: 'third_level', fromProperty: 'fourthLevel')], status: 200, operations: [new Get()])]
@@ -32,26 +31,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel'), 'thirdLevel' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel::class, identifiers: [], expandedValue: 'third_level', fromProperty: 'fourthLevel')], status: 200, operations: [new Get()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}/third_level/fourth_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], fromProperty: 'thirdLevel'), 'thirdLevel' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel::class, identifiers: [], expandedValue: 'third_level', fromProperty: 'fourthLevel')], status: 200, operations: [new Get()])]
 #[ApiResource(uriTemplate: '/third_levels/{id}/fourth_level.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel::class, identifiers: ['id'], fromProperty: 'fourthLevel')], status: 200, operations: [new Get()])]
+#[ORM\Entity]
 class FourthLevel
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
      */
-    private $id;
-    /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @Groups({"barcelona", "chicago"})
-     */
-    private $level = 4;
-    /**
-     * @ORM\OneToMany(targetEntity=ThirdLevel::class, cascade={"persist"}, mappedBy="badFourthLevel")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['barcelona', 'chicago'])]
+    private int $level = 4;
+    #[ORM\OneToMany(targetEntity: ThirdLevel::class, cascade: ['persist'], mappedBy: 'badFourthLevel')]
     public $badThirdLevel;
 
     public function getId(): ?int

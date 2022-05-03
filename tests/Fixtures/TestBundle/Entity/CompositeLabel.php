@@ -19,22 +19,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Label.
- *
- * @ORM\Entity
  */
 #[ApiResource]
-class CompositeLabel
+#[ORM\Entity]
+class CompositeLabel implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
     private $value;
 
     /**

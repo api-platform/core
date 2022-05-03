@@ -14,29 +14,21 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource
- * @ODM\Document
- * @ApiFilter(SearchFilter::class, properties={"nameConverted.nameConverted"="partial"})
- */
+#[ApiFilter(SearchFilter::class, properties: ['nameConverted.nameConverted' => 'partial'])]
+#[ApiResource]
+#[ODM\Document]
 class ConvertedOwner
 {
-    /**
-     * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var ConvertedRelated
-     *
-     * @ODM\ReferenceOne(targetDocument=ConvertedRelated::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceOne(targetDocument: ConvertedRelated::class, storeAs: 'id', nullable: true)]
     public $nameConverted;
 
     public function getId()

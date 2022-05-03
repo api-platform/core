@@ -19,39 +19,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(normalizationContext: ['groups' => ['car_read']], denormalizationContext: ['groups' => ['car_write']])]
+#[ORM\Entity]
 class VoDummyCar extends VoDummyVehicle
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(type="integer")
-     * @Groups({"car_read", "car_write"})
-     */
-    private $mileage;
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
-     */
-    private $bodyType;
-    /**
      * @var VoDummyInspection[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="VoDummyInspection", mappedBy="car", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
      */
-    private $inspections;
+    #[ORM\OneToMany(targetEntity: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
+    #[Groups(['car_read', 'car_write'])]
+    private readonly array|\Doctrine\Common\Collections\Collection $inspections;
 
-    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, int $mileage, string $bodyType = 'coupe')
+    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[ORM\Column(type: 'integer')] #[Groups(['car_read', 'car_write'])] private readonly int $mileage, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $bodyType = 'coupe')
     {
         parent::__construct($make, $insuranceCompany, $drivers);
-        $this->mileage = $mileage;
-        $this->bodyType = $bodyType;
         $this->inspections = new ArrayCollection();
     }
 

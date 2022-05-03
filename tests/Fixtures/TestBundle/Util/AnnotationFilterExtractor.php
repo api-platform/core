@@ -20,11 +20,8 @@ class AnnotationFilterExtractor
 {
     use AnnotationFilterExtractorTrait;
 
-    private $reader;
-
-    public function __construct(?Reader $reader = null)
+    public function __construct(private readonly ?Reader $reader = null)
     {
-        $this->reader = $reader;
     }
 
     public function getFilters(\ReflectionClass $reflectionClass)

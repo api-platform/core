@@ -23,21 +23,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()], normalizationContext: ['groups' => ['chicago']], denormalizationContext: ['groups' => ['chicago']])]
+#[ORM\Entity]
 class PatchDummyRelation
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
-    /**
-     * @ORM\ManyToOne(targetEntity="RelatedDummy")
-     * @Groups({"chicago"})
-     */
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
+    #[Groups(['chicago'])]
     protected $related;
 
     public function getRelated()

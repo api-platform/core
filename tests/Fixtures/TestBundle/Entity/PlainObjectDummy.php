@@ -20,16 +20,14 @@ use Doctrine\ORM\Mapping as ORM;
  * Regression test for https://github.com/api-platform/api-platform/issues/1085.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class PlainObjectDummy
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
     /**
      * @var string
@@ -43,7 +41,7 @@ class PlainObjectDummy
     public function setContent($content)
     {
         $this->content = $content;
-        $this->data = (array) json_decode($content);
+        $this->data = (array) json_decode($content, null, 512, \JSON_THROW_ON_ERROR);
     }
 
     public function getId()

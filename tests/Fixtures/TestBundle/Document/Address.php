@@ -13,30 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"order_read"}}}
- * )
- * @ODM\Document
- */
+#[ApiResource(normalizationContext: ['groups' => ['order_read']])]
+#[ODM\Document]
 class Address
 {
-    /**
-     * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"order_read"})
-     */
-    private $id;
-
-    /**
-     * @ODM\Field(type="string")
-     * @Groups({"order_read"})
-     */
+    #[Groups(['order_read'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[Groups(['order_read'])]
+    #[ODM\Field(type: 'string')]
     public $name;
 
     public function getId()

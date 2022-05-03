@@ -24,11 +24,8 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 
 final class AuthenticationEntryPoint implements AuthenticationEntryPointInterface
 {
-    private $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(private readonly RouterInterface $router)
     {
-        $this->router = $router;
     }
 
     public function start(Request $request, AuthenticationException $authException = null): Response

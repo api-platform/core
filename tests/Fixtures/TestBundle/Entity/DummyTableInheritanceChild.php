@@ -17,19 +17,15 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class DummyTableInheritanceChild extends DummyTableInheritance
 {
     /**
      * @var string The dummy nickname
-     *
-     * @ORM\Column
-     *
-     * @Groups({"default"})
      */
+    #[ORM\Column]
+    #[Groups(['default'])]
     private $nickname;
 
     public function getNickname()

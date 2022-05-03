@@ -22,19 +22,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()])]
+#[ORM\Entity]
 class PatchDummy
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
-    /**
-     * @ORM\Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     public $name;
 }

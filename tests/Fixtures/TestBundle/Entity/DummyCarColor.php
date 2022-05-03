@@ -13,45 +13,33 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class DummyCarColor
 {
     /**
      * @var int The entity Id
-     *
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
      */
-    private $id;
-    /**
-     * @var DummyCar
-     *
-     * @ORM\ManyToOne(targetEntity="DummyCar", inversedBy="colors")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE", referencedColumnName="id_id")
-     * @Assert\NotBlank
-     */
-    private $car;
-    /**
-     * @var string
-     *
-     * @ORM\Column(nullable=false)
-     * @ApiFilter(SearchFilter::class)
-     * @Assert\NotBlank
-     *
-     * @Serializer\Groups({"colors"})
-     */
-    private $prop = '';
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+    #[ORM\ManyToOne(targetEntity: DummyCar::class, inversedBy: 'colors')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE', referencedColumnName: 'id_id')]
+    #[Assert\NotBlank]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar $car = null;
+    #[ApiFilter(SearchFilter::class)]
+    #[ORM\Column(nullable: false)]
+    #[Assert\NotBlank]
+    #[Serializer\Groups(['colors'])]
+    private string $prop = '';
 
     public function getId()
     {

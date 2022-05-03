@@ -13,48 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- * @ODM\InheritanceType("SINGLE_COLLECTION")
- * @ODM\DiscriminatorField(value="discr")
- * @ODM\DiscriminatorMap({
- *     "dummyTableInheritance"=DummyTableInheritance::class,
- *     "dummyTableInheritanceChild"=DummyTableInheritanceChild::class,
- *     "dummyTableInheritanceDifferentChild"=DummyTableInheritanceDifferentChild::class,
- *     "dummyTableInheritanceNotApiResourceChild"=DummyTableInheritanceNotApiResourceChild::class
- * })
- * @ApiResource
- */
+#[ApiResource]
+#[ODM\Document]
+#[ODM\InheritanceType('SINGLE_COLLECTION')]
+#[ODM\DiscriminatorField(value: 'discr')]
+#[ODM\DiscriminatorMap(['dummyTableInheritance' => DummyTableInheritance::class, 'dummyTableInheritanceChild' => DummyTableInheritanceChild::class, 'dummyTableInheritanceDifferentChild' => DummyTableInheritanceDifferentChild::class, 'dummyTableInheritanceNotApiResourceChild' => DummyTableInheritanceNotApiResourceChild::class])]
 class DummyTableInheritance
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     *
-     * @Groups({"default"})
      */
-    private $id;
-
+    #[Groups(['default'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field
-     *
-     * @Groups({"default"})
      */
-    private $name;
-
-    /**
-     * @var DummyTableInheritanceRelated|null
-     *
-     * @ODM\ReferenceOne(targetDocument=DummyTableInheritanceRelated::class, inversedBy="children")
-     */
-    private $parent;
+    #[Groups(['default'])]
+    #[ODM\Field]
+    private ?string $name = null;
+    #[ODM\ReferenceOne(targetDocument: DummyTableInheritanceRelated::class, inversedBy: 'children')]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceRelated $parent = null;
 
     public function getName(): ?string
     {

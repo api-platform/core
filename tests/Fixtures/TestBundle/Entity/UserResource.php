@@ -21,8 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(operations: [new Post(uriTemplate: '/user-reset-password', input: UserResetPasswordDto::class)])]
 final class UserResource
 {
-    /**
-     * @Assert\NotBlank
-     */
+    #[Assert\NotBlank]
     public $username;
 }

@@ -17,29 +17,20 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(mercure: true)]
+#[ORM\Entity]
 class DummyMercure
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     public $name;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     public $description;
-    /**
-     * @ORM\ManyToOne(targetEntity="RelatedDummy")
-     */
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
     public $relatedDummy;
 }

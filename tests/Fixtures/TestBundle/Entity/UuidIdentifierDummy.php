@@ -18,25 +18,22 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom identifier dummy.
- *
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class UuidIdentifierDummy
 {
     /**
      * @var string The custom identifier
-     *
-     * @ORM\Column(type="guid")
-     * @ORM\Id
      */
-    private $uuid;
+    #[ORM\Column(type: 'guid')]
+    #[ORM\Id]
+    private ?string $uuid = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private ?string $name = null;
 
     public function getUuid(): string
     {

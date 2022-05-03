@@ -13,42 +13,37 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * DummyDtoCustom.
- *
- * @ODM\Document
- *
- * @ApiResource(
- *     collectionOperations={"post"={"input"=CustomInputDto::class}, "get", "custom_output"={"output"=CustomOutputDto::class, "path"="dummy_dto_custom_output", "method"="GET"}, "post_without_output"={"output"=false, "method"="POST", "path"="dummy_dto_custom_post_without_output"}},
- *     itemOperations={"get", "custom_output"={"output"=CustomOutputDto::class, "method"="GET", "path"="dummy_dto_custom_output/{id}"}, "put", "delete"}
- * )
  */
+#[ApiResource(operations: [new Get(), new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}'), new Put(), new Delete(), new Post(input: CustomInputDto::class), new GetCollection(), new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output'), new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output')])]
+#[ODM\Document]
 class DummyDtoCustom
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $lorem;
-
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $ipsum;
 
     public function getId()

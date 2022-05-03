@@ -22,28 +22,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Circular Reference.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(normalizationContext: ['groups' => ['circular']])]
+#[ORM\Entity]
 class CircularReference
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
-    /**
-     * @ORM\ManyToOne(targetEntity="CircularReference", inversedBy="children")
-     *
-     * @Groups({"circular"})
-     */
+    #[ORM\ManyToOne(targetEntity: CircularReference::class, inversedBy: 'children')]
+    #[Groups(['circular'])]
     public $parent;
-    /**
-     * @ORM\OneToMany(targetEntity="CircularReference", mappedBy="parent")
-     *
-     * @Groups({"circular"})
-     */
+    #[ORM\OneToMany(targetEntity: CircularReference::class, mappedBy: 'parent')]
+    #[Groups(['circular'])]
     public $children;
 
     public function __construct()

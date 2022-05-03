@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
@@ -25,75 +30,38 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * A User.
  *
- * @ODM\Document(collection="user_test")
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"user", "user-read"}},
- *         "denormalization_context"={"groups"={"user", "user-write"}}
- *     },
- *     collectionOperations={
- *         "post",
- *         "get",
- *         "post_password_reset_request"={
- *             "method"="POST",
- *             "path"="/users/password_reset_request",
- *             "messenger"="input",
- *             "input"=PasswordResetRequest::class,
- *             "output"=PasswordResetRequestResult::class,
- *             "normalization_context"={
- *                 "groups"={"user_password_reset_request"},
- *             },
- *             "denormalization_context"={
- *                 "groups"={"user_password_reset_request"},
- *             },
- *         },
- *     },
- *     itemOperations={"get", "put", "delete",
- *         "recover_password"={
- *             "input"=RecoverPasswordInput::class, "output"=RecoverPasswordOutput::class, "method"="PUT", "path"="users/recover/{id}"
- *         }
- *     }
- * )
- *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(operations: [new Get(), new Put(), new Delete(), new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}'), new Post(), new GetCollection(), new Post(uriTemplate: '/users/password_reset_request', messenger: 'input', input: PasswordResetRequest::class, output: PasswordResetRequestResult::class, normalizationContext: ['groups' => ['user_password_reset_request']], denormalizationContext: ['groups' => ['user_password_reset_request']])], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
+#[ODM\Document(collection: 'user_test')]
 class User extends AbstractSecurityUser
 {
     /**
      * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     protected $id;
-
     /**
      * @var string|null
-     *
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
     protected $email;
-
     /**
      * @var string|null
-     *
-     * @ODM\Field(type="string", nullable=true)
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
+    #[ODM\Field(type: 'string', nullable: true)]
     protected $fullname;
-
     /**
      * @var string|null
-     *
-     * @Groups({"user-write"})
      */
+    #[Groups(['user-write'])]
     protected $plainPassword;
-
     /**
      * @var string|null
-     *
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
     protected $username;
 
     public function getId(): ?int

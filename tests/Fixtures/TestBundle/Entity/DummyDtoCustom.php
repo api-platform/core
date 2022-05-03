@@ -25,31 +25,38 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * DummyDtoCustom.
- *
- * @ORM\Entity
  */
-#[ApiResource(operations: [new Get(), new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}'), new Put(), new Delete(), new Post(input: CustomInputDto::class), new GetCollection(), new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output'), new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output')])]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}'),
+        new Put(), 
+        new Delete(), 
+        new Post(input: CustomInputDto::class), 
+        new GetCollection(), 
+        new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output'),
+        new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output')
+    ]
+)]
+#[ORM\Entity]
 class DummyDtoCustom
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $lorem;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $ipsum;
 
     public function getId()

@@ -17,17 +17,13 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\NonResourceClass;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class NonRelationResource
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
     /**
      * @var NonResourceClass

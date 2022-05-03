@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,28 +25,24 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ODM\Document]
 class DummyFriend
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany", "friends"})
      */
-    private $name;
+    #[Assert\NotBlank]
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Groups(['fakemanytomany', 'friends'])]
+    #[ODM\Field(type: 'string')]
+    private ?string $name = null;
 
     /**
      * Get id.

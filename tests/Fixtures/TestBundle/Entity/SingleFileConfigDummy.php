@@ -17,25 +17,21 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * File Config Dummy.
- *
- * @ORM\Entity
  */
+#[ORM\Entity]
 class SingleFileConfigDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
 
     public function getId()

@@ -27,39 +27,32 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Secured resource with legacy access_control attribute.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Put(security: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new GetCollection(), new Post(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Mutation(name: 'delete'), new Mutation(name: 'update', security: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.')], security: 'is_granted(\'ROLE_USER\')')]
+#[ORM\Entity]
 class LegacySecuredDummy
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The title
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
      */
-    private $title;
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    private ?string $title = null;
     /**
      * @var string The description
-     *
-     * @ORM\Column
      */
-    private $description = '';
+    #[ORM\Column]
+    private string $description = '';
     /**
      * @var string The owner
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
      */
-    private $owner;
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    private ?string $owner = null;
 
     public function getId(): ?int
     {

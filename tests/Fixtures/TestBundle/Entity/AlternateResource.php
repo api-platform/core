@@ -21,12 +21,8 @@ if (\PHP_VERSION_ID > 80000) {
     #[Get('/alternate/{id}', uriVariables: ['id' => ['from_class' => AlternateResource::class, 'identifiers' => ['id']]])]
     final class AlternateResource
     {
-        #[ApiProperty(identifier: true)]
-        public string $id;
-
-        public function __construct(string $id)
+        public function __construct(#[ApiProperty(identifier: true)] public string $id)
         {
-            $this->id = $id;
         }
 
         public function getId()

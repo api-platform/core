@@ -13,39 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(
- *     attributes={"normalization_context"={"groups"={"order_read"}}},
- *     forceEager=false
- * )
- * @ODM\Document
- */
+#[ApiResource(normalizationContext: ['groups' => ['order_read']], forceEager: false)]
+#[ODM\Document]
 class Order
 {
-    /**
-     * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"order_read"})
-     */
-    private $id;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=Customer::class)
-     * @Groups({"order_read"})
-     */
+    #[Groups(['order_read'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[Groups(['order_read'])]
+    #[ODM\ReferenceOne(targetDocument: Customer::class)]
     public $customer;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=Customer::class)
-     * @Assert\NotNull
-     * @Groups({"order_read"})
-     */
+    #[Assert\NotNull]
+    #[Groups(['order_read'])]
+    #[ODM\ReferenceOne(targetDocument: Customer::class)]
     public $recipient;
 
     public function getId()

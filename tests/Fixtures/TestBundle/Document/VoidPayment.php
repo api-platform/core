@@ -13,31 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- *
- * @ApiResource
- */
+#[ApiResource]
+#[ODM\Document]
 class VoidPayment
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
-    /**
-     * @ODM\ReferenceOne(targetDocument=Payment::class, inversedBy="voidPayment")
-     */
-    private $payment;
-
-    public function __construct(Payment $payment)
-    {
-        $this->payment = $payment;
+    public function __construct(
+        #[ODM\ReferenceOne(targetDocument: Payment::class, inversedBy: 'voidPayment')] private readonly Payment $payment
+    ) {
     }
 
     public function getId(): ?int

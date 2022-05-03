@@ -41,24 +41,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 #[Patch]
 final class AttributeResource
 {
-    #[ApiProperty(identifier: true)]
-    private $identifier;
-
     /**
      * @var ?Dummy
      */
     #[Link('dummyId')]
     public $dummy = null;
 
-    /**
-     * @var string
-     */
-    public $name;
-
-    public function __construct(int $identifier, string $name)
+    public function __construct(#[ApiProperty(identifier: true)] private readonly int $identifier, public string $name)
     {
-        $this->identifier = $identifier;
-        $this->name = $name;
     }
 
     public function getIdentifier()

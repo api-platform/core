@@ -18,44 +18,22 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\MappedSuperclass
- */
+#[ODM\MappedSuperclass]
 abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
-
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $make;
-
-    /**
-     * @var VoDummyInsuranceCompany
-     *
-     * @ODM\ReferenceOne(targetDocument=VoDummyInsuranceCompany::class, cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $insuranceCompany;
-
     /**
      * @var VoDummyDriver[]|Collection
-     *
-     * @ODM\ReferenceMany(targetDocument=VoDummyDriver::class, cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
      */
-    private $drivers;
+    #[Groups(['car_read', 'car_write'])]
+    #[ODM\ReferenceMany(targetDocument: VoDummyDriver::class, cascade: ['persist'])]
+    private readonly array|\Doctrine\Common\Collections\Collection $drivers;
 
     public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $make,
+        #[Groups(['car_read', 'car_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyInsuranceCompany::class, cascade: ['persist'])] private readonly VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
-        $this->make = $make;
-        $this->insuranceCompany = $insuranceCompany;
         $this->drivers = new ArrayCollection($drivers);
     }
 
