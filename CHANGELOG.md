@@ -3,6 +3,7 @@
 ## 2.7.0-alpha.3
 
 * Implements Skolem IRIs instead of blank nodes, can be disabled using `iri: false` (#4731)
+* IRI Converter: new interface declaring `getIriFromResource` and `getResourceFromIri` (#4734)
 
 ## 2.7.0-alpha.2
 
