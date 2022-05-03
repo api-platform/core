@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -26,11 +25,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class CustomGeneratedIdentifier
 {
     /**
-     * @var Uuid
-     *
      * @ODM\Id(strategy="CUSTOM", type="string", options={"class"="ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator"})
      */
-    private $id;
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid $id = null;
 
     public function getId()
     {

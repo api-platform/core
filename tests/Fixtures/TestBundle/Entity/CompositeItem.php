@@ -20,27 +20,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Item.
- *
- * @ORM\Entity
  */
 #[ApiResource]
-class CompositeItem
+#[ORM\Entity]
+class CompositeItem implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
     private $field1;
-    /**
-     * @ORM\OneToMany(targetEntity="CompositeRelation", mappedBy="compositeItem", fetch="EAGER")
-     * @Groups({"default"})
-     */
+    #[ORM\OneToMany(targetEntity: 'CompositeRelation', mappedBy: 'compositeItem', fetch: 'EAGER')]
+    #[Groups(['default'])]
     private $compositeValues;
 
     /**

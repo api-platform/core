@@ -30,42 +30,37 @@ use Doctrine\ORM\Mapping as ORM;
  *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
  *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
  * })
- * @ORM\Entity
  */
 #[ApiResource(filters: ['my_dummy_date.date'])]
+#[ORM\Entity]
 class DummyDate
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var \DateTime The dummy date
-     *
-     * @ORM\Column(type="date")
      */
+    #[ORM\Column(type: 'date')]
     public $dummyDate;
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(type="date", nullable=true)
      */
+    #[ORM\Column(type: 'date', nullable: true)]
     public $dateIncludeNullAfter;
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(type="date", nullable=true)
      */
+    #[ORM\Column(type: 'date', nullable: true)]
     public $dateIncludeNullBefore;
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(type="date", nullable=true)
      */
+    #[ORM\Column(type: 'date', nullable: true)]
     public $dateIncludeNullBeforeAndAfter;
 
     /**

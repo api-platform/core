@@ -24,17 +24,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class VoDummyInsuranceCompany
 {
     use VoDummyIdAwareTrait;
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $name;
 
-    public function __construct(string $name)
-    {
-        $this->name = $name;
+    public function __construct(
+        /**
+         * @ODM\Field
+         */
+        #[Groups(['car_read', 'car_write'])] private readonly string $name
+    ) {
     }
 
     public function getName()

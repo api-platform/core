@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter;
@@ -40,13 +40,14 @@ class FilterValidator
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
+
     /**
      * @var string A name
      *
      * @ODM\Field
-     * @ApiProperty(iri="http://schema.org/name")
      */
+    #[ApiProperty(types: ['http://schema.org/name'])]
     private $name;
 
     public function getId()

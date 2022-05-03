@@ -23,21 +23,16 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class DummyBoolean
 {
     /**
-     * @var int
-     *
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
-    private $id;
-    /**
-     * @var bool
-     *
-     * @ODM\Field(type="bool", nullable=true)
-     */
-    private $isDummyBoolean;
+    private ?int $id = null;
 
-    public function __construct(bool $isDummyBoolean)
-    {
-        $this->isDummyBoolean = $isDummyBoolean;
+    public function __construct(
+        /**
+         * @ODM\Field(type="bool", nullable=true)
+         */
+        private readonly bool $isDummyBoolean
+    ) {
     }
 
     public function getId()

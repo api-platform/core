@@ -31,18 +31,18 @@ class CompositeRelation
     private $id;
     /**
      * @ODM\Field(type="string", nullable=true)
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $value;
     /**
      * @ODM\ReferenceOne(targetDocument=CompositeItem::class, inversedBy="compositeValues")
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $compositeItem;
     /**
      * @ODM\ReferenceOne(targetDocument=CompositeLabel::class)
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $compositeLabel;
 
     /**

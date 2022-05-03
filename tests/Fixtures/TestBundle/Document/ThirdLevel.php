@@ -39,24 +39,20 @@ class ThirdLevel
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var int
-     *
      * @ODM\Field(type="int")
-     * @Groups({"barcelona", "chicago"})
      */
-    private $level = 3;
+    #[Groups(['barcelona', 'chicago'])]
+    private int $level = 3;
     /**
-     * @var bool
-     *
      * @ODM\Field(type="bool")
      */
-    private $test = true;
+    private bool $test = true;
     /**
      * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"}, storeAs="id")
-     * @Groups({"barcelona", "chicago", "friends"})
      */
+    #[Groups(['barcelona', 'chicago', 'friends'])]
     public $fourthLevel;
     /**
      * @ODM\ReferenceOne(targetDocument=FourthLevel::class, cascade={"persist"})

@@ -20,14 +20,12 @@ use ApiPlatform\Metadata\ApiResource;
 final class DummyForAdditionalFieldsInput
 {
     /**
-     * @ApiProperty(identifier=true)
+     * #[ApiProperty(identifier: true)].
      */
     public $id;
-    private $dummyName;
 
-    public function __construct(string $dummyName)
+    public function __construct(private readonly string $dummyName)
     {
-        $this->dummyName = $dummyName;
     }
 
     public function getDummyName(): string

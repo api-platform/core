@@ -27,13 +27,11 @@ class ResourceWithInteger
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var int
-     *
      * @ODM\Field(type="int")
      */
-    private $myIntegerField = 0;
+    private int $myIntegerField = 0;
 
     public function getId()
     {

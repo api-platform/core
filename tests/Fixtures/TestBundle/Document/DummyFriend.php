@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -35,16 +35,16 @@ class DummyFriend
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany", "friends"})
      */
-    private $name;
+    #[Assert\NotBlank]
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Groups(['fakemanytomany', 'friends'])]
+    private ?string $name = null;
 
     /**
      * Get id.

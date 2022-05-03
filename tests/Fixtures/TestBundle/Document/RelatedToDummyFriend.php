@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
@@ -42,28 +42,28 @@ class RelatedToDummyFriend
      * @var string The dummy name
      *
      * @ODM\Field(type="string")
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany", "friends"})
      */
+    #[Assert\NotBlank]
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Groups(['fakemanytomany', 'friends'])]
     private $name;
     /**
      * @var string|null The dummy description
      *
      * @ODM\Field(type="string")
-     * @Groups({"fakemanytomany", "friends"})
      */
-    private $description;
+    #[Groups(['fakemanytomany', 'friends'])]
+    private ?string $description = null;
     /**
      * @ODM\ReferenceOne(targetDocument=DummyFriend::class, storeAs="id")
-     * @Groups({"fakemanytomany", "friends"})
-     * @Assert\NotNull
      */
+    #[Groups(['fakemanytomany', 'friends'])]
+    #[Assert\NotNull]
     private $dummyFriend;
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, inversedBy="relatedToDummyFriend", storeAs="id")
-     * @Assert\NotNull
      */
+    #[Assert\NotNull]
     private $relatedDummy;
 
     public function getId()

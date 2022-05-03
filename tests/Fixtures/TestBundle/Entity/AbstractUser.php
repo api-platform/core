@@ -18,30 +18,20 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\InheritanceType ("JOINED")
- */
 #[ApiResource(operations: [new Get(uriTemplate: '/custom_users/{id}'), new GetCollection(uriTemplate: '/custom_users')])]
+#[ORM\Entity]
+#[ORM\InheritanceType('JOINED')]
 abstract class AbstractUser
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     private $firstname;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     private $lastname;
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     private $email;
 
     public function getId(): ?int

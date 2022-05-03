@@ -33,8 +33,8 @@ class Pet
     private $id;
     /**
      * @ODM\Field(type="string")
-     * @Groups({"people.pets"})
      */
+    #[Groups(['people.pets'])]
     public $name;
     /**
      * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="pet")

@@ -29,31 +29,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyCustomMutation
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var int|null
-     *
      * @ODM\Field(type="int")
      */
-    private $operandA;
+    private ?int $operandA = null;
     /**
-     * @var int|null
-     *
-     * @Groups({"sum"})
      * @ODM\Field(type="int", nullable=true)
      */
-    private $operandB;
+    #[Groups(['sum'])]
+    private ?int $operandB = null;
     /**
-     * @var int|null
-     *
-     * @Groups({"result"})
      * @ODM\Field(type="int", nullable=true)
      */
-    private $result;
+    #[Groups(['result'])]
+    private ?int $result = null;
 
     public function getId(): ?int
     {

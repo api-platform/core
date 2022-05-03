@@ -30,59 +30,51 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyProperty
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
-     * @Groups({"dummy_read", "dummy_graphql_read"})
      */
-    private $id;
+    #[Groups(['dummy_read', 'dummy_graphql_read'])]
+    private ?int $id = null;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy_read", "dummy_write"})
      */
+    #[Groups(['dummy_read', 'dummy_write'])]
     public $foo;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
+    #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     public $bar;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
+    #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     public $baz;
     /**
      * @var DummyGroup|null
      *
      * @ODM\ReferenceOne(targetDocument=DummyGroup::class, cascade={"persist"}, nullable=true)
-     *
-     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
+    #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     public $group;
     /**
      * @var DummyGroup[]|null
      *
      * @ODM\ReferenceMany(targetDocument=DummyGroup::class, cascade={"persist"})
-     * @Groups({"dummy_read", "dummy_graphql_read", "dummy_write"})
      */
+    #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     public $groups;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy_read", "dummy_write"})
      */
+    #[Groups(['dummy_read', 'dummy_write'])]
     public $nameConverted;
 
     public function getId(): ?int

@@ -23,11 +23,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class ConvertedRelated
 {
     /**
-     * @var int
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string
      *

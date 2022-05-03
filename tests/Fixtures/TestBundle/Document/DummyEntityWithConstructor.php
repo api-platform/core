@@ -38,39 +38,27 @@ class DummyEntityWithConstructor
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var string
-     *
-     * @ODM\Field
-     */
-    private $foo;
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     */
-    private $bar;
-    /**
-     * @var string|null
-     *
      * @ODM\Field(nullable=true)
-     * @Groups({"put"})
      */
-    private $baz;
-    /**
-     * @var DummyObjectWithoutConstructor[]
-     */
-    private $items;
+    #[Groups(['put'])]
+    private ?string $baz = null;
 
     /**
      * @param DummyObjectWithoutConstructor[] $items
      */
-    public function __construct(string $foo, string $bar, array $items)
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
-        $this->items = $items;
+    public function __construct(
+        /**
+         * @ODM\Field
+         */
+        private readonly string $foo,
+        /**
+         * @ODM\Field
+         */
+        private readonly string $bar,
+        private readonly array $items
+    ) {
     }
 
     public function getId(): ?int

@@ -27,13 +27,11 @@ class ResourceWithFloat
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var float
-     *
      * @ODM\Field(type="float")
      */
-    private $myFloatField = 0.0;
+    private float $myFloatField = 0.0;
 
     public function getId()
     {

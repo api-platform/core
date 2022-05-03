@@ -15,17 +15,14 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
 {
     /**
      * @var bool The dummy swagg
-     *
-     * @ORM\Column(type="boolean")
      */
-    private $swaggerThanParent;
+    #[ORM\Column(type: 'boolean')]
+    private bool $swaggerThanParent;
 
     public function __construct()
     {

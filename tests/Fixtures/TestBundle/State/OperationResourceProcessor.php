@@ -26,11 +26,8 @@ final class OperationResourceProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
-        $this->managerRegistry = $managerRegistry;
     }
 
     private function persist($data, array $context = [])

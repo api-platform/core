@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
@@ -44,27 +44,27 @@ class Dummy
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
      */
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Assert\NotBlank]
     private $name;
     /**
      * @var string|null The dummy name alias
      *
      * @ODM\Field(nullable=true)
-     * @ApiProperty(iri="https://schema.org/alternateName")
      */
+    #[ApiProperty(types: ['http://schema.org/alternateName'])]
     private $alias;
     /**
      * @var array|null foo
      */
-    private $foo;
+    private ?array $foo = null;
     /**
      * @var string|null A short description of the item
      *
      * @ODM\Field(type="string", nullable=true)
-     * @ApiProperty(iri="https://schema.org/description")
      */
+    #[ApiProperty(types: ['http://schema.org/description'])]
     public $description;
     /**
      * @var string|null A dummy
@@ -82,8 +82,8 @@ class Dummy
      * @var \DateTime|null A dummy date
      *
      * @ODM\Field(type="date", nullable=true)
-     * @ApiProperty(iri="http://schema.org/DateTime")
      */
+    #[ApiProperty(types: ['http://schema.org/DateTime'])]
     public $dummyDate;
     /**
      * @var float|null A dummy float

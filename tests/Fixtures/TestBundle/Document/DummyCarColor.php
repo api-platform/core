@@ -31,24 +31,19 @@ class DummyCarColor
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var DummyCar
-     *
      * @ODM\ReferenceOne(targetDocument=DummyCar::class, inversedBy="colors", storeAs="id")
-     * @Assert\NotBlank
      */
-    private $car;
+    #[Assert\NotBlank]
+    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCar $car = null;
     /**
-     * @var string
-     *
      * @ODM\Field(nullable=false)
      * @ApiFilter(SearchFilter::class)
-     * @Assert\NotBlank
-     *
-     * @Serializer\Groups({"colors"})
      */
-    private $prop = '';
+    #[Assert\NotBlank]
+    #[Serializer\Groups(['colors'])]
+    private string $prop = '';
 
     public function getId()
     {

@@ -18,25 +18,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
+#[ORM\Entity]
 class RamseyUuidDummy
 {
-    /**
-     * @var \Ramsey\Uuid\UuidInterface
-     *
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     */
-    private $id;
-    /**
-     * @var \Ramsey\Uuid\UuidInterface|null
-     *
-     * @ORM\Column(type="uuid", nullable=true)
-     */
-    private $other;
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private readonly \Ramsey\Uuid\UuidInterface $id;
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?\Ramsey\Uuid\UuidInterface $other = null;
 
     public function __construct(?UuidInterface $id = null)
     {

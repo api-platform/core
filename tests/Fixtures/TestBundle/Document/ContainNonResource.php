@@ -30,20 +30,17 @@ class ContainNonResource
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
-     * @Groups("contain_non_resource")
      */
+    #[Groups('contain_non_resource')]
     public $id;
     /**
      * @var ContainNonResource
-     *
-     * @Groups("contain_non_resource")
      */
+    #[Groups('contain_non_resource')]
     public $nested;
     /**
      * @var NotAResource
-     *
-     * @Groups("contain_non_resource")
      */
+    #[Groups('contain_non_resource')]
     public $notAResource;
 }

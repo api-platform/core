@@ -22,24 +22,22 @@ use Doctrine\ORM\Mapping as ORM;
  * DummyNoGetOperation.
  *
  * @author Grégoire Hébert gregoire@les-tilleuls.coop
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Put(), new Post()])]
+#[ORM\Entity]
 class DummyNoGetOperation
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $lorem;
 
     public function setId($id)

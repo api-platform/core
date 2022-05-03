@@ -22,18 +22,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Taxon implements TaxonInterface
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
-     * @var string|null
-     *
      * @ODM\Field(type="string")
      */
-    private $code;
+    private ?string $code = null;
 
     /**
      * {@inheritdoc}

@@ -22,14 +22,14 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  */
 class FileConfigDummy
 {
-    public const HYDRA_TITLE = 'File config Dummy';
+    final public const HYDRA_TITLE = 'File config Dummy';
 
     /**
      * @var int The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @var string The dummy name

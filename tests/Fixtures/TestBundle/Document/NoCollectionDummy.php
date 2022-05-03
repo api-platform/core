@@ -33,7 +33,7 @@ class NoCollectionDummy
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     public function getId()
     {

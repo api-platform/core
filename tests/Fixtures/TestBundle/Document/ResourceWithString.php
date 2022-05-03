@@ -27,13 +27,11 @@ class ResourceWithString
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var string
-     *
      * @ODM\Field(type="string")
      */
-    private $myStringField = '';
+    private string $myStringField = '';
 
     public function getId()
     {

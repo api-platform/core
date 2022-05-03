@@ -13,19 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Symfony\Messenger\Processor;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerResponseInput;
 
-#[ApiResource(messenger: 'input', input: MessengerResponseInput::class)]
+#[ApiResource(processor: Processor::class, input: MessengerResponseInput::class)]
 class MessengerWithResponse
 {
-    /**
-     * @ApiProperty(identifier=true)
-     */
+    #[ApiProperty(identifier: true)]
     public $id;
-    /**
-     * @var string
-     */
-    public $name;
+
+    public string $name;
 }

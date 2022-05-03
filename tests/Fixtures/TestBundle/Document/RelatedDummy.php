@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -44,54 +44,54 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RelatedDummy extends ParentDummy
 {
     /**
-     * @ApiProperty(writable=false)
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"chicago", "friends"})
      */
+    #[Groups(['chicago', 'friends'])]
+    #[ApiProperty(writable: false)]
     private $id;
     /**
      * @var string A name
      *
      * @ODM\Field(type="string", nullable=true)
-     * @Groups({"friends"})
      */
+    #[Groups(['friends'])]
     public $name;
     /**
      * @ODM\Field(type="string")
-     * @Groups({"barcelona", "chicago", "friends"})
      */
+    #[Groups(['barcelona', 'chicago', 'friends'])]
     protected $symfony = 'symfony';
     /**
      * @var \DateTime A dummy date
      *
      * @ODM\Field(type="date", nullable=true)
-     * @Assert\DateTime
-     * @Groups({"friends"})
      */
+    #[Assert\DateTime]
+    #[Groups(['friends'])]
     public $dummyDate;
     /**
      * @ODM\ReferenceOne(targetDocument=ThirdLevel::class, cascade={"persist"}, nullable=true, storeAs="id")
-     * @Groups({"barcelona", "chicago", "friends"})
      */
+    #[Groups(['barcelona', 'chicago', 'friends'])]
     public $thirdLevel;
     /**
      * @ODM\ReferenceMany(targetDocument=RelatedToDummyFriend::class, cascade={"persist"}, mappedBy="relatedDummy", storeAs="id")
-     * @Groups({"fakemanytomany", "friends"})
      */
+    #[Groups(['fakemanytomany', 'friends'])]
     public $relatedToDummyFriend;
     /**
      * @var bool A dummy bool
      *
      * @ODM\Field(type="bool")
-     * @Groups({"friends"})
      */
+    #[Groups(['friends'])]
     public $dummyBoolean;
     /**
      * @var EmbeddableDummy
      *
      * @ODM\EmbedOne(targetDocument=EmbeddableDummy::class)
-     * @Groups({"friends"})
      */
+    #[Groups(['friends'])]
     public $embeddedDummy;
 
     public function __construct()

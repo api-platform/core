@@ -18,25 +18,22 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom Writable Identifier Dummy.
- *
- * @ORM\Entity
  */
 #[ApiResource]
+#[ORM\Entity]
 class CustomWritableIdentifierDummy
 {
     /**
      * @var string The special identifier
-     *
-     * @ORM\Column(name="slug", type="string", length=30)
-     * @ORM\Id
      */
-    private $slug;
+    #[ORM\Column(name: 'slug', type: 'string', length: 30)]
+    #[ORM\Id]
+    private ?string $slug = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(name="name", type="string", length=30)
      */
-    private $name;
+    #[ORM\Column(name: 'name', type: 'string', length: 30)]
+    private ?string $name = null;
 
     /**
      * @param string $slug

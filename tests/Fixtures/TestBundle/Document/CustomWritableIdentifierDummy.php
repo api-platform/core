@@ -29,13 +29,13 @@ class CustomWritableIdentifierDummy
      *
      * @ODM\Id(strategy="NONE", type="string")
      */
-    private $slug;
+    private ?string $slug = null;
     /**
      * @var string The dummy name
      *
      * @ODM\Field(name="name", type="string")
      */
-    private $name;
+    private ?string $name = null;
 
     /**
      * @param string $slug

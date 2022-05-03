@@ -30,19 +30,19 @@ class MaxDepthDummy
 {
     /**
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $id;
     /**
      * @ODM\Field(name="name", type="string")
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     public $name;
     /**
      * @ODM\ReferenceOne(targetDocument=MaxDepthDummy::class, cascade={"persist"})
-     * @Groups({"default"})
-     * @MaxDepth(1)
      */
+    #[Groups(['default'])]
+    #[MaxDepth(1)]
     public $child;
 
     public function getId()

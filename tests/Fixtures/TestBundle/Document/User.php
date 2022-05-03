@@ -46,28 +46,25 @@ class User extends AbstractSecurityUser
     protected $id;
     /**
      * @var string|null
-     *
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
     protected $email;
     /**
      * @var string|null
      *
      * @ODM\Field(type="string", nullable=true)
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
     protected $fullname;
     /**
      * @var string|null
-     *
-     * @Groups({"user-write"})
      */
+    #[Groups(['user-write'])]
     protected $plainPassword;
     /**
      * @var string|null
-     *
-     * @Groups({"user"})
      */
+    #[Groups(['user'])]
     protected $username;
 
     public function getId(): ?int

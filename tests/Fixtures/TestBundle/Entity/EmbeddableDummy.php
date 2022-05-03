@@ -21,52 +21,39 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Embeddable Dummy.
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
- *
- * @ORM\Embeddable
  */
+#[ORM\Embeddable]
 class EmbeddableDummy
 {
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"embed"})
      */
-    private $dummyName;
-
+    #[ORM\Column(nullable: true)]
+    #[Groups(['embed'])]
+    private ?string $dummyName = null;
     /**
      * @var bool|null A dummy boolean
-     *
-     * @ORM\Column(type="boolean", nullable=true)
      */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     public $dummyBoolean;
-
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Assert\DateTime]
     public $dummyDate;
-
     /**
      * @var float|null A dummy float
-     *
-     * @ORM\Column(type="float", nullable=true)
      */
+    #[ORM\Column(type: 'float', nullable: true)]
     public $dummyFloat;
-
     /**
      * @var string|null A dummy price
-     *
-     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public $dummyPrice;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"barcelona", "chicago"})
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['barcelona', 'chicago'])]
     protected $symfony;
 
     public static function staticMethod()

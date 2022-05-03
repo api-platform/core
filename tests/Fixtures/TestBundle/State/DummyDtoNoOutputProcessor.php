@@ -23,11 +23,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class DummyDtoNoOutputProcessor implements ProcessorInterface
 {
-    private $registry;
-
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private readonly ManagerRegistry $registry)
     {
-        $this->registry = $registry;
     }
 
     /**

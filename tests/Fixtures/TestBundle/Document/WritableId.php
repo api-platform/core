@@ -26,8 +26,8 @@ class WritableId
 {
     /**
      * @ODM\Id(strategy="UUID", type="string")
-     * @Assert\Uuid
      */
+    #[Assert\Uuid]
     public $id;
     /**
      * @ODM\Field

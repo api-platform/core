@@ -26,36 +26,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Relation Embedder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(routeName: 'relation_embedded.custom_get'), new Get(uriTemplate: '/api/custom-call/{id}'), new Put(uriTemplate: '/api/custom-call/{id}'), new Post(), new GetCollection()], normalizationContext: ['groups' => ['barcelona']], denormalizationContext: ['groups' => ['chicago']], hydraContext: ['@type' => 'hydra:Operation', 'hydra:title' => 'A custom operation', 'returns' => 'xmls:string'])]
+#[ORM\Entity]
 class RelationEmbedder
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
-    /**
-     * @ORM\Column
-     * @Groups({"chicago"})
-     */
+    #[ORM\Column]
+    #[Groups(['chicago'])]
     public $paris = 'Paris';
-    /**
-     * @ORM\Column
-     * @Groups({"barcelona", "chicago"})
-     */
+    #[ORM\Column]
+    #[Groups(['barcelona', 'chicago'])]
     public $krondstadt = 'Krondstadt';
-    /**
-     * @ORM\ManyToOne(targetEntity="RelatedDummy", cascade={"persist"})
-     * @Groups({"chicago", "barcelona"})
-     */
+    #[ORM\ManyToOne(targetEntity: 'RelatedDummy', cascade: ['persist'])]
+    #[Groups(['chicago', 'barcelona'])]
     public $anotherRelated;
-    /**
-     * @ORM\ManyToOne(targetEntity="RelatedDummy")
-     * @Groups({"barcelona", "chicago"})
-     */
+    #[ORM\ManyToOne(targetEntity: 'RelatedDummy')]
+    #[Groups(['barcelona', 'chicago'])]
     protected $related;
 
     public function getRelated()

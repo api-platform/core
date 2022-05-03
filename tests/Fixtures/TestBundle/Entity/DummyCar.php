@@ -30,7 +30,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
- * @ORM\Entity
  * @ApiFilter (DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
  * @ApiFilter (BooleanFilter::class)
  * @ApiFilter (PropertyFilter::class, arguments={"parameterName"="foobar"})
@@ -38,88 +37,62 @@ use Symfony\Component\Serializer\Annotation as Serializer;
  * @ApiFilter (GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
  */
 #[ApiResource(operations: [new Get(openapiContext: ['tags' => []]), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
+#[ORM\Entity]
 class DummyCar
 {
     /**
      * @var DummyCarIdentifier The entity Id
-     *
-     * @ORM\Id
-     * @ORM\OneToOne(targetEntity="DummyCarIdentifier", cascade={"persist"})
      */
-    private $id;
+    #[ORM\Id]
+    #[ORM\OneToOne(targetEntity: 'DummyCarIdentifier', cascade: ['persist'])]
+    private readonly \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCarIdentifier $id;
     /**
      * @var mixed Something else
      *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
+    #[ORM\OneToMany(targetEntity: 'DummyCarColor', mappedBy: 'car')]
+    #[Serializer\Groups(['colors'])]
     private $colors;
     /**
      * @var mixed Something else
      *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
-    private $secondColors;
+    #[ORM\OneToMany(targetEntity: 'DummyCarColor', mappedBy: 'car')]
+    #[Serializer\Groups(['colors'])]
+    private ?mixed $secondColors = null;
     /**
      * @var mixed Something else
      *
-     * @ORM\OneToMany(targetEntity="DummyCarColor", mappedBy="car")
-     *
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
-    private $thirdColors;
+    #[ORM\OneToMany(targetEntity: 'DummyCarColor', mappedBy: 'car')]
+    #[Serializer\Groups(['colors'])]
+    private ?mixed $thirdColors = null;
     /**
      * @var mixed Something else
      *
-     * @ORM\ManyToMany(targetEntity="UuidIdentifierDummy", indexBy="uuid")
-     * * @ORM\JoinTable(name="uuid_cars",
-     *     joinColumns={@ORM\JoinColumn(name="car_id", referencedColumnName="id_id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="uuid_uuid", referencedColumnName="uuid")}
-     * )
-     * @Serializer\Groups({"colors"})
      * @ApiFilter(SearchFilter::class, strategy="exact")
      */
-    private $uuid;
+    #[ORM\ManyToMany(targetEntity: 'UuidIdentifierDummy', indexBy: 'uuid')]
+    #[Serializer\Groups(['colors'])]
+    private ?mixed $uuid = null;
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
      * @ApiFilter(SearchFilter::class, strategy="partial")
      */
-    private $name;
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     */
-    private $canSell;
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(type="datetime")
-     */
-    private $availableAt;
-    /**
-     * @var string
-     *
-     * @Serializer\Groups({"colors"})
-     * @Serializer\SerializedName("carBrand")
-     *
-     * @ORM\Column
-     */
-    private $brand = 'DummyBrand';
-    /**
-     * @var DummyCarInfo
-     *
-     * @ORM\Embedded(class="DummyCarInfo")
-     */
-    private $info;
+    #[ORM\Column(type: 'string')]
+    private ?string $name = null;
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $canSell = null;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTime $availableAt = null;
+    #[Serializer\Groups(['colors'])]
+    #[Serializer\SerializedName('carBrand')]
+    #[ORM\Column]
+    private string $brand = 'DummyBrand';
+    #[ORM\Embedded(class: 'DummyCarInfo')]
+    private \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCarInfo $info;
 
     public function __construct()
     {

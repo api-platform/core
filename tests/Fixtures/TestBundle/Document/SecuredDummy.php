@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -38,79 +38,83 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SecuredDummy
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
+
     /**
      * @var string|null The title
      *
      * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $title;
+    #[Assert\NotBlank]
+    private ?string $title = null;
+
     /**
      * @var string The description
      *
      * @ODM\Field
      */
-    private $description = '';
+    private string $description = '';
+
     /**
      * @var string The dummy secret property, only readable/writable by specific users
      *
      * @ODM\Field
-     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
-    private $adminOnlyProperty = '';
+    #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    private ?string $adminOnlyProperty = '';
+
     /**
      * @var string Secret property, only readable/writable by owners
      *
      * @ODM\Field
-     * @ApiProperty(
-     *     security="object == null or object.getOwner() == user",
-     *     securityPostDenormalize="object.getOwner() == user",
-     * )
      */
-    private $ownerOnlyProperty = '';
+    #[ApiProperty(security: 'object == null or object.getOwner() == user', securityPostDenormalize: 'object.getOwner() == user')]
+    private ?string $ownerOnlyProperty = '';
+
     /**
      * @var string|null The owner
      *
      * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $owner;
+    #[Assert\NotBlank]
+    private ?string $owner = null;
+
     /**
      * @var Collection<RelatedDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     public $relatedDummies;
+
     /**
      * @var RelatedDummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     protected $relatedDummy;
+
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
      * @var Collection<RelatedSecuredDummy> Several dummies
      *
      * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_USER')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_USER')")]
     public $relatedSecuredDummies;
+
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
      * @var RelatedSecuredDummy
      *
      * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_USER')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_USER')")]
     protected $relatedSecuredDummy;
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.

@@ -21,30 +21,27 @@ use Doctrine\ORM\Mapping as ORM;
  * DummyDtoNoOutput.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(input: InputDto::class, output: false)]
+#[ORM\Entity]
 class DummyDtoNoOutput
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $lorem;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $ipsum;
 
     public function getId()

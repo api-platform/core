@@ -27,13 +27,11 @@ class ResourceWithBoolean
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var bool
-     *
      * @ODM\Field(type="bool")
      */
-    private $myBooleanField = false;
+    private bool $myBooleanField = false;
 
     public function getId()
     {

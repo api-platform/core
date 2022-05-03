@@ -34,26 +34,26 @@ class DummyValidation
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
      *
      * @ODM\Field(nullable=true)
-     * @Assert\NotNull(groups={"a"})
      */
-    private $name;
+    #[Assert\NotNull(groups: ['a'])]
+    private ?string $name = null;
     /**
      * @var string|null The dummy title
      *
      * @ODM\Field(nullable=true)
-     * @Assert\NotNull(groups={"b"})
      */
-    private $title;
+    #[Assert\NotNull(groups: ['b'])]
+    private ?string $title = null;
     /**
      * @var string|null The dummy code
      * @ODM\Field
      */
-    private $code;
+    private ?string $code = null;
 
     public function getId(): ?int
     {

@@ -26,32 +26,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class VoDummyCar extends VoDummyVehicle
 {
     /**
-     * @var int
-     *
-     * @ODM\Field(type="int")
-     * @Groups({"car_read", "car_write"})
-     */
-    private $mileage;
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     * @Groups({"car_read", "car_write"})
-     */
-    private $bodyType;
-    /**
      * @var VoDummyInspection[]|Collection
      *
      * @ODM\ReferenceMany(targetDocument=VoDummyInspection::class, mappedBy="car", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
      */
-    private $inspections;
+    #[Groups(['car_read', 'car_write'])]
+    private readonly array|\Doctrine\Common\Collections\Collection $inspections;
 
-    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, int $mileage, string $bodyType = 'coupe')
+    public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, /**
+     * @ODM\Field(type="int")
+     */
+    #[Groups(['car_read', 'car_write'])] private readonly int $mileage, /**
+     * @ODM\Field
+     */
+    #[Groups(['car_read', 'car_write'])] private readonly string $bodyType = 'coupe')
     {
         parent::__construct($make, $insuranceCompany, $drivers);
-        $this->mileage = $mileage;
-        $this->bodyType = $bodyType;
         $this->inspections = new ArrayCollection();
     }
 

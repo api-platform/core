@@ -35,7 +35,7 @@ class Company
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @var string The dummy name

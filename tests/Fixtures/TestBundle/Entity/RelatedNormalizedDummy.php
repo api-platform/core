@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,35 +25,33 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related to Normalized Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(normalizationContext: ['groups' => ['related_output', 'output']], denormalizationContext: ['groups' => ['related_input', 'input']])]
+#[ORM\Entity]
 class RelatedNormalizedDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"related_output", "related_input"})
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['related_output', 'related_input'])]
+    private ?int $id = null;
+
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"related_output", "related_input"})
      */
-    private $name;
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['related_output', 'related_input'])]
+    private ?string $name = null;
     /**
      * @var Collection<int, CustomNormalizedDummy> Several Normalized dummies
-     *
-     * @ORM\ManyToMany(targetEntity="CustomNormalizedDummy")
-     * @Groups({"related_output", "related_input"})
      */
+    #[ORM\ManyToMany(targetEntity: 'CustomNormalizedDummy')]
+    #[Groups(['related_output', 'related_input'])]
     public $customNormalizedDummy;
 
     public function __construct()

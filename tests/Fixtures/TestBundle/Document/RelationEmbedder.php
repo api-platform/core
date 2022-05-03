@@ -37,23 +37,23 @@ class RelationEmbedder
     public $id;
     /**
      * @ODM\Field
-     * @Groups({"chicago"})
      */
+    #[Groups(['chicago'])]
     public $paris = 'Paris';
     /**
      * @ODM\Field
-     * @Groups({"barcelona", "chicago"})
      */
+    #[Groups(['barcelona', 'chicago'])]
     public $krondstadt = 'Krondstadt';
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, cascade={"persist"})
-     * @Groups({"chicago", "barcelona"})
      */
+    #[Groups(['chicago', 'barcelona'])]
     public $anotherRelated;
     /**
      * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
-     * @Groups({"barcelona", "chicago"})
      */
+    #[Groups(['barcelona', 'chicago'])]
     protected $related;
 
     public function getRelated()

@@ -30,8 +30,8 @@ class ParentDummy
      * @var int The age
      *
      * @ODM\Field(type="int", nullable=true)
-     * @Groups({"friends"})
      */
+    #[Groups(['friends'])]
     private $age;
 
     public function getAge()

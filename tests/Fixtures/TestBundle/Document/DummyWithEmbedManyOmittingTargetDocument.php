@@ -29,13 +29,13 @@ class DummyWithEmbedManyOmittingTargetDocument
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var EmbeddableDummy[]|Collection
      *
      * @ODM\EmbedMany
      */
-    private $embeddedDummies;
+    private readonly array|\Doctrine\Common\Collections\Collection $embeddedDummies;
 
     public function __construct()
     {

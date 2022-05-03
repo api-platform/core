@@ -30,13 +30,11 @@ class IriOnlyDummy
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
-     * @var string|null
-     *
      * @ODM\Field(type="string")
      */
-    private $foo;
+    private ?string $foo = null;
 
     public function getId(): ?int
     {

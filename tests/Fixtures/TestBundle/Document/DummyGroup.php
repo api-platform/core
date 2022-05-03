@@ -31,44 +31,37 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class DummyGroup
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     *
-     * @Groups({"dummy", "dummy_read", "dummy_id"})
      */
-    private $id;
+    #[Groups(['dummy', 'dummy_read', 'dummy_id'])]
+    private ?int $id = null;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy", "dummy_read", "dummy_write", "dummy_foo"})
      */
+    #[Groups(['dummy', 'dummy_read', 'dummy_write', 'dummy_foo'])]
     public $foo;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy", "dummy_read", "dummy_write", "dummy_bar"})
      */
+    #[Groups(['dummy', 'dummy_read', 'dummy_write', 'dummy_bar'])]
     public $bar;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy", "dummy_read", "dummy_baz"})
      */
+    #[Groups(['dummy', 'dummy_read', 'dummy_baz'])]
     public $baz;
     /**
      * @var string|null
      *
      * @ODM\Field(nullable=true)
-     *
-     * @Groups({"dummy", "dummy_write", "dummy_qux"})
      */
+    #[Groups(['dummy', 'dummy_write', 'dummy_qux'])]
     public $qux;
 
     public function getId(): ?int

@@ -31,10 +31,10 @@ class PersonToPet
 
     /**
      * @ODM\ReferenceOne(targetDocument=Pet::class)
-     * @Groups({"people.pets"})
      *
      * @var Pet
      */
+    #[Groups(['people.pets'])]
     public $pet;
 
     /**

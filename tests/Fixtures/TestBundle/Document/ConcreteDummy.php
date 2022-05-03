@@ -30,8 +30,8 @@ class ConcreteDummy extends AbstractDummy
      * @var string a concrete thing
      *
      * @ODM\Field
-     * @Assert\NotBlank
      */
+    #[Assert\NotBlank]
     private $instance;
 
     public function setInstance($instance)

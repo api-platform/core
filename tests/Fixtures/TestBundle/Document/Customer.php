@@ -25,21 +25,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Customer
 {
     /**
-     * @var int
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"order_read"})
      */
-    private $id;
+    #[Groups(['order_read'])]
+    private ?int $id = null;
     /**
      * @ODM\Field(type="string")
-     * @Groups({"order_read"})
      */
+    #[Groups(['order_read'])]
     public $name;
     /**
      * @ODM\ReferenceMany(targetDocument=Address::class)
-     * @Groups({"order_read"})
      */
+    #[Groups(['order_read'])]
     public $addresses;
 
     public function __construct()

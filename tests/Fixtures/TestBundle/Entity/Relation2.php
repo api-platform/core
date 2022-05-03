@@ -18,22 +18,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource]
+#[ORM\Entity]
 class Relation2
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
     public $id;
-    /**
-     * @ORM\OneToMany(targetEntity="Relation1", mappedBy="relation2")
-     */
+    #[ORM\OneToMany(targetEntity: 'Relation1', mappedBy: 'relation2')]
     public $relation1s;
 
     public function __construct()

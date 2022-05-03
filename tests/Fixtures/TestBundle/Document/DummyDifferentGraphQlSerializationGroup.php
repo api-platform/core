@@ -32,23 +32,23 @@ class DummyDifferentGraphQlSerializationGroup
      * @var int|null The id
      *
      * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
-     * @Groups({"item_query", "collection_query"})
      */
-    private $id;
+    #[Groups(['item_query', 'collection_query'])]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
      *
      * @ODM\Field(type="string")
-     * @Groups({"item_query", "collection_query"})
      */
-    private $name;
+    #[Groups(['item_query', 'collection_query'])]
+    private ?string $name = null;
     /**
      * @var string|null The dummy title
      *
      * @ODM\Field(nullable=true)
-     * @Groups({"item_query"})
      */
-    private $title;
+    #[Groups(['item_query'])]
+    private ?string $title = null;
 
     public function getId(): ?int
     {

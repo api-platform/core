@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 
 /**
@@ -24,18 +24,10 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource]
 class SerializableResource
 {
-    /**
-     * @var int
-     *
-     * @ApiProperty(identifier=true)
-     */
-    public $id;
-    /**
-     * @var string
-     */
-    public $foo;
-    /**
-     * @var string
-     */
-    public $bar;
+    #[ApiProperty(identifier: true)]
+    public int $id;
+
+    public string $foo;
+
+    public string $bar;
 }

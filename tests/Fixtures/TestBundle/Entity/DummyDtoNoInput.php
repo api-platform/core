@@ -27,30 +27,27 @@ use Doctrine\ORM\Mapping as ORM;
  * DummyDtoNoInput.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(), new Delete(), new Post(uriTemplate: '/dummy_dto_no_inputs/{id}/double_bat', controller: DoubleBatAction::class, status: 200), new Post(uriTemplate: '/dummy_dto_no_inputs', controller: CreateItemAction::class), new GetCollection()], input: false, output: OutputDto::class)]
+#[ORM\Entity]
 class DummyDtoNoInput
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $lorem;
     /**
      * @var float
-     *
-     * @ORM\Column(type="float")
      */
+    #[ORM\Column(type: 'float')]
     public $ipsum;
 
     public function getId()

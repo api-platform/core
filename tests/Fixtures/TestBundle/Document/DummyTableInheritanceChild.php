@@ -27,9 +27,8 @@ class DummyTableInheritanceChild extends DummyTableInheritance
      * @var string The dummy nickname
      *
      * @ODM\Field
-     *
-     * @Groups({"default"})
      */
+    #[Groups(['default'])]
     private $nickname;
 
     public function getNickname()

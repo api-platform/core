@@ -33,31 +33,29 @@ use Symfony\Component\Validator\Constraints as Assert;
 class LegacySecuredDummy
 {
     /**
-     * @var int|null
-     *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    private ?int $id = null;
     /**
      * @var string|null The title
      *
      * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $title;
+    #[Assert\NotBlank]
+    private ?string $title = null;
     /**
      * @var string The description
      *
      * @ODM\Field
      */
-    private $description = '';
+    private string $description = '';
     /**
      * @var string|null The owner
      *
      * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $owner;
+    #[Assert\NotBlank]
+    private ?string $owner = null;
 
     public function getId(): ?int
     {

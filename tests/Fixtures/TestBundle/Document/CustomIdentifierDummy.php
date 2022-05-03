@@ -29,13 +29,13 @@ class CustomIdentifierDummy
      *
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $customId;
+    private ?int $customId = null;
     /**
      * @var string The dummy name
      *
      * @ODM\Field
      */
-    private $name;
+    private ?string $name = null;
 
     public function getCustomId(): int
     {

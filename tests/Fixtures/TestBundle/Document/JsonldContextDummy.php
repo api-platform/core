@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
@@ -28,23 +28,17 @@ class JsonldContextDummy
     /**
      * @var int The id
      *
-     * @ApiProperty(identifier=true)
      * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    #[ApiProperty(identifier: true)]
+    private ?int $id = null;
+
     /**
      * @var string The dummy person
-     *
-     * @ApiProperty(
-     *     attributes={
-     *         "jsonld_context"={
-     *             "@id"="http://example.com/id",
-     *             "@type"="@id",
-     *             "foo"="bar"
-     *         }
-     *     },
-     * )
      */
+    #[ApiProperty(
+        jsonldContext: ['@id' => 'https://example.com/id', '@type' => '@id', 'foo' => 'bar']
+    )]
     private $person;
 
     public function getId()
