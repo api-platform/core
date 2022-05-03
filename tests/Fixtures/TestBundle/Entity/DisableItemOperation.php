@@ -14,24 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Action\NotFoundAction;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(
- *     collectionOperations={
- *         "get",
- *     },
- *     itemOperations={
- *         "get"={
- *             "controller"=NotFoundAction::class,
- *             "read"=false,
- *             "output"=false,
- *         },
- *     },
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(controller: NotFoundAction::class, read: false, output: false), new GetCollection()])]
 class DisableItemOperation
 {
     /**
@@ -42,7 +33,6 @@ class DisableItemOperation
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The dummy name
      *

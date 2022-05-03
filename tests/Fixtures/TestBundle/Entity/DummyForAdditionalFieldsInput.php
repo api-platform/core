@@ -14,18 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 
-/**
- * @ApiResource
- */
+#[ApiResource]
 final class DummyForAdditionalFieldsInput
 {
     /**
      * @ApiProperty(identifier=true)
      */
     public $id;
-
     private $dummyName;
 
     public function __construct(string $dummyName)

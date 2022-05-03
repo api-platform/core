@@ -14,12 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MessengerInput;
 
-/**
- * @ApiResource(messenger="input", input=MessengerInput::class, graphql={"create"={"input"=MessengerInput::class, "messenger"="input"}})
- */
+#[ApiResource(graphQlOperations: [new Mutation(name: 'create', input: MessengerInput::class, messenger: 'input')], messenger: 'input', input: MessengerInput::class)]
 class MessengerWithInput
 {
     /**

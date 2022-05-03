@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -22,13 +27,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Embedded Dummy.
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
- *
- * @ApiResource(
- *     attributes={"filters"={"my_dummy.search", "my_dummy.order", "my_dummy.date", "my_dummy.range", "my_dummy.boolean", "my_dummy.numeric"}},
- *     itemOperations={"get", "put", "delete", "groups"={"method"="GET", "path"="/embedded_dummies_groups/{id}", "normalization_context"={"groups"={"embed"}}}}
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(uriTemplate: '/embedded_dummies_groups/{id}', normalizationContext: ['groups' => ['embed']]), new Post(), new GetCollection()], filters: ['my_dummy.search', 'my_dummy.order', 'my_dummy.date', 'my_dummy.range', 'my_dummy.boolean', 'my_dummy.numeric'])]
 class EmbeddedDummy
 {
     /**
@@ -39,7 +40,6 @@ class EmbeddedDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string|null The dummy name
      *
@@ -47,7 +47,6 @@ class EmbeddedDummy
      * @Groups({"embed"})
      */
     private $name;
-
     /**
      * @var \DateTime|null A dummy date
      *
@@ -55,7 +54,6 @@ class EmbeddedDummy
      * @Assert\DateTime
      */
     public $dummyDate;
-
     /**
      * @var EmbeddableDummy
      *
@@ -63,7 +61,6 @@ class EmbeddedDummy
      * @Groups({"embed"})
      */
     public $embeddedDummy;
-
     /**
      * @var RelatedDummy|null A related dummy
      *

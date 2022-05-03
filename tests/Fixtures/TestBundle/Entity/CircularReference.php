@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -22,10 +22,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Circular Reference.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(attributes={"normalization_context"={"groups"={"circular"}}})
  * @ORM\Entity
  */
+#[ApiResource(normalizationContext: ['groups' => ['circular']])]
 class CircularReference
 {
     /**
@@ -34,14 +33,12 @@ class CircularReference
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
-
     /**
      * @ORM\ManyToOne(targetEntity="CircularReference", inversedBy="children")
      *
      * @Groups({"circular"})
      */
     public $parent;
-
     /**
      * @ORM\OneToMany(targetEntity="CircularReference", mappedBy="parent")
      *

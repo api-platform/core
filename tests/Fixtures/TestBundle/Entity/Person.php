@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,10 +23,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Person.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(attributes={"normalization_context"={"groups"={"people.pets"}}})
  * @ORM\Entity
  */
+#[ApiResource(normalizationContext: ['groups' => ['people.pets']])]
 class Person
 {
     /**
@@ -36,13 +34,11 @@ class Person
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @ORM\Column(type="string")
      * @Groups({"people.pets"})
      */
     public $name;
-
     /**
      * @ORM\OneToMany(targetEntity="PersonToPet", mappedBy="person")
      * @Groups({"people.pets"})
@@ -50,9 +46,7 @@ class Person
      * @var Collection<int, PersonToPet>
      */
     public $pets;
-
     /**
-     * @ApiSubresource
      * @ORM\OneToMany(targetEntity="Greeting", mappedBy="sender")
      */
     public $sentGreetings;

@@ -13,25 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Payment\VoidPaymentAction;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- *
- * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "post_void"={
- *             "method"="POST",
- *             "path"="/payments/{id}/void",
- *             "controller"=VoidPaymentAction::class,
- *             "deserialize"=false,
- *         },
- *     },
- * )
  */
+#[ApiResource(operations: [new Get(), new Post(uriTemplate: '/payments/{id}/void', controller: VoidPaymentAction::class, deserialize: false), new Post(), new GetCollection()])]
 class Payment
 {
     /**
@@ -42,14 +34,12 @@ class Payment
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string
      *
      * @ORM\Column(type="decimal", precision=6, scale=2)
      */
     private $amount;
-
     /**
      * @ORM\OneToOne(targetEntity=VoidPayment::class, mappedBy="payment")
      */
@@ -75,7 +65,6 @@ class Payment
         if (null !== $this->voidPayment) {
             return;
         }
-
         $this->voidPayment = new VoidPayment($this);
     }
 

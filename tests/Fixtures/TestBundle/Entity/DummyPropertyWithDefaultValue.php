@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -21,12 +21,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * DummyPropertyWithDefaultValue.
  *
  * @ORM\Entity
- *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"dummy_read"}},
- *     "denormalization_context"={"groups"={"dummy_write"}}
- * })
  */
+#[ApiResource(normalizationContext: ['groups' => ['dummy_read']], denormalizationContext: ['groups' => ['dummy_write']])]
 class DummyPropertyWithDefaultValue
 {
     /**
@@ -39,7 +35,6 @@ class DummyPropertyWithDefaultValue
      * @Groups("dummy_read")
      */
     private $id;
-
     /**
      * @var string|null
      *
@@ -48,7 +43,6 @@ class DummyPropertyWithDefaultValue
      * @Groups({"dummy_read", "dummy_write"})
      */
     public $foo = 'foo';
-
     /**
      * @var string A dummy with a Doctrine default options
      *

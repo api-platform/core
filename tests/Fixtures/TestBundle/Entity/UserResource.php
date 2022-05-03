@@ -13,22 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\UserResetPasswordDto;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(
- *     collectionOperations={
- *         "post"={
- *             "method"="POST",
- *             "path"="/user-reset-password",
- *             "input"=UserResetPasswordDto::class
- *         }
- *     },
- *     itemOperations={}
- * )
- */
+#[ApiResource(operations: [new Post(uriTemplate: '/user-reset-password', input: UserResetPasswordDto::class)])]
 final class UserResource
 {
     /**

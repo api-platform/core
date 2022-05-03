@@ -14,23 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ApiResource(attributes={
- *     "pagination_partial"=true,
- *     "pagination_via_cursor"={
- *         {"field"="id", "direction"="DESC"}
- *     }
- * })
- *
- * @ApiFilter(RangeFilter::class, properties={"id"})
- * @ApiFilter(OrderFilter::class, properties={"id"="DESC"})
+ * @ApiFilter (RangeFilter::class, properties={"id"})
+ * @ApiFilter (OrderFilter::class, properties={"id"="DESC"})
  */
+#[ApiResource(paginationPartial: true, paginationViaCursor: [['field' => 'id', 'direction' => 'DESC']])]
 class SoMany
 {
     /**
@@ -39,7 +33,6 @@ class SoMany
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     public $id;
-
     /**
      * @ORM\Column(nullable=true)
      */

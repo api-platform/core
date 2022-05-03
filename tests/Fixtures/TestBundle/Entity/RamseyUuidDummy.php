@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * @ORM\Entity
- * @ApiResource
  */
+#[ApiResource]
 class RamseyUuidDummy
 {
     /**
@@ -31,7 +31,6 @@ class RamseyUuidDummy
      * @ORM\Column(type="uuid", unique=true)
      */
     private $id;
-
     /**
      * @var \Ramsey\Uuid\UuidInterface|null
      *

@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,12 +27,8 @@ use Doctrine\ORM\Mapping as ORM;
  * DummyDtoCustom.
  *
  * @ORM\Entity
- *
- * @ApiResource(
- *     collectionOperations={"post"={"input"=CustomInputDto::class}, "get", "custom_output"={"output"=CustomOutputDto::class, "path"="dummy_dto_custom_output", "method"="GET"}, "post_without_output"={"output"=false, "method"="POST", "path"="dummy_dto_custom_post_without_output"}},
- *     itemOperations={"get", "custom_output"={"output"=CustomOutputDto::class, "method"="GET", "path"="dummy_dto_custom_output/{id}"}, "put", "delete"}
- * )
  */
+#[ApiResource(operations: [new Get(), new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}'), new Put(), new Delete(), new Post(input: CustomInputDto::class), new GetCollection(), new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output'), new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output')])]
 class DummyDtoCustom
 {
     /**
@@ -38,14 +39,12 @@ class DummyDtoCustom
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string
      *
      * @ORM\Column
      */
     public $lorem;
-
     /**
      * @var string
      *

@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Jsonld Context Dummy.
  *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class JsonldContextDummy
 {
     /**
@@ -34,7 +34,6 @@ class JsonldContextDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The dummy person
      *

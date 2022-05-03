@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -22,10 +22,10 @@ use Symfony\Component\Uid\Uuid;
 if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
     /**
      * @ORM\Entity
-     * @ApiResource
      *
      * @author Vincent Chalamon <vincentchalamon@gmail.com>
      */
+    #[ApiResource]
     class SymfonyUuidDummy
     {
         /**
@@ -34,7 +34,6 @@ if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidTy
          * @ORM\GeneratedValue(strategy="NONE")
          */
         private $id;
-
         /**
          * @ORM\Column(nullable=true)
          */

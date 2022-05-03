@@ -14,7 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,32 +31,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Secured resource.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(
- *     attributes={"security"="is_granted('ROLE_USER')"},
- *     collectionOperations={
- *         "get"={"security"="is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"},
- *         "get_from_data_provider_generator"={
- *             "method"="GET",
- *             "path"="custom_data_provider_generator",
- *             "security"="is_granted('ROLE_USER')"
- *         },
- *         "post"={"security"="is_granted('ROLE_ADMIN')"}
- *     },
- *     itemOperations={
- *         "get"={"security"="is_granted('ROLE_USER') and object.getOwner() == user"},
- *         "put"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
- *     },
- *     graphql={
- *         "item_query"={"security"="is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.getOwner() == user)"},
- *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
- *         "delete"={},
- *         "update"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
- *         "create"={"security"="is_granted('ROLE_ADMIN')", "security_message"="Only admins can create a secured dummy."}
- *     }
- * )
  * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Put(securityPostDenormalize: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new GetCollection(security: 'is_granted(\'ROLE_USER\') or is_granted(\'ROLE_ADMIN\')'), new GetCollection(uriTemplate: 'custom_data_provider_generator', security: 'is_granted(\'ROLE_USER\')'), new Post(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_USER\') and object.getOwner() == user)'), new QueryCollection(name: 'collection_query', security: 'is_granted(\'ROLE_ADMIN\')'), new Mutation(name: 'delete'), new Mutation(name: 'update', securityPostDenormalize: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.')], security: 'is_granted(\'ROLE_USER\')')]
 class SecuredDummy
 {
     /**
@@ -60,7 +44,6 @@ class SecuredDummy
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string The title
      *
@@ -68,14 +51,12 @@ class SecuredDummy
      * @Assert\NotBlank
      */
     private $title;
-
     /**
      * @var string The description
      *
      * @ORM\Column
      */
     private $description = '';
-
     /**
      * @var string The dummy secret property, only readable/writable by specific users
      *
@@ -83,7 +64,6 @@ class SecuredDummy
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     private $adminOnlyProperty = '';
-
     /**
      * @var string Secret property, only readable/writable by owners
      *
@@ -94,7 +74,6 @@ class SecuredDummy
      * )
      */
     private $ownerOnlyProperty = '';
-
     /**
      * @var string The owner
      *
@@ -102,7 +81,6 @@ class SecuredDummy
      * @Assert\NotBlank
      */
     private $owner;
-
     /**
      * A collection of dummies that only admins can access.
      *
@@ -113,7 +91,6 @@ class SecuredDummy
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     public $relatedDummies;
-
     /**
      * A dummy that only admins can access.
      *
@@ -124,7 +101,6 @@ class SecuredDummy
      * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
     protected $relatedDummy;
-
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
@@ -135,7 +111,6 @@ class SecuredDummy
      * @ApiProperty(security="is_granted('ROLE_USER')")
      */
     public $relatedSecuredDummies;
-
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
@@ -146,7 +121,6 @@ class SecuredDummy
      * @ApiProperty(security="is_granted('ROLE_USER')")
      */
     protected $relatedSecuredDummy;
-
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
@@ -156,7 +130,6 @@ class SecuredDummy
      * @ORM\JoinTable(name="secured_dummy_public_related_secured_dummy")
      */
     public $publicRelatedSecuredDummies;
-
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *

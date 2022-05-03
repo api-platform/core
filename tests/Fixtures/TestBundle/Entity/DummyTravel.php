@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(filters={"dummy_travel.property"})
  * @ORM\Entity
  */
+#[ApiResource(filters: ['dummy_travel.property'])]
 class DummyTravel
 {
     /**
@@ -28,13 +28,11 @@ class DummyTravel
      * @ORM\Column(type="integer")
      */
     private $id;
-
     /**
      * @ORM\ManyToOne(targetEntity="DummyCar")
      * @ORM\JoinColumn(name="car_id", referencedColumnName="id_id")
      */
     public $car;
-
     /**
      * @ORM\Column(type="boolean")
      */

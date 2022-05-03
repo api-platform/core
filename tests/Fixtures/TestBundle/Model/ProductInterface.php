@@ -14,23 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\ProductProvider;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(
- *     shortName="Product",
- *     attributes={"identifiers"="code", "provider"=ProductProvider::class},
- *     normalizationContext={
- *         "groups"={"product_read"},
- *     },
- *     denormalizationContext={
- *         "groups"={"product_write"},
- *     },
- * )
- */
+#[ApiResource(shortName: 'Product', uriVariables: 'code', provider: ProductProvider::class, normalizationContext: ['groups' => ['product_read']], denormalizationContext: ['groups' => ['product_write']])]
 interface ProductInterface
 {
     public function getId();

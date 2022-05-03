@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom identifier.
  *
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
 class CustomGeneratedIdentifier
 {
     /**

@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource
  * @ORM\Entity
  */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/people/{id}/sent_greetings.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person::class, identifiers: ['id'], toProperty: 'sender')], status: 200, operations: [new GetCollection()])]
 class Greeting
 {
     /**
@@ -28,18 +31,15 @@ class Greeting
      * @ORM\Column(type="integer")
      */
     private $id;
-
     /**
      * @ORM\Column
      */
     public $message = '';
-
     /**
      * @ORM\ManyToOne(targetEntity="Person", inversedBy="sentGreetings")
      * @ORM\JoinColumn(name="sender_id")
      */
     public $sender;
-
     /**
      * @ORM\ManyToOne(targetEntity="Person")
      * @ORM\JoinColumn(name="recipient_id", nullable=true)

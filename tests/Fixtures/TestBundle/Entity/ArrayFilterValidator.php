@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,14 +22,9 @@ use Doctrine\ORM\Mapping as ORM;
  * Filter Validator entity.
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
- *
- * @ApiResource(attributes={
- *     "filters"={
- *         ArrayRequiredFilter::class
- *     }
- * })
  * @ORM\Entity
  */
+#[ApiResource(filters: [ArrayRequiredFilter::class])]
 class ArrayFilterValidator
 {
     /**
@@ -40,7 +35,6 @@ class ArrayFilterValidator
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
     /**
      * @var string A name
      *
