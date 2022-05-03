@@ -34,5 +34,3 @@ final class Paths
         return $this->paths ?? [];
     }
 }
-
-class_alias(Paths::class, \ApiPlatform\Core\OpenApi\Model\Paths::class);

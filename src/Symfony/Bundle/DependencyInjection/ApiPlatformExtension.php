@@ -15,13 +15,6 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -41,10 +34,8 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
-use Doctrine\Common\Annotations\Annotation;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -118,7 +109,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonHalConfiguration($formats, $loader, $config);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphQlConfiguration($container, $config, $loader);
-        $this->registerLegacyBundlesConfiguration($container, $config, $loader);
         $this->registerCacheConfiguration($container);
         $this->registerDoctrineOrmConfiguration($container, $config, $loader);
         $this->registerDoctrineMongoDbOdmConfiguration($container, $config, $loader);
@@ -132,18 +122,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerSecurityConfiguration($container, $loader, $config);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($container, $loader, $config);
-        $this->registerLegacyServices($container, $config, $loader);
-        $this->registerUpgradeCommandConfiguration($container, $loader, $config);
-
-        // TODO: remove in 3.x
-        $container->registerForAutoconfiguration(DataPersisterInterface::class)
-            ->addTag('api_platform.data_persister');
-        $container->registerForAutoconfiguration(ItemDataProviderInterface::class)
-            ->addTag('api_platform.item_data_provider');
-        $container->registerForAutoconfiguration(CollectionDataProviderInterface::class)
-            ->addTag('api_platform.collection_data_provider');
-        $container->registerForAutoconfiguration(SubresourceDataProviderInterface::class)
-            ->addTag('api_platform.subresource_data_provider');
 
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
@@ -155,57 +133,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
     {
+        $loader->load('symfony/events.xml');
         $loader->load('api.xml');
-
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/api.xml');
-            $loader->load('legacy/data_provider.xml');
-            $loader->load('legacy/backward_compatibility.xml');
-        } else {
-            $loader->load('v3/api.xml');
-            $loader->load('legacy/data_provider.xml');
-            $loader->load('v3/state.xml');
-            $loader->load('v3/backward_compatibility.xml');
-        }
-
-        $loader->load('data_persister.xml');
-        $loader->load('data_provider.xml');
+        $loader->load('state.xml');
         $loader->load('filter.xml');
-
-        if ($container->hasDefinition('api_platform.operation_method_resolver')) {
-            $container->getDefinition('api_platform.operation_method_resolver')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%service_id%" service is deprecated since API Platform 2.5.'));
-        }
-
-        if ($container->hasDefinition('api_platform.formats_provider')) {
-            $container->getDefinition('api_platform.formats_provider')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%service_id%" service is deprecated since API Platform 2.5.'));
-            $container->getAlias('ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.5', 'The "%alias_id%" alias is deprecated since API Platform 2.5.'));
-        }
-
-        if ($container->hasDefinition('api_platform.operation_path_resolver.underscore')) {
-            $container->getDefinition('api_platform.operation_path_resolver.underscore')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since API Platform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.underscore" instead.'));
-        }
-
-        if ($container->hasDefinition('api_platform.operation_path_resolver.underscore')) {
-            $container->getDefinition('api_platform.operation_path_resolver.dash')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since API Platform 2.1 and will be removed in 3.0. Use "api_platform.path_segment_name_generator.dash" instead.'));
-        }
-
-        $container->getDefinition('api_platform.filters')
-            ->setDeprecated(...$this->buildDeprecationArgs('2.1', 'The "%service_id%" service is deprecated since 2.1 and will be removed in 3.0. Use the "api_platform.filter_locator" service instead.'));
 
         if (class_exists(Uuid::class)) {
             $loader->load('ramsey_uuid.xml');
         }
 
         if (class_exists(AbstractUid::class)) {
-            $loader->load('symfony_uid.xml');
+            $loader->load('symfony/uid.xml');
         }
 
-        $container->setParameter('api_platform.metadata_backward_compatibility_layer', $config['metadata_backward_compatibility_layer']);
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
         $container->setParameter('api_platform.title', $config['title']);
@@ -277,19 +217,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function normalizeDefaults(array $defaults, bool $compatibility = false): array
     {
-        $key = $compatibility ? 'attributes' : 'extra_properties';
-        $normalizedDefaults = [$key => $defaults[$key] ?? []];
-        unset($defaults[$key]);
+        $normalizedDefaults = ['extra_properties' => $defaults['extra_properties'] ?? []];
+        unset($defaults['extra_properties']);
 
+        $rc = new \ReflectionClass(ApiResource::class);
         $publicProperties = [];
-
-        if ($compatibility) {
-            [$publicProperties,] = ApiResourceAnnotation::getConfigMetadata();
-        } else {
-            $rc = new \ReflectionClass(ApiResource::class);
-            foreach ($rc->getConstructor()->getParameters() as $param) {
-                $publicProperties[$param->getName()] = true;
-            }
+        foreach ($rc->getConstructor()->getParameters() as $param) {
+            $publicProperties[$param->getName()] = true;
         }
 
         $nameConverter = new CamelCaseToSnakeCaseNameConverter();
@@ -300,7 +234,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 continue;
             }
 
-            $normalizedDefaults[$key][$option] = $value;
+            $normalizedDefaults['extra_properties'][$option] = $value;
         }
 
         return $normalizedDefaults;
@@ -319,39 +253,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ));
         }
 
-        $loader->load('legacy/metadata.xml');
-        $container->getDefinition('api_platform.metadata.extractor.xml.legacy')->replaceArgument(0, $xmlResources);
-
-        if (class_exists(Annotation::class)) {
-            $loader->load('legacy/metadata_annotation.xml');
-        }
-
-        if (interface_exists(DocBlockFactoryInterface::class)) {
-            $loader->load('legacy/metadata_php_doc.xml');
-        }
-
-        if (class_exists(Yaml::class)) {
-            $loader->load('legacy/metadata_yaml.xml');
-            $container->getDefinition('api_platform.metadata.extractor.yaml.legacy')->replaceArgument(0, $yamlResources);
-
-            if ($config['metadata_backward_compatibility_layer']) {
-                $loader->load('legacy/metadata_yaml_backward_compatibility.xml');
-            }
-        }
-
-        // Load the legacy metadata as well
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/metadata_backward_compatibility.xml');
-
-            return;
-        }
-
         // V3 metadata
         $loader->load('metadata/xml.xml');
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
         $loader->load('metadata/resource.xml');
-        $loader->load('v3/metadata.xml');
 
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
@@ -492,22 +398,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
         $container->setParameter('api_platform.swagger_ui.extra_configuration', $config['openapi']['swagger_ui_extra_configuration'] ?: $config['swagger']['swagger_ui_extra_configuration']);
 
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/swagger.xml');
-            $loader->load('legacy/openapi.xml');
-            $loader->load('legacy/swagger_ui.xml');
-
-            if (true === $config['openapi']['backward_compatibility_layer']) {
-                $container->getDefinition('api_platform.swagger.normalizer.documentation')->addArgument($container->getDefinition('api_platform.openapi.normalizer'));
-            }
-
-            return;
-        }
-
         // for swagger 2 support
-        $loader->load('legacy/swagger.xml');
-        $loader->load('v3/openapi.xml');
-        $loader->load('v3/swagger_ui.xml');
+        $loader->load('openapi.xml');
+        $loader->load('swagger_ui.xml');
     }
 
     private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader): void
@@ -585,12 +478,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('graphql.xml');
 
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/graphql.xml');
-        } else {
-            $loader->load('v3/graphql.xml');
-        }
-
         $container->registerForAutoconfiguration(QueryItemResolverInterface::class)
             ->addTag('api_platform.graphql.query_resolver');
         $container->registerForAutoconfiguration(QueryCollectionResolverInterface::class)
@@ -603,50 +490,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.graphql.error_handler');
     }
 
-    private function registerLegacyBundlesConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
-    {
-        /** @var string[] $bundles */
-        $bundles = $container->getParameter('kernel.bundles');
-
-        if (isset($bundles['FOSUserBundle']) && $config['enable_fos_user']) {
-            $loader->load('fos_user.xml');
-        }
-
-        if (isset($bundles['NelmioApiDocBundle']) && $config['enable_nelmio_api_doc']) {
-            $loader->load('nelmio_api_doc.xml');
-
-            $container->getDefinition('api_platform.nelmio_api_doc.annotations_provider')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'));
-            $container->getDefinition('api_platform.nelmio_api_doc.parser')
-                ->setDeprecated(...$this->buildDeprecationArgs('2.2', 'The "%service_id%" service is deprecated since API Platform 2.2 and will be removed in 3.0. NelmioApiDocBundle 3 has native support for API Platform.'));
-        }
-    }
-
     private function registerCacheConfiguration(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('kernel.debug') || !$container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
-        }
-
-        if (!$container->hasParameter('api_platform.metadata_cache')) {
-            return;
-        }
-
-        @trigger_error('The "api_platform.metadata_cache" parameter is deprecated since version 2.4 and will have no effect in 3.0.', \E_USER_DEPRECATED);
-
-        // BC
-        if (!$container->getParameter('api_platform.metadata_cache')) {
-            $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
-
-            $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
-            $container->register('api_platform.cache.metadata.property.legacy', ArrayAdapter::class);
-            $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
-            $container->register('api_platform.cache.metadata.resource.legacy', ArrayAdapter::class);
-            $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class);
-            $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
-            $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
-            $container->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class);
-            $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
         }
     }
 
@@ -664,11 +511,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$requestStack' => null]);
 
         $loader->load('doctrine_orm.xml');
-        $loader->load('legacy/doctrine_orm.xml');
-
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('v3/doctrine_orm.xml');
-        }
 
         if ($this->isConfigEnabled($container, $config['eager_loading'])) {
             return;
@@ -694,11 +536,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
         $loader->load('doctrine_mongodb_odm.xml');
-        $loader->load('legacy/doctrine_odm.xml');
-
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('v3/doctrine_odm.xml');
-        }
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -752,12 +589,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (interface_exists(ValidatorInterface::class)) {
-            if ($config['metadata_backward_compatibility_layer']) {
-                $loader->load('legacy/validator.xml');
-            } else {
-                $loader->load('metadata/validator.xml');
-                $loader->load('symfony/validator.xml');
-            }
+            $loader->load('metadata/validator.xml');
+            $loader->load('symfony/validator.xml');
 
             $container->registerForAutoconfiguration(ValidationGroupsGeneratorInterface::class)
                 ->addTag('api_platform.validation_groups_generator')
@@ -785,20 +618,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/data_collector.xml');
-        } else {
-            $loader->load('v3/data_collector.xml');
-        }
+        $loader->load('data_collector.xml');
 
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('debug.xml');
-
-            if ($config['metadata_backward_compatibility_layer']) {
-                $loader->load('legacy/debug.xml');
-            } else {
-                $loader->load('v3/debug.xml');
-            }
         }
     }
 
@@ -814,42 +637,26 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
-            if ($config['metadata_backward_compatibility_layer']) {
-                $loader->load('legacy/doctrine_orm_mercure_publisher.xml');
-            } else {
-                $loader->load('v3/doctrine_orm_mercure_publisher.xml');
-            }
+            $loader->load('doctrine_orm_mercure_publisher.xml');
 
             if (class_exists(HubRegistry::class)) {
                 $container->getDefinition('api_platform.doctrine.orm.listener.mercure.publish')->setArgument(6, new Reference(HubRegistry::class));
             }
         }
         if ($this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
-            if ($config['metadata_backward_compatibility_layer']) {
-                $loader->load('legacy/doctrine_odm_mercure_publisher.xml');
-            } else {
-                $loader->load('v3/doctrine_odm_mercure_publisher.xml');
-            }
+            $loader->load('doctrine_odm_mercure_publisher.xml');
             if (class_exists(HubRegistry::class)) {
                 $container->getDefinition('api_platform.doctrine_mongodb.odm.listener.mercure.publish')->setArgument(6, new Reference(HubRegistry::class));
             }
         }
 
         if ($this->isConfigEnabled($container, $config['graphql'])) {
-            if ($config['metadata_backward_compatibility_layer']) {
-                $loader->load('legacy/graphql_mercure.xml');
-            } else {
-                $loader->load('v3/graphql_mercure.xml');
-            }
+            $loader->load('graphql_mercure.xml');
             if (class_exists(HubRegistry::class)) {
                 $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument(new Reference(HubRegistry::class));
             } else {
                 $container->getDefinition('api_platform.graphql.subscription.mercure_iri_generator')->addArgument($config['mercure']['hub_url'] ?? '%mercure.default_hub%');
             }
-        }
-
-        if ($config['metadata_backward_compatibility_layer']) {
-            $container->getDefinition('api_platform.mercure.listener.response.add_link_header')->setArgument(0, new Reference('api_platform.metadata.resource.metadata_factory'));
         }
     }
 
@@ -860,10 +667,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('messenger.xml');
-
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('v3/messenger.xml');
-        }
     }
 
     private function registerElasticsearchConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -877,10 +680,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
-
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('v3/elasticsearch.xml');
-        }
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
@@ -908,10 +707,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('security.xml');
-
-        if ($config['metadata_backward_compatibility_layer']) {
-            $container->getDefinition('api_platform.security.listener.request.deny_access')->setArgument(0, new Reference('api_platform.metadata.resource.metadata_factory'));
-        }
     }
 
     private function registerOpenApiConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -943,39 +738,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerArgumentResolverConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
     {
-        if ($config['metadata_backward_compatibility_layer']) {
-            return;
-        }
-
         $loader->load('argument_resolver.xml');
     }
-
-    private function registerLegacyServices(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
-    {
-        $container->setParameter('api_platform.metadata_backward_compatibility_layer', $config['metadata_backward_compatibility_layer']);
-
-        $loader->load('legacy/identifiers.xml');
-
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('symfony.xml');
-
-            return;
-        }
-
-        $loader->load('legacy/api.xml');
-    }
-
-    private function registerUpgradeCommandConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void
-    {
-        $loader->load('legacy/upgrade.xml');
-    }
-
-    private function buildDeprecationArgs(string $version, string $message): array
-    {
-        return method_exists(Definition::class, 'getDeprecation')
-            ? ['api-platform/core', $version, $message]
-            : [true, $message];
-    }
 }
-
-class_alias(ApiPlatformExtension::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\ApiPlatformExtension::class);

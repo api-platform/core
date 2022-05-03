@@ -100,5 +100,3 @@ trait ExistsFilterTrait
         return null;
     }
 }
-
-class_alias(ExistsFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class);

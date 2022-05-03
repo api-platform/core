@@ -77,6 +77,11 @@ final class ResourceMetadataCollection extends \ArrayObject
             $it->next();
         }
 
+        // Idea:
+        // if ($metadata) {
+        //     return (new class extends HttpOperation {})->withResource($metadata);
+        // }
+
         $this->handleNotFound($operationName, $metadata);
     }
 

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Property\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Property\Factory\CachedPropertyNameCollectionFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;

@@ -25,5 +25,3 @@ final class NotFoundAction
         throw new NotFoundHttpException();
     }
 }
-
-class_alias(NotFoundAction::class, \ApiPlatform\Core\Action\NotFoundAction::class);

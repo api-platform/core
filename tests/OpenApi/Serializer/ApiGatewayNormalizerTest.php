@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\OpenApi\Serializer;
 
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;

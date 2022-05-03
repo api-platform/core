@@ -56,5 +56,3 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
         ];
     }
 }
-
-class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\Problem\Serializer\ConstraintViolationListNormalizer::class);

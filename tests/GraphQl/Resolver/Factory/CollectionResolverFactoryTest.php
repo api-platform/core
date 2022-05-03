@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\CollectionResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;

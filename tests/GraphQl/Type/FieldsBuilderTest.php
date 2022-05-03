@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\FieldsBuilder;
 use ApiPlatform\GraphQl\Type\TypeBuilderInterface;

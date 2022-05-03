@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
-use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -35,44 +32,17 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class DeserializeListener
 {
     use OperationRequestInitiatorTrait;
-    use ToggleableOperationAttributeTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'deserialize';
 
     private $serializer;
     private $serializerContextBuilder;
-    private $formats;
-    private $formatsProvider;
 
-    /**
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
-     */
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if ($resourceMetadataFactory) {
-            if (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                @trigger_error(sprintf('Passing an array or an instance of "%s" as 3rd parameter of the constructor of "%s" is deprecated since API Platform 2.5, pass an instance of "%s" instead', FormatsProviderInterface::class, __CLASS__, ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
-            }
-
-            if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-            }
-
-            if ($resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-            }
-        }
-
-        if (\is_array($resourceMetadataFactory)) {
-            $this->formats = $resourceMetadataFactory;
-        } elseif ($resourceMetadataFactory instanceof FormatsProviderInterface) {
-            $this->formatsProvider = $resourceMetadataFactory;
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -101,32 +71,9 @@ final class DeserializeListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (
-            !$attributes['receive']
-            || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
-        )) {
-            return;
-        }
-
         $context = $this->serializerContextBuilder->createFromRequest($request, false, $attributes);
 
-        $formats = $operation ? $operation->getInputFormats() ?? null : null;
-
-        if (!$formats) {
-            // BC check to be removed in 3.0
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-                @trigger_error('When using a "route_name", be sure to define the "_api_operation" route defaults as we will not rely on metadata in API Platform 3.0.', \E_USER_DEPRECATED);
-                $formats = $this->resourceMetadataFactory
-                    ->create($attributes['resource_class'])
-                    ->getOperationAttribute($attributes, 'input_formats', [], true);
-            } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {
-                $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
-            } else {
-                $formats = $this->formats;
-            }
-        }
-
-        $format = $this->getFormat($request, $formats);
+        $format = $this->getFormat($request, $operation->getInputFormats() ?? []);
         $data = $request->attributes->get('data');
         if (null !== $data) {
             $context[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
@@ -169,5 +116,3 @@ final class DeserializeListener
         return $format;
     }
 }
-
-class_alias(DeserializeListener::class, \ApiPlatform\Core\EventListener\DeserializeListener::class);

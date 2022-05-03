@@ -149,5 +149,3 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
         return implode('/', $refParts);
     }
 }
-
-class_alias(ApiGatewayNormalizer::class, \ApiPlatform\Core\Swagger\Serializer\ApiGatewayNormalizer::class);

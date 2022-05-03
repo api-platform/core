@@ -182,5 +182,3 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         $queryBuilder->setParameter($valueParameter, $value, $type);
     }
 }
-
-class_alias(DateFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter::class);

@@ -33,5 +33,3 @@ final class SwaggerUiListener
         $request->attributes->set('_controller', 'api_platform.swagger.action.ui');
     }
 }
-
-class_alias(SwaggerUiListener::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\EventListener\SwaggerUiListener::class);

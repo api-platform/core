@@ -25,5 +25,3 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 final class RemoveStamp implements StampInterface
 {
 }
-
-class_alias(RemoveStamp::class, \ApiPlatform\Core\Bridge\Symfony\Messenger\RemoveStamp::class);

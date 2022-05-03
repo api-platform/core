@@ -111,5 +111,3 @@ abstract class AbstractFilter implements FilterInterface
         return implode('.', array_map([$this->nameConverter, 'normalize'], explode('.', (string) $property)));
     }
 }
-
-class_alias(AbstractFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\AbstractFilter::class);

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\Odm\Extension;
 
 use ApiPlatform\Api\FilterInterface as ApiFilterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Extension\FilterExtension;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\ApiResource;

@@ -108,6 +108,54 @@
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="16" />
         </service>
         <service id="ApiPlatform\Doctrine\Odm\Extension\OrderExtension" alias="api_platform.doctrine_mongodb.odm.aggregation_extension.order" />
+
+        <!-- Metadata loader -->
+        <service id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory"
+                 class="ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
+                 decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner"/>
+        </service>
+
+        <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+
+        <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
+
+        <service id="ApiPlatform\Doctrine\Odm\State\CollectionProvider" class="ApiPlatform\Doctrine\Odm\State\CollectionProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
+        <service id="ApiPlatform\Doctrine\Odm\State\ItemProvider" class="ApiPlatform\Doctrine\Odm\State\ItemProvider" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+
+            <tag name="api_platform.state_provider" priority="-100" />
+        </service>
+
+        <service id="api_platform.doctrine.odm.metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.doctrine.odm.metadata.resource.metadata_collection_factory.inner" />
+        </service>
+
+        <service id="api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory"
+                 class="ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
+                 decorates="api_platform.metadata.property.identifier_metadata_factory"
+                 decoration-priority="40">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory.inner"/>
+        </service>
     </services>
 
 </container>

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Action;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Action\EntrypointAction;
 use ApiPlatform\GraphQl\Action\GraphiQlAction;
 use ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction;

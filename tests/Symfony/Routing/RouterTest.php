@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

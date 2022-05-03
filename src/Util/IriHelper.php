@@ -113,5 +113,3 @@ final class IriHelper
         return $url;
     }
 }
-
-class_alias(IriHelper::class, \ApiPlatform\Core\Util\IriHelper::class);

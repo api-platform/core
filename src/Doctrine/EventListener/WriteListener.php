@@ -84,5 +84,3 @@ final class WriteListener
         return $objectManager;
     }
 }
-
-class_alias(WriteListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\WriteListener::class);

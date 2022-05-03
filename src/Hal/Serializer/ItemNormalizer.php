@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\Serializer;
 
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
@@ -66,7 +63,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
         $context = $this->initContext($resourceClass, $context);
-        $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object);
+        $iri = $this->iriConverter->getIriFromResource($object);
         $context['iri'] = $iri;
         $context['api_normalize'] = true;
 
@@ -141,11 +138,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         ];
 
         foreach ($attributes as $attribute) {
-            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
 
             // TODO: 3.0 support multiple types, default value of types will be [] instead of null
-            $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
+            $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
             $isOne = $isMany = false;
 
             if (null !== $type) {
@@ -278,5 +274,3 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return false;
     }
 }
-
-class_alias(ItemNormalizer::class, \ApiPlatform\Core\Hal\Serializer\ItemNormalizer::class);

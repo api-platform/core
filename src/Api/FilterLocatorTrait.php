@@ -62,5 +62,3 @@ trait FilterLocatorTrait
         return null;
     }
 }
-
-class_alias(FilterLocatorTrait::class, \ApiPlatform\Core\Api\FilterLocatorTrait::class);

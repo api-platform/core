@@ -169,5 +169,3 @@ trait PropertyHelperTrait
             ->getClassMetadata($resourceClass);
     }
 }
-
-class_alias(PropertyHelperTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\PropertyHelperTrait::class);

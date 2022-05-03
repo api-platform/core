@@ -89,5 +89,3 @@ final class QueryJoinParser
         return $orderBy->getParts();
     }
 }
-
-class_alias(QueryJoinParser::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::class);

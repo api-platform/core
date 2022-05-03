@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;

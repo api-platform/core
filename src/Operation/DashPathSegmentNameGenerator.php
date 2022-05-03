@@ -35,5 +35,3 @@ final class DashPathSegmentNameGenerator implements PathSegmentNameGeneratorInte
         return strtolower(preg_replace('~(?<=\\w)([A-Z])~', '-$1', $string));
     }
 }
-
-class_alias(DashPathSegmentNameGenerator::class, \ApiPlatform\Core\Operation\DashPathSegmentNameGenerator::class);

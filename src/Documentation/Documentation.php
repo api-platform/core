@@ -75,5 +75,3 @@ final class Documentation implements DocumentationInterface
         return $this->resourceNameCollection;
     }
 }
-
-class_alias(Documentation::class, \ApiPlatform\Core\Documentation\Documentation::class);

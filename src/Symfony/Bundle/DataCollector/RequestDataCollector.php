@@ -13,18 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DataCollector;
 
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DataPersister\TraceableChainDataPersister;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainCollectionDataProvider;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainItemDataProvider;
-use ApiPlatform\Core\Bridge\Symfony\Bundle\DataProvider\TraceableChainSubresourceDataProvider;
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
@@ -38,36 +27,15 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
  */
 final class RequestDataCollector extends DataCollector
 {
-    use ApiResourceToLegacyResourceMetadataTrait;
-
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface
-     */
     private $metadataFactory;
     private $filterLocator;
-    private $collectionDataProvider;
-    private $itemDataProvider;
-    private $subresourceDataProvider;
-    private $dataPersister;
 
     public function __construct(
         $metadataFactory,
         ContainerInterface $filterLocator,
-        CollectionDataProviderInterface $collectionDataProvider = null,
-        ItemDataProviderInterface $itemDataProvider = null,
-        SubresourceDataProviderInterface $subresourceDataProvider = null,
-        DataPersisterInterface $dataPersister = null
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->filterLocator = $filterLocator;
-        $this->collectionDataProvider = $collectionDataProvider;
-        $this->itemDataProvider = $itemDataProvider;
-        $this->subresourceDataProvider = $subresourceDataProvider;
-        $this->dataPersister = $dataPersister;
-
-        if (!$metadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
@@ -102,35 +70,8 @@ final class RequestDataCollector extends DataCollector
             'acceptable_content_types' => $request->getAcceptableContentTypes(),
             'filters' => $filters,
             'counters' => $counters,
-            'dataProviders' => [],
-            'dataPersisters' => ['responses' => []],
             'request_attributes' => $requestAttributes,
         ];
-
-        if ($this->collectionDataProvider instanceof TraceableChainCollectionDataProvider) {
-            $this->data['dataProviders']['collection'] = [
-                'context' => $this->cloneVar($this->collectionDataProvider->getContext()),
-                'responses' => $this->collectionDataProvider->getProvidersResponse(),
-            ];
-        }
-
-        if ($this->itemDataProvider instanceof TraceableChainItemDataProvider) {
-            $this->data['dataProviders']['item'] = [
-                'context' => $this->cloneVar($this->itemDataProvider->getContext()),
-                'responses' => $this->itemDataProvider->getProvidersResponse(),
-            ];
-        }
-
-        if ($this->subresourceDataProvider instanceof TraceableChainSubresourceDataProvider) {
-            $this->data['dataProviders']['subresource'] = [
-                'context' => $this->cloneVar($this->subresourceDataProvider->getContext()),
-                'responses' => $this->subresourceDataProvider->getProvidersResponse(),
-            ];
-        }
-
-        if ($this->dataPersister instanceof TraceableChainDataPersister) {
-            $this->data['dataPersisters']['responses'] = $this->dataPersister->getPersistersResponse();
-        }
     }
 
     private function setFilters(ApiResource $resourceMetadata, int $index, array &$filters, array &$counters): void
@@ -174,26 +115,6 @@ final class RequestDataCollector extends DataCollector
     public function getCounters(): array
     {
         return $this->data['counters'] ?? [];
-    }
-
-    public function getCollectionDataProviders(): array
-    {
-        return $this->data['dataProviders']['collection'] ?? ['context' => [], 'responses' => []];
-    }
-
-    public function getItemDataProviders(): array
-    {
-        return $this->data['dataProviders']['item'] ?? ['context' => [], 'responses' => []];
-    }
-
-    public function getSubresourceDataProviders(): array
-    {
-        return $this->data['dataProviders']['subresource'] ?? ['context' => [], 'responses' => []];
-    }
-
-    public function getDataPersisters(): array
-    {
-        return $this->data['dataPersisters'] ?? ['responses' => []];
     }
 
     public function getVersion(): ?string

@@ -104,5 +104,3 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
         throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
     }
 }
-
-class_alias(CatDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory::class);

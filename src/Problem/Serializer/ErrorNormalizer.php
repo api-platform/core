@@ -78,5 +78,3 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         return true;
     }
 }
-
-class_alias(ErrorNormalizer::class, \ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class);

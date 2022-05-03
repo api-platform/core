@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Security;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Security\ExpressionLanguage;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;

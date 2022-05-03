@@ -41,5 +41,3 @@ final class TestClientPass implements CompilerPassInterface
         );
     }
 }
-
-class_alias(TestClientPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass::class);

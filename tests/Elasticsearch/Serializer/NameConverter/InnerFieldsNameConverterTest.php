@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Serializer\NameConverter;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;

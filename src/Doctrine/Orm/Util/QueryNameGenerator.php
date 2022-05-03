@@ -41,5 +41,3 @@ final class QueryNameGenerator implements QueryNameGeneratorInterface
         return sprintf('%s_p%d', str_replace('.', '_', $name), $this->incrementedName++);
     }
 }
-
-class_alias(QueryNameGenerator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator::class);

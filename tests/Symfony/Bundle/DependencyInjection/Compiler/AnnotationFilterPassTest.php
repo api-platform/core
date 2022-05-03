@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Serializer\Filter\GroupFilter;

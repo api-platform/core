@@ -72,5 +72,3 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
      */
     abstract protected function alterRequestBody(array $requestBody, array $clauseBody): array;
 }
-
-class_alias(AbstractFilterExtension::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\AbstractFilterExtension::class);

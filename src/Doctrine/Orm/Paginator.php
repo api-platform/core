@@ -56,5 +56,3 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface, Q
         return $this->paginator->getQuery();
     }
 }
-
-class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator::class);

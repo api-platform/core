@@ -105,5 +105,3 @@ abstract class ApiTestCase extends KernelTestCase
         return $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getIriFromItem($item) : $iriConverter->getIriFromResource($item);
     }
 }
-
-class_alias(ApiTestCase::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Test\ApiTestCase::class);

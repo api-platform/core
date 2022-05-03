@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
-use ApiPlatform\Core\Filter\QueryParameterValidator as LegacyQueryParameterValidator;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -32,7 +29,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 final class QueryParameterValidateListener
 {
     use OperationRequestInitiatorTrait;
-    use ToggleableOperationAttributeTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'query_parameter_validate';
 
@@ -42,19 +38,9 @@ final class QueryParameterValidateListener
 
     private $enabled;
 
-    /**
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
-     * @param QueryParameterValidator|LegacyQueryParameterValidator                       $queryParameterValidator
-     */
-    public function __construct($resourceMetadataFactory, $queryParameterValidator, bool $enabled = true)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, QueryParameterValidator $queryParameterValidator, bool $enabled = true)
     {
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        } else {
-            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         $this->queryParameterValidator = $queryParameterValidator;
         $this->enabled = $enabled;
     }
@@ -72,33 +58,12 @@ final class QueryParameterValidateListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface)
-        ) {
-            return;
-        }
-
-        // TODO: remove in 3.0
-        $operationName = $attributes['collection_operation_name'] ?? null;
-        if (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (
-                null === $operationName
-                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY, !$this->enabled)
-            )
-        ) {
+        if (!$operation || !($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface) {
             return;
         }
 
         $queryString = RequestParser::getQueryString($request);
         $queryParameters = $queryString ? RequestParser::parseRequestParams($queryString) : [];
-        $resourceFilters = [];
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceFilters = $this->resourceMetadataFactory->create($attributes['resource_class'])->getCollectionOperationAttribute($operationName, 'filters', [], true);
-        } elseif ($operation) {
-            $resourceFilters = $operation->getFilters() ?? [];
-        }
-        $this->queryParameterValidator->validateFilters($attributes['resource_class'], $resourceFilters, $queryParameters);
+        $this->queryParameterValidator->validateFilters($attributes['resource_class'], $operation->getFilters() ?? [], $queryParameters);
     }
 }
-
-class_alias(QueryParameterValidateListener::class, \ApiPlatform\Core\EventListener\QueryParameterValidateListener::class);

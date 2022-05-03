@@ -210,5 +210,3 @@ final class Operation
         return $clone;
     }
 }
-
-class_alias(Operation::class, \ApiPlatform\Core\OpenApi\Model\Operation::class);

@@ -23,5 +23,3 @@ use ApiPlatform\Exception\RuntimeException;
 class ValidationException extends RuntimeException
 {
 }
-
-class_alias(ValidationException::class, \ApiPlatform\Core\Validator\Exception\ValidationException::class);

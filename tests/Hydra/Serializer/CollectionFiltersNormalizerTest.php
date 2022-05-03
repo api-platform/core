@@ -18,7 +18,7 @@ use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer;
