@@ -18,6 +18,7 @@ use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -25,6 +26,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SwaggerCommandUnitTest extends KernelTestCase
 {
+    use ExpectDeprecationTrait;
     /** @var MockObject&NormalizerInterface */
     private $normalizer;
 
@@ -50,8 +52,12 @@ class SwaggerCommandUnitTest extends KernelTestCase
             ->willReturn(new ResourceNameCollection());
     }
 
+    /**
+     * @group legacy
+     */
     public function testDocumentationJsonDoesNotUseEscapedSlashes(): void
     {
+        $this->expectDeprecation('The command "api:swagger:export" is using pre-2.7 metadata, new metadata will not appear, use "api:openapi:export" instead.');
         $this->normalizer->method('normalize')
             ->with(self::isInstanceOf(Documentation::class))
             ->willReturn(['a-jsonable-documentation' => 'containing/some/slashes']);

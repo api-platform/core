@@ -631,7 +631,7 @@ final class Configuration implements ConfigurationInterface
         $defaultsNode = $rootNode->children()->arrayNode('defaults');
 
         $defaultsNode
-            ->ignoreExtraKeys()
+            ->ignoreExtraKeys(false)
             ->beforeNormalization()
             ->always(static function (array $defaults) use ($nameConverter) {
                 $normalizedDefaults = [];

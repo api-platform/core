@@ -253,7 +253,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
         $container->setParameter('api_platform.asset_package', $config['asset_package']);
-        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? [], $config['metadata_backward_compatibility_layer'] ?? false));
     }
 
     /**
@@ -274,12 +274,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         return array_merge($collectionPaginationConfiguration, $paginationOptions);
     }
 
-    private function normalizeDefaults(array $defaults): array
+    private function normalizeDefaults(array $defaults, bool $compatibility = false): array
     {
         $normalizedDefaults = ['attributes' => $defaults['attributes'] ?? []];
         unset($defaults['attributes']);
 
-        [$publicProperties,] = ApiResource::getConfigMetadata();
+        $publicProperties = [];
+
+        if ($compatibility) {
+            [$publicProperties,] = ApiResource::getConfigMetadata();
+        } else {
+            $rc = new \ReflectionClass(ApiResource::class);
+            foreach ($rc->getConstructor()->getParameters() as $param) {
+                $publicProperties[$param->getName()] = true;
+            }
+        }
 
         $nameConverter = new CamelCaseToSnakeCaseNameConverter();
         foreach ($defaults as $option => $value) {
