@@ -1034,6 +1034,11 @@ class ApiPlatformExtensionTest extends TestCase
      */
     public function testLegacyPlainIdentifier()
     {
+        // There's an issue with deprecations being different on lower versions
+        if (\PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped();
+        }
+
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['allow_plain_identifiers'] = false;
         $this->expectDeprecation('Since api-platform/core 2.7: The use of `allow_plain_identifiers` has been deprecated in 2.7 and will be removed in 3.0.');
@@ -1046,7 +1051,7 @@ class ApiPlatformExtensionTest extends TestCase
     public function testLegacyPaginationCollectionOptions()
     {
         // There's an issue with deprecations being different on lower versions
-        if (PHP_VERSION_ID < 80000) {
+        if (\PHP_VERSION_ID < 80000) {
             $this->markTestSkipped();
         }
 
