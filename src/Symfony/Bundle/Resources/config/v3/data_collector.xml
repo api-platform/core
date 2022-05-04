@@ -12,8 +12,6 @@
             <argument type="service" id="api_platform.item_data_provider" />
             <argument type="service" id="api_platform.subresource_data_provider" />
             <argument type="service" id="api_platform.data_persister" />
-            <argument type="service" id="api_platform.state_provider" />
-            <argument type="service" id="api_platform.state_processor" />
             <tag
                 name="data_collector"
                 template="@ApiPlatform/DataCollector/request.html.twig"
