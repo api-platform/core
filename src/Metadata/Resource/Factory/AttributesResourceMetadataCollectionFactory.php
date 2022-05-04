@@ -234,16 +234,22 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function addGlobalDefaults($operation)
     {
+        $extraProperties = $operation->getExtraProperties();
         foreach ($this->defaults['attributes'] as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
-            $upperKey = ucfirst($key);
+            [$newKey, $value] = $this->getKeyValue($key, $value);
+            $upperKey = ucfirst($newKey);
             $getter = 'get'.$upperKey;
-            if (method_exists($operation, $getter) && null === $operation->{$getter}()) {
+
+            if (!method_exists($operation, $getter)) {
+                if (!isset($extraProperties[$key])) {
+                    $extraProperties[$key] = $value;
+                }
+            } elseif (null === $operation->{$getter}()) {
                 $operation = $operation->{'with'.$upperKey}($value);
             }
         }
 
-        return $operation;
+        return $operation->withExtraProperties($extraProperties);
     }
 
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource
