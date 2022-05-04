@@ -1045,6 +1045,11 @@ class ApiPlatformExtensionTest extends TestCase
      */
     public function testLegacyPaginationCollectionOptions()
     {
+        // There's an issue with deprecations being different on lower versions
+        if (PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped();
+        }
+
         $config = self::DEFAULT_CONFIG;
 
         $config['api_platform']['collection']['pagination'] = [
@@ -1057,18 +1062,13 @@ class ApiPlatformExtensionTest extends TestCase
             'client_partial' => false,
         ];
 
-        $prefix = 'Since api-platform/core 2.6: ';
-        if (class_exists(\Symfony\Bridge\PhpUnit\Legacy\SetUpTearDownTraitForV7::class)) {
-            $prefix = '';
-        }
-
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_enabled` instead.');
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_partial` instead.');
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.client_enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_enabled` instead.');
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.client_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_items_per_page` instead.');
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.client_partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_partial` instead.');
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_items_per_page` instead.');
-        $this->expectDeprecation($prefix.'The use of the `collection.pagination.maximum_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_maximum_items_per_page` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_enabled` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_partial` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.client_enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_enabled` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.client_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_items_per_page` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.client_partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_partial` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_items_per_page` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.maximum_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_maximum_items_per_page` instead.');
 
         (new ApiPlatformExtension())->load($config, $this->container);
     }
