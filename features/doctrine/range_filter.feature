@@ -481,7 +481,7 @@ Feature: Range filter on collections
                   "@type": {"pattern": "^IriTemplateMapping$"},
                   "variable": {
                     "oneOf": [
-                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte)?\\])?$"},
+                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte|ne)?\\])?$"},
                       {"pattern": "^order\\[name_converted\\]$"}
                     ]
                   },

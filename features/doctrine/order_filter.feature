@@ -964,7 +964,7 @@ Feature: Order filter on collections
                   "variable": {
                     "oneOf": [
                       {"pattern": "^order\\[name_converted\\]$"},
-                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte)?\\])?$"}
+                      {"pattern": "^name_converted(\\[(between|gt|gte|lt|lte|ne)?\\])?$"}
                     ]
                   },
                   "property": {"pattern": "^name_converted$"},

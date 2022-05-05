@@ -632,7 +632,7 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                         [
                             '$match' => [
                                 'dummyPrice' => [
-                                    '$notEqual' => 9.99,
+                                    '$ne' => 9.99,
                                 ],
                             ],
                         ],
