@@ -471,7 +471,7 @@ Feature: Range filter on collections
           "type": "object",
           "properties": {
             "@type": {"pattern": "^hydra:IriTemplate$"},
-            "hydra:template": {"pattern": "^/converted_integers\\{\\?.*name_converted\\[between\\],name_converted\\[gt\\],name_converted\\[gte\\],name_converted\\[lt\\],name_converted\\[lte\\].*\\}$"},
+            "hydra:template": {"pattern": "^/converted_integers\\{\\?.*name_converted\\[between\\],name_converted\\[gt\\],name_converted\\[gte\\],name_converted\\[lt\\],name_converted\\[lte\\],name_converted\\[ne\\].*\\}$"},
             "hydra:variableRepresentation": {"pattern": "^BasicRepresentation$"},
             "hydra:mapping": {
               "type": "array",
@@ -491,8 +491,8 @@ Feature: Range filter on collections
                 "required": ["@type", "variable", "property", "required"],
                 "additionalProperties": false
               },
-              "minItems": 8,
-              "maxItems": 8,
+              "minItems": 9,
+              "maxItems": 9,
               "uniqueItems": true
             }
           },

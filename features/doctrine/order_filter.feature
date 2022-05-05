@@ -973,8 +973,8 @@ Feature: Order filter on collections
                 "required": ["@type", "variable", "property", "required"],
                 "additionalProperties": false
               },
-              "minItems": 8,
-              "maxItems": 8,
+              "minItems": 9,
+              "maxItems": 9,
               "uniqueItems": true
             }
           },
