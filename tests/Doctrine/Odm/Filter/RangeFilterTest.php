@@ -60,6 +60,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'id[ne]' => [
+                'property' => 'id',
+                'type' => 'string',
+                'required' => false,
+            ],
             'name[between]' => [
                 'property' => 'name',
                 'type' => 'string',
@@ -81,6 +86,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'name[lte]' => [
+                'property' => 'name',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'name[ne]' => [
                 'property' => 'name',
                 'type' => 'string',
                 'required' => false,
@@ -110,6 +120,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'alias[ne]' => [
+                'property' => 'alias',
+                'type' => 'string',
+                'required' => false,
+            ],
             'description[between]' => [
                 'property' => 'description',
                 'type' => 'string',
@@ -131,6 +146,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'description[lte]' => [
+                'property' => 'description',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'description[ne]' => [
                 'property' => 'description',
                 'type' => 'string',
                 'required' => false,
@@ -160,6 +180,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummy[ne]' => [
+                'property' => 'dummy',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyDate[between]' => [
                 'property' => 'dummyDate',
                 'type' => 'string',
@@ -181,6 +206,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'dummyDate[lte]' => [
+                'property' => 'dummyDate',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyDate[ne]' => [
                 'property' => 'dummyDate',
                 'type' => 'string',
                 'required' => false,
@@ -210,6 +240,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummyFloat[ne]' => [
+                'property' => 'dummyFloat',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyPrice[between]' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
@@ -231,6 +266,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'dummyPrice[lte]' => [
+                'property' => 'dummyPrice',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyPrice[ne]' => [
                 'property' => 'dummyPrice',
                 'type' => 'string',
                 'required' => false,
@@ -260,6 +300,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'jsonData[ne]' => [
+                'property' => 'jsonData',
+                'type' => 'string',
+                'required' => false,
+            ],
             'arrayData[between]' => [
                 'property' => 'arrayData',
                 'type' => 'string',
@@ -281,6 +326,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'arrayData[lte]' => [
+                'property' => 'arrayData',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'arrayData[ne]' => [
                 'property' => 'arrayData',
                 'type' => 'string',
                 'required' => false,
@@ -310,6 +360,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'nameConverted[ne]' => [
+                'property' => 'nameConverted',
+                'type' => 'string',
+                'required' => false,
+            ],
             'dummyBoolean[between]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'string',
@@ -331,6 +386,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'dummyBoolean[lte]' => [
+                'property' => 'dummyBoolean',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBoolean[ne]' => [
                 'property' => 'dummyBoolean',
                 'type' => 'string',
                 'required' => false,
@@ -360,6 +420,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'relatedDummy[ne]' => [
+                'property' => 'relatedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
             'relatedDummies[between]' => [
                 'property' => 'relatedDummies',
                 'type' => 'string',
@@ -381,6 +446,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'relatedDummies[lte]' => [
+                'property' => 'relatedDummies',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedDummies[ne]' => [
                 'property' => 'relatedDummies',
                 'type' => 'string',
                 'required' => false,
@@ -410,6 +480,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'relatedOwnedDummy[ne]' => [
+                'property' => 'relatedOwnedDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
             'relatedOwningDummy[between]' => [
                 'property' => 'relatedOwningDummy',
                 'type' => 'string',
@@ -431,6 +506,11 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
             ],
             'relatedOwningDummy[lte]' => [
+                'property' => 'relatedOwningDummy',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'relatedOwningDummy[ne]' => [
                 'property' => 'relatedOwningDummy',
                 'type' => 'string',
                 'required' => false,
@@ -546,6 +626,20 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
                             ],
                         ],
                     ],
+                ],
+                'ne' => [
+                    [
+                        [
+                            '$match' => [
+                                'dummyPrice' => [
+                                    '$notEqual' => 9.99,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'ne (non-numeric)' => [
+                    [],
                 ],
             ]
         );

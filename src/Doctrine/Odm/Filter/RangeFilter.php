@@ -123,6 +123,15 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                 $aggregationBuilder->match()->field($matchField)->lte($value);
 
                 break;
+            case self::PARAMETER_NOT_EQUAL:
+                $value = $this->normalizeValue($value, $operator);
+                if (null === $value) {
+                    return;
+                }
+
+                $aggregationBuilder->match()->field($matchField)->notEqual($value);
+
+                break;
         }
     }
 }
