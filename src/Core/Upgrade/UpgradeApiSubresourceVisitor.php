@@ -43,6 +43,7 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
         $operationToCreate = $this->subresourceMetadata['collection'] ? GetCollection::class : Get::class;
         $operationUseStatementNeeded = true;
         $apiResourceUseStatementNeeded = true;
+        $linkUseStatementNeeded = true;
 
         $comment = $node->getDocComment();
         if ($comment && preg_match('/@ApiSubresource/', $comment->getText())) {
@@ -62,6 +63,11 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
 
                 if (ApiResource::class === $useStatement) {
                     $apiResourceUseStatementNeeded = false;
+                    continue;
+                }
+
+                if (Link::class === $useStatement) {
+                    $linkUseStatementNeeded = false;
                     continue;
                 }
 
@@ -93,7 +99,13 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
                                 ApiResource::class
                             )
                         ),
-                    ]),
+                    ])
+                );
+            }
+
+            if ($linkUseStatementNeeded) {
+                array_unshift(
+                    $node->stmts,
                     new Node\Stmt\Use_([
                         new Node\Stmt\UseUse(
                             new Node\Name(
