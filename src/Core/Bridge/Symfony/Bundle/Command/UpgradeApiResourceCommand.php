@@ -44,7 +44,6 @@ final class UpgradeApiResourceCommand extends Command
     private $subresourceTransformer;
     private $reader;
     private $identifiersExtractor;
-    private $localCache = [];
 
     public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, SubresourceOperationFactoryInterface $subresourceOperationFactory, SubresourceTransformer $subresourceTransformer, IdentifiersExtractorInterface $identifiersExtractor, AnnotationReader $reader = null)
     {
@@ -83,104 +82,8 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             return Command::INVALID;
         }
 
-        $this->transformApiSubresource($input, $output);
-        $this->transformApiResource($input, $output);
+        $subresources = $this->getSubresources();
 
-        return Command::SUCCESS;
-    }
-
-    /**
-     * This computes a local cache with resource classes having subresources.
-     * We first loop over all the classes and re-map the metadata on the correct Resource class.
-     * Then we transform the ApiSubresource to an ApiResource class.
-     */
-    private function transformApiSubresource(InputInterface $input, OutputInterface $output): void
-    {
-        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            try {
-                new \ReflectionClass($resourceClass);
-            } catch (\Exception $e) {
-                continue;
-            }
-
-            if (!isset($this->localCache[$resourceClass])) {
-                $this->localCache[$resourceClass] = [];
-            }
-
-            foreach ($this->subresourceOperationFactory->create($resourceClass) as $subresourceMetadata) {
-                if (!isset($this->localCache[$subresourceMetadata['resource_class']])) {
-                    $this->localCache[$subresourceMetadata['resource_class']] = [];
-                }
-
-                foreach ($this->localCache[$subresourceMetadata['resource_class']] as $currentSubresourceMetadata) {
-                    if ($currentSubresourceMetadata['path'] === $subresourceMetadata['path']) {
-                        continue 2;
-                    }
-                }
-                $this->localCache[$subresourceMetadata['resource_class']][] = $subresourceMetadata;
-            }
-        }
-
-        // Compute URI variables
-        foreach ($this->localCache as $class => $subresources) {
-            if (!$subresources) {
-                unset($this->localCache[$class]);
-                continue;
-            }
-
-            foreach ($subresources as $i => $subresourceMetadata) {
-                $this->localCache[$class][$i]['uri_variables'] = $this->subresourceTransformer->toUriVariables($subresourceMetadata);
-            }
-        }
-
-        foreach ($this->localCache as $resourceClass => $linkedSubresourceMetadata) {
-            $fileName = (new \ReflectionClass($resourceClass))->getFilename();
-
-            $referenceType = null;
-            try {
-                $metadata = $this->resourceMetadataFactory->create($resourceClass);
-                $referenceType = $metadata->getAttribute('url_generation_strategy');
-            } catch (\Exception $e) {
-            }
-
-            foreach ($linkedSubresourceMetadata as $subresourceMetadata) {
-                $lexer = new Emulative([
-                    'usedAttributes' => [
-                        'comments',
-                        'startLine', 'endLine',
-                        'startTokenPos', 'endTokenPos',
-                    ],
-                ]);
-                $parser = new Php7($lexer);
-
-                $traverser = new NodeTraverser();
-                $traverser->addVisitor(new UpgradeApiSubresourceVisitor($subresourceMetadata, $referenceType));
-                $prettyPrinter = new Standard();
-
-                $oldCode = file_get_contents($fileName);
-                $oldStmts = $parser->parse($oldCode);
-                $oldTokens = $lexer->getTokens();
-
-                $newStmts = $traverser->traverse($oldStmts);
-
-                $newCode = $prettyPrinter->printFormatPreserving($newStmts, $oldStmts, $oldTokens);
-
-                if (!$input->getOption('force') && $input->getOption('dry-run')) {
-                    if ($input->getOption('silent')) {
-                        continue;
-                    }
-
-                    $this->printDiff($oldCode, $newCode, $output);
-                    continue;
-                }
-
-                file_put_contents($fileName, $newCode);
-            }
-        }
-    }
-
-    private function transformApiResource(InputInterface $input, OutputInterface $output): void
-    {
         $prettyPrinter = new Standard();
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             try {
@@ -188,6 +91,7 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
             } catch (ResourceClassNotFoundException $e) {
                 continue;
             }
+
             $lexer = new Emulative([
                 'usedAttributes' => [
                     'comments',
@@ -209,6 +113,13 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
 
             $traverser->addVisitor(new UpgradeApiResourceVisitor($attribute, $isAnnotation, $this->identifiersExtractor, $resourceClass));
 
+            if (isset($subresources[$resourceClass])) {
+                $referenceType = $resourceMetadata->getAttribute('url_generation_strategy');
+                foreach ($subresources[$resourceClass] as $subresourceMetadata) {
+                    $traverser->addVisitor(new UpgradeApiSubresourceVisitor($subresourceMetadata, $referenceType));
+                }
+            }
+
             $oldCode = file_get_contents($fileName);
             $oldStmts = $parser->parse($oldCode);
             $oldTokens = $lexer->getTokens();
@@ -227,6 +138,56 @@ This will remove "ApiPlatform\Core\Annotation\ApiResource" annotation/attribute 
 
             file_put_contents($fileName, $newCode);
         }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * This computes a local cache with resource classes having subresources.
+     * We first loop over all the classes and re-map the metadata on the correct Resource class.
+     * Then we transform the ApiSubresource to an ApiResource class.
+     */
+    private function getSubresources(): array
+    {
+        $localCache = [];
+        foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
+            try {
+                new \ReflectionClass($resourceClass);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            if (!isset($localCache[$resourceClass])) {
+                $localCache[$resourceClass] = [];
+            }
+
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $subresourceMetadata) {
+                if (!isset($localCache[$subresourceMetadata['resource_class']])) {
+                    $localCache[$subresourceMetadata['resource_class']] = [];
+                }
+
+                foreach ($localCache[$subresourceMetadata['resource_class']] as $currentSubresourceMetadata) {
+                    if ($currentSubresourceMetadata['path'] === $subresourceMetadata['path']) {
+                        continue 2;
+                    }
+                }
+                $localCache[$subresourceMetadata['resource_class']][] = $subresourceMetadata;
+            }
+        }
+
+        // Compute URI variables
+        foreach ($localCache as $class => $subresources) {
+            if (!$subresources) {
+                unset($localCache[$class]);
+                continue;
+            }
+
+            foreach ($subresources as $i => $subresourceMetadata) {
+                $localCache[$class][$i]['uri_variables'] = $this->subresourceTransformer->toUriVariables($subresourceMetadata);
+            }
+        }
+
+        return $localCache;
     }
 
     private function printDiff(string $oldCode, string $newCode, OutputInterface $output): void
