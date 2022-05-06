@@ -9,7 +9,7 @@
             <argument type="service" id="twig" on-invalid="null" />
             <argument type="service" id="router" />
             <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.openapi.factory.next" />
+            <argument type="service" id="api_platform.openapi.factory" />
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.swagger_ui.context" />
             <argument>%api_platform.formats%</argument>
