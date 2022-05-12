@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Symfony\Validator\Validator;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;

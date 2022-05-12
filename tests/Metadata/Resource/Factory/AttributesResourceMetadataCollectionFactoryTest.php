@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Resource\Factory;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -34,6 +33,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExtraPropertiesResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProcessor;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

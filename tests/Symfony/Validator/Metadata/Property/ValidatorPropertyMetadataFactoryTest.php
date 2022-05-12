@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Validator\Metadata\Property;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
@@ -43,6 +42,7 @@ use ApiPlatform\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedHostnameEntity;
 use ApiPlatform\Tests\Fixtures\DummyValidatedUlidEntity;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Common\Annotations\AnnotationReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;

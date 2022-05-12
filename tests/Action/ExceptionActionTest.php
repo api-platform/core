@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Action;
 
 use ApiPlatform\Action\ExceptionAction;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -24,6 +21,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Tests\ProphecyTrait;
 use DomainException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
@@ -38,7 +36,6 @@ use Symfony\Component\Serializer\SerializerInterface;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  *
- * @group legacy
  * @group time-sensitive
  */
 class ExceptionActionTest extends TestCase
@@ -64,62 +61,6 @@ class ExceptionActionTest extends TestCase
         $response = $exceptionAction($flattenException, $request);
         $this->assertSame('', $response->getContent());
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertTrue($response->headers->contains('Content-Type', 'application/problem+json; charset=utf-8'));
-        $this->assertTrue($response->headers->contains('X-Content-Type-Options', 'nosniff'));
-        $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));
-    }
-
-    /**
-     * @dataProvider provideOperationExceptionToStatusCases
-     * @group legacy
-     */
-    public function testLegacyActionWithOperationExceptionToStatus(
-        array $globalExceptionToStatus,
-        ?array $resourceExceptionToStatus,
-        ?array $operationExceptionToStatus,
-        int $expectedStatusCode
-    ) {
-        $this->expectDeprecation('Since api-platform/core 2.7: Use "ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface" instead of "ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface".');
-
-        $exception = new DomainException();
-        $flattenException = FlattenException::create($exception);
-
-        $serializer = $this->prophesize(SerializerInterface::class);
-        $serializer->serialize($flattenException, 'jsonproblem', ['statusCode' => $expectedStatusCode])->willReturn('');
-
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create('Foo')->willReturn(new ResourceMetadata(
-            'Foo',
-            null,
-            null,
-            [
-                'operation' => null !== $operationExceptionToStatus ? ['exception_to_status' => $operationExceptionToStatus] : [],
-            ],
-            null,
-            null !== $resourceExceptionToStatus ? ['exception_to_status' => $resourceExceptionToStatus] : []
-        ));
-
-        $exceptionAction = new ExceptionAction(
-            $serializer->reveal(),
-            [
-                'jsonproblem' => ['application/problem+json'],
-                'jsonld' => ['application/ld+json'],
-            ],
-            $globalExceptionToStatus,
-            $resourceMetadataFactory->reveal()
-        );
-
-        $request = new Request();
-        $request->setFormat('jsonproblem', 'application/problem+json');
-        $request->attributes->replace([
-            '_api_resource_class' => 'Foo',
-            '_api_item_operation_name' => 'operation',
-        ]);
-
-        $response = $exceptionAction($flattenException, $request);
-
-        $this->assertSame('', $response->getContent());
-        $this->assertSame($expectedStatusCode, $response->getStatusCode());
         $this->assertTrue($response->headers->contains('Content-Type', 'application/problem+json; charset=utf-8'));
         $this->assertTrue($response->headers->contains('X-Content-Type-Options', 'nosniff'));
         $this->assertTrue($response->headers->contains('X-Frame-Options', 'deny'));

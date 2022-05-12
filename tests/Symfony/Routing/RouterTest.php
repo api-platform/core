@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Routing\Router;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
