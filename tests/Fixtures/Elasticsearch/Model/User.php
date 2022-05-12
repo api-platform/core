@@ -13,57 +13,36 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\Elasticsearch\Model;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     normalizationContext={
- *         "groups"={"user:read"}
- *     }
- * )
- * @ApiFilter(TermFilter::class, properties={"id", "gender", "age", "firstName", "tweets.id", "tweets.date"})
- */
+#[ApiResource(normalizationContext: ['groups' => ['user:read']])]
+#[ApiFilter(TermFilter::class, properties: ['id', 'gender', 'age', 'firstName', 'tweets.id', 'tweets.date'])]
 class User
 {
-    /**
-     * @ApiProperty(identifier=true)
-     *
-     * @Groups({"user:read", "tweet:read"})
-     */
+    #[ApiProperty(identifier: true)]
+    #[Groups(['tweet:read', 'user:read'])]
     private $id;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
+    #[Groups(['tweet:read', 'user:read'])]
     private $gender;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
+    #[Groups(['tweet:read', 'user:read'])]
     private $age;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
+    #[Groups(['tweet:read', 'user:read'])]
     private $firstName;
 
-    /**
-     * @Groups({"user:read", "tweet:read"})
-     */
+    #[Groups(['tweet:read', 'user:read'])]
     private $lastName;
 
-    /**
-     * @Groups({"user:read"})
-     */
+    #[Groups(['user:read'])]
     private $registeredAt;
 
-    /**
-     * @Groups({"user:read"})
-     */
+    #[Groups(['user:read'])]
     private $tweets = [];
 
     public function getId(): ?string

@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Action;
 
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConfigCustom
 {
-    public function __construct(private readonly ItemDataProviderInterface $dataProvider)
+    public function __construct(private readonly ProviderInterface $provider)
     {
     }
 
@@ -32,6 +33,6 @@ class ConfigCustom
     {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        return $this->dataProvider->getItem($attributes['resource_class'], $id);
+        return $this->provider->provide(new Get(class: $attributes['resource_class']), ['id' => $id]);
     }
 }

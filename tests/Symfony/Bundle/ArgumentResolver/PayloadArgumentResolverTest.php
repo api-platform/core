@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\ArgumentResolver;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Post;
@@ -24,6 +23,7 @@ use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceImplementation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use Prophecy\Argument;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;

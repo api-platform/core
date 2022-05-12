@@ -22,7 +22,6 @@ use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
@@ -39,6 +38,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;

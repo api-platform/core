@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Messenger;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Symfony\Messenger\ContextStamp;
 use ApiPlatform\Symfony\Messenger\Processor;
 use ApiPlatform\Symfony\Messenger\RemoveStamp;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;

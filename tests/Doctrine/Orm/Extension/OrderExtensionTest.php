@@ -15,11 +15,11 @@ namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Extension\OrderExtension;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\OrderBy;

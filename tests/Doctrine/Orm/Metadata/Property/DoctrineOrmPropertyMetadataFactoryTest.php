@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Metadata\Property;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyPropertyWithDefaultValue;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;

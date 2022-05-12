@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Extension;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Extension\PaginationExtension;
 use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
@@ -27,6 +26,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;

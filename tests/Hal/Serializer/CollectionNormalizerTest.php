@@ -16,10 +16,10 @@ namespace ApiPlatform\Tests\Hal\Serializer;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Hal\Serializer\CollectionNormalizer;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 

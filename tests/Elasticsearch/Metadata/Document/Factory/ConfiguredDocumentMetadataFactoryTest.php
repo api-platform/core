@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Document\Factory;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 class ConfiguredDocumentMetadataFactoryTest extends TestCase

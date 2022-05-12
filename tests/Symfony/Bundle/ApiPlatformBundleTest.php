@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
@@ -26,6 +25,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolver
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;

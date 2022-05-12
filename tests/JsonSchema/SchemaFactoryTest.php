@@ -17,7 +17,6 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
@@ -27,6 +26,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OverriddenOperationDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;

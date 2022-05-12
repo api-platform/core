@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostValidationStage;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\State;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;

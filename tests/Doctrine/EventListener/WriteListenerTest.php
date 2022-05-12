@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\EventListener;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\EventListener\WriteListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;

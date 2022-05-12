@@ -18,12 +18,12 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -164,8 +164,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            false,
-            null,
             [],
             null
         );
@@ -212,8 +210,6 @@ class ItemNormalizerTest extends TestCase
             null,
             null,
             null,
-            null,
-            false,
             null,
             [],
             null

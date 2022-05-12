@@ -15,13 +15,13 @@ namespace ApiPlatform\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Core\Metadata\Extractor\XmlExtractor;
 use ApiPlatform\Core\Metadata\Extractor\YamlExtractor;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FileConfigDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

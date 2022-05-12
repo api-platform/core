@@ -16,9 +16,7 @@ namespace ApiPlatform\Tests\Fixtures;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 
-/**
- * @ApiFilter(OrderFilter::class, arguments={"orderParameterName"="positionOrder"}, properties={"position"})
- */
+#[ApiFilter(OrderFilter::class, arguments: ['orderParameterName' => 'positionOrder'], properties: ['position'])]
 class DummyEntityFilterAnnotated
 {
     public $position;

@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Util;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;

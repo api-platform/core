@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\State;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
@@ -21,6 +20,7 @@ use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Tests\ProphecyTrait;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use PHPUnit\Framework\TestCase;

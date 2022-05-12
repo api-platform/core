@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Filter;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter\DummyFilter;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 

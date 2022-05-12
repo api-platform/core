@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\OpenApi\Serializer;
 
 use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;

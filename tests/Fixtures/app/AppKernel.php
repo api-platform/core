@@ -11,8 +11,8 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Behat\DoctrineContext;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;

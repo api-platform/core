@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Api;
 
 use ApiPlatform\Api\IdentifiersExtractor;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
@@ -23,6 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

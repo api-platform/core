@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\Orm;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Tests\Fixtures\Query;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use PHPUnit\Framework\TestCase;
 

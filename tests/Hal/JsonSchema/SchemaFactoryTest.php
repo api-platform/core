@@ -19,13 +19,13 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInte
 use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Hal\JsonSchema\SchemaFactory;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

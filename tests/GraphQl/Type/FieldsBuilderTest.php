@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\GraphQl\Type;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\FieldsBuilder;
 use ApiPlatform\GraphQl\Type\TypeBuilderInterface;
@@ -35,6 +34,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;

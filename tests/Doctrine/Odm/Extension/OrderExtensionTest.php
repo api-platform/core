@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Extension;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Extension\OrderExtension;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -21,6 +20,7 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Lookup;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;

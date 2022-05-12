@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -31,6 +30,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Symfony\EventListener\WriteListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
