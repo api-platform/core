@@ -38,7 +38,7 @@ class CustomMultipleIdentifierDummy
      *
      * @ODM\Field(type="int")
      */
-     #[ApiProperty(identifier: true)
+    #[ApiProperty(identifier: true)]
     private ?int $secondId = null;
 
     /**

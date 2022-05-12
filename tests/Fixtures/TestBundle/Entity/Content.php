@@ -35,7 +35,7 @@ class Content implements \JsonSerializable
      */
     #[ORM\OneToMany(targetEntity: Field::class, mappedBy: 'content', cascade: ['persist'], orphanRemoval: true, indexBy: 'name')]
     #[ORM\OrderBy(['id' => 'ASC'])]
-    private \Doctrine\Common\Collections\Collection & iterable $fields;
+    private \Doctrine\Common\Collections\Collection $fields;
     #[ORM\Column(type: 'string')]
     private readonly string $status;
 

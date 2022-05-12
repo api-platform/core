@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Odm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -31,12 +31,12 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
  * @ODM\Document
- * @ApiFilter (DateFilter::class, strategy=DateFilter::EXCLUDE_NULL)
- * @ApiFilter (BooleanFilter::class)
- * @ApiFilter (PropertyFilter::class, arguments={"parameterName"="foobar"})
- * @ApiFilter (GroupFilter::class, arguments={"parameterName"="foobargroups"})
- * @ApiFilter (GroupFilter::class, arguments={"parameterName"="foobargroups_override"}, id="override")
  */
+#[ApiFilter(DateFilter::class, strategy: DateFilter::EXCLUDE_NULL)]
+#[ApiFilter(BooleanFilter::class)]
+#[ApiFilter(PropertyFilter::class, arguments: ['parameterName' => 'foobar'])]
+#[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups'])]
+#[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups_override'], id: 'override')]
 #[ApiResource(operations: [new Get(openapiContext: ['tags' => []]), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
 class DummyCar
 {
@@ -50,42 +50,38 @@ class DummyCar
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
-     *
-     * @ApiFilter(SearchFilter::class, properties={"colors.prop"="ipartial", "colors"="exact"})
      */
+    #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[Serializer\Groups(['colors'])]
     private $colors;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
-     *
-     * @ApiFilter(SearchFilter::class, strategy="exact")
      */
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
-    private ?mixed $secondColors = null;
+    private mixed $secondColors = null;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
-     *
-     * @ApiFilter(SearchFilter::class, strategy="exact")
      */
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
-    private ?mixed $thirdColors = null;
+    private mixed $thirdColors = null;
     /**
      * @var mixed Something else
      *
      * @ODM\ReferenceMany(targetDocument=UuidIdentifierDummy::class)
-     *
-     * @ApiFilter(SearchFilter::class, strategy="exact")
      */
+    #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
-    private ?mixed $uuid = null;
+    private mixed $uuid = null;
     /**
      * @ODM\Field(type="string")
-     * @ApiFilter(SearchFilter::class, strategy="partial")
      */
+    #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?string $name = null;
     /**
      * @ODM\Field(type="bool")

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -23,16 +23,15 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * Dummy Date.
  *
- * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ApiFilter (SearchFilter::class, properties={"dummyDate"})
- * @ApiFilter (DateFilter::class, properties={
- *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
- *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
- *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
- * })
  * @ODM\Document
  */
+#[ApiFilter(DateFilter::class, properties: [
+    'dateIncludeNullAfter' => DateFilter::INCLUDE_NULL_AFTER,
+    'dateIncludeNullBefore' => DateFilter::INCLUDE_NULL_BEFORE,
+    'dateIncludeNullBeforeAndAfter' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER,
+])]
+#[ApiFilter(SearchFilter::class, properties: ['dummyDate'])]
 #[ApiResource(filters: ['my_dummy_date.mongodb.date'])]
 class DummyDate
 {

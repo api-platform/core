@@ -44,7 +44,7 @@ class Content implements \JsonSerializable
      *     cascade={"persist"},
      * )
      */
-    private \Doctrine\Common\Collections\Collection & iterable $fields;
+    private $fields;
     /**
      * @ODM\Field(type="string")
      */

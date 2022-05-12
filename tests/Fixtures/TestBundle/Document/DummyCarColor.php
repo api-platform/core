@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
@@ -39,8 +39,8 @@ class DummyCarColor
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCar $car = null;
     /**
      * @ODM\Field(nullable=false)
-     * @ApiFilter(SearchFilter::class)
      */
+    #[ApiFilter(SearchFilter::class)]
     #[Assert\NotBlank]
     #[Serializer\Groups(['colors'])]
     private string $prop = '';
