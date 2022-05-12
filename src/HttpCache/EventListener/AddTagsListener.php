@@ -108,5 +108,3 @@ final class AddTagsListener
         }
     }
 }
-
-class_alias(AddTagsListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::class);

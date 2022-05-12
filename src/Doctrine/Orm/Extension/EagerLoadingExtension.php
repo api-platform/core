@@ -13,10 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactory;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -27,14 +23,14 @@ use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -55,38 +51,16 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     private $propertyMetadataFactory;
     private $classMetadataFactory;
     private $maxJoins;
-    private $serializerContextBuilder;
-    private $requestStack;
 
-    /**
-     * @TODO move $fetchPartial after $forceEager (@soyuka) in 3.0
-     *
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
-     * @param PropertyMetadataFactoryInterface|LegacyPropertyMetadataFactory              $propertyMetadataFactory
-     */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
-        if (null !== $this->requestStack) {
-            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', RequestStack::class), \E_USER_DEPRECATED);
-        }
-        if (null !== $this->serializerContextBuilder) {
-            @trigger_error(sprintf('Passing an instance of "%s" is deprecated since version 2.2 and will be removed in 3.0. Use the data provider\'s context instead.', SerializerContextBuilderInterface::class), \E_USER_DEPRECATED);
-        }
-
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->classMetadataFactory = $classMetadataFactory;
         $this->maxJoins = $maxJoins;
         $this->forceEager = $forceEager;
         $this->fetchPartial = $fetchPartial;
-        $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->requestStack = $requestStack;
     }
 
     /**
@@ -122,29 +96,19 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $operation = null;
         $forceEager = $this->forceEager;
         $fetchPartial = $this->fetchPartial;
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
-            try {
-                $operation = $resourceMetadataCollection->getOperation($operationName);
-                $forceEager = $operation->getForceEager() ?? $this->forceEager;
-                $fetchPartial = $operation->getFetchPartial() ?? $this->fetchPartial;
-            } catch (OperationNotFoundException $e) {
-                // In some cases the operation may not exist
-            }
-        } else {
-            $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
-            $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
+        $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+        try {
+            $operation = $resourceMetadataCollection->getOperation($operationName);
+            $forceEager = $operation->getForceEager() ?? $this->forceEager;
+            $fetchPartial = $operation->getFetchPartial() ?? $this->fetchPartial;
+        } catch (OperationNotFoundException $e) {
+            // In some cases the operation may not exist
         }
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
-                $context += $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
-            } elseif ($operation) {
+            if ($operation) {
                 $context += 'denormalization_context' === $contextType ? ($operation->getDenormalizationContext() ?? []) : ($operation->getNormalizationContext() ?? []);
-            } elseif (!$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                // TODO: remove in 3.0
-                $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
             }
         }
 
@@ -156,9 +120,12 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             $options['serializer_groups'] = (array) $context[AbstractNormalizer::GROUPS];
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $options['normalization_groups'] = $operation ? ($operation->getNormalizationContext()['groups'] ?? null) : null;
-            $options['denormalization_groups'] = $operation ? ($operation->getDenormalizationContext()['groups'] ?? null) : null;
+        if ($operation && $normalizationGroups = $operation->getNormalizationContext()['groups'] ?? null) {
+            $options['normalization_groups'] = $normalizationGroups;
+        }
+
+        if ($operation && $denormalizationGroups = $operation->getDenormalizationContext()['groups'] ?? null) {
+            $options['denormalization_groups'] = $denormalizationGroups;
         }
 
         $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
@@ -191,7 +158,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
             }
 
             try {
-                /** @var ApiProperty|PropertyMetadata */
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $options);
             } catch (PropertyNotFoundException $propertyNotFoundException) {
                 // skip properties not found
@@ -221,16 +187,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
-            $fetchEager = null;
-            if ($propertyMetadata instanceof ApiProperty) {
-                $fetchEager = $propertyMetadata->getFetchEager();
-            } elseif (
-                $propertyMetadata instanceof PropertyMetadata &&
-                (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
-                (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
-            ) {
-                @trigger_error('The "fetchEager" attribute is deprecated since 2.3. Please use "fetch_eager" instead.', \E_USER_DEPRECATED);
-            }
+            $fetchEager = $propertyMetadata->getFetchEager();
 
             if (false === $fetchEager) {
                 continue;
@@ -320,7 +277,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // If it's an embedded property see below
             if (!\array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
-                $isFetchable = $propertyMetadata instanceof ApiProperty ? $propertyMetadata->isFetchable() : $propertyMetadata->getAttribute('fetchable');
+                $isFetchable = $propertyMetadata->isFetchable();
                 // the field test allows to add methods to a Resource which do not reflect real database fields
                 if ($targetClassMetadata->hasField($property) && (true === $isFetchable || $propertyMetadata->isReadable())) {
                     $select[] = $property;
@@ -331,7 +288,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // It's an embedded property, select relevant subfields
             foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
-                $isFetchable = $propertyMetadata instanceof ApiProperty ? $propertyMetadata->isFetchable() : $propertyMetadata->getAttribute('fetchable');
+                $isFetchable = $propertyMetadata->isFetchable();
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
                 $propertyName = "$property.$embeddedProperty";
                 if ($targetClassMetadata->hasField($propertyName) && (true === $isFetchable || $propertyMetadata->isReadable())) {
@@ -362,10 +319,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      */
     private function getNormalizationContext(string $resourceClass, string $contextType, array $options): array
     {
-        if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
-            return $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
-        }
-
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         if (isset($options['collection_operation_name'])) {
             $context = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $contextType, null, true);
@@ -378,5 +331,3 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         return $context ?? [];
     }
 }
-
-class_alias(EagerLoadingExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\EagerLoadingExtension::class);

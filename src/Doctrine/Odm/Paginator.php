@@ -184,5 +184,3 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
         return false;
     }
 }
-
-class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Paginator::class);

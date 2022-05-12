@@ -115,6 +115,3 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
         }
     }
 }
-
-class_alias(OrderExtension::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\OrderExtension::class);
-class_alias(OrderExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\OrderExtension::class);

@@ -105,5 +105,3 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
         );
     }
 }
-
-class_alias(OrderFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\OrderFilter::class);

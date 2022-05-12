@@ -131,5 +131,3 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         return \is_array($properties) ? $properties : [];
     }
 }
-
-class_alias(OrderFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter::class);

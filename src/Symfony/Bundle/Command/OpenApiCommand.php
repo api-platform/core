@@ -96,5 +96,3 @@ final class OpenApiCommand extends Command
         return 0;
     }
 }
-
-class_alias(OpenApiCommand::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Command\OpenApiCommand::class);

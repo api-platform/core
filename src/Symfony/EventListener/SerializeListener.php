@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ResourceList;
@@ -38,26 +36,17 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class SerializeListener
 {
     use OperationRequestInitiatorTrait;
-    use ToggleableOperationAttributeTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'serialize';
 
     private $serializer;
     private $serializerContextBuilder;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, $resourceMetadataFactory = null)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        if ($resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -75,21 +64,11 @@ final class SerializeListener
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        // TODO: 3.0 remove condition
-        if (
-            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface)
-            &&
-            (
-                !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))
-                || ($attributes && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
-            )
-        ) {
+        if (!($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))) {
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            ($operation && !($operation->canSerialize() ?? true))
-        ) {
+        if (!$operation || !($operation->canSerialize() ?? true)) {
             return;
         }
 
@@ -154,5 +133,3 @@ final class SerializeListener
         $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));
     }
 }
-
-class_alias(SerializeListener::class, \ApiPlatform\Core\EventListener\SerializeListener::class);

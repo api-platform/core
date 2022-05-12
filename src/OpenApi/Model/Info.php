@@ -127,5 +127,3 @@ final class Info
         return $clone;
     }
 }
-
-class_alias(Info::class, \ApiPlatform\Core\OpenApi\Model\Info::class);

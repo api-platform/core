@@ -100,5 +100,3 @@ final class Required implements ValidatorInterface
         return $queryParameters[(string) $rootName];
     }
 }
-
-class_alias(Required::class, \ApiPlatform\Core\Filter\Validator\Required::class);

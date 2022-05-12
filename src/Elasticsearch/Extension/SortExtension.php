@@ -97,5 +97,3 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         return [$property => $order];
     }
 }
-
-class_alias(SortExtension::class, \ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\SortExtension::class);

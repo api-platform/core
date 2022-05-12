@@ -23,5 +23,9 @@
         </service>
 
         <service id="ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface" alias="api_platform.metadata.resource.name_collection_factory" />
+        <service id="api_platform.metadata.resource.name_collection_factory.attributes" decorates="api_platform.metadata.resource.name_collection_factory" class="ApiPlatform\Metadata\Resource\Factory\AttributesResourceNameCollectionFactory" public="false">
+            <argument>%api_platform.resource_class_directories%</argument>
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory.attributes.inner" />
+        </service>
     </services>
 </container>

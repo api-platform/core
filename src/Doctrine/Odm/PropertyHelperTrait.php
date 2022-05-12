@@ -105,5 +105,3 @@ trait PropertyHelperTrait
         return [$property, $propertyParts['field'], $propertyParts['associations']];
     }
 }
-
-class_alias(PropertyHelperTrait::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait::class);

@@ -35,5 +35,3 @@ final class AuthenticatorManagerPass implements CompilerPassInterface
         }
     }
 }
-
-class_alias(AuthenticatorManagerPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass::class);

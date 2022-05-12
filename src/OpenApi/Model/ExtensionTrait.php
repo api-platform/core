@@ -34,5 +34,3 @@ trait ExtensionTrait
         return $this->extensionProperties;
     }
 }
-
-class_alias(ExtensionTrait::class, \ApiPlatform\Core\OpenApi\Model\ExtensionTrait::class);

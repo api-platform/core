@@ -127,5 +127,3 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         return $resourceMetadata->getOperation()->getShortName();
     }
 }
-
-class_alias(ObjectNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ObjectNormalizer::class);

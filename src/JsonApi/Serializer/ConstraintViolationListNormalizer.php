@@ -111,5 +111,3 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface, Ca
         return "data/attributes/$fieldName";
     }
 }
-
-class_alias(ConstraintViolationListNormalizer::class, \ApiPlatform\Core\JsonApi\Serializer\ConstraintViolationListNormalizer::class);

@@ -218,5 +218,3 @@ final class QueryBuilderHelper
         return $aliasMap;
     }
 }
-
-class_alias(QueryBuilderHelper::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryBuilderHelper::class);

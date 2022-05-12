@@ -112,5 +112,3 @@ final class VarnishXKeyPurger implements PurgerInterface
         }
     }
 }
-
-class_alias(VarnishXKeyPurger::class, \ApiPlatform\Core\HttpCache\VarnishXKeyPurger::class);

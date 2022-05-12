@@ -80,5 +80,3 @@ class GraphQlExportCommand extends Command
         return 0;
     }
 }
-
-class_alias(GraphQlExportCommand::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Command\GraphQlExportCommand::class);

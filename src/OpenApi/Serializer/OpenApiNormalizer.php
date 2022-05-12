@@ -87,5 +87,3 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
         return true;
     }
 }
-
-class_alias(OpenApiNormalizer::class, \ApiPlatform\Core\OpenApi\Serializer\OpenApiNormalizer::class);

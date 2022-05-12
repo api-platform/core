@@ -82,5 +82,3 @@ trait PropertyHelperTrait
         return [$alias, $propertyParts['field'], $propertyParts['associations']];
     }
 }
-
-class_alias(PropertyHelperTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\PropertyHelperTrait::class);

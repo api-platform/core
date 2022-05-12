@@ -174,5 +174,3 @@ final class OpenApi implements DocumentationInterface
         return $clone;
     }
 }
-
-class_alias(OpenApi::class, \ApiPlatform\Core\OpenApi\OpenApi::class);

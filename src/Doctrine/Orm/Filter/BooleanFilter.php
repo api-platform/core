@@ -72,5 +72,3 @@ class BooleanFilter extends AbstractContextAwareFilter
             ->setParameter($valueParameter, $value);
     }
 }
-
-class_alias(BooleanFilter::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter::class);

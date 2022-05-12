@@ -176,5 +176,3 @@ trait SearchFilterTrait
         return true;
     }
 }
-
-class_alias(SearchFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\SearchFilterTrait::class);
