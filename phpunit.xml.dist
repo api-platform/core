@@ -16,8 +16,6 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
-            <directory phpVersion="8.0" phpVersionOperator=">=">tests/Metadata/Resource/Factory</directory>
-            <exclude>tests/Metadata/Resource/Factory</exclude>
         </testsuite>
     </testsuites>
 
@@ -29,9 +27,6 @@
             <directory>features</directory>
             <directory>tests</directory>
             <directory>vendor</directory>
-            <directory>src/Core/Bridge/NelmioApiDoc</directory>
-            <directory>src/Core/Bridge/FosUser</directory>
-            <directory>src/Core/Bridge/Symfony/Maker/Resources/skeleton</directory>
             <file>.php-cs-fixer.dist.php</file>
             <file>src/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php</file>
             <file>src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php</file>

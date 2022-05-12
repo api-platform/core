@@ -29,7 +29,6 @@
     "require-dev": {
         "behat/behat": "^3.1",
         "behat/mink": "^1.9@dev",
-        "doctrine/annotations": "^1.7",
         "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^2.11 || ^3.0",
         "doctrine/data-fixtures": "^1.2.2",
@@ -115,14 +114,10 @@
     "autoload": {
         "psr-4": {
             "ApiPlatform\\": "src/"
-        },
-        "files": [
-            "src/deprecation.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "ApiPlatform\\Core\\Tests\\": "tests/Core/",
             "ApiPlatform\\Tests\\": "tests/",
             "App\\": "tests/Fixtures/app/var/tmp/src/"
         }
@@ -139,7 +134,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "2.7.x-dev"
+            "dev-main": "3.0.x-dev"
         },
         "symfony": {
             "require": "^3.4 || ^4.4 || ^5.1 || ^6.0"
