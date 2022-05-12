@@ -35,5 +35,3 @@ trait CloneTrait
         }
     }
 }
-
-class_alias(CloneTrait::class, \ApiPlatform\Core\Util\CloneTrait::class);

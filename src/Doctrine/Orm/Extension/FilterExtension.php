@@ -106,5 +106,3 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
         }
     }
 }
-
-class_alias(FilterExtension::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\FilterExtension::class);

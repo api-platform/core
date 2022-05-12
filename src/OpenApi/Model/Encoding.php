@@ -107,5 +107,3 @@ final class Encoding
         return $clone;
     }
 }
-
-class_alias(Encoding::class, \ApiPlatform\Core\OpenApi\Model\Encoding::class);

@@ -58,5 +58,3 @@ final class AddLinkHeaderListener
         $request->attributes->set('_links', $linkProvider->withLink($link));
     }
 }
-
-class_alias(AddLinkHeaderListener::class, \ApiPlatform\Core\Hydra\EventListener\AddLinkHeaderListener::class);

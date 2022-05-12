@@ -187,5 +187,3 @@ final class SchemaFactory implements SchemaFactoryInterface
         }
     }
 }
-
-class_alias(SchemaFactory::class, \ApiPlatform\Core\Hydra\JsonSchema\SchemaFactory::class);

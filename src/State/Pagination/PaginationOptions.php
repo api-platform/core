@@ -102,5 +102,3 @@ final class PaginationOptions
         return $this->partialPaginationParameterName;
     }
 }
-
-class_alias(PaginationOptions::class, \ApiPlatform\Core\DataProvider\PaginationOptions::class);

@@ -104,5 +104,3 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
         return $metadata + $data;
     }
 }
-
-class_alias(ObjectNormalizer::class, \ApiPlatform\Core\JsonLd\Serializer\ObjectNormalizer::class);

@@ -45,5 +45,3 @@ final class GraphQlQueryResolverPass implements CompilerPassInterface
         $container->getDefinition('api_platform.graphql.query_resolver_locator')->addArgument($resolvers);
     }
 }
-
-class_alias(GraphQlQueryResolverPass::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass::class);

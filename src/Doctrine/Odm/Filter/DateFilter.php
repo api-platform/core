@@ -151,5 +151,3 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
         $aggregationBuilder->match()->addAnd($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value));
     }
 }
-
-class_alias(DateFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\DateFilter::class);

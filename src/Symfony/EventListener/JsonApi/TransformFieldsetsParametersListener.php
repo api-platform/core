@@ -88,5 +88,3 @@ final class TransformFieldsetsParametersListener
         $request->attributes->set('_api_filter_property', $properties);
     }
 }
-
-class_alias(TransformFieldsetsParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformFieldsetsParametersListener::class);

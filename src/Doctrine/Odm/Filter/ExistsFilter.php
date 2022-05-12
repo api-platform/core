@@ -105,5 +105,3 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         return $metadata instanceof ClassMetadata && $metadata->hasField($field) ? $metadata->isNullable($field) : false;
     }
 }
-
-class_alias(ExistsFilter::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\ExistsFilter::class);

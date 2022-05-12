@@ -76,5 +76,3 @@ final class PayloadArgumentResolver implements ArgumentValueResolverInterface
         return $context['input'] ?? $context['resource_class'];
     }
 }
-
-class_alias(PayloadArgumentResolver::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver::class);

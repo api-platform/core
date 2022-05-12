@@ -438,5 +438,3 @@ final class SchemaFactory implements SchemaFactoryInterface
         return $options;
     }
 }
-
-class_alias(SchemaFactory::class, \ApiPlatform\Core\JsonSchema\SchemaFactory::class);

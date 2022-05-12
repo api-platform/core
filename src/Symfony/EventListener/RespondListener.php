@@ -156,5 +156,3 @@ final class RespondListener
         return $headers;
     }
 }
-
-class_alias(RespondListener::class, \ApiPlatform\Core\EventListener\RespondListener::class);

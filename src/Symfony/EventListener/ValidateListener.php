@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ToggleableOperationAttributeTrait;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -31,23 +29,16 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 final class ValidateListener
 {
     use OperationRequestInitiatorTrait;
-    use ToggleableOperationAttributeTrait;
 
     public const OPERATION_ATTRIBUTE_KEY = 'validate';
 
     private $validator;
     private $resourceMetadataFactory;
 
-    public function __construct(ValidatorInterface $validator, $resourceMetadataFactory)
+    public function __construct(ValidatorInterface $validator, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
         $this->validator = $validator;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        } else {
-            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -70,32 +61,10 @@ final class ValidateListener
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->canValidate() ?? true))
-        ) {
+        if (!$operation || !($operation->canValidate() ?? true)) {
             return;
         }
 
-        // TODO: 3.0 remove condition
-        if (
-            $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && (
-                !$attributes['receive']
-                || $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
-            )
-        ) {
-            return;
-        }
-
-        $validationContext = $operation ? ($operation->getValidationContext() ?? []) : [];
-
-        if (!$validationContext && $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $validationGroups = $resourceMetadata->getOperationAttribute($attributes, 'validation_groups', null, true);
-            $validationContext = ['groups' => $validationGroups];
-        }
-
-        $this->validator->validate($controllerResult, $validationContext);
+        $this->validator->validate($controllerResult, $operation->getValidationContext() ?? []);
     }
 }
-
-class_alias(ValidateListener::class, \ApiPlatform\Core\Validator\EventListener\ValidateListener::class);

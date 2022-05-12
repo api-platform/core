@@ -15,14 +15,6 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer as MessengerDataTransformer;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidValueException;
 use ApiPlatform\Exception\ItemNotFoundException;
@@ -78,16 +70,15 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $resourceClassResolver;
     protected $resourceAccessChecker;
     protected $propertyAccessor;
-    protected $itemDataProvider;
     protected $allowPlainIdentifiers;
     protected $dataTransformers = [];
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, array $defaultContext = [], iterable $dataTransformers = [], $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
-                return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object);
+                return $this->iriConverter->getIriFromResource($object);
             };
         }
         if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($this, 'setCircularReferenceHandler')) {
@@ -98,36 +89,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
-
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
-        $this->itemDataProvider = $itemDataProvider;
-
-        if (true === $allowPlainIdentifiers) {
-            @trigger_error(sprintf('Allowing plain identifiers as argument of "%s" is deprecated since API Platform 2.7 and will not be possible anymore in API Platform 3.', self::class), \E_USER_DEPRECATED);
-        }
-        $this->allowPlainIdentifiers = $allowPlainIdentifiers;
-
-        $this->dataTransformers = $dataTransformers;
-
-        // Just skip our data transformer to trigger a proper deprecation
-        $customDataTransformers = array_filter(\is_array($dataTransformers) ? $dataTransformers : iterator_to_array($dataTransformers), function ($dataTransformer) {
-            return !$dataTransformer instanceof MessengerDataTransformer;
-        });
-
-        if (\count($customDataTransformers)) {
-            trigger_deprecation('api-platform/core', '2.7', 'The DataTransformer pattern is deprecated, use a Provider or a Processor and either use your input or return a new output there.');
-        }
-
-        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->resourceAccessChecker = $resourceAccessChecker;
     }
@@ -188,7 +152,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (isset($context['iri'])) {
             $iri = $context['iri'];
         } else {
-            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
+            $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
         }
 
         $context['iri'] = $iri;
@@ -245,69 +209,23 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['api_denormalize'] = true;
         $context['resource_class'] = $resourceClass;
 
-        if (null !== $inputClass = $this->getInputClass($resourceClass, $context)) {
-            if (null !== $dataTransformer = $this->getDataTransformer($data, $resourceClass, $context)) {
-                $dataTransformerContext = $context;
-
-                unset($context['input']);
-                unset($context['resource_class']);
-
-                if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
-                }
-
-                if ($dataTransformer instanceof DataTransformerInitializerInterface) {
-                    $context[AbstractObjectNormalizer::OBJECT_TO_POPULATE] = $dataTransformer->initialize($inputClass, $context);
-                    $context[AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE] = true;
-                }
-
-                try {
-                    $denormalizedInput = $this->serializer->denormalize($data, $inputClass, $format, $context);
-                } catch (NotNormalizableValueException $e) {
-                    throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
-                }
-
-                if (!\is_object($denormalizedInput)) {
-                    throw new UnexpectedValueException('Expected denormalized input to be an object.');
-                }
-
-                return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
-            }
-
-            // Are we in a Request context?
-            if ($context['operation'] ?? $context['operation_type'] ?? false) {
-                $resourceClass = $inputClass;
-                $context['resource_class'] = $inputClass;
-            }
+        if (
+            $inputClass = $this->getInputClass($resourceClass, $context)
+            &&
+            ($context['operation'] ?? $context['operation_type'] ?? false) // Are we in a Request context?
+        ) {
+            $resourceClass = $inputClass;
+            $context['resource_class'] = $inputClass;
         }
-
-        $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();
 
         if (\is_string($data)) {
             try {
-                return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($data, $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+                return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
             }
-        }
-
-        if (!\is_array($data)) {
-            if (!$supportsPlainIdentifiers) {
-                throw new UnexpectedValueException(sprintf('Expected IRI or document for resource "%s", "%s" given.', $resourceClass, \gettype($data)));
-            }
-
-            $item = $this->itemDataProvider->getItem($resourceClass, $data, null, $context + ['fetch_data' => true]);
-            if (null === $item) {
-                throw new ItemNotFoundException(sprintf('Item not found for resource "%s" with id "%s".', $resourceClass, $data));
-            }
-
-            return $item;
         }
 
         $previousObject = null !== $objectToPopulate ? clone $objectToPopulate : null;
@@ -598,19 +516,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
-        $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();
-
         if (\is_string($value)) {
             try {
-                return $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($value, $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
+                return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
-                }
+                throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
             }
         }
 
@@ -629,23 +541,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 return $item;
             } catch (InvalidValueException $e) {
-                if (!$supportsPlainIdentifiers) {
-                    throw $e;
-                }
+                throw $e;
             }
         }
 
         if (!\is_array($value)) {
-            if (!$supportsPlainIdentifiers) {
-                throw new UnexpectedValueException(sprintf('Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)));
-            }
-
-            $item = $this->itemDataProvider->getItem($className, $value, null, $context + ['fetch_data' => true]);
-            if (null === $item) {
-                throw new ItemNotFoundException(sprintf('Item not found for resource "%s" with id "%s".', $className, $value));
-            }
-
-            return $item;
+            throw new UnexpectedValueException(sprintf('Expected IRI or nested document for attribute "%s", "%s" given.', $attributeName, \gettype($value)));
         }
 
         throw new UnexpectedValueException(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName));
@@ -855,50 +756,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $iri;
     }
 
-    /**
-     * Finds the first supported data transformer if any.
-     *
-     * @param object|array $data object on normalize / array on denormalize
-     */
-    protected function getDataTransformer($data, string $to, array $context = []): ?DataTransformerInterface
-    {
-        foreach ($this->dataTransformers as $dataTransformer) {
-            if ($dataTransformer->supportsTransformation($data, $to, $context)) {
-                return $dataTransformer;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * For a given resource, it returns an output representation if any
-     * If not, the resource is returned.
-     *
-     * @param mixed $object
-     */
-    protected function transformOutput($object, array $context = [], string $outputClass = null)
-    {
-        if (null === $outputClass) {
-            $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
-        }
-
-        if (null !== $outputClass && null !== $dataTransformer = $this->getDataTransformer($object, $outputClass, $context)) {
-            return $dataTransformer->transform($object, $outputClass, $context);
-        }
-
-        return $object;
-    }
-
     private function createAttributeValue($attribute, $value, $format = null, array $context = [])
     {
         if (!$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
             return $value;
         }
 
-        /** @var ApiProperty|PropertyMetadata */
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
-        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
+        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
         if (null === $type) {
             // No type provided, blindly return the value
@@ -1036,16 +901,4 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             // Properties not found are ignored
         }
     }
-
-    /**
-     * TODO: to remove in 3.0.
-     *
-     * @deprecated since 2.7
-     */
-    private function supportsPlainIdentifiers(): bool
-    {
-        return $this->allowPlainIdentifiers && null !== $this->itemDataProvider;
-    }
 }
-
-class_alias(AbstractItemNormalizer::class, \ApiPlatform\Core\Serializer\AbstractItemNormalizer::class);

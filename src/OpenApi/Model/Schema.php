@@ -172,5 +172,3 @@ final class Schema extends \ArrayObject
         return $clone;
     }
 }
-
-class_alias(Schema::class, \ApiPlatform\Core\OpenApi\Model\Schema::class);

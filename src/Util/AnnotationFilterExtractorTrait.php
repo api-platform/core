@@ -155,5 +155,3 @@ trait AnnotationFilterExtractorTrait
         return 'annotated_'.Inflector::tableize(str_replace('\\', '', $reflectionClass->getName().(new \ReflectionClass($filterClass))->getName().$suffix));
     }
 }
-
-class_alias(AnnotationFilterExtractorTrait::class, \ApiPlatform\Core\Util\AnnotationFilterExtractorTrait::class);

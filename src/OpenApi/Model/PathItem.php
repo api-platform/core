@@ -218,5 +218,3 @@ final class PathItem
         return $clone;
     }
 }
-
-class_alias(PathItem::class, \ApiPlatform\Core\OpenApi\Model\PathItem::class);

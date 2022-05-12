@@ -67,5 +67,3 @@ final class License
         return $clone;
     }
 }
-
-class_alias(License::class, \ApiPlatform\Core\OpenApi\Model\License::class);

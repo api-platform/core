@@ -5,6 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />
+        <service id="ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface" alias="api_platform.metadata.property.metadata_factory" />
         <!-- The PropertyInfo decorator must always be the first decorator, it will create the metadata if it doesn't exist -->
         <service id="api_platform.metadata.property.metadata_factory.property_info" class="ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="40" public="false">
             <argument type="service" id="api_platform.property_info" />
@@ -50,11 +52,6 @@
         <service id="api_platform.metadata.property.identifier_metadata_factory.xml" decorates="api_platform.metadata.property.identifier_metadata_factory" class="ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory" public="false" decoration-priority="10">
             <argument type="service" id="api_platform.metadata.property_extractor.xml" />
             <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.xml.inner" />
-        </service>
-
-        <service id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata" class="ApiPlatform\Metadata\Property\Factory\LegacyPropertyMetadataFactory" decorates="api_platform.metadata.property.identifier_metadata_factory" decoration-priority="1000" public="false">
-            <argument type="service" id="api_platform.metadata.property.metadata_factory.legacy" />
-            <argument type="service" id="api_platform.metadata.property.identifier_metadata_factory.legacy_property_metadata.inner" />
         </service>
 
         <service id="api_platform.metadata.property.metadata_factory" alias="api_platform.metadata.property.metadata_factory.xml" />

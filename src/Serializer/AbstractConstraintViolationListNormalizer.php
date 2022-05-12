@@ -85,5 +85,3 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
         return [$messages, $violations];
     }
 }
-
-class_alias(AbstractConstraintViolationListNormalizer::class, \ApiPlatform\Core\Serializer\AbstractConstraintViolationListNormalizer::class);

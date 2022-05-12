@@ -176,5 +176,3 @@ final class Components
         return $clone;
     }
 }
-
-class_alias(Components::class, \ApiPlatform\Core\OpenApi\Model\Components::class);

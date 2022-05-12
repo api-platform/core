@@ -103,5 +103,3 @@ final class RequestParser
         return implode('&', $parts);
     }
 }
-
-class_alias(RequestParser::class, \ApiPlatform\Core\Util\RequestParser::class);

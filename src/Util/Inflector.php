@@ -53,5 +53,3 @@ final class Inflector
         return class_exists(InflectorFactory::class) ? self::getInstance()->pluralize($word) : LegacyInflector::pluralize($word); // @phpstan-ignore-line
     }
 }
-
-class_alias(Inflector::class, \ApiPlatform\Core\Util\Inflector::class);

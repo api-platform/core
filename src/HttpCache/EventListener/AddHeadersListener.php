@@ -107,5 +107,3 @@ final class AddHeadersListener
         }
     }
 }
-
-class_alias(AddHeadersListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddHeadersListener::class);

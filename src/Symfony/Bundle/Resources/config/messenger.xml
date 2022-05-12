@@ -7,11 +7,8 @@
     <services>
         <service id="api_platform.message_bus" alias="messenger.default_bus" />
 
-        <service id="api_platform.messenger.data_persister" class="ApiPlatform\Core\Bridge\Symfony\Messenger\DataPersister" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
-            <argument type="service" id="api_platform.message_bus" />
-
-            <tag name="api_platform.data_persister" priority="-900" />
+        <service id="api_platform.messenger.metadata.resource.metadata_collection_factory" class="ApiPlatform\Symfony\Messenger\Metadata\MessengerResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="50">
+            <argument type="service" id="api_platform.messenger.metadata.resource.metadata_collection_factory.inner" />
         </service>
 
         <service id="ApiPlatform\Symfony\Messenger\Processor" class="ApiPlatform\Symfony\Messenger\Processor" public="false">
@@ -20,11 +17,6 @@
             <tag name="api_platform.state_processor" priority="-900" />
         </service>
 
-        <service id="api_platform.messenger.data_transformer" class="ApiPlatform\Core\Bridge\Symfony\Messenger\DataTransformer" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
-
-            <tag name="api_platform.data_transformer" priority="-10" />
-        </service>
     </services>
 
 </container>

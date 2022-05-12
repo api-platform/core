@@ -195,5 +195,3 @@ final class TypeFactory implements TypeFactoryInterface
         return array_merge($jsonSchema, ['nullable' => true]);
     }
 }
-
-class_alias(TypeFactory::class, \ApiPlatform\Core\JsonSchema\TypeFactory::class);

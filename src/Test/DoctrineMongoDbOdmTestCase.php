@@ -51,5 +51,3 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         return DocumentManager::create(null, $config);
     }
 }
-
-class_alias(DoctrineMongoDbOdmTestCase::class, \ApiPlatform\Core\Test\DoctrineMongoDbOdmTestCase::class);

@@ -104,5 +104,3 @@ trait FieldDatatypeTrait
         return null;
     }
 }
-
-class_alias(FieldDatatypeTrait::class, \ApiPlatform\Core\Bridge\Elasticsearch\Util\FieldDatatypeTrait::class);

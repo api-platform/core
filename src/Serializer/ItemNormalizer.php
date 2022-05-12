@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -36,15 +37,9 @@ class ItemNormalizer extends AbstractItemNormalizer
 {
     private $logger;
 
-    /**
-     * @param mixed                                             $propertyMetadataFactory
-     * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
-     * @param mixed                                             $resourceClassResolver
-     * @param mixed|null                                        $resourceMetadataFactory
-     */
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers, [], $dataTransformers, $resourceMetadataFactory, $resourceAccessChecker);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, [], $resourceMetadataFactory, $resourceAccessChecker);
 
         $this->logger = $logger ?: new NullLogger();
     }
@@ -80,33 +75,13 @@ class ItemNormalizer extends AbstractItemNormalizer
     private function updateObjectToPopulate(array $data, array &$context): void
     {
         try {
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri((string) $data['id'], $context + ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
-            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
-                // remove in 3.0
-                $identifier = null;
-                $options = $this->getFactoryOptions($context);
+            $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
+            // todo: we could guess uri variables with the operation and the data instead of hardcoding id
+            $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
 
-                foreach ($this->propertyNameCollectionFactory->create($context['resource_class'], $options) as $propertyName) {
-                    if (true === $this->propertyMetadataFactory->create($context['resource_class'], $propertyName)->isIdentifier()) {
-                        $identifier = $propertyName;
-                        break;
-                    }
-                }
-
-                if (null === $identifier) {
-                    throw $e;
-                }
-                $iri = sprintf('%s/%s', $this->iriConverter->getIriFromResourceClass($context['resource_class']), $data[$identifier]);
-            } else {
-                $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
-                // todo: we could guess uri variables with the operation and the data instead of hardcoding id
-                $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
-            }
-
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getItemFromIri($iri, ['fetch_data' => true]) : $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
+            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => true]);
         }
     }
 }
-
-class_alias(ItemNormalizer::class, \ApiPlatform\Core\Serializer\ItemNormalizer::class);

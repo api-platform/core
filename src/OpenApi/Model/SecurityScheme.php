@@ -142,5 +142,3 @@ final class SecurityScheme
         return $clone;
     }
 }
-
-class_alias(SecurityScheme::class, \ApiPlatform\Core\OpenApi\Model\SecurityScheme::class);
