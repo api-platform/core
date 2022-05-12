@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
- * @ApiFilter (RangeFilter::class, properties={"id"})
- * @ApiFilter (OrderFilter::class, properties={"id"="DESC"})
  */
+#[ApiFilter(RangeFilter::class, properties: ['id'])]
+#[ApiFilter(OrderFilter::class, properties: ['id' => 'DESC'])]
 #[ApiResource(paginationPartial: true, paginationViaCursor: [['field' => 'id', 'direction' => 'DESC']])]
 class SoMany
 {

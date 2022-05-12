@@ -20,8 +20,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
- * @ApiFilter (SearchFilter::class, properties={"nameConverted.nameConverted"="partial"})
  */
+#[ApiFilter(SearchFilter::class, properties: ['nameConverted.nameConverted' => 'partial'])]
 #[ApiResource]
 class ConvertedOwner
 {

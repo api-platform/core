@@ -27,7 +27,7 @@ class CustomGeneratedIdentifier
     #[ORM\Column(type: 'string')]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: \ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\UuidGenerator::class)]
-    private ?mixed $id = null;
+    private ?string $id = null;
 
     public function getId()
     {

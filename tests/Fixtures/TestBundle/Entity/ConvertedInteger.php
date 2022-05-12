@@ -13,18 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiFilter (NumericFilter::class, properties={"nameConverted"})
- * @ApiFilter (RangeFilter::class, properties={"nameConverted"})
- * @ApiFilter (OrderFilter::class, properties={"nameConverted"})
- */
+#[ApiFilter(NumericFilter::class, properties: ['nameConverted'])]
+#[ApiFilter(RangeFilter::class, properties: ['nameConverted'])]
+#[ApiFilter(OrderFilter::class, properties: ['nameConverted'])]
 #[ApiResource]
 #[ORM\Entity]
 class ConvertedInteger

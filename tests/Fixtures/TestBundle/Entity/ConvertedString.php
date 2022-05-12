@@ -13,14 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiFilter (ExistsFilter::class, properties={"nameConverted"})
- */
+#[ApiFilter(ExistsFilter::class, properties: ['nameConverted'])]
 #[ApiResource]
 #[ORM\Entity]
 class ConvertedString

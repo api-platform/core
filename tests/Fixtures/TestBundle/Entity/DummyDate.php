@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,13 +24,13 @@ use Doctrine\ORM\Mapping as ORM;
  * Dummy Date.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ApiFilter (SearchFilter::class, properties={"dummyDate"})
- * @ApiFilter (DateFilter::class, properties={
- *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
- *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
- *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
- * })
  */
+#[ApiFilter(DateFilter::class, properties: [
+    'dateIncludeNullAfter' => DateFilter::INCLUDE_NULL_AFTER,
+    'dateIncludeNullBefore' => DateFilter::INCLUDE_NULL_BEFORE,
+    'dateIncludeNullBeforeAndAfter' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER,
+])]
+#[ApiFilter(SearchFilter::class, properties: ['dummyDate'])]
 #[ApiResource(filters: ['my_dummy_date.date'])]
 #[ORM\Entity]
 class DummyDate
