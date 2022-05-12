@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Api\QueryParameterValidator;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 

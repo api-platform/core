@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Action;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;

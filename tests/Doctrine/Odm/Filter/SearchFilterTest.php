@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
@@ -23,6 +22,7 @@ use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use MongoDB\BSON\Regex;
 use Prophecy\Argument;

@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Test\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use PHPUnit\Framework\TestCase;

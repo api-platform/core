@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

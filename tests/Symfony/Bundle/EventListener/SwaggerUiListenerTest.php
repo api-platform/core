@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\EventListener;
 
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\EventListener\SwaggerUiListener;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;

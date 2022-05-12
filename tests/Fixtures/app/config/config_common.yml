@@ -230,7 +230,7 @@ services:
 
     app.config_dummy_resource.action:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Action\ConfigCustom'
-        arguments: ['@api_platform.item_data_provider']
+        arguments: ['@api_platform.state_provider']
         public: true
 
     app.entity.filter.dummy_property.property:
@@ -437,8 +437,8 @@ services:
         arguments:
             $router: '@router'
 
-    app.serializer.normalizer.override_documentation:
-        class: ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
-        decorates: api_platform.swagger.normalizer.documentation
-        public: false
-        arguments: ['@app.serializer.normalizer.override_documentation.inner']
+    # app.serializer.normalizer.override_documentation:
+    #     class: ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Normalizer\OverrideDocumentationNormalizer
+    #     decorates: api_platform.swagger.normalizer.documentation
+    #     public: false
+    #     arguments: ['@app.serializer.normalizer.override_documentation.inner']

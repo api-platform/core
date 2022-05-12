@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Hal\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Tests\ProphecyTrait;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
