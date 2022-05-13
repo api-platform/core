@@ -139,6 +139,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'paginationMaximumItemsPerPage' => $this->phpize($resource, 'paginationMaximumItemsPerPage', 'integer'),
             'paginationPartial' => $this->phpize($resource, 'paginationPartial', 'bool'),
             'paginationType' => $this->phpize($resource, 'paginationType', 'string'),
+            'processor' => $this->phpize($resource, 'processor', 'string'),
+            'provider' => $this->phpize($resource, 'provider', 'string'),
             'security' => $this->phpize($resource, 'security', 'string'),
             'securityMessage' => $this->phpize($resource, 'securityMessage', 'string'),
             'securityPostDenormalize' => $this->phpize($resource, 'securityPostDenormalize', 'string'),
