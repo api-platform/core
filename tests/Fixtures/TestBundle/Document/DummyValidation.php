@@ -23,36 +23,31 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new Post(uriTemplate: 'dummy_validation.{_format}'), new GetCollection(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]), new GetCollection(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator'])])]
+#[ODM\Document]
 class DummyValidation
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(nullable=true)
      */
     #[Assert\NotNull(groups: ['a'])]
+    #[ODM\Field(nullable: true)]
     private ?string $name = null;
     /**
      * @var string|null The dummy title
-     *
-     * @ODM\Field(nullable=true)
      */
     #[Assert\NotNull(groups: ['b'])]
+    #[ODM\Field(nullable: true)]
     private ?string $title = null;
     /**
      * @var string|null The dummy code
-     * @ODM\Field
      */
+    #[ODM\Field]
     private ?string $code = null;
 
     public function getId(): ?int

@@ -25,34 +25,31 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related to Normalized Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(normalizationContext: ['groups' => ['related_output', 'output']], denormalizationContext: ['groups' => ['related_input', 'input']])]
+#[ODM\Document]
 class RelatedNormalizedDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     #[Groups(['related_output', 'related_input'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field
      */
     #[Assert\NotBlank]
     #[ApiProperty(types: ['http://schema.org/name'])]
     #[Groups(['related_output', 'related_input'])]
+    #[ODM\Field]
     private ?string $name = null;
 
     /**
      * @var iterable Several Normalized dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=CustomNormalizedDummy::class)
      */
     #[Groups(['related_output', 'related_input'])]
+    #[ODM\ReferenceMany(targetDocument: CustomNormalizedDummy::class)]
     public $customNormalizedDummy;
 
     public function __construct()

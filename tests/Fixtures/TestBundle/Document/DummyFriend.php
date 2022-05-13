@@ -25,25 +25,23 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class DummyFriend
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
      */
     #[Assert\NotBlank]
     #[ApiProperty(types: ['http://schema.org/name'])]
     #[Groups(['fakemanytomany', 'friends'])]
+    #[ODM\Field(type: 'string')]
     private ?string $name = null;
 
     /**

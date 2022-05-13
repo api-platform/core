@@ -22,17 +22,15 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * No Collection Dummy.
- *
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete()])]
+#[ODM\Document]
 class NoCollectionDummy
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     public function getId()

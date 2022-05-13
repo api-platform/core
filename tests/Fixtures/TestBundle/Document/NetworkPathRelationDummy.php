@@ -18,19 +18,13 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::NET_PATH)]
+#[ODM\Document]
 class NetworkPathRelationDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\ReferenceMany(targetDocument=NetworkPathDummy::class, mappedBy="networkPathRelationDummy")
-     */
+    #[ODM\ReferenceMany(targetDocument: NetworkPathDummy::class, mappedBy: 'networkPathRelationDummy')]
     public $networkPathDummies;
 
     public function __construct()

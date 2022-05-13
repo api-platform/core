@@ -25,34 +25,29 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ODM\Document
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct::class, identifiers: ['id'], toProperty: 'product')], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class DummyAggregateOffer
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\ReferenceMany(targetDocument=DummyOffer::class, mappedBy="aggregate", cascade={"persist"})
-     */
+    #[ODM\ReferenceMany(targetDocument: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
     private \Doctrine\Common\Collections\ArrayCollection $offers;
     /**
      * @var DummyProduct The dummy product
-     *
-     * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="offers", storeAs="id")
      */
+    #[ODM\ReferenceOne(targetDocument: DummyProduct::class, inversedBy: 'offers', storeAs: 'id')]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct $product = null;
     /**
      * @var int The dummy aggregate offer value
-     *
-     * @ODM\Field(type="int")
      */
+    #[ODM\Field(type: 'int')]
     private $value;
 
     public function __construct()

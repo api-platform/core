@@ -20,20 +20,17 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy with iri_only.
  *
  * @author Pierre Thibaudeau <pierre.thibaudeau@les-tilleuls.coop>
- * @ODM\Document
  */
 #[ApiResource(normalizationContext: ['iri_only' => true, 'jsonld_embed_context' => true])]
+#[ODM\Document]
 class IriOnlyDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     private ?string $foo = null;
 
     public function getId(): ?int

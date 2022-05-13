@@ -28,43 +28,38 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(uriTemplate: '/embedded_dummies_groups/{id}', normalizationContext: ['groups' => ['embed']]), new Post(), new GetCollection()], filters: ['my_dummy.mongodb.search', 'my_dummy.mongodb.order', 'my_dummy.mongodb.date', 'my_dummy.mongodb.boolean'])]
+#[ODM\Document]
 class EmbeddedDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
      */
     #[Groups(['embed'])]
+    #[ODM\Field(type: 'string')]
     private ?string $name = null;
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ODM\Field(type="date")
      */
     #[Assert\DateTime]
+    #[ODM\Field(type: 'date')]
     public $dummyDate;
     /**
      * @var EmbeddableDummy
-     *
-     * @ODM\EmbedOne(targetDocument=EmbeddableDummy::class)
      */
     #[Groups(['embed'])]
+    #[ODM\EmbedOne(targetDocument: EmbeddableDummy::class)]
     public $embeddedDummy;
     /**
      * @var RelatedDummy|null A related dummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id")
      */
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id')]
     public $relatedDummy;
 
     public static function staticMethod(): void

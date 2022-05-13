@@ -21,28 +21,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
+#[ODM\Document]
 class FooDummy
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $name;
     /**
      * @var Dummy The foo dummy
-     *
-     * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, storeAs="id")
      */
+    #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], storeAs: 'id')]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy $dummy = null;
 
     public function getId()

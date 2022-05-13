@@ -19,30 +19,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Relation.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CompositeRelation
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     */
     #[Groups(['default'])]
+    #[ODM\Field(type: 'string', nullable: true)]
     private $value;
-    /**
-     * @ODM\ReferenceOne(targetDocument=CompositeItem::class, inversedBy="compositeValues")
-     */
     #[Groups(['default'])]
+    #[ODM\ReferenceOne(targetDocument: CompositeItem::class, inversedBy: 'compositeValues')]
     private $compositeItem;
-    /**
-     * @ODM\ReferenceOne(targetDocument=CompositeLabel::class)
-     */
     #[Groups(['default'])]
+    #[ODM\ReferenceOne(targetDocument: CompositeLabel::class)]
     private $compositeLabel;
 
     /**

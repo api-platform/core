@@ -28,50 +28,44 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Overridden Operation Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Get(normalizationContext: ['groups' => ['overridden_operation_dummy_get']], denormalizationContext: ['groups' => ['overridden_operation_dummy_get']]), new Put(normalizationContext: ['groups' => ['overridden_operation_dummy_put']], denormalizationContext: ['groups' => ['overridden_operation_dummy_put']]), new Delete(), new GetCollection(), new Post(), new GetCollection(uriTemplate: '/override/swagger')], normalizationContext: ['groups' => ['overridden_operation_dummy_read']], denormalizationContext: ['groups' => ['overridden_operation_dummy_write']])]
+#[ODM\Document]
 class OverriddenOperationDummy
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
     #[Assert\NotBlank]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_write', 'overridden_operation_dummy_get'])]
     #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ODM\Field]
     private $name;
 
     /**
      * @var string The dummy name alias
-     *
-     * @ODM\Field(nullable=true)
      */
     #[ApiProperty(types: ['http://schema.org/alternateName'])]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_put', 'overridden_operation_dummy_get'])]
+    #[ODM\Field(nullable: true)]
     private $alias;
 
     /**
      * @var string A short description of the item
-     *
-     * @ODM\Field(nullable=true)
      */
     #[ApiProperty(types: ['http://schema.org/description'])]
     #[Groups(['overridden_operation_dummy_read', 'overridden_operation_dummy_write', 'overridden_operation_dummy_get', 'overridden_operation_dummy_put'])]
+    #[ODM\Field(nullable: true)]
     public $description;
 
-    /**
-     * @ODM\Field(nullable=true)
-     */
     #[Groups(['overridden_operation_dummy_write'])]
+    #[ODM\Field(nullable: true)]
     public $notGettable;
 
     public function getId()

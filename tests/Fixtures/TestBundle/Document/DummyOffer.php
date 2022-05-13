@@ -24,31 +24,28 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ODM\Document
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummy_aggregate_offers/{id}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/related_products/{relatedProducts}/offers/{offers}/offers.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct::class, identifiers: ['id']), 'relatedProducts' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyProduct::class, identifiers: ['id'], toProperty: 'product'), 'offers' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer::class, identifiers: ['id'], toProperty: 'aggregate')], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class DummyOffer
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var int The dummy aggregate offer value
-     *
-     * @ODM\Field(type="int")
      */
+    #[ODM\Field(type: 'int')]
     private ?int $value = null;
     /**
      * @var DummyAggregateOffer The dummy aggregate offer value
-     *
-     * @ODM\ReferenceOne(targetDocument=DummyAggregateOffer::class, inversedBy="offers", storeAs="id")
      */
+    #[ODM\ReferenceOne(targetDocument: DummyAggregateOffer::class, inversedBy: 'offers', storeAs: 'id')]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer $aggregate = null;
 
     public function getId()

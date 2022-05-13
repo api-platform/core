@@ -22,30 +22,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Dummy with a custom GraphQL mutation resolver.
  *
- * @ODM\Document
- *
  * @author Raoul Clais <raoul.clais@gmail.com>
  */
 #[ApiResource(graphQlOperations: [new Mutation(name: 'sum', resolver: 'app.graphql.mutation_resolver.dummy_custom', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']]), new Mutation(name: 'sumNotPersisted', resolver: 'app.graphql.mutation_resolver.dummy_custom_not_persisted', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']]), new Mutation(name: 'sumNoWriteCustomResult', resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']], write: false), new Mutation(name: 'sumOnlyPersist', resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist_document', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']], read: false, deserialize: false, validate: false, serialize: false), new Mutation(name: 'testCustomArguments', resolver: 'app.graphql.mutation_resolver.dummy_custom', args: ['operandC' => ['type' => 'Int!']]), new Mutation(name: 'testOutput', resolver: 'app.graphql.mutation_resolver.dummy_custom', output: OutputDto::class)])]
+#[ODM\Document]
 class DummyCustomMutation
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(type="int")
-     */
+    #[ODM\Field(type: 'int')]
     private ?int $operandA = null;
-    /**
-     * @ODM\Field(type="int", nullable=true)
-     */
     #[Groups(['sum'])]
+    #[ODM\Field(type: 'int', nullable: true)]
     private ?int $operandB = null;
-    /**
-     * @ODM\Field(type="int", nullable=true)
-     */
     #[Groups(['result'])]
+    #[ODM\Field(type: 'int', nullable: true)]
     private ?int $result = null;
 
     public function getId(): ?int

@@ -19,23 +19,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Dummy Date Immutable.
- *
- * @ODM\Document
  */
 #[ApiResource(filters: ['my_dummy_immutable_date.mongodb.date'])]
+#[ODM\Document]
 class DummyImmutableDate
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var \DateTimeImmutable The dummy date
-     *
-     * @ODM\Field(type="date_immutable")
      */
+    #[ODM\Field(type: 'date_immutable')]
     public $dummyDate;
 
     /**

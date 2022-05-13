@@ -19,25 +19,21 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(normalizationContext: ['groups' => ['default']], denormalizationContext: ['groups' => ['default']])]
+#[ODM\Document]
 class DummyTableInheritanceRelated
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     #[Groups(['default'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var Collection Related children
-     *
-     * @ODM\ReferenceMany(targetDocument=DummyTableInheritance::class, mappedBy="parent")
      */
     #[Groups(['default'])]
+    #[ODM\ReferenceMany(targetDocument: DummyTableInheritance::class, mappedBy: 'parent')]
     private \Doctrine\Common\Collections\Collection $children;
 
     public function __construct()

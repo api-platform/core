@@ -16,21 +16,16 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class ResourceWithFloat
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(type="float")
-     */
+    #[ODM\Field(type: 'float')]
     private float $myFloatField = 0.0;
 
     public function getId()

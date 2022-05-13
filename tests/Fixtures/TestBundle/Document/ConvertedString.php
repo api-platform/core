@@ -18,22 +18,17 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiFilter(ExistsFilter::class, properties: ['nameConverted'])]
 #[ApiResource]
+#[ODM\Document]
 class ConvertedString
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null
-     *
-     * @ODM\Field(type="string", nullable=true)
      */
+    #[ODM\Field(type: 'string', nullable: true)]
     public $nameConverted;
 
     public function getId()

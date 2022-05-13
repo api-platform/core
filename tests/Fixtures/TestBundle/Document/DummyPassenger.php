@@ -16,19 +16,13 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class DummyPassenger
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     public $nickname;
 
     public function getId()

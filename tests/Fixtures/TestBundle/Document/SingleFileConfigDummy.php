@@ -17,23 +17,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * File Config Dummy.
- *
- * @ODM\Document
  */
+#[ODM\Document]
 class SingleFileConfigDummy
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $name;
 
     public function getId()

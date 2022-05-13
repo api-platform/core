@@ -19,20 +19,14 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiFilter(RangeFilter::class, properties: ['id'])]
 #[ApiFilter(OrderFilter::class, properties: ['id' => 'DESC'])]
 #[ApiResource(paginationPartial: true, paginationViaCursor: [['field' => 'id', 'direction' => 'DESC']])]
+#[ODM\Document]
 class SoMany
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-    /**
-     * @ODM\Field(nullable=true)
-     */
+    #[ODM\Field(nullable: true)]
     public $content;
 }

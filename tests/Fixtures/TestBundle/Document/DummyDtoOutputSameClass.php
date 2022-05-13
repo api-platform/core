@@ -20,28 +20,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy InputOutput.
  *
  * @author Daniel West <daniel@silverback.is>
- * @ODM\Document
  */
 #[ApiResource(output: DummyDtoOutputSameClass::class)]
+#[ODM\Document]
 class DummyDtoOutputSameClass
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
     private ?int $id = null;
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $lorem;
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $ipsum;
 
     public function getId()

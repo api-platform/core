@@ -27,34 +27,29 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Secured resource with legacy access_control attribute.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Put(security: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new GetCollection(), new Post(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Mutation(name: 'delete'), new Mutation(name: 'update', security: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() ==  user'), new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.')], security: 'is_granted(\'ROLE_USER\')')]
+#[ODM\Document]
 class LegacySecuredDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null The title
-     *
-     * @ODM\Field
      */
     #[Assert\NotBlank]
+    #[ODM\Field]
     private ?string $title = null;
     /**
      * @var string The description
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private string $description = '';
     /**
      * @var string|null The owner
-     *
-     * @ODM\Field
      */
     #[Assert\NotBlank]
+    #[ODM\Field]
     private ?string $owner = null;
 
     public function getId(): ?int

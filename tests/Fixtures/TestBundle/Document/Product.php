@@ -17,24 +17,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Model\ProductInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
+#[ODM\Document]
 class Product implements ProductInterface
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     private ?string $code = null;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=Taxon::class)
-     */
+    #[ODM\ReferenceOne(targetDocument: Taxon::class)]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon $mainTaxon = null;
 
     /**

@@ -17,18 +17,15 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class DummyTableInheritanceChild extends DummyTableInheritance
 {
     /**
      * @var string The dummy nickname
-     *
-     * @ODM\Field
      */
     #[Groups(['default'])]
+    #[ODM\Field]
     private $nickname;
 
     public function getNickname()

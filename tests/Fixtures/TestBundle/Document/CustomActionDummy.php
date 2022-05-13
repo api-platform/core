@@ -20,20 +20,15 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ODM\Document
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(operations: [new Get(), new Get(uriTemplate: 'custom_action_collection_dummies/{id}'), new Get(routeName: 'custom_normalization'), new Get(routeName: 'short_custom_normalization'), new GetCollection(), new GetCollection(uriTemplate: 'custom_action_collection_dummies'), new Post(routeName: 'custom_denormalization'), new GetCollection(routeName: 'short_custom_denormalization')])]
+#[ODM\Document]
 class CustomActionDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field
-     */
+    #[ODM\Field]
     private string $foo = '';
 
     public function getId(): ?int

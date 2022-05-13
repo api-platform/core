@@ -18,30 +18,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Composite Primitive Item.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CompositePrimitiveItem
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     private $description;
 
     public function __construct(
-        /**
-         * @ODM\Field(type="string")
-         */
-        private readonly string $name,
-        /**
-         * @ODM\Field(type="int")
-         */
-        private readonly int $year
+        #[ODM\Field(type: 'string')] private readonly string $name,
+        #[ODM\Field(type: 'int')] private readonly int $year
     ) {
     }
 

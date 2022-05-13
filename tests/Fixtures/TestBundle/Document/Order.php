@@ -18,27 +18,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(normalizationContext: ['groups' => ['order_read']], forceEager: false)]
+#[ODM\Document]
 class Order
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
     #[Groups(['order_read'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\ReferenceOne(targetDocument=Customer::class)
-     */
     #[Groups(['order_read'])]
+    #[ODM\ReferenceOne(targetDocument: Customer::class)]
     public $customer;
-    /**
-     * @ODM\ReferenceOne(targetDocument=Customer::class)
-     */
     #[Assert\NotNull]
     #[Groups(['order_read'])]
+    #[ODM\ReferenceOne(targetDocument: Customer::class)]
     public $recipient;
 
     public function getId()

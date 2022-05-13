@@ -21,17 +21,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
- *
- * @ODM\MappedSuperclass
  */
+#[ODM\MappedSuperclass]
 class ParentDummy
 {
     /**
      * @var int The age
-     *
-     * @ODM\Field(type="int", nullable=true)
      */
     #[Groups(['friends'])]
+    #[ODM\Field(type: 'int', nullable: true)]
     private $age;
 
     public function getAge()

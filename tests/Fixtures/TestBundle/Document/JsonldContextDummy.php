@@ -19,18 +19,16 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Jsonld Context Dummy.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class JsonldContextDummy
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     #[ApiProperty(identifier: true)]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**

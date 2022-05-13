@@ -18,23 +18,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Identifier Dummy.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CustomIdentifierDummy
 {
     /**
      * @var int The custom identifier
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $customId = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private ?string $name = null;
 
     public function getCustomId(): int

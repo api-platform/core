@@ -26,35 +26,27 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * https://github.com/api-platform/core/issues/1107.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ODM\Document
  */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/dummy_products/{id}/related_products.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class DummyProduct
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\ReferenceMany(targetDocument=DummyAggregateOffer::class, mappedBy="product", cascade={"persist"})
-     */
+    #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
     private \Doctrine\Common\Collections\Collection $offers;
     /**
      * @var string The tour name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $name;
-    /**
-     * @ODM\ReferenceMany(targetDocument=DummyProduct::class, mappedBy="parent")
-     */
+    #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
     private \Doctrine\Common\Collections\Collection $relatedProducts;
-    /**
-     * @ODM\ReferenceOne(targetDocument=DummyProduct::class, inversedBy="relatedProducts")
-     */
+    #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
     public function __construct()

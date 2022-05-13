@@ -15,16 +15,13 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
+#[ODM\Document]
 class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
 {
     /**
      * @var bool The dummy swagg
-     *
-     * @ODM\Field(type="bool")
      */
+    #[ODM\Field(type: 'bool')]
     private bool $swaggerThanParent;
 
     public function __construct()

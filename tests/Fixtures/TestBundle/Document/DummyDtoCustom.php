@@ -25,29 +25,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * DummyDtoCustom.
- *
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}'), new Put(), new Delete(), new Post(input: CustomInputDto::class), new GetCollection(), new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output'), new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output')])]
+#[ODM\Document]
 class DummyDtoCustom
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $lorem;
     /**
      * @var string
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $ipsum;
 
     public function getId()

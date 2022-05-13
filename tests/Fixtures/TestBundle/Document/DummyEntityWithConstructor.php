@@ -28,35 +28,26 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * https://github.com/api-platform/core/issues/1747.
  *
  * @author Maxime Veber <maxime.veber@nekland.fr>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Put(denormalizationContext: ['groups' => ['put']]), new Post(), new GetCollection()])]
+#[ODM\Document]
 class DummyEntityWithConstructor
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(nullable=true)
-     */
     #[Groups(['put'])]
+    #[ODM\Field(nullable: true)]
     private ?string $baz = null;
 
     /**
      * @param DummyObjectWithoutConstructor[] $items
      */
     public function __construct(
-        /**
-         * @ODM\Field
-         */
-        private readonly string $foo,
-        /**
-         * @ODM\Field
-         */
-        private readonly string $bar,
+        #[ODM\Field] private readonly string $foo,
+        #[ODM\Field] private readonly string $bar,
         private readonly array $items
     ) {
     }

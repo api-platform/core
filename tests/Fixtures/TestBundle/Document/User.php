@@ -30,19 +30,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * A User.
  *
- * @ODM\Document (collection="user_test")
- *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}'), new Post(), new GetCollection(), new Post(uriTemplate: '/users/password_reset_request', messenger: 'input', input: PasswordResetRequest::class, output: PasswordResetRequestResult::class, normalizationContext: ['groups' => ['user_password_reset_request']], denormalizationContext: ['groups' => ['user_password_reset_request']])], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
+#[ODM\Document(collection: 'user_test')]
 class User extends AbstractSecurityUser
 {
     /**
      * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     protected $id;
     /**
      * @var string|null
@@ -51,10 +49,9 @@ class User extends AbstractSecurityUser
     protected $email;
     /**
      * @var string|null
-     *
-     * @ODM\Field(type="string", nullable=true)
      */
     #[Groups(['user'])]
+    #[ODM\Field(type: 'string', nullable: true)]
     protected $fullname;
     /**
      * @var string|null

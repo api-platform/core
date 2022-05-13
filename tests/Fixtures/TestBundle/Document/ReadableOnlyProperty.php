@@ -17,25 +17,21 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class ReadableOnlyProperty
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string The foo name
-     *
-     * @ODM\Field
      */
     #[ApiProperty(writable: false)]
+    #[ODM\Field]
     private readonly string $name;
 
     public function __construct()

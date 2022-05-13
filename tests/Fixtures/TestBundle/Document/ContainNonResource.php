@@ -21,17 +21,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Resource linked to a standard object.
  *
- * @ODM\Document
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(filters: ['my_dummy.property'], normalizationContext: ['groups' => ['contain_non_resource']])]
+#[ODM\Document]
 class ContainNonResource
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
     #[Groups('contain_non_resource')]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
     /**
      * @var ContainNonResource

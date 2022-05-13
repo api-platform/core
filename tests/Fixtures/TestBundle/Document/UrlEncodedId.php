@@ -23,14 +23,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * @author Daniel West <daniel@silverback.is>
  *
  * Resource with an ID that will be URL encoded
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(requirements: ['id' => '.+']), new Post(), new GetCollection()])]
+#[ODM\Document]
 class UrlEncodedId
 {
-    /**
-     * @ODM\Id(strategy="none")
-     */
+    #[ODM\Id(strategy: 'none')]
     private string $id = '%encode:id';
 
     public function getId()

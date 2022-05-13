@@ -18,23 +18,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom identifier dummy.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class UuidIdentifierDummy
 {
     /**
      * @var string The custom identifier
-     *
-     * @ODM\Id(strategy="UUID")
      */
+    #[ODM\Id(strategy: 'UUID')]
     private ?string $uuid = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private ?string $name = null;
 
     public function getUuid(): string

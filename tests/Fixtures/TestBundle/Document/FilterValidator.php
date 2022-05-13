@@ -30,24 +30,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ODM\Document
  */
 #[ApiResource(filters: [ArrayItemsFilter::class, BoundsFilter::class, EnumFilter::class, LengthFilter::class, MultipleOfFilter::class, PatternFilter::class, RequiredFilter::class, RequiredAllowEmptyFilter::class])]
+#[ODM\Document]
 class FilterValidator
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string A name
-     *
-     * @ODM\Field
      */
     #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ODM\Field]
     private $name;
 
     public function getId()

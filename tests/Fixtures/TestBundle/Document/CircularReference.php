@@ -22,24 +22,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Circular Reference.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(normalizationContext: ['groups' => ['circular']])]
+#[ODM\Document]
 class CircularReference
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-    /**
-     * @ODM\ReferenceOne(targetDocument=CircularReference::class, inversedBy="children")
-     */
     #[Groups(['circular'])]
+    #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'children')]
     public $parent;
-    /**
-     * @ODM\ReferenceMany(targetDocument=CircularReference::class, mappedBy="parent")
-     */
     #[Groups(['circular'])]
+    #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
     public $children;
 
     public function __construct()

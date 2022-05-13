@@ -18,26 +18,16 @@ use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(graphQlOperations: [], normalizationContext: ['groups' => ['inspection_read']], denormalizationContext: ['groups' => ['inspection_write']])]
+#[ODM\Document]
 class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
-    /**
-     * @ODM\Field(type="date")
-     */
     #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    #[ODM\Field(type: 'date')]
     private \DateTime $performed;
 
-    public function __construct(/**
-     * @ODM\Field(type="bool")
-     */
-    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private readonly bool $accepted, /**
-     * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
-     */
-    #[Groups(['inspection_read', 'inspection_write'])] private readonly VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
+    public function __construct(#[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] #[ODM\Field(type: 'bool')] private readonly bool $accepted, #[Groups(['inspection_read', 'inspection_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyCar::class, inversedBy: 'inspections')] private readonly VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
     {
         $this->performed = $performed ?: new DateTime();
     }

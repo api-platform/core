@@ -16,21 +16,16 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class WithJsonDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
     private ?int $id = null;
     /**
      * @var array|null
-     *
-     * @ODM\Field(type="hash", nullable=true)
      */
+    #[ODM\Field(type: 'hash', nullable: true)]
     public $json;
 
     public function getId(): ?int

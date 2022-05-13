@@ -17,23 +17,15 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class VoDummyDriver
 {
     use VoDummyIdAwareTrait;
 
     public function __construct(
-        /**
-         * @ODM\Field
-         */
-        #[Groups(['car_read', 'car_write'])] private readonly string $firstName,
-        /**
-         * @ODM\Field
-         */
-        #[Groups(['car_read', 'car_write'])] private readonly string $lastName
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $firstName,
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $lastName
     ) {
     }
 

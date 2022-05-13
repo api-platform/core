@@ -23,35 +23,31 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Identifier Dummy With Subresource.
- *
- * @ODM\Document
  */
 #[ApiResource(uriVariables: 'slug')]
 #[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies/{childDummies}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], toProperty: 'parentDummy'), 'childDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
 #[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
+#[ODM\Document]
 class SlugParentDummy
 {
     /**
      * @var int|null The database identifier
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     #[ApiProperty(identifier: false)]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string|null The slug used a API identifier
-     *
-     * @ODM\Field
      */
     #[ApiProperty(identifier: true)]
+    #[ODM\Field]
     private ?string $slug = null;
 
     /**
-     * @ODM\ReferenceMany(targetDocument=SlugChildDummy::class, mappedBy="parentDummy")
-     *
      * @var \Collection<int,\SlugChildDummy>
      */
+    #[ODM\ReferenceMany(targetDocument: SlugChildDummy::class, mappedBy: 'parentDummy')]
     private \Collection $childDummies;
 
     public function __construct()

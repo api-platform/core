@@ -16,27 +16,17 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(filters: ['dummy_travel.property'])]
+#[ODM\Document]
 class DummyTravel
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\ReferenceOne(targetDocument=DummyCar::class)
-     */
+    #[ODM\ReferenceOne(targetDocument: DummyCar::class)]
     public $car;
-    /**
-     * @ODM\Field(type="bool")
-     */
+    #[ODM\Field(type: 'bool')]
     public $confirmed;
-    /**
-     * @ODM\ReferenceOne(targetDocument=DummyPassenger::class)
-     */
+    #[ODM\ReferenceOne(targetDocument: DummyPassenger::class)]
     public $passenger;
 
     public function getId()

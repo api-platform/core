@@ -24,9 +24,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy InputOutput.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(input: InputDto::class, output: OutputDto::class)]
+#[ODM\Document]
 class DummyDtoInputOutput
 {
     public function __construct()
@@ -35,22 +35,22 @@ class DummyDtoInputOutput
     }
     /**
      * @var int The id
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
     public $id;
     /**
      * @var string
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $str;
     /**
      * @var int
-     * @ODM\Field(type="float")
      */
+    #[ODM\Field(type: 'float')]
     public $num;
     /**
      * @var Collection<RelatedDummy>
-     * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public $relatedDummies;
 }

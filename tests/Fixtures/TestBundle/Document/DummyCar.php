@@ -29,73 +29,58 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 
-/**
- * @ODM\Document
- */
 #[ApiFilter(DateFilter::class, strategy: DateFilter::EXCLUDE_NULL)]
 #[ApiFilter(BooleanFilter::class)]
 #[ApiFilter(PropertyFilter::class, arguments: ['parameterName' => 'foobar'])]
 #[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups'])]
 #[ApiFilter(GroupFilter::class, arguments: ['parameterName' => 'foobargroups_override'], id: 'override')]
 #[ApiResource(operations: [new Get(openapiContext: ['tags' => []]), new Put(), new Delete(), new Post(), new GetCollection()], sunset: '2050-01-01', normalizationContext: ['groups' => ['colors']])]
+#[ODM\Document]
 class DummyCar
 {
     /**
      * @var int The entity Id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var mixed Something else
-     *
-     * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      */
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[Serializer\Groups(['colors'])]
+    #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
     private $colors;
     /**
      * @var mixed Something else
-     *
-     * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
+    #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
     private mixed $secondColors = null;
     /**
      * @var mixed Something else
-     *
-     * @ODM\ReferenceMany(targetDocument=DummyCarColor::class, mappedBy="car")
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
+    #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
     private mixed $thirdColors = null;
     /**
      * @var mixed Something else
-     *
-     * @ODM\ReferenceMany(targetDocument=UuidIdentifierDummy::class)
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
+    #[ODM\ReferenceMany(targetDocument: UuidIdentifierDummy::class)]
     private mixed $uuid = null;
-    /**
-     * @ODM\Field(type="string")
-     */
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
+    #[ODM\Field(type: 'string')]
     private ?string $name = null;
-    /**
-     * @ODM\Field(type="bool")
-     */
+    #[ODM\Field(type: 'bool')]
     private ?bool $canSell = null;
-    /**
-     * @ODM\Field(type="date")
-     */
+    #[ODM\Field(type: 'date')]
     private ?\DateTime $availableAt = null;
-    /**
-     * @ODM\Field
-     */
     #[Serializer\Groups(['colors'])]
     #[Serializer\SerializedName('carBrand')]
+    #[ODM\Field]
     private string $brand = 'DummyBrand';
 
     public function __construct()

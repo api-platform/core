@@ -18,23 +18,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class DummyWithEmbedManyOmittingTargetDocument
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var EmbeddableDummy[]|Collection
-     *
-     * @ODM\EmbedMany
      */
+    #[ODM\EmbedMany]
     private readonly array|\Doctrine\Common\Collections\Collection $embeddedDummies;
 
     public function __construct()

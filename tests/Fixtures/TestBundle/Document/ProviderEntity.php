@@ -22,24 +22,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * ProviderEntity.
- *
- * @ODM\Document
  */
 #[ApiResource]
 #[Get]
 #[GetCollection]
 #[Post]
+#[ODM\Document]
 class ProviderEntity
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
-    /**
-     * @ODM\Field
-     */
     #[Assert\NotBlank]
+    #[ODM\Field]
     private ?string $foo = null;
 
     /**

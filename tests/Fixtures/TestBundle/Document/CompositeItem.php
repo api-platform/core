@@ -19,25 +19,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Item.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CompositeItem implements \Stringable
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     */
     #[Groups(['default'])]
+    #[ODM\Field(type: 'string', nullable: true)]
     private $field1;
-    /**
-     * @ODM\ReferenceMany(targetDocument=CompositeRelation::class, mappedBy="compositeItem")
-     */
     #[Groups(['default'])]
+    #[ODM\ReferenceMany(targetDocument: CompositeRelation::class, mappedBy: 'compositeItem')]
     private $compositeValues;
 
     /**

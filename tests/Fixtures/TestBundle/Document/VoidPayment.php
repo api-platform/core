@@ -16,22 +16,15 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class VoidPayment
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     public function __construct(
-        /**
-         * @ODM\ReferenceOne(targetDocument=Payment::class, inversedBy="voidPayment")
-         */
-        private readonly Payment $payment
+        #[ODM\ReferenceOne(targetDocument: Payment::class, inversedBy: 'voidPayment')] private readonly Payment $payment
     ) {
     }
 

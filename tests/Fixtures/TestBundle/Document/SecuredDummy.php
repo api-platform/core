@@ -32,105 +32,92 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Put(securityPostDenormalize: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new GetCollection(security: 'is_granted(\'ROLE_USER\') or is_granted(\'ROLE_ADMIN\')'), new GetCollection(uriTemplate: 'custom_data_provider_generator', security: 'is_granted(\'ROLE_USER\')'), new Post(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_USER\') and object.getOwner() == user)'), new QueryCollection(name: 'collection_query', security: 'is_granted(\'ROLE_ADMIN\')'), new Mutation(name: 'delete'), new Mutation(name: 'update', securityPostDenormalize: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() ==  user'), new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.')], security: 'is_granted(\'ROLE_USER\')')]
+#[ODM\Document]
 class SecuredDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string|null The title
-     *
-     * @ODM\Field
      */
     #[Assert\NotBlank]
+    #[ODM\Field]
     private ?string $title = null;
 
     /**
      * @var string The description
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private string $description = '';
 
     /**
      * @var string The dummy secret property, only readable/writable by specific users
-     *
-     * @ODM\Field
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    #[ODM\Field]
     private ?string $adminOnlyProperty = '';
 
     /**
      * @var string Secret property, only readable/writable by owners
-     *
-     * @ODM\Field
      */
     #[ApiProperty(security: 'object == null or object.getOwner() == user', securityPostDenormalize: 'object.getOwner() == user')]
+    #[ODM\Field]
     private ?string $ownerOnlyProperty = '';
 
     /**
      * @var string|null The owner
-     *
-     * @ODM\Field
      */
     #[Assert\NotBlank]
+    #[ODM\Field]
     private ?string $owner = null;
 
     /**
      * @var Collection<RelatedDummy> Several dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public $relatedDummies;
 
     /**
      * @var RelatedDummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     protected $relatedDummy;
 
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
      * @var Collection<RelatedSecuredDummy> Several dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
+    #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     public $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
      * @var RelatedSecuredDummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
+    #[ODM\ReferenceOne(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     protected $relatedSecuredDummy;
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
      * @var Collection<RelatedSecuredDummy> Several dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     public $publicRelatedSecuredDummies;
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
      * @var RelatedSecuredDummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceOne(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     protected $publicRelatedSecuredDummy;
 
     public function __construct()

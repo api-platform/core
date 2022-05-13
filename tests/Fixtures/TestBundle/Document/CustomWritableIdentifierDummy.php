@@ -18,23 +18,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Writable Identifier Dummy.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CustomWritableIdentifierDummy
 {
     /**
      * @var string The special identifier
-     *
-     * @ODM\Id(strategy="NONE", type="string")
      */
+    #[ODM\Id(strategy: 'NONE', type: 'string')]
     private ?string $slug = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field(name="name", type="string")
      */
+    #[ODM\Field(name: 'name', type: 'string')]
     private ?string $name = null;
 
     /**

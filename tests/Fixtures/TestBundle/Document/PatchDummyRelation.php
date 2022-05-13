@@ -23,19 +23,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()], normalizationContext: ['groups' => ['chicago']], denormalizationContext: ['groups' => ['chicago']])]
+#[ODM\Document]
 class PatchDummyRelation
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-    /**
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
-     */
     #[Groups(['chicago'])]
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class)]
     protected $related;
 
     public function getRelated()

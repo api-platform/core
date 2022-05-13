@@ -19,29 +19,25 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
 #[Get]
 #[Post]
 #[ApiResource(uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
 #[Get]
 #[ApiResource(uriTemplate: '/employees/{employeeId}/company', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
+#[ODM\Document]
 class Company
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $name;
 
     /** @var Employee[] */

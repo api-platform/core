@@ -19,18 +19,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class WritableId
 {
-    /**
-     * @ODM\Id(strategy="UUID", type="string")
-     */
     #[Assert\Uuid]
+    #[ODM\Id(strategy: 'UUID', type: 'string')]
     public $id;
-    /**
-     * @ODM\Field
-     */
+    #[ODM\Field]
     public $name;
 }

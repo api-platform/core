@@ -22,25 +22,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Pet.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class Pet
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(type="string")
-     */
     #[Groups(['people.pets'])]
+    #[ODM\Field(type: 'string')]
     public $name;
     /**
-     * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="pet")
-     *
      * @var ArrayCollection
      */
+    #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'pet')]
     public $people;
 
     public function __construct()

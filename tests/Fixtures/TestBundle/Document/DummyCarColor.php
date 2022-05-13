@@ -20,29 +20,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
+#[ODM\Document]
 class DummyCarColor
 {
     /**
      * @var int The entity Id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\ReferenceOne(targetDocument=DummyCar::class, inversedBy="colors", storeAs="id")
-     */
     #[Assert\NotBlank]
+    #[ODM\ReferenceOne(targetDocument: DummyCar::class, inversedBy: 'colors', storeAs: 'id')]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCar $car = null;
-    /**
-     * @ODM\Field(nullable=false)
-     */
     #[ApiFilter(SearchFilter::class)]
     #[Assert\NotBlank]
     #[Serializer\Groups(['colors'])]
+    #[ODM\Field(nullable: false)]
     private string $prop = '';
 
     public function getId()

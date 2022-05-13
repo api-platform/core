@@ -22,25 +22,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ODM\Document
  */
 #[ApiResource(types: ['https://schema.org/Product'])]
+#[ODM\Document]
 class RelatedOwningDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
     /**
      * @var string A name
-     *
-     * @ODM\Field(type="string")
      */
+    #[ODM\Field(type: 'string')]
     public $name;
     /**
      * @var \Dummy
-     * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, mappedBy="relatedOwningDummy")
      */
+    #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], mappedBy: 'relatedOwningDummy')]
     public $ownedDummy;
 
     public function getId()

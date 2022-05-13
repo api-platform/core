@@ -18,22 +18,17 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiFilter(BooleanFilter::class)]
 #[ApiResource]
+#[ODM\Document]
 class ConvertedBoolean
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var bool
-     *
-     * @ODM\Field(type="bool")
      */
+    #[ODM\Field(type: 'bool')]
     public $nameConverted;
 
     public function getId()

@@ -20,24 +20,19 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiFilter(NumericFilter::class, properties: ['nameConverted'])]
 #[ApiFilter(RangeFilter::class, properties: ['nameConverted'])]
 #[ApiFilter(OrderFilter::class, properties: ['nameConverted'])]
 #[ApiResource]
+#[ODM\Document]
 class ConvertedInteger
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var int
-     *
-     * @ODM\Field(type="int")
      */
+    #[ODM\Field(type: 'int')]
     public $nameConverted;
 
     public function getId()

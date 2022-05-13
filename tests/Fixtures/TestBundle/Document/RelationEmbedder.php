@@ -26,34 +26,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Relation Embedder.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new Get(routeName: 'relation_embedded.custom_get'), new Get(uriTemplate: '/api/custom-call/{id}'), new Put(uriTemplate: '/api/custom-call/{id}'), new Post(), new GetCollection()], normalizationContext: ['groups' => ['barcelona']], denormalizationContext: ['groups' => ['chicago']], hydraContext: ['@type' => 'hydra:Operation', 'hydra:title' => 'A custom operation', 'returns' => 'xmls:string'])]
+#[ODM\Document]
 class RelationEmbedder
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-    /**
-     * @ODM\Field
-     */
     #[Groups(['chicago'])]
+    #[ODM\Field]
     public $paris = 'Paris';
-    /**
-     * @ODM\Field
-     */
     #[Groups(['barcelona', 'chicago'])]
+    #[ODM\Field]
     public $krondstadt = 'Krondstadt';
-    /**
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, cascade={"persist"})
-     */
     #[Groups(['chicago', 'barcelona'])]
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, cascade: ['persist'])]
     public $anotherRelated;
-    /**
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class)
-     */
     #[Groups(['barcelona', 'chicago'])]
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class)]
     protected $related;
 
     public function getRelated()

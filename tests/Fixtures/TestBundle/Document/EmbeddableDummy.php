@@ -22,52 +22,39 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Jordan Samouh <jordan.samouh@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
- *
- * @ODM\EmbeddedDocument
  */
+#[ODM\EmbeddedDocument]
 class EmbeddableDummy
 {
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
      */
     #[Groups(['embed'])]
+    #[ODM\Field(type: 'string')]
     private ?string $dummyName = null;
-
     /**
      * @var bool|null A dummy boolean
-     *
-     * @ODM\Field(type="bool")
      */
+    #[ODM\Field(type: 'bool')]
     public $dummyBoolean;
-
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ODM\Field(type="date")
      */
     #[Assert\DateTime]
+    #[ODM\Field(type: 'date')]
     public $dummyDate;
-
     /**
      * @var float|null A dummy float
-     *
-     * @ODM\Field(type="float")
      */
+    #[ODM\Field(type: 'float')]
     public $dummyFloat;
-
     /**
      * @var float|null A dummy price
-     *
-     * @ODM\Field(type="float")
      */
+    #[ODM\Field(type: 'float')]
     public $dummyPrice;
-
-    /**
-     * @ODM\Field(type="string")
-     */
     #[Groups(['barcelona', 'chicago'])]
+    #[ODM\Field(type: 'string')]
     protected $symfony;
 
     public static function staticMethod(): void

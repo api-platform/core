@@ -20,28 +20,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * PersonToPet.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @ODM\Document
  */
+#[ODM\Document]
 class PersonToPet
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
     /**
-     * @ODM\ReferenceOne(targetDocument=Pet::class)
-     *
      * @var Pet
      */
     #[Groups(['people.pets'])]
+    #[ODM\ReferenceOne(targetDocument: Pet::class)]
     public $pet;
-
     /**
-     * @ODM\ReferenceOne(targetDocument=Person::class)
-     *
      * @var Person
      */
+    #[ODM\ReferenceOne(targetDocument: Person::class)]
     public $person;
 
     public function getId()

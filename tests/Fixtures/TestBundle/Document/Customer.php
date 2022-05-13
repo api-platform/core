@@ -18,26 +18,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(normalizationContext: ['groups' => ['order_read']])]
+#[ODM\Document]
 class Customer
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
     #[Groups(['order_read'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(type="string")
-     */
     #[Groups(['order_read'])]
+    #[ODM\Field(type: 'string')]
     public $name;
-    /**
-     * @ODM\ReferenceMany(targetDocument=Address::class)
-     */
     #[Groups(['order_read'])]
+    #[ODM\ReferenceMany(targetDocument: Address::class)]
     public $addresses;
 
     public function __construct()

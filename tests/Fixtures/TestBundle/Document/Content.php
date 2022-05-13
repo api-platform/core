@@ -20,34 +20,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(normalizationContext: ['groups' => ['get_content']])]
+#[ODM\Document]
 class Content implements \JsonSerializable
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     private ?string $contentType = null;
     /**
      * @var Collection<Field>
-     *
-     * @ODM\ReferenceMany(
-     *     targetDocument=Field::class,
-     *     mappedBy="content",
-     *     strategy="set",
-     *     cascade={"persist"},
-     * )
      */
-    private $fields;
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\ReferenceMany(targetDocument: Field::class, mappedBy: 'content', strategy: 'set', cascade: ['persist'])]
+    private \Doctrine\Common\Collections\Collection & iterable $fields;
+    #[ODM\Field(type: 'string')]
     private readonly string $status;
 
     public function __construct()

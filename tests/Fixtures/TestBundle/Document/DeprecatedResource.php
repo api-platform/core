@@ -18,23 +18,19 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ODM\Document
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(deprecationReason: 'This resource is deprecated')]
+#[ODM\Document]
 class DeprecatedResource
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
 
     /**
      * @var string
-     *
-     * @ODM\Field
      */
     #[ApiProperty(deprecationReason: 'This field is deprecated')]
+    #[ODM\Field]
     public $deprecatedField;
 }

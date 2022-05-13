@@ -23,31 +23,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Dummy with different serialization groups for item_query and collection_query.
  *
  * @author Mahmood Bazdar <mahmood@bazdar.me>
- * @ODM\Document
  */
 #[ApiResource(graphQlOperations: [new Query(name: 'item_query', normalizationContext: ['groups' => ['item_query']]), new QueryCollection(name: 'collection_query', normalizationContext: ['groups' => ['collection_query']])])]
+#[ODM\Document]
 class DummyDifferentGraphQlSerializationGroup
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
      */
     #[Groups(['item_query', 'collection_query'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
     private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(type="string")
      */
     #[Groups(['item_query', 'collection_query'])]
+    #[ODM\Field(type: 'string')]
     private ?string $name = null;
     /**
      * @var string|null The dummy title
-     *
-     * @ODM\Field(nullable=true)
      */
     #[Groups(['item_query'])]
+    #[ODM\Field(nullable: true)]
     private ?string $title = null;
 
     public function getId(): ?int

@@ -18,22 +18,17 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiFilter(DateFilter::class)]
 #[ApiResource]
+#[ODM\Document]
 class ConvertedDate
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var \DateTime
-     *
-     * @ODM\Field(type="date")
      */
+    #[ODM\Field(type: 'date')]
     public $nameConverted;
 
     public function getId()

@@ -27,33 +27,24 @@ use Symfony\Component\Serializer\Annotation as Serializer;
 
 /**
  * Answer.
- *
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(normalizationContext: ['groups' => ['foobar']])])]
 #[ApiResource(uriTemplate: '/answers/{id}/related_questions/{relatedQuestions}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], toProperty: 'answer'), 'relatedQuestions' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
 #[ApiResource(uriTemplate: '/questions/{id}/answer.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\Question::class, identifiers: ['id'], fromProperty: 'answer')], status: 200, operations: [new Get()])]
+#[ODM\Document]
 class Answer
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
     #[Serializer\Groups(['foobar'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(nullable=false)
-     */
     #[Serializer\Groups(['foobar'])]
+    #[ODM\Field(nullable: false)]
     private $content;
-    /**
-     * @ODM\ReferenceOne(targetDocument=Question::class, mappedBy="answer")
-     */
     #[Serializer\Groups(['foobar'])]
+    #[ODM\ReferenceOne(targetDocument: Question::class, mappedBy: 'answer')]
     private $question;
-    /**
-     * @ODM\ReferenceMany(targetDocument=Question::class, mappedBy="answer")
-     */
     #[Serializer\Groups(['foobar'])]
+    #[ODM\ReferenceMany(targetDocument: Question::class, mappedBy: 'answer')]
     private $relatedQuestions;
 
     public function __construct()

@@ -17,22 +17,14 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(input: InitializeInputDto::class)]
+#[ODM\Document]
 class InitializeInput
 {
-    /**
-     * @ODM\Id(strategy="NONE", type="int")
-     */
+    #[ODM\Id(strategy: 'NONE', type: 'int')]
     public $id;
-    /**
-     * @ODM\Field
-     */
+    #[ODM\Field]
     public $manager;
-    /**
-     * @ODM\Field
-     */
+    #[ODM\Field]
     public $name;
 }

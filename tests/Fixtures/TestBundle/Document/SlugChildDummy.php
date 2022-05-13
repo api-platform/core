@@ -19,33 +19,27 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
 #[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugParentDummy::class, identifiers: ['slug'], toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], fromProperty: 'parentDummy'), 'parentDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugParentDummy::class, identifiers: [], expandedValue: 'parent_dummy', toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ODM\Document]
 class SlugChildDummy
 {
     /**
      * @var int The identifier
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     #[ApiProperty(identifier: false)]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
 
     /**
      * @var string The slug used as API identifier
-     *
-     * @ODM\Field
      */
     #[ApiProperty(identifier: true)]
+    #[ODM\Field]
     private ?string $slug = null;
 
-    /**
-     * @ODM\ReferenceOne(targetDocument=SlugParentDummy::class, inversedBy="childDummies", storeAs="id")
-     */
+    #[ODM\ReferenceOne(targetDocument: SlugParentDummy::class, inversedBy: 'childDummies', storeAs: 'id')]
     private $parentDummy;
 
     public function getId(): ?int

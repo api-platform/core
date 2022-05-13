@@ -18,15 +18,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom identifier.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CustomGeneratedIdentifier
 {
-    /**
-     * @ODM\Id(strategy="CUSTOM", type="string", options={"class"="ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator"})
-     */
+    #[ODM\Id(strategy: 'CUSTOM', type: 'string', options: ['class' => \ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\DocumentUuidGenerator::class])]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Generator\Uuid $id = null;
 
     public function getId()

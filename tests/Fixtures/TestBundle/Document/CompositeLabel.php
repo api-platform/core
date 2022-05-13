@@ -19,20 +19,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Label.
- *
- * @ODM\Document
  */
 #[ApiResource]
+#[ODM\Document]
 class CompositeLabel implements \Stringable
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     */
     #[Groups(['default'])]
+    #[ODM\Field(type: 'string', nullable: true)]
     private $value;
 
     /**

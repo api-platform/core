@@ -17,21 +17,15 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(normalizationContext: ['groups' => ['order_read']])]
+#[ODM\Document]
 class Address
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
     #[Groups(['order_read'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\Field(type="string")
-     */
     #[Groups(['order_read'])]
+    #[ODM\Field(type: 'string')]
     public $name;
 
     public function getId()

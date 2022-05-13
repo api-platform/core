@@ -27,27 +27,25 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Abstract Dummy.
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
- * @ODM\Document
- * @ODM\InheritanceType ("SINGLE_COLLECTION")
- * @ODM\DiscriminatorField (value="discr")
- * @ODM\DiscriminatorMap ({"concrete"=ConcreteDummy::class})
  */
 #[ApiResource(operations: [new Get(), new Put(), new Delete(), new GetCollection(), new Post()], filters: ['my_dummy.mongodb.search', 'my_dummy.mongodb.order', 'my_dummy.mongodb.date'])]
+#[ODM\Document]
+#[ODM\InheritanceType('SINGLE_COLLECTION')]
+#[ODM\DiscriminatorField(value: 'discr')]
+#[ODM\DiscriminatorMap(['concrete' => ConcreteDummy::class])]
 abstract class AbstractDummy
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
     #[ApiProperty(types: ['http://schema.org/name'])]
     #[Assert\NotBlank]
+    #[ODM\Field]
     private $name;
 
     public function getId()

@@ -20,17 +20,14 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_ADMIN\')'), new GetCollection(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_ADMIN\')'), new QueryCollection(name: 'collection_query', security: 'is_granted(\'ROLE_ADMIN\')')], security: 'is_granted(\'ROLE_ADMIN\')')]
+#[ODM\Document]
 class RelatedSecuredDummy
 {
     /**
      * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
 
     public function getId()

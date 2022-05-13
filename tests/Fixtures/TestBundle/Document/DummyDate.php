@@ -24,7 +24,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Dummy Date.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
- * @ODM\Document
  */
 #[ApiFilter(DateFilter::class, properties: [
     'dateIncludeNullAfter' => DateFilter::INCLUDE_NULL_AFTER,
@@ -33,37 +32,33 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 ])]
 #[ApiFilter(SearchFilter::class, properties: ['dummyDate'])]
 #[ApiResource(filters: ['my_dummy_date.mongodb.date'])]
+#[ODM\Document]
 class DummyDate
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var \DateTime|null The dummy date
-     *
-     * @ODM\Field(type="date")
      */
+    #[ODM\Field(type: 'date')]
     public $dummyDate;
     /**
      * @var \DateTime|null
-     *
-     * @ODM\Field(type="date")
      */
+    #[ODM\Field(type: 'date')]
     public $dateIncludeNullAfter;
     /**
      * @var \DateTime|null
-     *
-     * @ODM\Field(type="date")
      */
+    #[ODM\Field(type: 'date')]
     public $dateIncludeNullBefore;
     /**
      * @var \DateTime|null
-     *
-     * @ODM\Field(type="date")
      */
+    #[ODM\Field(type: 'date')]
     public $dateIncludeNullBeforeAndAfter;
 
     /**

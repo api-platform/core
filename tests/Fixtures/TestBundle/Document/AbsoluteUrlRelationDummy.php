@@ -18,19 +18,13 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
+#[ODM\Document]
 class AbsoluteUrlRelationDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\ReferenceMany(targetDocument=AbsoluteUrlDummy::class, mappedBy="absoluteUrlRelationDummy")
-     */
+    #[ODM\ReferenceMany(targetDocument: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
     public $absoluteUrlDummies;
 
     public function __construct()

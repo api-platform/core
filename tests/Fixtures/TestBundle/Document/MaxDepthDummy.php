@@ -21,28 +21,22 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 /**
  * *
  *
- * @ODM\Document
  *
  * @author Brian Fox <brian@brianfox.fr>
  */
 #[ApiResource(normalizationContext: ['groups' => ['default'], 'enable_max_depth' => true], denormalizationContext: ['groups' => ['default'], 'enable_max_depth' => true])]
+#[ODM\Document]
 class MaxDepthDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
     #[Groups(['default'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-    /**
-     * @ODM\Field(name="name", type="string")
-     */
     #[Groups(['default'])]
+    #[ODM\Field(name: 'name', type: 'string')]
     public $name;
-    /**
-     * @ODM\ReferenceOne(targetDocument=MaxDepthDummy::class, cascade={"persist"})
-     */
     #[Groups(['default'])]
     #[MaxDepth(1)]
+    #[ODM\ReferenceOne(targetDocument: self::class, cascade: ['persist'])]
     public $child;
 
     public function getId()

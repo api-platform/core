@@ -20,19 +20,13 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Payment\VoidPaymentAction;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource(operations: [new Get(), new Post(uriTemplate: '/payments/{id}/void', controller: VoidPaymentAction::class, deserialize: false), new Post(), new GetCollection()])]
+#[ODM\Document]
 class Payment
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
-    /**
-     * @ODM\ReferenceOne(targetDocument=VoidPayment::class, mappedBy="payment")
-     */
+    #[ODM\ReferenceOne(targetDocument: VoidPayment::class, mappedBy: 'payment')]
     private $voidPayment;
 
     public function __construct(private readonly ?string $amount)

@@ -17,37 +17,26 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ODM\Document
- * @ODM\InheritanceType ("SINGLE_COLLECTION")
- * @ODM\DiscriminatorField (value="discr")
- * @ODM\DiscriminatorMap ({
- *     "dummyTableInheritance"=DummyTableInheritance::class,
- *     "dummyTableInheritanceChild"=DummyTableInheritanceChild::class,
- *     "dummyTableInheritanceDifferentChild"=DummyTableInheritanceDifferentChild::class,
- *     "dummyTableInheritanceNotApiResourceChild"=DummyTableInheritanceNotApiResourceChild::class
- * })
- */
 #[ApiResource]
+#[ODM\Document]
+#[ODM\InheritanceType('SINGLE_COLLECTION')]
+#[ODM\DiscriminatorField(value: 'discr')]
+#[ODM\DiscriminatorMap(['dummyTableInheritance' => DummyTableInheritance::class, 'dummyTableInheritanceChild' => DummyTableInheritanceChild::class, 'dummyTableInheritanceDifferentChild' => DummyTableInheritanceDifferentChild::class, 'dummyTableInheritanceNotApiResourceChild' => DummyTableInheritanceNotApiResourceChild::class])]
 class DummyTableInheritance
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
     #[Groups(['default'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field
      */
     #[Groups(['default'])]
+    #[ODM\Field]
     private ?string $name = null;
-    /**
-     * @ODM\ReferenceOne(targetDocument=DummyTableInheritanceRelated::class, inversedBy="children")
-     */
+    #[ODM\ReferenceOne(targetDocument: DummyTableInheritanceRelated::class, inversedBy: 'children')]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceRelated $parent = null;
 
     public function getName(): ?string

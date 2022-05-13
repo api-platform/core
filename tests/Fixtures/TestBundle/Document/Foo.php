@@ -28,28 +28,25 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  * Foo.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- * @ODM\Document
  */
 #[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new GetCollection(uriTemplate: 'custom_collection_desc_foos', order: ['name' => 'DESC']), new GetCollection(uriTemplate: 'custom_collection_asc_foos', order: ['name' => 'ASC'])], graphQlOperations: [new Query(name: 'item_query'), new QueryCollection(name: 'collection_query', paginationEnabled: false), new Mutation(name: 'create'), new Mutation(name: 'delete')], order: ['bar', 'name' => 'DESC'])]
+#[ODM\Document]
 class Foo
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $name;
     /**
      * @var string The foo bar
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     private $bar;
 
     public function getId()
