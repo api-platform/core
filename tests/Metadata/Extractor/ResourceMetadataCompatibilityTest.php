@@ -28,7 +28,6 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
@@ -46,8 +45,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class ResourceMetadataCompatibilityTest extends TestCase
 {
-    use DeprecationMetadataTrait;
-
     private const RESOURCE_CLASS = Comment::class;
     private const SHORT_NAME = 'Comment';
     private const FIXTURES = [

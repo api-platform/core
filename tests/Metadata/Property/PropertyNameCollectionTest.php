@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Metadata\Property;
 
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use PHPUnit\Framework\TestCase;
 
 /**

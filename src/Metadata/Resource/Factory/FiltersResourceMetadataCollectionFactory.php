@@ -15,8 +15,6 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Util\AnnotationFilterExtractorTrait;
-use Doctrine\Common\Annotations\Reader;
 
 /**
  * Creates a resource metadata from {@see Resource} annotations.
@@ -26,17 +24,11 @@ use Doctrine\Common\Annotations\Reader;
  */
 final class FiltersResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    use AnnotationFilterExtractorTrait;
-
     private $decorated;
-    private $reader;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ?Reader $reader = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->decorated = $decorated;
-        if ($reader) {
-            $this->reader = $reader;
-        }
     }
 
     /**
@@ -56,21 +48,15 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        $filters = array_keys($this->readFilterAnnotations($reflectionClass, $this->reader));
-
-        if (\count($filters)) {
-            trigger_deprecation('api-platform/core', '2.7', 'Use php attributes instead of doctrine annotations to declare filters.');
-        }
-
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() as $operationName => $operation) {
-                $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters))));
+                $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? []))));
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations);
 
             foreach ($graphQlOperations = $resource->getGraphQlOperations() ?? [] as $operationName => $operation) {
-                $graphQlOperations[$operationName] = $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters)));
+                $graphQlOperations[$operationName] = $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [])));
             }
 
             $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
