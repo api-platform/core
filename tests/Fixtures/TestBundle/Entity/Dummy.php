@@ -98,17 +98,14 @@ class Dummy
     #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     public $dummyPrice;
 
-    /**
-     * @var RelatedDummy|null A related dummy
-     */
     #[ApiProperty(push: true)]
-    #[ORM\ManyToOne(targetEntity: 'RelatedDummy')]
-    public $relatedDummy;
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
+    public ?RelatedDummy $relatedDummy;
 
     /**
-     * @var \Collection<int,\RelatedDummy> Several dummies
+     * @var \Collection<int, RelatedDummy> Several dummies
      */
-    #[ORM\ManyToMany(targetEntity: 'RelatedDummy')]
+    #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     public $relatedDummies;
 
     /**

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
-use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Get;
@@ -115,28 +113,14 @@ trait ApiTestAssertionsTrait
 
     public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schemaFactory = self::getSchemaFactory();
-
-        if ($schemaFactory instanceof LegacySchemaFactoryInterface) {
-            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName, null);
-        } else {
-            $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
-            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
-        }
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, new GetCollection(name: $operationName), null);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schemaFactory = self::getSchemaFactory();
-
-        if ($schemaFactory instanceof LegacySchemaFactoryInterface) {
-            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName, null);
-        } else {
-            $operation = $operationName ? (new Get())->withName($operationName) : new Get();
-            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
-        }
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, new Get(name: $operationName), null);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
