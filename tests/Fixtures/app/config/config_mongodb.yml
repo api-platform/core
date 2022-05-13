@@ -16,7 +16,7 @@ doctrine_mongodb:
         default:
             mappings:
                 TestBundle:
-                    type: 'annotation'
+                    type: 'attribute'
                     dir: '%kernel.project_dir%/../TestBundle/Document'
                     prefix: 'ApiPlatform\Tests\Fixtures\TestBundle\Document'
 

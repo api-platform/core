@@ -25,7 +25,7 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             DocumentMetadataFactoryInterface::class,
@@ -33,7 +33,7 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
         );
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $originalDocumentMetadata = new DocumentMetadata();
 
@@ -47,7 +47,7 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
         self::assertSame('bar', $configuredDocumentMetadata->getType());
     }
 
-    public function testCreateWithEmptyMapping()
+    public function testCreateWithEmptyMapping(): void
     {
         $originalDocumentMetadata = new DocumentMetadata();
 
@@ -59,7 +59,7 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
         self::assertSame($originalDocumentMetadata, $configuredDocumentMetadata);
     }
 
-    public function testCreateWithEmptyMappingAndNoParentDocumentMetadata()
+    public function testCreateWithEmptyMappingAndNoParentDocumentMetadata(): void
     {
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();

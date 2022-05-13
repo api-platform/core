@@ -56,8 +56,8 @@ final class SerializeStage implements SerializeStageInterface
 
         if (!($operation->canSerialize() ?? true)) {
             if ($isCollection) {
-                if ($this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
-                    return 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
+                if ($this->pagination->isGraphQlEnabled($operation, $context)) {
+                    return 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                         $this->getDefaultCursorBasedPaginatedData() :
                         $this->getDefaultPageBasedPaginatedData();
                 }
@@ -88,13 +88,13 @@ final class SerializeStage implements SerializeStageInterface
         }
 
         if ($isCollection && is_iterable($itemOrCollection)) {
-            if (!$this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
+            if (!$this->pagination->isGraphQlEnabled($operation, $context)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);
                 }
             } else {
-                $data = 'cursor' === $this->pagination->getGraphQlPaginationType($resourceClass, $operationName) ?
+                $data = 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                     $this->serializeCursorBasedPaginatedCollection($itemOrCollection, $normalizationContext, $context) :
                     $this->serializePageBasedPaginatedCollection($itemOrCollection, $normalizationContext);
             }

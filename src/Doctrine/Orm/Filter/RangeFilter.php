@@ -16,23 +16,23 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
  * Filters the collection by range.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
- *
- * @final
  */
-class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInterface
+final class RangeFilter extends AbstractFilter implements RangeFilterInterface
 {
     use RangeFilterTrait;
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
             !\is_array($values) ||
@@ -51,7 +51,7 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 
         foreach ($values as $operator => $value) {
@@ -68,13 +68,8 @@ class RangeFilter extends AbstractContextAwareFilter implements RangeFilterInter
 
     /**
      * Adds the where clause according to the operator.
-     *
-     * @param string $alias
-     * @param string $field
-     * @param string $operator
-     * @param string $value
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, $alias, $field, $operator, $value)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, string $value): void
     {
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 

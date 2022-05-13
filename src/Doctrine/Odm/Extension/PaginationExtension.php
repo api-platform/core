@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Doctrine\Odm\Paginator;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -35,19 +33,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class PaginationExtension implements AggregationResultCollectionExtensionInterface
 {
-    private $managerRegistry;
-    private $resourceMetadataFactory;
-    private $pagination;
+    private ManagerRegistry $managerRegistry;
+    private Pagination $pagination;
 
-    public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, Pagination $pagination)
+    public function __construct(ManagerRegistry $managerRegistry, Pagination $pagination)
     {
         $this->managerRegistry = $managerRegistry;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->pagination = $pagination;
     }
 
@@ -56,19 +47,19 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
      *
      * @throws RuntimeException
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
-        if (!$this->pagination->isEnabled($resourceClass, $operationName, $context)) {
+        if (!$this->pagination->isEnabled($operation, $context)) {
             return;
         }
 
-        if (($context['graphql_operation_name'] ?? false) && !$this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context)) {
+        if (($context['graphql_operation_name'] ?? false) && !$this->pagination->isGraphQlEnabled($operation, $context)) {
             return;
         }
 
         $context = $this->addCountToContext(clone $aggregationBuilder, $context);
 
-        [, $offset, $limit] = $this->pagination->getPagination($resourceClass, $operationName, $context);
+        [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
@@ -101,13 +92,13 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
+    public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
-            return $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context);
+            return $this->pagination->isGraphQlEnabled($operation, $context);
         }
 
-        return $this->pagination->isEnabled($resourceClass, $operationName, $context);
+        return $this->pagination->isEnabled($operation, $context);
     }
 
     /**
@@ -115,20 +106,14 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
      *
      * @throws RuntimeException
      */
-    public function getResult(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array $context = [])
+    public function getResult(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array $context = []): iterable
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
             throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
-            $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
-        } catch (OperationNotFoundException $e) {
-            $attribute = $resourceMetadata->getOperation(null, true)->getExtraProperties()['doctrine_mongodb'] ?? [];
-        }
+        $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
         return new Paginator($aggregationBuilder->execute($executeOptions), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());

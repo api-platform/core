@@ -16,7 +16,6 @@ namespace ApiPlatform\Metadata\Property\Factory;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
-use ApiPlatform\Metadata\Property\DeprecationMetadataTrait;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -27,7 +26,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    use DeprecationMetadataTrait;
     private $extractor;
     private $decorated;
 
@@ -65,11 +63,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         $apiProperty = new ApiProperty();
 
         foreach ($propertyMetadata as $key => $value) {
-            if ('subresource' === $key) {
-                trigger_deprecation('api-platform', '2.7', 'Using "subresource" is deprecated, declare another resource instead.');
-                continue;
-            }
-
             if ('builtinTypes' === $key && null !== $value) {
                 $value = array_map(function (string $builtinType): Type {
                     return new Type($builtinType);
@@ -81,10 +74,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             if (method_exists($apiProperty, $methodName) && null !== $value) {
                 $apiProperty = $apiProperty->{$methodName}($value);
             }
-        }
-
-        if (isset($propertyMetadata['attributes'])) {
-            $apiProperty = $this->withDeprecatedAttributes($apiProperty, $propertyMetadata['attributes']);
         }
 
         return $apiProperty;
@@ -125,10 +114,6 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
 
             $propertyMetadata = $propertyMetadata->{'with'.ucfirst($metadataKey)}($metadata[$metadataKey]);
-        }
-
-        if (isset($metadata['attributes'])) {
-            $propertyMetadata = $this->withDeprecatedAttributes($propertyMetadata, $metadata['attributes']);
         }
 
         return $propertyMetadata;

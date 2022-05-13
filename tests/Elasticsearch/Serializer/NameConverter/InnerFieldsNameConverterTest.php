@@ -22,7 +22,7 @@ class InnerFieldsNameConverterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             AdvancedNameConverterInterface::class,
@@ -30,7 +30,7 @@ class InnerFieldsNameConverterTest extends TestCase
         );
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $decoratedProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
         $decoratedProphecy->normalize('fooBar', null, null, [])->willReturn('foo_bar')->shouldBeCalled();
@@ -41,7 +41,7 @@ class InnerFieldsNameConverterTest extends TestCase
         self::assertSame('foo_bar.baz_qux', $innerFieldsNameConverter->normalize('fooBar.bazQux'));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $decoratedProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
         $decoratedProphecy->denormalize('foo_bar', null, null, [])->willReturn('fooBar')->shouldBeCalled();

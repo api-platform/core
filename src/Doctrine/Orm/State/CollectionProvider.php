@@ -34,9 +34,9 @@ final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $collectionExtensions;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ManagerRegistry $managerRegistry;
+    private iterable $collectionExtensions;
 
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
@@ -66,10 +66,10 @@ final class CollectionProvider implements ProviderInterface
         $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operation->getName(), $context);
+            $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
 
-            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                return $extension->getResult($queryBuilder, $resourceClass, $operation, $context);
             }
         }
 

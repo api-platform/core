@@ -27,10 +27,10 @@ class NumericFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use NumericFilterTestTrait;
 
-    protected $filterClass = NumericFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = NumericFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 

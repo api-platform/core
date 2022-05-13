@@ -44,7 +44,6 @@ parameters:
 		- src/Core/Bridge/Doctrine/Orm/Extension/FilterExtension.php
 		- src/Core/Bridge/Doctrine/Orm/Extension/OrderExtension.php
 		- src/Core/Bridge/Doctrine/Orm/Extension/PaginationExtension.php
-		- src/Core/Bridge/Doctrine/Orm/Filter/AbstractContextAwareFilter.php
 		- src/Core/Bridge/Doctrine/Orm/Filter/AbstractFilter.php
 		- src/Core/Bridge/Doctrine/Orm/Filter/BooleanFilter.php
 		- src/Core/Bridge/Doctrine/Orm/Filter/DateFilter.php
@@ -340,7 +339,7 @@ parameters:
 		- '#Method ApiPlatform\\Doctrine\\Orm\\Filter\\(Abstract|Exists|Order)Filter::filterProperty\(\) invoked with 7 parameters, 5-6 required\.#'
 		- '#Method ApiPlatform\\Doctrine\\Orm\\Filter\\(AbstractFilter|FilterInterface)::apply\(\) invoked with 5 parameters, 3-4 required\.#'
 		- '#Method ApiPlatform\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
-		- 
+		-
 			message: '#If condition is always false.#'
 			path: src/Core
 
@@ -366,7 +365,7 @@ parameters:
 			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
 			path: src
 		# Skipped tests, we do this on purpose
-		- 
+		-
 			message: "#^Unreachable statement - code above always terminates.$#"
 			path: tests
 		-

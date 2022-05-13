@@ -21,7 +21,6 @@ use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -43,9 +42,9 @@ class SchemaFactoryTest extends TestCase
         $resourceMetadataFactoryCollection = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryCollection->create(Dummy::class)->willReturn(
                 new ResourceMetadataCollection(Dummy::class, [
-                    (new ApiResource())->withOperations(new Operations([
-                        'get' => (new Get())->withName('get'),
-                    ])),
+                    new ApiResource(operations: [
+                        'get' => new Get(name: 'get'),
+                    ]),
                 ])
         );
 

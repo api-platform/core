@@ -55,7 +55,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         return $resourceMetadataCollectionFactory->reveal();
     }
 
-    public function testWithoutManager()
+    public function testWithoutManager(): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');
@@ -75,7 +75,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
     /**
      * @dataProvider operationProvider
      */
-    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null)
+    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');

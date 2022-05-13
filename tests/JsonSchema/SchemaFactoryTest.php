@@ -109,11 +109,11 @@ class SchemaFactoryTest extends TestCase
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ])->withShortName($shortName)->withValidationContext(['groups' => ['validation_groups_dummy_put']]);
         $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)
-                                        ->willReturn(
-                                            new ResourceMetadataCollection(OverriddenOperationDummy::class, [
-                                                (new ApiResource())->withOperations(new Operations(['put' => $operation])),
-                                            ])
-                                        );
+            ->willReturn(
+                new ResourceMetadataCollection(OverriddenOperationDummy::class, [
+                    (new ApiResource())->withOperations(new Operations(['put' => $operation])),
+                ])
+            );
 
         $serializerGroup = 'overridden_operation_dummy_put';
         $validationGroups = 'validation_groups_dummy_put';

@@ -25,8 +25,8 @@ use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
  */
 final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private $mapping;
-    private $decorated;
+    private array $mapping;
+    private ?DocumentMetadataFactoryInterface $decorated;
 
     public function __construct(array $mapping, ?DocumentMetadataFactoryInterface $decorated = null)
     {

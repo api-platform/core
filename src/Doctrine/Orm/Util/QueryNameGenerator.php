@@ -22,8 +22,8 @@ namespace ApiPlatform\Doctrine\Orm\Util;
  */
 final class QueryNameGenerator implements QueryNameGeneratorInterface
 {
-    private $incrementedAssociation = 1;
-    private $incrementedName = 1;
+    private int $incrementedAssociation = 1;
+    private int $incrementedName = 1;
 
     /**
      * {@inheritdoc}

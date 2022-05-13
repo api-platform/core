@@ -14,15 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Operation;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -30,19 +27,13 @@ use Doctrine\ORM\QueryBuilder;
  * Fixes filters on OneToMany associations
  * https://github.com/api-platform/core/issues/944.
  */
-final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionExtensionInterface
+final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
-    use EagerLoadingTrait;
+    private ?ResourceClassResolverInterface $resourceClassResolver;
+    private bool $forceEager;
 
-    private $resourceClassResolver;
-
-    public function __construct($resourceMetadataFactory, bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
+    public function __construct(bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
     {
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->forceEager = $forceEager;
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -50,7 +41,7 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
@@ -58,27 +49,11 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
-        /** @var HttpOperation|GraphQlOperation|null */
-        $operation = null;
-        $forceEager = $this->forceEager;
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
-            try {
-                $operation = $resourceMetadataCollection->getOperation($operationName);
-                $forceEager = $operation->getForceEager() ?? $this->forceEager;
-            } catch (OperationNotFoundException $e) {
-                // In some cases the operation may not exist
-            }
+        $forceEager = $operation?->getForceEager() ?? $this->forceEager;
 
-            if (!$forceEager && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
-                return;
-            }
-        } else {
-            // TODO: remove in 3.0
-            if (!$this->shouldOperationForceEager($resourceClass, ['collection_operation_name' => $operationName]) && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
-                return;
-            }
+        if (!$forceEager && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
+            return;
         }
 
         // If no where part, nothing to do
@@ -134,6 +109,34 @@ final class FilterEagerLoadingExtension implements ContextAwareQueryCollectionEx
 
         $queryBuilder->resetDQLPart('where');
         $queryBuilder->add('where', $queryBuilderClone->getDQLPart('where'));
+    }
+
+    /**
+     * Checks if the class has an associationMapping with FETCH=EAGER.
+     *
+     * @param array $checked array cache of tested metadata classes
+     */
+    private function hasFetchEagerAssociation(EntityManagerInterface $em, ClassMetadataInfo $classMetadata, array &$checked = []): bool
+    {
+        $checked[] = $classMetadata->name;
+
+        foreach ($classMetadata->getAssociationMappings() as $mapping) {
+            if (ClassMetadataInfo::FETCH_EAGER === $mapping['fetch']) {
+                return true;
+            }
+
+            $related = $em->getClassMetadata($mapping['targetEntity']);
+
+            if (\in_array($related->name, $checked, true)) {
+                continue;
+            }
+
+            if (true === $this->hasFetchEagerAssociation($em, $related, $checked)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

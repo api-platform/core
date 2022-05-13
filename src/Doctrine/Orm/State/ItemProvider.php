@@ -34,9 +34,9 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $itemExtensions;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ManagerRegistry $managerRegistry;
+    private iterable $itemExtensions;
 
     /**
      * @param QueryItemExtensionInterface[] $itemExtensions
@@ -71,10 +71,10 @@ final class ItemProvider implements ProviderInterface
         $this->handleLinks($queryBuilder, $uriVariables, $queryNameGenerator, $context, $resourceClass, $operation);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operation->getName(), $context);
+            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $uriVariables, $operation, $context);
 
-            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                return $extension->getResult($queryBuilder, $resourceClass, $operation, $context);
             }
         }
 

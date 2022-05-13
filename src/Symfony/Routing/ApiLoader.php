@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Routing;
 
-use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -33,10 +33,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 final class ApiLoader extends Loader
 {
-    /**
-     * @deprecated since version 2.1, to be removed in 3.0. Use {@see RouteNameGenerator::ROUTE_NAME_PREFIX} instead.
-     */
-    public const ROUTE_NAME_PREFIX = 'api_';
     public const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
     private $fileLoader;
@@ -50,7 +46,6 @@ final class ApiLoader extends Loader
     private $graphQlPlaygroundEnabled;
     private $entrypointEnabled;
     private $docsEnabled;
-    private $identifiersExtractor;
 
     public function __construct(KernelInterface $kernel, ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ContainerInterface $container, array $formats, array $resourceClassDirectories = [], bool $graphqlEnabled = false, bool $entrypointEnabled = true, bool $docsEnabled = true, bool $graphiQlEnabled = false, bool $graphQlPlaygroundEnabled = false)
     {
@@ -87,31 +82,6 @@ final class ApiLoader extends Loader
                         continue;
                     }
 
-                    // $legacyDefaults = [];
-
-                    // if ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) {
-                    //     $legacyDefaults['_api_subresource_operation_name'] = $operationName;
-                    //     $legacyDefaults['_api_subresource_context'] = [
-                    //         'property' => $operation->getExtraProperties()['legacy_subresource_property'],
-                    //         'identifiers' => $operation->getExtraProperties()['legacy_subresource_identifiers'],
-                    //         'collection' => $operation instanceof CollectionOperationInterface,
-                    //         'operationId' => $operation->getExtraProperties()['legacy_subresource_operation_name'] ?? null,
-                    //     ];
-                    //     $legacyDefaults['_api_identifiers'] = $operation->getExtraProperties()['legacy_subresource_identifiers'];
-                    // } elseif ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) {
-                    //     $legacyDefaults[sprintf('_api_%s_operation_name', $operation instanceof CollectionOperationInterface ? OperationType::COLLECTION : OperationType::ITEM)] = $operationName;
-                    //     $legacyDefaults['_api_identifiers'] = [];
-                    //     // Legacy identifiers
-                    //     $hasCompositeIdentifier = false;
-                    //     foreach ($operation->getUriVariables() ?? [] as $parameterName => $identifiedBy) {
-                    //         $hasCompositeIdentifier = $identifiedBy->getCompositeIdentifier();
-                    //         foreach ($identifiedBy->getIdentifiers() ?? [] as $identifier) {
-                    //             $legacyDefaults['_api_identifiers'][] = $identifier;
-                    //         }
-                    //     }
-                    //     $legacyDefaults['_api_has_composite_identifier'] = $hasCompositeIdentifier;
-                    // }
-
                     $path = ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate();
                     foreach ($operation->getUriVariables() ?? [] as $parameterName => $link) {
                         if (!$expandedValue = $link->getExpandedValue()) {
@@ -121,10 +91,16 @@ final class ApiLoader extends Loader
                         $path = str_replace(sprintf('{%s}', $parameterName), $expandedValue, $path);
                     }
 
+                    if ($controller = $operation->getController()) {
+                        if (!$this->container->has($controller)) {
+                            throw new RuntimeException(sprintf('There is no builtin action for the "%s" operation. You need to define the controller yourself.', $operationName));
+                        }
+                    }
+
                     $route = new Route(
                         $path,
                         [
-                            '_controller' => $operation->getController() ?? 'api_platform.action.placeholder',
+                            '_controller' => $controller ?? 'api_platform.action.placeholder',
                             '_format' => null,
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,

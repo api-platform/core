@@ -3,4 +3,3 @@ services:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory'
         decorates: api_platform.metadata.resource.metadata_collection_factory
         arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory.inner']
-

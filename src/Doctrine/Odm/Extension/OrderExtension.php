@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
 use Doctrine\Persistence\ManagerRegistry;
@@ -38,17 +36,11 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    private $order;
-    private $resourceMetadataFactory;
-    private $managerRegistry;
+    private ?string $order;
+    private ?ManagerRegistry $managerRegistry;
 
-    public function __construct(string $order = null, $resourceMetadataFactory = null, ManagerRegistry $managerRegistry = null)
+    public function __construct(string $order = null, ManagerRegistry $managerRegistry = null)
     {
-        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->order = $order;
         $this->managerRegistry = $managerRegistry;
     }
@@ -56,7 +48,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         // Do not apply order if already defined on $aggregationBuilder
         if ($this->hasSortStage($aggregationBuilder)) {
@@ -65,40 +57,29 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
         $classMetaData = $this->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
-        if (null !== $this->resourceMetadataFactory) {
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                if (isset($context['operation'])) {
-                    $defaultOrder = $context['operation']->getOrder() ?? [];
-                } else {
-                    $metadata = $this->resourceMetadataFactory->create($resourceClass);
-                    try {
-                        $defaultOrder = $metadata->getOperation($operationName)->getOrder();
-                    } catch (OperationNotFoundException $e) {
-                        $defaultOrder = $metadata->getOperation(null, true)->getOrder();
-                    }
-                }
-            } else {
-                $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getAttribute('order');
-            }
+        if (isset($context['operation'])) {
+            $defaultOrder = $context['operation']->getOrder() ?? [];
+        } else {
+            $defaultOrder = $operation?->getOrder();
+        }
 
-            if ($defaultOrder) {
-                foreach ($defaultOrder as $field => $order) {
-                    if (\is_int($field)) {
-                        // Default direction
-                        $field = $order;
-                        $order = 'ASC';
-                    }
-
-                    if ($this->isPropertyNested($field, $resourceClass)) {
-                        [$field] = $this->addLookupsForNestedProperty($field, $aggregationBuilder, $resourceClass);
-                    }
-                    $aggregationBuilder->sort(
-                        $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]
-                    );
+        if ($defaultOrder) {
+            foreach ($defaultOrder as $field => $order) {
+                if (\is_int($field)) {
+                    // Default direction
+                    $field = $order;
+                    $order = 'ASC';
                 }
 
-                return;
+                if ($this->isPropertyNested($field, $resourceClass)) {
+                    [$field] = $this->addLookupsForNestedProperty($field, $aggregationBuilder, $resourceClass);
+                }
+                $aggregationBuilder->sort(
+                    $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]
+                );
             }
+
+            return;
         }
 
         if (null !== $this->order) {

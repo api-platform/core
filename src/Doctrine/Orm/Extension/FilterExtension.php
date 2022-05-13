@@ -13,17 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Container\ContainerInterface;
 
@@ -33,52 +27,25 @@ use Psr\Container\ContainerInterface;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class FilterExtension implements ContextAwareQueryCollectionExtensionInterface
+final class FilterExtension implements QueryCollectionExtensionInterface
 {
-    use FilterLocatorTrait;
+    private ContainerInterface $filterLocator;
 
-    private $resourceMetadataFactory;
-
-    /**
-     * @param ContainerInterface|FilterCollection $filterLocator           The new filter locator or the deprecated filter collection
-     * @param mixed                               $resourceMetadataFactory
-     */
-    public function __construct($resourceMetadataFactory, $filterLocator)
+    public function __construct(ContainerInterface $filterLocator)
     {
-        $this->setFilterLocator($filterLocator);
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->filterLocator = $filterLocator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
         }
 
-        /** @var ResourceMetadata|ResourceMetadataCollection */
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-        } else {
-            try {
-                $operation = $context['operation'] ?? $resourceMetadata->getOperation($operationName);
-                $resourceFilters = $operation->getFilters();
-            } catch (OperationNotFoundException $e) {
-                // In some cases the operation may not exist
-                if (isset($context['graphql_operation_name'])) {
-                    $resourceFilters = $resourceMetadata->getOperation(null, true)->getFilters();
-                }
-            }
-        }
+        $resourceFilters = $operation?->getFilters();
 
         if (empty($resourceFilters)) {
             return;
@@ -87,7 +54,7 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
         $orderFilters = [];
 
         foreach ($resourceFilters as $filterId) {
-            $filter = $this->getFilter($filterId);
+            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
                 // Apply the OrderFilter after every other filter to avoid an edge case where OrderFilter would do a LEFT JOIN instead of an INNER JOIN
                 if ($filter instanceof OrderFilter) {
@@ -96,13 +63,13 @@ final class FilterExtension implements ContextAwareQueryCollectionExtensionInter
                 }
 
                 $context['filters'] = $context['filters'] ?? [];
-                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
             }
         }
 
         foreach ($orderFilters as $orderFilter) {
             $context['filters'] = $context['filters'] ?? [];
-            $orderFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $orderFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
     }
 }

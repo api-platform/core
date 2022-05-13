@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle;
 
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AnnotationFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
@@ -24,7 +23,6 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolver
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -43,8 +41,6 @@ final class ApiPlatformBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new DataProviderPass());
-        // Run the compiler pass before the {@see ResolveInstanceofConditionalsPass} to allow autoconfiguration of generated filter definitions.
-        $container->addCompilerPass(new AnnotationFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
         $container->addCompilerPass(new FilterPass());
         $container->addCompilerPass(new ElasticsearchClientPass());
         $container->addCompilerPass(new GraphQlTypePass());

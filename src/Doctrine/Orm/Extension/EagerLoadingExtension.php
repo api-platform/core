@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Doctrine\Orm\Util\EagerLoadingTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Property\PropertyMetadata;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
@@ -43,20 +39,17 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensionInterface, QueryItemExtensionInterface
+final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    use EagerLoadingTrait;
+    private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
+    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
+    private ?ClassMetadataFactoryInterface $classMetadataFactory;
+    private int $maxJoins;
 
-    private $propertyNameCollectionFactory;
-    private $propertyMetadataFactory;
-    private $classMetadataFactory;
-    private $maxJoins;
-
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, int $maxJoins = 30, bool $forceEager = true, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->classMetadataFactory = $classMetadataFactory;
         $this->maxJoins = $maxJoins;
         $this->forceEager = $forceEager;
@@ -66,9 +59,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
-        $this->apply(true, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        $this->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 
     /**
@@ -76,34 +69,21 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      *
      * The context may contain serialization groups which helps defining joined entities that are readable.
      */
-    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, string $operationName = null, array $context = [])
+    public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, Operation $operation = null, array $context = []): void
     {
-        $this->apply(false, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        $this->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 
-    private function apply(bool $collection, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass, ?string $operationName, array $context)
+    private function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, ?string $resourceClass, ?Operation $operation, array $context): void
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
         }
 
         $options = [];
-        if (null !== $operationName) {
-            // TODO remove in 3.0
-            $options[($collection ? 'collection' : 'item').'_operation_name'] = $operationName;
-        }
 
-        $operation = null;
-        $forceEager = $this->forceEager;
-        $fetchPartial = $this->fetchPartial;
-        $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
-        try {
-            $operation = $resourceMetadataCollection->getOperation($operationName);
-            $forceEager = $operation->getForceEager() ?? $this->forceEager;
-            $fetchPartial = $operation->getFetchPartial() ?? $this->fetchPartial;
-        } catch (OperationNotFoundException $e) {
-            // In some cases the operation may not exist
-        }
+        $forceEager = $operation?->getForceEager() ?? $this->forceEager;
+        $fetchPartial = $operation?->getFetchPartial() ?? $this->fetchPartial;
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
@@ -140,7 +120,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, int $currentDepth = null, string $parentAssociation = null)
+    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, int $currentDepth = null, string $parentAssociation = null): void
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
@@ -149,7 +129,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $currentDepth = $currentDepth > 0 ? $currentDepth - 1 : $currentDepth;
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
-        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() : null;
+        $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($resourceClass)->getAttributesMetadata();
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             // Don't join if max depth is enabled and the current depth limit is reached
@@ -255,7 +235,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         }
     }
 
-    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions)
+    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions): void
     {
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();
@@ -267,7 +247,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         }
 
         foreach ($this->propertyNameCollectionFactory->create($entity) as $property) {
-            /** @var ApiProperty|PropertyMetadata */
             $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
 
             if (true === $propertyMetadata->isIdentifier()) {
@@ -300,7 +279,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
     }
 
-    private function addSelectOnce(QueryBuilder $queryBuilder, string $alias)
+    private function addSelectOnce(QueryBuilder $queryBuilder, string $alias): void
     {
         $existingSelects = array_reduce($queryBuilder->getDQLPart('select') ?? [], function ($existing, $dqlSelect) {
             return ($dqlSelect instanceof Select) ? array_merge($existing, $dqlSelect->getParts()) : $existing;
@@ -309,25 +288,5 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         if (!\in_array($alias, $existingSelects, true)) {
             $queryBuilder->addSelect($alias);
         }
-    }
-
-    /**
-     * Gets the serializer context.
-     *
-     * @param string $contextType normalization_context or denormalization_context
-     * @param array  $options     represents the operation name so that groups are the one of the specific operation
-     */
-    private function getNormalizationContext(string $resourceClass, string $contextType, array $options): array
-    {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (isset($options['collection_operation_name'])) {
-            $context = $resourceMetadata->getCollectionOperationAttribute($options['collection_operation_name'], $contextType, null, true);
-        } elseif (isset($options['item_operation_name'])) {
-            $context = $resourceMetadata->getItemOperationAttribute($options['item_operation_name'], $contextType, null, true);
-        } else {
-            $context = $resourceMetadata->getAttribute($contextType);
-        }
-
-        return $context ?? [];
     }
 }

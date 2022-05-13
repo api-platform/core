@@ -28,8 +28,8 @@ class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use DateFilterTestTrait;
 
-    protected $filterClass = DateFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = DateFilter::class;
+    protected string $resourceClass = Dummy::class;
 
     public function provideApplyTestData(): array
     {

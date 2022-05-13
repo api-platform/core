@@ -87,7 +87,6 @@
         </service>
 
         <service id="api_platform.elasticsearch.request_body_search_extension.filter" public="false" abstract="true">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.filter_locator" />
         </service>
 
@@ -100,7 +99,6 @@
         </service>
 
         <service id="api_platform.elasticsearch.request_body_search_extension.sort" class="ApiPlatform\Elasticsearch\Extension\SortExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_factory" />
             <argument type="service" id="api_platform.elasticsearch.identifier_extractor" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />

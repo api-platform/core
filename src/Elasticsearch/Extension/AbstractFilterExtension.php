@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -25,22 +25,19 @@ use Psr\Container\ContainerInterface;
  */
 abstract class AbstractFilterExtension implements RequestBodySearchCollectionExtensionInterface
 {
-    private $resourceMetadataFactory;
-    private $filterLocator;
+    private ContainerInterface $filterLocator;
 
-    public function __construct(ResourceMetadataFactoryInterface $resourceMetadataFactory, ContainerInterface $filterLocator)
+    public function __construct(ContainerInterface $filterLocator)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->filterLocator = $filterLocator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(array $requestBody, string $resourceClass, ?string $operationName = null, array $context = []): array
+    public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
+        $resourceFilters = $operation?->getFilters();
 
         if (!$resourceFilters) {
             return $requestBody;
@@ -51,7 +48,7 @@ abstract class AbstractFilterExtension implements RequestBodySearchCollectionExt
 
         foreach ($resourceFilters as $filterId) {
             if ($this->filterLocator->has($filterId) && is_a($filter = $this->filterLocator->get($filterId), $this->getFilterInterface())) {
-                $clauseBody = $filter->apply($clauseBody, $resourceClass, $operationName, $context);
+                $clauseBody = $filter->apply($clauseBody, $resourceClass, $operation, $context);
             }
         }
 

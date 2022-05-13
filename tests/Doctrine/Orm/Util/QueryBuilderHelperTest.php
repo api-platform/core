@@ -32,7 +32,7 @@ class QueryBuilderHelperTest extends TestCase
     /**
      * @dataProvider provideAddJoinOnce
      */
-    public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias)
+    public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');
@@ -60,7 +60,7 @@ class QueryBuilderHelperTest extends TestCase
     /**
      * @dataProvider provideAddJoinOnce
      */
-    public function testAddJoinOnceWithSpecifiedNewAlias()
+    public function testAddJoinOnceWithSpecifiedNewAlias(): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');

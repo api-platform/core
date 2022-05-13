@@ -25,9 +25,9 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
 {
     use NumericFilterTestTrait;
 
-    protected $filterClass = NumericFilter::class;
+    protected string $filterClass = NumericFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 

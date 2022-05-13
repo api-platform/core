@@ -13,12 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
-use ApiPlatform\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
 
@@ -32,47 +28,29 @@ use Psr\Container\ContainerInterface;
  */
 final class FilterExtension implements AggregationCollectionExtensionInterface
 {
-    use FilterLocatorTrait;
+    private ContainerInterface $filterLocator;
 
-    private $resourceMetadataFactory;
-
-    /**
-     * @param ContainerInterface|FilterCollection $filterLocator           The new filter locator or the deprecated filter collection
-     * @param mixed                               $resourceMetadataFactory
-     */
-    public function __construct($resourceMetadataFactory, $filterLocator)
+    public function __construct(ContainerInterface $filterLocator)
     {
-        $this->setFilterLocator($filterLocator);
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->filterLocator = $filterLocator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        try {
-            $operation = $resourceMetadata->getOperation($operationName);
-            $resourceFilters = $operation->getFilters();
-        } catch (OperationNotFoundException $e) {
-            $resourceFilters = $resourceMetadata->getOperation(null, true)->getFilters();
-        }
+        $resourceFilters = $operation?->getFilters();
 
         if (empty($resourceFilters)) {
             return;
         }
 
         foreach ($resourceFilters as $filterId) {
-            $filter = $this->getFilter($filterId);
+            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
                 $context['filters'] = $context['filters'] ?? [];
-                $filter->apply($aggregationBuilder, $resourceClass, $operationName, $context);
+                $filter->apply($aggregationBuilder, $resourceClass, $operation, $context);
             }
         }
     }

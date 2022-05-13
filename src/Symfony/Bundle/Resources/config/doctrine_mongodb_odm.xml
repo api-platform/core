@@ -83,7 +83,6 @@
         <!-- Doctrine Aggregation extensions -->
 
         <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.filter" class="ApiPlatform\Doctrine\Odm\Extension\FilterExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="32" />
@@ -93,7 +92,6 @@
         <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.pagination"
                  class="ApiPlatform\Doctrine\Odm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.pagination" />
 
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection"/>
@@ -102,7 +100,6 @@
 
         <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.order" class="ApiPlatform\Doctrine\Odm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine_mongodb" />
 
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="16" />
@@ -120,7 +117,7 @@
         <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine_mongodb" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
+            <argument type="service" id="api_platform.identifiers_extractor.cached" on-invalid="ignore" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>

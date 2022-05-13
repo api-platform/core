@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
 {
-    private $decorated;
+    private NameConverterInterface $decorated;
 
     public function __construct(?NameConverterInterface $decorated = null)
     {

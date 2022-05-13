@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\ProphecyTrait;
@@ -26,15 +26,15 @@ final class DocumentNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
-        $itemNormalizer = new DocumentNormalizer($this->prophesize(IdentifierExtractorInterface::class)->reveal());
+        $itemNormalizer = new DocumentNormalizer($this->prophesize(IdentifiersExtractorInterface::class)->reveal());
 
         self::assertInstanceOf(DenormalizerInterface::class, $itemNormalizer);
         self::assertInstanceOf(NormalizerInterface::class, $itemNormalizer);
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $document = [
             '_index' => 'test',
@@ -49,13 +49,13 @@ final class DocumentNormalizerTest extends TestCase
             ],
         ];
 
-        $itemNormalizer = new DocumentNormalizer($this->prophesize(IdentifierExtractorInterface::class)->reveal());
+        $itemNormalizer = new DocumentNormalizer($this->prophesize(IdentifiersExtractorInterface::class)->reveal());
 
         self::assertTrue($itemNormalizer->supportsDenormalization($document, Foo::class, DocumentNormalizer::FORMAT));
         self::assertFalse($itemNormalizer->supportsDenormalization($document, Foo::class, 'text/coffee'));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $document = [
             '_index' => 'test',
@@ -69,7 +69,7 @@ final class DocumentNormalizerTest extends TestCase
             ],
         ];
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $normalizer = new DocumentNormalizer($identifierExtractorProphecy->reveal());
@@ -81,18 +81,18 @@ final class DocumentNormalizerTest extends TestCase
         self::assertEquals($expectedFoo, $normalizer->denormalize($document, Foo::class, DocumentNormalizer::FORMAT));
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
-        $itemNormalizer = new DocumentNormalizer($this->prophesize(IdentifierExtractorInterface::class)->reveal());
+        $itemNormalizer = new DocumentNormalizer($this->prophesize(IdentifiersExtractorInterface::class)->reveal());
 
         self::assertTrue($itemNormalizer->supportsNormalization(new Foo(), DocumentNormalizer::FORMAT));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(sprintf('%s is a write-only format.', DocumentNormalizer::FORMAT));
 
-        (new DocumentNormalizer($this->prophesize(IdentifierExtractorInterface::class)->reveal()))->normalize(new Foo(), DocumentNormalizer::FORMAT);
+        (new DocumentNormalizer($this->prophesize(IdentifiersExtractorInterface::class)->reveal()))->normalize(new Foo(), DocumentNormalizer::FORMAT);
     }
 }

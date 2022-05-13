@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Metadata\Property\Factory;
+namespace ApiPlatform\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\CachedPropertyMetadataFactory;

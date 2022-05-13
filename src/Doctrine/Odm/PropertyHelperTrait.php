@@ -31,7 +31,7 @@ trait PropertyHelperTrait
     /**
      * Splits the given property into parts.
      */
-    abstract protected function splitPropertyParts(string $property/* , string $resourceClass */): array;
+    abstract protected function splitPropertyParts(string $property, string $resourceClass): array;
 
     /**
      * Gets class metadata for the given resource.
