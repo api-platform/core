@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+//use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -31,18 +31,16 @@ final class AddHeadersListener
     private $sharedMaxAge;
     private $vary;
     private $public;
-    private $resourceMetadataFactory;
     private $staleWhileRevalidate;
     private $staleIfError;
 
-    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataFactoryInterface $resourceMetadataFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
+    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, int $staleWhileRevalidate = null, int $staleIfError = null)
     {
         $this->etag = $etag;
         $this->maxAge = $maxAge;
         $this->sharedMaxAge = $sharedMaxAge;
         $this->vary = $vary;
         $this->public = $public;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->staleWhileRevalidate = $staleWhileRevalidate;
         $this->staleIfError = $staleIfError;
     }
@@ -65,14 +63,7 @@ final class AddHeadersListener
             return;
         }
 
-        $resourceCacheHeaders = [];
-
-        if ($this->resourceMetadataFactory) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
-        } else {
-            $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
-        }
+        $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
 
         if ($this->etag && !$response->getEtag()) {
             $response->setEtag(md5((string) $response->getContent()));
