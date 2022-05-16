@@ -110,7 +110,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
-        $this->registerOpenApiConfiguration($container, $config);
+        $this->registerOpenApiConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config['enable_docs']);
@@ -469,8 +469,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$config['enable_swagger'] && $config['enable_swagger_ui']) {
             throw new RuntimeException('You can not enable the Swagger UI without enabling Swagger, fix this by enabling swagger via the configuration "enable_swagger: true".');
         }
-
-        $loader->load('json_schema.xml');
 
         if (!$config['enable_swagger']) {
             return;
@@ -899,7 +897,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config): void
+    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         $container->setParameter('api_platform.openapi.termsOfService', $config['openapi']['termsOfService']);
         $container->setParameter('api_platform.openapi.contact.name', $config['openapi']['contact']['name']);
@@ -907,6 +905,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.contact.email', $config['openapi']['contact']['email']);
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
+
+        $loader->load('json_schema.xml');
+
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/json_schema.xml');
+        } else {
+            $loader->load('v3/json_schema.xml');
+        }
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

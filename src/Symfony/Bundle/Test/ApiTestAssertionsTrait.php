@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
-use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -112,14 +113,14 @@ trait ApiTestAssertionsTrait
 
     public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName, null);
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, new GetCollection(name: $operationName), null);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName, null);
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, new Get(name: $operationName), null);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }

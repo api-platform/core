@@ -117,6 +117,11 @@ XML
         $this->buildValues($resource->addChild('openapiContext'), $values);
     }
 
+    private function buildJsonSchemaContext(\SimpleXMLElement $resource, array $values): void
+    {
+        $this->buildValues($resource->addChild('jsonSchemaContext'), $values);
+    }
+
     private function buildExtraProperties(\SimpleXMLElement $resource, array $values): void
     {
         $this->buildValues($resource->addChild('extraProperties'), $values);
