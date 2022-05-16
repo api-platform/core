@@ -137,7 +137,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 
     public function testCreateWithDefaults(): void
     {
-        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['attributes' => ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']]);
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']);
 
         $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10, extraProperties: ['non_existing_attribute' => 'foo']);
 
@@ -165,9 +165,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(
             null, null, [
-                'attributes' => [
-                    'pagination_items_per_page' => 3,
-                ],
+                'pagination_items_per_page' => 3,
             ]
         );
 
