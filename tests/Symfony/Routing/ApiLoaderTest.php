@@ -14,10 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Routing;
 
 use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
-use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -30,8 +29,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
-use ApiPlatform\PathResolver\CustomOperationPathResolver;
-use ApiPlatform\PathResolver\OperationPathResolver;
 use ApiPlatform\Symfony\Routing\ApiLoader;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\Fixtures\RelatedDummyEntity;
@@ -46,9 +43,6 @@ use Symfony\Component\Routing\Route;
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
- * TODO: in 3.0 just remove the IdentifiersExtractor
- * @group legacy
  */
 class ApiLoaderTest extends TestCase
 {
@@ -255,6 +249,7 @@ class ApiLoaderTest extends TestCase
         $kernelProphecy = $this->prophesize(KernelInterface::class);
         $kernelProphecy->locateResource(Argument::any())->willReturn($routingConfig);
         $possibleArguments = [
+            'some.service.name',
             'api_platform.action.get_collection',
             'api_platform.action.post_collection',
             'api_platform.action.get_item',
@@ -284,15 +279,9 @@ class ApiLoaderTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummyEntity::class, 'id')->willReturn(new ApiProperty());
         $propertyMetadataFactoryProphecy->create(DummyEntity::class, 'id')->willReturn(new ApiProperty());
 
-        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
-
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-        $identifiersExtractor = $identifiersExtractorProphecy->reveal();
-
-        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $operationPathResolver, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], null, false, true, true, false, false, $identifiersExtractor);
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false, false);
     }
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
