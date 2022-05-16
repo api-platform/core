@@ -93,6 +93,8 @@ class XmlExtractorTest extends TestCase
                     'operations' => null,
                     'graphQlOperations' => null,
                     'class' => Comment::class,
+                    'processor' => null,
+                    'provider' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments.{_format}',
@@ -254,6 +256,8 @@ class XmlExtractorTest extends TestCase
                             'collection' => null,
                             'method' => null,
                             'priority' => null,
+                            'processor' => null,
+                            'provider' => null,
                         ],
                         [
                             'name' => null,
@@ -346,10 +350,14 @@ class XmlExtractorTest extends TestCase
                             'collection' => null,
                             'method' => null,
                             'priority' => null,
+                            'processor' => null,
+                            'provider' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
                     'class' => Comment::class,
+                    'processor' => null,
+                    'provider' => null,
                 ],
             ],
         ], $extractor->getResources());

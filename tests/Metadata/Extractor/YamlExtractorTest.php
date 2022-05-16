@@ -93,6 +93,8 @@ class YamlExtractorTest extends TestCase
                     'extraProperties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
+                    'processor' => null,
+                    'provider' => null,
                 ],
             ],
             Program::class => [
@@ -156,6 +158,8 @@ class YamlExtractorTest extends TestCase
                     'extraProperties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
+                    'processor' => null,
+                    'provider' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs.{_format}',
@@ -283,6 +287,8 @@ class YamlExtractorTest extends TestCase
                             'serialize' => null,
                             'queryParameterValidate' => null,
                             'priority' => null,
+                            'processor' => null,
+                            'provider' => null,
                         ],
                         [
                             'name' => null,
@@ -354,9 +360,13 @@ class YamlExtractorTest extends TestCase
                             'serialize' => null,
                             'queryParameterValidate' => null,
                             'priority' => null,
+                            'processor' => null,
+                            'provider' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
+                    'processor' => null,
+                    'provider' => null,
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -420,6 +430,8 @@ class YamlExtractorTest extends TestCase
                     'extraProperties' => null,
                     'operations' => null,
                     'graphQlOperations' => null,
+                    'processor' => null,
+                    'provider' => null,
                 ],
             ],
         ], $extractor->getResources());
