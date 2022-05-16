@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
 use ApiPlatform\Util\IriHelper;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -43,14 +41,9 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         [$paginator, $paginated, $currentPage, $itemsPerPage, $lastPage, $pageTotalItems, $totalItems] = $this->getPaginationConfig($object, $context);
         $parsed = IriHelper::parseIri($context['uri'] ?? '/', $this->pageParameterName);
 
-        /** @var ResourceMetadata|ResourceMetadataCollection */
         $metadata = $this->resourceMetadataFactory->create($context['resource_class'] ?? '');
-        if ($metadata instanceof ResourceMetadataCollection) {
-            $operation = $metadata->getOperation($context['operation_name'] ?? null);
-            $urlGenerationStrategy = $operation->getUrlGenerationStrategy();
-        } else {
-            $urlGenerationStrategy = $metadata->getAttribute('url_generation_strategy');
-        }
+        $operation = $metadata->getOperation($context['operation_name'] ?? null);
+        $urlGenerationStrategy = $operation->getUrlGenerationStrategy();
 
         $data = [
             '_links' => [
