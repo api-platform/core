@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\OpenApi\Factory;
 
-use ApiPlatform\Core\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactory;
@@ -39,8 +38,6 @@ use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
-use ApiPlatform\PathResolver\CustomOperationPathResolver;
-use ApiPlatform\PathResolver\OperationPathResolver;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\Tests\Fixtures\DummyFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
@@ -180,8 +177,6 @@ class OpenApiFactoryTest extends TestCase
             (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('This is an enum.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
         );
 
-        $operationPathResolver = new CustomOperationPathResolver(new OperationPathResolver(new UnderscorePathSegmentNameGenerator()));
-
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $filters = [
             'f1' => new DummyFilter(['name' => [
@@ -238,7 +233,6 @@ class OpenApiFactoryTest extends TestCase
             $propertyMetadataFactory,
             $schemaFactory,
             $typeFactory,
-            $operationPathResolver,
             $filterLocatorProphecy->reveal(),
             [],
             new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [
@@ -259,6 +253,7 @@ class OpenApiFactoryTest extends TestCase
             'type' => 'object',
             'description' => 'This is a dummy',
             'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
+            'deprecated' => false,
             'properties' => [
                 'id' => new \ArrayObject([
                     'type' => 'integer',
