@@ -70,7 +70,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
             (new ApiResource())
                 ->withShortName('Foo')
-                ->withOperations(new Operations(['get' => (new GetCollection())]))
+                ->withOperations(new Operations(['get' => (new GetCollection())])),
         ]));
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
@@ -147,7 +147,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
             (new ApiResource())
                 ->withShortName('Foo')
-                ->withOperations(new Operations(['get' => (new GetCollection())]))
+                ->withOperations(new Operations(['get' => (new GetCollection())])),
         ]));
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
@@ -211,7 +211,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
             (new ApiResource())
                 ->withShortName('Foo')
-                ->withOperations(new Operations(['get' => (new GetCollection())]))
+                ->withOperations(new Operations(['get' => (new GetCollection())])),
         ]));
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
         $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
@@ -268,7 +268,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
             (new ApiResource())
                 ->withShortName('Foo')
-                ->withOperations(new Operations(['get' => (new GetCollection())]))
+                ->withOperations(new Operations(['get' => (new GetCollection())])),
         ]));
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);
@@ -349,7 +349,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
             (new ApiResource())
                 ->withShortName('Foo')
-                ->withOperations(new Operations(['get' => (new GetCollection())]))
+                ->withOperations(new Operations(['get' => (new GetCollection())])),
         ]));
 
         $itemNormalizer = $this->prophesize(NormalizerInterface::class);

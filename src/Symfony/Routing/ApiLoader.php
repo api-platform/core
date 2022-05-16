@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Exception\RuntimeException;
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -91,7 +90,7 @@ final class ApiLoader extends Loader
 
                         $path = str_replace(sprintf('{%s}', $parameterName), $expandedValue, $path);
                     }
-                    
+
                     if ($controller = $operation->getController()) {
                         if (!$this->container->has($controller)) {
                             throw new RuntimeException(sprintf('There is no builtin action for the "%s" operation. You need to define the controller yourself.', $operationName));
