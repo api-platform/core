@@ -128,6 +128,8 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'filters' => $this->buildArrayValue($resource, 'filter'),
             'order' => isset($resource->order->values) ? $this->buildValues($resource->order->values) : null,
             'extraProperties' => $this->buildExtraProperties($resource, 'extraProperties'),
+            'read' => $this->phpize($resource, 'read', 'bool'),
+            'write' => $this->phpize($resource, 'write', 'bool'),
         ];
     }
 
