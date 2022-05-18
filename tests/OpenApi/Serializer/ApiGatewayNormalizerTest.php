@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\OpenApi\Serializer;
 
-use ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
+use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -29,14 +29,14 @@ final class ApiGatewayNormalizerTest extends TestCase
 
     public function testSupportsNormalization(): void
     {
-        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $documentationNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
-        $documentationNormalizerProphecy->supportsNormalization(DocumentationNormalizer::FORMAT, Documentation::class)->willReturn(true);
-        $documentationNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
+        $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $normalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
+        $normalizerProphecy->supportsNormalization(OpenApiNormalizer::FORMAT, Documentation::class)->willReturn(true);
+        $normalizerProphecy->hasCacheableSupportsMethod()->willReturn(true);
 
-        $normalizer = new ApiGatewayNormalizer($documentationNormalizerProphecy->reveal());
+        $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
-        $this->assertTrue($normalizer->supportsNormalization(DocumentationNormalizer::FORMAT, Documentation::class));
+        $this->assertTrue($normalizer->supportsNormalization(OpenApiNormalizer::FORMAT, Documentation::class));
         $this->assertTrue($normalizer->hasCacheableSupportsMethod());
     }
 
@@ -355,15 +355,15 @@ final class ApiGatewayNormalizerTest extends TestCase
             'basePath' => '/',
         ];
 
-        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $documentationNormalizerProphecy->normalize($documentation, DocumentationNormalizer::FORMAT, [
+        $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $normalizerProphecy->normalize($documentation, OpenApiNormalizer::FORMAT, [
             'spec_version' => 2,
             ApiGatewayNormalizer::API_GATEWAY => true,
         ])->willReturn($swaggerDocument);
 
-        $normalizer = new ApiGatewayNormalizer($documentationNormalizerProphecy->reveal());
+        $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
-        $this->assertEquals($modifiedSwaggerDocument, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, [
+        $this->assertEquals($modifiedSwaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT, [
             'spec_version' => 2,
             ApiGatewayNormalizer::API_GATEWAY => true,
         ]));
@@ -534,14 +534,14 @@ final class ApiGatewayNormalizerTest extends TestCase
             ]),
         ];
 
-        $documentationNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $documentationNormalizerProphecy->normalize($documentation, DocumentationNormalizer::FORMAT, [
+        $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $normalizerProphecy->normalize($documentation, OpenApiNormalizer::FORMAT, [
             'spec_version' => 2,
         ])->willReturn($swaggerDocument);
 
-        $normalizer = new ApiGatewayNormalizer($documentationNormalizerProphecy->reveal());
+        $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
-        $this->assertEquals($swaggerDocument, $normalizer->normalize($documentation, DocumentationNormalizer::FORMAT, [
+        $this->assertEquals($swaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT, [
             'spec_version' => 2,
         ]));
     }
