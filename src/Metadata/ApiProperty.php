@@ -169,7 +169,6 @@ final class ApiProperty
         $this->jsonSchemaContext = $jsonSchemaContext;
         $this->push = $push;
         $this->security = $security;
-        $this->openapiContext = $openapiContext;
         $this->securityPostDenormalize = $securityPostDenormalize;
         $this->types = $types;
         $this->builtinTypes = $builtinTypes;
