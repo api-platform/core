@@ -47,7 +47,6 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     {
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass]);
 
-        dump($this->tester->getDisplay());
         $this->assertJson($this->tester->getDisplay());
     }
 
