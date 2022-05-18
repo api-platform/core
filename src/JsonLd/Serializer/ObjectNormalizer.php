@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
@@ -34,15 +33,11 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
     private $iriConverter;
     private $anonymousContextBuilder;
 
-    public function __construct(NormalizerInterface $decorated, $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
+    public function __construct(NormalizerInterface $decorated, IriConverterInterface $iriConverter, AnonymousContextBuilderInterface $anonymousContextBuilder)
     {
         $this->decorated = $decorated;
         $this->iriConverter = $iriConverter;
         $this->anonymousContextBuilder = $anonymousContextBuilder;
-
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
     }
 
     /**
@@ -92,7 +87,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
         if (isset($originalResource)) {
             try {
-                $context['output']['iri'] = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($originalResource) : $this->iriConverter->getIriFromResource($originalResource);
+                $context['output']['iri'] = $this->iriConverter->getIriFromResource($originalResource);
             } catch (InvalidArgumentException $e) {
                 // The original resource has no identifiers
             }

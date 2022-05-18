@@ -402,9 +402,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $options = $this->getFactoryOptions($context);
-        /** @var PropertyMetadata|ApiProperty */
+        /** @var ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
-        $security = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('security') : $propertyMetadata->getSecurity();
+        $security = $propertyMetadata->getSecurity();
         if ($this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
@@ -423,9 +423,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function canAccessAttributePostDenormalize($object, $previousObject, string $attribute, array $context = []): bool
     {
         $options = $this->getFactoryOptions($context);
-        /** @var PropertyMetadata|ApiProperty */
+        /** @var ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
-        $security = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('security_post_denormalize') : $propertyMetadata->getSecurityPostDenormalize();
+        $security = $propertyMetadata->getSecurityPostDenormalize();
         if ($this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
@@ -468,12 +468,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Denormalizes a collection of objects.
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param mixed                        $value
+     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
-    protected function denormalizeCollection(string $attribute, $propertyMetadata, Type $type, string $className, $value, ?string $format, array $context): array
+    protected function denormalizeCollection(string $attribute, ApiProperty $propertyMetadata, Type $type, string $className, $value, ?string $format, array $context): array
     {
         if (!\is_array($value)) {
             throw new InvalidArgumentException(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)));
@@ -497,8 +496,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Denormalizes a relation.
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param mixed                        $value
+     * @param mixed $value
      *
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -506,7 +504,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @return object|null
      */
-    protected function denormalizeRelation(string $attributeName, $propertyMetadata, string $className, $value, ?string $format, array $context)
+    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
         if (\is_string($value)) {
             try {
@@ -600,20 +598,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function getAttributeValue($object, $attribute, $format = null, array $context = [])
     {
         $context['api_attribute'] = $attribute;
-        /** @var ApiProperty|PropertyMetadata */
+        /** @var ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
         try {
             $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
         } catch (NoSuchPropertyException $e) {
-            // BC to be removed in 3.0
-            if ($propertyMetadata instanceof PropertyMetadata && !$propertyMetadata->hasChildInherited()) {
-                throw $e;
-            }
-            if ($propertyMetadata instanceof ApiProperty) {
-                throw $e;
-            }
-
+            throw $e;
             $attributeValue = null;
         }
 
@@ -621,7 +612,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $attributeValue;
         }
 
-        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : ($propertyMetadata->getBuiltinTypes()[0] ?? null);
+        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
         if (
             $type &&
@@ -692,12 +683,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Normalizes a collection of relations (to-many).
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param iterable                     $attributeValue
-     *
      * @throws UnexpectedValueException
      */
-    protected function normalizeCollectionOfRelations($propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
+    protected function normalizeCollectionOfRelations(ApiProperty $propertyMetadata, iterable $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         $value = [];
         foreach ($attributeValue as $index => $obj) {
@@ -714,15 +702,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * Normalizes a relation.
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param object|null                  $relatedObject
-     *
      * @throws LogicException
      * @throws UnexpectedValueException
      *
      * @return string|array|\ArrayObject|null IRI or normalized object data
      */
-    protected function normalizeRelation($propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
+    protected function normalizeRelation(ApiProperty $propertyMetadata, ?object $relatedObject, string $resourceClass, ?string $format, array $context)
     {
         if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
             if (!$this->serializer instanceof NormalizerInterface) {
@@ -738,13 +723,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $normalizedRelatedObject;
         }
 
-        $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($relatedObject) : $this->iriConverter->getIriFromResource($relatedObject);
+        $iri = $this->iriConverter->getIriFromResource($relatedObject);
 
         if (isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
         }
 
-        $push = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('push', false) : ($propertyMetadata->getPush() ?? false);
+        $push = $propertyMetadata->getPush() ?? false;
         if (isset($context['resources_to_push']) && $push) {
             $context['resources_to_push'][$iri] = $iri;
         }

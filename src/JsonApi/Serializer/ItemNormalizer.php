@@ -183,12 +183,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     *
      * @throws RuntimeException
      * @throws NotNormalizableValueException
      */
-    protected function denormalizeRelation(string $attributeName, $propertyMetadata, string $className, $value, ?string $format, array $context)
+    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, $value, ?string $format, array $context)
     {
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new NotNormalizableValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
@@ -204,11 +202,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     *
      * @see http://jsonapi.org/format/#document-resource-object-linkage
      */
-    protected function normalizeRelation($propertyMetadata, $relatedObject, string $resourceClass, ?string $format, array $context)
+    protected function normalizeRelation(ApiProperty $propertyMetadata, ?object $relatedObject, string $resourceClass, ?string $format, array $context)
     {
         if (null !== $relatedObject) {
             $iri = $this->iriConverter->getIriFromResource($relatedObject);
