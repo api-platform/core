@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Action;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
@@ -37,28 +38,18 @@ final class ExceptionAction
     private $serializer;
     private $errorFormats;
     private $exceptionToStatus;
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
-     */
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
 
     /**
-     * @param array      $errorFormats            A list of enabled error formats
-     * @param array      $exceptionToStatus       A list of exceptions mapped to their HTTP status code
-     * @param mixed|null $resourceMetadataFactory
+     * @param array $errorFormats      A list of enabled error formats
+     * @param array $exceptionToStatus A list of exceptions mapped to their HTTP status code
      */
-    public function __construct(SerializerInterface $serializer, array $errorFormats, array $exceptionToStatus = [], $resourceMetadataFactory = null)
+    public function __construct(SerializerInterface $serializer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, array $errorFormats, array $exceptionToStatus = [])
     {
         $this->serializer = $serializer;
         $this->errorFormats = $errorFormats;
         $this->exceptionToStatus = $exceptionToStatus;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if (null !== $resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        } else {
-            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
@@ -98,21 +89,19 @@ final class ExceptionAction
     {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        if ([] === $attributes || null === $this->resourceMetadataFactory) {
+        if ([] === $attributes) {
             return [];
         }
 
-        $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-        $operationExceptionToStatus = $resourceMetadata->getOperationAttribute($attributes, 'exception_to_status', [], false);
-        $resourceExceptionToStatus = $resourceMetadata->getAttribute('exception_to_status', []);
-
-        if (!\is_array($operationExceptionToStatus) || !\is_array($resourceExceptionToStatus)) {
-            throw new \LogicException('"exception_to_status" attribute should be an array.');
+        $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($attributes['resource_class']);
+        /** @var HttpOperation $operation */
+        $operation = $resourceMetadataCollection->getOperation($attributes['operation_name'] ?? null);
+        $exceptionToStatus = $operation->getExceptionToStatus() ?: [];
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            /** @var ApiResource $resourceMetadata */
+            $exceptionToStatus = array_merge($exceptionToStatus, $resourceMetadata->getExceptionToStatus() ?: []);
         }
 
-        return array_merge(
-            $resourceExceptionToStatus,
-            $operationExceptionToStatus
-        );
+        return $exceptionToStatus;
     }
 }
