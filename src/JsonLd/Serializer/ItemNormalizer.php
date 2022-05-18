@@ -96,7 +96,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $data;
         }
 
-        $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation();
+        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
         if (null === $types) {
             $types = [$operation->getShortName()];

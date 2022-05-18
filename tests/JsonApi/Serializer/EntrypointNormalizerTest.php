@@ -14,22 +14,27 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\JsonApi\Serializer;
 
 use ApiPlatform\Api\Entrypoint;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
-use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @group legacy
  */
 class EntrypointNormalizerTest extends TestCase
 {
@@ -40,7 +45,7 @@ class EntrypointNormalizerTest extends TestCase
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
 
-        $factoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
 
@@ -56,15 +61,27 @@ class EntrypointNormalizerTest extends TestCase
     {
         $collection = new ResourceNameCollection([Dummy::class, RelatedDummy::class, DummyCar::class]);
         $entrypoint = new Entrypoint($collection);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('Dummy', null, null, null, ['get']))->shouldBeCalled();
-        $resourceMetadataFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadata('RelatedDummy', null, null, ['get'], null))->shouldBeCalled();
-        $resourceMetadataFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadata('DummyCar', null, null, null, ['post']))->shouldBeCalled();
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())->withShortName('Dummy')->withOperations(new Operations([
+                'get' => (new GetCollection())->withShortName('Dummy'),
+            ])),
+        ]))->shouldBeCalled();
+        $resourceMetadataCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection('RelatedDummy', [
+            (new ApiResource())->withShortName('RelatedDummy')->withOperations(new Operations([
+                'get' => (new Get())->withShortName('RelatedDummy'),
+            ])),
+        ]))->shouldBeCalled();
+        $resourceMetadataCollectionFactoryProphecy->create(DummyCar::class)->willReturn(new ResourceMetadataCollection('DummyCar', [
+            (new ApiResource())->withShortName('DummyCar')->withOperations(new Operations([
+                'post' => (new Post())->withShortName('DummyCar'),
+            ])),
+        ]))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, UrlGeneratorInterface::ABS_URL)->willReturn('http://localhost/api/dummies')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResourceClass(RelatedDummy::class, UrlGeneratorInterface::ABS_URL)->shouldNotBeCalled();
-        $iriConverterProphecy->getIriFromResourceClass(DummyCar::class, UrlGeneratorInterface::ABS_URL)->willThrow(new InvalidArgumentException())->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_URL, Argument::type(Operation::class))->willReturn('http://localhost/api/dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(RelatedDummy::class, UrlGeneratorInterface::ABS_URL, Argument::type(Operation::class))->shouldNotBeCalled();
+        $iriConverterProphecy->getIriFromResource(DummyCar::class, UrlGeneratorInterface::ABS_URL, Argument::type(Operation::class))->shouldNotBeCalled();
 
         $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
         $urlGeneratorProphecy->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)->willReturn('http://localhost/api')->shouldBeCalled();
@@ -76,7 +93,7 @@ class EntrypointNormalizerTest extends TestCase
                     'dummy' => 'http://localhost/api/dummies',
                 ],
             ],
-            (new EntrypointNormalizer($resourceMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal()))->normalize($entrypoint, EntrypointNormalizer::FORMAT)
+            (new EntrypointNormalizer($resourceMetadataCollectionFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal()))->normalize($entrypoint, EntrypointNormalizer::FORMAT)
         );
     }
 }
