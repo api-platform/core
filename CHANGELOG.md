@@ -6,6 +6,8 @@
 * chore(openapi): upgrade Swagger UI to version 4.1.3
 * chore(openapi): upgrade ReDoc to version 2.0.0-rc.59
 * chore(graphql): upgrade GraphiQL to version 1.5.16
+* fix(messenger): unwrap exception thrown in the handler for delayed messages
+
 
 ## 2.6.7
 

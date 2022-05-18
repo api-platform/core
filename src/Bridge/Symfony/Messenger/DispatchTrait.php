@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Symfony\Messenger;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -42,7 +43,11 @@ trait DispatchTrait
 
         try {
             return $this->messageBus->dispatch($message);
-        } catch (HandlerFailedException $e) {
+        } catch (DelayedMessageHandlingException|HandlerFailedException $e) {
+            while ($e instanceof DelayedMessageHandlingException) {
+                /** @var \Throwable $e */
+                $e = $e->getPrevious();
+            }
             // unwrap the exception thrown in handler for Symfony Messenger >= 4.3
             while ($e instanceof HandlerFailedException) {
                 /** @var \Throwable $e */

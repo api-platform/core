@@ -25,6 +25,8 @@ use ApiPlatform\Core\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\DelayedMessageHandlingException;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
@@ -66,6 +68,28 @@ class DataPersisterTest extends TestCase
 
         $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
         $this->assertSame($dummy, $dataPersister->persist($dummy));
+    }
+
+    public function testPersistDelayedMessageWithAnException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $dummy = new Dummy();
+
+        $envelope = new Envelope($dummy);
+
+        $messageBus = $this->prophesize(MessageBusInterface::class);
+        $messageBus
+            ->dispatch(Argument::that(function (Envelope $envelope) use ($dummy) {
+                return $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class);
+            }))
+            ->willReturn($envelope)
+            ->willThrow(new DelayedMessageHandlingException([
+                new HandlerFailedException($envelope, [new \InvalidArgumentException('Delayed message exception')]),
+            ]));
+
+        $dataPersister = new DataPersister($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $messageBus->reveal());
+        $dataPersister->persist($dummy);
     }
 
     public function testRemove()
