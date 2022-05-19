@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OverriddenOperationDummy;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -70,6 +71,7 @@ final class SchemaFactory implements SchemaFactoryInterface
     public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
         $schema = $schema ? clone $schema : new Schema();
+        
         if (null === $metadata = $this->getMetadata($className, $type, $operation, $serializerContext)) {
             return $schema;
         }
@@ -277,25 +279,25 @@ final class SchemaFactory implements SchemaFactoryInterface
         if (!$operation || !$operation->getClass()) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($className);
 
-            foreach ($resourceMetadataCollection as $resourceMetadata) {
-                foreach ($resourceMetadata->getOperations() ?? [] as $op) {
-                    if ($operation && $operation->getName() === $op->getName()) {
-                        $operation = $op;
-                        break 2;
-                    }
+            if ($operation && $operation->getName()) {
+                $operation = $resourceMetadataCollection->getOperation($operation->getName());
+            } else {
+                // Guess the operation and use the first one that matches criterias
+                foreach ($resourceMetadataCollection as $resourceMetadata) {
+                    foreach ($resourceMetadata->getOperations() ?? [] as $op) {
+                        if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
+                            $operation = $op;
+                            break 2;
+                        }
 
-                    if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
-                        $operation = $op;
-                        break 2;
-                    }
+                        if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
+                            $operation = $op;
+                            break 2;
+                        }
 
-                    if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
-                        $operation = $op;
-                        break 2;
-                    }
-
-                    if (!$operation) {
-                        $operation = $op;
+                        if (!$operation) {
+                            $operation = $op;
+                        }
                     }
                 }
             }

@@ -115,7 +115,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $legacyMode;
 
     /**
-     * @param SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
+     * @param LegacySchemaFactoryInterface|SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
      * @param ContainerInterface|FilterCollection|null                   $filterLocator
      * @param array|OperationAwareFormatsProviderInterface               $formats
      * @param mixed|null                                                 $jsonSchemaTypeFactory
