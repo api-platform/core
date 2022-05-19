@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -103,16 +104,14 @@ class SchemaFactoryTest extends TestCase
 
         $shortName = (new \ReflectionClass(OverriddenOperationDummy::class))->getShortName();
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $operation = (new Put)->withName('put')->withNormalizationContext([
+        $operation = (new Put())->withName('put')->withNormalizationContext([
             'groups' => 'overridden_operation_dummy_put',
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ])->withShortName($shortName)->withValidationContext(['groups' => ['validation_groups_dummy_put']]);
         $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)
                                         ->willReturn(
                                             new ResourceMetadataCollection(OverriddenOperationDummy::class, [
-                                                new ApiResource(operations: [
-                                                    'put' => $operation,
-                                                ]),
+                                                (new ApiResource())->withOperations(new Operations(['put' => $operation])),
                                             ])
                                         );
 
