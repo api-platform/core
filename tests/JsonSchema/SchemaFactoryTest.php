@@ -103,17 +103,10 @@ class SchemaFactoryTest extends TestCase
 
         $shortName = (new \ReflectionClass(OverriddenOperationDummy::class))->getShortName();
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $operation = new Put(
-            name: 'put',
-            normalizationContext: [
-                'groups' => 'overridden_operation_dummy_put',
-                AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
-            ],
-            shortName: $shortName,
-            validationContext: [
-                'groups' => ['validation_groups_dummy_put'],
-            ]
-        );
+        $operation = (new Put)->withName('put')->withNormalizationContext([
+            'groups' => 'overridden_operation_dummy_put',
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ])->withShortName($shortName)->withValidationContext(['groups' => ['validation_groups_dummy_put']]);
         $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)
                                         ->willReturn(
                                             new ResourceMetadataCollection(OverriddenOperationDummy::class, [
