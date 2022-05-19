@@ -113,14 +113,16 @@ trait ApiTestAssertionsTrait
 
     public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, (new GetCollection)->withName($operationName), null);
+        $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, (new GetCollection)->withName($operationName), null);
+        $operation = $operationName ? (new Get())->withName($operationName) : new Get();
+        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
