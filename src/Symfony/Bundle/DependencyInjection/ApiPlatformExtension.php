@@ -113,8 +113,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOpenApiConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
-        $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config['enable_docs']);
-        $this->registerJsonHalConfiguration($formats, $loader);
+        $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
+        $this->registerJsonHalConfiguration($formats, $loader, $config);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerLegacyBundlesConfiguration($container, $config, $loader);
@@ -517,7 +517,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonapi.xml');
     }
 
-    private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled): void
+    private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, array $config): void
     {
         if (!isset($formats['jsonld'])) {
             return;
@@ -526,22 +526,34 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
 
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/hydra.xml');
+        } else {
+            $loader->load('v3/hydra.xml');
+        }
+
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
         }
 
-        if (!$docEnabled) {
+        if (!$config['enable_docs']) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
         }
     }
 
-    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader): void
+    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader, array $config): void
     {
         if (!isset($formats['jsonhal'])) {
             return;
         }
 
         $loader->load('hal.xml');
+
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/hal.xml');
+        } else {
+            $loader->load('v3/hal.xml');
+        }
     }
 
     private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void

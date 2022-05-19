@@ -116,11 +116,11 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * @param LegacySchemaFactoryInterface|SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
-     * @param ContainerInterface|FilterCollection|null                   $filterLocator
-     * @param array|OperationAwareFormatsProviderInterface               $formats
-     * @param mixed|null                                                 $jsonSchemaTypeFactory
-     * @param int[]                                                      $swaggerVersions
-     * @param mixed                                                      $resourceMetadataFactory
+     * @param ContainerInterface|FilterCollection|null                                                $filterLocator
+     * @param array|OperationAwareFormatsProviderInterface                                            $formats
+     * @param mixed|null                                                                              $jsonSchemaTypeFactory
+     * @param int[]                                                                                   $swaggerVersions
+     * @param mixed                                                                                   $resourceMetadataFactory
      */
     public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null, bool $legacyMode = false)
     {
