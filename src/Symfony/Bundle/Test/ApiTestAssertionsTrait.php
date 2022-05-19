@@ -135,7 +135,7 @@ trait ApiTestAssertionsTrait
             $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName, null);
         } else {
             $operation = $operationName ? (new Get())->withName($operationName) : new Get();
-            $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
+            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
         }
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
