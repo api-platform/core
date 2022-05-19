@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test;
 
+use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Get;
@@ -113,16 +115,28 @@ trait ApiTestAssertionsTrait
 
     public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
+        $schemaFactory = self::getSchemaFactory();
+
+        if ($schemaFactory instanceof LegacySchemaFactoryInterface) {
+            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName, null);
+        } else {
+            $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
+            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
+        }
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
 
     public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld'): void
     {
-        $operation = $operationName ? (new Get())->withName($operationName) : new Get();
-        $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
+        $schemaFactory = self::getSchemaFactory();
+
+        if ($schemaFactory instanceof LegacySchemaFactoryInterface) {
+            $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName, null);
+        } else {
+            $operation = $operationName ? (new Get())->withName($operationName) : new Get();
+            $schema = self::getSchemaFactory()->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
+        }
 
         static::assertMatchesJsonSchema($schema->getArrayCopy());
     }
@@ -151,12 +165,15 @@ trait ApiTestAssertionsTrait
         return $response;
     }
 
-    private static function getSchemaFactory(): SchemaFactoryInterface
+    /**
+     * @return SchemaFactoryInterface|LegacySchemaFactoryInterface
+     */
+    private static function getSchemaFactory()
     {
         $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
 
         try {
-            /** @var SchemaFactoryInterface $schemaFactory */
+            /** @var SchemaFactoryInterface|LegacySchemaFactoryInterface $schemaFactory */
             $schemaFactory = $container->get('api_platform.json_schema.schema_factory');
         } catch (ServiceNotFoundException $e) {
             throw new \LogicException('You cannot use the resource JSON Schema assertions if the "api_platform.swagger.versions" config is null or empty.');
