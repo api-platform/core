@@ -64,23 +64,32 @@ class ConstraintViolationNormalizerTest extends TestCase
         $list = new ConstraintViolationList([
             new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'f24bdbad0becef97a6887238aa58221c', $constraint),
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
+            new ConstraintViolation('1', '2', ['p1', 'p2'], '3', '4', '5'),
         ]);
 
         $expected = [
             '@context' => '/context/foo',
             '@type' => 'ConstraintViolationList',
             'hydra:title' => 'An error occurred',
-            'hydra:description' => "_d: a\n_4: 1",
+            'hydra:description' => "_d: a\n_4: 1\n_4: 1",
             'violations' => [
                 [
                     'propertyPath' => '_d',
                     'message' => 'a',
                     'code' => 'f24bdbad0becef97a6887238aa58221c',
+                    'parameters' => [],
                 ],
                 [
                     'propertyPath' => '_4',
                     'message' => '1',
                     'code' => null,
+                    'parameters' => [],
+                ],
+                [
+                    'propertyPath' => '_4',
+                    'message' => '1',
+                    'code' => null,
+                    'parameters' => ['p1', 'p2'],
                 ],
             ],
         ];

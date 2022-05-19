@@ -37,7 +37,10 @@ Feature: Using validations groups
          {
              "propertyPath": "name",
              "message": "This value should not be null.",
-             "code": "ad32d13f-c3d4-423b-909a-857b961eb720"
+             "code": "ad32d13f-c3d4-423b-909a-857b961eb720",
+             "parameters": {
+                "{{ value }}": "null"
+             }
          }
       ]
     }
@@ -66,7 +69,10 @@ Feature: Using validations groups
          {
              "propertyPath": "title",
              "message": "This value should not be null.",
-             "code": "ad32d13f-c3d4-423b-909a-857b961eb720"
+             "code": "ad32d13f-c3d4-423b-909a-857b961eb720",
+             "parameters": {
+                "{{ value }}": "null"
+             }
          }
       ]
     }

@@ -55,12 +55,13 @@ class ConstraintViolationNormalizerTest extends TestCase
         $list = new ConstraintViolationList([
             new ConstraintViolation('a', 'b', [], 'c', 'd', 'e', null, 'f24bdbad0becef97a6887238aa58221c', $constraint),
             new ConstraintViolation('1', '2', [], '3', '4', '5'),
+            new ConstraintViolation('1', '2', ['p1', 'p2'], '3', '4', '5'),
         ]);
 
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
             'title' => 'An error occurred',
-            'detail' => "_d: a\n_4: 1",
+            'detail' => "_d: a\n_4: 1\n_4: 1",
             'violations' => [
                 [
                     'propertyPath' => '_d',
@@ -69,11 +70,19 @@ class ConstraintViolationNormalizerTest extends TestCase
                     'payload' => [
                         'severity' => 'warning',
                     ],
+                    'parameters' => [],
                 ],
                 [
                     'propertyPath' => '_4',
                     'message' => '1',
                     'code' => null,
+                    'parameters' => [],
+                ],
+                [
+                    'propertyPath' => '_4',
+                    'message' => '1',
+                    'code' => null,
+                    'parameters' => ['p1', 'p2'],
                 ],
             ],
         ];

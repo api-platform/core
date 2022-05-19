@@ -65,6 +65,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
                 'propertyPath' => $this->nameConverter ? $this->nameConverter->normalize($violation->getPropertyPath(), $class, static::FORMAT) : $violation->getPropertyPath(),
                 'message' => $violation->getMessage(),
                 'code' => $violation->getCode(),
+                'parameters' => $violation->getParameters(),
             ];
 
             $constraint = $violation instanceof ConstraintViolation ? $violation->getConstraint() : null;
