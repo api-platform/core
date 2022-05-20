@@ -95,6 +95,8 @@ class XmlExtractorTest extends TestCase
                     'class' => Comment::class,
                     'processor' => null,
                     'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments.{_format}',
@@ -358,6 +360,8 @@ class XmlExtractorTest extends TestCase
                     'class' => Comment::class,
                     'processor' => null,
                     'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
             ],
         ], $extractor->getResources());

@@ -157,6 +157,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'extraProperties' => $this->buildArrayValue($resource, 'extraProperties'),
             'mercure' => $this->buildMercure($resource),
             'messenger' => $this->buildMessenger($resource),
+            'read' => $this->phpize($resource, 'read', 'bool'),
+            'write' => $this->phpize($resource, 'write', 'bool'),
         ];
     }
 
