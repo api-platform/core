@@ -22,6 +22,8 @@ use ApiPlatform\Core\Api\OperationMethodResolverInterface;
 use ApiPlatform\Core\Api\OperationType;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\JsonSchema\SchemaFactory as LegacySchemaFactory;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\ApiResourceToLegacyResourceMetadataTrait;
@@ -36,6 +38,7 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
@@ -94,7 +97,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $formatsProvider;
 
     /**
-     * @var SchemaFactoryInterface
+     * @var SchemaFactoryInterface|LegacySchemaFactoryInterface
      */
     private $jsonSchemaFactory;
     /**
@@ -112,12 +115,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private $legacyMode;
 
     /**
-     * @param SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
-     * @param ContainerInterface|FilterCollection|null                   $filterLocator
-     * @param array|OperationAwareFormatsProviderInterface               $formats
-     * @param mixed|null                                                 $jsonSchemaTypeFactory
-     * @param int[]                                                      $swaggerVersions
-     * @param mixed                                                      $resourceMetadataFactory
+     * @param LegacySchemaFactoryInterface|SchemaFactoryInterface|ResourceClassResolverInterface|null $jsonSchemaFactory
+     * @param ContainerInterface|FilterCollection|null                                                $filterLocator
+     * @param array|OperationAwareFormatsProviderInterface                                            $formats
+     * @param mixed|null                                                                              $jsonSchemaTypeFactory
+     * @param int[]                                                                                   $swaggerVersions
+     * @param mixed                                                                                   $resourceMetadataFactory
      */
     public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, $jsonSchemaFactory = null, $jsonSchemaTypeFactory = null, OperationPathResolverInterface $operationPathResolver = null, UrlGeneratorInterface $urlGenerator = null, $filterLocator = null, NameConverterInterface $nameConverter = null, bool $oauthEnabled = false, string $oauthType = '', string $oauthFlow = '', string $oauthTokenUrl = '', string $oauthAuthorizationUrl = '', array $oauthScopes = [], array $apiKeys = [], SubresourceOperationFactoryInterface $subresourceOperationFactory = null, bool $paginationEnabled = true, string $paginationPageParameterName = 'page', bool $clientItemsPerPage = false, string $itemsPerPageParameterName = 'itemsPerPage', $formats = [], bool $paginationClientEnabled = false, string $paginationClientEnabledParameterName = 'pagination', array $defaultContext = [], array $swaggerVersions = [2, 3], IdentifiersExtractorInterface $identifiersExtractor = null, NormalizerInterface $openApiNormalizer = null, bool $legacyMode = false)
     {
@@ -135,7 +138,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         if (null === $jsonSchemaFactory || $jsonSchemaFactory instanceof ResourceClassResolverInterface) {
-            $jsonSchemaFactory = new SchemaFactory($this->jsonSchemaTypeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $nameConverter);
+            if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+                $jsonSchemaFactory = new LegacySchemaFactory($this->jsonSchemaTypeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $nameConverter);
+            } else {
+                $jsonSchemaFactory = new SchemaFactory($this->jsonSchemaTypeFactory, $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, $nameConverter);
+            }
+
             $this->jsonSchemaTypeFactory->setSchemaFactory($jsonSchemaFactory);
         }
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -730,6 +738,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     {
         $schema = new Schema($v3 ? Schema::VERSION_OPENAPI : Schema::VERSION_SWAGGER);
         $schema->setDefinitions($definitions);
+
+        if ($this->jsonSchemaFactory instanceof SchemaFactoryInterface) {
+            $operation = $operationName ? (new class() extends HttpOperation {})->withName($operationName) : null;
+
+            return $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
+        }
 
         return $this->jsonSchemaFactory->buildSchema($resourceClass, $format, $type, $operationType, $operationName, $schema, $serializerContext, $forceCollection);
     }

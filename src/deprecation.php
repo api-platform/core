@@ -222,7 +222,6 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Core\EventListener\SerializeListener::class => ApiPlatform\Symfony\EventListener\SerializeListener::class,
 
     // Hal
-    ApiPlatform\Core\Hal\JsonSchema\SchemaFactory::class => ApiPlatform\Hal\JsonSchema\SchemaFactory::class,
     ApiPlatform\Core\Hal\Serializer\CollectionNormalizer::class => ApiPlatform\Hal\Serializer\CollectionNormalizer::class,
     ApiPlatform\Core\Hal\Serializer\EntrypointNormalizer::class => ApiPlatform\Hal\Serializer\EntrypointNormalizer::class,
     ApiPlatform\Core\Hal\Serializer\ItemNormalizer::class => ApiPlatform\Hal\Serializer\ItemNormalizer::class,
