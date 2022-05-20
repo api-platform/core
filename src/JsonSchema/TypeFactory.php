@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -41,7 +42,12 @@ final class TypeFactory implements TypeFactoryInterface
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
+    /**
+     * SchemaFactoryInterface|LegacySchemaFactoryInterface.
+     *
+     * @param mixed $schemaFactory
+     */
+    public function setSchemaFactory($schemaFactory): void
     {
         $this->schemaFactory = $schemaFactory;
     }
@@ -148,7 +154,7 @@ final class TypeFactory implements TypeFactoryInterface
             throw new \LogicException('The schema factory must be injected by calling the "setSchemaFactory" method.');
         }
 
-        $subSchema = $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext, false);
+        $subSchema = $this->schemaFactory instanceof LegacySchemaFactoryInterface ? $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, null, $subSchema, $serializerContext, false) : $this->schemaFactory->buildSchema($className, $format, Schema::TYPE_OUTPUT, null, $subSchema, $serializerContext, false);
 
         return ['$ref' => $subSchema['$ref']];
     }

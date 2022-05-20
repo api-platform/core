@@ -62,6 +62,9 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'openapiContext' => [
             'foo' => 'bar',
         ],
+        'jsonSchemaContext' => [
+            'foo' => 'bar',
+        ],
         'push' => true,
         'security' => 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
         'securityPostDenormalize' => 'is_granted(\'ROLE_CUSTOM_ADMIN\')',

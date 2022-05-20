@@ -73,6 +73,7 @@ final class ApiProperty
     private $fetchEager;
     private $jsonldContext;
     private $openapiContext;
+    private $jsonSchemaContext;
     private $push;
     private $security;
     private $securityPostDenormalize;
@@ -132,6 +133,7 @@ final class ApiProperty
         ?bool $fetchEager = null,
         ?array $jsonldContext = null,
         ?array $openapiContext = null,
+        ?array $jsonSchemaContext = null,
         ?bool $push = null,
         ?string $security = null,
         ?string $securityPostDenormalize = null,
@@ -160,6 +162,7 @@ final class ApiProperty
         $this->fetchEager = $fetchEager;
         $this->jsonldContext = $jsonldContext;
         $this->openapiContext = $openapiContext;
+        $this->jsonSchemaContext = $jsonSchemaContext;
         $this->push = $push;
         $this->security = $security;
         $this->openapiContext = $openapiContext;
@@ -350,6 +353,19 @@ final class ApiProperty
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
+
+        return $self;
+    }
+
+    public function getJsonSchemaContext(): ?array
+    {
+        return $this->jsonSchemaContext;
+    }
+
+    public function withJsonSchemaContext($jsonSchemaContext): self
+    {
+        $self = clone $this;
+        $self->jsonSchemaContext = $jsonSchemaContext;
 
         return $self;
     }

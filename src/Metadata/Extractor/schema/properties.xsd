@@ -18,6 +18,7 @@
         <xsd:sequence minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="jsonldContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="openapiContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="jsonSchemaContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="types" minOccurs="0" type="types"/>
             <xsd:element name="builtinTypes" minOccurs="0" type="builtinTypes"/>
             <xsd:element name="schema" minOccurs="0" type="sequenceWithValues"/>

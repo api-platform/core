@@ -14,17 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\JsonSchema;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\NotAResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OverriddenOperationDummy;
 use PHPUnit\Framework\TestCase;
@@ -32,9 +34,6 @@ use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-/**
- * @group legacy
- */
 class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;
@@ -55,7 +54,7 @@ class SchemaFactoryTest extends TestCase
             'type' => 'integer',
         ]);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar']));
@@ -103,20 +102,18 @@ class SchemaFactoryTest extends TestCase
             'type' => 'string',
         ]);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)->willReturn(new ResourceMetadata((new \ReflectionClass(OverriddenOperationDummy::class))->getShortName(), null, null, [
-            'put' => [
-                'normalization_context' => [
-                    'groups' => 'overridden_operation_dummy_put',
-                    AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
-                ],
-                'validation_groups' => ['validation_groups_dummy_put'],
-            ],
-        ], [], [
-            'normalization_context' => [
-                'groups' => 'overridden_operation_dummy_read',
-            ],
-        ]));
+        $shortName = (new \ReflectionClass(OverriddenOperationDummy::class))->getShortName();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $operation = (new Put())->withName('put')->withNormalizationContext([
+            'groups' => 'overridden_operation_dummy_put',
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ])->withShortName($shortName)->withValidationContext(['groups' => ['validation_groups_dummy_put']]);
+        $resourceMetadataFactoryProphecy->create(OverriddenOperationDummy::class)
+                                        ->willReturn(
+                                            new ResourceMetadataCollection(OverriddenOperationDummy::class, [
+                                                (new ApiResource())->withOperations(new Operations(['put' => $operation])),
+                                            ])
+                                        );
 
         $serializerGroup = 'overridden_operation_dummy_put';
         $validationGroups = 'validation_groups_dummy_put';
@@ -141,7 +138,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
 
         $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
-        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, OperationType::ITEM, 'put');
+        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
         $definitions = $resultSchema->getDefinitions();
@@ -193,7 +190,7 @@ class SchemaFactoryTest extends TestCase
             'additionalProperties' => Type::BUILTIN_TYPE_STRING,
         ]);
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar']));
