@@ -95,6 +95,8 @@ class YamlExtractorTest extends TestCase
                     'graphQlOperations' => null,
                     'processor' => null,
                     'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
             ],
             Program::class => [
@@ -160,6 +162,8 @@ class YamlExtractorTest extends TestCase
                     'graphQlOperations' => null,
                     'processor' => null,
                     'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs.{_format}',
@@ -367,6 +371,8 @@ class YamlExtractorTest extends TestCase
                     'graphQlOperations' => null,
                     'processor' => null,
                     'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -432,6 +438,8 @@ class YamlExtractorTest extends TestCase
                     'graphQlOperations' => null,
                     'processor' => null,
                     'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
             ],
         ], $extractor->getResources());
