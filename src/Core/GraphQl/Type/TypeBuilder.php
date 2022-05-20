@@ -54,6 +54,12 @@ final class TypeBuilder implements TypeBuilderInterface
     {
         $shortName = $resourceMetadata->getShortName();
 
+        $ioMetadata = $resourceMetadata->getGraphqlAttribute($subscriptionName ?? $mutationName ?? $queryName, $input ? 'input' : 'output', null, true);
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
+            $resourceClass = $ioMetadata['class'];
+            $shortName = $ioMetadata['name'];
+        }
+
         if (null !== $mutationName) {
             $shortName = $mutationName.ucfirst($shortName);
         }
@@ -91,11 +97,6 @@ final class TypeBuilder implements TypeBuilderInterface
             }
 
             return $resourceObjectType;
-        }
-
-        $ioMetadata = $resourceMetadata->getGraphqlAttribute($subscriptionName ?? $mutationName ?? $queryName, $input ? 'input' : 'output', null, true);
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
         }
 
         $wrapData = !$wrapped && (null !== $mutationName || null !== $subscriptionName) && !$input && $depth < 1;

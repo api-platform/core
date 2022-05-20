@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -50,6 +51,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *     "testCustomArguments"={
  *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
  *         "args"={"operandC"={"type"="Int!"}}
+ *     },
+ *     "testOutput"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
+ *         "output"=OutputDto::class
  *     }
  * })
  *
