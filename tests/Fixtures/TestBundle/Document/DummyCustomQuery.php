@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -46,6 +47,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *             "customArgumentIntArray"={"type"="[Int!]!"},
  *             "customArgumentCustomType"={"type"="DateTime!"}
  *         }
+ *     },
+ *     "testItemOutput"={
+ *         "item_query"="app.graphql.query_resolver.dummy_custom_item",
+ *         "output"=OutputDto::class
  *     },
  *     "testCollection"={
  *         "collection_query"="app.graphql.query_resolver.dummy_custom_collection"
