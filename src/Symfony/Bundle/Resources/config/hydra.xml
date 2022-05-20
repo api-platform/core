@@ -76,12 +76,6 @@
             <argument type="service" id="api_platform.filter_locator" />
         </service>
 
-        <!-- JSON Schema -->
-
-        <service id="api_platform.hydra.json_schema.schema_factory" class="ApiPlatform\Hydra\JsonSchema\SchemaFactory" decorates="api_platform.json_schema.schema_factory">
-            <argument type="service" id="api_platform.hydra.json_schema.schema_factory.inner" />
-        </service>
-
     </services>
 
 </container>

@@ -110,11 +110,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
-        $this->registerOpenApiConfiguration($container, $config);
+        $this->registerOpenApiConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
-        $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config['enable_docs']);
-        $this->registerJsonHalConfiguration($formats, $loader);
+        $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
+        $this->registerJsonHalConfiguration($formats, $loader, $config);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerLegacyBundlesConfiguration($container, $config, $loader);
@@ -470,8 +470,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             throw new RuntimeException('You can not enable the Swagger UI without enabling Swagger, fix this by enabling swagger via the configuration "enable_swagger: true".');
         }
 
-        $loader->load('json_schema.xml');
-
         if (!$config['enable_swagger']) {
             return;
         }
@@ -519,7 +517,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonapi.xml');
     }
 
-    private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, bool $docEnabled): void
+    private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, XmlFileLoader $loader, array $config): void
     {
         if (!isset($formats['jsonld'])) {
             return;
@@ -528,22 +526,34 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
 
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/hydra.xml');
+        } else {
+            $loader->load('v3/hydra.xml');
+        }
+
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
         }
 
-        if (!$docEnabled) {
+        if (!$config['enable_docs']) {
             $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
         }
     }
 
-    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader): void
+    private function registerJsonHalConfiguration(array $formats, XmlFileLoader $loader, array $config): void
     {
         if (!isset($formats['jsonhal'])) {
             return;
         }
 
         $loader->load('hal.xml');
+
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/hal.xml');
+        } else {
+            $loader->load('v3/hal.xml');
+        }
     }
 
     private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void
@@ -899,7 +909,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config): void
+    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         $container->setParameter('api_platform.openapi.termsOfService', $config['openapi']['termsOfService']);
         $container->setParameter('api_platform.openapi.contact.name', $config['openapi']['contact']['name']);
@@ -907,6 +917,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.contact.email', $config['openapi']['contact']['email']);
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
+
+        $loader->load('json_schema.xml');
+
+        if ($config['metadata_backward_compatibility_layer']) {
+            $loader->load('legacy/json_schema.xml');
+        } else {
+            $loader->load('v3/json_schema.xml');
+        }
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

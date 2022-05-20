@@ -61,6 +61,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'fetchEager' => $this->phpize($property, 'fetchEager', 'bool'),
                 'jsonldContext' => isset($property->jsonldContext->values) ? $this->buildValues($property->jsonldContext->values) : null,
                 'openapiContext' => isset($property->openapiContext->values) ? $this->buildValues($property->openapiContext->values) : null,
+                'jsonSchemaContext' => isset($property->jsonSchemaContext->values) ? $this->buildValues($property->jsonSchemaContext->values) : null,
                 'push' => $this->phpize($property, 'push', 'bool'),
                 'security' => $this->phpize($property, 'security', 'string'),
                 'securityPostDenormalize' => $this->phpize($property, 'securityPostDenormalize', 'string'),
@@ -69,6 +70,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'schema' => isset($property->schema->values) ? $this->buildValues($property->schema->values) : null,
                 'initializable' => $this->phpize($property, 'initializable', 'bool'),
                 'extraProperties' => $this->buildExtraProperties($property, 'extraProperties'),
+                'iri' => $this->phpize($property, 'iri', 'bool'),
             ];
         }
     }

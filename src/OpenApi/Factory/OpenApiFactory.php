@@ -174,7 +174,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $operationOutputSchemas = [];
 
             foreach ($responseMimeTypes as $operationFormat) {
-                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, null, $operationName, $schema, null, $forceSchemaCollection);
+                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
                 $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
             }
@@ -259,7 +259,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             } elseif (\in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
-                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, null, $operationName, $schema, null, $forceSchemaCollection);
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
                     $operationInputSchemas[$operationFormat] = $operationInputSchema;
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
