@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Util;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Doctrine\Orm\Util\QueryJoinParser;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
@@ -34,7 +34,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.
      */
     public function testGetClassMetadataFromJoinAliasWithJoinByAssociation(): void
     {
@@ -65,7 +65,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getClassMetadataFromJoinAlias()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper::getEntityClassByAlias()" instead.
      */
     public function testGetClassMetadataFromJoinAliasWithJoinByClass(): void
     {
@@ -88,7 +88,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getJoin()" directly instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getJoin()" directly instead.
      */
     public function testGetJoinRelationshipWithJoin()
     {
@@ -98,7 +98,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getJoin()" directly instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinRelationship()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getJoin()" directly instead.
      */
     public function testGetJoinRelationshipWithClassJoin()
     {
@@ -108,7 +108,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getAlias()" directly instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getAlias()" directly instead.
      */
     public function testGetJoinAliasWithJoin()
     {
@@ -118,7 +118,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getAlias()" directly instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getJoinAlias()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\Join::getAlias()" directly instead.
      */
     public function testGetJoinAliasWithClassJoin()
     {
@@ -128,7 +128,7 @@ class QueryJoinParserTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryJoinParser::getOrderByParts()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\OrderBy::getParts()" directly instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryJoinParser::getOrderByParts()" is deprecated since 2.3 and will be removed in 3.0. Use "Doctrine\ORM\Query\Expr\OrderBy::getParts()" directly instead.
      */
     public function testGetOrderByPartsWithOrderBy()
     {

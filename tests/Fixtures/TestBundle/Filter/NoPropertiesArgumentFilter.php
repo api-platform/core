@@ -19,7 +19,7 @@ final class NoPropertiesArgumentFilter implements FilterInterface
 {
     private $foo;
 
-    public function __construct(string $foo = 'bar')
+    public function __construct($foo = 'bar')
     {
         $this->foo = $foo;
     }

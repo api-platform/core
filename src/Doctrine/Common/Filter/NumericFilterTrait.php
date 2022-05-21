@@ -52,7 +52,7 @@ trait NumericFilterTrait
                     'property' => $propertyName,
                     'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
                     'required' => false,
-                    'is_collection' => '[]' === substr((string) $filterParameterName, -2),
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                 ];
             }
         }
@@ -122,5 +122,3 @@ trait NumericFilterTrait
         return true;
     }
 }
-
-class_alias(NumericFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\NumericFilterTrait::class);

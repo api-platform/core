@@ -13,10 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-class_exists(\ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter::class);
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use Doctrine\ORM\QueryBuilder;
 
-if (false) {
-    class AbstractContextAwareFilter extends \ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter
+abstract class AbstractContextAwareFilter extends AbstractFilter implements ContextAwareFilterInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
+        if (!isset($context['filters']) || !\is_array($context['filters'])) {
+            parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+
+            return;
+        }
+
+        foreach ($context['filters'] as $property => $value) {
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+        }
     }
 }

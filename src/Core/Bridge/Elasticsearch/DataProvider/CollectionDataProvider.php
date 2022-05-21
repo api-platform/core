@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Elasticsearch\DataProvider;
 
 use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
+use ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Extension\RequestBodySearchCollectionExtensionInterface as LegacyRequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\ContextAwareCollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\Pagination as LegacyPagination;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
@@ -46,9 +47,9 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
     private $resourceMetadataFactory;
 
     /**
-     * @param RequestBodySearchCollectionExtensionInterface[]                             $collectionExtensions
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     * @param Pagination|LegacyPagination                                                 $pagination
+     * @param LegacyRequestBodySearchCollectionExtensionInterface[]|RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
+     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface                           $resourceMetadataFactory
+     * @param Pagination|LegacyPagination                                                                           $pagination
      */
     public function __construct(Client $client, DocumentMetadataFactoryInterface $documentMetadataFactory, IdentifierExtractorInterface $identifierExtractor = null, DenormalizerInterface $denormalizer, $pagination, $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
@@ -117,7 +118,13 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
-            $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
+            if ($collectionExtension instanceof LegacyRequestBodySearchCollectionExtensionInterface) {
+                $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
+            }
+
+            if ($collectionExtension instanceof RequestBodySearchCollectionExtensionInterface) {
+                $body = $collectionExtension->applyToCollection($body, $resourceClass, $context['operation'] ?? null, $context);
+            }
         }
 
         if (!isset($body['query']) && !isset($body['aggs'])) {

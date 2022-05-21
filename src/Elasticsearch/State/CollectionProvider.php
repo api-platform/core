@@ -64,15 +64,15 @@ final class CollectionProvider implements ProviderInterface
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
-            $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
+            $body = $collectionExtension->applyToCollection($body, $resourceClass, $operation, $context);
         }
 
         if (!isset($body['query']) && !isset($body['aggs'])) {
             $body['query'] = ['match_all' => new \stdClass()];
         }
 
-        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName, $context);
-        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($resourceClass, $operationName, $context);
+        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($operation, $context);
+        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($operation, $context);
 
         $params = [
             'index' => $documentMetadata->getIndex(),

@@ -14,6 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as LegacyQueryCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface as LegacyQueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface as LegacyQueryResultCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface as LegacyQueryResultItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -45,8 +49,8 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     private $itemExtensions;
 
     /**
-     * @param QueryCollectionExtensionInterface[] $collectionExtensions
-     * @param QueryItemExtensionInterface[]       $itemExtensions
+     * @param LegacyQueryCollectionExtensionInterface[]|QueryCollectionExtensionInterface[] $collectionExtensions
+     * @param LegacyQueryItemExtensionInterface[]|QueryItemExtensionInterface[]             $itemExtensions
      */
     public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {
@@ -100,16 +104,34 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
                     continue;
                 }
 
-                $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
-                if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                    return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
+                if ($extension instanceof LegacyQueryCollectionExtensionInterface) {
+                    $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context); // @phpstan-ignore-line see context aware
+                } elseif ($extension instanceof QueryCollectionExtensionInterface) {
+                    $extension->applyToCollection($queryBuilder, $queryNameGenerator, $resourceClass, $context['operation'] ?? null, $context);
+                }
+
+                if ($extension instanceof LegacyQueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) { // @phpstan-ignore-line see context aware
+                    return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context); // @phpstan-ignore-line see context aware
+                }
+
+                if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                    return $extension->getResult($queryBuilder, $resourceClass, $context['operation'] ?? null, $context);
                 }
             }
         } else {
             foreach ($this->itemExtensions as $extension) {
-                $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
-                if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                    return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
+                if ($extension instanceof LegacyQueryItemExtensionInterface) {
+                    $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
+                } elseif ($extension instanceof QueryItemExtensionInterface) {
+                    $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $context['operation'] ?? null, $context);
+                }
+
+                if ($extension instanceof LegacyQueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) { // @phpstan-ignore-line see context aware
+                    return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context); // @phpstan-ignore-line see context aware
+                }
+
+                if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                    return $extension->getResult($queryBuilder, $resourceClass, $context['operation'], $context);
                 }
             }
         }

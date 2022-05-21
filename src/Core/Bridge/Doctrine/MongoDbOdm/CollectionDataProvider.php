@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface as LegacyAggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultCollectionExtensionInterface as LegacyAggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
@@ -41,8 +43,8 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
     private $collectionExtensions;
 
     /**
-     * @param AggregationCollectionExtensionInterface[]                                   $collectionExtensions
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param LegacyAggregationCollectionExtensionInterface[]|AggregationCollectionExtensionInterface[] $collectionExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface               $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, iterable $collectionExtensions = [])
     {
@@ -74,10 +76,18 @@ final class CollectionDataProvider implements CollectionDataProviderInterface, R
 
         $aggregationBuilder = $repository->createAggregationBuilder();
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof LegacyAggregationCollectionExtensionInterface) {
+                $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
+            } elseif ($extension instanceof AggregationCollectionExtensionInterface) {
+                $extension->applyToCollection($aggregationBuilder, $resourceClass, $context['operation'] ?? null, $context);
+            }
 
-            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+            if ($extension instanceof LegacyAggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+            }
+
+            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $context['operation'] ?? null, $context);
             }
         }
 

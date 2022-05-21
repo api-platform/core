@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\Orm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface as LegacyQueryItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface as LegacyQueryResultItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -45,8 +47,8 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
     private $itemExtensions;
 
     /**
-     * @param QueryItemExtensionInterface[]                   $itemExtensions
-     * @param ResourceMetadataCollectionFactoryInterface|null $resourceMetadataFactory
+     * @param LegacyQueryItemExtensionInterface[]|QueryItemExtensionInterface[] $itemExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|null                   $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [], $resourceMetadataFactory = null)
     {
@@ -104,10 +106,20 @@ class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProviderIn
         $this->addWhereForIdentifiers($identifiers, $queryBuilder, $doctrineClassMetadata, $queryNameGenerator);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
+            if ($extension instanceof LegacyQueryItemExtensionInterface) {
+                $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $operationName, $context);
+            }
 
-            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
-                return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context);
+            if ($extension instanceof QueryItemExtensionInterface) {
+                $extension->applyToItem($queryBuilder, $queryNameGenerator, $resourceClass, $identifiers, $context['operation'] ?? null, $context);
+            }
+
+            if ($extension instanceof LegacyQueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) { // @phpstan-ignore-line because of context
+                return $extension->getResult($queryBuilder, $resourceClass, $operationName, $context); // @phpstan-ignore-line because of context
+            }
+
+            if ($extension instanceof QueryResultItemExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                return $extension->getResult($queryBuilder, $resourceClass, $context['operation'] ?? null, $context);
             }
         }
 

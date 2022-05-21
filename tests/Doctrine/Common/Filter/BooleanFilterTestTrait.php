@@ -18,7 +18,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait BooleanFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildFilter([
             'id' => null,
@@ -36,7 +36,7 @@ trait BooleanFilterTestTrait
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 

@@ -1086,7 +1086,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $bundles = $this->container->getParameter('kernel.bundles');
 
-        if (!isset($bundles['FOSUserBundle'])) {
+        if (!isset($bundles['FOSUserBundle'])) { // @phpstan-ignore-line
             $this->markTestSkipped('bundle FOSUserBundle does not exist');
         }
 
@@ -1109,7 +1109,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $bundles = $this->container->getParameter('kernel.bundles');
 
-        if (!isset($bundles['NelmioApiDocBundle'])) {
+        if (!isset($bundles['NelmioApiDocBundle'])) { // @phpstan-ignore-line
             $this->markTestSkipped('bundle NelmioApiDocBundle does not exist');
         }
 
@@ -1601,7 +1601,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.elasticsearch.metadata.document.metadata_factory.attribute',
             'api_platform.elasticsearch.metadata.document.metadata_factory.cat',
             'api_platform.elasticsearch.metadata.document.metadata_factory.cached',
-            'api_platform.elasticsearch.identifier_extractor',
             'api_platform.elasticsearch.name_converter.inner_fields',
             'api_platform.elasticsearch.normalizer.item',
             'api_platform.elasticsearch.normalizer.document',
@@ -1621,7 +1620,6 @@ class ApiPlatformExtensionTest extends TestCase
             // elasticsearch.xml
             'api_platform.elasticsearch.metadata.document.metadata_factory',
             'ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface',
-            'ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface',
             'ApiPlatform\Elasticsearch\Filter\TermFilter',
             'ApiPlatform\Elasticsearch\Filter\MatchFilter',
             'ApiPlatform\Elasticsearch\Filter\OrderFilter',

@@ -62,7 +62,7 @@ final class TypeBuilder implements TypeBuilderInterface
         $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
-            $shortName = $ioMetadata['name'];
+            $shortName = $ioMetadata['name'] ?? $shortName;
         }
 
         if ($operation instanceof Mutation) {
@@ -221,10 +221,10 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType
     {
         $shortName = $resourceType->name;
-        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $operationName);
+        $paginationType = $this->pagination->getGraphQlPaginationType($operation);
 
         $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
         if ($this->typesContainer->has($connectionTypeKey)) {

@@ -287,7 +287,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(NormalizerInterface::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            new \ArrayObject()
+            new \ArrayObject() // @phpstan-ignore-line
         );
     }
 

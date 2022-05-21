@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -57,9 +56,6 @@ class TypeBuilderTest extends TestCase
     /** @var ObjectProphecy */
     private $fieldsBuilderLocatorProphecy;
 
-    /** @var ObjectProphecy */
-    private $resourceMetadataCollectionFactoryProphecy;
-
     /** @var TypeBuilder */
     private $typeBuilder;
 
@@ -72,12 +68,11 @@ class TypeBuilderTest extends TestCase
         $this->defaultFieldResolver = function () {
         };
         $this->fieldsBuilderLocatorProphecy = $this->prophesize(ContainerInterface::class);
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $this->typeBuilder = new TypeBuilder(
             $this->typesContainerProphecy->reveal(),
             $this->defaultFieldResolver,
             $this->fieldsBuilderLocatorProphecy->reveal(),
-            new Pagination($this->resourceMetadataCollectionFactoryProphecy->reveal())
+            new Pagination()
         );
     }
 
@@ -483,18 +478,15 @@ class TypeBuilderTest extends TestCase
 
     public function testCursorBasedGetResourcePaginatedCollectionType(): void
     {
+        /** @var Operation */
+        $operation = (new Query())->withPaginationType('cursor');
         $this->typesContainerProphecy->has('StringCursorConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringCursorConnection', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
-        $this->resourceMetadataCollectionFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('StringResourceClass', [
-            (new ApiResource())->withGraphQlOperations([
-                'operationName' => (new Query())->withPaginationType('cursor'),
-            ]),
-        ]));
 
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', $operation);
         $this->assertSame('StringCursorConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Cursor connection for String.', $resourcePaginatedCollectionType->description);
 
@@ -542,18 +534,14 @@ class TypeBuilderTest extends TestCase
 
     public function testPageBasedGetResourcePaginatedCollectionType(): void
     {
+        /** @var Operation $operation */
+        $operation = (new Query())->withPaginationType('page');
         $this->typesContainerProphecy->has('StringPageConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringPageConnection', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
 
-        $this->resourceMetadataCollectionFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('StringResourceClass', [
-            (new ApiResource())->withGraphQlOperations([
-                'operationName' => (new Query())->withPaginationType('page'),
-            ]),
-        ]));
-
         /** @var ObjectType $resourcePaginatedCollectionType */
-        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', 'operationName');
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(GraphQLType::string(), 'StringResourceClass', $operation);
         $this->assertSame('StringPageConnection', $resourcePaginatedCollectionType->name);
         $this->assertSame('Page connection for String.', $resourcePaginatedCollectionType->description);
 

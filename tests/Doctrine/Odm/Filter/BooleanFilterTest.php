@@ -20,7 +20,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 
 /**
  * @group mongodb
- * @group legacy
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */

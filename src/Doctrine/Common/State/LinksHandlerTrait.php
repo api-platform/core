@@ -42,7 +42,7 @@ trait LinksHandlerTrait
             }
         }
 
-        // Using graphql, it's possible that we won't find a graphql operation of the same type (eg it is disabled).
+        // Using GraphQL, it's possible that we won't find a GraphQL Operation of the same type (e.g. it is disabled).
         try {
             $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($linkClass);
             $linkedOperation = $resourceMetadataCollection->getOperation($operation->getName());
@@ -51,7 +51,7 @@ trait LinksHandlerTrait
                 throw $e;
             }
 
-            // Instead we'll look for the first Query available
+            // Instead, we'll look for the first Query available.
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getGraphQlOperations() as $operation) {
                     if ($operation instanceof Query) {

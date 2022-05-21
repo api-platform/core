@@ -139,5 +139,3 @@ trait RangeFilterTrait
         return $value + 0; // coerce $value to the right type.
     }
 }
-
-class_alias(RangeFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class);
