@@ -11,21 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\Filter;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Filter;
 
-use ApiPlatform\Api\FilterInterface as BaseFilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Doctrine ORM filter interface.
+ * Context aware filter.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface FilterInterface extends BaseFilterInterface
+interface ContextAwareFilterInterface extends FilterInterface
 {
     /**
-     * Applies the filter.
+     * {@inheritdoc}
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = []);
 }

@@ -42,9 +42,6 @@ return [
     ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface::class => ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface::class,
     ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryResultItemExtensionInterface::class => ApiPlatform\Doctrine\Orm\Extension\QueryResultItemExtensionInterface::class,
 
-    ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ContextAwareFilterInterface::class => ApiPlatform\Doctrine\Orm\Filter\ContextAwareFilterInterface::class,
-    ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface::class => ApiPlatform\Doctrine\Orm\Filter\FilterInterface::class,
-
     ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface::class => ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface::class,
 
     // Bridge\Elasticsearch => Elasticsearch

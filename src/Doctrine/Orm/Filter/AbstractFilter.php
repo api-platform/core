@@ -60,16 +60,24 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null/* , array $context = [] */)
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
     {
-        @trigger_error(sprintf('Using "%s::apply()" is deprecated since 2.2. Use "%s::apply()" with the "filters" context key instead.', __CLASS__, AbstractContextAwareFilter::class), \E_USER_DEPRECATED);
+        if (!isset($context['filters']) || !\is_array($context['filters'])) {
+            @trigger_error(sprintf('Using "%s::apply()" is deprecated since 2.2. Use "%s::apply()" with the "filters" context key instead.', __CLASS__, AbstractContextAwareFilter::class), \E_USER_DEPRECATED);
 
-        if (null === $this->requestStack || null === $request = $this->requestStack->getCurrentRequest()) {
+            if (null === $this->requestStack || null === $request = $this->requestStack->getCurrentRequest()) {
+                return;
+            }
+
+            foreach ($this->extractProperties($request, $resourceClass) as $property => $value) {
+                $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+            }
+
             return;
         }
 
-        foreach ($this->extractProperties($request, $resourceClass) as $property => $value) {
-            $this->filterProperty($property, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName);
+        foreach ($context['filters'] as $property => $value) {
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
         }
     }
 

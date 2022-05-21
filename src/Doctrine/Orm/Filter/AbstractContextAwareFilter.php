@@ -16,7 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use Doctrine\ORM\QueryBuilder;
 
-abstract class AbstractContextAwareFilter extends AbstractFilter implements ContextAwareFilterInterface
+abstract class AbstractContextAwareFilter extends AbstractFilter implements FilterInterface
 {
     /**
      * {@inheritdoc}
