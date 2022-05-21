@@ -78,7 +78,7 @@ final class LegacyPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
             $wither = str_replace(['get', 'is'], 'with', $method);
 
-            if (method_exists($propertyMetadata, $wither) && null !== $legacyPropertyMetadata->{$method}()) {
+            if (method_exists($propertyMetadata, $wither) && null !== $legacyPropertyMetadata->{$method}() && null === $propertyMetadata->{$method}()) {
                 $propertyMetadata = $propertyMetadata->{$wither}($legacyPropertyMetadata->{$method}());
             }
         }
