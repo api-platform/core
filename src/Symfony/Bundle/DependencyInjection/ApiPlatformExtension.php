@@ -637,7 +637,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
 
             $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
+            $container->register('api_platform.cache.metadata.property.legacy', ArrayAdapter::class);
             $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
+            $container->register('api_platform.cache.metadata.resource.legacy', ArrayAdapter::class);
+            $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class);
             $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
             $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
             $container->register('api_platform.cache.subresource_operation_factory', ArrayAdapter::class);
