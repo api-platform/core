@@ -42,6 +42,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Config\FileLocator;
@@ -500,6 +501,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->hasParameter('kernel.debug') || !$container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.cache_warmer.cache_pool_clearer');
         }
+
+        $container->register('api_platform.cache.metadata.property', ArrayAdapter::class);
+        $container->register('api_platform.cache.metadata.resource', ArrayAdapter::class);
+        $container->register('api_platform.cache.metadata.resource_collection', ArrayAdapter::class);
+        $container->register('api_platform.cache.route_name_resolver', ArrayAdapter::class);
+        $container->register('api_platform.cache.identifiers_extractor', ArrayAdapter::class);
+        $container->register('api_platform.elasticsearch.cache.metadata.document', ArrayAdapter::class);
     }
 
     private function registerDoctrineOrmConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
