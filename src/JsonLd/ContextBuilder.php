@@ -230,7 +230,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 $id = $propertyMetadata->getIri();
             } else {
                 $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
-                $id = $propertyMetadata->getTypes()[0] ?? null;
+
+                if ($id = $propertyMetadata->getIris()) {
+                    $id = 1 === \count($id) ? $id[0] : $id;
+                }
             }
 
             if (!$id) {

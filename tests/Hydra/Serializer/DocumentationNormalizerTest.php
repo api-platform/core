@@ -103,7 +103,7 @@ class DocumentationNormalizerTest extends TestCase
         $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'nameConverted', 'relatedDummy']));
+        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'nameConverted', 'relatedDummy', 'iri']));
 
         if ($resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
             $propertyMetadataFactoryProphecy = $this->prophesize(LegacyPropertyMetadataFactoryInterface::class);
@@ -117,6 +117,7 @@ class DocumentationNormalizerTest extends TestCase
                 (new PropertyMetadata())->withType(new Type(Type::BUILTIN_TYPE_STRING))->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
             );
             $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new PropertyMetadata())->withType(new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy')))->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+            $propertyMetadataFactoryProphecy->create('dummy', 'iri', Argument::type('array'))->shouldBeCalled()->willReturn((new PropertyMetadata())->withIri('https://schema.org/Dummy'));
         } else {
             $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
             $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
@@ -129,6 +130,7 @@ class DocumentationNormalizerTest extends TestCase
                 (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
             );
             $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy'))])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+            $propertyMetadataFactoryProphecy->create('dummy', 'iri', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withIris(['https://schema.org/Dummy']));
         }
 
         $subresourceOperationFactoryProphecy = null;
@@ -272,6 +274,19 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:readable' => true,
                             'hydra:writeable' => true,
                             'hydra:description' => 'This is a name.',
+                        ],
+                        [
+                            '@type' => 'hydra:SupportedProperty',
+                            'hydra:property' => [
+                                '@id' => 'https://schema.org/Dummy',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'iri',
+                                'domain' => '#dummy',
+                            ],
+                            'hydra:title' => 'iri',
+                            'hydra:required' => null,
+                            'hydra:readable' => null,
+                            'hydra:writeable' => false,
                         ],
                     ],
                     'hydra:supportedOperation' => [

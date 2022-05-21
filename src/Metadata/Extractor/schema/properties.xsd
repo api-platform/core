@@ -20,6 +20,7 @@
             <xsd:element name="openapiContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="jsonSchemaContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="types" minOccurs="0" type="types"/>
+            <xsd:element name="iris" minOccurs="0" type="iris"/>
             <xsd:element name="builtinTypes" minOccurs="0" type="builtinTypes"/>
             <xsd:element name="schema" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="extraProperties" minOccurs="0" type="sequenceWithValues"/>
@@ -42,7 +43,6 @@
         <xsd:attribute name="security" type="xsd:string"/>
         <xsd:attribute name="securityPostDenormalize" type="xsd:string"/>
         <xsd:attribute name="initializable" type="xsd:boolean"/>
-        <xsd:attribute name="iri" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="types">
@@ -52,6 +52,18 @@
     </xsd:complexType>
 
     <xsd:simpleType name="type">
+        <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:complexType name="iris">
+        <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="iri" maxOccurs="unbounded" type="iri"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:simpleType name="iri">
         <xsd:restriction base="xsd:string">
             <xsd:minLength value="1"/>
         </xsd:restriction>

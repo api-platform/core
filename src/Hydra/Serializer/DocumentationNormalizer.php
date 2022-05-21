@@ -622,10 +622,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     private function getProperty($propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
-        $iri = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getIri() : ($propertyMetadata->getTypes()[0] ?? null);
+        if ($propertyMetadata instanceof PropertyMetadata) {
+            $iri = $propertyMetadata->getIri();
+        } else {
+            if ($iri = $propertyMetadata->getIris()) {
+                $iri = 1 === \count($iri) ? $iri[0] : $iri;
+            }
+        }
+
+        if (!isset($iri)) {
+            $iri = "#$shortName/$propertyName";
+        }
 
         $propertyData = [
-            '@id' => $iri ?? "#$shortName/$propertyName",
+            '@id' => $iri,
             '@type' => false === $propertyMetadata->isReadableLink() ? 'hydra:Link' : 'rdf:Property',
             'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,
