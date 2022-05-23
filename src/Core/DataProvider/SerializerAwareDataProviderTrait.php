@@ -37,6 +37,7 @@ trait SerializerAwareDataProviderTrait
 
     private function getSerializer(): SerializerInterface
     {
+        /* @var SerializerInterface */
         return $this->serializerLocator->get('serializer');
     }
 }
