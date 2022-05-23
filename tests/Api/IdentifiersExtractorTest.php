@@ -243,7 +243,7 @@ class IdentifiersExtractorTest extends TestCase
 
     private function getMetadataFactoryProphecies($class, $identifiers, array $prophecies = null)
     {
-        //adds a random property that is not an identifier
+        // adds a random property that is not an identifier
         $properties = array_merge(['foo'], $identifiers);
 
         if (!$prophecies) {

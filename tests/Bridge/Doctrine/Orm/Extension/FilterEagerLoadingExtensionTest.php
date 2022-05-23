@@ -232,7 +232,9 @@ SQL;
             ->from(DummyCar::class, 'o')
             ->leftJoin('o.colors', 'colors', 'ON', 'o.id = colors.car AND colors.id IN (1,2,3)')
             ->where('o.colors = :foo')
-            ->setParameter('foo', 1);
+            ->andWhere('o.info.name = :bar')
+            ->setParameter('foo', 1)
+            ->setParameter('bar', 'a');
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
@@ -248,7 +250,7 @@ LEFT JOIN o.colors colors ON o.id = colors.car AND colors.id IN (1,2,3)
 WHERE o IN(
   SELECT o_2 FROM ApiPlatform\Core\Tests\Fixtures\TestBundle\Entity\DummyCar o_2
   LEFT JOIN o_2.colors colors_2 ON o_2.id = colors_2.car AND colors_2.id IN (1,2,3)
-  WHERE o_2.colors = :foo
+  WHERE o_2.colors = :foo AND o_2.info.name = :bar
 )
 SQL;
 
