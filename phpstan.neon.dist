@@ -369,9 +369,6 @@ parameters:
 		- 
 			message: "#^Unreachable statement - code above always terminates.$#"
 			path: tests
-		- 
-			message: "#^Unreachable statement - code above always terminates.$#"
-			path: src/Core/Bridge/Doctrine/EventListener/PublishMercureUpdatesListener.php
 		-
 			message: "#Access to an undefined static property static\\([^)]+\\)::\\$container.$#"
 			path: tests

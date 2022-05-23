@@ -289,8 +289,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
+    /**
+     * @return \ArrayObject<Model\MediaType>
+     */
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
     {
+        /** @var \ArrayObject<Model\MediaType> */
         $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
@@ -368,10 +372,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#linkObject.
      *
-     * return Model\Link[]
+     * @return \ArrayObject<Model\Link>
      */
     private function getLinks(ResourceMetadataCollection $resourceMetadataCollection, HttpOperation $currentOperation): \ArrayObject
     {
+        /** @var \ArrayObject<Model\Link> */
         $links = new \ArrayObject();
 
         // Only compute get links for now

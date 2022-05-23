@@ -26,6 +26,7 @@ class BookTestDeprecatedClient extends ApiTestCase
 
     protected function setup(): void
     {
+        /* @phpstan-ignore-next-line */
         $this->client = static::createClient();
     }
 

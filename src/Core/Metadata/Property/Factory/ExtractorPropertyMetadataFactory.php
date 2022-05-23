@@ -17,6 +17,7 @@ use ApiPlatform\Core\Exception\PropertyNotFoundException;
 use ApiPlatform\Core\Metadata\Extractor\ExtractorInterface;
 use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
 use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
+use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -29,7 +30,10 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     private $extractor;
     private $decorated;
 
-    public function __construct(ExtractorInterface $extractor, PropertyMetadataFactoryInterface $decorated = null)
+    /**
+     * @param ResourceExtractorInterface|ExtractorInterface $extractor
+     */
+    public function __construct($extractor, PropertyMetadataFactoryInterface $decorated = null)
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;

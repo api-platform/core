@@ -46,6 +46,7 @@ final class AnnotationPropertyNameCollectionFactory implements PropertyNameColle
 
         if ($this->decorated) {
             try {
+                /** @var PropertyNameCollection */
                 $propertyNameCollection = $this->decorated->create($resourceClass, $options);
             } catch (ResourceClassNotFoundException $resourceClassNotFoundException) {
                 // Ignore not found exceptions from decorated factory
