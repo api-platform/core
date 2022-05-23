@@ -104,7 +104,7 @@ class ApiPlatformExtensionTest extends TestCase
             'enabled' => true,
         ],
         'defaults' => [
-            'attributes' => [],
+            'extra_properties' => [],
             'url_generation_strategy' => UrlGeneratorInterface::ABS_URL,
         ],
         'collection' => [
@@ -1872,11 +1872,11 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['defaults'] = [
             'something' => 'test',
-            'attributes' => ['else' => 'foo'],
+            'extra_properties' => ['else' => 'foo'],
         ];
 
         (new ApiPlatformExtension())->load($config, $this->container);
 
-        $this->assertEquals($this->container->getParameter('api_platform.defaults'), ['attributes' => ['else' => 'foo', 'something' => 'test']]);
+        $this->assertEquals($this->container->getParameter('api_platform.defaults'), ['extra_properties' => ['else' => 'foo', 'something' => 'test']]);
     }
 }

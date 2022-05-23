@@ -15,7 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -36,6 +36,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
@@ -276,13 +277,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function normalizeDefaults(array $defaults, bool $compatibility = false): array
     {
-        $normalizedDefaults = ['attributes' => $defaults['attributes'] ?? []];
-        unset($defaults['attributes']);
+        $key = $compatibility ? 'attributes' : 'extra_properties';
+        $normalizedDefaults = [$key => $defaults[$key] ?? []];
+        unset($defaults[$key]);
 
         $publicProperties = [];
 
         if ($compatibility) {
-            [$publicProperties,] = ApiResource::getConfigMetadata();
+            [$publicProperties,] = ApiResourceAnnotation::getConfigMetadata();
         } else {
             $rc = new \ReflectionClass(ApiResource::class);
             foreach ($rc->getConstructor()->getParameters() as $param) {
@@ -298,7 +300,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 continue;
             }
 
-            $normalizedDefaults['attributes'][$option] = $value;
+            $normalizedDefaults[$key][$option] = $value;
         }
 
         return $normalizedDefaults;
