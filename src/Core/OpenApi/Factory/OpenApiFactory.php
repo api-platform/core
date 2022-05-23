@@ -300,6 +300,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
     {
+        /** @var \ArrayObject<Model\MediaType> */
         $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
