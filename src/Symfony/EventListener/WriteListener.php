@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Api\UriVariablesConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -44,7 +45,7 @@ final class WriteListener
     private $processor;
     private $iriConverter;
 
-    public function __construct(ProcessorInterface $processor, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver)
+    public function __construct(ProcessorInterface $processor, IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, ?UriVariablesConverterInterface $uriVariablesConverter = null)
     {
         $this->processor = $processor;
         $this->iriConverter = $iriConverter;
@@ -52,6 +53,7 @@ final class WriteListener
         // TODO 3.0: see ResourceClassInfoTrait
         $this->resourceMetadataFactory = $resourceMetadataCollectionFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->uriVariablesConverter = $uriVariablesConverter;
     }
 
     /**
