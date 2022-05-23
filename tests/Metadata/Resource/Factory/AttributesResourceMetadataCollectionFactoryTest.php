@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeDefaultOperations;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResources;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExtraPropertiesResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProcessor;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider;
 use PHPUnit\Framework\TestCase;
@@ -186,5 +187,14 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                 paginationItemsPerPage: 10
             ),
         ]), $attributeResourceMetadataCollectionFactory->create(AttributeDefaultOperations::class));
+    }
+
+    public function testExtraProperties(): void
+    {
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();
+        $extraPropertiesResource = $attributeResourceMetadataCollectionFactory->create(ExtraPropertiesResource::class);
+
+        $this->assertEquals($extraPropertiesResource[0]->getExtraProperties(), ['foo' => 'bar']);
+        $this->assertEquals($extraPropertiesResource->getOperation('_api_ExtraPropertiesResource_get')->getExtraProperties(), ['foo' => 'bar']);
     }
 }

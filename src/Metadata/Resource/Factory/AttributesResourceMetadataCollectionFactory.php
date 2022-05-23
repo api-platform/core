@@ -194,6 +194,8 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
+        $operation = $operation->withExtraProperties(array_merge($resource->getExtraProperties(), $operation->getExtraProperties()));
+
         // Add global defaults attributes to the operation
         $operation = $this->addGlobalDefaults($operation);
 
