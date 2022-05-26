@@ -41,7 +41,7 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'security',
         'securityPostDenormalize',
         'initializable',
-        'iri',
+        'iris',
     ];
 
     /**
@@ -104,6 +104,14 @@ XML
         $node = $resource->addChild('types');
         foreach ($values as $value) {
             $node->addChild('type', $value);
+        }
+    }
+
+    private function buildIris(\SimpleXMLElement $resource, array $values): void
+    {
+        $node = $resource->addChild('iris');
+        foreach ($values as $value) {
+            $node->addChild('iri', $value);
         }
     }
 

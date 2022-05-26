@@ -82,7 +82,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                     'security' => $this->phpize($propertyValues, 'security', 'string'),
                     'securityPostDenormalize' => $this->phpize($propertyValues, 'securityPostDenormalize', 'string'),
                     'initializable' => $this->phpize($propertyValues, 'initializable', 'bool'),
-                    'iri' => $this->phpize($propertyValues, 'iri', 'bool'),
+                    'iris' => $this->buildAttribute($propertyValues, 'iris'),
                     'jsonldContext' => $this->buildAttribute($propertyValues, 'jsonldContext'),
                     'openapiContext' => $this->buildAttribute($propertyValues, 'openapiContext'),
                     'jsonSchemaContext' => $this->buildAttribute($propertyValues, 'jsonSchemaContext'),

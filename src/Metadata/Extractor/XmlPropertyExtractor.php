@@ -70,7 +70,7 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'schema' => isset($property->schema->values) ? $this->buildValues($property->schema->values) : null,
                 'initializable' => $this->phpize($property, 'initializable', 'bool'),
                 'extraProperties' => $this->buildExtraProperties($property, 'extraProperties'),
-                'iri' => $this->phpize($property, 'iri', 'bool'),
+                'iris' => $this->buildArrayValue($property, 'iri'),
             ];
         }
     }

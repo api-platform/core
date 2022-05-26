@@ -63,7 +63,7 @@ final class LegacyPropertyMetadataFactory implements PropertyMetadataFactoryInte
                     continue;
                 }
 
-                $propertyMetadata = $propertyMetadata->withTypes([$legacyPropertyMetadata->getIri()]);
+                $propertyMetadata = $propertyMetadata->withIris([$legacyPropertyMetadata->getIri()]);
                 continue;
             }
 
