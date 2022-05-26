@@ -15,6 +15,15 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\Core\Api\OperationMethodResolverInterface;
+use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Core\Metadata\Property\PropertyMetadata;
+use ApiPlatform\Core\Metadata\Property\SubresourceMetadata;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Core\Operation\Factory\SubresourceOperationFactoryInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\ApiProperty;
@@ -24,7 +33,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\PropertyInfo\Type;
@@ -42,20 +50,44 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 {
     public const FORMAT = 'jsonld';
 
+    /**
+     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
+     */
     private $resourceMetadataFactory;
     private $propertyNameCollectionFactory;
+
+    /**
+     * @var PropertyMetadataFactoryInterface|LegacyPropertyMetadataFactoryInterface
+     */
     private $propertyMetadataFactory;
     private $resourceClassResolver;
+    private $operationMethodResolver;
     private $urlGenerator;
+    private $subresourceOperationFactory;
     private $nameConverter;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, UrlGeneratorInterface $urlGenerator, NameConverterInterface $nameConverter = null)
+    public function __construct($resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, OperationMethodResolverInterface $operationMethodResolver = null, UrlGeneratorInterface $urlGenerator, SubresourceOperationFactoryInterface $subresourceOperationFactory = null, NameConverterInterface $nameConverter = null)
     {
+        if ($operationMethodResolver) {
+            @trigger_error(sprintf('Passing an instance of %s to %s() is deprecated since version 2.5 and will be removed in 3.0.', OperationMethodResolverInterface::class, __METHOD__), \E_USER_DEPRECATED);
+        }
+
         $this->resourceMetadataFactory = $resourceMetadataFactory;
+
+        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
+        }
+
+        if ($subresourceOperationFactory) {
+            trigger_deprecation('api-platform/core', '2.7', sprintf('Using "%s" is deprecated and will be removed.', SubresourceOperationFactoryInterface::class));
+        }
+
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->operationMethodResolver = $operationMethodResolver;
         $this->urlGenerator = $urlGenerator;
+        $this->subresourceOperationFactory = $subresourceOperationFactory;
         $this->nameConverter = $nameConverter;
     }
 
@@ -71,10 +103,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         foreach ($object->getResourceNameCollection() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
+
+            if ($resourceMetadataCollection instanceof ResourceMetadata) {
+                $shortName = $resourceMetadataCollection->getShortName();
+                $prefixedShortName = $resourceMetadataCollection->getIri() ?? "#$shortName";
+
+                $this->populateEntrypointProperties($resourceClass, $resourceMetadataCollection, $shortName, $prefixedShortName, $entrypointProperties);
+                $classes[] = $this->getClass($resourceClass, $resourceMetadataCollection, $shortName, $prefixedShortName, $context);
+                continue;
+            }
+
             $resourceMetadata = $resourceMetadataCollection[0];
             $shortName = $resourceMetadata->getShortName();
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
-            $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $resourceMetadataCollection);
+            $this->populateEntrypointProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $resourceMetadataCollection);
         }
 
@@ -83,10 +125,12 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Populates entrypoint properties.
+     *
+     * @param ResourceMetadata|ApiResource $resourceMetadata
      */
-    private function populateEntrypointProperties(ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null)
+    private function populateEntrypointProperties(string $resourceClass, $resourceMetadata, string $shortName, string $prefixedShortName, array &$entrypointProperties, ?ResourceMetadataCollection $resourceMetadataCollection = null)
     {
-        $hydraCollectionOperations = $this->getHydraOperations(true, $resourceMetadataCollection);
+        $hydraCollectionOperations = $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, true, $resourceMetadataCollection);
         if (empty($hydraCollectionOperations)) {
             return;
         }
@@ -114,7 +158,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'hydra:writeable' => false,
         ];
 
-        if ($resourceMetadata->getDeprecationReason()) {
+        if ($resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getCollectionOperationAttribute('GET', 'deprecation_reason', null, true) : $resourceMetadata->getDeprecationReason()) {
             $entrypointProperty['owl:deprecated'] = true;
         }
 
@@ -123,11 +167,18 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets a Hydra class.
+     *
+     * @param ResourceMetadata|ApiResource $resourceMetadata
      */
-    private function getClass(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
+    private function getClass(string $resourceClass, $resourceMetadata, string $shortName, string $prefixedShortName, array $context, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
     {
-        $description = $resourceMetadata->getDescription();
-        $isDeprecated = $resourceMetadata->getDeprecationReason();
+        if ($resourceMetadata instanceof ApiResource) {
+            $description = $resourceMetadata->getDescription();
+            $isDeprecated = $resourceMetadata->getDeprecationReason();
+        } else {
+            $description = $resourceMetadata->getDescription();
+            $isDeprecated = $resourceMetadata->getAttribute('deprecation_reason');
+        }
 
         $class = [
             '@id' => $prefixedShortName,
@@ -135,7 +186,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'rdfs:label' => $shortName,
             'hydra:title' => $shortName,
             'hydra:supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context),
-            'hydra:supportedOperation' => $this->getHydraOperations(false, $resourceMetadataCollection),
+            'hydra:supportedOperation' => $this->getHydraOperations($resourceClass, $resourceMetadata, $prefixedShortName, false, $resourceMetadataCollection),
         ];
 
         if (null !== $description) {
@@ -147,6 +198,35 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         }
 
         return $class;
+    }
+
+    /**
+     * Gets the context for the property name factory.
+     */
+    private function getPropertyNameCollectionFactoryContext(ResourceMetadata $resourceMetadata): array
+    {
+        $attributes = $resourceMetadata->getAttributes();
+        $context = [];
+
+        if (isset($attributes['normalization_context'][AbstractNormalizer::GROUPS])) {
+            $context['serializer_groups'] = (array) $attributes['normalization_context'][AbstractNormalizer::GROUPS];
+        }
+
+        if (!isset($attributes['denormalization_context'][AbstractNormalizer::GROUPS])) {
+            return $context;
+        }
+
+        if (isset($context['serializer_groups'])) {
+            foreach ((array) $attributes['denormalization_context'][AbstractNormalizer::GROUPS] as $groupName) {
+                $context['serializer_groups'][] = $groupName;
+            }
+
+            return $context;
+        }
+
+        $context['serializer_groups'] = (array) $attributes['denormalization_context'][AbstractNormalizer::GROUPS];
+
+        return $context;
     }
 
     /**
@@ -185,36 +265,54 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets Hydra properties.
+     *
+     * @param ResourceMetadata|ApiResource $resourceMetadata
      */
-    private function getHydraProperties(string $resourceClass, ApiResource $resourceMetadata, string $shortName, string $prefixedShortName, array $context): array
+    private function getHydraProperties(string $resourceClass, $resourceMetadata, string $shortName, string $prefixedShortName, array $context): array
     {
         $classes = [];
 
-        foreach ($resourceMetadata->getOperations() as $operation) {
-            /** @var Operation $operation */
-            if (!$operation instanceof CollectionOperationInterface) {
-                continue;
-            }
+        if ($resourceMetadata instanceof ResourceMetadata) {
+            foreach ($resourceMetadata->getCollectionOperations() as $operationName => $operation) {
+                $inputMetadata = $resourceMetadata->getTypedOperationAttribute(OperationType::COLLECTION, $operationName, 'input', ['class' => $resourceClass], true);
+                if (null !== $inputClass = $inputMetadata['class'] ?? null) {
+                    $classes[$inputClass] = true;
+                }
 
-            $inputMetadata = $operation->getInput();
-            if (null !== $inputClass = $inputMetadata['class'] ?? null) {
-                $classes[$inputClass] = true;
+                $outputMetadata = $resourceMetadata->getTypedOperationAttribute(OperationType::COLLECTION, $operationName, 'output', ['class' => $resourceClass], true);
+                if (null !== $outputClass = $outputMetadata['class'] ?? null) {
+                    $classes[$outputClass] = true;
+                }
             }
-
-            $outputMetadata = $operation->getOutput();
-            if (null !== $outputClass = $outputMetadata['class'] ?? null) {
-                $classes[$outputClass] = true;
-            }
-        }
-
-        if (!$classes) {
+        } else {
             $classes[$resourceClass] = true;
+            foreach ($resourceMetadata->getOperations() as $operation) {
+                /** @var Operation $operation */
+                if (!$operation instanceof CollectionOperationInterface) {
+                    continue;
+                }
+
+                $inputMetadata = $operation->getInput();
+                if (null !== $inputClass = $inputMetadata['class'] ?? null) {
+                    $classes[$inputClass] = true;
+                }
+
+                $outputMetadata = $operation->getOutput();
+                if (null !== $outputClass = $outputMetadata['class'] ?? null) {
+                    $classes[$outputClass] = true;
+                }
+            }
         }
 
         /** @var string[] $classes */
         $classes = array_keys($classes);
         $properties = [];
-        [$propertyNameContext, $propertyContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
+        if ($resourceMetadata instanceof ResourceMetadata) {
+            $propertyNameContext = $this->getPropertyNameCollectionFactoryContext($resourceMetadata);
+            $propertyContext = [];
+        } else {
+            [$propertyNameContext, $propertyContext] = $this->getPropertyMetadataFactoryContext($resourceMetadata);
+        }
 
         foreach ($classes as $class) {
             foreach ($this->propertyNameCollectionFactory->create($class, $propertyNameContext) as $propertyName) {
@@ -237,17 +335,38 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets Hydra operations.
+     *
+     * @param ResourceMetadata|ApiResource $resourceMetadata
      */
-    private function getHydraOperations(bool $collection, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
+    private function getHydraOperations(string $resourceClass, $resourceMetadata, string $prefixedShortName, bool $collection, ?ResourceMetadataCollection $resourceMetadataCollection = null): array
     {
-        $hydraOperations = [];
-        foreach ($resourceMetadataCollection as $resourceMetadata) {
-            foreach ($resourceMetadata->getOperations() as $operation) {
-                if (($operation instanceof Post || $operation instanceof CollectionOperationInterface) !== $collection) {
-                    continue;
-                }
+        if ($resourceMetadata instanceof ResourceMetadata) {
+            if (null === $operations = $collection ? $resourceMetadata->getCollectionOperations() : $resourceMetadata->getItemOperations()) {
+                return [];
+            }
 
-                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}");
+            $hydraOperations = [];
+            foreach ($operations as $operationName => $operation) {
+                $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $prefixedShortName, $collection ? OperationType::COLLECTION : OperationType::ITEM);
+            }
+        } else {
+            $hydraOperations = [];
+            foreach ($resourceMetadataCollection as $resourceMetadata) {
+                foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if (($operation instanceof Post || $operation instanceof CollectionOperationInterface) !== $collection) {
+                        continue;
+                    }
+
+                    $hydraOperations[] = $this->getHydraOperation($resourceClass, $resourceMetadata, $operationName, $operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}", null);
+                }
+            }
+        }
+
+        if (null !== $this->subresourceOperationFactory && !$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            foreach ($this->subresourceOperationFactory->create($resourceClass) as $operationId => $operation) {
+                $subresourceMetadata = $this->resourceMetadataFactory->create($operation['resource_class']);
+                $propertyMetadata = $this->propertyMetadataFactory->create(end($operation['identifiers'])[0], $operation['property']);
+                $hydraOperations[] = $this->getHydraOperation($resourceClass, $subresourceMetadata, $operation['route_name'], $operation, "#{$subresourceMetadata->getShortName()}", OperationType::SUBRESOURCE, $propertyMetadata->getSubresource());
             }
         }
 
@@ -256,26 +375,57 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets and populates if applicable a Hydra operation.
+     *
+     * @param ResourceMetadata|ApiResource $resourceMetadata
+     * @param SubresourceMetadata          $subresourceMetadata
+     * @param array|HttpOperation          $operation
      */
-    private function getHydraOperation(HttpOperation $operation, string $prefixedShortName): array
+    private function getHydraOperation(string $resourceClass, $resourceMetadata, string $operationName, $operation, string $prefixedShortName, ?string $operationType = null, SubresourceMetadata $subresourceMetadata = null): array
     {
-        $method = $operation->getMethod() ?: HttpOperation::METHOD_GET;
+        if ($operation instanceof HttpOperation) {
+            $method = $operation->getMethod() ?: HttpOperation::METHOD_GET;
+        } elseif ($this->operationMethodResolver) {
+            if (OperationType::COLLECTION === $operationType) {
+                $method = $this->operationMethodResolver->getCollectionOperationMethod($resourceClass, $operationName);
+            } elseif (OperationType::ITEM === $operationType) {
+                $method = $this->operationMethodResolver->getItemOperationMethod($resourceClass, $operationName);
+            } else {
+                $method = 'GET';
+            }
+        } else {
+            $method = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'method', 'GET');
+        }
+
         $hydraOperation = $operation instanceof HttpOperation ? ($operation->getHydraContext() ?? []) : ($operation['hydra_context'] ?? []);
-        if ($operation->getDeprecationReason()) {
+        if ($operation instanceof HttpOperation ? $operation->getDeprecationReason() : $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true)) {
             $hydraOperation['owl:deprecated'] = true;
         }
 
-        $shortName = $operation->getShortName();
-        $inputMetadata = $operation->getInput() ?? [];
-        $outputMetadata = $operation->getOutput() ?? [];
+        if ($operation instanceof HttpOperation) {
+            $shortName = $operation->getShortName();
+            $inputMetadata = $operation->getInput() ?? [];
+            $outputMetadata = $operation->getOutput() ?? [];
+            $operationType = $operation instanceof CollectionOperationInterface ? OperationType::COLLECTION : OperationType::ITEM;
+        } else {
+            $shortName = $resourceMetadata->getShortName();
+            $inputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'input', ['class' => false]);
+            $outputMetadata = $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'output', ['class' => false]);
+        }
+
         $inputClass = \array_key_exists('class', $inputMetadata) ? $inputMetadata['class'] : false;
         $outputClass = \array_key_exists('class', $outputMetadata) ? $outputMetadata['class'] : false;
 
-        if ('GET' === $method && $operation instanceof CollectionOperationInterface) {
+        if ('GET' === $method && OperationType::COLLECTION === $operationType) {
             $hydraOperation += [
                 '@type' => ['hydra:Operation', 'schema:FindAction'],
                 'hydra:title' => "Retrieves the collection of $shortName resources.",
                 'returns' => 'hydra:Collection',
+            ];
+        } elseif ('GET' === $method && OperationType::SUBRESOURCE === $operationType) {
+            $hydraOperation += [
+                '@type' => ['hydra:Operation', 'schema:FindAction'],
+                'hydra:title' => $subresourceMetadata && $subresourceMetadata->isCollection() ? "Retrieves the collection of $shortName resources." : "Retrieves a $shortName resource.",
+                'returns' => null === $outputClass ? 'owl:Nothing' : "#$shortName",
             ];
         } elseif ('GET' === $method) {
             $hydraOperation += [
@@ -325,17 +475,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets the range of the property.
+     *
+     * @param ApiProperty|PropertyMetadata $propertyMetadata
      */
-    private function getRange(ApiProperty $propertyMetadata): ?string
+    private function getRange($propertyMetadata): ?string
     {
-        $jsonldContext = $propertyMetadata->getJsonldContext();
+        $jsonldContext = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttributes()['jsonld_context'] ?? [] : $propertyMetadata->getJsonldContext();
 
         if (isset($jsonldContext['@type'])) {
             return $jsonldContext['@type'];
         }
 
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? [];
-        if ([] === $type) {
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        if (null === $type) {
             return null;
         }
 
@@ -363,13 +516,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
                 if ($this->resourceClassResolver->isResourceClass($className)) {
                     $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                    $operation = $resourceMetadata->getOperation();
+                    if ($resourceMetadata instanceof ResourceMetadataCollection) {
+                        $operation = $resourceMetadata->getOperation();
 
-                    if (!$operation instanceof HttpOperation) {
-                        return "#{$operation->getShortName()}";
+                        if (!$operation instanceof HttpOperation) {
+                            return "#{$operation->getShortName()}";
+                        }
+
+                        return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
                     }
 
-                    return $operation->getTypes()[0] ?? "#{$operation->getShortName()}";
+                    return $resourceMetadata->getIri() ?? "#{$resourceMetadata->getShortName()}";
                 }
         }
 
@@ -460,11 +617,17 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
     /**
      * Gets a property definition.
+     *
+     * @param ApiProperty|PropertyMetadata $propertyMetadata
      */
-    private function getProperty(ApiProperty $propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
+    private function getProperty($propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
-        if ($iri = $propertyMetadata->getIris()) {
-            $iri = 1 === \count($iri) ? $iri[0] : $iri;
+        if ($propertyMetadata instanceof PropertyMetadata) {
+            $iri = $propertyMetadata->getIri();
+        } else {
+            if ($iri = $propertyMetadata->getIris()) {
+                $iri = 1 === \count($iri) ? $iri[0] : $iri;
+            }
         }
 
         if (!isset($iri)) {
@@ -478,9 +641,10 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             'domain' => $prefixedShortName,
         ];
 
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+        // TODO: 3.0 support multiple types, default value of types will be [] instead of null
+        $type = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getType() : $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
-        if (null !== $type && [] !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
+        if (null !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
             $propertyData['owl:maxCardinality'] = 1;
         }
 
@@ -501,7 +665,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $property['hydra:description'] = $description;
         }
 
-        if ($propertyMetadata->getDeprecationReason()) {
+        if ($deprecationReason = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('deprecation_reason') : $propertyMetadata->getDeprecationReason()) {
             $property['owl:deprecated'] = true;
         }
 
@@ -566,3 +730,5 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         return true;
     }
 }
+
+class_alias(DocumentationNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\DocumentationNormalizer::class);
