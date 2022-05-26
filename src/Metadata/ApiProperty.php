@@ -92,7 +92,11 @@ final class ApiProperty
 
     private $schema;
     private $initializable;
-    private $iri;
+
+    /**
+     * @var string[]
+     */
+    private $iris;
 
     /**
      * @var array
@@ -100,21 +104,21 @@ final class ApiProperty
     private $extraProperties;
 
     /**
-     * @param bool|null        $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null        $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null        $required                https://api-platform.com/docs/admin/validation/#client-side-validation
-     * @param bool|null        $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param string|null      $default
-     * @param string|null      $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string|null      $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param bool|null        $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
-     * @param array|null       $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
-     * @param array|null       $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param bool|null        $push                    https://api-platform.com/docs/core/push-relations/
-     * @param string|null      $security                https://api-platform.com/docs/core/security
-     * @param string|null      $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param array|null       $types                   the RDF types of this property
-     * @param bool|string|null $iri                     the IRI representing the property, can be `false` to remove the generated "@id"
+     * @param bool|null            $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null            $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null            $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool|null            $identifier              https://api-platform.com/docs/core/identifiers/
+     * @param string|null          $default
+     * @param string|null          $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string|null          $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param bool|null            $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array|null           $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array|null           $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|null            $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string|null          $security                https://api-platform.com/docs/core/security
+     * @param string|null          $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param array|null           $types                   the RDF types of this property
+     * @param string|string[]|null $iris
      */
     public function __construct(
         ?string $description = null,
@@ -138,12 +142,12 @@ final class ApiProperty
         ?string $security = null,
         ?string $securityPostDenormalize = null,
 
-        ?array $types = null,
+        $types = null,
         ?array $builtinTypes = null,
         ?array $schema = null,
         ?bool $initializable = null,
 
-        $iri = null,
+        $iris = null,
 
         // attributes
         array $extraProperties = []
@@ -171,7 +175,7 @@ final class ApiProperty
         $this->builtinTypes = $builtinTypes;
         $this->schema = $schema;
         $this->initializable = $initializable;
-        $this->iri = $iri;
+        $this->iris = $iris;
         $this->extraProperties = $extraProperties;
     }
 
@@ -486,20 +490,20 @@ final class ApiProperty
     /**
      * Gets IRI of this property.
      */
-    public function getIri()
+    public function getIris()
     {
-        return $this->iri;
+        return $this->iris;
     }
 
     /**
      * Returns a new instance with the given IRI.
      *
-     * @param mixed $iri
+     * @param string|string[] $iris
      */
-    public function withIri($iri): self
+    public function withIris($iris): self
     {
         $metadata = clone $this;
-        $metadata->iri = $iri;
+        $metadata->iris = (array) $iris;
 
         return $metadata;
     }
