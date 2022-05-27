@@ -28,12 +28,15 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\GraphQl\Type\DummyNotImplementingNullableInterfaceType;
+use GraphQL\Type\Definition\FieldDefinition;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
+use GraphQL\Type\Definition\StringType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -485,7 +488,7 @@ class TypeBuilderTest extends TestCase
     {
         $this->typesContainerProphecy->has('StringCursorConnection')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('StringCursorConnection', Argument::type(ObjectType::class))->shouldBeCalled();
-        $this->typesContainerProphecy->set('StringEdge', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('StringEdge', Argument::type(NonNull::class))->shouldBeCalled();
         $this->typesContainerProphecy->set('StringPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->resourceMetadataCollectionFactoryProphecy->create('StringResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('StringResourceClass', [
             (new ApiResource())->withGraphQlOperations([
@@ -503,16 +506,29 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('pageInfo', $resourcePaginatedCollectionTypeFields);
         $this->assertArrayHasKey('totalCount', $resourcePaginatedCollectionTypeFields);
 
+        /** @var NonNull $nonNullableEdgesType */
+        $nonNullableEdgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
+        $this->assertInstanceOf(NonNull::class, $nonNullableEdgesType);
+
         /** @var ListOfType $edgesType */
-        $edgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
+        $edgesType = $nonNullableEdgesType->getWrappedType();
+        $this->assertInstanceOf(ListOfType::class, $edgesType);
+
+        /** @var NonNull $nonNullWrappedType */
+        $nonNullWrappedType = $edgesType->getWrappedType();
+        $this->assertInstanceOf(NonNull::class, $nonNullWrappedType);
+
         /** @var ObjectType $wrappedType */
-        $wrappedType = $edgesType->getWrappedType();
+        $wrappedType = $nonNullWrappedType->getWrappedType();
+        $this->assertInstanceOf(ObjectType::class, $wrappedType);
         $this->assertSame('StringEdge', $wrappedType->name);
         $this->assertSame('Edge of String.', $wrappedType->description);
+
         $edgeObjectTypeFields = $wrappedType->getFields();
         $this->assertArrayHasKey('node', $edgeObjectTypeFields);
         $this->assertArrayHasKey('cursor', $edgeObjectTypeFields);
-        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['node']->getType());
+        $this->assertInstanceOf(NonNull::class, $edgeObjectTypeFields['node']->getType());
+        $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['node']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $edgeObjectTypeFields['cursor']->getType());
         $this->assertSame(GraphQLType::string(), $edgeObjectTypeFields['cursor']->getType()->getWrappedType());
 
@@ -540,6 +556,52 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::int(), $totalCountType->getWrappedType());
     }
 
+    public function testCursorBasedGetResourcePaginatedCollectionWithNonNullableType(): void
+    {
+        $this->typesContainerProphecy->has('DummyCursorConnection')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('DummyCursorConnection', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('DummyEdge', Argument::type(NonNull::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('DummyPageInfo', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->resourceMetadataCollectionFactoryProphecy->create('DummyResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('DummyResourceClass', [
+            (new ApiResource())->withGraphQlOperations([
+                'operationName' => (new Query())->withPaginationType('cursor'),
+            ]),
+        ]));
+
+        /** @var ObjectType $resourcePaginatedCollectionType */
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(new DummyNotImplementingNullableInterfaceType(), 'DummyResourceClass', 'operationName');
+        $this->assertSame('DummyCursorConnection', $resourcePaginatedCollectionType->name);
+        $this->assertSame('Cursor connection for Dummy.', $resourcePaginatedCollectionType->description);
+
+        $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
+        $this->assertArrayHasKey('edges', $resourcePaginatedCollectionTypeFields);
+        $this->assertArrayHasKey('pageInfo', $resourcePaginatedCollectionTypeFields);
+        $this->assertArrayHasKey('totalCount', $resourcePaginatedCollectionTypeFields);
+
+        /** @var NonNull $nonNullableEdgesType */
+        $nonNullableEdgesType = $resourcePaginatedCollectionTypeFields['edges']->getType();
+        $this->assertInstanceOf(NonNull::class, $nonNullableEdgesType);
+
+        /** @var ListOfType $edgesType */
+        $edgesType = $nonNullableEdgesType->getWrappedType();
+        $this->assertInstanceOf(ListOfType::class, $edgesType);
+
+        /** @var NonNull $nonNullWrappedType */
+        $nonNullWrappedType = $edgesType->getWrappedType();
+        $this->assertInstanceOf(NonNull::class, $nonNullWrappedType);
+
+        /** @var ObjectType $wrappedType */
+        $wrappedType = $nonNullWrappedType->getWrappedType();
+        $this->assertInstanceOf(ObjectType::class, $wrappedType);
+        $this->assertSame('DummyEdge', $wrappedType->name);
+        $this->assertSame('Edge of Dummy.', $wrappedType->description);
+
+        $edgeObjectTypeFields = $wrappedType->getFields();
+        $this->assertArrayHasKey('node', $edgeObjectTypeFields);
+        $this->assertArrayHasKey('cursor', $edgeObjectTypeFields);
+        $this->assertInstanceOf(DummyNotImplementingNullableInterfaceType::class, $edgeObjectTypeFields['node']->getType());
+    }
+
     public function testPageBasedGetResourcePaginatedCollectionType(): void
     {
         $this->typesContainerProphecy->has('StringPageConnection')->shouldBeCalled()->willReturn(false);
@@ -561,6 +623,25 @@ class TypeBuilderTest extends TestCase
         $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
         $this->assertArrayHasKey('paginationInfo', $resourcePaginatedCollectionTypeFields);
 
+        /** @var FieldDefinition $nonNullCollectionListDefinition */
+        $nonNullCollectionListDefinition = $resourcePaginatedCollectionTypeFields['collection'];
+        $this->assertInstanceOf(FieldDefinition::class, $nonNullCollectionListDefinition);
+
+        /** @var NonNull $nonNullCollectionList */
+        $nonNullCollectionList = $nonNullCollectionListDefinition->getType();
+        $this->assertInstanceOf(NonNull::class, $nonNullCollectionList);
+
+        /** @var ListOfType $collectionList */
+        $collectionList = $nonNullCollectionList->getWrappedType();
+        $this->assertInstanceOf(ListOfType::class, $collectionList);
+
+        /** @var NonNull $nonNullCollectionItem */
+        $nonNullCollectionItem = $collectionList->getWrappedType();
+        $this->assertInstanceOf(NonNull::class, $nonNullCollectionItem);
+
+        $collectionItem = $nonNullCollectionItem->getWrappedType();
+        $this->assertInstanceOf(StringType::class, $collectionItem);
+
         /** @var NonNull $paginationInfoType */
         $paginationInfoType = $resourcePaginatedCollectionTypeFields['paginationInfo']->getType();
         /** @var ObjectType $wrappedType */
@@ -577,6 +658,45 @@ class TypeBuilderTest extends TestCase
         $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['lastPage']->getType()->getWrappedType());
         $this->assertInstanceOf(NonNull::class, $paginationInfoObjectTypeFields['totalCount']->getType());
         $this->assertSame(GraphQLType::int(), $paginationInfoObjectTypeFields['totalCount']->getType()->getWrappedType());
+    }
+
+    public function testPageBasedGetResourcePaginatedCollectionWithNonNullableType(): void
+    {
+        $this->typesContainerProphecy->has('DummyPageConnection')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('DummyPageConnection', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->set('DummyPaginationInfo', Argument::type(ObjectType::class))->shouldBeCalled();
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('DummyResourceClass')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('DummyResourceClass', [
+            (new ApiResource())->withGraphQlOperations([
+                'operationName' => (new Query())->withPaginationType('page'),
+            ]),
+        ]));
+
+        /** @var ObjectType $resourcePaginatedCollectionType */
+        $resourcePaginatedCollectionType = $this->typeBuilder->getResourcePaginatedCollectionType(new DummyNotImplementingNullableInterfaceType(), 'DummyResourceClass', 'operationName');
+        $this->assertSame('DummyPageConnection', $resourcePaginatedCollectionType->name);
+        $this->assertSame('Page connection for Dummy.', $resourcePaginatedCollectionType->description);
+
+        $resourcePaginatedCollectionTypeFields = $resourcePaginatedCollectionType->getFields();
+        $this->assertArrayHasKey('collection', $resourcePaginatedCollectionTypeFields);
+        $this->assertArrayHasKey('paginationInfo', $resourcePaginatedCollectionTypeFields);
+
+        /** @var FieldDefinition $nonNullCollectionListDefinition */
+        $nonNullCollectionListDefinition = $resourcePaginatedCollectionTypeFields['collection'];
+        $this->assertInstanceOf(FieldDefinition::class, $nonNullCollectionListDefinition);
+
+        /** @var NonNull $nonNullCollectionList */
+        $nonNullCollectionList = $nonNullCollectionListDefinition->getType();
+        $this->assertInstanceOf(NonNull::class, $nonNullCollectionList);
+
+        /** @var ListOfType $collectionList */
+        $collectionList = $nonNullCollectionList->getWrappedType();
+        $this->assertInstanceOf(ListOfType::class, $collectionList);
+
+        /** @var NonNull $nonNullCollectionItem */
+        $nonNullCollectionItem = $collectionList->getWrappedType();
+        $this->assertNotInstanceOf(NonNull::class, $nonNullCollectionItem);
+        $this->assertInstanceOf(DummyNotImplementingNullableInterfaceType::class, $nonNullCollectionItem);
     }
 
     /**

@@ -21,6 +21,7 @@ use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\NonNull;
+use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
@@ -232,6 +233,10 @@ final class TypeBuilder implements TypeBuilderInterface
     {
         $shortName = $resourceType->name;
 
+        if ($resourceType instanceof NullableType) {
+            $resourceType = GraphQLType::nonNull($resourceType);
+        }
+
         $edgeObjectTypeConfiguration = [
             'name' => "{$shortName}Edge",
             'description' => "Edge of $shortName.",
@@ -240,7 +245,9 @@ final class TypeBuilder implements TypeBuilderInterface
                 'cursor' => GraphQLType::nonNull(GraphQLType::string()),
             ],
         ];
-        $edgeObjectType = new ObjectType($edgeObjectTypeConfiguration);
+        $edgeObjectType = GraphQLType::nonNull(
+            new ObjectType($edgeObjectTypeConfiguration)
+        );
         $this->typesContainer->set("{$shortName}Edge", $edgeObjectType);
 
         $pageInfoObjectTypeConfiguration = [
@@ -257,7 +264,11 @@ final class TypeBuilder implements TypeBuilderInterface
         $this->typesContainer->set("{$shortName}PageInfo", $pageInfoObjectType);
 
         return [
-            'edges' => GraphQLType::listOf($edgeObjectType),
+            'edges' => GraphQLType::nonNull(
+                GraphQLType::listOf(
+                    $edgeObjectType
+                )
+            ),
             'pageInfo' => GraphQLType::nonNull($pageInfoObjectType),
             'totalCount' => GraphQLType::nonNull(GraphQLType::int()),
         ];
@@ -279,8 +290,16 @@ final class TypeBuilder implements TypeBuilderInterface
         $paginationInfoObjectType = new ObjectType($paginationInfoObjectTypeConfiguration);
         $this->typesContainer->set("{$shortName}PaginationInfo", $paginationInfoObjectType);
 
+        if ($resourceType instanceof NullableType) {
+            $resourceType = GraphQLType::nonNull($resourceType);
+        }
+
         return [
-            'collection' => GraphQLType::listOf($resourceType),
+            'collection' => GraphQLType::nonNull(
+                GraphQLType::listOf(
+                    $resourceType
+                )
+            ),
             'paginationInfo' => GraphQLType::nonNull($paginationInfoObjectType),
         ];
     }
