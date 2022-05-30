@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -35,10 +36,10 @@ abstract class AbstractFilter implements FilterInterface
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    protected $managerRegistry;
-    protected $logger;
-    protected $properties;
-    protected $nameConverter;
+    protected ManagerRegistry $managerRegistry;
+    protected LoggerInterface $logger;
+    protected ?array $properties;
+    protected ?NameConverterInterface $nameConverter;
 
     public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
@@ -51,10 +52,10 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = [])
     {
         foreach ($context['filters'] as $property => $value) {
-            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
         }
     }
 
@@ -63,7 +64,7 @@ abstract class AbstractFilter implements FilterInterface
      *
      * @param mixed $value
      */
-    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = []);
+    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []);
 
     protected function getManagerRegistry(): ManagerRegistry
     {
@@ -93,7 +94,7 @@ abstract class AbstractFilter implements FilterInterface
         return \array_key_exists($property, $this->properties);
     }
 
-    protected function denormalizePropertyName($property)
+    protected function denormalizePropertyName($property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
@@ -102,7 +103,7 @@ abstract class AbstractFilter implements FilterInterface
         return implode('.', array_map([$this->nameConverter, 'denormalize'], explode('.', (string) $property)));
     }
 
-    protected function normalizePropertyName($property)
+    protected function normalizePropertyName($property): string
     {
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;

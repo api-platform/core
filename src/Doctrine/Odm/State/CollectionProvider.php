@@ -15,7 +15,6 @@ namespace ApiPlatform\Doctrine\Odm\State;
 
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -32,9 +31,9 @@ final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $collectionExtensions;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ManagerRegistry $managerRegistry;
+    private iterable $collectionExtensions;
 
     /**
      * @param AggregationCollectionExtensionInterface[] $collectionExtensions
@@ -63,20 +62,14 @@ final class CollectionProvider implements ProviderInterface
         $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->collectionExtensions as $extension) {
-            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operation->getName(), $context);
+            $extension->applyToCollection($aggregationBuilder, $resourceClass, $operation, $context);
 
-            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation, $context);
             }
         }
 
-        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        try {
-            $operation = $context['operation'] ?? $resourceMetadata->getOperation($operation->getName());
-            $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
-        } catch (OperationNotFoundException $e) {
-            $attribute = $resourceMetadata->getOperation(null, true)->getExtraProperties()['doctrine_mongodb'] ?? [];
-        }
+        $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
         return $aggregationBuilder->hydrate($resourceClass)->execute($executeOptions);

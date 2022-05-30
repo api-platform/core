@@ -14,39 +14,34 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\Orm\Extension;
 
 use ApiPlatform\Api\FilterInterface as ApiFilterInterface;
-use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Orm\Extension\FilterExtension;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\QueryBuilder;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @group legacy
  */
 class FilterExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testApplyToCollectionWithValidFilters()
+    public function testApplyToCollectionWithValidFilters(): void
     {
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
 
-        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET', 'filters' => ['dummyFilter', 'dummyBadFilter']], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], []);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-
         $queryBuilder = $queryBuilderProphecy->reveal();
 
+        $operation = new GetCollection(filters: ['dummyFilter', 'dummyBadFilter']);
+
         $ormFilterProphecy = $this->prophesize(FilterInterface::class);
-        $ormFilterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get', ['filters' => []])->shouldBeCalled();
+        $ormFilterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, $operation, ['filters' => []])->shouldBeCalled();
 
         $ordinaryFilterProphecy = $this->prophesize(ApiFilterInterface::class);
 
@@ -56,50 +51,18 @@ class FilterExtensionTest extends TestCase
         $filterLocatorProphecy->get('dummyFilter')->willReturn($ormFilterProphecy->reveal())->shouldBeCalled();
         $filterLocatorProphecy->get('dummyBadFilter')->willReturn($ordinaryFilterProphecy->reveal())->shouldBeCalled();
 
-        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal());
-        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get');
+        $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
+        $filterExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, $operation);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
-     */
-    public function testApplyToCollectionWithValidFiltersAndDeprecatedFilterCollection()
+    public function testApplyToCollectionWithoutFilters(): void
     {
-        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
-        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET', 'filters' => ['dummyFilter']], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], []);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $filterLocatorProphecy->has(Argument::cetera())->willReturn(false);
+        $filterLocatorProphecy->get(Argument::cetera())->shouldNotBeCalled();
 
-        $queryBuilder = $queryBuilderProphecy->reveal();
-
-        $filterProphecy = $this->prophesize(FilterInterface::class);
-        $filterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get', ['filters' => []])->shouldBeCalled();
-
-        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), new FilterCollection(['dummyFilter' => $filterProphecy->reveal()]));
-        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, 'get');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testConstructWithInvalidFilterLocator()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
-
-        new FilterExtension($this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), new \ArrayObject());
-    }
-
-    public function testApplyToCollectionWithoutFilters()
-    {
-        $dummyMetadata = new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']]);
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-
-        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
-        $orderExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, 'get');
+        $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
+        $filterExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, new GetCollection(filters: ['dummyFilter', 'dummyBadFilter']));
     }
 }

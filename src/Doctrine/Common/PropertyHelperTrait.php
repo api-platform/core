@@ -47,26 +47,14 @@ trait PropertyHelperTrait
     /**
      * Determines whether the given property is nested.
      */
-    protected function isPropertyNested(string $property/* , string $resourceClass */): bool
+    protected function isPropertyNested(string $property, string $resourceClass): bool
     {
-        if (\func_num_args() > 1) {
-            $resourceClass = (string) func_get_arg(1);
-        } else {
-            if (__CLASS__ !== static::class) {
-                $r = new \ReflectionMethod($this, __FUNCTION__);
-                if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                    @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), \E_USER_DEPRECATED);
-                }
-            }
-            $resourceClass = null;
-        }
-
         $pos = strpos($property, '.');
         if (false === $pos) {
             return false;
         }
 
-        return null !== $resourceClass && $this->getClassMetadata($resourceClass)->hasAssociation(substr($property, 0, $pos));
+        return $this->getClassMetadata($resourceClass)->hasAssociation(substr($property, 0, $pos));
     }
 
     /**
@@ -74,7 +62,7 @@ trait PropertyHelperTrait
      */
     protected function isPropertyEmbedded(string $property, string $resourceClass): bool
     {
-        return false !== strpos($property, '.') && $this->getClassMetadata($resourceClass)->hasField($property);
+        return str_contains($property, '.') && $this->getClassMetadata($resourceClass)->hasField($property);
     }
 
     /**
@@ -84,26 +72,9 @@ trait PropertyHelperTrait
      *   - associations: array of associations according to nesting order
      *   - field: string holding the actual field (leaf node)
      */
-    protected function splitPropertyParts(string $property/* , string $resourceClass */): array
+    protected function splitPropertyParts(string $property, string $resourceClass): array
     {
-        $resourceClass = null;
         $parts = explode('.', $property);
-
-        if (\func_num_args() > 1) {
-            $resourceClass = func_get_arg(1);
-        } elseif (__CLASS__ !== static::class) {
-            $r = new \ReflectionMethod($this, __FUNCTION__);
-            if (__CLASS__ !== $r->getDeclaringClass()->getName()) {
-                @trigger_error(sprintf('Method %s() will have a second `$resourceClass` argument in version API Platform 3.0. Not defining it is deprecated since API Platform 2.1.', __FUNCTION__), \E_USER_DEPRECATED);
-            }
-        }
-
-        if (null === $resourceClass) {
-            return [
-                'associations' => \array_slice($parts, 0, -1),
-                'field' => end($parts),
-            ];
-        }
 
         $metadata = $this->getClassMetadata($resourceClass);
         $slice = 0;

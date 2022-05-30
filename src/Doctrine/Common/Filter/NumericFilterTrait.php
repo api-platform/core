@@ -52,7 +52,7 @@ trait NumericFilterTrait
                     'property' => $propertyName,
                     'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
                     'required' => false,
-                    'is_collection' => '[]' === substr((string) $filterParameterName, -2),
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                 ];
             }
         }

@@ -15,7 +15,9 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\NumericFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -28,10 +30,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
- *
- * @final
  */
-class NumericFilter extends AbstractContextAwareFilter
+final class NumericFilter extends AbstractFilter
 {
     use NumericFilterTrait;
 
@@ -51,7 +51,7 @@ class NumericFilter extends AbstractContextAwareFilter
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass) ||
@@ -70,7 +70,7 @@ class NumericFilter extends AbstractContextAwareFilter
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);

@@ -16,12 +16,11 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -36,16 +35,14 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
- *
- * @final
  */
-class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInterface
+final class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
     use OrderFilterTrait;
 
-    private $orderNullsComparison;
+    private ?string $orderNullsComparison;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack = null, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null, ?string $orderNullsComparison = null)
+    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null, ?string $orderNullsComparison = null)
     {
         if (null !== $properties) {
             $properties = array_map(static function ($propertyOptions) {
@@ -60,7 +57,7 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
             }, $properties);
         }
 
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->orderParameterName = $orderParameterName;
         $this->orderNullsComparison = $orderNullsComparison;
@@ -69,27 +66,27 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
     /**
      * {@inheritdoc}
      */
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
             return;
         }
 
         if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
-            parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
 
             return;
         }
 
         foreach ($context['filters'][$this->orderParameterName] as $property => $value) {
-            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $direction, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
@@ -117,17 +114,5 @@ class OrderFilter extends AbstractContextAwareFilter implements OrderFilterInter
         }
 
         $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $direction);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function extractProperties(Request $request/* , string $resourceClass */): array
-    {
-        @trigger_error(sprintf('The use of "%s::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.', __CLASS__), \E_USER_DEPRECATED);
-
-        $properties = $request->query->all()[$this->orderParameterName] ?? null;
-
-        return \is_array($properties) ? $properties : [];
     }
 }

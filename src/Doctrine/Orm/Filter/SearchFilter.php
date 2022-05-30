@@ -13,18 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -33,29 +34,23 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Filter the collection by given properties.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final
  */
-class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInterface
+final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
     use SearchFilterTrait;
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?RequestStack $requestStack, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $requestStack, $logger, $properties, $nameConverter);
-
-        if (null === $identifiersExtractor) {
-            @trigger_error('Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.', \E_USER_DEPRECATED);
-        }
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
         $this->identifiersExtractor = $identifiersExtractor;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    protected function getIriConverter()
+    protected function getIriConverter(): IriConverterInterface
     {
         return $this->iriConverter;
     }
@@ -68,7 +63,7 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         if (
             null === $value ||
@@ -88,14 +83,14 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
 
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 
         $caseSensitive = true;
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
         // prefixing the strategy with i makes it case insensitive
-        if (0 === strpos($strategy, 'i')) {
+        if (str_starts_with($strategy, 'i')) {
             $strategy = substr($strategy, 1);
             $caseSensitive = false;
         }
@@ -126,14 +121,10 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
         }
 
         $values = array_map([$this, 'getIdFromValue'], $values);
-        $associationFieldIdentifier = 'id';
-        $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
 
-        if (null !== $this->identifiersExtractor) {
-            $associationResourceClass = $metadata->getAssociationTargetClass($field);
-            $associationFieldIdentifier = $this->identifiersExtractor->getIdentifiersFromResourceClass($associationResourceClass)[0];
-            $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
-        }
+        $associationResourceClass = $metadata->getAssociationTargetClass($field);
+        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
+        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
@@ -156,11 +147,9 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
     /**
      * Adds where clause according to the strategy.
      *
-     * @param mixed $values
-     *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, $values, bool $caseSensitive)
+    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive): void
     {
         if (!\is_array($values)) {
             $values = [$values];
@@ -192,34 +181,31 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
             $keyValueParameter = sprintf('%s_%s', $valueParameter, $key);
             $parameters[$caseSensitive ? $value : strtolower($value)] = $keyValueParameter;
 
-            switch ($strategy) {
-                case self::STRATEGY_PARTIAL:
-                    $ors[] = $queryBuilder->expr()->like(
-                        $wrapCase($aliasedField),
-                        $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter, "'%'"))
-                    );
-                    break;
-                case self::STRATEGY_START:
-                    $ors[] = $queryBuilder->expr()->like(
+            $ors[] = match ($strategy) {
+                self::STRATEGY_PARTIAL => $queryBuilder->expr()->like(
+                    $wrapCase($aliasedField),
+                    $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter, "'%'"))
+                ),
+                self::STRATEGY_START => $queryBuilder->expr()->like(
+                    $wrapCase($aliasedField),
+                    $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'"))
+                ),
+                self::STRATEGY_END => $queryBuilder->expr()->like(
+                    $wrapCase($aliasedField),
+                    $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter))
+                ),
+                self::STRATEGY_WORD_START => $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like(
                         $wrapCase($aliasedField),
                         $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'"))
-                    );
-                    break;
-                case self::STRATEGY_END:
-                    $ors[] = $queryBuilder->expr()->like(
+                    ),
+                    $queryBuilder->expr()->like(
                         $wrapCase($aliasedField),
-                        $wrapCase((string) $queryBuilder->expr()->concat("'%'", $keyValueParameter))
-                    );
-                    break;
-                case self::STRATEGY_WORD_START:
-                    $ors[] = $queryBuilder->expr()->orX(
-                        $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat($keyValueParameter, "'%'"))),
-                        $queryBuilder->expr()->like($wrapCase($aliasedField), $wrapCase((string) $queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'")))
-                    );
-                    break;
-                default:
-                    throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy));
-            }
+                        $wrapCase((string) $queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'"))
+                    )
+                ),
+                default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
+            };
         }
 
         $queryBuilder->andWhere($queryBuilder->expr()->orX(...$ors));
@@ -249,28 +235,13 @@ class SearchFilter extends AbstractContextAwareFilter implements SearchFilterInt
      */
     protected function getType(string $doctrineType): string
     {
-        switch ($doctrineType) {
-            case Types::ARRAY:
-                return 'array';
-            case Types::BIGINT:
-            case Types::INTEGER:
-            case Types::SMALLINT:
-                return 'int';
-            case Types::BOOLEAN:
-                return 'bool';
-            case Types::DATE_MUTABLE:
-            case Types::TIME_MUTABLE:
-            case Types::DATETIME_MUTABLE:
-            case Types::DATETIMETZ_MUTABLE:
-            case Types::DATE_IMMUTABLE:
-            case Types::TIME_IMMUTABLE:
-            case Types::DATETIME_IMMUTABLE:
-            case Types::DATETIMETZ_IMMUTABLE:
-                return \DateTimeInterface::class;
-            case Types::FLOAT:
-                return 'float';
-        }
-
-        return 'string';
+        return match ($doctrineType) {
+            Types::ARRAY => 'array',
+            Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
+            Types::BOOLEAN => 'bool',
+            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE => \DateTimeInterface::class,
+            Types::FLOAT => 'float',
+            default => 'string',
+        };
     }
 }

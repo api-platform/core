@@ -13,24 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\DataProvider\Pagination as LegacyPagination;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Doctrine\Orm\AbstractPaginator;
 use ApiPlatform\Doctrine\Orm\Paginator;
 use ApiPlatform\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrineOrmPaginator;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(AbstractPaginator::class);
@@ -41,91 +34,23 @@ class_exists(AbstractPaginator::class);
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class PaginationExtension implements ContextAwareQueryResultCollectionExtensionInterface
+final class PaginationExtension implements QueryResultCollectionExtensionInterface
 {
-    private $managerRegistry;
-    private $requestStack;
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface
-     */
-    private $resourceMetadataFactory;
-    private $enabled;
-    private $clientEnabled;
-    private $clientItemsPerPage;
-    private $itemsPerPage;
-    private $pageParameterName;
-    private $enabledParameterName;
-    private $itemsPerPageParameterName;
-    private $maximumItemPerPage;
-    private $partial;
-    private $clientPartial;
-    private $partialParameterName;
-    /**
-     * @var Pagination|null
-     */
-    private $pagination;
+    private ManagerRegistry $managerRegistry;
+    private ?Pagination $pagination;
 
-    /**
-     * @param ResourceMetadataFactoryInterface|RequestStack $resourceMetadataFactory
-     * @param Pagination|ResourceMetadataFactoryInterface   $pagination
-     */
-    public function __construct(ManagerRegistry $managerRegistry, /* ResourceMetadataCollectionFactoryInterface */ $resourceMetadataFactory, /* Pagination */ $pagination)
+    public function __construct(ManagerRegistry $managerRegistry, Pagination $pagination)
     {
-        if ($resourceMetadataFactory instanceof RequestStack && $pagination instanceof ResourceMetadataFactoryInterface) {
-            @trigger_error(sprintf('Passing an instance of "%s" as second argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', RequestStack::class, self::class, ResourceMetadataFactoryInterface::class), \E_USER_DEPRECATED);
-            @trigger_error(sprintf('Passing an instance of "%s" as third argument of "%s" is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" instead.', ResourceMetadataFactoryInterface::class, self::class, Pagination::class), \E_USER_DEPRECATED);
-
-            $this->requestStack = $resourceMetadataFactory;
-            $resourceMetadataFactory = $pagination;
-            $pagination = null;
-
-            $args = \array_slice(\func_get_args(), 3);
-            $legacyPaginationArgs = [
-                ['arg_name' => 'enabled', 'type' => 'bool', 'default' => true],
-                ['arg_name' => 'clientEnabled', 'type' => 'bool', 'default' => false],
-                ['arg_name' => 'clientItemsPerPage', 'type' => 'bool', 'default' => false],
-                ['arg_name' => 'itemsPerPage', 'type' => 'int', 'default' => 30],
-                ['arg_name' => 'pageParameterName', 'type' => 'string', 'default' => 'page'],
-                ['arg_name' => 'enabledParameterName', 'type' => 'string', 'default' => 'pagination'],
-                ['arg_name' => 'itemsPerPageParameterName', 'type' => 'string', 'default' => 'itemsPerPage'],
-                ['arg_name' => 'maximumItemPerPage', 'type' => 'int', 'default' => null],
-                ['arg_name' => 'partial', 'type' => 'bool', 'default' => false],
-                ['arg_name' => 'clientPartial', 'type' => 'bool', 'default' => false],
-                ['arg_name' => 'partialParameterName', 'type' => 'string', 'default' => 'partial'],
-            ];
-
-            foreach ($legacyPaginationArgs as $pos => $arg) {
-                if (\array_key_exists($pos, $args)) {
-                    @trigger_error(sprintf('Passing "$%s" arguments is deprecated since API Platform 2.4 and will not be possible anymore in API Platform 3. Pass an instance of "%s" as third argument instead.', implode('", "$', array_column($legacyPaginationArgs, 'arg_name')), Paginator::class), \E_USER_DEPRECATED);
-
-                    if (!((null === $arg['default'] && null === $args[$pos]) || \call_user_func("is_{$arg['type']}", $args[$pos]))) {
-                        throw new InvalidArgumentException(sprintf('The "$%s" argument is expected to be a %s%s.', $arg['arg_name'], $arg['type'], null === $arg['default'] ? ' or null' : ''));
-                    }
-
-                    $value = $args[$pos];
-                } else {
-                    $value = $arg['default'];
-                }
-
-                $this->{$arg['arg_name']} = $value;
-            }
-        } elseif (!$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            throw new InvalidArgumentException(sprintf('The "$resourceMetadataFactory" argument is expected to be an implementation of the "%s" interface.', ResourceMetadataFactoryInterface::class));
-        } elseif (!$pagination instanceof Pagination && !$pagination instanceof LegacyPagination) { // @phpstan-ignore-line
-            throw new InvalidArgumentException(sprintf('The "$pagination" argument is expected to be an instance of the "%s" class, "%s" given.', Pagination::class, \get_class($pagination)));
-        }
-
         $this->managerRegistry = $managerRegistry;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->pagination = $pagination;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        if (null === $pagination = $this->getPagination($queryBuilder, $resourceClass, $operationName, $context)) {
+        if (null === $pagination = $this->getPagination($queryBuilder, $operation, $context)) {
             return;
         }
 
@@ -139,27 +64,19 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * {@inheritdoc}
      */
-    public function supportsResult(string $resourceClass, string $operationName = null, array $context = []): bool
+    public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
-            return $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context);
+            return $this->pagination->isGraphQlEnabled($operation, $context);
         }
 
-        if (null === $this->requestStack) {
-            return $this->pagination->isEnabled($resourceClass, $operationName, $context);
-        }
-
-        if (null === $request = $this->requestStack->getCurrentRequest()) {
-            return false;
-        }
-
-        return $this->isPaginationEnabled($request, $this->resourceMetadataFactory->create($resourceClass), $operationName);
+        return $this->pagination->isEnabled($operation, $context);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): iterable
+    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, Operation $operation = null, array $context = []): iterable
     {
         $query = $queryBuilder->getQuery();
 
@@ -168,18 +85,10 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
             $query->setHint(CountWalker::HINT_DISTINCT, false);
         }
 
-        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->shouldDoctrinePaginatorFetchJoinCollection($queryBuilder, $resourceClass, $operationName, $context));
-        $doctrineOrmPaginator->setUseOutputWalkers($this->shouldDoctrinePaginatorUseOutputWalkers($queryBuilder, $resourceClass, $operationName, $context));
+        $doctrineOrmPaginator = new DoctrineOrmPaginator($query, $this->shouldDoctrinePaginatorFetchJoinCollection($queryBuilder, $operation, $context));
+        $doctrineOrmPaginator->setUseOutputWalkers($this->shouldDoctrinePaginatorUseOutputWalkers($queryBuilder, $operation, $context));
 
-        if (null === $this->requestStack) {
-            $isPartialEnabled = $this->pagination->isPartialEnabled($resourceClass, $operationName, $context);
-        } else {
-            $isPartialEnabled = $this->isPartialPaginationEnabled(
-                $this->requestStack->getCurrentRequest(),
-                null === $resourceClass ? null : $this->resourceMetadataFactory->create($resourceClass),
-                $operationName
-            );
-        }
+        $isPartialEnabled = $this->pagination->isPartialEnabled($operation, $context);
 
         if ($isPartialEnabled) {
             return new class($doctrineOrmPaginator) extends AbstractPaginator {
@@ -192,158 +101,17 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * @throws InvalidArgumentException
      */
-    private function getPagination(QueryBuilder $queryBuilder, string $resourceClass, ?string $operationName, array $context): ?array
+    private function getPagination(QueryBuilder $queryBuilder, ?Operation $operation, array $context): ?array
     {
-        $request = null;
-        if (null !== $this->requestStack && null === $request = $this->requestStack->getCurrentRequest()) {
+        $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($operation, $context) : $this->pagination->isEnabled($operation, $context);
+
+        if (!$enabled) {
             return null;
         }
 
-        if (null === $request) {
-            $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($resourceClass, $operationName, $context) : $this->pagination->isEnabled($resourceClass, $operationName, $context);
+        $context = $this->addCountToContext($queryBuilder, $context);
 
-            if (!$enabled) {
-                return null;
-            }
-
-            $context = $this->addCountToContext($queryBuilder, $context);
-
-            return \array_slice($this->pagination->getPagination($resourceClass, $operationName, $context), 1);
-        }
-
-        /**
-         * @var ResourceMetadata|ResourceMetadataCollection
-         */
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if (!$this->isPaginationEnabled($request, $resourceMetadata, $operationName)) {
-            return null;
-        }
-
-        $itemsPerPage = $this->itemsPerPage;
-        $maxItemsPerPage = $this->maximumItemPerPage;
-
-        // TODO: remove in 3.0
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $itemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $this->itemsPerPage, true);
-            if ($request->attributes->getBoolean('_graphql', false)) {
-                $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
-                $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
-            }
-
-            if ($resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $this->clientItemsPerPage, true)) {
-                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
-
-                if (null !== $maxItemsPerPage) {
-                    @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', \E_USER_DEPRECATED);
-                }
-
-                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage ?? $this->maximumItemPerPage, true);
-                $itemsPerPage = (int) $this->getPaginationParameter($request, $this->itemsPerPageParameterName, $itemsPerPage);
-                $itemsPerPage = (null !== $maxItemsPerPage && $itemsPerPage >= $maxItemsPerPage ? $maxItemsPerPage : $itemsPerPage);
-            }
-        } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-            try {
-                $operation = $resourceMetadata->getOperation($operationName);
-                $itemsPerPage = $operation->getPaginationItemsPerPage();
-                if ($operation->getPaginationClientItemsPerPage()) {
-                    $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->maximumItemPerPage;
-                    $itemsPerPage = (int) $this->getPaginationParameter($request, $this->itemsPerPageParameterName, $itemsPerPage);
-                    $itemsPerPage = (null !== $maxItemsPerPage && $itemsPerPage >= $maxItemsPerPage ? $maxItemsPerPage : $itemsPerPage);
-                }
-            } catch (OperationNotFoundException $e) {
-                // In some cases the operation may not exist
-            }
-
-            if ($request->attributes->getBoolean('_graphql', false)) {
-                $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
-                $itemsPerPage = $collectionArgs[$resourceClass]['first'] ?? $itemsPerPage;
-            }
-        }
-
-        if (0 > $itemsPerPage) {
-            throw new InvalidArgumentException('Item per page parameter should not be less than 0');
-        }
-
-        $page = (int) $this->getPaginationParameter($request, $this->pageParameterName, 1);
-
-        if (1 > $page) {
-            throw new InvalidArgumentException('Page should not be less than 1');
-        }
-
-        if (0 === $itemsPerPage && 1 < $page) {
-            throw new InvalidArgumentException('Page should not be greater than 1 if itemsPerPage is equal to 0');
-        }
-
-        $firstResult = ($page - 1) * $itemsPerPage;
-        if ($request->attributes->getBoolean('_graphql', false)) {
-            $collectionArgs = $request->attributes->get('_graphql_collections_args', []);
-            if (isset($collectionArgs[$resourceClass]['after'])) {
-                $after = base64_decode($collectionArgs[$resourceClass]['after'], true);
-                $firstResult = (int) $after;
-                $firstResult = false === $after ? $firstResult : ++$firstResult;
-            }
-        }
-
-        return [$firstResult, $itemsPerPage];
-    }
-
-    /**
-     * @param ResourceMetadata|ResourceMetadataCollection $resourceMetadata
-     */
-    private function isPartialPaginationEnabled(Request $request = null, $resourceMetadata = null, string $operationName = null): bool
-    {
-        $enabled = $this->partial;
-        $clientEnabled = $this->clientPartial;
-
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_partial', $enabled, true);
-
-            if ($request) {
-                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_partial', $clientEnabled, true);
-            }
-        } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-            $operation = $resourceMetadata->getOperation($operationName);
-            $enabled = $operation->getPaginationPartial() ?? $enabled;
-            $clientEnabled = $operation->getPaginationClientPartial() ?? $clientEnabled;
-        }
-
-        if ($clientEnabled && $request) {
-            $enabled = filter_var($this->getPaginationParameter($request, $this->partialParameterName, $enabled), \FILTER_VALIDATE_BOOLEAN);
-        }
-
-        return $enabled;
-    }
-
-    /**
-     * @param ResourceMetadata|ResourceMetadataCollection $resourceMetadata
-     */
-    private function isPaginationEnabled(Request $request, $resourceMetadata, string $operationName = null): bool
-    {
-        $clientEnabled = false;
-        $enabled = false;
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_enabled', $this->enabled, true);
-            $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_enabled', $this->clientEnabled, true);
-        } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-            $operation = $resourceMetadata->getOperation($operationName);
-            $enabled = $operation->getPaginationEnabled();
-            $clientEnabled = $operation->getPaginationClientEnabled();
-        }
-
-        if ($clientEnabled) {
-            $enabled = filter_var($this->getPaginationParameter($request, $this->enabledParameterName, $enabled), \FILTER_VALIDATE_BOOLEAN);
-        }
-
-        return $enabled;
-    }
-
-    private function getPaginationParameter(Request $request, string $parameterName, $default = null)
-    {
-        if (null !== $paginationAttribute = $request->attributes->get('_api_pagination')) {
-            return \array_key_exists($parameterName, $paginationAttribute) ? $paginationAttribute[$parameterName] : $default;
-        }
-
-        return $request->query->all()[$parameterName] ?? $default;
+        return \array_slice($this->pagination->getPagination($operation, $context), 1);
     }
 
     private function addCountToContext(QueryBuilder $queryBuilder, array $context): array
@@ -362,37 +130,16 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * Determines the value of the $fetchJoinCollection argument passed to the Doctrine ORM Paginator.
      */
-    private function shouldDoctrinePaginatorFetchJoinCollection(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): bool
+    private function shouldDoctrinePaginatorFetchJoinCollection(QueryBuilder $queryBuilder, Operation $operation = null, array $context = []): bool
     {
-        if (null !== $resourceClass) {
-            /**
-             * @var ResourceMetadata|ResourceMetadataCollection
-             */
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $fetchJoinCollection = $operation?->getPaginationFetchJoinCollection();
 
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                $fetchJoinCollection = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_fetch_join_collection', null, true);
-            } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-                try {
-                    $operation = $resourceMetadata->getOperation($operationName);
-                    $fetchJoinCollection = $operation->getPaginationFetchJoinCollection();
-                } catch (OperationNotFoundException $e) {
-                    // In some cases the operation may not exist
-                    $fetchJoinCollection = null;
-                }
-            }
+        if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($fetchJoinCollection)) {
+            return $fetchJoinCollection;
+        }
 
-            if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($fetchJoinCollection)) {
-                return $fetchJoinCollection;
-            }
-
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                $fetchJoinCollection = $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_fetch_join_collection', null, true);
-            }
-
-            if (isset($context['graphql_operation_name']) && isset($fetchJoinCollection)) {
-                return $fetchJoinCollection;
-            }
+        if (isset($context['graphql_operation_name']) && isset($fetchJoinCollection)) {
+            return $fetchJoinCollection;
         }
 
         /*
@@ -416,36 +163,16 @@ final class PaginationExtension implements ContextAwareQueryResultCollectionExte
     /**
      * Determines whether the Doctrine ORM Paginator should use output walkers.
      */
-    private function shouldDoctrinePaginatorUseOutputWalkers(QueryBuilder $queryBuilder, string $resourceClass = null, string $operationName = null, array $context = []): bool
+    private function shouldDoctrinePaginatorUseOutputWalkers(QueryBuilder $queryBuilder, Operation $operation = null, array $context = []): bool
     {
-        if (null !== $resourceClass) {
-            /**
-             * @var ResourceMetadata|ResourceMetadataCollection
-             */
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
+        $useOutputWalkers = $operation?->getPaginationUseOutputWalkers();
 
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                $useOutputWalkers = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_use_output_walkers', null, true);
-            } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-                try {
-                    $operation = $resourceMetadata->getOperation($operationName);
-                    $useOutputWalkers = $operation->getPaginationUseOutputWalkers();
-                } catch (OperationNotFoundException $e) {
-                    // In some cases the operation may not exist
-                }
-            }
+        if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($useOutputWalkers)) {
+            return $useOutputWalkers;
+        }
 
-            if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($useOutputWalkers)) {
-                return $useOutputWalkers;
-            }
-
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                $useOutputWalkers = $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_use_output_walkers', null, true);
-            }
-
-            if (isset($context['graphql_operation_name']) && isset($useOutputWalkers)) {
-                return $useOutputWalkers;
-            }
+        if (isset($context['graphql_operation_name']) && isset($useOutputWalkers)) {
+            return $useOutputWalkers;
         }
 
         /*

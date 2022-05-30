@@ -29,7 +29,7 @@ trait OrderFilterTrait
     /**
      * @var string Keyword used to retrieve the value
      */
-    protected $orderParameterName;
+    protected string $orderParameterName;
 
     /**
      * {@inheritdoc}

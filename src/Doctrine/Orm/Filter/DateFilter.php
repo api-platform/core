@@ -17,8 +17,10 @@ use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\DBAL\Types\Type as DBALType;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -26,10 +28,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
- *
- * @final
  */
-class DateFilter extends AbstractContextAwareFilter implements DateFilterInterface
+final class DateFilter extends AbstractFilter implements DateFilterInterface
 {
     use DateFilterTrait;
 
@@ -47,7 +47,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (
@@ -63,7 +63,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         $field = $property;
 
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass);
+            [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 
         $nullManagement = $this->properties[$property] ?? null;
@@ -128,11 +128,8 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
 
     /**
      * Adds the where clause according to the chosen null management.
-     *
-     * @param string|DBALType $type
-     * @param mixed           $value
      */
-    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, $value, string $nullManagement = null, $type = null)
+    protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, mixed $value, string $nullManagement = null, DBALType|string $type = null)
     {
         $type = (string) $type;
         $value = $this->normalizeValue($value, $operator);
@@ -142,7 +139,7 @@ class DateFilter extends AbstractContextAwareFilter implements DateFilterInterfa
         }
 
         try {
-            $value = false === strpos($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
+            $value = !str_contains($type, '_immutable') ? new \DateTime($value) : new \DateTimeImmutable($value);
         } catch (\Exception $e) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [

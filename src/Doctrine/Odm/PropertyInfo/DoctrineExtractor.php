@@ -34,7 +34,7 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class DoctrineExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface
 {
-    private $objectManager;
+    private ObjectManager $objectManager;
 
     public function __construct(ObjectManager $objectManager)
     {
@@ -132,7 +132,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     {
         if (
             null === ($metadata = $this->getMetadata($class))
-            || $metadata instanceof MongoDbClassMetadata && MongoDbClassMetadata::GENERATOR_TYPE_NONE === $metadata->generatorType
+            || ($metadata instanceof MongoDbClassMetadata && MongoDbClassMetadata::GENERATOR_TYPE_NONE === $metadata->generatorType)
             || !\in_array($property, $metadata->getIdentifierFieldNames(), true)
         ) {
             return null;
@@ -155,31 +155,12 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
      */
     private function getPhpType(string $doctrineType): ?string
     {
-        switch ($doctrineType) {
-            case MongoDbType::INTEGER:
-            case MongoDbType::INT:
-            case MongoDbType::INTID:
-            case MongoDbType::KEY:
-                return Type::BUILTIN_TYPE_INT;
-            case MongoDbType::FLOAT:
-                return Type::BUILTIN_TYPE_FLOAT;
-            case MongoDbType::STRING:
-            case MongoDbType::ID:
-            case MongoDbType::OBJECTID:
-            case MongoDbType::TIMESTAMP:
-            case MongoDbType::BINDATA:
-            case MongoDbType::BINDATABYTEARRAY:
-            case MongoDbType::BINDATACUSTOM:
-            case MongoDbType::BINDATAFUNC:
-            case MongoDbType::BINDATAMD5:
-            case MongoDbType::BINDATAUUID:
-            case MongoDbType::BINDATAUUIDRFC4122:
-                return Type::BUILTIN_TYPE_STRING;
-            case MongoDbType::BOOLEAN:
-            case MongoDbType::BOOL:
-                return Type::BUILTIN_TYPE_BOOL;
-        }
-
-        return null;
+        return match ($doctrineType) {
+            MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => Type::BUILTIN_TYPE_INT,
+            MongoDbType::FLOAT => Type::BUILTIN_TYPE_FLOAT,
+            MongoDbType::STRING, MongoDbType::ID, MongoDbType::OBJECTID, MongoDbType::TIMESTAMP, MongoDbType::BINDATA, MongoDbType::BINDATABYTEARRAY, MongoDbType::BINDATACUSTOM, MongoDbType::BINDATAFUNC, MongoDbType::BINDATAMD5, MongoDbType::BINDATAUUID, MongoDbType::BINDATAUUIDRFC4122 => Type::BUILTIN_TYPE_STRING,
+            MongoDbType::BOOLEAN, MongoDbType::BOOL => Type::BUILTIN_TYPE_BOOL,
+            default => null,
+        };
     }
 }

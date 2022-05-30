@@ -14,7 +14,7 @@ doctrine:
         auto_generate_proxy_classes:   '%kernel.debug%'
         mappings:
             TestBundle: 
-                type: 'annotation'
+                type: 'attribute'
 
 mercure:
     hubs:

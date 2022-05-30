@@ -34,9 +34,9 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerTrait;
 
-    private $resourceMetadataCollectionFactory;
-    private $managerRegistry;
-    private $itemExtensions;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ManagerRegistry $managerRegistry;
+    private iterable $itemExtensions;
 
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
@@ -70,10 +70,10 @@ final class ItemProvider implements ProviderInterface
         $this->handleLinks($aggregationBuilder, $uriVariables, $context, $resourceClass, $operation);
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operation->getName(), $context);
+            $extension->applyToItem($aggregationBuilder, $resourceClass, $uriVariables, $operation, $context);
 
-            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation->getName(), $context)) {
-                return $extension->getResult($aggregationBuilder, $resourceClass, $operation->getName(), $context);
+            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operation, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $operation, $context);
             }
         }
 

@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Metadata\Document\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
@@ -34,17 +31,11 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
  */
 final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private $client;
-    /**
-     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
-     */
-    private $resourceMetadataFactory;
-    private $decorated;
+    private Client $client;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory;
+    private ?DocumentMetadataFactoryInterface $decorated;
 
-    /**
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     */
-    public function __construct(Client $client, $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
+    public function __construct(Client $client, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?DocumentMetadataFactoryInterface $decorated = null)
     {
         $this->client = $client;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -69,13 +60,8 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
             return $documentMetadata;
         }
 
-        /** @var ResourceMetadata|ResourceMetadataCollection */
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        if ($resourceMetadata instanceof ResourceMetadata) {
-            $resourceShortName = $resourceMetadata->getShortName();
-        } else {
-            $resourceShortName = $resourceMetadata->getOperation()->getShortName();
-        }
+        $resourceShortName = $resourceMetadata->getOperation()->getShortName();
 
         if (null === $resourceShortName) {
             return $this->handleNotFound($documentMetadata, $resourceClass);

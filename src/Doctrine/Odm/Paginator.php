@@ -31,38 +31,21 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface
     public const LIMIT_ZERO_MARKER_FIELD = '___';
     public const LIMIT_ZERO_MARKER = 'limit0';
 
-    /**
-     * @var Iterator
-     */
-    private $mongoDbOdmIterator;
-    /**
-     * @var array
-     */
-    private $pipeline;
-    /**
-     * @var UnitOfWork
-     */
-    private $unitOfWork;
-    /**
-     * @var string
-     */
-    private $resourceClass;
+    private Iterator $mongoDbOdmIterator;
 
-    /** @var \ArrayIterator|null */
-    private $iterator;
+    private array $pipeline;
 
-    /**
-     * @var int
-     */
-    private $firstResult;
-    /**
-     * @var int
-     */
-    private $maxResults;
-    /**
-     * @var int
-     */
-    private $totalItems;
+    private UnitOfWork $unitOfWork;
+
+    private string $resourceClass;
+
+    private ?\ArrayIterator $iterator;
+
+    private int $firstResult;
+
+    private int $maxResults;
+
+    private int $totalItems;
 
     public function __construct(Iterator $mongoDbOdmIterator, UnitOfWork $unitOfWork, string $resourceClass, array $pipeline)
     {

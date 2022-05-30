@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDBClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -43,7 +44,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = [MongoDbType::INTEGER, MongoDbType::INT];
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, IdentifiersExtractorInterface $identifiersExtractor, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, ?IdentifiersExtractorInterface $identifiersExtractor, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
@@ -52,7 +53,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $this->identifiersExtractor = $identifiersExtractor;
     }
 
-    protected function getIriConverter()
+    protected function getIriConverter(): IriConverterInterface
     {
         return $this->iriConverter;
     }
@@ -65,7 +66,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
             null === $value ||
@@ -91,7 +92,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
 
         // prefixing the strategy with i makes it case insensitive
-        if (0 === strpos($strategy, 'i')) {
+        if (str_starts_with($strategy, 'i')) {
             $strategy = substr($strategy, 1);
             $caseSensitive = false;
         }
@@ -123,13 +124,10 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
 
         $values = array_map([$this, 'getIdFromValue'], $values);
-        $doctrineTypeField = $this->getDoctrineFieldType($property, $resourceClass);
 
-        if (null !== $this->identifiersExtractor) {
-            $associationResourceClass = $metadata->getAssociationTargetClass($field);
-            $associationFieldIdentifier = $this->identifiersExtractor->getIdentifiersFromResourceClass($associationResourceClass)[0];
-            $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
-        }
+        $associationResourceClass = $metadata->getAssociationTargetClass($field);
+        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
+        $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [

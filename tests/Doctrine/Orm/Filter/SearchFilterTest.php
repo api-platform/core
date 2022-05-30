@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\Orm\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Test\DoctrineOrmFilterTestCase;
 use ApiPlatform\Tests\Doctrine\Common\Filter\SearchFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -26,23 +26,20 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConvert
 use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\Persistence\ManagerRegistry;
 use Prophecy\Argument;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Julien Deniau <julien.deniau@mapado.com>
  * @author Vincent CHALAMON <vincentchalamon@gmail.com>
- * @group legacy
  */
 class SearchFilterTest extends DoctrineOrmFilterTestCase
 {
     use ProphecyTrait;
     use SearchFilterTestTrait;
 
-    protected $alias = 'oo';
-    protected $filterClass = SearchFilter::class;
+    protected string $alias = 'oo';
+    protected string $filterClass = SearchFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildSearchFilter($this->managerRegistry);
 
@@ -218,151 +215,60 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         ], $filter->getDescription($this->resourceClass));
     }
 
-    public function testDoubleJoin()
-    {
-        $this->doTestDoubleJoin(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestDoubleJoin()
-    {
-        $this->doTestDoubleJoin(true);
-    }
-
-    private function doTestDoubleJoin(bool $request)
+    public function testDoubleJoin(): void
     {
         $filters = ['relatedDummy.symfony' => 'foo'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
-
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null], $requestStack);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null]);
 
         $queryBuilder->innerJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 WHERE relateddummy_a1.symfony = :symfony_p1', $this->alias, Dummy::class));
         $this->assertEquals($actual, $expected);
     }
 
-    public function testTripleJoin()
-    {
-        $this->doTestTripleJoin(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestTripleJoin()
-    {
-        $this->doTestTripleJoin(true);
-    }
-
-    private function doTestTripleJoin(bool $request)
+    public function testTripleJoin(): void
     {
         $filters = ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '2'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
-
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null], $requestStack);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]);
 
         $queryBuilder->innerJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
         $queryBuilder->innerJoin('relateddummy_a1.thirdLevel', 'thirdLevel_a1');
 
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s inner join %1$s.relatedDummy relateddummy_a1 inner join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
         $this->assertEquals($actual, $expected);
     }
 
-    public function testJoinLeft()
-    {
-        $this->doTestJoinLeft(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestJoinLeft()
-    {
-        $this->doTestJoinLeft(true);
-    }
-
-    private function doTestJoinLeft(bool $request)
+    public function testJoinLeft(): void
     {
         $filters = ['relatedDummy.symfony' => 'foo', 'relatedDummy.thirdLevel.level' => '3'];
-
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
 
         $queryBuilder = $this->repository->createQueryBuilder($this->alias);
         $queryBuilder->leftJoin(sprintf('%s.relatedDummy', $this->alias), 'relateddummy_a1');
 
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null], $requestStack);
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['relatedDummy.symfony' => null, 'relatedDummy.thirdLevel.level' => null]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $actual = strtolower($queryBuilder->getQuery()->getDQL());
         $expected = strtolower(sprintf('SELECT %s FROM %s %1$s left join %1$s.relatedDummy relateddummy_a1 left join relateddummy_a1.thirdLevel thirdLevel_a1 WHERE relateddummy_a1.symfony = :symfony_p1 and thirdLevel_a1.level = :level_p2', $this->alias, Dummy::class));
         $this->assertEquals($actual, $expected);
     }
 
-    public function testApplyWithAnotherAlias()
-    {
-        $this->doTestApplyWithAnotherAlias(false);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRequestApplyWithAnotherAlias()
-    {
-        $this->doTestApplyWithAnotherAlias(true);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Not injecting ItemIdentifiersExtractor is deprecated since API Platform 2.5 and can lead to unexpected behaviors, it will not be possible anymore in API Platform 3.0.
-     */
-    public function testNotPassingIdentifiersExtractor()
-    {
-        $requestStack = new RequestStack();
-        $requestStack->push(Request::create('/api/dummies', 'GET', []));
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverter = $iriConverterProphecy->reveal();
-        $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
-
-        return new SearchFilter($this->managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, null, null);
-    }
-
-    private function doTestApplyWithAnotherAlias(bool $request)
+    public function testApplyWithAnotherAlias(): void
     {
         $filters = ['name' => 'exact'];
 
-        $requestStack = null;
-        if ($request) {
-            $requestStack = new RequestStack();
-            $requestStack->push(Request::create('/api/dummies', 'GET', $filters));
-        }
-
         $queryBuilder = $this->repository->createQueryBuilder('somealias');
 
-        $filter = $this->buildSearchFilter($this->managerRegistry, ['id' => null, 'name' => null], $requestStack);
-        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, 'op', $request ? [] : ['filters' => $filters]);
+        $filter = $this->buildSearchFilter($this->managerRegistry, ['id' => null, 'name' => null]);
+        $filter->apply($queryBuilder, new QueryNameGenerator(), $this->resourceClass, new Get(), ['filters' => $filters]);
 
         $expectedDql = sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name = :name_p1', 'somealias', Dummy::class);
         $this->assertEquals($expectedDql, $queryBuilder->getQuery()->getDQL());
@@ -590,7 +496,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null, RequestStack $requestStack = null)
+    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -608,9 +514,6 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-
-        return new SearchFilter($managerRegistry, $requestStack, $iriConverter, $propertyAccessor, null, $properties, $identifierExtractorProphecy->reveal(), new CustomConverter());
+        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, null, new CustomConverter());
     }
 }

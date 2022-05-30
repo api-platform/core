@@ -32,7 +32,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateNoManager()
+    public function testCreateNoManager(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -46,7 +46,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsIdentifier()
+    public function testCreateIsIdentifier(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
@@ -67,7 +67,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineOrmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsWritable()
+    public function testCreateIsWritable(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withWritable(false);
@@ -93,7 +93,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
     }
 
-    public function testCreateWithDefaultOption()
+    public function testCreateWithDefaultOption(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -119,7 +119,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->getDefault(), 'default value');
     }
 
-    public function testCreateClassMetadataInfo()
+    public function testCreateClassMetadataInfo(): void
     {
         $propertyMetadata = new ApiProperty();
 
@@ -145,7 +145,7 @@ class DoctrineOrmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), true);
     }
 
-    public function testCreateClassMetadata()
+    public function testCreateClassMetadata(): void
     {
         $propertyMetadata = new ApiProperty();
 

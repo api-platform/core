@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -28,29 +26,19 @@ use Doctrine\ORM\QueryBuilder;
  * @author Samuel ROZE <samuel.roze@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-final class OrderExtension implements ContextAwareQueryCollectionExtensionInterface
+final class OrderExtension implements QueryCollectionExtensionInterface
 {
-    private $order;
-    private $resourceMetadataFactory;
+    private ?string $order;
 
-    /**
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     */
-    public function __construct(string $order = null, $resourceMetadataFactory = null)
+    public function __construct(string $order = null)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if ($this->resourceMetadataFactory && $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
         $this->order = $order;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, string $operationName = null, array $context = [])
+    public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass = null, Operation $operation = null, array $context = []): void
     {
         if (null === $resourceClass) {
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
@@ -66,41 +54,28 @@ final class OrderExtension implements ContextAwareQueryCollectionExtensionInterf
 
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
-        if (null !== $this->resourceMetadataFactory) {
-            if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-                $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
-                try {
-                    $defaultOrder = $resourceMetadataCollection->getOperation($operationName)->getOrder() ?? [];
-                } catch (OperationNotFoundException $e) {
-                    // In some cases the operation may not exist
-                    $defaultOrder = [];
-                }
-            } else {
-                // TODO: remove in 3.0
-                $defaultOrder = $this->resourceMetadataFactory->create($resourceClass)->getCollectionOperationAttribute($operationName, 'order', [], true);
-            }
+        $defaultOrder = $operation?->getOrder() ?? [];
 
-            if (null !== $defaultOrder && [] !== $defaultOrder) {
-                foreach ($defaultOrder as $field => $order) {
-                    if (\is_int($field)) {
-                        // Default direction
-                        $field = $order;
-                        $order = 'ASC';
-                    }
-
-                    $pos = strpos($field, '.');
-                    if (false === $pos || isset($classMetaData->embeddedClasses[substr($field, 0, $pos)])) {
-                        // Configure default filter with property
-                        $field = "{$rootAlias}.{$field}";
-                    } else {
-                        $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $rootAlias, substr($field, 0, $pos));
-                        $field = sprintf('%s.%s', $alias, substr($field, $pos + 1));
-                    }
-                    $queryBuilder->addOrderBy($field, $order);
+        if ([] !== $defaultOrder) {
+            foreach ($defaultOrder as $field => $order) {
+                if (\is_int($field)) {
+                    // Default direction
+                    $field = $order;
+                    $order = 'ASC';
                 }
 
-                return;
+                $pos = strpos($field, '.');
+                if (false === $pos || isset($classMetaData->embeddedClasses[substr($field, 0, $pos)])) {
+                    // Configure default filter with property
+                    $field = "{$rootAlias}.{$field}";
+                } else {
+                    $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $rootAlias, substr($field, 0, $pos));
+                    $field = sprintf('%s.%s', $alias, substr($field, $pos + 1));
+                }
+                $queryBuilder->addOrderBy($field, $order);
             }
+
+            return;
         }
 
         if (null !== $this->order) {

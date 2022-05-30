@@ -31,14 +31,8 @@ class PaginatorTest extends TestCase
 
     /**
      * @dataProvider initializeProvider
-     *
-     * @param mixed $firstResult
-     * @param mixed $maxResults
-     * @param mixed $totalItems
-     * @param mixed $currentPage
-     * @param mixed $lastPage
      */
-    public function testInitialize($firstResult, $maxResults, $totalItems, $currentPage, $lastPage)
+    public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);
 
@@ -47,7 +41,7 @@ class PaginatorTest extends TestCase
         $this->assertEquals($maxResults, $paginator->getItemsPerPage());
     }
 
-    public function testInitializeWithFacetStageNotApplied()
+    public function testInitializeWithFacetStageNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('$facet stage was not applied to the aggregation pipeline.');
@@ -55,7 +49,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage();
     }
 
-    public function testInitializeWithResultsFacetNotApplied()
+    public function testInitializeWithResultsFacetNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"results" facet was not applied to the aggregation pipeline.');
@@ -63,7 +57,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage(true);
     }
 
-    public function testInitializeWithCountFacetNotApplied()
+    public function testInitializeWithCountFacetNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"count" facet was not applied to the aggregation pipeline.');
@@ -71,7 +65,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage(true, true);
     }
 
-    public function testInitializeWithSkipStageNotApplied()
+    public function testInitializeWithSkipStageNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('$skip stage was not applied to the facet stage of the aggregation pipeline.');
@@ -79,7 +73,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage(true, true, true);
     }
 
-    public function testInitializeWithLimitStageNotApplied()
+    public function testInitializeWithLimitStageNotApplied(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('$limit stage was not applied to the facet stage of the aggregation pipeline.');
@@ -87,7 +81,7 @@ class PaginatorTest extends TestCase
         $this->getPaginatorWithMissingStage(true, true, true, true);
     }
 
-    public function testInitializeWithLimitZeroStageApplied()
+    public function testInitializeWithLimitZeroStageApplied(): void
     {
         $paginator = $this->getPaginator(0, 5, 0, true);
 
@@ -96,7 +90,7 @@ class PaginatorTest extends TestCase
         $this->assertEquals(0, $paginator->getItemsPerPage());
     }
 
-    public function testInitializeWithNoCount()
+    public function testInitializeWithNoCount(): void
     {
         $paginator = $this->getPaginatorWithNoCount();
 
@@ -105,14 +99,14 @@ class PaginatorTest extends TestCase
         $this->assertEquals(15, $paginator->getItemsPerPage());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $paginator = $this->getPaginator();
 
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42, $limitZero = false)
+    private function getPaginator($firstResult = 1, $maxResults = 15, $totalItems = 42, $limitZero = false): Paginator
     {
         $iterator = $this->prophesize(Iterator::class);
         $pipeline = [
@@ -146,7 +140,7 @@ class PaginatorTest extends TestCase
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
-    private function getPaginatorWithMissingStage($facet = false, $results = false, $count = false, $maxResults = false)
+    private function getPaginatorWithMissingStage($facet = false, $results = false, $count = false, $maxResults = false): Paginator
     {
         $pipeline = [];
 
@@ -177,7 +171,7 @@ class PaginatorTest extends TestCase
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
-    private function getPaginatorWithNoCount($firstResult = 1, $maxResults = 15)
+    private function getPaginatorWithNoCount($firstResult = 1, $maxResults = 15): Paginator
     {
         $iterator = $this->prophesize(Iterator::class);
         $pipeline = [
@@ -207,7 +201,7 @@ class PaginatorTest extends TestCase
         return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
     }
 
-    public function initializeProvider()
+    public function initializeProvider(): array
     {
         return [
             'First of three pages of 15 items each' => [0, 15, 42, 1, 3],

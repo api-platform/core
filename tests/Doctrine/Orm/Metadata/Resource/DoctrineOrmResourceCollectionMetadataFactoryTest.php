@@ -51,7 +51,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
         return $resourceMetadataCollectionFactory->reveal();
     }
 
-    public function testWithoutManager()
+    public function testWithoutManager(): void
     {
         $operation = (new Get())->withClass(Dummy::class)->withName('get');
         $managerRegistry = $this->prophesize(ManagerRegistry::class);
@@ -67,7 +67,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
     /**
      * @dataProvider operationProvider
      */
-    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null)
+    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null): void
     {
         $objectManager = $this->prophesize(EntityManagerInterface::class);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);

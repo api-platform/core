@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
@@ -28,7 +29,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-class DateFilter extends AbstractFilter implements DateFilterInterface
+final class DateFilter extends AbstractFilter implements DateFilterInterface
 {
     use DateFilterTrait;
 
@@ -40,7 +41,7 @@ class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         // Expect $values to be an array having the period as keys and the date value as values
         if (

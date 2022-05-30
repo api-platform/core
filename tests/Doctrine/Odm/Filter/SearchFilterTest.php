@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\Odm\Filter;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Test\DoctrineMongoDbOdmFilterTestCase;
@@ -31,15 +30,14 @@ use Prophecy\Argument;
  * @author Alan Poulain <contact@alanpoulain.eu>
  *
  * @group mongodb
- * @group legacy
  */
 class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use ProphecyTrait;
     use SearchFilterTestTrait;
 
-    protected $filterClass = SearchFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = SearchFilter::class;
+    protected string $resourceClass = Dummy::class;
 
     public function testGetDescriptionDefaultFields()
     {
@@ -740,7 +738,7 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         );
     }
 
-    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null)
+    protected function buildSearchFilter(ManagerRegistry $managerRegistry, ?array $properties = null): SearchFilter
     {
         $relatedDummyProphecy = $this->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -758,9 +756,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
-
-        return new SearchFilter($managerRegistry, $iriConverter, $identifierExtractorProphecy->reveal(), $propertyAccessor, null, $properties, new CustomConverter());
+        return new SearchFilter($managerRegistry, $iriConverter, null, $propertyAccessor, null, $properties, new CustomConverter());
     }
 }

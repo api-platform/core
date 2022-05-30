@@ -16,13 +16,14 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
 class RequiredAllowEmptyFilter extends AbstractFilter
 {
     use PropertyHelperTrait;
 
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = [])
     {
     }
 

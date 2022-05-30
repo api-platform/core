@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -50,27 +51,19 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    public function apply(Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
-        if (!\is_array($context['filters'][$this->existsParameterName] ?? null)) {
-            $context['exists_deprecated_syntax'] = true;
-            parent::apply($aggregationBuilder, $resourceClass, $operationName, $context);
-
-            return;
-        }
-
         foreach ($context['filters'][$this->existsParameterName] as $property => $value) {
-            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operationName, $context);
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
-            (($context['exists_deprecated_syntax'] ?? false) && !isset($value[self::QUERY_PARAMETER_KEY])) ||
             !$this->isPropertyEnabled($property, $resourceClass) ||
             !$this->isPropertyMapped($property, $resourceClass, true) ||
             !$this->isNullableField($property, $resourceClass)

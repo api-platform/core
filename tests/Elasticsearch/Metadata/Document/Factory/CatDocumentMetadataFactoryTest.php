@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Metadata\Document\Factory;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Elasticsearch\Exception\IndexNotFoundException;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\CatDocumentMetadataFactory;
 use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\ProphecyTrait;
 use Elasticsearch\Client;
@@ -26,33 +29,31 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Namespaces\CatNamespace;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group legacy
- * @requires PHP >= 7.4
- */
 class CatDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             DocumentMetadataFactoryInterface::class,
             new CatDocumentMetadataFactory(
                 $this->prophesize(Client::class)->reveal(),
-                $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
+                $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(),
                 $this->prophesize(DocumentMetadataFactoryInterface::class)->reveal()
             )
         );
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
 
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create(Foo::class)->willReturn(new ResourceMetadata('Foo'))->shouldBeCalled();
+        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([new Get(shortName: 'Foo')]))]);
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $catNamespaceProphecy = $this->prophesize(CatNamespace::class);
         $catNamespaceProphecy->indices(['index' => 'foo'])
@@ -79,29 +80,31 @@ class CatDocumentMetadataFactoryTest extends TestCase
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithIndexAlreadySet()
+    public function testCreateWithIndexAlreadySet(): void
     {
         $originalDocumentMetadata = new DocumentMetadata('foo');
 
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willReturn($originalDocumentMetadata)->shouldBeCalled();
 
-        $documentMetadata = (new CatDocumentMetadataFactory($this->prophesize(Client::class)->reveal(), $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
+        $documentMetadata = (new CatDocumentMetadataFactory($this->prophesize(Client::class)->reveal(), $this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
         self::assertSame($originalDocumentMetadata, $documentMetadata);
         self::assertSame('foo', $documentMetadata->getIndex());
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithNoResourceShortName()
+    public function testCreateWithNoResourceShortName(): void
     {
         $originalDocumentMetadata = new DocumentMetadata();
 
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willReturn($originalDocumentMetadata)->shouldBeCalled();
 
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create(Foo::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([new Get()]))]);
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $documentMetadata = (new CatDocumentMetadataFactory($this->prophesize(Client::class)->reveal(), $resourceMetadataFactory->reveal(), $decoratedProphecy->reveal()))->create(Foo::class);
 
@@ -110,7 +113,7 @@ class CatDocumentMetadataFactoryTest extends TestCase
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithIndexNotFound()
+    public function testCreateWithIndexNotFound(): void
     {
         $this->expectException(IndexNotFoundException::class);
         $this->expectExceptionMessage(sprintf('No index associated with the "%s" resource class.', Foo::class));
@@ -118,8 +121,10 @@ class CatDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
 
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactory->create(Foo::class)->willReturn(new ResourceMetadata('Foo'))->shouldBeCalled();
+        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([new Get(shortName: 'Foo')]))]);
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();
 
         $catNamespaceProphecy = $this->prophesize(CatNamespace::class);
         $catNamespaceProphecy->indices(['index' => 'foo'])->willThrow(new Missing404Exception())->shouldBeCalled();

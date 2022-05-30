@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Elasticsearch\Filter\SortFilterInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +31,7 @@ class OrderFilterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             SortFilterInterface::class,
@@ -44,7 +44,7 @@ class OrderFilterTest extends TestCase
         );
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
@@ -67,7 +67,7 @@ class OrderFilterTest extends TestCase
         );
     }
 
-    public function testApplyWithNestedProperty()
+    public function testApplyWithNestedProperty(): void
     {
         $fooType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
         $barType = new Type(Type::BUILTIN_TYPE_STRING);
@@ -98,7 +98,7 @@ class OrderFilterTest extends TestCase
         );
     }
 
-    public function testApplyWithInvalidOrderFilter()
+    public function testApplyWithInvalidOrderFilter(): void
     {
         $orderFilter = new OrderFilter(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
@@ -111,7 +111,7 @@ class OrderFilterTest extends TestCase
         self::assertSame([], $orderFilter->apply([], Foo::class, null, ['filters' => ['order' => 'error']]));
     }
 
-    public function testApplyWithInvalidTypeAndInvalidDirection()
+    public function testApplyWithInvalidTypeAndInvalidDirection(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
@@ -134,7 +134,7 @@ class OrderFilterTest extends TestCase
         );
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();

@@ -24,12 +24,9 @@ use Elasticsearch\Common\Exceptions\Missing404Exception;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface
-     */
-    private $decorated;
+    private ResourceMetadataCollectionFactoryInterface $decorated;
 
-    private $client;
+    private Client $client;
 
     public function __construct(Client $client, ResourceMetadataCollectionFactoryInterface $decorated)
     {

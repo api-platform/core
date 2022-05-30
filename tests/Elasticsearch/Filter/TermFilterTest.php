@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Elasticsearch\Filter\ConstantScoreFilterInterface;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -31,14 +31,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-/**
- * @group legacy
- */
 class TermFilterTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             ConstantScoreFilterInterface::class,
@@ -46,7 +43,7 @@ class TermFilterTest extends TestCase
                 $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
                 $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-                $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
+                $this->prophesize(IdentifiersExtractorInterface::class)->reveal(),
                 $this->prophesize(IriConverterInterface::class)->reveal(),
                 $this->prophesize(PropertyAccessorInterface::class)->reveal(),
                 $this->prophesize(NameConverterInterface::class)->reveal()
@@ -54,7 +51,7 @@ class TermFilterTest extends TestCase
         );
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'name', 'bar']))->shouldBeCalled();
@@ -63,7 +60,7 @@ class TermFilterTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $foo = new Foo();
@@ -96,7 +93,7 @@ class TermFilterTest extends TestCase
         );
     }
 
-    public function testApplyWithNestedProperty()
+    public function testApplyWithNestedProperty(): void
     {
         $fooType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
         $barType = new Type(Type::BUILTIN_TYPE_STRING);
@@ -108,7 +105,7 @@ class TermFilterTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -132,7 +129,7 @@ class TermFilterTest extends TestCase
         );
     }
 
-    public function testApplyWithInvalidFilters()
+    public function testApplyWithInvalidFilters(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'bar']))->shouldBeCalled();
@@ -141,7 +138,7 @@ class TermFilterTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new ApiProperty())->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifierExtractorInterface::class);
+        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
         $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -163,7 +160,7 @@ class TermFilterTest extends TestCase
         );
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Foo::class)->willReturn(new PropertyNameCollection(['id', 'name', 'bar', 'date', 'weird']))->shouldBeCalled();
@@ -182,7 +179,7 @@ class TermFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(IdentifierExtractorInterface::class)->reveal(),
+            $this->prophesize(IdentifiersExtractorInterface::class)->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $this->prophesize(NameConverterInterface::class)->reveal()

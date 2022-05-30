@@ -14,11 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Doctrine\Odm\Extension;
 
 use ApiPlatform\Doctrine\Odm\Extension\OrderExtension;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -39,7 +35,7 @@ class OrderExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testApplyToCollectionWithValidOrder()
+    public function testApplyToCollectionWithValidOrder(): void
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
@@ -56,11 +52,11 @@ class OrderExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
-        $orderExtensionTest = new OrderExtension('asc', null, $managerRegistryProphecy->reveal());
+        $orderExtensionTest = new OrderExtension('asc', $managerRegistryProphecy->reveal());
         $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class);
     }
 
-    public function testApplyToCollectionWithWrongOrder()
+    public function testApplyToCollectionWithWrongOrder(): void
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
@@ -77,13 +73,12 @@ class OrderExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
-        $orderExtensionTest = new OrderExtension(null, null, $managerRegistryProphecy->reveal());
+        $orderExtensionTest = new OrderExtension(null, $managerRegistryProphecy->reveal());
         $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class);
     }
 
-    public function testApplyToCollectionWithOrderOverridden()
+    public function testApplyToCollectionWithOrderOverridden(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
         $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
@@ -92,9 +87,6 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withOrder(['foo' => 'DESC'])]))]);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
-
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
@@ -102,13 +94,12 @@ class OrderExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
-        $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal());
-        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, 'get');
+        $orderExtensionTest = new OrderExtension('asc', $managerRegistryProphecy->reveal());
+        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, (new GetCollection())->withOrder(['foo' => 'DESC']));
     }
 
-    public function testApplyToCollectionWithOrderOverriddenWithNoDirection()
+    public function testApplyToCollectionWithOrderOverriddenWithNoDirection(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
         $aggregationBuilderProphecy->getStage(0)->willThrow(new OutOfRangeException('message'));
@@ -118,9 +109,6 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->getIdentifier()->shouldBeCalled()->willReturn(['name']);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withOrder(['foo', 'bar' => 'DESC'])]))]);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
-
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
@@ -128,13 +116,12 @@ class OrderExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
-        $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal());
-        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, 'get');
+        $orderExtensionTest = new OrderExtension('asc', $managerRegistryProphecy->reveal());
+        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, (new GetCollection())->withOrder(['foo', 'bar' => 'DESC']));
     }
 
-    public function testApplyToCollectionWithOrderOverriddenWithAssociation()
+    public function testApplyToCollectionWithOrderOverriddenWithAssociation(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
         $lookupProphecy = $this->prophesize(Lookup::class);
@@ -154,9 +141,6 @@ class OrderExtensionTest extends TestCase
         $classMetadataProphecy->hasReference('author')->shouldBeCalled()->willReturn(true);
         $classMetadataProphecy->getFieldMapping('author')->shouldBeCalled()->willReturn(['isOwningSide' => true, 'storeAs' => ClassMetadata::REFERENCE_STORE_AS_ID]);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withOrder(['author.name'])]))]);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn($dummyMetadata);
-
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
@@ -164,11 +148,11 @@ class OrderExtensionTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
-        $orderExtensionTest = new OrderExtension('asc', $resourceMetadataFactoryProphecy->reveal(), $managerRegistryProphecy->reveal());
-        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, 'get');
+        $orderExtensionTest = new OrderExtension('asc', $managerRegistryProphecy->reveal());
+        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, (new GetCollection())->withOrder(['author.name']));
     }
 
-    public function testApplyToCollectionWithExistingSortStage()
+    public function testApplyToCollectionWithExistingSortStage(): void
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
@@ -178,7 +162,7 @@ class OrderExtensionTest extends TestCase
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->shouldNotBeCalled();
 
-        $orderExtensionTest = new OrderExtension('asc', null, $managerRegistryProphecy->reveal());
+        $orderExtensionTest = new OrderExtension('asc', $managerRegistryProphecy->reveal());
         $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class);
     }
 }

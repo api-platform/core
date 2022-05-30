@@ -27,10 +27,10 @@ class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use RangeFilterTestTrait;
 
-    protected $filterClass = RangeFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = RangeFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 

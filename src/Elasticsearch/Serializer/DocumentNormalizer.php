@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
+use ApiPlatform\Api\IdentifiersExtractorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -33,9 +33,9 @@ final class DocumentNormalizer extends ObjectNormalizer
 {
     public const FORMAT = 'elasticsearch';
 
-    private $identifierExtractor;
+    private IdentifiersExtractorInterface $identifierExtractor;
 
-    public function __construct(IdentifierExtractorInterface $identifierExtractor, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(IdentifiersExtractorInterface $identifierExtractor, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
 

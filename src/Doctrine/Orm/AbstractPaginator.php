@@ -20,10 +20,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 abstract class AbstractPaginator implements \IteratorAggregate, PartialPaginatorInterface
 {
-    protected $paginator;
-    protected $iterator;
-    protected $firstResult;
-    protected $maxResults;
+    protected DoctrinePaginator $paginator;
+    protected array|\Traversable $iterator;
+    protected ?int $firstResult;
+    protected ?int $maxResults;
 
     /**
      * @throws InvalidArgumentException

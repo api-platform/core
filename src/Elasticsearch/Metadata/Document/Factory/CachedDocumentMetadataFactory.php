@@ -29,9 +29,9 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
 {
     private const CACHE_KEY_PREFIX = 'index_metadata';
 
-    private $cacheItemPool;
-    private $decorated;
-    private $localCache = [];
+    private CacheItemPoolInterface $cacheItemPool;
+    private DocumentMetadataFactoryInterface $decorated;
+    private array $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, DocumentMetadataFactoryInterface $decorated)
     {

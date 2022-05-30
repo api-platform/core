@@ -33,11 +33,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class CollectionProvider implements ProviderInterface
 {
-    private $client;
-    private $documentMetadataFactory;
-    private $denormalizer;
-    private $pagination;
-    private $collectionExtensions;
+    private Client $client;
+    private DocumentMetadataFactoryInterface $documentMetadataFactory;
+    private DenormalizerInterface $denormalizer;
+    private Pagination $pagination;
+    private iterable $collectionExtensions;
 
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
@@ -59,20 +59,19 @@ final class CollectionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceClass = $operation->getClass();
-        $operationName = $operation->getName();
         $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {
-            $body = $collectionExtension->applyToCollection($body, $resourceClass, $operationName, $context);
+            $body = $collectionExtension->applyToCollection($body, $resourceClass, $operation, $context);
         }
 
         if (!isset($body['query']) && !isset($body['aggs'])) {
             $body['query'] = ['match_all' => new \stdClass()];
         }
 
-        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($resourceClass, $operationName, $context);
-        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($resourceClass, $operationName, $context);
+        $limit = $body['size'] = $body['size'] ?? $this->pagination->getLimit($operation, $context);
+        $offset = $body['from'] = $body['from'] ?? $this->pagination->getOffset($operation, $context);
 
         $params = [
             'index' => $documentMetadata->getIndex(),

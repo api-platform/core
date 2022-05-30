@@ -120,7 +120,7 @@ final class QueryChecker
 
         foreach ($orderByParts as $orderBy) {
             foreach ($orderBy->getParts() as $part) {
-                if (false !== strpos($part, '.')) {
+                if (str_contains($part, '.')) {
                     [$alias] = explode('.', $part);
 
                     $orderByAliases[] = $alias;
@@ -148,18 +148,6 @@ final class QueryChecker
         }
 
         return false;
-    }
-
-    /**
-     * Determines whether the QueryBuilder has ORDER BY on a column from a fetch joined to-many association.
-     *
-     * @deprecated
-     */
-    public static function hasOrderByOnToManyJoin(QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): bool
-    {
-        @trigger_error(sprintf('The use of "%s::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "%1$s::hasOrderByOnFetchJoinedToManyAssociation()" instead.', __CLASS__), \E_USER_DEPRECATED);
-
-        return self::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistry);
     }
 
     /**

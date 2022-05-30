@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Test;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
+use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeReader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use function sys_get_temp_dir;
@@ -41,7 +41,7 @@ class DoctrineMongoDbOdmTestCase extends TestCase
         $config->setHydratorDir(sys_get_temp_dir());
         $config->setProxyNamespace('SymfonyTests\Doctrine');
         $config->setHydratorNamespace('SymfonyTests\Doctrine');
-        $config->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader(), $paths));
+        $config->setMetadataDriverImpl(new AttributeDriver($paths, new AttributeReader()));
         if (method_exists($config, 'setMetadataCache')) {
             $config->setMetadataCache(new ArrayAdapter());
         } else {

@@ -32,7 +32,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testCreateNoManager()
+    public function testCreateNoManager(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -46,7 +46,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsIdentifier()
+    public function testCreateIsIdentifier(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withIdentifier(true);
@@ -67,7 +67,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrineMongoDbOdmPropertyMetadataFactory->create(Dummy::class, 'id'), $propertyMetadata);
     }
 
-    public function testCreateIsWritable()
+    public function testCreateIsWritable(): void
     {
         $propertyMetadata = new ApiProperty();
         $propertyMetadata = $propertyMetadata->withWritable(false);
@@ -92,7 +92,7 @@ class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($doctrinePropertyMetadata->isWritable(), false);
     }
 
-    public function testCreateClassMetadata()
+    public function testCreateClassMetadata(): void
     {
         $propertyMetadata = new ApiProperty();
 

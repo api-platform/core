@@ -25,7 +25,6 @@
 
         <service id="api_platform.doctrine.orm.order_filter" class="ApiPlatform\Doctrine\Orm\Filter\OrderFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument>%api_platform.collection.order_parameter_name%</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
@@ -35,7 +34,6 @@
 
         <service id="api_platform.doctrine.orm.range_filter" class="ApiPlatform\Doctrine\Orm\Filter\RangeFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
@@ -43,7 +41,6 @@
 
         <service id="api_platform.doctrine.orm.date_filter" class="ApiPlatform\Doctrine\Orm\Filter\DateFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
@@ -51,7 +48,6 @@
 
         <service id="api_platform.doctrine.orm.boolean_filter" class="ApiPlatform\Doctrine\Orm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
@@ -59,7 +55,6 @@
 
         <service id="api_platform.doctrine.orm.numeric_filter" class="ApiPlatform\Doctrine\Orm\Filter\NumericFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
@@ -67,7 +62,6 @@
 
         <service id="api_platform.doctrine.orm.exists_filter" class="ApiPlatform\Doctrine\Orm\Filter\ExistsFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument key="$existsParameterName">%api_platform.collection.exists_parameter_name%</argument>
             <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
@@ -79,7 +73,6 @@
         <service id="api_platform.doctrine.orm.query_extension.eager_loading" class="ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension" public="false">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument>%api_platform.eager_loading.max_joins%</argument>
             <argument>%api_platform.eager_loading.force_eager%</argument>
             <argument>null</argument>
@@ -94,7 +87,6 @@
         <service id="ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension" alias="api_platform.doctrine.orm.query_extension.eager_loading" />
 
         <service id="api_platform.doctrine.orm.query_extension.filter" class="ApiPlatform\Doctrine\Orm\Extension\FilterExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="service" id="api_platform.filter_locator" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-16" />
@@ -104,7 +96,6 @@
         <!-- This needs to be executed right after the filter extension -->
 
         <service id="api_platform.doctrine.orm.query_extension.filter_eager_loading" class="ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument>%api_platform.eager_loading.force_eager%</argument>
             <argument type="service" id="api_platform.resource_class_resolver" />
 
@@ -114,7 +105,6 @@
 
         <service id="api_platform.doctrine.orm.query_extension.pagination" class="ApiPlatform\Doctrine\Orm\Extension\PaginationExtension" public="false">
             <argument type="service" id="doctrine" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="service" id="api_platform.pagination" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-64" />
@@ -123,7 +113,6 @@
 
         <service id="api_platform.doctrine.orm.query_extension.order" class="ApiPlatform\Doctrine\Orm\Extension\OrderExtension" public="false">
             <argument>%api_platform.collection.order%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
 
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-32" />
         </service>
@@ -158,7 +147,6 @@
 
         <service id="api_platform.doctrine.orm.search_filter" class="ApiPlatform\Doctrine\Orm\Filter\SearchFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
-            <argument>null</argument>
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="logger" on-invalid="ignore" />

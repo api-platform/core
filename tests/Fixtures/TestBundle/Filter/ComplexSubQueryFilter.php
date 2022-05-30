@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
-final class ComplexSubQueryFilter extends AbstractContextAwareFilter
+final class ComplexSubQueryFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
@@ -28,7 +29,8 @@ final class ComplexSubQueryFilter extends AbstractContextAwareFilter
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
-        ?string $operationName = null
+        ?Operation $operation = null,
+        array $context = []
     ): void {
         if ('complex_sub_query_filter' !== $property) {
             return;

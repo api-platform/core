@@ -18,7 +18,6 @@ use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryI
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
 use ApiPlatform\Tests\ProphecyTrait;
 use Elasticsearch\Client;
@@ -28,8 +27,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * @requires PHP 8.0
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
@@ -37,7 +34,7 @@ final class ItemProviderTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             ItemProvider::class,
@@ -49,7 +46,7 @@ final class ItemProviderTest extends TestCase
         );
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
@@ -82,15 +79,13 @@ final class ItemProviderTest extends TestCase
         self::assertSame($foo, $itemDataProvider->provide((new Get())->withClass(Foo::class), ['id' => 1]));
     }
 
-    public function testGetItemWithMissing404Exception()
+    public function testGetItemWithMissing404Exception(): void
     {
         $documentMetadataFactoryProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $documentMetadataFactoryProphecy->create(Foo::class)->willReturn(new DocumentMetadata('foo'))->shouldBeCalled();
 
         $clientProphecy = $this->prophesize(Client::class);
         $clientProphecy->get(['index' => 'foo', 'id' => '404'])->willThrow(new Missing404Exception())->shouldBeCalled();
-
-        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $itemDataProvider = new ItemProvider($clientProphecy->reveal(), $documentMetadataFactoryProphecy->reveal(), $this->prophesize(DenormalizerInterface::class)->reveal());
 

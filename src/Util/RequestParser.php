@@ -30,17 +30,6 @@ final class RequestParser
     }
 
     /**
-     * Gets a fixed request.
-     */
-    public static function parseAndDuplicateRequest(Request $request): Request
-    {
-        $query = self::parseRequestParams(self::getQueryString($request) ?? '');
-        $body = self::parseRequestParams($request->getContent());
-
-        return $request->duplicate($query, $body);
-    }
-
-    /**
      * Parses request parameters from the specified source.
      *
      * @author Rok Kralj

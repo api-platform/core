@@ -19,7 +19,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait OrderFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildFilter(['id' => null, 'name' => null, 'foo' => null]);
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -24,5 +25,5 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 interface AggregationItemExtensionInterface
 {
-    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, string $operationName = null, array &$context = []);
+    public function applyToItem(Builder $aggregationBuilder, string $resourceClass, array $identifiers, Operation $operation = null, array &$context = []);
 }
