@@ -15,8 +15,6 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -37,20 +35,11 @@ final class RespondListener
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    private $resourceMetadataFactory;
     private $iriConverter;
 
-    public function __construct($resourceMetadataFactory = null, IriConverterInterface $iriConverter = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, IriConverterInterface $iriConverter = null)
     {
-        if ($resourceMetadataFactory && !$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        if ($resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         $this->iriConverter = $iriConverter;
     }
 
@@ -82,36 +71,24 @@ final class RespondListener
             'X-Frame-Options' => 'deny',
         ];
 
-        $status = $operation ? $operation->getStatus() : null;
+        $status = $operation?->getStatus();
 
-        // TODO: remove this in 3.x
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && $attributes) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
+        if ($sunset = $operation?->getSunset()) {
+            $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
+        }
 
-            if ($sunset = $resourceMetadata->getOperationAttribute($attributes, 'sunset', null, true)) {
-                $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
-            }
+        if ($acceptPatch = $operation?->getAcceptPatch()) {
+            $headers['Accept-Patch'] = $acceptPatch;
+        }
 
-            $headers = $this->addAcceptPatchHeader($headers, $attributes, $resourceMetadata);
-            $status = $resourceMetadata->getOperationAttribute($attributes, 'status');
-        } elseif ($operation) {
-            if ($sunset = $operation->getSunset()) {
-                $headers['Sunset'] = (new \DateTimeImmutable($sunset))->format(\DateTime::RFC1123);
-            }
-
-            if ($acceptPatch = $operation->getAcceptPatch()) {
-                $headers['Accept-Patch'] = $acceptPatch;
-            }
-
-            if (
-                $this->iriConverter &&
-                ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) &&
-                !($operation->getExtraProperties()['is_legacy_subresource'] ?? false)
-                && 301 === $operation->getStatus()
-            ) {
-                $status = 301;
-                $headers['Location'] = $this->iriConverter->getIriFromResource($request->attributes->get('data'), UrlGeneratorInterface::ABS_PATH, $operation);
-            }
+        if (
+            $this->iriConverter &&
+            $operation &&
+            ($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false)
+            && 301 === $operation->getStatus()
+        ) {
+            $status = 301;
+            $headers['Location'] = $this->iriConverter->getIriFromResource($request->attributes->get('data'), UrlGeneratorInterface::ABS_PATH, $operation);
         }
 
         $status = $status ?? self::METHOD_TO_CODE[$request->getMethod()] ?? Response::HTTP_OK;
@@ -129,30 +106,5 @@ final class RespondListener
             $status,
             $headers
         ));
-    }
-
-    private function addAcceptPatchHeader(array $headers, array $attributes, ResourceMetadata $resourceMetadata): array
-    {
-        if (!isset($attributes['item_operation_name'])) {
-            return $headers;
-        }
-
-        $patchMimeTypes = [];
-        foreach ($resourceMetadata->getItemOperations() as $operation) {
-            if ('PATCH' !== ($operation['method'] ?? '') || !isset($operation['input_formats'])) {
-                continue;
-            }
-
-            foreach ($operation['input_formats'] as $mimeTypes) {
-                foreach ($mimeTypes as $mimeType) {
-                    $patchMimeTypes[] = $mimeType;
-                }
-            }
-            $headers['Accept-Patch'] = implode(', ', $patchMimeTypes);
-
-            return $headers;
-        }
-
-        return $headers;
     }
 }

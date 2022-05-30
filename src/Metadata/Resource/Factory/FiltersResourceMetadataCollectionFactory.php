@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Util\AttributeFilterExtractorTrait;
 
 /**
  * Creates a resource metadata from {@see Resource} annotations.
@@ -24,6 +25,8 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class FiltersResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use AttributeFilterExtractorTrait;
+
     private $decorated;
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null)
@@ -48,15 +51,17 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
+        $filters = array_keys($this->readFilterAttributes($reflectionClass));
+
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() as $operationName => $operation) {
-                $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? []))));
+                $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters))));
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations);
 
             foreach ($graphQlOperations = $resource->getGraphQlOperations() ?? [] as $operationName => $operation) {
-                $graphQlOperations[$operationName] = $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [])));
+                $graphQlOperations[$operationName] = $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters)));
             }
 
             $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);

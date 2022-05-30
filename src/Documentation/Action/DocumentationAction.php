@@ -29,27 +29,18 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class DocumentationAction
 {
-    private $resourceNameCollectionFactory;
-    private $title;
-    private $description;
-    private $version;
-    private $formats;
-    private $formatsProvider;
-    private $swaggerVersions;
-    private $openApiFactory;
+    private ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory;
+    private string $title;
+    private string $description;
+    private string $version;
+    private OpenApiFactoryInterface $openApiFactory;
 
-    /**
-     * @param int[]                                                 $swaggerVersions
-     * @param mixed|array|FormatsProviderInterface                  $formatsProvider
-     * @param LegacyOpenApiFactoryInterface|OpenApiFactoryInterface $openApiFactory
-     */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', array $swaggerVersions = [2, 3], OpenApiFactoryInterface $openApiFactory = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', OpenApiFactoryInterface $openApiFactory = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
-        $this->swaggerVersions = $swaggerVersions;
         $this->openApiFactory = $openApiFactory;
     }
 
@@ -69,6 +60,6 @@ final class DocumentationAction
             return $this->openApiFactory->__invoke($context ?? []);
         }
 
-        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
     }
 }

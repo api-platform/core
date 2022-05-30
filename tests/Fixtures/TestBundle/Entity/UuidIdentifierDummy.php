@@ -28,7 +28,7 @@ class UuidIdentifierDummy
      */
     #[ORM\Column(type: 'guid')]
     #[ORM\Id]
-    private ?string $uuid = null;
+    private $uuid;
     /**
      * @var string The dummy name
      */

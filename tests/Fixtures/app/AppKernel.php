@@ -242,9 +242,6 @@ class AppKernel extends Kernel
             $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
         }
 
-        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['METADATA_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
-        $c->prependExtensionConfig('api_platform', ['metadata_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
-
         $loader->load(__DIR__.'/config/config.yml');
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [

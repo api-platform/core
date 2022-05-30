@@ -158,7 +158,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * Groups are extracted in the following order:
      *
      * - From the "serializer_groups" key of the $options array.
-     * - From metadata of the given operation ("collection_operation_name" and "item_operation_name" keys).
+     * - From metadata of the given operation ("operation_name" key).
      * - From metadata of the current resource.
      *
      * @throws ResourceClassNotFoundException

@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener\JsonApi;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -27,18 +24,11 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 final class TransformFieldsetsParametersListener
 {
-    /**
-     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface
-     */
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
 
-    public function __construct($resourceMetadataFactory)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function onKernelRequest(RequestEvent $event): void
@@ -66,9 +56,8 @@ final class TransformFieldsetsParametersListener
             return;
         }
 
-        /** @var ResourceMetadata|ResourceMetadataCollection */
-        $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-        $resourceShortName = $resourceMetadata instanceof ResourceMetadata ? $resourceMetadata->getShortName() : $resourceMetadata->getOperation()->getShortName();
+        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $resourceShortName = $resourceMetadata->getOperation()->getShortName();
 
         $properties = [];
         foreach ($fieldsParameter as $resourceType => $fields) {

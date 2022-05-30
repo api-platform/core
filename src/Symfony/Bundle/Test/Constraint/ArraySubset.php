@@ -13,13 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test\Constraint;
 
-use PHPUnit\Runner\Version;
-use PHPUnit\SebastianBergmann\Comparator\ComparisonFailure;
-use SebastianBergmann\Comparator\ComparisonFailure as LegacyComparisonFailure;
+use PHPUnit\Framework\Constraint\Constraint;
 
-if (!class_exists(ComparisonFailure::class) && class_exists(LegacyComparisonFailure::class)) {
-}
+/**
+ * Is used for phpunit >= 9.
+ *
+ * @internal
+ */
+final class ArraySubset extends Constraint
+{
+    use ArraySubsetTrait;
 
-// Aliases as string to avoid loading the class
-if (\PHP_VERSION_ID >= 80000 || (float) Version::series() >= 9) {
+    /**
+     * {@inheritdoc}
+     */
+    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
+    {
+        return $this->_evaluate($other, $description, $returnResult);
+    }
 }

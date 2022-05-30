@@ -22,9 +22,6 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
-/**
- * @group legacy
- */
 class ClientTest extends ApiTestCase
 {
     protected function setUp(): void

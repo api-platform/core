@@ -5,6 +5,12 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- JSON Schema -->
+
+        <service id="api_platform.hal.json_schema.schema_factory" class="ApiPlatform\Hal\JsonSchema\SchemaFactory" decorates="api_platform.json_schema.schema_factory">
+            <argument type="service" id="api_platform.hal.json_schema.schema_factory.inner" />
+        </service>
+
         <service id="api_platform.hal.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">
             <argument>jsonhal</argument>
 
@@ -36,10 +42,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
-            <argument>null</argument>
-            <argument>false</argument>
             <argument type="collection" />
-            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 

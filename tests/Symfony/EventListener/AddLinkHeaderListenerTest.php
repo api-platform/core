@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\AddLinkHeaderListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
@@ -33,7 +35,6 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class AddLinkHeaderListenerTest extends TestCase
 {
@@ -44,12 +45,14 @@ class AddLinkHeaderListenerTest extends TestCase
      */
     public function testAddLinkHeader(string $expected, Request $request)
     {
-        if (!class_exists(Discovery::class)) {
-            $this->markTestSkipped();
-        }
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => ['hub' => 'managed']]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                'get' => new Get(mercure: [
+                    'hub' => 'managed',
+                ]),
+            ])),
+        ]));
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -64,39 +67,16 @@ class AddLinkHeaderListenerTest extends TestCase
         $mercure = new HubRegistry($defaultHub, ['default' => $defaultHub, 'managed' => $managedHub]);
         $discovery = new Discovery($mercure);
 
-        $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), $discovery);
+        $listener = new AddLinkHeaderListener($discovery, $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelResponse($event);
-
-        $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
-    }
-
-    /**
-     * @dataProvider addProvider
-     * @group legacy
-     */
-    public function testAddLinkHeaderWithLegacySignature(string $expected, Request $request)
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, null, null, ['mercure' => true]));
-
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
-            new Response()
-        );
-
-        $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://managed.mercure.rocks/.well-known/mercure');
-        $listener->onKernelResponse($event);
-
         $this->assertSame($expected, (new HttpHeaderSerializer())->serialize($request->attributes->get('_links')->getLinks()));
     }
 
     public function addProvider(): array
     {
         return [
-            ['<https://managed.mercure.rocks/.well-known/mercure>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get'])],
-            ['<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation",<https://managed.mercure.rocks/.well-known/mercure>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_links' => new GenericLinkProvider([new Link('http://www.w3.org/ns/hydra/core#apiDocumentation', 'http://example.com/docs')])])],
+            ['<https://managed.mercure.rocks/.well-known/mercure>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get'])],
+            ['<http://example.com/docs>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation",<https://managed.mercure.rocks/.well-known/mercure>; rel="mercure"', new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_links' => new GenericLinkProvider([new Link('http://www.w3.org/ns/hydra/core#apiDocumentation', 'http://example.com/docs')])])],
         ];
     }
 
@@ -105,12 +85,10 @@ class AddLinkHeaderListenerTest extends TestCase
      */
     public function testDoNotAddHeader(Request $request)
     {
-        if (!class_exists(Discovery::class)) {
-            $this->markTestSkipped();
-        }
-
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [new Get()])),
+        ]));
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -121,52 +99,7 @@ class AddLinkHeaderListenerTest extends TestCase
 
         $defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://external/.well-known/mercure');
         $registry = new HubRegistry($defaultHub, ['default' => $defaultHub]);
-        $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), new Discovery($registry));
-        $listener->onKernelResponse($event);
-
-        $this->assertNull($request->attributes->get('_links'));
-    }
-
-    /**
-     * @dataProvider doNotAddProvider
-     *
-     * @group legacy
-     */
-    public function testDoNotAddHeaderLegacy(Request $request)
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
-
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
-            new Response()
-        );
-
-        $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://external/.well-known/mercure');
-        $listener->onKernelResponse($event);
-
-        $this->assertNull($request->attributes->get('_links'));
-    }
-
-    /**
-     * @dataProvider doNotAddProvider
-     * @group legacy
-     */
-    public function testDoNotAddHeaderWithLegacySignature(Request $request)
-    {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata());
-
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
-            new Response()
-        );
-
-        $listener = new AddLinkHeaderListener($resourceMetadataFactoryProphecy->reveal(), 'https://demo.mercure.rocks/hub');
+        $listener = new AddLinkHeaderListener(new Discovery($registry), $resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelResponse($event);
 
         $this->assertNull($request->attributes->get('_links'));
@@ -182,10 +115,6 @@ class AddLinkHeaderListenerTest extends TestCase
 
     public function testSkipWhenPreflightRequest(): void
     {
-        if (!class_exists(Discovery::class)) {
-            $this->markTestSkipped();
-        }
-
         $request = new Request();
         $request->setMethod('OPTIONS');
         $request->headers->set('Access-Control-Request-Method', 'POST');
@@ -196,35 +125,10 @@ class AddLinkHeaderListenerTest extends TestCase
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             new Response()
         );
-
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
 
         $defaultHub = new Hub('https://internal/.well-known/mercure', new StaticTokenProvider('xxx'), null, 'https://external/.well-known/mercure');
         $registry = new HubRegistry($defaultHub, ['default' => $defaultHub]);
-        $listener = new AddLinkHeaderListener($resourceMetadataFactory->reveal(), new Discovery($registry));
-        $listener->onKernelResponse($event);
-
-        $this->assertFalse($request->attributes->has('_links'));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testSkipWhenPreflightRequestWithLegacySignature(): void
-    {
-        $request = new Request();
-        $request->setMethod('OPTIONS');
-        $request->headers->set('Access-Control-Request-Method', 'POST');
-
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            $request,
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
-            new Response()
-        );
-
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $listener = new AddLinkHeaderListener($resourceMetadataFactory->reveal(), 'http://example.com/.well-known/mercure');
+        $listener = new AddLinkHeaderListener(new Discovery($registry));
         $listener->onKernelResponse($event);
 
         $this->assertFalse($request->attributes->has('_links'));

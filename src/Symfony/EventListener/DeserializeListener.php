@@ -38,7 +38,7 @@ final class DeserializeListener
     private $serializer;
     private $serializerContextBuilder;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -55,19 +55,18 @@ final class DeserializeListener
         $request = $event->getRequest();
         $method = $request->getMethod();
 
-        $operation = $this->initializeOperation($request);
-
         if (
             'DELETE' === $method
             || $request->isMethodSafe()
             || !($attributes = RequestAttributesExtractor::extractAttributes($request))
+            || !$attributes['receive']
         ) {
             return;
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface &&
-            (!$operation || !($operation->canDeserialize() ?? true) || !$attributes['receive'])
-        ) {
+        $operation = $this->initializeOperation($request);
+
+        if (!($operation?->canDeserialize() ?? true)) {
             return;
         }
 

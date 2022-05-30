@@ -22,8 +22,6 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
- * @group legacy
  */
 class OpenApiCommandTest extends KernelTestCase
 {
@@ -31,7 +29,6 @@ class OpenApiCommandTest extends KernelTestCase
      * @var ApplicationTester
      */
     private $tester;
-    private $legacy;
 
     protected function setUp(): void
     {
@@ -41,15 +38,9 @@ class OpenApiCommandTest extends KernelTestCase
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
 
-        $this->legacy = static::$kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
         $this->tester = new ApplicationTester($application);
     }
 
-    /**
-     * TODO: change this once we support #[Resource].
-     *
-     * @group legacy
-     */
     public function testExecute()
     {
         $this->tester->run(['command' => 'api:openapi:export']);
@@ -63,7 +54,7 @@ class OpenApiCommandTest extends KernelTestCase
 
         $result = $this->tester->getDisplay();
         $this->assertYaml($result);
-        $operationId = $this->legacy ? 'getDummyCarCollection' : 'api_dummy_cars_get_collection';
+        $operationId = 'api_dummy_cars_get_collection';
 
         $expected = <<<YAML
   /dummy_cars:
@@ -75,7 +66,7 @@ YAML;
 
         $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
 
-        $operationId = $this->legacy ? 'getDummyCarItem' : 'api_dummy_cars_get_item';
+        $operationId = 'api_dummy_cars_id_get';
         $expected = <<<YAML
   '/dummy_cars/{id}':
     get:

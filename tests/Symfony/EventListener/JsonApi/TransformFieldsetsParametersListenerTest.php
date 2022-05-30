@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformFieldsetsParametersListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
@@ -22,9 +24,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-/**
- * @group legacy
- */
 class TransformFieldsetsParametersListenerTest extends TestCase
 {
     use ProphecyTrait;
@@ -33,8 +32,12 @@ class TransformFieldsetsParametersListenerTest extends TestCase
 
     protected function setUp(): void
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata('dummy'));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                'get' => new Get(shortName: 'dummy'),
+            ])),
+        ]));
 
         $this->listener = new TransformFieldsetsParametersListener($resourceMetadataFactoryProphecy->reveal());
     }

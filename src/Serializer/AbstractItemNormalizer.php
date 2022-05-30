@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\InvalidValueException;
@@ -57,9 +58,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
     public const IS_TRANSFORMED_TO_SAME_CLASS = 'is_transformed_to_same_class';
 
-    /**
-     * @var PropertyNameCollectionFactoryInterface
-     */
     protected $propertyNameCollectionFactory;
     protected $propertyMetadataFactory;
     protected $iriConverter;
@@ -68,7 +66,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $propertyAccessor;
     protected $localCache = [];
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = function ($object) {
@@ -567,14 +565,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (isset($context['operation_name'])) {
             $options['operation_name'] = $context['operation_name'];
-        }
-
-        if (isset($context['collection_operation_name'])) {
-            $options['collection_operation_name'] = $context['collection_operation_name'];
-        }
-
-        if (isset($context['item_operation_name'])) {
-            $options['item_operation_name'] = $context['item_operation_name'];
         }
 
         return $options;

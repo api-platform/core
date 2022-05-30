@@ -77,8 +77,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
-        // TODO: 3.0 remove collection/item
-        $parameters['_api_operation_name'] = $parameters['_api_operation_name'] ?? $parameters['_api_collection_operation_name'] ?? $parameters['_api_item_operation_name'] ?? $parameters['_api_subresource_operation_name'] ?? null;
+        $parameters['_api_operation_name'] = $parameters['_api_operation_name'] ?? null;
 
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));

@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\FormatMatcher;
-use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -35,35 +33,13 @@ final class AddFormatListener
     use OperationRequestInitiatorTrait;
 
     private $negotiator;
-    private $resourceMetadataFactory;
     private $formats = [];
-    private $formatsProvider;
-    private $formatMatcher;
 
-    /**
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|FormatsProviderInterface|array $resourceMetadataFactory
-     */
-    public function __construct(Negotiator $negotiator, $resourceMetadataFactory, array $formats = [])
+    public function __construct(Negotiator $negotiator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, array $formats = [])
     {
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface && !$resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            trigger_deprecation('api-plaform/core', '2.5', sprintf('Passing an array or an instance of "%s" as 2nd parameter of the constructor of "%s" is deprecated since API Platform 2.5, pass an instance of "%s" instead', FormatsProviderInterface::class, __CLASS__, ResourceMetadataFactoryInterface::class));
-        }
-
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface && $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
         $this->negotiator = $negotiator;
-        $this->resourceMetadataFactory = $resourceMetadataFactory instanceof ResourceMetadataFactoryInterface ? $resourceMetadataFactory : null;
         $this->formats = $formats;
-
-        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface ? $resourceMetadataFactory : null;
-
-        if (\is_array($resourceMetadataFactory)) {
-            $this->formats = $resourceMetadataFactory;
-        } elseif ($resourceMetadataFactory instanceof FormatsProviderInterface) {
-            $this->formatsProvider = $resourceMetadataFactory;
-        }
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
@@ -86,21 +62,7 @@ final class AddFormatListener
         }
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
-        $formats = $this->formats;
-
-        // BC check to be removed in 3.0
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface && $attributes) {
-            // TODO: Subresource operation metadata aren't available by default, for now we have to fallback on default formats.
-            // TODO: A better approach would be to always populate the subresource operation array.
-            $formats = $this
-                ->resourceMetadataFactory
-                ->create($attributes['resource_class'])
-                ->getOperationAttribute($attributes, 'output_formats', $this->formats, true);
-        } elseif ($this->formatsProvider instanceof FormatsProviderInterface) {
-            $formats = $this->formatsProvider->getFormatsFromAttributes($attributes);
-        } elseif ($operation && $operation->getOutputFormats()) {
-            $formats = $operation->getOutputFormats();
-        }
+        $formats = $operation?->getOutputFormats() ?? $this->formats;
 
         $this->addRequestFormats($request, $formats);
         $this->formatMatcher = new FormatMatcher($formats);

@@ -31,9 +31,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group legacy
- */
 class SchemaFactoryTest extends TestCase
 {
     use ProphecyTrait;

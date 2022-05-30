@@ -48,7 +48,7 @@ class ExceptionListenerTest extends TestCase
     public function getRequest()
     {
         return [
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get'])],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get'])],
             [new Request([], [], ['_api_respond' => true])],
         ];
     }

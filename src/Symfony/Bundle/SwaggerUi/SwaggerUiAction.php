@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +42,7 @@ final class SwaggerUiAction
     private $oauthClientSecret;
     private $oauthPkce;
 
-    public function __construct($resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null, bool $oauthPkce = false)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ?TwigEnvironment $twig, UrlGeneratorInterface $urlGenerator, NormalizerInterface $normalizer, OpenApiFactoryInterface $openApiFactory, Options $openApiOptions, SwaggerUiContext $swaggerUiContext, array $formats = [], string $oauthClientId = null, string $oauthClientSecret = null, bool $oauthPkce = false)
     {
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->twig = $twig;
@@ -72,8 +72,7 @@ final class SwaggerUiAction
             'showWebby' => $this->swaggerUiContext->isWebbyShown(),
             'swaggerUiEnabled' => $this->swaggerUiContext->isSwaggerUiEnabled(),
             'reDocEnabled' => $this->swaggerUiContext->isRedocEnabled(),
-            // FIXME: typo graphql => graphQl
-            'graphqlEnabled' => $this->swaggerUiContext->isGraphQlEnabled(),
+            'graphQlEnabled' => $this->swaggerUiContext->isGraphQlEnabled(),
             'graphiQlEnabled' => $this->swaggerUiContext->isGraphiQlEnabled(),
             'graphQlPlaygroundEnabled' => $this->swaggerUiContext->isGraphQlPlaygroundEnabled(),
             'assetPackage' => $this->swaggerUiContext->getAssetPackage(),
@@ -100,21 +99,10 @@ final class SwaggerUiAction
             $swaggerData['id'] = $request->attributes->get('id');
             $swaggerData['queryParameters'] = $request->query->all();
 
-            $metadata = $this->resourceMetadataFactory->create($resourceClass);
+            $metadata = $this->resourceMetadataFactory->create($resourceClass)->getOperation($request->attributes->get('_api_operation_name'));
 
-            if ($metadata instanceof ResourceMetadata) {
-                $swaggerData['shortName'] = $metadata->getShortName();
-                if (null !== $collectionOperationName = $request->attributes->get('_api_collection_operation_name')) {
-                    $swaggerData['operationId'] = sprintf('%s%sCollection', $collectionOperationName, ucfirst($swaggerData['shortName']));
-                } elseif (null !== $itemOperationName = $request->attributes->get('_api_item_operation_name')) {
-                    $swaggerData['operationId'] = sprintf('%s%sItem', $itemOperationName, ucfirst($swaggerData['shortName']));
-                } elseif (null !== $subresourceOperationContext = $request->attributes->get('_api_subresource_context')) {
-                    $swaggerData['operationId'] = $subresourceOperationContext['operationId'];
-                }
-            } else {
-                $swaggerData['shortName'] = $metadata[0]->getShortName();
-                $swaggerData['operationId'] = $request->attributes->get('_api_operation_name');
-            }
+            $swaggerData['shortName'] = $metadata->getShortName();
+            $swaggerData['operationId'] = $metadata->getName();
 
             [$swaggerData['path'], $swaggerData['method']] = $this->getPathAndMethod($swaggerData);
         }

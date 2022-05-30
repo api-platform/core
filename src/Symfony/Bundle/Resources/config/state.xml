@@ -9,13 +9,11 @@
         </service>
         <service id="api_platform.state_provider" alias="api_platform.state_provider.locator" />
 
-        <service id="api_platform.pagination.next" class="ApiPlatform\State\Pagination\Pagination">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+        <service id="api_platform.pagination" class="ApiPlatform\State\Pagination\Pagination">
             <argument>%api_platform.collection.pagination%</argument>
             <argument>%api_platform.graphql.collection.pagination%</argument>
         </service>
-        <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination.next" />
-        <service id="api_platform.pagination" alias="api_platform.pagination.next" />
+        <service id="ApiPlatform\State\Pagination\Pagination" alias="api_platform.pagination" />
 
         <service id="api_platform.state_processor.locator" class="ApiPlatform\State\CallableProcessor">
             <argument type="tagged_locator" tag="api_platform.state_processor"/>

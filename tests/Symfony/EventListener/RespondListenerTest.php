@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\EventListener\RespondListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
@@ -26,7 +29,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class RespondListenerTest extends TestCase
 {
@@ -81,7 +83,7 @@ class RespondListenerTest extends TestCase
 
     public function testPost200WithoutLocation()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'post', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
 
         $event = new ViewEvent(
@@ -90,8 +92,12 @@ class RespondListenerTest extends TestCase
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             'bar'
         );
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_OK]]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                'post' => new Post(status: Response::HTTP_OK),
+            ])),
+        ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -103,7 +109,7 @@ class RespondListenerTest extends TestCase
 
     public function testPost301WithLocation()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_respond' => true, '_api_write_item_iri' => '/dummy_entities/1']);
         $request->setMethod('POST');
 
         $event = new ViewEvent(
@@ -112,8 +118,13 @@ class RespondListenerTest extends TestCase
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             'bar'
         );
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_MOVED_PERMANENTLY]]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                'get' => new Get(status: Response::HTTP_MOVED_PERMANENTLY),
+            ])),
+        ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -181,12 +192,17 @@ class RespondListenerTest extends TestCase
     {
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_respond' => true]),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             'bar'
         );
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['sunset' => 'tomorrow']]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                'get' => new Get(sunset: 'tomorrow'),
+            ])),
+        ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -201,12 +217,16 @@ class RespondListenerTest extends TestCase
     {
         $event = new ViewEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_respond' => true]),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             'bar'
         );
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadata(null, null, null, ['get' => ['status' => Response::HTTP_ACCEPTED]]));
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(operations: [
+                'get' => new Get(status: Response::HTTP_ACCEPTED),
+            ])),
+        ]));
 
         $listener = new RespondListener($resourceMetadataFactoryProphecy->reveal());
         $listener->onKernelView($event);
@@ -221,7 +241,7 @@ class RespondListenerTest extends TestCase
         $response = new Response();
         $event = new ViewEvent(
           $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get', '_api_respond' => true]),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_respond' => true]),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );

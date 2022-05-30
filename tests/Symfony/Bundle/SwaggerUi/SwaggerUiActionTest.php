@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\SwaggerUi;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Documentation\DocumentationInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;
@@ -33,7 +36,6 @@ use Twig\Environment as TwigEnvironment;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
- * @group legacy
  */
 class SwaggerUiActionTest extends TestCase
 {
@@ -53,8 +55,13 @@ class SwaggerUiActionTest extends TestCase
      */
     public function testInvoke(Request $request, $twigProphecy)
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata('F'))->shouldBeCalled();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource(operations: [
+                'getFItem' => new Get(shortName: 'F', name: 'getFItem'),
+                'getFCollection' => new GetCollection(shortName: 'F', name: 'getFCollection'),
+            ])),
+        ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
@@ -88,7 +95,7 @@ class SwaggerUiActionTest extends TestCase
             'showWebby' => true,
             'swaggerUiEnabled' => false,
             'reDocEnabled' => false,
-            'graphqlEnabled' => false,
+            'graphQlEnabled' => false,
             'graphiQlEnabled' => false,
             'graphQlPlaygroundEnabled' => false,
             'assetPackage' => null,
@@ -124,7 +131,7 @@ class SwaggerUiActionTest extends TestCase
             'swaggerUiEnabled' => false,
             'showWebby' => true,
             'reDocEnabled' => false,
-            'graphqlEnabled' => false,
+            'graphQlEnabled' => false,
             'graphiQlEnabled' => false,
             'graphQlPlaygroundEnabled' => false,
             'assetPackage' => null,
@@ -153,9 +160,9 @@ class SwaggerUiActionTest extends TestCase
         ])->shouldBeCalled()->willReturn('');
 
         return [
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get']), $twigCollectionProphecy],
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get']), $twigItemProphecy],
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_item_operation_name' => 'get'], [], [], ['REQUEST_URI' => '/docs', 'SCRIPT_FILENAME' => '/docs']), $twigItemProphecy],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'getFCollection']), $twigCollectionProphecy],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'getFItem']), $twigItemProphecy],
+            [new Request([], [], ['_api_resource_class' => 'Foo'], [], [], ['REQUEST_URI' => '/docs', 'SCRIPT_FILENAME' => '/docs']), $twigItemProphecy],
         ];
     }
 
@@ -164,8 +171,12 @@ class SwaggerUiActionTest extends TestCase
      */
     public function testDoNotRunCurrentRequest(Request $request)
     {
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadata());
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource(operations: [
+                'get' => new Get(),
+            ])),
+        ]));
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize(Argument::type(DocumentationInterface::class), 'json', Argument::type('array'))->willReturn(self::SPEC)->shouldBeCalled();
@@ -178,7 +189,7 @@ class SwaggerUiActionTest extends TestCase
             'showWebby' => true,
             'swaggerUiEnabled' => false,
             'reDocEnabled' => false,
-            'graphqlEnabled' => false,
+            'graphQlEnabled' => false,
             'graphiQlEnabled' => false,
             'graphQlPlaygroundEnabled' => false,
             'assetPackage' => null,
@@ -221,7 +232,7 @@ class SwaggerUiActionTest extends TestCase
 
     public function getDoNotRunCurrentRequestParameters(): iterable
     {
-        $nonSafeRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'post']);
+        $nonSafeRequest = new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'post']);
         $nonSafeRequest->setMethod('POST');
         yield [$nonSafeRequest];
         yield [new Request()];

@@ -44,11 +44,12 @@ class SlugParentDummy
     #[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, unique: true)]
     private ?string $slug = null;
+
     /**
-     * @var \Collection<int,\SlugChildDummy>
+     * @var Collection<int,\SlugChildDummy>
      */
     #[ORM\OneToMany(targetEntity: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugChildDummy::class, mappedBy: 'parentDummy')]
-    private \Collection $childDummies;
+    private Collection $childDummies;
 
     public function __construct()
     {

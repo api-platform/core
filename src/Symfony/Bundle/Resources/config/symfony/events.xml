@@ -28,8 +28,8 @@
         <service id="api_platform.listener.view.write" class="ApiPlatform\Symfony\EventListener\WriteListener">
             <argument type="service" id="api_platform.state_processor" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.uri_variables.converter" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="32" />
@@ -47,7 +47,6 @@
             <argument type="service" id="api_platform.serializer" />
             <argument type="service" id="api_platform.serializer.context_builder" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="16" />
         </service>

@@ -19,7 +19,6 @@ final class Schema extends \ArrayObject
 {
     use ExtensionTrait;
 
-    private $nullable;
     private $discriminator;
     private $readOnly;
     private $writeOnly;
@@ -29,12 +28,8 @@ final class Schema extends \ArrayObject
     private $deprecated;
     private $schema;
 
-    public function __construct(bool $nullable = null, $discriminator = null, bool $readOnly = false, bool $writeOnly = false, string $xml = null, $externalDocs = null, $example = null, bool $deprecated = false)
+    public function __construct($discriminator = null, bool $readOnly = false, bool $writeOnly = false, string $xml = null, $externalDocs = null, $example = null, bool $deprecated = false)
     {
-        if (null !== $nullable) {
-            @trigger_error('The nullable keyword has been removed from the Schema Object (null can be used as a type value). This behaviour will not be possible anymore in API Platform 3.0.', \E_USER_DEPRECATED);
-            $this->nullable = $nullable;
-        }
         $this->discriminator = $discriminator;
         $this->readOnly = $readOnly;
         $this->writeOnly = $writeOnly;

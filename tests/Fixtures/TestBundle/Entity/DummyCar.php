@@ -64,9 +64,13 @@ class DummyCar
      * @var mixed Something else
      */
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[ORM\ManyToMany(targetEntity: 'UuidIdentifierDummy', indexBy: 'uuid')]
+    #[ORM\ManyToMany(targetEntity: UuidIdentifierDummy::class, indexBy: 'uuid')]
+    #[ORM\JoinColumn(name: 'car_id', referencedColumnName: 'id_id')]
+    #[ORM\InverseJoinColumn(name: 'uuid_uuid', referencedColumnName: 'uuid')]
+    #[ORM\JoinTable(name: 'uuid_cars')]
     #[Serializer\Groups(['colors'])]
-    private mixed $uuid = null;
+    private $uuid = null;
+
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ORM\Column(type: 'string')]
     private ?string $name = null;

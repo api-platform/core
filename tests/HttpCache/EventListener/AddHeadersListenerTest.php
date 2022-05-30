@@ -35,7 +35,7 @@ class AddHeadersListenerTest extends TestCase
 
     public function testDoNotSetHeaderWhenMethodNotCacheable()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
         $request->setMethod('PUT');
         $response = new Response();
         $event = new ResponseEvent(
@@ -53,7 +53,7 @@ class AddHeadersListenerTest extends TestCase
 
     public function testDoNotSetHeaderOnUnsuccessfulResponse()
     {
-        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']);
+        $request = new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']);
         $response = new Response('{}', Response::HTTP_BAD_REQUEST);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
@@ -89,7 +89,7 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response();
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );

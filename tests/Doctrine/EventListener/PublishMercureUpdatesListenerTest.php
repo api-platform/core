@@ -46,15 +46,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class PublishMercureUpdatesListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testLegacyPublishUpdate(): void
     {
         if (method_exists(Update::class, 'isPrivate')) {
@@ -144,9 +140,6 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertSame([['enable_async_update' => true], ['enable_async_update' => true], ['enable_async_update' => true], ['foo', 'bar', 'enable_async_update' => true]], $targets);
     }
 
-    /**
-     * @group legacy
-     */
     public function testPublishUpdateWithLegacySignature(): void
     {
         if (!method_exists(Update::class, 'isPrivate')) {

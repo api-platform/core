@@ -72,9 +72,6 @@ class SecurityPostDenormalizeStageTest extends TestCase
         ($this->securityPostDenormalizeStage)($resourceClass, $operation, ['extra_variables' => $extraVariables]);
     }
 
-    /**
-     * @group legacy
-     */
     public function testGrantedLegacy(): void
     {
         self::markTestSkipped('The deprecation is handled in the Metadata transformation, this is not required anymore.'); // @phpstan-ignore-next-line

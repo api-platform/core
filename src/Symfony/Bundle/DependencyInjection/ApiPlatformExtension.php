@@ -418,10 +418,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             throw new RuntimeException('You can not set "swagger_ui_extra_configuration" twice - in "openapi" and "swagger" section.');
         }
         $container->setParameter('api_platform.swagger_ui.extra_configuration', $config['openapi']['swagger_ui_extra_configuration'] ?: $config['swagger']['swagger_ui_extra_configuration']);
-
-        // for swagger 2 support
-        $loader->load('openapi.xml');
-        $loader->load('swagger_ui.xml');
     }
 
     private function registerJsonApiConfiguration(array $formats, XmlFileLoader $loader): void
@@ -442,12 +438,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonld.xml');
         $loader->load('hydra.xml');
 
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/hydra.xml');
-        } else {
-            $loader->load('v3/hydra.xml');
-        }
-
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
         }
@@ -464,12 +454,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('hal.xml');
-
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/hal.xml');
-        } else {
-            $loader->load('v3/hal.xml');
-        }
     }
 
     private function registerJsonProblemConfiguration(array $errorFormats, XmlFileLoader $loader): void
@@ -749,12 +733,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
 
         $loader->load('json_schema.xml');
-
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/json_schema.xml');
-        } else {
-            $loader->load('v3/json_schema.xml');
-        }
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

@@ -49,9 +49,6 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
         $this->mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator($this->requestContext, $this->registry);
     }
 
-    /**
-     * @group legacy
-     */
     public function testGenerateTopicIriWithLegacySignature(): void
     {
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', 'example.com'), 'https://example.com/.well-known/mercure');
@@ -59,9 +56,6 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
         $this->assertSame('http://example.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testGenerateDefaultTopicIriWithLegacySignature(): void
     {
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', '', ''), 'https://example.com/.well-known/mercure');
@@ -69,9 +63,6 @@ class MercureSubscriptionIriGeneratorTest extends TestCase
         $this->assertSame('https://api-platform.com/subscriptions/subscription-id', $mercureSubscriptionIriGenerator->generateTopicIri('subscription-id'));
     }
 
-    /**
-     * @group legacy
-     */
     public function testGenerateMercureUrlWithLegacySignature(): void
     {
         $mercureSubscriptionIriGenerator = new MercureSubscriptionIriGenerator(new RequestContext('', 'GET', 'example.com'), 'https://example.com/.well-known/mercure');

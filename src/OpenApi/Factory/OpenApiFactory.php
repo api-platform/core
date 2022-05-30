@@ -148,7 +148,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            $operationId = $operation->getOpenapiContext()['operationId'] ?? $operationName;
+            $operationId = $operation->getOpenapiContext()['operationId'] ?? $this->normalizeOperationName($operationName);
 
             if ($path) {
                 $pathItem = $paths->getPath($path) ?: new Model\PathItem();
@@ -555,5 +555,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return false;
+    }
+
+    private function normalizeOperationName(string $operationName): string
+    {
+        return preg_replace('/^_/', '', str_replace(['/', '.{_format}', '{', '}'], ['', '', '_', ''], $operationName));
     }
 }

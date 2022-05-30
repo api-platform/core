@@ -42,7 +42,7 @@ final class SerializeListener
     private $serializer;
     private $serializerContextBuilder;
 
-    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
+    public function __construct(SerializerInterface $serializer, SerializerContextBuilderInterface $serializerContextBuilder, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
         $this->serializer = $serializer;
         $this->serializerContextBuilder = $serializerContextBuilder;
@@ -56,7 +56,6 @@ final class SerializeListener
     {
         $controllerResult = $event->getControllerResult();
         $request = $event->getRequest();
-        $operation = $this->initializeOperation($request);
 
         if ($controllerResult instanceof Response) {
             return;
@@ -68,7 +67,8 @@ final class SerializeListener
             return;
         }
 
-        if (!$operation || !($operation->canSerialize() ?? true)) {
+        $operation = $this->initializeOperation($request);
+        if (!($operation?->canSerialize() ?? true)) {
             return;
         }
 

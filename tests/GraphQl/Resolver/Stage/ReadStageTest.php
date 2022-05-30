@@ -28,7 +28,6 @@ use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -36,7 +35,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ReadStageTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     /** @var ReadStage */
@@ -282,39 +280,5 @@ class ReadStageTest extends TestCase
                 ['subresource'],
             ],
         ];
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testApplyCollectionWithDeprecatedFilterSyntax(): void
-    {
-        $operationName = 'collection_query';
-        $resourceClass = 'myResource';
-        $info = $this->prophesize(ResolveInfo::class)->reveal();
-        $fieldName = 'subresource';
-        $info->fieldName = $fieldName;
-        $context = [
-            'is_collection' => true,
-            'is_mutation' => false,
-            'is_subscription' => false,
-            'args' => ['filter' => [['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']]],
-            'info' => $info,
-            'source' => null,
-        ];
-        $filters = ['filter' => ['filterArg1' => 'filterValue1', 'filterArg2' => 'filterValue2']];
-        /** @var Operation $operation */
-        $operation = (new QueryCollection())->withName($operationName)->withClass($resourceClass)->withFilters($filters);
-
-        $normalizationContext = ['normalization' => true, 'operation' => $operation];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
-
-        $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $filters])->willReturn([]);
-
-        $this->expectDeprecation('The filter syntax "filter: {filterArg1: "filterValue1", filterArg2: "filterValue2"}" is deprecated since API Platform 2.6, use the following syntax instead: "filter: [{filterArg1: "filterValue1"}, {filterArg2: "filterValue2"}]".');
-
-        $result = ($this->readStage)($resourceClass, 'myResource', $operation, $context);
-
-        $this->assertSame([], $result);
     }
 }

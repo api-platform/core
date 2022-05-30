@@ -127,17 +127,6 @@ final class ReadStage implements ReadStageInterface
 
                 // If the value contains arrays, we need to merge them for the filters to understand this syntax, proper to GraphQL to preserve the order of the arguments.
                 if ($this->isSequentialArrayOfArrays($value)) {
-                    if (\count($value[0]) > 1) {
-                        $deprecationMessage = "The filter syntax \"$name: {";
-                        $filterArgsOld = [];
-                        $filterArgsNew = [];
-                        foreach ($value[0] as $filterArgName => $filterArgValue) {
-                            $filterArgsOld[] = "$filterArgName: \"$filterArgValue\"";
-                            $filterArgsNew[] = sprintf('{%s: "%s"}', $filterArgName, $filterArgValue);
-                        }
-                        $deprecationMessage .= sprintf('%s}" is deprecated since API Platform 2.6, use the following syntax instead: "%s: [%s]".', implode(', ', $filterArgsOld), $name, implode(', ', $filterArgsNew));
-                        @trigger_error($deprecationMessage, \E_USER_DEPRECATED);
-                    }
                     $value = array_merge(...$value);
                 }
                 $filters[$name] = $this->getNormalizedFilters($value);

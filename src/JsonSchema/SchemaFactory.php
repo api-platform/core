@@ -119,6 +119,8 @@ final class SchemaFactory implements SchemaFactoryInterface
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
         if (Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason()) {
             $definition['deprecated'] = true;
+        } else {
+            $definition['deprecated'] = false;
         }
 
         // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it

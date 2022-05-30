@@ -32,15 +32,12 @@ final class QueryParameterValidateListener
 
     public const OPERATION_ATTRIBUTE_KEY = 'query_parameter_validate';
 
-    private $resourceMetadataFactory;
+    private QueryParameterValidator $queryParameterValidator;
+    private bool $enabled;
 
-    private $queryParameterValidator;
-
-    private $enabled;
-
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, QueryParameterValidator $queryParameterValidator, bool $enabled = true)
+    public function __construct(QueryParameterValidator $queryParameterValidator, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, bool $enabled = true)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->queryParameterValidator = $queryParameterValidator;
         $this->enabled = $enabled;
     }
@@ -48,7 +45,6 @@ final class QueryParameterValidateListener
     public function onKernelRequest(RequestEvent $event)
     {
         $request = $event->getRequest();
-        $operation = $this->initializeOperation($request);
 
         if (
             !$request->isMethodSafe()
@@ -58,12 +54,14 @@ final class QueryParameterValidateListener
             return;
         }
 
-        if (!$operation || !($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface) {
+        $operation = $this->initializeOperation($request);
+
+        if (!($operation?->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface) {
             return;
         }
 
         $queryString = RequestParser::getQueryString($request);
         $queryParameters = $queryString ? RequestParser::parseRequestParams($queryString) : [];
-        $this->queryParameterValidator->validateFilters($attributes['resource_class'], $operation->getFilters() ?? [], $queryParameters);
+        $this->queryParameterValidator->validateFilters($attributes['resource_class'], $operation?->getFilters() ?? [], $queryParameters);
     }
 }

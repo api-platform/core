@@ -35,29 +35,7 @@ class DocumentationActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testDocumentationActionV2(): void
-    {
-        $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
-        $requestProphecy = $this->prophesize(Request::class);
-        $requestProphecy->getRequestFormat()->willReturn('json');
-        $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
-        $queryProphecy = $this->prophesize(ParameterBag::class);
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));
-        $requestProphecy->attributes = $attributesProphecy->reveal();
-        $requestProphecy->query = $queryProphecy->reveal();
-        $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
-        $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
-        $queryProphecy->getInt('spec_version', 2)->willReturn(2)->shouldBeCalledTimes(1);
-        $attributesProphecy->all()->willReturn(['_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2]])->shouldBeCalledTimes(1);
-        $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
-        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 2])->shouldBeCalledTimes(1);
-
-        $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0', [2, 3], $openApiFactoryProphecy->reveal());
-        $this->assertEquals(new Documentation(new ResourceNameCollection(['dummies']), 'My happy hippie api', 'lots of chocolate', '1.0.0'), $documentation($requestProphecy->reveal()));
-    }
-
-    public function testDocumentationActionV3(): void
+    public function testDocumentationAction(): void
     {
         $openApi = new OpenApi(new Info('my api', '1.0.0'), [], new Paths());
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
@@ -66,8 +44,6 @@ class DocumentationActionTest extends TestCase
         $requestProphecy->getRequestFormat()->willReturn('json');
         $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
         $queryProphecy = $this->prophesize(ParameterBag::class);
-        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']));
         $requestProphecy->attributes = $attributesProphecy->reveal();
         $requestProphecy->query = $queryProphecy->reveal();
         $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
@@ -77,7 +53,7 @@ class DocumentationActionTest extends TestCase
         $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
         $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => 3])->shouldBeCalledTimes(1);
 
-        $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'My happy hippie api', 'lots of chocolate', '1.0.0', [2, 3], $openApiFactoryProphecy->reveal());
+        $documentation = new DocumentationAction($openApiFactoryProphecy->reveal());
         $this->assertInstanceOf(OpenApi::class, $documentation($requestProphecy->reveal()));
     }
 }

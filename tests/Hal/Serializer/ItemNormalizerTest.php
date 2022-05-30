@@ -38,15 +38,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class ItemNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testDoesNotSupportDenormalization()
     {
         $this->expectException(LogicException::class);
@@ -71,9 +67,6 @@ class ItemNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
-    /**
-     * @group legacy
-     */
     public function testSupportsNormalization()
     {
         $std = new \stdClass();

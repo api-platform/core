@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DataCollector;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\RequestAttributesExtractor;
 use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
@@ -31,7 +32,7 @@ final class RequestDataCollector extends DataCollector
     private $filterLocator;
 
     public function __construct(
-        $metadataFactory,
+        ResourceMetadataCollectionFactoryInterface $metadataFactory,
         ContainerInterface $filterLocator,
     ) {
         $this->metadataFactory = $metadataFactory;

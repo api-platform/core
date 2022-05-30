@@ -105,33 +105,6 @@ class ValidatorTest extends TestCase
         $validator->validate(new DummyEntity(), ['groups' => 'groups_builder']);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using a public validation groups generator service not implementing "ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface" is deprecated since 2.6 and will be removed in 3.0.
-     */
-    public function testValidateGetGroupsFromLegacyService(): void
-    {
-        $data = new DummyEntity();
-
-        $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
-        $constraintViolationListProphecy->count()->willReturn(0);
-
-        $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
-        $symfonyValidatorProphecy->validate($data, null, ['a', 'b', 'c'])->willReturn($constraintViolationListProphecy);
-
-        $containerProphecy = $this->prophesize(ContainerInterface::class);
-        $containerProphecy->has('groups_builder')->willReturn(true);
-        $containerProphecy->get('groups_builder')->willReturn(new class() {
-            public function __invoke($data): array
-            {
-                return $data instanceof DummyEntity ? ['a', 'b', 'c'] : [];
-            }
-        });
-
-        $validator = new Validator($symfonyValidatorProphecy->reveal(), $containerProphecy->reveal());
-        $validator->validate(new DummyEntity(), ['groups' => 'groups_builder']);
-    }
-
     public function testValidatorWithScalarGroup()
     {
         $data = new DummyEntity();

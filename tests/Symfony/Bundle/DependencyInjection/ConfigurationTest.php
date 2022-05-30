@@ -234,42 +234,6 @@ class ConfigurationTest extends TestCase
         ], $config);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation Using a string "HTTP_INTERNAL_SERVER_ERROR" as a constant of the "Symfony\Component\HttpFoundation\Response" class is deprecated since API Platform 2.1 and will not be possible anymore in API Platform 3. Use the Symfony's custom YAML extension for PHP constants instead (i.e. "!php/const Symfony\Component\HttpFoundation\Response::HTTP_INTERNAL_SERVER_ERROR").
-     */
-    public function testLegacyExceptionToStatusConfig()
-    {
-        $config = $this->processor->processConfiguration($this->configuration, [
-            'api_platform' => [
-                'exception_to_status' => [
-                    \InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                    \RuntimeException::class => 'HTTP_INTERNAL_SERVER_ERROR',
-                ],
-            ],
-        ]);
-
-        $this->assertTrue(isset($config['exception_to_status']));
-        $this->assertSame([
-            \InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-            \RuntimeException::class => Response::HTTP_INTERNAL_SERVER_ERROR,
-        ], $config['exception_to_status']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyDefaultOperationPathResolver()
-    {
-        $config = $this->processor->processConfiguration($this->configuration, [
-            'api_platform' => [
-                'default_operation_path_resolver' => 'api_platform.operation_path_resolver.dash',
-            ],
-        ]);
-
-        $this->assertTrue(isset($config['default_operation_path_resolver']));
-    }
-
     public function invalidHttpStatusCodeProvider()
     {
         return [
