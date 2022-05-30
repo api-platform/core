@@ -81,7 +81,7 @@ final class WriteListener
             return;
         }
 
-        $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class']];
+        $context = ['operation' => $operation, 'resource_class' => $attributes['resource_class'], 'previous_data' => $attributes['previous_data'] ?? null];
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
         } catch (InvalidIdentifierException $e) {
