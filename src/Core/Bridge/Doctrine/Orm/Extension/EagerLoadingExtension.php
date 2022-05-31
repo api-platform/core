@@ -24,8 +24,10 @@ use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
@@ -51,9 +53,6 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
     private $serializerContextBuilder;
     private $requestStack;
 
-    /**
-     * @TODO move $fetchPartial after $forceEager (@soyuka) in 3.0
-     */
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataFactoryInterface $resourceMetadataFactory, int $maxJoins = 30, bool $forceEager = true, RequestStack $requestStack = null, SerializerContextBuilderInterface $serializerContextBuilder = null, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
         if (null !== $this->requestStack) {
@@ -100,15 +99,21 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
         $options = [];
         if (null !== $operationName) {
+            // TODO remove in 3.0
             $options[($collection ? 'collection' : 'item').'_operation_name'] = $operationName;
         }
 
+        $operation = null;
         $forceEager = $this->shouldOperationForceEager($resourceClass, $options);
         $fetchPartial = $this->shouldOperationFetchPartial($resourceClass, $options);
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
-            $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
+            if (null !== $this->requestStack && null !== $this->serializerContextBuilder && null !== $request = $this->requestStack->getCurrentRequest()) {
+                $context += $this->serializerContextBuilder->createFromRequest($request, 'normalization_context' === $contextType);
+            } else {
+                $context += $this->getNormalizationContext($context['resource_class'] ?? $resourceClass, $contextType, $options);
+            }
         }
 
         if (empty($context[AbstractNormalizer::GROUPS]) && !isset($context[AbstractNormalizer::ATTRIBUTES])) {
@@ -131,7 +136,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, int $currentDepth = null)
+    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, int $currentDepth = null, string $parentAssociation = null)
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
@@ -178,6 +183,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 $inAttributes = null;
             }
 
+            $fetchEager = null;
             if (
                 (null === $fetchEager = $propertyMetadata->getAttribute('fetch_eager')) &&
                 (null !== $fetchEager = $propertyMetadata->getAttribute('fetchEager'))
@@ -189,8 +195,17 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 continue;
             }
 
-            $isNotReadableLink = false === $propertyMetadata->isReadableLink();
-            if (null === $fetchEager && (false === $propertyMetadata->isReadable() || ((null === $inAttributes && $isNotReadableLink) || (false === $inAttributes)))) {
+            if (true !== $fetchEager && (false === $propertyMetadata->isReadable() || false === $inAttributes)) {
+                continue;
+            }
+
+            // Avoid joining back to the parent that we just came from, but only on *ToOne relations
+            if (
+                null !== $parentAssociation &&
+                isset($mapping['inversedBy']) &&
+                $mapping['inversedBy'] === $parentAssociation &&
+                $mapping['type'] & ClassMetadata::TO_ONE
+            ) {
                 continue;
             }
 
@@ -216,16 +231,16 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                     continue;
                 }
             } else {
-                $queryBuilder->addSelect($associationAlias);
+                $this->addSelectOnce($queryBuilder, $associationAlias);
             }
 
-            // Avoid recursive joins
+            // Avoid recursive joins for self-referencing relations
             if ($mapping['targetEntity'] === $resourceClass) {
-                // Avoid joining the same association twice (see #1959)
-                if (!\in_array($associationAlias, $queryBuilder->getAllAliases(), true)) {
-                    $queryBuilder->addSelect($associationAlias);
-                }
+                continue;
+            }
 
+            // Only join the relation's relations recursively if it's a readableLink
+            if (true !== $fetchEager && (true !== $propertyMetadata->isReadableLink())) {
                 continue;
             }
 
@@ -238,7 +253,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
                 }
             }
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth, $association);
         }
     }
 
@@ -248,7 +263,7 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
         $entityManager = $queryBuilder->getEntityManager();
         $targetClassMetadata = $entityManager->getClassMetadata($entity);
         if (!empty($targetClassMetadata->subClasses)) {
-            $queryBuilder->addSelect($associationAlias);
+            $this->addSelectOnce($queryBuilder, $associationAlias);
 
             return;
         }
@@ -263,8 +278,9 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // If it's an embedded property see below
             if (!\array_key_exists($property, $targetClassMetadata->embeddedClasses)) {
+                $isFetchable = $propertyMetadata->getAttribute('fetchable');
                 // the field test allows to add methods to a Resource which do not reflect real database fields
-                if ($targetClassMetadata->hasField($property) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                if ($targetClassMetadata->hasField($property) && (true === $isFetchable || $propertyMetadata->isReadable())) {
                     $select[] = $property;
                 }
 
@@ -273,15 +289,27 @@ final class EagerLoadingExtension implements ContextAwareQueryCollectionExtensio
 
             // It's an embedded property, select relevant subfields
             foreach ($this->propertyNameCollectionFactory->create($targetClassMetadata->embeddedClasses[$property]['class']) as $embeddedProperty) {
+                $isFetchable = $propertyMetadata->getAttribute('fetchable');
                 $propertyMetadata = $this->propertyMetadataFactory->create($entity, $property, $propertyMetadataOptions);
                 $propertyName = "$property.$embeddedProperty";
-                if ($targetClassMetadata->hasField($propertyName) && (true === $propertyMetadata->getAttribute('fetchable') || $propertyMetadata->isReadable())) {
+                if ($targetClassMetadata->hasField($propertyName) && (true === $isFetchable || $propertyMetadata->isReadable())) {
                     $select[] = $propertyName;
                 }
             }
         }
 
         $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+    }
+
+    private function addSelectOnce(QueryBuilder $queryBuilder, string $alias)
+    {
+        $existingSelects = array_reduce($queryBuilder->getDQLPart('select') ?? [], function ($existing, $dqlSelect) {
+            return ($dqlSelect instanceof Select) ? array_merge($existing, $dqlSelect->getParts()) : $existing;
+        }, []);
+
+        if (!\in_array($alias, $existingSelects, true)) {
+            $queryBuilder->addSelect($alias);
+        }
     }
 
     /**

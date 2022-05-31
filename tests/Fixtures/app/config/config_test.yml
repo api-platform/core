@@ -67,7 +67,7 @@ services:
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
 
     app.related_dummy_resource.complex_sub_query_filter:
-        class: ApiPlatform\Tests\Fixtures\TestBundle\Filter\ComplexSubQueryFilter
+        class: ApiPlatform\Tests\Fixtures\TestBundle\Filter\LegacyComplexSubQueryFilter
         arguments: ['@doctrine']
         tags: [ { name: 'api_platform.filter', id: 'related_dummy.complex_sub_query' } ]
 
