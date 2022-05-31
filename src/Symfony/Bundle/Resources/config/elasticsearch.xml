@@ -80,6 +80,11 @@
 
             <tag name="api_platform.collection_data_provider" priority="5" />
         </service>
+        <service id="api_platform.elasticsearch.identifier_extractor" class="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractor" public="false">
+            <argument type="service" id="api_platform.identifiers_extractor.legacy" />
+        </service>
+        <service id="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface" alias="api_platform.elasticsearch.identifier_extractor" />
+
     </services>
 
 </container>
