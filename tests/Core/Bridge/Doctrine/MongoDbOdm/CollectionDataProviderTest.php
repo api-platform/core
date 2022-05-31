@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\CollectionDataProvider;
+use ApiPlatform\Core\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Core\Tests\ProphecyTrait;
-use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
-use ApiPlatform\Doctrine\Odm\Extension\AggregationResultCollectionExtensionInterface;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;

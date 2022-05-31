@@ -697,10 +697,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
         $loader->load('doctrine_mongodb_odm.xml');
-        $loader->load('legacy/doctrine_odm.xml');
 
         if (!$config['metadata_backward_compatibility_layer']) {
             $loader->load('v3/doctrine_odm.xml');
+        } else {
+            $loader->load('legacy/doctrine_odm.xml');
         }
     }
 

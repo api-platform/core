@@ -212,6 +212,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             case MongoDbType::BOOLEAN:
                 return 'bool';
             case MongoDbType::DATE:
+            case MongoDbType::DATE_IMMUTABLE:
                 return \DateTimeInterface::class;
             case MongoDbType::FLOAT:
                 return 'float';

@@ -57,11 +57,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
         $classMetaData = $this->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
-        if (isset($context['operation'])) {
-            $defaultOrder = $context['operation']->getOrder() ?? [];
-        } else {
-            $defaultOrder = $operation?->getOrder();
-        }
+        $defaultOrder = $operation ? $operation->getOrder() : null;
 
         if ($defaultOrder) {
             foreach ($defaultOrder as $field => $order) {
