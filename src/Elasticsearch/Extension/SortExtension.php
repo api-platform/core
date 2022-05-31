@@ -66,7 +66,7 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         } elseif (null !== $this->defaultDirection) {
             $property = 'id';
             if ($operation instanceof HttpOperation) {
-                $uriVariables = $operation->getUriVariables()[0];
+                $uriVariables = $operation->getUriVariables()[0] ?? null;
                 $property = $uriVariables ? $uriVariables->getIdentifiers()[0] ?? 'id' : 'id';
             }
 

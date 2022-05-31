@@ -881,6 +881,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
+        $loader->load('legacy/elasticsearch.xml');
 
         if (!$config['metadata_backward_compatibility_layer']) {
             $loader->load('v3/elasticsearch.xml');
