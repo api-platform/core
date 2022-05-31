@@ -36,8 +36,8 @@ class_exists(AbstractPaginator::class);
  */
 final class PaginationExtension implements QueryResultCollectionExtensionInterface
 {
-    private ManagerRegistry $managerRegistry;
-    private ?Pagination $pagination;
+    private $managerRegistry;
+    private $pagination;
 
     public function __construct(ManagerRegistry $managerRegistry, Pagination $pagination)
     {
@@ -132,7 +132,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
      */
     private function shouldDoctrinePaginatorFetchJoinCollection(QueryBuilder $queryBuilder, Operation $operation = null, array $context = []): bool
     {
-        $fetchJoinCollection = $operation?->getPaginationFetchJoinCollection();
+        $fetchJoinCollection = $operation ? $operation->getPaginationFetchJoinCollection() : null;
 
         if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($fetchJoinCollection)) {
             return $fetchJoinCollection;
@@ -165,7 +165,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
      */
     private function shouldDoctrinePaginatorUseOutputWalkers(QueryBuilder $queryBuilder, Operation $operation = null, array $context = []): bool
     {
-        $useOutputWalkers = $operation?->getPaginationUseOutputWalkers();
+        $useOutputWalkers = $operation ? $operation->getPaginationUseOutputWalkers() : null;
 
         if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($useOutputWalkers)) {
             return $useOutputWalkers;

@@ -41,10 +41,15 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  */
 final class EagerLoadingExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    private PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory;
-    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
-    private ?ClassMetadataFactoryInterface $classMetadataFactory;
-    private int $maxJoins;
+    /** @var PropertyNameCollectionFactoryInterface */
+    private $propertyNameCollectionFactory;
+    /** @var PropertyMetadataFactoryInterface */
+    private $propertyMetadataFactory;
+    /** @var ClassMetadataFactoryInterface|null */
+    private $classMetadataFactory;
+    private $maxJoins;
+    private $forceEager;
+    private $fetchPartial;
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, int $maxJoins = 30, bool $forceEager = true, bool $fetchPartial = false, ClassMetadataFactoryInterface $classMetadataFactory = null)
     {
@@ -82,8 +87,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         $options = [];
 
-        $forceEager = $operation?->getForceEager() ?? $this->forceEager;
-        $fetchPartial = $operation?->getFetchPartial() ?? $this->fetchPartial;
+        $forceEager = $this->forceEager;
+        $fetchPartial = $this->fetchPartial;
+
+        if ($operation) {
+            $forceEager = $operation->getForceEager() ?? $this->forceEager;
+            $fetchPartial = $operation->getFetchPartial() ?? $this->fetchPartial;
+        }
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
@@ -129,7 +139,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $currentDepth = $currentDepth > 0 ? $currentDepth - 1 : $currentDepth;
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
-        $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($resourceClass)->getAttributesMetadata();
+        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() : [];
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             // Don't join if max depth is enabled and the current depth limit is reached

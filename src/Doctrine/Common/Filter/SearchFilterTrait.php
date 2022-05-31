@@ -30,9 +30,8 @@ trait SearchFilterTrait
 {
     use PropertyHelperTrait;
 
-    protected IriConverterInterface $iriConverter;
-    protected PropertyAccessorInterface $propertyAccessor;
-    protected ?IdentifiersExtractorInterface $identifiersExtractor;
+    protected $iriConverter;
+    protected $propertyAccessor;
 
     /**
      * {@inheritdoc}
@@ -113,7 +112,7 @@ trait SearchFilterTrait
 
     abstract protected function getPropertyAccessor(): PropertyAccessorInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Gets the ID from an IRI or a raw ID.

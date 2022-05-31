@@ -756,6 +756,6 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
-        return new SearchFilter($managerRegistry, $iriConverter, null, $propertyAccessor, null, $properties, new CustomConverter());
+        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, new CustomConverter());
     }
 }

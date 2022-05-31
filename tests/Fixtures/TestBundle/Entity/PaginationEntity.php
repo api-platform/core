@@ -31,10 +31,19 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class PaginationEntity
 {
-    #[ORM\Column(type: 'integer', nullable: true)]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private ?int $id = null;
+    public function __construct(int $id = null)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
 
     /**
      * @return int

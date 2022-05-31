@@ -67,7 +67,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 40), ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(40), ['filters' => ['pagination' => true, 'itemsPerPage' => 20, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithItemPerPageZero(): void
@@ -86,7 +86,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 1]]);
     }
 
     public function testApplyToCollectionWithItemPerPageZeroAndPage2(): void
@@ -108,7 +108,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(0), ['filters' => ['pagination' => true, 'itemsPerPage' => 0, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithItemPerPageLessThan0(): void
@@ -130,7 +130,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: -20), ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(-20), ['filters' => ['pagination' => true, 'itemsPerPage' => -20, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithItemPerPageTooHigh(): void
@@ -149,7 +149,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationClientItemsPerPage: true), ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationClientItemsPerPage(true), ['filters' => ['pagination' => true, 'itemsPerPage' => 301, '_page' => 2]]);
     }
 
     public function testApplyToCollectionWithGraphql(): void
@@ -165,7 +165,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationItemsPerPage: 20), ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query']);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(20), ['filters' => ['pagination' => true, 'first' => 5, 'after' => 'OQ=='], 'graphql_operation_name' => 'query']);
     }
 
     public function testApplyToCollectionNofilters(): void
@@ -237,7 +237,7 @@ class PaginationExtensionTest extends TestCase
             $this->prophesize(ManagerRegistry::class)->reveal(),
             $pagination
         );
-        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', new GetCollection(paginationEnabled: true, paginationClientEnabled: true, paginationMaximumItemsPerPage: 80), ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]]);
+        $extension->applyToCollection($queryBuilder, new QueryNameGenerator(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationMaximumItemsPerPage(80), ['filters' => ['pagination' => true, 'itemsPerPage' => 80, 'page' => 1]]);
     }
 
     public function testSupportsResult(): void
@@ -383,7 +383,7 @@ class PaginationExtensionTest extends TestCase
             new Pagination()
         );
 
-        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, new GetCollection(paginationFetchJoinCollection: $paginationFetchJoinCollection), $context);
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, (new GetCollection())->withPaginationFetchJoinCollection($paginationFetchJoinCollection), $context);
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
@@ -433,7 +433,7 @@ class PaginationExtensionTest extends TestCase
             new Pagination()
         );
 
-        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, new GetCollection(paginationUseOutputWalkers: $paginationUseOutputWalkers), $context);
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, (new GetCollection())->withPaginationUseOutputWalkers($paginationUseOutputWalkers), $context);
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertInstanceOf(PaginatorInterface::class, $result);
@@ -480,7 +480,7 @@ class PaginationExtensionTest extends TestCase
             new Pagination()
         );
 
-        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, new GetCollection(paginationPartial: true));
+        $result = $paginationExtension->getResult($queryBuilder, Dummy::class, (new GetCollection())->withPaginationPartial(true));
 
         $this->assertInstanceOf(PartialPaginatorInterface::class, $result);
         $this->assertNotInstanceOf(PaginatorInterface::class, $result);

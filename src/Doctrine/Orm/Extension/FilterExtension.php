@@ -29,7 +29,8 @@ use Psr\Container\ContainerInterface;
  */
 final class FilterExtension implements QueryCollectionExtensionInterface
 {
-    private ContainerInterface $filterLocator;
+    /** @var ContainerInterface */
+    private $filterLocator;
 
     public function __construct(ContainerInterface $filterLocator)
     {
@@ -45,7 +46,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
             throw new InvalidArgumentException('The "$resourceClass" parameter must not be null');
         }
 
-        $resourceFilters = $operation?->getFilters();
+        $resourceFilters = $operation ? $operation->getFilters() : [];
 
         if (empty($resourceFilters)) {
             return;

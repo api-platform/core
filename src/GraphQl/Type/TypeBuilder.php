@@ -62,7 +62,7 @@ final class TypeBuilder implements TypeBuilderInterface
         $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
         if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
             $resourceClass = $ioMetadata['class'];
-            $shortName = $ioMetadata['name'];
+            $shortName = $ioMetadata['name'] ?? $shortName;
         }
 
         if ($operation instanceof Mutation) {

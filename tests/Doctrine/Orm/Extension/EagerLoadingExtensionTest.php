@@ -251,7 +251,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], new Get(name: 'item_operation'), ['groups' => ['foo']]);
+        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], (new Get())->withName('item_operation'), ['groups' => ['foo']]);
     }
 
     public function testCreateCollectionWithOperation(): void
@@ -272,7 +272,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, new GetCollection(name: 'collection_operation'), ['groups' => ['foo']]);
+        $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, (new GetCollection())->withName('collection_operation'), ['groups' => ['foo']]);
     }
 
     public function testDenormalizeItemWithCorrectResourceClass(): void
@@ -292,7 +292,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], new Get(name: 'get', normalizationContext: ['groups' => ['foo']]), ['resource_class' => Dummy::class]);
+        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], (new Get())->withName('get')->withNormalizationContext(['groups' => ['foo']]), ['resource_class' => Dummy::class]);
     }
 
     public function testDenormalizeItemWithExistingGroups(): void
@@ -312,7 +312,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], new Get(name: 'item_operation', normalizationContext: ['groups' => ['foo']]), [AbstractNormalizer::GROUPS => 'some_groups']);
+        $eagerExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), RelatedDummy::class, ['id' => 1], (new Get())->withName('item_operation')->withNormalizationContext(['groups' => ['foo']]), [AbstractNormalizer::GROUPS => 'some_groups']);
     }
 
     public function testMaxJoinsReached(): void
@@ -425,7 +425,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true, $classMetadataFactoryProphecy->reveal());
-        $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: ['enable_max_depth' => 'true', 'groups' => ['foo']]));
+        $eagerExtensionTest->applyToCollection($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext(['enable_max_depth' => 'true', 'groups' => ['foo']]));
     }
 
     public function testForceEager(): void
@@ -465,7 +465,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foobar']));
+        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], (new Get())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foobar']));
     }
 
     public function testExtraLazy(): void
@@ -496,7 +496,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foobar']));
+        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], (new Get())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foobar']));
     }
 
     public function testResourceClassNotFoundException(): void
@@ -517,7 +517,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], (new Get())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testPropertyNotFoundException(): void
@@ -538,7 +538,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], (new Get())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testResourceClassNotFoundExceptionPropertyNameCollection(): void
@@ -565,7 +565,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
-        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], new Get(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $orderExtensionTest->applyToItem($queryBuilderProphecy->reveal(), new QueryNameGenerator(), Dummy::class, [], (new Get())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testAttributes(): void
@@ -623,7 +623,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testNotInAttributes(): void
@@ -653,7 +653,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo', AbstractNormalizer::ATTRIBUTES => ['relatedDummy']]));
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo', AbstractNormalizer::ATTRIBUTES => ['relatedDummy']]));
     }
 
     public function testOnlyOneRelationNotInAttributes(): void
@@ -709,7 +709,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo', AbstractNormalizer::ATTRIBUTES => ['relatedDummy' => ['id', 'name']]]));
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo', AbstractNormalizer::ATTRIBUTES => ['relatedDummy' => ['id', 'name']]]));
     }
 
     public function testApplyToCollectionNoPartial(): void
@@ -749,7 +749,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 
     public function testApplyToCollectionWithANonReadableButFetchEagerProperty(): void
@@ -794,7 +794,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 
     /**
@@ -838,7 +838,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']), $context);
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']), $context);
     }
 
     public function provideExistingJoinCases(): iterable
@@ -882,6 +882,6 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30);
-        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withNormalizationContext([AbstractNormalizer::GROUPS => 'foo']));
     }
 }

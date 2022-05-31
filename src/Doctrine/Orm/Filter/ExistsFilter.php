@@ -53,7 +53,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        foreach ($context['filters'][$this->existsParameterName] as $property => $value) {
+        foreach ($context['filters'][$this->existsParameterName] ?? [] as $property => $value) {
             $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
     }

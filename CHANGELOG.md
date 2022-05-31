@@ -1,5 +1,41 @@
 # Changelog
 
+## 2.7.0-beta
+
+Json-Ld: property metadata types and iris (#4769)
+Symfony: write listener uri variables converter (#4774)
+Metadata: extra properties operation inheritance (#4773)
+
+**BC**
+
+Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPlatform\Doctrine` namespace after fixing your deprecations: (#4779)
+  - `ApiPlatform\Core\Bridge\Doctrine\Orm\Extension` interfaces have an `Operation` instead of the `$operationName`, the new namespace is `ApiPlatform\Doctrine\Orm\Extension`
+  - `ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension` interfaces have an `Operation` instead of the `$operationName`, the new namespace is `ApiPlatform\Doctrine\Odm\Extension`
+
+## 2.7.0-alpha.7
+
+Metadata: defaults deprecation (#4772)
+
+## 2.7.0-alpha.6
+
+GraphQl: output creates its own type in TypeBuilder (#4766)
+Metadata: clear missing metadata cache pools (#4770)
+Metadata: property override when value is set (#4767)
+Metadata: add read and write to extractor (#4760) 
+JsonSchema: factory backward compatibility layer (#4758)
+Metadata: defaults properly overrides metadata (#4759) 
+Metadata: Add missing processor and provider to extractor (#4754)
+
+## 2.7.0-alpha.5
+
+* Backward compatibility: fix upgrade script for subresources (#4747)
+* Backward compatibility: fix dependency injection (#4748)
+
+## 2.7.0-alpha.4
+
+* Backward compatibility: fix dependency injection (#4744)
+* Metadata: allow extra keys within defaults (#4743)
+
 ## 2.7.0-alpha.3
 
 * Implements Skolem IRIs instead of blank nodes, can be disabled using `iri: false` (#4731)

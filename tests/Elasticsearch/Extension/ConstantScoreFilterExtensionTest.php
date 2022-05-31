@@ -39,7 +39,7 @@ class ConstantScoreFilterExtensionTest extends TestCase
 
     public function testApplyToCollection(): void
     {
-        $operation = new Get(filters: ['filter.term']);
+        $operation = (new Get())->withFilters(['filter.term']);
 
         $constantScoreFilterProphecy = $this->prophesize(ConstantScoreFilterInterface::class);
         $constantScoreFilterProphecy->apply([], Foo::class, $operation, ['filters' => ['name' => ['Kilian', 'Xavier', 'François']]])->willReturn(['bool' => ['must' => [['terms' => ['name' => ['Kilian', 'Xavier', 'François']]]]]])->shouldBeCalled();
@@ -68,6 +68,6 @@ class ConstantScoreFilterExtensionTest extends TestCase
 
         $constantScoreFilterExtension = new ConstantScoreFilterExtension($containerProphecy->reveal());
 
-        self::assertEmpty($constantScoreFilterExtension->applyToCollection([], Foo::class, new Get(filters: ['filter.order']), ['filters' => ['name' => ['Kilian', 'Xavier', 'François']]]));
+        self::assertEmpty($constantScoreFilterExtension->applyToCollection([], Foo::class, (new Get())->withFilters(['filter.order']), ['filters' => ['name' => ['Kilian', 'Xavier', 'François']]]));
     }
 }

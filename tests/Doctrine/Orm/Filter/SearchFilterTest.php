@@ -514,6 +514,6 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $iriConverter = $iriConverterProphecy->reveal();
         $propertyAccessor = static::$kernel->getContainer()->get('test.property_accessor');
 
-        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, null, new CustomConverter());
+        return new SearchFilter($managerRegistry, $iriConverter, $propertyAccessor, null, $properties, new CustomConverter());
     }
 }

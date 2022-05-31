@@ -36,10 +36,14 @@ abstract class AbstractFilter implements FilterInterface
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    protected ManagerRegistry $managerRegistry;
-    protected LoggerInterface $logger;
-    protected ?array $properties;
-    protected ?NameConverterInterface $nameConverter;
+    /** @var ManagerRegistry */
+    protected $managerRegistry;
+    /** @var LoggerInterface */
+    protected $logger;
+    /** @var array|null */
+    protected $properties;
+    /** @var NameConverterInterface|null */
+    protected $nameConverter;
 
     public function __construct(ManagerRegistry $managerRegistry, LoggerInterface $logger = null, array $properties = null, NameConverterInterface $nameConverter = null)
     {

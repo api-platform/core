@@ -36,8 +36,8 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
 
-    private ?string $order;
-    private ?ManagerRegistry $managerRegistry;
+    private $order;
+    private $managerRegistry;
 
     public function __construct(string $order = null, ManagerRegistry $managerRegistry = null)
     {
@@ -57,11 +57,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
         $classMetaData = $this->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
-        if (isset($context['operation'])) {
-            $defaultOrder = $context['operation']->getOrder() ?? [];
-        } else {
-            $defaultOrder = $operation?->getOrder();
-        }
+        $defaultOrder = $operation ? $operation->getOrder() : null;
 
         if ($defaultOrder) {
             foreach ($defaultOrder as $field => $order) {

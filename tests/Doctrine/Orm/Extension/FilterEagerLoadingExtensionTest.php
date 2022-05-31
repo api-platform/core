@@ -50,7 +50,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get', forceEager: false));
+        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get')->withForceEager(false));
     }
 
     public function testIsForceEagerConfig(): void
@@ -65,7 +65,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(false);
-        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
     }
 
     public function testHasNoWherePart(): void
@@ -80,7 +80,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
     }
 
     public function testHasNoJoinPart(): void
@@ -97,7 +97,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb->reveal(), $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
     }
 
     public function testApplyCollection(): void
@@ -119,7 +119,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
 
         $this->assertEquals('SELECT o FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o LEFT JOIN o.colors colors WHERE o IN(SELECT o_2 FROM ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar o_2 LEFT JOIN o_2.colors colors_2 WHERE o_2.colors = :foo)', $qb->getDQL());
     }
@@ -151,7 +151,7 @@ class FilterEagerLoadingExtensionTest extends TestCase
         $queryNameGenerator->generateJoinAlias('t_a3')->shouldBeCalled()->willReturn('t_a3_a20');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true, new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal()));
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
 
         $expected = <<<'SQL'
 SELECT o
@@ -193,7 +193,7 @@ SQL;
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true, new ResourceClassResolver($resourceNameCollectionFactoryProphecy->reveal()));
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
 
         $expected = <<<'SQL'
 SELECT o
@@ -231,7 +231,7 @@ SQL;
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
 
         $expected = <<<SQL
 SELECT o, CASE WHEN o.dateCreated IS NULL THEN 0 ELSE 1 END AS HIDDEN _o_dateCreated_null_rank
@@ -268,7 +268,7 @@ SQL;
         $queryNameGenerator->generateJoinAlias('colors')->shouldBeCalled()->willReturn('colors_2');
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
 
         $expected = <<<SQL
 SELECT o, count(o.id) as counter
@@ -316,7 +316,7 @@ SQL;
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, (new Get())->withName('get'));
 
         $expected = <<<SQL
 SELECT o
@@ -382,7 +382,7 @@ SQL;
         $queryNameGenerator->generateJoinAlias(DummyCar::class)->shouldNotBeCalled();
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(false);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, (new Get())->withName('get'));
 
         $expected = <<<DQL
 SELECT o
@@ -441,7 +441,7 @@ DQL;
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, (new Get())->withName('get'));
 
         $expected = <<<SQL
 SELECT o
@@ -490,7 +490,7 @@ SQL;
 
         $queryNameGenerator = $this->prophesize(QueryNameGeneratorInterface::class);
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), CompositeRelation::class, (new Get())->withName('get'));
 
         $expected = <<<SQL
 SELECT o
@@ -526,7 +526,7 @@ SQL;
         $queryNameGenerator->generateJoinAlias('o')->shouldBeCalled()->willReturn('o_2');
 
         $filterEagerLoadingExtension = new FilterEagerLoadingExtension(true);
-        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, new Get(name: 'get'));
+        $filterEagerLoadingExtension->applyToCollection($qb, $queryNameGenerator->reveal(), DummyCar::class, (new Get())->withName('get'));
 
         $expected = <<<SQL
 SELECT o

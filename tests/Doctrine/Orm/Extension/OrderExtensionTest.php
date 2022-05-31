@@ -92,7 +92,7 @@ class OrderExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
-        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(order: ['foo' => 'DESC']));
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withOrder(['foo' => 'DESC']));
     }
 
     public function testApplyToCollectionWithOrderOverriddenWithNoDirection(): void
@@ -114,7 +114,7 @@ class OrderExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
-        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(order: ['foo', 'bar' => 'DESC']));
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withOrder(['foo', 'bar' => 'DESC']));
     }
 
     public function testApplyToCollectionWithOrderOverriddenWithAssociation(): void
@@ -137,7 +137,7 @@ class OrderExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
-        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(order: ['author.name']));
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, (new GetCollection())->withOrder(['author.name']));
     }
 
     public function testApplyToCollectionWithOrderOverriddenWithEmbeddedAssociation(): void
@@ -158,7 +158,7 @@ class OrderExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
         $orderExtensionTest = new OrderExtension('asc');
-        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), EmbeddedDummy::class, new GetCollection(order: ['embeddedDummy.dummyName' => 'DESC']));
+        $orderExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), EmbeddedDummy::class, (new GetCollection())->withOrder(['embeddedDummy.dummyName' => 'DESC']));
     }
 
     public function testApplyToCollectionWithExistingOrderByDql(): void

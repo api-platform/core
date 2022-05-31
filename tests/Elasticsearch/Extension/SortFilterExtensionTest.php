@@ -39,7 +39,7 @@ class SortFilterExtensionTest extends TestCase
 
     public function testApplyToCollection(): void
     {
-        $operation = new GetCollection(filters: ['filter.order']);
+        $operation = (new GetCollection())->withFilters(['filter.order']);
 
         $sortFilterProphecy = $this->prophesize(SortFilterInterface::class);
         $sortFilterProphecy->apply([], Foo::class, $operation, ['filters' => ['order' => ['id' => 'desc']]])->willReturn([['id' => ['order' => 'desc']]])->shouldBeCalled();
@@ -68,6 +68,6 @@ class SortFilterExtensionTest extends TestCase
 
         $sortFilterExtension = new SortFilterExtension($containerProphecy->reveal());
 
-        self::assertEmpty($sortFilterExtension->applyToCollection([], Foo::class, new GetCollection(filters: ['filter.term']), ['filters' => ['order' => ['id' => 'desc']]]));
+        self::assertEmpty($sortFilterExtension->applyToCollection([], Foo::class, (new GetCollection())->withFilters(['filter.term']), ['filters' => ['order' => ['id' => 'desc']]]));
     }
 }

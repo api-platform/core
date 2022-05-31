@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures;
 
 use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 #[ApiFilter(OrderFilter::class, arguments: ['orderParameterName' => 'positionOrder'], properties: ['position'])]
 class DummyEntityFilterAnnotated
