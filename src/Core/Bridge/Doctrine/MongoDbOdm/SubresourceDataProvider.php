@@ -14,6 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationCollectionExtensionInterface as LegacyAggregationCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface as LegacyAggregationItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultCollectionExtensionInterface as LegacyAggregationResultCollectionExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultItemExtensionInterface as LegacyAggregationResultItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -53,9 +57,9 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
     private $itemExtensions;
 
     /**
-     * @param AggregationCollectionExtensionInterface[]                                   $collectionExtensions
-     * @param AggregationItemExtensionInterface[]                                         $itemExtensions
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param LegacyAggregationCollectionExtensionInterface[]|AggregationCollectionExtensionInterface[] $collectionExtensions
+     * @param LegacyAggregationItemExtensionInterface[]|AggregationItemExtensionInterface[]             $itemExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface               $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $collectionExtensions = [], iterable $itemExtensions = [])
     {
@@ -120,16 +124,34 @@ final class SubresourceDataProvider implements SubresourceDataProviderInterface
 
         if (true === $context['collection']) {
             foreach ($this->collectionExtensions as $extension) {
-                $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
-                if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+                if ($extension instanceof LegacyAggregationCollectionExtensionInterface) {
+                    $extension->applyToCollection($aggregationBuilder, $resourceClass, $operationName, $context);
+                } elseif ($extension instanceof AggregationCollectionExtensionInterface) {
+                    $extension->applyToCollection($aggregationBuilder, $resourceClass, $context['operation'] ?? null, $context);
+                }
+
+                if ($extension instanceof LegacyAggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                     return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+                }
+
+                if ($extension instanceof AggregationResultCollectionExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                    return $extension->getResult($aggregationBuilder, $resourceClass, $context['operation'] ?? null, $context);
                 }
             }
         } else {
             foreach ($this->itemExtensions as $extension) {
-                $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);
-                if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+                if ($extension instanceof LegacyAggregationItemExtensionInterface) {
+                    $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $operationName, $context);
+                } elseif ($extension instanceof AggregationItemExtensionInterface) {
+                    $extension->applyToItem($aggregationBuilder, $resourceClass, $identifiers, $context['operation'] ?? null, $context);
+                }
+
+                if ($extension instanceof LegacyAggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                     return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+                }
+
+                if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                    return $extension->getResult($aggregationBuilder, $resourceClass, $context['operation'] ?? null, $context);
                 }
             }
         }

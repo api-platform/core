@@ -25,6 +25,7 @@ final class PersistProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
+    /** @var ManagerRegistry */
     private $managerRegistry;
 
     public function __construct(ManagerRegistry $managerRegistry)

@@ -1924,7 +1924,7 @@ class DocumentationNormalizerV2Test extends TestCase
             null,
             $this->prophesize(OperationPathResolverInterface::class)->reveal(),
             null,
-            new \ArrayObject(),
+            new \ArrayObject(), // @phpstan-ignore-line
             null,
             false,
             '',

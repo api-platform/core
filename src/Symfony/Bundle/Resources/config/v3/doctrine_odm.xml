@@ -14,17 +14,6 @@
             <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner"/>
         </service>
 
-        <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
-            <argument type="service" id="doctrine_mongodb" />
-            <argument type="service" id="api_platform.iri_converter" />
-            <argument type="service" id="api_platform.identifiers_extractor.cached" />
-            <argument type="service" id="api_platform.property_accessor" />
-            <argument type="service" id="logger" on-invalid="ignore" />
-            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
-        </service>
-
-        <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
-
         <service id="ApiPlatform\Doctrine\Odm\State\CollectionProvider" class="ApiPlatform\Doctrine\Odm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine_mongodb" />
@@ -53,5 +42,86 @@
             <argument type="service" id="doctrine_mongodb"/>
             <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.identifier_metadata_factory.inner"/>
         </service>
+
+        <!-- Filter -->
+
+        <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.property_accessor" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\SearchFilter" alias="api_platform.doctrine_mongodb.odm.search_filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.boolean_filter" class="ApiPlatform\Doctrine\Odm\Filter\BooleanFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\BooleanFilter" alias="api_platform.doctrine_mongodb.odm.boolean_filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.date_filter" class="ApiPlatform\Doctrine\Odm\Filter\DateFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\DateFilter" alias="api_platform.doctrine_mongodb.odm.date_filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.exists_filter" class="ApiPlatform\Doctrine\Odm\Filter\ExistsFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$existsParameterName">%api_platform.collection.exists_parameter_name%</argument>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\ExistsFilter" alias="api_platform.doctrine_mongodb.odm.exists_filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.numeric_filter" class="ApiPlatform\Doctrine\Odm\Filter\NumericFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\NumericFilter" alias="api_platform.doctrine_mongodb.odm.numeric_filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.order_filter" class="ApiPlatform\Doctrine\Odm\Filter\OrderFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument>%api_platform.collection.order_parameter_name%</argument>
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\OrderFilter" alias="api_platform.doctrine_mongodb.odm.order_filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.range_filter" class="ApiPlatform\Doctrine\Odm\Filter\RangeFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine_mongodb" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Filter\RangeFilter" alias="api_platform.doctrine_mongodb.odm.range_filter" />
+
+        <!-- Doctrine Aggregation extensions -->
+
+        <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.filter" class="ApiPlatform\Doctrine\Odm\Extension\FilterExtension" public="false">
+            <argument type="service" id="api_platform.filter_locator" />
+
+            <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="32" />
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Extension\FilterExtension" alias="api_platform.doctrine_mongodb.odm.aggregation_extension.filter" />
+
+        <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.pagination"
+                 class="ApiPlatform\Doctrine\Odm\Extension\PaginationExtension" public="false">
+            <argument type="service" id="doctrine_mongodb"/>
+            <argument type="service" id="api_platform.pagination" />
+
+            <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection"/>
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Extension\PaginationExtension" alias="api_platform.doctrine_mongodb.odm.aggregation_extension.pagination" />
+
+        <service id="api_platform.doctrine_mongodb.odm.aggregation_extension.order" class="ApiPlatform\Doctrine\Odm\Extension\OrderExtension" public="false">
+            <argument>%api_platform.collection.order%</argument>
+            <argument type="service" id="doctrine_mongodb" />
+
+            <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="16" />
+        </service>
+        <service id="ApiPlatform\Doctrine\Odm\Extension\OrderExtension" alias="api_platform.doctrine_mongodb.odm.aggregation_extension.order" />
     </services>
 </container>

@@ -20,7 +20,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\EmbeddedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Théo FIDRY <theo.fidry@gmail.com>
@@ -32,7 +31,7 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
 
     protected $filterClass = OrderFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -297,11 +296,11 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $orderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): OrderFilter {
-            return new OrderFilter($managerRegistry, $requestStack, 'order', null, $properties);
+        $orderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter {
+            return new OrderFilter($managerRegistry, 'order', null, $properties);
         };
-        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): OrderFilter {
-            return new OrderFilter($managerRegistry, $requestStack, 'customOrder', null, $properties);
+        $customOrderFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): OrderFilter {
+            return new OrderFilter($managerRegistry, 'customOrder', null, $properties);
         };
 
         return array_merge_recursive(
@@ -425,6 +424,6 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
 
     protected function buildFilter(?array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, null, 'order', null, $properties, new CustomConverter());
+        return new $this->filterClass($this->managerRegistry, 'order', null, $properties, new CustomConverter());
     }
 }

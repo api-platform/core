@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\Extension;
+namespace ApiPlatform\Core\Bridge\Doctrine\Orm\Extension;
 
 use Doctrine\ORM\QueryBuilder;
 
@@ -20,7 +20,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface ContextAwareQueryResultItemExtensionInterface extends QueryResultItemExtensionInterface
+interface ContextAwareQueryResultCollectionExtensionInterface extends QueryResultCollectionExtensionInterface
 {
     /**
      * {@inheritdoc}

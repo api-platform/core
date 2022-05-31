@@ -15,33 +15,22 @@ namespace ApiPlatform\Tests\Util;
 
 use ApiPlatform\Util\RequestParser;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
 class RequestParserTest extends TestCase
 {
-    public function testParseAndDuplicateRequest()
-    {
-        $request = new Request(['toto=tata'], [], [], [], [], [], '{"gerard":"toto"}');
-        $value = RequestParser::parseAndDuplicateRequest($request);
-        $this->assertNotNull($value);
-    }
-
     /**
      * @dataProvider parseRequestParamsProvider
-     *
-     * @param mixed $source
-     * @param mixed $expected
      */
-    public function testParseRequestParams($source, $expected)
+    public function testParseRequestParams(string $source, array $expected): void
     {
         $actual = RequestParser::parseRequestParams($source);
         $this->assertEquals($expected, $actual);
     }
 
-    public function parseRequestParamsProvider()
+    public function parseRequestParamsProvider(): array
     {
         return [
             ['gerard.name=dargent', ['gerard.name' => 'dargent']],

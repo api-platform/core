@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Util;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker as LegacyQueryChecker;
 use ApiPlatform\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -206,7 +207,7 @@ class QueryCheckerTest extends TestCase
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyJoinWithoutJoin()
     {
@@ -219,12 +220,12 @@ class QueryCheckerTest extends TestCase
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyJoinWithoutOrderBy()
     {
@@ -237,12 +238,12 @@ class QueryCheckerTest extends TestCase
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyJoinNotFetchJoined()
     {
@@ -273,12 +274,12 @@ class QueryCheckerTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
 
-        $this->assertFalse(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     /**
      * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
+     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
      */
     public function testHasOrderByOnToManyWithJoinByAssociation()
     {
@@ -304,7 +305,7 @@ class QueryCheckerTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
         $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
 
-        $this->assertTrue(QueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
+        $this->assertTrue(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
     public function testHasJoinedToManyAssociationWithoutJoin()

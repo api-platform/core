@@ -201,7 +201,7 @@ class SerializeStageTest extends TestCase
     {
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection(''));
-        $pagination = new Pagination($resourceMetadataCollectionFactoryProphecy->reveal(), [], ['enabled' => $paginationEnabled]);
+        $pagination = new Pagination([], ['enabled' => $paginationEnabled]);
 
         return new SerializeStage(
             $this->normalizerProphecy->reveal(),

@@ -67,7 +67,7 @@ trait OrderFilterTrait
 
     abstract protected function getProperties(): ?array;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     private function normalizeValue($value, string $property): ?string
     {
@@ -84,5 +84,3 @@ trait OrderFilterTrait
         return $value;
     }
 }
-
-class_alias(OrderFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class);

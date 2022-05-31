@@ -55,7 +55,7 @@ trait DateFilterTrait
 
     abstract protected function getProperties(): ?array;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Determines whether the given property refers to a date field.
@@ -94,5 +94,3 @@ trait DateFilterTrait
         return $value;
     }
 }
-
-class_alias(DateFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\DateFilterTrait::class);

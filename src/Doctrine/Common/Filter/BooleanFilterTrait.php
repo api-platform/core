@@ -65,7 +65,7 @@ trait BooleanFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Determines whether the given property refers to a boolean field.
@@ -97,5 +97,3 @@ trait BooleanFilterTrait
         return null;
     }
 }
-
-class_alias(BooleanFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\BooleanFilterTrait::class);

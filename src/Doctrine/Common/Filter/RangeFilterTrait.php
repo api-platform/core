@@ -58,7 +58,7 @@ trait RangeFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Gets filter description.
@@ -139,5 +139,3 @@ trait RangeFilterTrait
         return $value + 0; // coerce $value to the right type.
     }
 }
-
-class_alias(RangeFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\RangeFilterTrait::class);

@@ -32,6 +32,11 @@ use Doctrine\ORM\Mapping as ORM;
 )]
 class PaginationEntity
 {
+    public function __construct(int $id = null)
+    {
+        $this->id = $id;
+    }
+
     /**
      * @var int|null
      *

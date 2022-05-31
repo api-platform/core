@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm;
 
 use ApiPlatform\Core\Bridge\Doctrine\Common\Util\IdentifierManagerTrait;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationItemExtensionInterface as LegacyAggregationItemExtensionInterface;
+use ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Extension\AggregationResultItemExtensionInterface as LegacyAggregationResultItemExtensionInterface;
 use ApiPlatform\Core\DataProvider\DenormalizedIdentifiersAwareItemDataProviderInterface;
 use ApiPlatform\Core\DataProvider\RestrictedDataProviderInterface;
 use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
@@ -47,8 +49,8 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
     private $itemExtensions;
 
     /**
-     * @param AggregationItemExtensionInterface[]                                         $itemExtensions
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
+     * @param LegacyAggregationItemExtensionInterface[]|AggregationItemExtensionInterface[] $itemExtensions
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface   $resourceMetadataFactory
      */
     public function __construct(ManagerRegistry $managerRegistry, $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, iterable $itemExtensions = [])
     {
@@ -102,10 +104,18 @@ final class ItemDataProvider implements DenormalizedIdentifiersAwareItemDataProv
         }
 
         foreach ($this->itemExtensions as $extension) {
-            $extension->applyToItem($aggregationBuilder, $resourceClass, $id, $operationName, $context);
+            if ($extension instanceof LegacyAggregationItemExtensionInterface) {
+                $extension->applyToItem($aggregationBuilder, $resourceClass, $id, $operationName, $context);
+            } elseif ($extension instanceof AggregationItemExtensionInterface) {
+                $extension->applyToItem($aggregationBuilder, $resourceClass, $id, $context['operation'] ?? null, $context);
+            }
 
-            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
+            if ($extension instanceof LegacyAggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $operationName, $context)) {
                 return $extension->getResult($aggregationBuilder, $resourceClass, $operationName, $context);
+            }
+
+            if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($resourceClass, $context['operation'] ?? null, $context)) {
+                return $extension->getResult($aggregationBuilder, $resourceClass, $context['operation'] ?? null, $context);
             }
         }
 

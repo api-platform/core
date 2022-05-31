@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter as DoctrineOrmAbstractContextAwareFilter;
 use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
@@ -29,7 +30,7 @@ use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter as DoctrineOrmAbstractContextAwareFilter;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
@@ -156,6 +157,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats): void
     {
         $loader->load('api.xml');
+        $loader->load('v3/state.xml');
 
         if ($config['metadata_backward_compatibility_layer']) {
             $loader->load('legacy/api.xml');
@@ -164,7 +166,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         } else {
             $loader->load('v3/api.xml');
             $loader->load('legacy/data_provider.xml');
-            $loader->load('v3/state.xml');
             $loader->load('v3/backward_compatibility.xml');
         }
 
@@ -662,6 +663,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
         $container->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)
             ->setBindings(['$requestStack' => null]);
+        $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class)
+            ->setBindings(['$requestStack' => null]);
 
         $loader->load('doctrine_orm.xml');
         $loader->load('legacy/doctrine_orm.xml');
@@ -694,10 +697,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
         $loader->load('doctrine_mongodb_odm.xml');
-        $loader->load('legacy/doctrine_odm.xml');
 
         if (!$config['metadata_backward_compatibility_layer']) {
             $loader->load('v3/doctrine_odm.xml');
+        } else {
+            $loader->load('legacy/doctrine_odm.xml');
         }
     }
 
@@ -877,6 +881,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
+        $loader->load('legacy/elasticsearch.xml');
 
         if (!$config['metadata_backward_compatibility_layer']) {
             $loader->load('v3/elasticsearch.xml');

@@ -69,7 +69,7 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
 
             $order = ['order' => $direction];
 
-            if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) {
+            if (null !== $nestedPath = $this->getNestedFieldPath($resourceClass, $property)) { // @phpstan-ignore-line
                 $nestedPath = null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath, $resourceClass, null, $context);
                 $order['nested'] = ['path' => $nestedPath];
             }

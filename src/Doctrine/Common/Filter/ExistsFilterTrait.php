@@ -68,7 +68,7 @@ trait ExistsFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     private function normalizeValue($value, string $property): ?bool
     {
@@ -100,5 +100,3 @@ trait ExistsFilterTrait
         return null;
     }
 }
-
-class_alias(ExistsFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class);

@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -33,13 +35,15 @@ final class DocumentNormalizer extends ObjectNormalizer
 {
     public const FORMAT = 'elasticsearch';
 
-    private $identifierExtractor;
+    private $resourceMetadataFactory;
 
-    public function __construct(IdentifierExtractorInterface $identifierExtractor, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    /**
+     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
+     */
+    public function __construct($resourceMetadataFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
-
-        $this->identifierExtractor = $identifierExtractor;
+        $this->resourceMetadataFactory = $resourceMetadataFactory;
     }
 
     /**
@@ -90,7 +94,22 @@ final class DocumentNormalizer extends ObjectNormalizer
      */
     private function populateIdentifier(array $data, string $class): array
     {
-        $identifier = $this->identifierExtractor->getIdentifierFromResourceClass($class);
+        $identifier = 'id';
+        $resourceMetadata = $this->resourceMetadataFactory->create($class);
+
+        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
+            $identifier = $resourceMetadata->getItemOperationAttribute('get', 'identifiers');
+        } else {
+            $operation = $resourceMetadata->getOperation();
+            if ($operation instanceof HttpOperation) {
+                $uriVariable = $operation->getUriVariables()[0] ?? null;
+
+                if ($uriVariable) {
+                    $identifier = $uriVariable->getIdentifiers()[0] ?? 'id';
+                }
+            }
+        }
+
         $identifier = null === $this->nameConverter ? $identifier : $this->nameConverter->normalize($identifier, $class, self::FORMAT);
 
         if (!isset($data['_source'][$identifier])) {
