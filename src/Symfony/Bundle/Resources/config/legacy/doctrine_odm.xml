@@ -5,14 +5,6 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <!-- Metadata loader -->
-        <service id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.legacy"
-                 class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory"
-                 decorates="api_platform.metadata.property.metadata_factory.legacy" decoration-priority="40" public="false">
-            <argument type="service" id="doctrine_mongodb"/>
-            <argument type="service" id="api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.legacy.inner"/>
-        </service>
-
         <!-- Filter -->
 
         <service id="api_platform.doctrine_mongodb.odm.search_filter" class="ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\Filter\SearchFilter" public="false" abstract="true">
