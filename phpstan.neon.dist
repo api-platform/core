@@ -16,6 +16,7 @@ parameters:
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 	excludePaths:
+		- src/deprecation.php
 		- src/Core/Bridge/Symfony/Bundle/Test/Constraint/ArraySubsetLegacy.php
 		# Class ... extends final class cannot be ignored...
 		- src/Core/Action/EntrypointAction.php
@@ -342,7 +343,16 @@ parameters:
 		-
 			message: '#^Property .+ is unused.$#'
 			path: tests/Doctrine/Odm/PropertyInfo/Fixtures/DoctrineDummy.php
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionValueType\(\)#'
+			path: src
+		-
+			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
+			path: src
 		# Skipped tests, we do this on purpose
 		- 
 			message: "#^Unreachable statement - code above always terminates.$#"
+			path: tests
+		-
+			message: "#Access to an undefined static property static\\([^)]+\\)::\\$container.$#"
 			path: tests

@@ -68,7 +68,7 @@ trait ExistsFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     private function normalizeValue($value, string $property): ?bool
     {
