@@ -73,7 +73,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
             }
 
             $property = null === $this->nameConverter ? $property : $this->nameConverter->normalize($property, $resourceClass, null, $context);
-            $nestedPath = $this->getNestedFieldPath($resourceClass, $property);
+            $nestedPath = $this->getNestedFieldPath($resourceClass, $property); // @phpstan-ignore-line
             $nestedPath = null === $nestedPath || null === $this->nameConverter ? $nestedPath : $this->nameConverter->normalize($nestedPath, $resourceClass, null, $context);
 
             $searches[] = $this->getQuery($property, $values, $nestedPath);

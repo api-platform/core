@@ -208,7 +208,6 @@ $deprecatedClassesWithAliases = [
     // JsonSchema
     ApiPlatform\Core\JsonSchema\Command\JsonSchemaGenerateCommand::class => ApiPlatform\JsonSchema\Command\JsonSchemaGenerateCommand::class,
     ApiPlatform\Core\JsonSchema\Schema::class => ApiPlatform\JsonSchema\Schema::class,
-    ApiPlatform\Core\JsonSchema\SchemaFactory::class => ApiPlatform\JsonSchema\SchemaFactory::class,
     ApiPlatform\Core\JsonSchema\TypeFactory::class => ApiPlatform\JsonSchema\TypeFactory::class,
 
     // Mercure/EventListener => Symfony/EventListener
@@ -330,6 +329,7 @@ $deprecatedClassesWithAliases = [
 
 // These classes are deprecated but we don't want aliases as the interfaces changed
 $deprecatedClassesWithoutAliases = [
+    ApiPlatform\Core\JsonSchema\SchemaFactory::class => ApiPlatform\JsonSchema\SchemaFactory::class,
     ApiPlatform\Core\Api\FilterLocatorTrait::class => ApiPlatform\Api\FilterLocatorTrait::class,
 
     ApiPlatform\Core\Bridge\Elasticsearch\DataProvider\Filter\AbstractFilter::class => ApiPlatform\Elasticsearch\Filter\AbstractFilter::class,

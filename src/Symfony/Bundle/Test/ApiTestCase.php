@@ -76,9 +76,9 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected function findIriBy(string $resourceClass, array $criteria): ?string
     {
-        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container;
+        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
 
-        if (!isset(static::$container) && !method_exists(static::class, 'getContainer')) { // @phpstan-ignore-line
+        if (!isset(static::$container) && !method_exists(static::class, 'getContainer')) {
             throw new \RuntimeException(sprintf('The container is not available. You must call "bootKernel()" or "createClient()" before calling "%s".', __METHOD__));
         }
 
@@ -102,7 +102,7 @@ abstract class ApiTestCase extends KernelTestCase
 
         $iriConverter = $container->get('api_platform.iri_converter');
 
-        return $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getIriFromItem($item) : $iriConverter->getIriFromResource($item); // @phpstan-ignore-line
+        return $iriConverter instanceof LegacyIriConverterInterface ? $iriConverter->getIriFromItem($item) : $iriConverter->getIriFromResource($item);
     }
 }
 
