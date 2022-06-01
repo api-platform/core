@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\Util\RequestAttributesExtractor;
@@ -35,21 +34,17 @@ final class AddHeadersListener
     private $sharedMaxAge;
     private $vary;
     private $public;
-    private $resourceMetadataFactory;
     private $staleWhileRevalidate;
     private $staleIfError;
 
-    /**
-     * @param ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory
-     */
-    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, $resourceMetadataFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
+    public function __construct(bool $etag = false, int $maxAge = null, int $sharedMaxAge = null, array $vary = null, bool $public = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, int $staleWhileRevalidate = null, int $staleIfError = null)
     {
         $this->etag = $etag;
         $this->maxAge = $maxAge;
         $this->sharedMaxAge = $sharedMaxAge;
         $this->vary = $vary;
         $this->public = $public;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->staleWhileRevalidate = $staleWhileRevalidate;
         $this->staleIfError = $staleIfError;
     }
@@ -73,14 +68,7 @@ final class AddHeadersListener
         }
 
         $operation = $this->initializeOperation($request);
-        $resourceCacheHeaders = $attributes['cache_headers'] ?? [];
-
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($attributes['resource_class']);
-            $resourceCacheHeaders = $resourceMetadata->getOperationAttribute($attributes, 'cache_headers', [], true);
-        } elseif ($operation) {
-            $resourceCacheHeaders = $operation->getCacheHeaders();
-        }
+        $resourceCacheHeaders = $attributes['cache_headers'] ?? $operation?->getCacheHeaders() ?? [];
 
         if ($this->etag && !$response->getEtag()) {
             $response->setEtag(md5((string) $response->getContent()));

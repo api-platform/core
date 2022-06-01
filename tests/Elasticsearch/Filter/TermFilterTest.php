@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Filter;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Filter\ConstantScoreFilterInterface;
@@ -43,7 +42,6 @@ class TermFilterTest extends TestCase
                 $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
                 $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-                $this->prophesize(IdentifiersExtractorInterface::class)->reveal(),
                 $this->prophesize(IriConverterInterface::class)->reveal(),
                 $this->prophesize(PropertyAccessorInterface::class)->reveal(),
                 $this->prophesize(NameConverterInterface::class)->reveal()
@@ -59,9 +57,6 @@ class TermFilterTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'name')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
-
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
 
         $foo = new Foo();
         $foo->setName('Xavier');
@@ -81,7 +76,6 @@ class TermFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $identifierExtractorProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
             $nameConverterProphecy->reveal()
@@ -105,9 +99,6 @@ class TermFilterTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
-
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $nameConverterProphecy->normalize('foo.bar', Foo::class, null, Argument::type('array'))->willReturn('foo.bar')->shouldBeCalled();
         $nameConverterProphecy->normalize('foo', Foo::class, null, Argument::type('array'))->willReturn('foo')->shouldBeCalled();
@@ -116,7 +107,6 @@ class TermFilterTest extends TestCase
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $identifierExtractorProphecy->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $nameConverterProphecy->reveal(),
@@ -138,9 +128,6 @@ class TermFilterTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Foo::class, 'id')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]))->shouldBeCalled();
         $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn(new ApiProperty())->shouldBeCalled();
 
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
-
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('/invalid_iri_foos/1', ['fetch_data' => false])->willThrow(new InvalidArgumentException())->shouldBeCalled();
 
@@ -148,7 +135,6 @@ class TermFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            $identifierExtractorProphecy->reveal(),
             $iriConverterProphecy->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $this->prophesize(NameConverterInterface::class)->reveal()
@@ -179,7 +165,6 @@ class TermFilterTest extends TestCase
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(IdentifiersExtractorInterface::class)->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(PropertyAccessorInterface::class)->reveal(),
             $this->prophesize(NameConverterInterface::class)->reveal()

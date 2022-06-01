@@ -15,8 +15,6 @@ namespace ApiPlatform\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\HttpCache\PurgerInterface as LegacyPurgerInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -44,15 +42,10 @@ final class AddTagsListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    private $iriConverter;
-    private $purger;
+    private IriConverterInterface $iriConverter;
+    private ?PurgerInterface $purger;
 
-    /**
-     * @param LegacyPurgerInterface|PurgerInterface|null        $purger
-     * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
-     * @param mixed|null                                        $purger
-     */
-    public function __construct($iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $purger = null)
+    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, PurgerInterface $purger = null)
     {
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;

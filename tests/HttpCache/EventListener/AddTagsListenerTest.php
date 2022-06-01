@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\HttpCache\EventListener\AddTagsListener;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\ApiResource;
@@ -34,7 +33,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class AddTagsListenerTest extends TestCase
 {
@@ -135,7 +133,7 @@ class AddTagsListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
@@ -192,31 +190,9 @@ class AddTagsListenerTest extends TestCase
         $this->assertSame('/dummies', $response->headers->get('Cache-Tags'));
     }
 
-    public function testAddSubResourceCollectionIri()
-    {
-        $iriConverterProphecy = $this->prophesize(LegacyIriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Dummy::class, UrlGeneratorInterface::ABS_PATH)->willReturn('/dummies')->shouldBeCalled();
-
-        $response = new Response();
-        $response->setPublic();
-        $response->setEtag('foo');
-
-        $event = new ResponseEvent(
-            $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => ['/foo', '/bar'], '_api_resource_class' => Dummy::class, '_api_subresource_operation_name' => 'api_dummies_relatedDummies_get_subresource', '_api_subresource_context' => ['collection' => true]]),
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
-            $response
-        );
-
-        $listener = new AddTagsListener($iriConverterProphecy->reveal());
-        $listener->onKernelResponse($event);
-
-        $this->assertSame('/foo,/bar,/dummies', $response->headers->get('Cache-Tags'));
-    }
-
     public function testAddTagsWithXKey()
     {
-        $operation = (new GetCollection());
+        $operation = (new GetCollection(name: 'get'));
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
@@ -230,7 +206,7 @@ class AddTagsListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             HttpKernelInterface::MASTER_REQUEST,
             $response
         );
@@ -246,7 +222,7 @@ class AddTagsListenerTest extends TestCase
 
     public function testAddTagsWithoutHeader()
     {
-        $operation = (new GetCollection());
+        $operation = (new GetCollection(name: 'get'));
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation, Argument::type('array'))->willReturn('/dummies')->shouldBeCalled();
 
@@ -260,7 +236,7 @@ class AddTagsListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_resources' => ['/foo' => '/foo', '/bar' => '/bar'], '_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             HttpKernelInterface::MASTER_REQUEST,
             $response
         );

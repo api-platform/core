@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Elasticsearch\Extension;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Extension\SortExtension;
@@ -35,7 +34,6 @@ class SortExtensionTest extends TestCase
         self::assertInstanceOf(
             RequestBodySearchCollectionExtensionInterface::class,
             new SortExtension(
-                $this->prophesize(IdentifiersExtractorInterface::class)->reveal(),
                 $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
                 $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
                 $this->prophesize(NameConverterInterface::class)->reveal(),
@@ -50,9 +48,9 @@ class SortExtensionTest extends TestCase
         $nameConverterProphecy->normalize('name', Foo::class)->willReturn('name')->shouldBeCalled();
         $nameConverterProphecy->normalize('bar', Foo::class)->willReturn('bar')->shouldBeCalled();
 
-        $sortExtension = new SortExtension($this->prophesize(IdentifiersExtractorInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
+        $sortExtension = new SortExtension($this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
-        self::assertSame(['sort' => [['name' => ['order' => 'asc']], ['bar' => ['order' => 'desc']]]], $sortExtension->applyToCollection([], Foo::class, new GetCollection(order: ['name', 'bar' => 'desc'])));
+        self::assertSame(['sort' => [['name' => ['order' => 'asc']], ['bar' => ['order' => 'desc']]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['name', 'bar' => 'desc'])));
     }
 
     public function testApplyToCollectionWithNestedProperty(): void
@@ -69,27 +67,24 @@ class SortExtensionTest extends TestCase
         $nameConverterProphecy->normalize('foo.bar', Foo::class)->willReturn('foo.bar')->shouldBeCalled();
         $nameConverterProphecy->normalize('foo', Foo::class)->willReturn('foo')->shouldBeCalled();
 
-        $sortExtension = new SortExtension($this->prophesize(IdentifiersExtractorInterface::class)->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $nameConverterProphecy->reveal(), 'asc');
+        $sortExtension = new SortExtension($propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
-        self::assertSame(['sort' => [['foo.bar' => ['order' => 'desc', 'nested' => ['path' => 'foo']]]]], $sortExtension->applyToCollection([], Foo::class, new GetCollection(order: ['foo.bar' => 'desc'])));
+        self::assertSame(['sort' => [['foo.bar' => ['order' => 'desc', 'nested' => ['path' => 'foo']]]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['foo.bar' => 'desc'])));
     }
 
     public function testApplyToCollectionWithDefaultDirection(): void
     {
-        $identifierExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-        $identifierExtractorProphecy->getIdentifierFromResourceClass(Foo::class)->willReturn('id')->shouldBeCalled();
-
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
         $nameConverterProphecy->normalize('id', Foo::class)->willReturn('id')->shouldBeCalled();
 
-        $sortExtension = new SortExtension($identifierExtractorProphecy->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
+        $sortExtension = new SortExtension($this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $nameConverterProphecy->reveal(), 'asc');
 
         self::assertSame(['sort' => [['id' => ['order' => 'asc']]]], $sortExtension->applyToCollection([], Foo::class));
     }
 
     public function testApplyToCollectionWithNoOrdering(): void
     {
-        $sortExtension = new SortExtension($this->prophesize(IdentifiersExtractorInterface::class)->reveal(), $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal());
+        $sortExtension = new SortExtension($this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(), $this->prophesize(ResourceClassResolverInterface::class)->reveal(), $this->prophesize(NameConverterInterface::class)->reveal());
 
         self::assertEmpty($sortExtension->applyToCollection([], Foo::class));
     }

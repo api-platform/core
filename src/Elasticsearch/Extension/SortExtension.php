@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -32,13 +32,11 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
 {
     use FieldDatatypeTrait;
 
-    private ?string $defaultDirection;
-    private IdentifiersExtractorInterface $identifierExtractor;
-    private ?NameConverterInterface $nameConverter;
+    private $defaultDirection;
+    private $nameConverter;
 
-    public function __construct(IdentifiersExtractorInterface $identifierExtractor, $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
+    public function __construct($propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
     {
-        $this->identifierExtractor = $identifierExtractor;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->nameConverter = $nameConverter;
@@ -53,7 +51,8 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         $orders = [];
 
         if (
-            null !== ($defaultOrder = $operation?->getOrder())
+            $operation &&
+            null !== ($defaultOrder = $operation->getOrder())
             && \is_array($defaultOrder)
         ) {
             foreach ($defaultOrder as $property => $direction) {
@@ -65,9 +64,15 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
                 $orders[] = $this->getOrder($resourceClass, $property, $direction);
             }
         } elseif (null !== $this->defaultDirection) {
+            $property = 'id';
+            if ($operation instanceof HttpOperation) {
+                $uriVariables = $operation->getUriVariables()[0] ?? null;
+                $property = $uriVariables ? $uriVariables->getIdentifiers()[0] ?? 'id' : 'id';
+            }
+
             $orders[] = $this->getOrder(
                 $resourceClass,
-                $this->identifierExtractor->getIdentifierFromResourceClass($resourceClass),
+                $property,
                 $this->defaultDirection
             );
         }
