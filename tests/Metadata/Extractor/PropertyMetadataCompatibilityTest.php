@@ -60,7 +60,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
             'foo' => 'bar',
         ],
         'jsonSchemaContext' => [
-            'foo' => 'bar',
+            'lorem' => 'ipsum',
         ],
         'push' => true,
         'security' => 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
@@ -71,7 +71,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'extraProperties' => [
             'custom_property' => 'Lorem ipsum dolor sit amet',
         ],
-        'iris' => ['https://schema.org/totalPrice'],
+        'iri' => false,
     ];
 
     /**

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Extension;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Metadata\HttpOperation;

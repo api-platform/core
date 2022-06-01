@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\HttpCache\EventListener;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\HttpCache\EventListener\AddHeadersListener;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +28,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class AddHeadersListenerTest extends TestCase
 {
@@ -103,13 +104,13 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => new Get(name: 'get')])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event);
@@ -129,13 +130,13 @@ class AddHeadersListenerTest extends TestCase
 
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn(new ResourceMetadata())->shouldBeCalled();
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => new Get(name: 'get')])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event);
@@ -150,14 +151,14 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response('some content', 200, ['Vary' => ['Accept', 'Cookie']]);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, ['cache_headers' => ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]]);
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+        $operation = new Get(name: 'get', cacheHeaders: ['max_age' => 123, 'shared_max_age' => 456, 'stale_while_revalidate' => 928, 'stale_if_error' => 70,  'vary' => ['Vary-1', 'Vary-2']]);
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => $operation])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], true, $factory->reveal(), 15, 30);
         $listener->onKernelResponse($event);
@@ -171,20 +172,19 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
-            'cache_headers' => [
-                'max_age' => 123,
-                'public' => false,
-                'shared_max_age' => 456,
-            ],
+        $operation = new Get(name: 'get', cacheHeaders: [
+            'max_age' => 123,
+            'public' => false,
+            'shared_max_age' => 456,
         ]);
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => $operation])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event);
@@ -200,20 +200,19 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
-            'cache_headers' => [
-                'max_age' => 123,
-                'public' => true,
-                'shared_max_age' => 456,
-            ],
+        $operation = new Get(name: 'get', cacheHeaders: [
+            'max_age' => 123,
+            'public' => true,
+            'shared_max_age' => 456,
         ]);
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => $operation])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event);
@@ -226,19 +225,18 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
-            'cache_headers' => [
-                'max_age' => 123,
-                'shared_max_age' => 456,
-            ],
+        $operation = new Get(name: 'get', cacheHeaders: [
+            'max_age' => 123,
+            'shared_max_age' => 456,
         ]);
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => $operation])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, [], true, $factory->reveal());
         $listener->onKernelResponse($event);
@@ -251,19 +249,18 @@ class AddHeadersListenerTest extends TestCase
         $response = new Response('some content', 200);
         $event = new ResponseEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
-            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_item_operation_name' => 'get']),
+            new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get']),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response
         );
 
-        $metadata = new ResourceMetadata(null, null, null, null, null, [
-            'cache_headers' => [
-                'max_age' => 123,
-                'shared_max_age' => 456,
-            ],
+        $operation = new Get(name: 'get', cacheHeaders: [
+            'max_age' => 123,
+            'shared_max_age' => 456,
         ]);
-        $factory = $this->prophesize(ResourceMetadataFactoryInterface::class);
-        $factory->create(Dummy::class)->willReturn($metadata)->shouldBeCalled();
+
+        $factory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [new ApiResource(operations: ['get' => $operation])]))->shouldBeCalled();
 
         $listener = new AddHeadersListener(true, 100, 200, ['Accept', 'Accept-Encoding'], false, $factory->reveal());
         $listener->onKernelResponse($event);

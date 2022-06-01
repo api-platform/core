@@ -77,7 +77,7 @@ class ItemNormalizer extends AbstractItemNormalizer
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
         } catch (InvalidArgumentException $e) {
-            $operation = $this->resourceMetadataFactory->create($context['resource_class'])->getOperation();
+            $operation = $this->resourceMetadataCollectionFactory->create($context['resource_class'])->getOperation();
             // todo: we could guess uri variables with the operation and the data instead of hardcoding id
             $iri = $this->iriConverter->getIriFromResource($context['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => $data['id']]]);
 

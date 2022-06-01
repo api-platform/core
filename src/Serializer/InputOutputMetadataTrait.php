@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -21,14 +20,14 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 trait InputOutputMetadataTrait
 {
     /**
-     * @var ResourceMetadataFactoryInterface|ResourceMetadataCollectionFactoryInterface|null
+     * @var ResourceMetadataCollectionFactoryInterface|null
      */
-    protected $resourceMetadataFactory;
+    protected $resourceMetadataCollectionFactory;
 
     protected function getInputClass(string $class, array $context = []): ?string
     {
-        if (!$this->resourceMetadataFactory || !$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            return $this->getInputOutputMetadata($class, 'input', $context);
+        if (!$this->resourceMetadataCollectionFactory) {
+            return $context['input']['class'] ?? null;
         }
 
         if (null !== ($context['input']['class'] ?? null)) {
@@ -38,8 +37,8 @@ trait InputOutputMetadataTrait
         $operation = $context['operation'] ?? null;
         if (!$operation) {
             try {
-                $operation = $this->resourceMetadataFactory->create($class)->getOperation($context['operation_name'] ?? null);
-            } catch (OperationNotFoundException $e) {
+                $operation = $this->resourceMetadataCollectionFactory->create($class)->getOperation($context['operation_name'] ?? null);
+            } catch (OperationNotFoundException|ResourceClassNotFoundException $e) {
                 return null;
             }
         }
@@ -49,8 +48,8 @@ trait InputOutputMetadataTrait
 
     protected function getOutputClass(string $class, array $context = []): ?string
     {
-        if (!$this->resourceMetadataFactory || !$this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            return $this->getInputOutputMetadata($class, 'output', $context);
+        if (!$this->resourceMetadataCollectionFactory) {
+            return $context['output']['class'] ?? null;
         }
 
         if (null !== ($context['output']['class'] ?? null)) {
@@ -60,28 +59,12 @@ trait InputOutputMetadataTrait
         $operation = $context['operation'] ?? null;
         if (null === $operation) {
             try {
-                $operation = $this->resourceMetadataFactory->create($class)->getOperation($context['operation_name'] ?? null);
-            } catch (OperationNotFoundException $e) {
+                $operation = $this->resourceMetadataCollectionFactory->create($class)->getOperation($context['operation_name'] ?? null);
+            } catch (OperationNotFoundException|ResourceClassNotFoundException $e) {
                 return null;
             }
         }
 
         return $operation ? $operation->getOutput()['class'] ?? null : null;
-    }
-
-    // TODO: remove in 3.0
-    private function getInputOutputMetadata(string $class, string $inputOrOutput, array $context)
-    {
-        if (null === $this->resourceMetadataFactory || null !== ($context[$inputOrOutput]['class'] ?? null)) {
-            return $context[$inputOrOutput]['class'] ?? null;
-        }
-
-        try {
-            $metadata = $this->resourceMetadataFactory->create($class);
-        } catch (ResourceClassNotFoundException $e) {
-            return null;
-        }
-
-        return $metadata->getAttribute($inputOrOutput)['class'] ?? null;
     }
 }

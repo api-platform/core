@@ -236,6 +236,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function addGlobalDefaults($operation)
     {
+        $extraProperties = [];
         foreach ($this->defaults as $key => $value) {
             $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
@@ -249,7 +250,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
         }
 
-        return $operation->withExtraProperties($extraProperties);
+        return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
     }
 
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource

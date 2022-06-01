@@ -480,7 +480,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
 
-        if ([] !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
+        if (null !== $type && [] !== $type && !$type->isCollection() && (null !== $className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className)) {
             $propertyData['owl:maxCardinality'] = 1;
         }
 

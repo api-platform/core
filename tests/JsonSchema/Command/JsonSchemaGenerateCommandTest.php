@@ -47,27 +47,26 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     {
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass]);
 
-        dump($this->tester->getDisplay());
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteWithItemOperationGet()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => 'api_dummies_get_item', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}.{_format}_get', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteWithCollectionOperationGet()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => 'api_dummies_get_collection', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies.{_format}_get_collection', '--type' => 'output']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     public function testExecuteWithJsonldFormatOption()
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => 'api_dummies_post_collection', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies.{_format}_post', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('@id', $result);

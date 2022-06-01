@@ -13,11 +13,17 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonLd\Action;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +31,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- * @group legacy
  */
 class ContextActionTest extends TestCase
 {
@@ -35,9 +40,9 @@ class ContextActionTest extends TestCase
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $contextBuilderProphecy->getEntrypointContext()->willReturn(['/entrypoints']);
-        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
 
         $this->assertEquals(['@context' => ['/entrypoints']], $contextAction('Entrypoint'));
     }
@@ -46,9 +51,9 @@ class ContextActionTest extends TestCase
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $contextBuilderProphecy->getBaseContext()->willReturn(['/contexts']);
-        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
 
         $this->assertEquals(['@context' => ['/contexts']], $contextAction('Error'));
     }
@@ -57,13 +62,26 @@ class ContextActionTest extends TestCase
     {
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummy']));
-        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
         $contextBuilderProphecy->getResourceContext('dummy')->willReturn(['/dummies']);
 
-        $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(
-            new ResourceMetadata('dummy', 'dummy', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], [])
+        $resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(
+            new ResourceMetadataCollection('dummy', [
+                (new ApiResource())
+                ->withShortName('dummy')
+                ->withDescription('dummy')
+                ->withTypes(['#dummy'])
+                ->withOperations(new Operations([
+                    'get' => (new Get())->withShortName('dummy'),
+                    'put' => (new Put())->withShortName('dummy'),
+                    'get_collection' => (new GetCollection())->withShortName('dummy'),
+                    'post' => (new Post())->withShortName('dummy'),
+                    'custom' => (new Get())->withUriTemplate('/foo')->withShortName('dummy'),
+                    'custom2' => (new Post())->withUriTemplate('/foo')->withShortName('dummy'),
+                ])),
+            ])
         );
         $this->assertEquals(['@context' => ['/dummies']], $contextAction('dummy'));
     }
@@ -74,12 +92,25 @@ class ContextActionTest extends TestCase
 
         $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['gerard']));
-        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal());
+        $contextAction = new ContextAction($contextBuilderProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
 
-        $resourceMetadataFactoryProphecy->create('gerard')->shouldBeCalled()->willReturn(
-            new ResourceMetadata('gerard', 'gerard', '#dummy', ['get' => ['method' => 'GET'], 'put' => ['method' => 'PUT']], ['get' => ['method' => 'GET'], 'post' => ['method' => 'POST'], 'custom' => ['method' => 'GET', 'path' => '/foo'], 'custom2' => ['method' => 'POST', 'path' => '/foo']], [])
+        $resourceMetadataCollectionFactoryProphecy->create('gerard')->shouldBeCalled()->willReturn(
+            new ResourceMetadataCollection('gerard', [
+                (new ApiResource())
+                    ->withShortName('gerard')
+                    ->withDescription('gerard')
+                    ->withTypes(['#dummy'])
+                    ->withOperations(new Operations([
+                        'get' => (new Get())->withShortName('gerard'),
+                        'put' => (new Put())->withShortName('gerard'),
+                        'get_collection' => (new GetCollection())->withShortName('gerard'),
+                        'post' => (new Post())->withShortName('gerard'),
+                        'custom' => (new Get())->withUriTemplate('/foo')->withShortName('gerard'),
+                        'custom2' => (new Post())->withUriTemplate('/foo')->withShortName('gerard'),
+                    ])),
+            ])
         );
         $contextAction('dummy');
     }

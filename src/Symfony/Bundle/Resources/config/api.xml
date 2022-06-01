@@ -112,9 +112,9 @@
 
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
             <argument type="service" id="api_platform.serializer" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument>%api_platform.error_formats%</argument>
             <argument>%api_platform.exception_to_status%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
         </service>
 
         <!-- Cache -->
