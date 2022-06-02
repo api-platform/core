@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-final class Post extends HttpOperation
+final class Post extends HttpOperation implements PostOperationInterface
 {
     /**
      * {@inheritdoc}
