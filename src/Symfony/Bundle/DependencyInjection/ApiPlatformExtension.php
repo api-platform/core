@@ -663,8 +663,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
         $container->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)
             ->setBindings(['$requestStack' => null]);
-        $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class)
-            ->setBindings(['$requestStack' => null]);
+        $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class);
 
         $loader->load('doctrine_orm.xml');
         $loader->load('legacy/doctrine_orm.xml');
