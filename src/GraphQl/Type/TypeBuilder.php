@@ -59,12 +59,6 @@ final class TypeBuilder implements TypeBuilderInterface
         $shortName = $operation->getShortName();
         $operationName = $operation->getName();
 
-        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
-            $shortName = $ioMetadata['name'] ?? $shortName;
-        }
-
         if ($operation instanceof Mutation) {
             $shortName = $operationName.ucfirst($shortName);
         }
@@ -106,6 +100,11 @@ final class TypeBuilder implements TypeBuilderInterface
             }
 
             return $resourceObjectType;
+        }
+
+        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
+            $resourceClass = $ioMetadata['class'];
         }
 
         $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;

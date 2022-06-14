@@ -432,32 +432,6 @@ Feature: GraphQL query support
     }
     """
 
-  Scenario: Custom item query with output
-    Given there are 2 dummyCustomQuery objects
-    When I send the following GraphQL request:
-    """
-    {
-      testItemOutputDummyCustomQuery(id: "/dummy_custom_queries/1",) {
-        baz
-        bat
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON should be equal to:
-    """
-    {
-      "data": {
-        "testItemOutputDummyCustomQuery": {
-          "baz": 46,
-          "bat": "Success!"
-        }
-      }
-    }
-    """
-
   @createSchema
   Scenario: Retrieve an item with different serialization groups for item_query and collection_query
     Given there are 1 dummy with different GraphQL serialization groups objects

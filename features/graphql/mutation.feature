@@ -819,26 +819,6 @@ Feature: GraphQL mutation support
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.dummyCustomMutation.result" should be equal to "18"
     And the JSON node "data.testCustomArgumentsDummyCustomMutation.clientMutationId" should be equal to "myId"
 
-  Scenario: Execute a custom mutation with output
-    When I send the following GraphQL request:
-    """
-    mutation {
-      testOutputDummyCustomMutation(input: {id: "/dummy_custom_mutations/1", operandA: 9, clientMutationId: "myId"}) {
-        dummyCustomMutation {
-          baz
-          bat
-        }
-        clientMutationId
-      }
-    }
-    """
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/json"
-    And the JSON node "data.testOutputDummyCustomMutation.dummyCustomMutation.baz" should be equal to "98"
-    And the JSON node "data.testOutputDummyCustomMutation.dummyCustomMutation.bat" should be equal to "9"
-    And the JSON node "data.testOutputDummyCustomMutation.clientMutationId" should be equal to "myId"
-
   Scenario: Uploading a file with a custom mutation
     Given I have the following file for a GraphQL request:
       | name | file     |
