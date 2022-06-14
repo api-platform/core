@@ -103,23 +103,23 @@ class TypeBuilderTest extends TestCase
     public function testGetResourceObjectTypeOutputClass(): void
     {
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', []);
-        $this->typesContainerProphecy->has('outputName')->shouldBeCalled()->willReturn(false);
-        $this->typesContainerProphecy->set('outputName', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
         $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
         $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
 
         /** @var Operation $operation */
-        $operation = (new Query())->withShortName('shortName')->withDescription('description')->withOutput(['class' => 'outputClass', 'name' => 'outputName']);
+        $operation = (new Query())->withShortName('shortName')->withDescription('description')->withOutput(['class' => 'outputClass']);
         /** @var ObjectType $resourceObjectType */
         $resourceObjectType = $this->typeBuilder->getResourceObjectType('resourceClass', $resourceMetadata, $operation, false);
-        $this->assertSame('outputName', $resourceObjectType->name);
+        $this->assertSame('shortName', $resourceObjectType->name);
         $this->assertSame('description', $resourceObjectType->description);
         $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
         $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
         $this->assertArrayHasKey('fields', $resourceObjectType->config);
 
         $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderInterface::class);
-        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $operation, false, 0, ['class' => 'outputClass', 'name' => 'outputName'])->shouldBeCalled();
+        $fieldsBuilderProphecy->getResourceObjectTypeFields('outputClass', $operation, false, 0, ['class' => 'outputClass'])->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
     }

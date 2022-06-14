@@ -306,18 +306,6 @@ services:
         tags:
             -  { name: 'api_platform.data_transformer' }
 
-    app.data_transformer.dummy_custom_query_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\DummyCustomQueryDtoDataTransformer'
-        public: false
-        tags:
-            -  { name: 'api_platform.data_transformer' }
-
-    app.data_transformer.dummy_custom_mutation_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\DummyCustomMutationDtoDataTransformer'
-        public: false
-        tags:
-            -  { name: 'api_platform.data_transformer' }
-
     app.data_transformer.custom_output_dto_fallback_same_class:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
         public: false

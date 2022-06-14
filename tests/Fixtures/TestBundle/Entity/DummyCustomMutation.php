@@ -13,33 +13,81 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GraphQl\Mutation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Dummy with a custom GraphQL mutation resolver.
  *
+ * @ORM\Entity
+ * @ApiResource(graphql={
+ *     "sum"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
+ *         "normalization_context"={"groups"={"result"}},
+ *         "denormalization_context"={"groups"={"sum"}}
+ *     },
+ *     "sumNotPersisted"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom_not_persisted",
+ *         "normalization_context"={"groups"={"result"}},
+ *         "denormalization_context"={"groups"={"sum"}}
+ *     },
+ *     "sumNoWriteCustomResult"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom_no_write_custom_result",
+ *         "normalization_context"={"groups"={"result"}},
+ *         "denormalization_context"={"groups"={"sum"}},
+ *         "write"=false
+ *     },
+ *     "sumOnlyPersist"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom_only_persist",
+ *         "normalization_context"={"groups"={"result"}},
+ *         "denormalization_context"={"groups"={"sum"}},
+ *         "read"=false,
+ *         "deserialize"=false,
+ *         "validate"=false,
+ *         "serialize"=false
+ *     },
+ *     "testCustomArguments"={
+ *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
+ *         "args"={"operandC"={"type"="Int!"}}
+ *     }
+ * })
+ *
  * @author Raoul Clais <raoul.clais@gmail.com>
  */
-#[ApiResource(graphQlOperations: [new Mutation(name: 'sum', resolver: 'app.graphql.mutation_resolver.dummy_custom', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']]), new Mutation(name: 'sumNotPersisted', resolver: 'app.graphql.mutation_resolver.dummy_custom_not_persisted', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']]), new Mutation(name: 'sumNoWriteCustomResult', resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']], write: false), new Mutation(name: 'sumOnlyPersist', resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist', normalizationContext: ['groups' => ['result']], denormalizationContext: ['groups' => ['sum']], read: false, deserialize: false, validate: false, serialize: false), new Mutation(name: 'testCustomArguments', resolver: 'app.graphql.mutation_resolver.dummy_custom', args: ['operandC' => ['type' => 'Int!']]), new Mutation(name: 'testOutput', resolver: 'app.graphql.mutation_resolver.dummy_custom', output: OutputDto::class)])]
-#[ORM\Entity]
 class DummyCustomMutation
 {
-    #[ORM\Column(type: 'integer')]
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private ?int $id = null;
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $operandA = null;
-    #[Groups(['sum'])]
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $operandB = null;
-    #[Groups(['result'])]
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $result = null;
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $operandA;
+
+    /**
+     * @var int|null
+     *
+     * @Groups({"sum"})
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $operandB;
+
+    /**
+     * @var int|null
+     *
+     * @Groups({"result"})
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $result;
 
     public function getId(): ?int
     {
