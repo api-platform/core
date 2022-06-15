@@ -11,6 +11,9 @@ api_platform:
     elasticsearch:
         hosts: '%env(resolve:ELASTICSEARCH_URL)%'
 
+    doctrine: 
+        enabled: false
+
 services:
     test.api_platform.elasticsearch.client:
         parent: api_platform.elasticsearch.client
