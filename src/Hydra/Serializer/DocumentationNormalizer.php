@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -241,7 +240,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $hydraOperations = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                if (($operation instanceof Post || $operation instanceof CollectionOperationInterface) !== $collection) {
+                if ((HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
 

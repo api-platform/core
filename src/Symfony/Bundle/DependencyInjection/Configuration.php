@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Annotation\ApiResource as LegacyApiResource;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
