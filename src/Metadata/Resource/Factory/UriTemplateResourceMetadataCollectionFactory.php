@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Operation\PathSegmentNameGeneratorInterface;
 use Symfony\Component\Routing\Route;
@@ -137,7 +136,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
         $operation = $this->normalizeUriVariables($operation);
 
         if (!($uriTemplate = $operation->getUriTemplate())) {
-            if ($operation instanceof Post) {
+            if ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod()) {
                 return $operation->withUriVariables([]);
             }
 
