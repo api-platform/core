@@ -37,7 +37,7 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): DocumentMetadata
+    public function create(string $resourceClass, array $context = []): DocumentMetadata
     {
         $documentMetadata = null;
 

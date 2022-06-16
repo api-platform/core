@@ -54,7 +54,7 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): DocumentMetadata
+    public function create(string $resourceClass, array $context = []): DocumentMetadata
     {
         $documentMetadata = null;
 

@@ -86,7 +86,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
         }
 
         try {
-            $this->documentMetadataFactory->create($resourceClass);
+            $this->documentMetadataFactory->create($resourceClass, $context);
         } catch (IndexNotFoundException $e) {
             return false;
         }
@@ -113,7 +113,7 @@ final class CollectionDataProvider implements ContextAwareCollectionDataProvider
      */
     public function getCollection(string $resourceClass, ?string $operationName = null, array $context = []): iterable
     {
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
+        $documentMetadata = $this->documentMetadataFactory->create($resourceClass, $context);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {

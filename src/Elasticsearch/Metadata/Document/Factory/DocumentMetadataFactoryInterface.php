@@ -30,5 +30,5 @@ interface DocumentMetadataFactoryInterface
      *
      * @throws IndexNotFoundException
      */
-    public function create(string $resourceClass): DocumentMetadata;
+    public function create(string $resourceClass, array $context = []): DocumentMetadata;
 }

@@ -42,7 +42,7 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
     /**
      * {@inheritdoc}
      */
-    public function create(string $resourceClass): DocumentMetadata
+    public function create(string $resourceClass, array $context = []): DocumentMetadata
     {
         if (isset($this->localCache[$resourceClass])) {
             return $this->handleNotFound($this->localCache[$resourceClass], $resourceClass);

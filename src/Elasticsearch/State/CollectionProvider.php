@@ -60,7 +60,7 @@ final class CollectionProvider implements ProviderInterface
     {
         $resourceClass = $operation->getClass();
         $operationName = $operation->getName();
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
+        $documentMetadata = $this->documentMetadataFactory->create($resourceClass, $context);
         $body = [];
 
         foreach ($this->collectionExtensions as $collectionExtension) {

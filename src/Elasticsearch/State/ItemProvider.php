@@ -50,7 +50,7 @@ final class ItemProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
         $resourceClass = $operation->getClass();
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
+        $documentMetadata = $this->documentMetadataFactory->create($resourceClass, $context);
 
         try {
             $params = [

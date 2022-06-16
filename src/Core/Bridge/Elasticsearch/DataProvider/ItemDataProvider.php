@@ -67,7 +67,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
         }
 
         try {
-            $this->documentMetadataFactory->create($resourceClass);
+            $this->documentMetadataFactory->create($resourceClass, $context);
         } catch (IndexNotFoundException $e) {
             return false;
         }
@@ -90,7 +90,7 @@ final class ItemDataProvider implements ItemDataProviderInterface, RestrictedDat
             $id = $id[$this->identifierExtractor->getIdentifierFromResourceClass($resourceClass)];
         }
 
-        $documentMetadata = $this->documentMetadataFactory->create($resourceClass);
+        $documentMetadata = $this->documentMetadataFactory->create($resourceClass, $context);
 
         try {
             $params = [
