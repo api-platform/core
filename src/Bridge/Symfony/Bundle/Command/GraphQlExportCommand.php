@@ -30,8 +30,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class GraphQlExportCommand extends Command
 {
-    protected static $defaultName = 'api:graphql:export';
-
     private $schemaBuilder;
 
     public function __construct(SchemaBuilderInterface $schemaBuilder)
@@ -78,5 +76,11 @@ class GraphQlExportCommand extends Command
         }
 
         return 0;
+    }
+
+    // Use AsCommand Attribute when SF 4.4 and PHP 7 gets dropped
+    public static function getDefaultName(): string
+    {
+        return 'api:graphql:export';
     }
 }
