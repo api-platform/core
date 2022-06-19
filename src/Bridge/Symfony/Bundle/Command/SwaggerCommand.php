@@ -108,7 +108,6 @@ final class SwaggerCommand extends Command
         return 0;
     }
 
-    // Use AsCommand Attribute when SF 4.4 and PHP 7 gets dropped
     public static function getDefaultName(): string
     {
         return 'api:swagger:export';
