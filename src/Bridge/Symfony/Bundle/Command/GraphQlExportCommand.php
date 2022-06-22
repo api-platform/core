@@ -30,8 +30,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class GraphQlExportCommand extends Command
 {
-    protected static $defaultName = 'api:graphql:export';
-
+    
     private $schemaBuilder;
 
     public function __construct(SchemaBuilderInterface $schemaBuilder)
@@ -47,6 +46,7 @@ class GraphQlExportCommand extends Command
     protected function configure(): void
     {
         $this
+            ->setName('api:graphql:export')
             ->setDescription('Export the GraphQL schema in Schema Definition Language (SDL)')
             ->addOption('comment-descriptions', null, InputOption::VALUE_NONE, 'Use preceding comments as the description')
             ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write output to file');
