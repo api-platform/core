@@ -102,7 +102,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
             ];
         } else {
             $resourceData = [
-                'id' => \function_exists('spl_object_id') ? spl_object_id($object) : spl_object_hash($object),
+                'id' => '/.well-known/genid/'.(bin2hex(random_bytes(10))),
                 'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
             ];
         }
