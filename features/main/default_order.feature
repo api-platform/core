@@ -127,7 +127,7 @@ Feature: Default order
     """
     {
       "@context": "/contexts/Foo",
-      "@id": "/foos",
+      "@id": "/custom_collection_asc_foos",
       "@type": "hydra:Collection",
       "hydra:member": [
         {
@@ -183,7 +183,7 @@ Feature: Default order
     """
     {
       "@context": "/contexts/Foo",
-      "@id": "/foos",
+      "@id": "/custom_collection_desc_foos",
       "@type": "hydra:Collection",
       "hydra:member": [
         {

@@ -116,6 +116,12 @@ services:
         tags:
             - { name: 'api_platform.state_processor' }
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\RPCProcessor:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\RPCProcessor'
+        public: false
+        tags:
+            - { name: 'api_platform.state_processor' }
+
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ContainNonResourceProvider'

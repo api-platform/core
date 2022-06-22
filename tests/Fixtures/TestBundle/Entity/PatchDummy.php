@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()])]
+#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi'], normalizationContext: ['skip_null_values' => true]), new Post(), new GetCollection()])]
 #[ORM\Entity]
 class PatchDummy
 {

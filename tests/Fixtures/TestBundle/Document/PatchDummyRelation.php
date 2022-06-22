@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi']), new Post(), new GetCollection()], normalizationContext: ['groups' => ['chicago']], denormalizationContext: ['groups' => ['chicago']])]
+#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi'], normalizationContext: ['skip_null_values' => true, 'groups' => ['chicago']]), new Post(), new GetCollection()], normalizationContext: ['groups' => ['chicago']], denormalizationContext: ['groups' => ['chicago']])]
 #[ODM\Document]
 class PatchDummyRelation
 {

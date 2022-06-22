@@ -16,11 +16,12 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RPCOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\RPCProcessor;
 
 /**
  * RPC-like resource.
  */
-#[ApiResource(operations: [new Post(status: 202, messenger: true, uriTemplate: 'rpc', output: false), new Post(status: 200, uriTemplate: 'rpc_output', output: RPCOutput::class)])]
+#[ApiResource(operations: [new Post(status: 202, messenger: true, uriTemplate: 'rpc', output: false), new Post(status: 200, uriTemplate: 'rpc_output', output: RPCOutput::class, processor: RPCProcessor::class)])]
 class RPC
 {
     /**

@@ -13,7 +13,7 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/Answer",
-      "@id": "/answers/1",
+      "@id": "/questions/1/answer",
       "@type": "Answer",
       "id": 1,
       "content": "42",
@@ -234,7 +234,7 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/RelatedDummy",
-      "@id": "/related_dummies/2",
+      "@id": "/dummies/1/related_dummies/2",
       "@type": "https://schema.org/Product",
       "id": 2,
       "name": null,
@@ -274,7 +274,7 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/ThirdLevel",
-      "@id": "/third_levels/1",
+      "@id": "/dummies/1/related_dummies/1/third_level",
       "@type": "ThirdLevel",
       "fourthLevel": "/fourth_levels/1",
       "badFourthLevel": null,
@@ -293,7 +293,7 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/FourthLevel",
-      "@id": "/fourth_levels/1",
+      "@id": "/dummies/1/related_dummies/1/third_level/fourth_level",
       "@type": "FourthLevel",
       "badThirdLevel": [],
       "id": 1,
@@ -411,7 +411,7 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies/1",
+      "@id": "/related_owned_dummies/1/owning_dummy",
       "@type": "Dummy",
       "description": null,
       "dummy": null,
@@ -444,7 +444,7 @@ Feature: Subresource support
     """
     {
       "@context": "/contexts/Dummy",
-      "@id": "/dummies/1",
+      "@id": "/related_owning_dummies/1/owned_dummy",
       "@type": "Dummy",
       "description": null,
       "dummy": null,

@@ -43,10 +43,10 @@ class RelationEmbedder
     public $krondstadt = 'Krondstadt';
     #[ORM\ManyToOne(targetEntity: RelatedDummy::class, cascade: ['persist'])]
     #[Groups(['chicago', 'barcelona'])]
-    public $anotherRelated;
+    public ?RelatedDummy $anotherRelated;
     #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
     #[Groups(['barcelona', 'chicago'])]
-    protected $related;
+    protected ?RelatedDummy $related;
 
     public function getRelated()
     {
