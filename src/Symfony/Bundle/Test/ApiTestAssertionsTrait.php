@@ -19,6 +19,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\ExpectationFailedException;
@@ -120,7 +121,12 @@ trait ApiTestAssertionsTrait
         if ($schemaFactory instanceof LegacySchemaFactoryInterface) {
             $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::COLLECTION, $operationName, null);
         } else {
-            $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
+            if ($resourceMetadataFactoryCollection = self::getResourceMetadataCollectionFactory()) {
+                $operation = $resourceMetadataFactoryCollection->create($resourceClass)->getOperation($operationName, true);
+            } else {
+                $operation = $operationName ? (new GetCollection())->withName($operationName) : new GetCollection();
+            }
+
             $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
         }
 
@@ -134,7 +140,12 @@ trait ApiTestAssertionsTrait
         if ($schemaFactory instanceof LegacySchemaFactoryInterface) {
             $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, OperationType::ITEM, $operationName, null);
         } else {
-            $operation = $operationName ? (new Get())->withName($operationName) : new Get();
+            if ($resourceMetadataFactoryCollection = self::getResourceMetadataCollectionFactory()) {
+                $operation = $resourceMetadataFactoryCollection->create($resourceClass)->getOperation($operationName);
+            } else {
+                $operation = $operationName ? (new Get())->withName($operationName) : new Get();
+            }
+
             $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null);
         }
 
@@ -180,6 +191,22 @@ trait ApiTestAssertionsTrait
         }
 
         return $schemaFactory;
+    }
+
+    /**
+     * @return ResourceMetadataCollectionFactoryInterface|null
+     */
+    private static function getResourceMetadataCollectionFactory()
+    {
+        $container = method_exists(static::class, 'getContainer') ? static::getContainer() : static::$container; // @phpstan-ignore-line
+
+        try {
+            $resourceMetadataFactoryCollection = $container->get('api_platform.metadata.resource.metadata_collection_factory');
+        } catch (ServiceNotFoundException $e) {
+            return null;
+        }
+
+        return $resourceMetadataFactoryCollection;
     }
 }
 
