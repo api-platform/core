@@ -65,7 +65,7 @@ final class ReadListener
             return;
         }
 
-        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe()) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || ($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
             return;
         }
 

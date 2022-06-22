@@ -36,7 +36,7 @@ class MaxDepthEagerDummy
     #[ORM\Column(name: 'name', type: 'string', length: 30)]
     #[Groups(['default'])]
     public $name;
-    #[ORM\ManyToOne(targetEntity: MaxDepthEagerDummy::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'])]
     #[Groups(['default'])]
     #[MaxDepth(1)]
     public $child;

@@ -37,7 +37,7 @@ class MaxDepthDummy
     public $name;
 
     #[ApiProperty(fetchEager: false)]
-    #[ORM\ManyToOne(targetEntity: MaxDepthDummy::class, cascade: ['persist'])]
+    #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'])]
     #[Groups(['default'])]
     #[MaxDepth(1)]
     public $child;

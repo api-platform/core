@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ConvertedBoolean;
 use ApiPlatform\Util\AttributeFilterExtractorTrait;
 use ApiPlatform\Util\ReflectionClassRecursiveIterator;
 use Symfony\Component\DependencyInjection\ChildDefinition;

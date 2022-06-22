@@ -92,7 +92,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
                 throw new UnexpectedValueException('Expected item to be an array');
             }
             $data['_embedded']['item'][] = $item;
-            $data['_links']['item'][] = $item['_links']['self'];
+            $data['_links']['item'][] = $item['_links']['self'] ?? null;
         }
 
         return $data;

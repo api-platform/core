@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,13 +31,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     operations: [
         new Get(),
-        new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}'),
-        new Put(), 
-        new Delete(), 
-        new Post(input: CustomInputDto::class), 
-        new GetCollection(), 
-        new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output'),
-        new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output')
+        new Put(),
+        new Delete(),
+        new Post(input: CustomInputDto::class, processor: CustomInputDtoProcessor::class),
+        new GetCollection(),
+        new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output', provider: CustomOutputDtoProvider::class),
+        new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}', provider: CustomOutputDtoProvider::class),
+        new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output'),
     ]
 )]
 #[ORM\Entity]

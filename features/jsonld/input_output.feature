@@ -38,7 +38,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -47,8 +47,7 @@ Feature: JSON-LD DTO input and output
         "foo": "CustomOutputDto/foo",
         "bar": "CustomOutputDto/bar"
       },
-      "@type": "DummyDtoCustom",
-      "@id": "/dummy_dto_customs/1",
+      "@type": "CustomOutputDto",
       "foo": "test",
       "bar": 1
     }
@@ -61,65 +60,25 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/DummyDtoCustom",
-      "@id": "/dummy_dto_customs",
+      "@id": "/dummy_dto_custom_output",
       "@type": "hydra:Collection",
       "hydra:member": [
         {
-          "@type": "DummyDtoCustom",
-          "@id": "/dummy_dto_customs/1",
+          "@type": "CustomOutputDto",
           "foo": "test",
           "bar": 1
         },
         {
-          "@type": "DummyDtoCustom",
-          "@id": "/dummy_dto_customs/2",
+          "@type": "CustomOutputDto",
           "foo": "test",
           "bar": 2
         }
       ],
       "hydra:totalItems": 2
-    }
-    """
-
-  @createSchema
-  Scenario: Get an item with same class as custom output
-    Given there is a DummyDtoOutputSameClass
-    When I send a "GET" request to "/dummy_dto_output_same_classes/1"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/DummyDtoOutputSameClass",
-      "@id": "/dummy_dto_output_same_classes/1",
-      "@type": "DummyDtoOutputSameClass",
-      "lorem": "test",
-      "ipsum": "modified",
-      "id": 1
-    }
-    """
-
-  @createSchema
-  Scenario: Get an item with a data transformer that will return the original class as a fallback
-    Given there is a DummyDtoOutputFallbackToSameClass
-    When I send a "GET" request to "/dummy_dto_output_fallback_to_same_classes/1"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
-      "@context": "/contexts/DummyDtoOutputFallbackToSameClass",
-      "@id": "/dummy_dto_output_fallback_to_same_classes/1",
-      "@type": "DummyDtoOutputFallbackToSameClass",
-      "lorem": "test",
-      "ipsum": "modified",
-      "id": 1
     }
     """
 
@@ -144,8 +103,9 @@ Feature: JSON-LD DTO input and output
       "bar": 1
     }
     """
+    Then print last JSON response
     Then the response status code should be 201
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -156,8 +116,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoInputOutput",
-      "@id": "/dummy_dto_input_outputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 1,
       "bat": "test",
@@ -174,7 +133,7 @@ Feature: JSON-LD DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -185,8 +144,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoInputOutput",
-      "@id": "/dummy_dto_input_outputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 2,
       "bat": "test",
@@ -215,7 +173,7 @@ Feature: JSON-LD DTO input and output
     }
     """
     Then the response status code should be 200
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -223,8 +181,7 @@ Feature: JSON-LD DTO input and output
         "hydra": "http://www.w3.org/ns/hydra/core#",
         "dummy": "RecoverPasswordOutput/dummy"
       },
-      "@type": "User",
-      "@id": "/users/1",
+      "@type": "RecoverPasswordOutput",
       "dummy": "/dummies/1"
     }
     """
@@ -235,7 +192,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -246,8 +203,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoNoInput",
-      "@id": "/dummy_dto_no_inputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 1,
       "bat": "test",
@@ -260,7 +216,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": {
@@ -271,8 +227,7 @@ Feature: JSON-LD DTO input and output
         "bat": "OutputDto/bat",
         "relatedDummies": "OutputDto/relatedDummies"
       },
-      "@type": "DummyDtoNoInput",
-      "@id": "/dummy_dto_no_inputs/1",
+      "@type": "OutputDto",
       "id": 1,
       "baz": 1,
       "bat": "testtest",

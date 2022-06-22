@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,7 +29,17 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Delete(), new Post(uriTemplate: '/dummy_dto_no_inputs/{id}/double_bat', controller: DoubleBatAction::class, status: 200), new Post(uriTemplate: '/dummy_dto_no_inputs', controller: CreateItemAction::class), new GetCollection()], input: false, output: OutputDto::class)]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new Delete(),
+        new Post(uriTemplate: '/dummy_dto_no_inputs/{id}/double_bat', controller: DoubleBatAction::class, status: 200, processor: DummyDtoNoInputsProcessor::class),
+        new Post(uriTemplate: '/dummy_dto_no_inputs', controller: CreateItemAction::class, processor: DummyDtoNoInputsProcessor::class),
+        new GetCollection(),
+    ],
+    input: false,
+    output: OutputDto::class
+)]
 #[ORM\Entity]
 class DummyDtoNoInput
 {

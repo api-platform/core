@@ -79,7 +79,7 @@ Feature: JSON-LD contexts generation
               "@vocab": "http://example.com/docs.jsonld#",
               "hydra": "http://www.w3.org/ns/hydra/core#",
               "person": {
-                  "@id": "http://example.com/id",
+                  "@id": "https://example.com/id",
                   "@type": "@id",
                   "foo": "bar"
               }

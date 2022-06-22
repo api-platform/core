@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Documentation\Action;
 
 use ApiPlatform\Documentation\Action\DocumentationAction;
-use ApiPlatform\Documentation\Documentation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Paths;

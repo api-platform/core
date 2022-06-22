@@ -52,7 +52,7 @@ class DummyProduct
     /**
      * @var \Collection<int,\DummyProduct>
      */
-    #[ORM\OneToMany(targetEntity: DummyProduct::class, mappedBy: 'parent')]
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     private Collection $relatedProducts;
     #[ORM\ManyToOne(targetEntity: 'DummyProduct', inversedBy: 'relatedProducts')]
     private $parent;

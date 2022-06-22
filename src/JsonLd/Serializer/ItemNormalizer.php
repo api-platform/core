@@ -71,20 +71,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize($object, $format = null, array $context = [])
     {
         $objectClass = $this->getObjectClass($object);
-        $outputClass = $this->getOutputClass($objectClass, $context);
-        if (null !== $outputClass && !isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS])) {
-            return parent::normalize($object, $format, $context);
+
+        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+
+        if (isset($context['operation']) && $resourceClass !== $context['operation']->getClass()) {
+            unset($context['operation']);
         }
 
-        // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
-        $previousResourceClass = $context['resource_class'] ?? null;
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+        $operation = $context['operation'] = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
         $context = $this->initContext($resourceClass, $context);
         $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-
-        if (isset($context['operation']) && $previousResourceClass !== $resourceClass) {
-            unset($context['operation'], $context['operation_name']);
-        }
 
         $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
         $context['iri'] = $iri;
@@ -96,7 +92,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $data;
         }
 
-        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
         if (null === $types) {
             $types = [$operation->getShortName()];

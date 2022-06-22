@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Documentation\Action;
 
-use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface as LegacyOpenApiFactoryInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;

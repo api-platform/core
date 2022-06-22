@@ -294,59 +294,93 @@ services:
         tags: ['messenger.message_handler']
     mercure.hub.default.publisher: '@mercure.hub.default.message_handler'
 
-    app.data_transformer.custom_input_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomInputDtoDataTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor: 
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
-            -  { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_processor'
 
-    app.data_transformer.custom_output_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomOutputDtoDataTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider: 
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
         tags:
-            -  { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_provider'
 
-    app.data_transformer.custom_output_dto_fallback_same_class:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
         tags:
-            - { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_processor'
 
-    app.data_transformer.input_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\InputDtoDataTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
         tags:
-            -  { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_provider'
 
-    app.data_transformer.output_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoDataTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\RecoverPasswordProcessor: 
         tags:
-            -  { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_processor'
 
-    app.data_transformer.dummy_dto_no_input_to_output_dto:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\DummyDtoNoInputToOutputDtoDataTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProcessor:
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
-            -  { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_processor'
 
-    app.data_transformer.recover_password_input:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordInputDataTransformer'
-        public: false
+    ApiPlatform\Tests\Fixtures\TestBundle\State\InitializeInputProcessor:
         tags:
-            -  { name: 'api_platform.data_transformer' }
-
-    app.data_transformer.recover_password_output:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordOutputDataTransformer'
-        public: false
-        tags:
-            -  { name: 'api_platform.data_transformer' }
-
-    app.data_transformer.initialize_input:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\InitializeInputDataTransformer'
-        public: false
-        tags:
-            -  { name: 'api_platform.data_transformer' }
+            - name: 'api_platform.state_processor'
+    # app.data_transformer.custom_input_dto:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomInputDtoDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.custom_output_dto:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\CustomOutputDtoDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.custom_output_dto_fallback_same_class:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoSameClassTransformer'
+    #     public: false
+    #     tags:
+    #         - { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.input_dto:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\InputDtoDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.output_dto:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\OutputDtoDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.dummy_dto_no_input_to_output_dto:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\DummyDtoNoInputToOutputDtoDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.recover_password_input:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordInputDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.recover_password_output:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RecoverPasswordOutputDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
+    #
+    # app.data_transformer.initialize_input:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\InitializeInputDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
 
     app.messenger_handler.messenger_with_response:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
@@ -414,11 +448,11 @@ services:
         arguments: ['@app.graphql.type_converter.inner']
         public: false
 
-    app.data_transformer.rpc_output:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RPCOutputDataTransformer'
-        public: false
-        tags:
-            -  { name: 'api_platform.data_transformer' }
+    # app.data_transformer.rpc_output:
+    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataTransformer\RPCOutputDataTransformer'
+    #     public: false
+    #     tags:
+    #         -  { name: 'api_platform.data_transformer' }
 
     app.security.authentication_entrypoint:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Security\AuthenticationEntryPoint'

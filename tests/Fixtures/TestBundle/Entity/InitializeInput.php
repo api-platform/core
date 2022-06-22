@@ -15,9 +15,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\InitializeInputProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource(input: InitializeInputDto::class)]
+#[ApiResource(input: InitializeInputDto::class, processor: InitializeInputProcessor::class)]
 #[ORM\Entity]
 class InitializeInput
 {

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Test\Constraint;
 
-use PHPUnit\SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
  * Constraint that asserts that the array it is evaluated for has a specified subset.

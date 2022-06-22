@@ -61,4 +61,3 @@ final class CompositeIdentifierParser
         return implode(';', $composite);
     }
 }
-

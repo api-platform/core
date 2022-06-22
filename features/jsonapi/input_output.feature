@@ -19,8 +19,7 @@ Feature: JSON API DTO input and output
     """
     {
       "data": {
-        "id": "/dummy_dto_customs/1",
-        "type": "DummyDtoCustom",
+        "type": "CustomOutputDto",
         "attributes": {
           "foo": "test",
           "bar": 1
@@ -42,16 +41,14 @@ Feature: JSON API DTO input and output
     {
       "data": [
         {
-          "id": "/dummy_dto_customs/1",
-          "type": "DummyDtoCustom",
+          "type": "CustomOutputDto",
           "attributes": {
             "foo": "test",
             "bar": 1
           }
         },
         {
-          "id": "/dummy_dto_customs/2",
-          "type": "DummyDtoCustom",
+          "type": "CustomOutputDto",
           "attributes": {
             "foo": "test",
             "bar": 2

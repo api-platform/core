@@ -24,6 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\RecoverPasswordProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -33,7 +34,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Put(), new Delete(), new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}'), new Post(), new GetCollection(), new Post(uriTemplate: '/users/password_reset_request', messenger: 'input', input: PasswordResetRequest::class, output: PasswordResetRequestResult::class, normalizationContext: ['groups' => ['user_password_reset_request']], denormalizationContext: ['groups' => ['user_password_reset_request']])], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
+#[ApiResource(operations: [
+    new Get(),
+    new Put(),
+    new Delete(),
+    new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}', processor: RecoverPasswordProcessor::class),
+    new Post(),
+    new GetCollection(),
+    new Post(
+        uriTemplate: '/users/password_reset_request',
+        messenger: 'input',
+        input: PasswordResetRequest::class,
+        output: PasswordResetRequestResult::class,
+        normalizationContext: ['groups' => ['user_password_reset_request']],
+        denormalizationContext: ['groups' => ['user_password_reset_request']]
+    ),
+], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
 #[ORM\Entity]
 #[ORM\Table(name: 'user_test')]
 class User extends AbstractSecurityUser
