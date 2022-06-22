@@ -22,6 +22,7 @@ use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -39,6 +40,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class PurgeHttpCacheListener
 {
+    use ClassInfoTrait;
+
     private $purger;
     private $iriConverter;
     private $resourceClassResolver;
@@ -159,8 +162,11 @@ final class PurgeHttpCacheListener
 
     private function addTagForItem($value): void
     {
+        if (!$this->resourceClassResolver->isResourceClass($this->getObjectClass($value))) {
+            return;
+        }
+
         try {
-            // TODO: test if this is a resource class
             $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($value) : $this->iriConverter->getIriFromResource($value);
             $this->tags[$iri] = $iri;
         } catch (RuntimeException|InvalidArgumentException $e) {
