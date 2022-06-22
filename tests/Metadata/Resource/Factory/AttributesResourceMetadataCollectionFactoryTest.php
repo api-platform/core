@@ -138,9 +138,17 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
 
     public function testCreateWithDefaults(): void
     {
-        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, ['cache_headers' => ['max_age' => 60], 'non_existing_attribute' => 'foo']);
+        $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory(null, null, [
+            'cache_headers' => [
+                'max_age' => 60,
+                'shared_max_age' => 120,
+                'public' => true,
+            ],
+            'non_existing_attribute' => 'foo',
+        ]);
 
-        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60], paginationItemsPerPage: 10, extraProperties: ['non_existing_attribute' => 'foo']);
+        // Check the AttributeDefaultOperations it specifies a shared_max_age that should not be overridden
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true], paginationItemsPerPage: 10, extraProperties: ['non_existing_attribute' => 'foo']);
 
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
@@ -155,7 +163,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation),
                     '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation),
                 ],
-                cacheHeaders: ['max_age' => 60],
+                cacheHeaders: ['max_age' => 60, 'shared_max_age' => 60, 'public' => true],
                 paginationItemsPerPage: 10,
                 extraProperties: ['non_existing_attribute' => 'foo']
             ),
@@ -170,7 +178,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
             ]
         );
 
-        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, paginationItemsPerPage: 10);
+        $operation = new HttpOperation(shortName: 'AttributeDefaultOperations', class: AttributeDefaultOperations::class, paginationItemsPerPage: 10, cacheHeaders: ['shared_max_age' => 60]);
         $this->assertEquals(new ResourceMetadataCollection(AttributeDefaultOperations::class, [
             new ApiResource(
                 shortName: 'AttributeDefaultOperations',
@@ -183,6 +191,7 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     '_api_AttributeDefaultOperations_patch' => (new Patch())->withOperation($operation),
                     '_api_AttributeDefaultOperations_delete' => (new Delete())->withOperation($operation),
                 ],
+                cacheHeaders: ['shared_max_age' => 60],
                 graphQlOperations: [],
                 paginationItemsPerPage: 10
             ),

@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 
-#[ApiResource(paginationItemsPerPage: 10, graphQlOperations: [])]
+#[ApiResource(paginationItemsPerPage: 10, graphQlOperations: [], cacheHeaders: ['shared_max_age' => 60])]
 final class AttributeDefaultOperations
 {
     public function __construct(#[ApiProperty(identifier: true)] private readonly int $identifier, private readonly string $name)

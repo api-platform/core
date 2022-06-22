@@ -245,7 +245,17 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 if (!isset($extraProperties[$key])) {
                     $extraProperties[$key] = $value;
                 }
-            } elseif (null === $operation->{$getter}()) {
+            } else {
+                $currentValue = $operation->{$getter}();
+
+                if (\is_array($currentValue) && $currentValue) {
+                    $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+                }
+
+                if (null !== $currentValue) {
+                    continue;
+                }
+
                 $operation = $operation->{'with'.$upperKey}($value);
             }
         }
