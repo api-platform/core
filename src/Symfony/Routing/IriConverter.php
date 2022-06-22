@@ -157,7 +157,7 @@ final class IriConverter implements IriConverterInterface
         if (\is_object($item)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
-            } catch (RuntimeException $e) {
+            } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
                     throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
