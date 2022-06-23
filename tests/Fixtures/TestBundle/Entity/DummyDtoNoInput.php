@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,6 +23,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\CreateItemA
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\DummyDtoNoInput\DoubleBatAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProvider;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,12 +35,13 @@ use Doctrine\ORM\Mapping as ORM;
     operations: [
         new Get(),
         new Delete(),
-        new Post(uriTemplate: '/dummy_dto_no_inputs/{id}/double_bat', controller: DoubleBatAction::class, status: 200, processor: DummyDtoNoInputsProcessor::class),
+        new Post(uriTemplate: '/dummy_dto_no_inputs/{id}/double_bat', controller: DoubleBatAction::class, status: 200, processor: DummyDtoNoInputsProcessor::class, output: DummyDtoNoInput::class, provider: ItemProvider::class),
         new Post(uriTemplate: '/dummy_dto_no_inputs', controller: CreateItemAction::class, processor: DummyDtoNoInputsProcessor::class),
         new GetCollection(),
     ],
     input: false,
-    output: OutputDto::class
+    output: OutputDto::class,
+    provider: DummyDtoNoInputsProvider::class
 )]
 #[ORM\Entity]
 class DummyDtoNoInput

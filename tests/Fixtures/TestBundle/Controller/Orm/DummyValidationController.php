@@ -21,7 +21,7 @@ class DummyValidationController
     /**
      * @param mixed $data
      */
-    #[Route(methods: ['POST'], name: 'post_validation_groups', path: '/dummy_validation/validation_groups', defaults: ['_api_resource_class' => DummyValidation::class, '_api_collection_operation_name' => 'post_validation_groups'])]
+    #[Route(methods: ['POST'], name: 'post_validation_groups', path: '/dummy_validation/validation_groups', defaults: ['_api_resource_class' => DummyValidation::class, '_api_operation_name' => 'post_validation_groups'])]
     public function postValidationGroups($data)
     {
         return $data;
@@ -30,7 +30,7 @@ class DummyValidationController
     /**
      * @param mixed $data
      */
-    #[Route(methods: ['POST'], name: 'post_validation_sequence', path: '/dummy_validation/validation_sequence', defaults: ['_api_resource_class' => DummyValidation::class, '_api_collection_operation_name' => 'post_validation_sequence'])]
+    #[Route(methods: ['POST'], name: 'post_validation_sequence', path: '/dummy_validation/validation_sequence', defaults: ['_api_resource_class' => DummyValidation::class, '_api_operation_name' => 'post_validation_sequence'])]
     public function postValidationSequence($data)
     {
         return $data;

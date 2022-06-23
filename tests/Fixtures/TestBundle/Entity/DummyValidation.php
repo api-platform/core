@@ -14,16 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new Post(uriTemplate: 'dummy_validation.{_format}'), new GetCollection(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]), new GetCollection(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator'])])]
+#[ApiResource(operations: [
+    new GetCollection(),
+    new Post(uriTemplate: 'dummy_validation.{_format}'),
+    new Post(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]),
+    new Post(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator']),
+]
+)]
 #[ORM\Entity]
 class DummyValidation
 {

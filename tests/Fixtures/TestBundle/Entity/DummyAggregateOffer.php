@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -40,10 +41,10 @@ class DummyAggregateOffer
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     /**
-     * @var \Collection<int,\DummyOffer>
+     * @var Collection<int,\DummyOffer>
      */
     #[ORM\OneToMany(targetEntity: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
-    private \Collection $offers;
+    private Collection $offers;
     /**
      * @var DummyProduct|null The dummy product
      */

@@ -20,71 +20,68 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * Dummy with a custom GraphQL mutation resolver.
  *
- * @ODM\Document
- * @ApiResource(graphql={
- *     "sum"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}}
- *     },
- *     "sumNotPersisted"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom_not_persisted",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}}
- *     },
- *     "sumNoWriteCustomResult"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom_no_write_custom_result",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}},
- *         "write"=false
- *     },
- *     "sumOnlyPersist"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom_only_persist_document",
- *         "normalization_context"={"groups"={"result"}},
- *         "denormalization_context"={"groups"={"sum"}},
- *         "read"=false,
- *         "deserialize"=false,
- *         "validate"=false,
- *         "serialize"=false
- *     },
- *     "testCustomArguments"={
- *         "mutation"="app.graphql.mutation_resolver.dummy_custom",
- *         "args"={"operandC"={"type"="Int!"}}
- *     }
- * })
- *
  * @author Raoul Clais <raoul.clais@gmail.com>
  */
+#[ODM\Document]
+#[ApiResource(graphQlOperations: [
+    new Mutation(
+        name: 'sum',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom',
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']]
+    ),
+    new Mutation(
+        name: 'sumNotPersisted',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom_not_persisted',
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']]
+    ),
+    new Mutation(name: 'sumNoWriteCustomResult',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom_no_write_custom_result',
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']],
+        write: false
+    ),
+    new Mutation(name: 'sumOnlyPersist',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom_only_persist_document',
+        normalizationContext: ['groups' => ['result']],
+        denormalizationContext: ['groups' => ['sum']],
+        read: false,
+        deserialize: false,
+        validate: false,
+        serialize: false
+    ),
+    new Mutation(name: 'testCustomArguments',
+        resolver: 'app.graphql.mutation_resolver.dummy_custom',
+        args: ['operandC' => ['type' => 'Int!']]
+    ),
+])]
 class DummyCustomMutation
 {
     /**
      * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
 
     /**
      * @var int|null
-     *
-     * @ODM\Field(type="int")
      */
+    #[ODM\Field(type: 'int')]
     private $operandA;
 
     /**
      * @var int|null
-     *
-     * @Groups({"sum"})
-     * @ODM\Field(type="int", nullable=true)
      */
+    #[Groups(['sum'])]
+     #[ODM\Field(type: 'int', nullable: true)]
     private $operandB;
 
     /**
      * @var int|null
-     *
-     * @Groups({"result"})
-     * @ODM\Field(type="int", nullable=true)
      */
+    #[Groups(['result'])]
+    #[ODM\Field(type: 'int', nullable: true)]
     private $result;
 
     public function getId(): ?int
