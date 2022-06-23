@@ -42,9 +42,9 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -381,9 +381,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
         $container->setParameter('api_platform.oauth.pkce', $config['oauth']['pkce']);
 
-        if ($container->hasDefinition('api_platform.swagger.action.ui')) {
-            $container->getDefinition('api_platform.swagger.action.ui')->setArgument(27, $config['oauth']['pkce']);
-        }
         if ($container->hasDefinition('api_platform.swagger_ui.action')) {
             $container->getDefinition('api_platform.swagger_ui.action')->setArgument(10, $config['oauth']['pkce']);
         }

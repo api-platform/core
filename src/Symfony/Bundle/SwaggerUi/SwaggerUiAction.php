@@ -17,6 +17,7 @@ use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
+use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -30,6 +31,8 @@ use Twig\Environment as TwigEnvironment;
  */
 final class SwaggerUiAction
 {
+    use NormalizeOperationNameTrait;
+
     private $twig;
     private $urlGenerator;
     private $normalizer;
@@ -102,7 +105,7 @@ final class SwaggerUiAction
             $metadata = $this->resourceMetadataFactory->create($resourceClass)->getOperation($request->attributes->get('_api_operation_name'));
 
             $swaggerData['shortName'] = $metadata->getShortName();
-            $swaggerData['operationId'] = $metadata->getName();
+            $swaggerData['operationId'] = $this->normalizeOperationName($metadata->getName());
 
             [$swaggerData['path'], $swaggerData['method']] = $this->getPathAndMethod($swaggerData);
         }

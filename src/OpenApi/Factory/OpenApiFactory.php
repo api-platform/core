@@ -30,6 +30,7 @@ use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
+use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -41,6 +42,7 @@ use Symfony\Component\Routing\RouterInterface;
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     use FilterLocatorTrait;
+    use NormalizeOperationNameTrait;
 
     public const BASE_URL = 'base_url';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -554,10 +556,5 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return false;
-    }
-
-    private function normalizeOperationName(string $operationName): string
-    {
-        return preg_replace('/^_/', '', str_replace(['/', '.{_format}', '{', '}'], ['', '', '_', ''], $operationName));
     }
 }
