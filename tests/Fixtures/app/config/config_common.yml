@@ -314,10 +314,14 @@ services:
             - name: 'api_platform.state_provider'
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
+        arguments:
+            $registry: '@doctrine'
         tags:
             - name: 'api_platform.state_processor'
 
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
         tags:
             - name: 'api_platform.state_provider'
 

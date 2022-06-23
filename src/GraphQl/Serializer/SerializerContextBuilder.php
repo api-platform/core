@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Serializer;
 
-use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -36,33 +35,18 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $this->nameConverter = $nameConverter;
     }
 
-    public function create(?string $resourceClass, string $operationName, array $resolverContext, bool $normalization): array
+    public function create(?string $resourceClass, Operation $operation, array $resolverContext, bool $normalization): array
     {
-        $context = ['resource_class' => $resourceClass, 'operation_name' => $operationName, 'graphql_operation_name' => $operationName];
-        $operation = null;
-
-        if ($resourceClass) {
-            $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-            try {
-                $operation = $resourceMetadata->getOperation($operationName);
-            } catch (OperationNotFoundException $e) {
-                // It's possible that the serialization context may not be tight to an existing operation
-                try {
-                    $context['operation_name'] = $resourceMetadata->getOperation()->getName();
-                } catch (OperationNotFoundException $e) {
-                }
-            }
-        }
+        $context = ['resource_class' => $resourceClass, 'operation_name' => $operation->getName(), 'graphql_operation_name' => $operation->getName()];
 
         if (isset($resolverContext['fields'])) {
             $context['no_resolver_data'] = true;
         }
 
-        if ($operation) {
-            $context['input'] = $operation->getInput();
-            $context['output'] = $operation->getOutput();
-            $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
-        }
+        $context['operation'] = $operation;
+        $context['input'] = $operation->getInput();
+        $context['output'] = $operation->getOutput();
+        $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 
         if ($normalization) {
             $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation instanceof Operation ? $operation : null, $resolverContext, $context);

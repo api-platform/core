@@ -76,7 +76,7 @@ final class SerializeStage implements SerializeStageInterface
             return null;
         }
 
-        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operationName, $context, true);
+        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, true);
 
         $data = null;
         if (!$isCollection) {

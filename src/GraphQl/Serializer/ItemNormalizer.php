@@ -58,9 +58,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
@@ -72,22 +72,28 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (isset($context['operation_name'])) {
-            unset($context['operation_name']);
-        }
+        $resourceClass = $this->getObjectClass($object);
 
-        if (null !== $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if ($outputClass = $this->getOutputClass($resourceClass, $context)) {
+            $context['graphql_identifiers'] = [
+                self::ITEM_RESOURCE_CLASS_KEY => $context['operation']->getClass(),
+                self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null),
+            ];
+
             return parent::normalize($object, $format, $context);
         }
 
+        unset($context['operation_name'], $context['operation']);
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             throw new UnexpectedValueException('Expected data to be an array.');
         }
 
-        if (!($context['no_resolver_data'] ?? false)) {
-            $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($object);
-            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object);
+        if (isset($context['graphql_identifiers'])) {
+            $data = $data + $context['graphql_identifiers'];
+        } elseif (!($context['no_resolver_data'] ?? false)) {
+            $data[self::ITEM_RESOURCE_CLASS_KEY] = $resourceClass;
+            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null);
         }
 
         return $data;
@@ -105,9 +111,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, string $type, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
 
     /**

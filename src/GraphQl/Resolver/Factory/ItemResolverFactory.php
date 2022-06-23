@@ -71,6 +71,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 throw new \LogicException('Item from read stage should be a nullable object.');
             }
 
+            $resourceClass = $operation->getOutput()['class'] ?? $resourceClass;
             // The item retrieved can be of another type when using an identifier (see Relay Nodes at query.feature:23)
             $resourceClass = $this->getResourceClass($item, $resourceClass);
             $queryResolverId = $operation->getResolver();

@@ -103,7 +103,6 @@ Feature: JSON-LD DTO input and output
       "bar": 1
     }
     """
-    Then print last JSON response
     Then the response status code should be 201
     And the JSON should be a superset of:
     """

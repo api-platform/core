@@ -65,6 +65,10 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
 
+        if (!$this->isResourceClass($resourceClass) && ($builtinType = $propertyMetadata->getBuiltinTypes()[0] ?? null) && $builtinType->isCollection()) {
+            return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
+        }
+
         return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
     }
 

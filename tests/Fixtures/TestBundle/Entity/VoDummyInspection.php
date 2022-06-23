@@ -23,13 +23,27 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
+
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    private bool $accepted;
+
+    #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')]
+    #[Groups(['inspection_read', 'inspection_write'])]
+    private ?VoDummyCar $car;
+
     #[ORM\Column(type: 'datetime')]
     #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
     private \DateTime $performed;
 
-    public function __construct(#[ORM\Column(type: 'boolean')] #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private readonly bool $accepted, #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')] #[Groups(['inspection_read', 'inspection_write'])] private readonly ?VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
+    private $attributeWithoutConstructorEquivalent;
+
+    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
     {
+        $this->accepted = $accepted;
+        $this->car = $car;
         $this->performed = $performed ?: new DateTime();
+        $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
     public function isAccepted()

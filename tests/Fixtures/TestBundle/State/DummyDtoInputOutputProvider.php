@@ -19,13 +19,22 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 
 final class DummyDtoInputOutputProvider implements ProviderInterface
 {
+    public function __construct(private ProviderInterface $decorated)
+    {
+    }
+
     /**
      * {@inheritDoc}
      */
     public function provide(Operation $operation, array $uriVariables = [], array $context = [])
     {
+        $data = $this->decorated->provide($operation, $uriVariables, $context);
+
         $outputDto = new OutputDto();
-        $outputDto->id = $uriVariables['id'];
+        $outputDto->id = $data->id;
+        $outputDto->baz = $data->num;
+        $outputDto->bat = $data->str;
+        $outputDto->relatedDummies = $data->relatedDummies;
 
         return $outputDto;
     }

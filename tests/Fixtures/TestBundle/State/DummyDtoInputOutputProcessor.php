@@ -17,9 +17,15 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use Doctrine\Persistence\ManagerRegistry;
 
 final class DummyDtoInputOutputProcessor implements ProcessorInterface
 {
+    public function __construct(private ManagerRegistry $registry)
+    {
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -27,13 +33,26 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
      */
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        $outputDto = $context['previous_data'] ?? new OutputDto();
-        if (!$outputDto->id) {
-            $outputDto->id = 1;
+        // TODO: mongodb
+        $entity = new DummyDtoInputOutput();
+        $manager = $this->registry->getManagerForClass(DummyDtoInputOutput::class);
+
+        if (isset($context['previous_data'])) {
+            $entity = $manager->getReference(DummyDtoInputOutput::class, $context['previous_data']->id);
         }
 
-        $outputDto->baz = $data->bar;
-        $outputDto->bat = $data->foo;
+        $entity->str = $data->foo;
+        $entity->num = $data->bar;
+        $entity->relatedDummies = $data->relatedDummies;
+
+        $manager->persist($entity);
+        $manager->flush();
+
+        $outputDto = new OutputDto();
+        $outputDto->id = $entity->id;
+        $outputDto->baz = $entity->num;
+        $outputDto->bat = $entity->str;
+        $outputDto->relatedDummies = $data->relatedDummies ?? [];
 
         return $outputDto;
     }

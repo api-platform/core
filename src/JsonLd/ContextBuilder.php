@@ -191,5 +191,3 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         return $context;
     }
 }
-
-class_alias(ContextBuilder::class, \ApiPlatform\Core\JsonLd\ContextBuilder::class);

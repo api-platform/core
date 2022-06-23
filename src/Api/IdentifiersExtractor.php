@@ -55,6 +55,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     public function getIdentifiersFromItem($item, Operation $operation = null, array $context = []): array
     {
         $identifiers = [];
+
+        if (!$this->isResourceClass($this->getObjectClass($item))) {
+            return ['id' => $this->propertyAccessor->getValue($item, 'id')];
+        }
+
         $resourceClass = $this->getResourceClass($item, true);
         $operation = $operation ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
 

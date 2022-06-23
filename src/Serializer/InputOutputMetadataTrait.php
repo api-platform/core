@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
 trait InputOutputMetadataTrait
@@ -34,16 +32,7 @@ trait InputOutputMetadataTrait
             return $context['input']['class'];
         }
 
-        $operation = $context['operation'] ?? null;
-        if (!$operation) {
-            try {
-                $operation = $this->resourceMetadataCollectionFactory->create($class)->getOperation($context['operation_name'] ?? null);
-            } catch (OperationNotFoundException|ResourceClassNotFoundException $e) {
-                return null;
-            }
-        }
-
-        return $operation ? $operation->getInput()['class'] ?? null : null;
+        return null;
     }
 
     protected function getOutputClass(string $class, array $context = []): ?string
@@ -56,15 +45,6 @@ trait InputOutputMetadataTrait
             return $context['output']['class'];
         }
 
-        $operation = $context['operation'] ?? null;
-        if (null === $operation) {
-            try {
-                $operation = $this->resourceMetadataCollectionFactory->create($class)->getOperation($context['operation_name'] ?? null);
-            } catch (OperationNotFoundException|ResourceClassNotFoundException $e) {
-                return null;
-            }
-        }
-
-        return $operation ? $operation->getOutput()['class'] ?? null : null;
+        return null;
     }
 }

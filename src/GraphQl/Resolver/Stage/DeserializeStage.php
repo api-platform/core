@@ -44,7 +44,7 @@ final class DeserializeStage implements DeserializeStageInterface
             return $objectToPopulate;
         }
 
-        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, false);
+        $denormalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, false);
         if (null !== $objectToPopulate) {
             $denormalizationContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $objectToPopulate;
         }
