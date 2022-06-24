@@ -89,28 +89,28 @@ final class ApiGatewayNormalizer implements NormalizerInterface, CacheableSuppor
             }
         }
 
-        foreach ($data['definitions'] as $definition => $options) {
+        foreach ($data['components']['schemas'] as $definition => $options) {
             if (!isset($options['properties'])) {
                 continue;
             }
             foreach ($options['properties'] as $property => $propertyOptions) {
                 if (isset($propertyOptions['readOnly'])) {
-                    unset($data['definitions'][$definition]['properties'][$property]['readOnly']);
+                    unset($data['components']['schemas'][$definition]['properties'][$property]['readOnly']);
                 }
                 if (isset($propertyOptions['$ref']) && $this->isLocalRef($propertyOptions['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
+                    $data['components']['schemas'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
                 }
                 if (isset($propertyOptions['items']['$ref']) && $this->isLocalRef($propertyOptions['items']['$ref'])) {
-                    $data['definitions'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
+                    $data['components']['schemas'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
                 }
             }
         }
 
         // $data['definitions'] is an instance of \ArrayObject
-        foreach (array_keys($data['definitions']->getArrayCopy()) as $definition) {
+        foreach (array_keys($data['components']['schemas']) as $definition) {
             if (!preg_match('/^[0-9A-Za-z]+$/', (string) $definition)) {
-                $data['definitions'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $data['definitions'][$definition];
-                unset($data['definitions'][$definition]);
+                $data['components']['schemas'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $data['components']['schemas'][$definition];
+                unset($data['components']['schemas'][$definition]);
             }
         }
 

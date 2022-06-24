@@ -24,7 +24,10 @@ class RamseyUuidDummy
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    private readonly \Ramsey\Uuid\UuidInterface $id;
+    /**
+     * The dummy id.
+     */
+    private \Ramsey\Uuid\UuidInterface $id;
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?\Ramsey\Uuid\UuidInterface $other = null;
 
