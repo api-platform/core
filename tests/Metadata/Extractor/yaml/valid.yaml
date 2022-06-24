@@ -7,6 +7,9 @@ resources:
             uriVariables: ['author']
             types: ['someirischema']
             description: User programs
+            normalizationContext:
+                groups: ['foo', 'bar']
+                enabled: false
             operations:
                 ApiPlatform\Metadata\GetCollection: ~
                 ApiPlatform\Metadata\Get:
