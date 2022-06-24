@@ -53,6 +53,7 @@
                         <value>comment:custom-read</value>
                     </values>
                 </value>
+                <value name="enabled">true</value>
             </values>
         </normalizationContext>
 
