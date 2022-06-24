@@ -76,7 +76,7 @@ class DeserializeStageTest extends TestCase
         $operation = (new Query())->withName($operationName)->withClass($resourceClass);
         $context = ['args' => ['input' => 'myInput']];
 
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
 
         $denormalizedData = new \stdClass();
         $this->denormalizerProphecy->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext)->shouldBeCalled()->willReturn($denormalizedData);

@@ -39,7 +39,7 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return 'json' === $format && SerializableResource::class === $type && \is_array($data);
     }

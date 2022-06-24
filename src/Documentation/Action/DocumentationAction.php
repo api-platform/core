@@ -45,7 +45,7 @@ final class DocumentationAction
     public function __invoke(Request $request = null): DocumentationInterface
     {
         if (null !== $request) {
-            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', $this->swaggerVersions[0] ?? 3)];
+            $context = ['base_url' => $request->getBaseUrl()];
             if ($request->query->getBoolean('api_gateway')) {
                 $context['api_gateway'] = true;
             }
@@ -54,7 +54,7 @@ final class DocumentationAction
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         }
 
-        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory && 3 === ($context['spec_version'] ?? null)) {
+        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory) {
             return $this->openApiFactory->__invoke($context ?? []);
         }
 

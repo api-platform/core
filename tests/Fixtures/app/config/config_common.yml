@@ -2,6 +2,9 @@ web_profiler:
     toolbar: true
     intercept_redirects: false
 
+framework:
+    http_method_override: false
+
 doctrine:
     dbal:
         driver:                       'pdo_sqlite'

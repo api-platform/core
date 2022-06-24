@@ -45,7 +45,7 @@ class DummyTableInheritance
     private string $name;
     #[ORM\ManyToOne(targetEntity: DummyTableInheritanceRelated::class, inversedBy: 'children')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated $parent = null;
+    private ?DummyTableInheritanceRelated $parent = null;
 
     public function getName(): ?string
     {

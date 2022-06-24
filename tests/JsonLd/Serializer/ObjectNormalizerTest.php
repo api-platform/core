@@ -99,7 +99,7 @@ class ObjectNormalizerTest extends TestCase
         $serializerProphecy->normalize($dummy, null, Argument::type('array'))->willReturn(['name' => 'hello']);
 
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
-        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['iri' => '/dummy/1234', 'api_resource' => $dummy])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy', '@context' => []]);
+        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['api_resource' => $dummy])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy', '@context' => []]);
 
         $normalizer = new ObjectNormalizer(
             $serializerProphecy->reveal(), // @phpstan-ignore-line
@@ -129,7 +129,7 @@ class ObjectNormalizerTest extends TestCase
         $serializerProphecy->normalize($dummy, null, Argument::type('array'))->willReturn(['name' => 'hello']);
 
         $contextBuilderProphecy = $this->prophesize(AnonymousContextBuilderInterface::class);
-        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['iri' => '/dummy/1234', 'api_resource' => $dummy, 'has_context' => true])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy']);
+        $contextBuilderProphecy->getAnonymousResourceContext($dummy, ['api_resource' => $dummy, 'has_context' => true])->shouldBeCalled()->willReturn(['@id' => '/dummy/1234', '@type' => 'Dummy']);
 
         $normalizer = new ObjectNormalizer(
             $serializerProphecy->reveal(), // @phpstan-ignore-line

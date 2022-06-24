@@ -98,7 +98,7 @@ class SerializeStageTest extends TestCase
         $operation = $operation->withShortName('shortName')->withName($operationName)->withClass($resourceClass);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
@@ -142,7 +142,7 @@ class SerializeStageTest extends TestCase
         $operation = (new QueryCollection())->withShortName('shortName')->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
@@ -187,7 +187,7 @@ class SerializeStageTest extends TestCase
         $operation = (new Query())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
 

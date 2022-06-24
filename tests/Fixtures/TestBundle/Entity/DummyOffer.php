@@ -48,7 +48,7 @@ class DummyOffer
      * @var DummyAggregateOffer|null The dummy aggregate offer value
      */
     #[ORM\ManyToOne(targetEntity: DummyAggregateOffer::class, inversedBy: 'offers')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAggregateOffer $aggregate = null;
+    private ?DummyAggregateOffer $aggregate = null;
 
     public function getId()
     {

@@ -90,6 +90,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $decoratedProphecy->create(Dummy::class, 'nameConverted', $context)->willReturn($nameConvertedPropertyMetadata);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
 
@@ -133,6 +134,9 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $serializerClassMetadataFactoryProphecy->getMetadataFor(DummyIgnoreProperty::class)->willReturn($dummyIgnorePropertySerializerClassMetadata);
 
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyIgnoreProperty::class)->willReturn(true);
+
         $ignoredPropertyMetadata = (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING, true)]);
 
         $options = [
@@ -146,7 +150,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(
             $serializerClassMetadataFactoryProphecy->reveal(),
             $decoratedProphecy->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal()
+            $resourceClassResolverProphecy->reveal()
         );
 
         $result = $serializerPropertyMetadataFactory->create(DummyIgnoreProperty::class, 'ignored', $options);

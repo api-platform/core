@@ -21,7 +21,7 @@ class Field implements \JsonSerializable
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     #[ODM\ReferenceOne(targetDocument: Content::class, inversedBy: 'fields')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Content $content = null;
+    private ?Content $content = null;
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
     #[ODM\Field(type: 'string')]

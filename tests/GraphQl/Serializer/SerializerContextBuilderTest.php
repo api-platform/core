@@ -47,6 +47,39 @@ class SerializerContextBuilderTest extends TestCase
         return new SerializerContextBuilder($advancedNameConverter ?? new CustomConverter());
     }
 
+    private function buildOperationFromContext(bool $isMutation, bool $isSubscription, array $expectedContext, bool $isNormalization = true, ?string $resourceClass = null)
+    {
+        $operation = !$isMutation && !$isSubscription ? new Query() : new Mutation();
+        if ($isSubscription) {
+            $operation = new Subscription();
+        }
+
+        $operation = $operation->withShortName('shortName');
+        if (isset($expectedContext['operation_name'])) {
+            $operation = $operation->withName($expectedContext['operation_name']);
+        }
+
+        if ($resourceClass) {
+            if (isset($expectedContext['groups'])) {
+                if ($isNormalization) {
+                    $operation = $operation->withNormalizationContext(['groups' => $expectedContext['groups']]);
+                } else {
+                    $operation = $operation->withDenormalizationContext(['groups' => $expectedContext['groups']]);
+                }
+            }
+
+            if (isset($expectedContext['input'])) {
+                $operation = $operation->withInput($expectedContext['input']);
+            }
+
+            if (isset($expectedContext['input'])) {
+                $operation = $operation->withOutput($expectedContext['output']);
+            }
+        }
+
+        return $operation;
+    }
+
     /**
      * @dataProvider createNormalizationContextProvider
      */
@@ -57,21 +90,13 @@ class SerializerContextBuilderTest extends TestCase
             'is_subscription' => $isSubscription,
         ];
 
+        $operation = $this->buildOperationFromContext($isMutation, $isSubscription, $expectedContext, true, $resourceClass);
         if ($noInfo) {
             $resolverContext['fields'] = $fields;
         } else {
             $resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
             $resolveInfoProphecy->getFieldSelection(\PHP_INT_MAX)->willReturn($fields);
             $resolverContext['info'] = $resolveInfoProphecy->reveal();
-        }
-
-        $operation = !$isMutation && !$isSubscription ? new Query() : new Mutation();
-        if ($isSubscription) {
-            $operation = new Subscription();
-        }
-
-        if ($resourceClass) {
-            $operation = $operation->withShortName('shortName')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass'])->withNormalizationContext(['groups' => ['normalization_group']]);
         }
 
         if ($expectedExceptionClass) {
@@ -87,6 +112,7 @@ class SerializerContextBuilderTest extends TestCase
         /** @var Operation $operation */
         $context = $serializerContextBuilder->create($resourceClass, $operation, $resolverContext, true);
 
+        unset($context['operation']);
         $this->assertSame($expectedContext, $context);
     }
 
@@ -192,18 +218,6 @@ class SerializerContextBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'mutation without resource class' => [
-                $resourceClass = null,
-                $operationName = 'create',
-                ['shortName' => ['_id' => 7, 'related' => ['field' => 'bar']]],
-                true,
-                false,
-                false,
-                [],
-                null,
-                \LogicException::class,
-                'An operation should always exist for a mutation or a subscription.',
-            ],
             'subscription (using fields in context)' => [
                 $resourceClass = 'myResource',
                 $operationName = 'update',
@@ -233,15 +247,12 @@ class SerializerContextBuilderTest extends TestCase
      */
     public function testCreateDenormalizationContext(?string $resourceClass, string $operationName, array $expectedContext): void
     {
-        $operation = new Mutation(name: $operationName);
-
-        if ($resourceClass) {
-            $operation = $operation->withShortName('shortName')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass'])->withDenormalizationContext(['groups' => ['denormalization_group']]);
-        }
+        $operation = $this->buildOperationFromContext(true, false, $expectedContext, false, $resourceClass);
 
         /** @var Operation $operation */
         $context = $this->serializerContextBuilder->create($resourceClass, $operation, [], false);
 
+        unset($context['operation']);
         $this->assertSame($expectedContext, $context);
     }
 

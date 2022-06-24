@@ -140,7 +140,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $this->routeCollection = $this->router->getRouteCollection();
             }
 
-            $path = $this->getPath($routeName && $this->routeCollection ? $this->routeCollection->get($routeName)->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
+            if ($this->routeCollection && $routeName && $route = $this->routeCollection->get($routeName)) {
+                $path = $route->getPath();
+            } else {
+                $path = ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate();
+            }
+
+            $path = $this->getPath($path);
             $method = $operation->getMethod() ?? HttpOperation::METHOD_GET;
 
             if (!\in_array($method, Model\PathItem::$methods, true)) {

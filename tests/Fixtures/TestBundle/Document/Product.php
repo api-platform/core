@@ -25,7 +25,7 @@ class Product implements ProductInterface
     #[ODM\Field(type: 'string')]
     private ?string $code = null;
     #[ODM\ReferenceOne(targetDocument: Taxon::class)]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon $mainTaxon = null;
+    private ?Taxon $mainTaxon = null;
 
     /**
      * {@inheritdoc}

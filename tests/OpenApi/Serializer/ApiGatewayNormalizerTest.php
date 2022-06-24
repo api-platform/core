@@ -20,6 +20,7 @@ use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -134,7 +135,7 @@ final class ApiGatewayNormalizerTest extends TestCase
                     ]),
                 ],
             ]),
-            'definitions' => new \ArrayObject([
+            'components' => ['schemas' => [
                 'Dummy' => new \ArrayObject([
                     'properties' => [
                         'id' => [
@@ -202,7 +203,7 @@ final class ApiGatewayNormalizerTest extends TestCase
                         ]),
                     ],
                 ]),
-            ]),
+            ]],
         ];
 
         $modifiedSwaggerDocument = [
@@ -287,7 +288,7 @@ final class ApiGatewayNormalizerTest extends TestCase
                     ]),
                 ],
             ]),
-            'definitions' => new \ArrayObject([
+            'components' => ['schemas' => [
                 'Dummy' => new \ArrayObject([
                     'properties' => [
                         'id' => [
@@ -351,20 +352,18 @@ final class ApiGatewayNormalizerTest extends TestCase
                         ]),
                     ],
                 ]),
-            ]),
+            ]],
             'basePath' => '/',
         ];
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $normalizerProphecy->normalize($documentation, OpenApiNormalizer::FORMAT, [
-            'spec_version' => 2,
             ApiGatewayNormalizer::API_GATEWAY => true,
         ])->willReturn($swaggerDocument);
 
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
         $this->assertEquals($modifiedSwaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT, [
-            'spec_version' => 2,
             ApiGatewayNormalizer::API_GATEWAY => true,
         ]));
     }
@@ -463,7 +462,7 @@ final class ApiGatewayNormalizerTest extends TestCase
                     ]),
                 ],
             ]),
-            'definitions' => new \ArrayObject([
+            'components' => ['schemas' => new \ArrayObject([
                 'Dummy' => new \ArrayObject([
                     'properties' => [
                         'id' => [
@@ -531,18 +530,14 @@ final class ApiGatewayNormalizerTest extends TestCase
                         ]),
                     ],
                 ]),
-            ]),
+            ])],
         ];
 
         $normalizerProphecy = $this->prophesize(NormalizerInterface::class);
-        $normalizerProphecy->normalize($documentation, OpenApiNormalizer::FORMAT, [
-            'spec_version' => 2,
-        ])->willReturn($swaggerDocument);
+        $normalizerProphecy->normalize($documentation, OpenApiNormalizer::FORMAT, Argument::type('array'))->willReturn($swaggerDocument);
 
         $normalizer = new ApiGatewayNormalizer($normalizerProphecy->reveal());
 
-        $this->assertEquals($swaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT, [
-            'spec_version' => 2,
-        ]));
+        $this->assertEquals($swaggerDocument, $normalizer->normalize($documentation, OpenApiNormalizer::FORMAT));
     }
 }

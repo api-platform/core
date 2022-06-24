@@ -40,7 +40,7 @@ class FooDummy
      * @var Dummy The foo dummy
      */
     #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], storeAs: 'id')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy $dummy = null;
+    private ?Dummy $dummy = null;
 
     public function getId()
     {

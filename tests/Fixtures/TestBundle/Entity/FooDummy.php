@@ -42,7 +42,7 @@ class FooDummy
      * @var Dummy|null The foo dummy
      */
     #[ORM\ManyToOne(targetEntity: Dummy::class, cascade: ['persist'])]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy $dummy = null;
+    private ?Dummy $dummy = null;
 
     public function getId()
     {

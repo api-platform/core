@@ -125,10 +125,6 @@ class AppKernel extends Kernel
             ],
         ];
 
-        // Symfony 5.4+
-        if (class_exists(SessionFactory::class)) {
-            $messengerConfig['reset_on_message'] = true;
-        }
         $c->prependExtensionConfig('framework', [
             'secret' => 'dunglas.fr',
             'validation' => ['enable_annotations' => true],

@@ -17,6 +17,7 @@ use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -35,7 +36,7 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
     private $defaultDirection;
     private $nameConverter;
 
-    public function __construct($propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
+    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?NameConverterInterface $nameConverter = null, ?string $defaultDirection = null)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
         $this->resourceClassResolver = $resourceClassResolver;

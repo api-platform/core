@@ -1087,7 +1087,6 @@ class ApiPlatformExtensionTest extends TestCase
             ElasticsearchItemProvider::class,
             ElasticsearchCollectionProvider::class,
             'api_platform.elasticsearch.client',
-            'api_platform.elasticsearch.metadata.resource.metadata_factory.operation',
             'api_platform.elasticsearch.cache.metadata.document',
             'api_platform.elasticsearch.metadata.document.metadata_factory.configured',
             'api_platform.elasticsearch.metadata.document.metadata_factory.attribute',
@@ -1122,8 +1121,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.elasticsearch.normalizer.document', ['serializer.normalizer']);
         $this->assertServiceHasTags(ElasticsearchItemProvider::class, ['api_platform.state_provider']);
         $this->assertServiceHasTags(ElasticsearchCollectionProvider::class, ['api_platform.state_provider']);
-        $this->assertServiceHasTags('api_platform.elasticsearch.item_data_provider', ['api_platform.item_data_provider']);
-        $this->assertServiceHasTags('api_platform.elasticsearch.collection_data_provider', ['api_platform.collection_data_provider']);
         $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', ['api_platform.elasticsearch.request_body_search_extension.collection']);
         $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.sort_filter', ['api_platform.elasticsearch.request_body_search_extension.collection']);
         $this->assertServiceHasTags('api_platform.elasticsearch.request_body_search_extension.sort', ['api_platform.elasticsearch.request_body_search_extension.collection']);

@@ -20,9 +20,9 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy as RelatedDummyEntity;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * BC to keep allow_plain_identifiers working in 2.7 tests
@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-class DummyPlainIdentifierDenormalizer implements ContextAwareDenormalizerInterface, DenormalizerAwareInterface
+class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
 

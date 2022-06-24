@@ -103,8 +103,10 @@ class ReadStageTest extends TestCase
             'info' => $info,
         ];
 
+        /** @var Operation $operation */
+        $operation = (new Query())->withName($operationName);
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
             $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
@@ -112,8 +114,6 @@ class ReadStageTest extends TestCase
             $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willReturn($item);
         }
 
-        /** @var Operation $operation */
-        $operation = (new Query())->withName($operationName);
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
@@ -148,8 +148,10 @@ class ReadStageTest extends TestCase
             'info' => $info,
         ];
 
+        /** @var Operation $operation */
+        $operation = (new Mutation())->withName($operationName)->withShortName('shortName');
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         if ($throwNotFound) {
             $this->iriConverterProphecy->getResourceFromIri($identifier, $normalizationContext)->willThrow(new ItemNotFoundException());
@@ -162,8 +164,6 @@ class ReadStageTest extends TestCase
             $this->expectExceptionMessage($expectedExceptionMessage);
         }
 
-        /** @var Operation $operation */
-        $operation = (new Mutation())->withName($operationName)->withShortName('shortName');
         $result = ($this->readStage)($resourceClass, null, $operation, $context);
 
         $this->assertSame($expectedResult, $result);
@@ -207,7 +207,7 @@ class ReadStageTest extends TestCase
         /** @var Operation $operation */
         $operation = (new QueryCollection())->withName($operationName);
         $normalizationContext = ['normalization' => true, 'operation' => $operation];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->providerProphecy->provide($operation, [], $normalizationContext + ['filters' => $expectedFilters])->willReturn([]);
         $this->providerProphecy->provide($operation, ['id' => 3], $normalizationContext + ['filters' => $expectedFilters, 'linkClass' => 'myResource'])->willReturn(['subresource']);
@@ -242,7 +242,7 @@ class ReadStageTest extends TestCase
         $operation = (new QueryCollection())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         ($this->readStage)($resourceClass, $resourceClass, $operation, $context);
 

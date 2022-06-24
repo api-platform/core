@@ -39,7 +39,6 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -48,7 +47,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implements ContextAwareDenormalizerInterface
+abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
     use ClassInfoTrait;
     use ContextTrait;
@@ -568,8 +567,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        if (isset($context['resource_class']) && $this->resourceClassResolver->isResourceClass($context['resource_class'])) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($context['resource_class'], $context['resource_class']);
+        if (isset($context['resource_class']) && $this->resourceClassResolver->isResourceClass($context['resource_class']) && $this->resourceMetadataCollectionFactory) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
+            // This is a hot spot, we should avoid calling this here but in many cases we can't
             $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
             $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
             $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
@@ -618,7 +618,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
-            $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            if ($this->resourceMetadataCollectionFactory) {
+                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            }
             unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
@@ -636,7 +638,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
-            $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            if ($this->resourceMetadataCollectionFactory) {
+                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            }
             unset($childContext['iri'], $childContext['uri_variables']);
 
             return $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
@@ -761,9 +765,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
             $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
             $childContext = $this->createChildContext($context, $attribute, $format);
             $childContext['resource_class'] = $resourceClass;
-            // if ($this->resourceMetadataCollectionFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
-            // }
+            if ($this->resourceMetadataCollectionFactory) {
+                $childContext['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            }
 
             return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
         }

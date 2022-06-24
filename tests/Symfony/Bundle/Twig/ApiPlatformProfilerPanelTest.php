@@ -135,7 +135,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(6, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
+        $this->assertCount(4, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
         $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
@@ -146,13 +146,5 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
         $this->assertSame('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
         $this->assertSame('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
-
-        // Data providers tab
-        $this->assertSame('Data Providers', $crawler->filter('.data-provider-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.data-provider-tab-content'));
-
-        // Data persisters tab
-        $this->assertSame('Data Persisters', $crawler->filter('.data-persister-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.data-persister-tab-content'));
     }
 }

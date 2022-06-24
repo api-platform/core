@@ -41,8 +41,12 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['operation'] = $operation;
-        $context['input'] = $operation->getInput();
-        $context['output'] = $operation->getOutput();
+        if ($operation->getInput()) {
+            $context['input'] = $operation->getInput();
+        }
+        if ($operation->getOutput()) {
+            $context['output'] = $operation->getOutput();
+        }
         $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 
         if ($normalization) {
@@ -55,7 +59,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     /**
      * Retrieves fields, recursively replaces the "_id" key (the raw id) by "id" (the name of the property expected by the Serializer) and flattens edge and node structures (pagination).
      */
-    private function fieldsToAttributes(?string $resourceClass, ?Operation $operation, array $resolverContext, array $context): array
+    private function fieldsToAttributes(?string $resourceClass, Operation $operation, array $resolverContext, array $context): array
     {
         if (isset($resolverContext['fields'])) {
             $fields = $resolverContext['fields'];
@@ -68,10 +72,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $attributes = $this->replaceIdKeys($fields['edges']['node'] ?? $fields['collection'] ?? $fields, $resourceClass, $context);
 
         if ($resolverContext['is_mutation'] || $resolverContext['is_subscription']) {
-            if (!$operation) {
-                throw new \LogicException('An operation should always exist for a mutation or a subscription.');
-            }
-
             $wrapFieldName = lcfirst($operation->getShortName());
 
             return $attributes[$wrapFieldName] ?? [];

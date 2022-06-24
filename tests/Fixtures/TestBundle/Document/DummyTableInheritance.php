@@ -37,7 +37,7 @@ class DummyTableInheritance
     #[ODM\Field]
     private ?string $name = null;
     #[ODM\ReferenceOne(targetDocument: DummyTableInheritanceRelated::class, inversedBy: 'children')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyTableInheritanceRelated $parent = null;
+    private ?DummyTableInheritanceRelated $parent = null;
 
     public function getName(): ?string
     {

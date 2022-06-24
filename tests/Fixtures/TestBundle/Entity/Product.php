@@ -27,7 +27,7 @@ class Product implements ProductInterface
     #[ORM\Column(type: 'string', unique: true)]
     private string $code;
     #[ORM\ManyToOne(targetEntity: Taxon::class)]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon $mainTaxon = null;
+    private ?Taxon $mainTaxon = null;
 
     /**
      * {@inheritdoc}

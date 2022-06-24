@@ -82,7 +82,7 @@ class WriteStageTest extends TestCase
         $operation = (new Mutation())->withName($operationName);
 
         $denormalizationContext = ['denormalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, false)->willReturn($denormalizationContext);
 
         $data = new \stdClass();
         $processedData = new \stdClass();

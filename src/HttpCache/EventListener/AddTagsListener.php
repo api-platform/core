@@ -83,6 +83,12 @@ final class AddTagsListener
             return;
         }
 
+        if (!$this->purger) {
+            $response->headers->set('Cache-Tags', implode(',', $resources));
+
+            return;
+        }
+
         $headers = $this->purger->getResponseHeaders($resources);
 
         foreach ($headers as $key => $value) {

@@ -253,18 +253,14 @@ jobs:
       - name: Export OpenAPI documents
         run: |
           mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 -o build/out/openapi/swagger_v2.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=2 --yaml -o build/out/openapi/swagger_v2.yaml
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --spec-version=3 --yaml -o build/out/openapi/openapi_v3.yaml
+          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
+          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
         uses: actions/setup-node@v2
         with:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.json
-          npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/swagger_v2.yaml
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.json
           npx git+https://github.com/soyuka/swagger-cli#master validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts

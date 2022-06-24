@@ -72,20 +72,6 @@ class SecurityPostDenormalizeStageTest extends TestCase
         ($this->securityPostDenormalizeStage)($resourceClass, $operation, ['extra_variables' => $extraVariables]);
     }
 
-    public function testGrantedLegacy(): void
-    {
-        self::markTestSkipped('The deprecation is handled in the Metadata transformation, this is not required anymore.'); // @phpstan-ignore-next-line
-        $operationName = 'item_query';
-        $resourceClass = 'myResource';
-        $isGranted = 'not_granted';
-        $extraVariables = ['extra' => false];
-        $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
-
-        $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
-
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, ['extra_variables' => $extraVariables]);
-    }
-
     public function testNotGranted(): void
     {
         $operationName = 'item_query';

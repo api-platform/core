@@ -46,7 +46,7 @@ class DummyOffer
      * @var DummyAggregateOffer The dummy aggregate offer value
      */
     #[ODM\ReferenceOne(targetDocument: DummyAggregateOffer::class, inversedBy: 'offers', storeAs: 'id')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyAggregateOffer $aggregate = null;
+    private ?DummyAggregateOffer $aggregate = null;
 
     public function getId()
     {

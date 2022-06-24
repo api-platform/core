@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 
 /**
  * @author Tomasz Grochowski <tg@urias.it>
@@ -52,6 +53,7 @@ class IdentifiersExtractorTest extends TestCase
         $item = new Dummy();
         $resourceClass = Dummy::class;
 
+        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass($item)->willReturn($resourceClass);
         $operation->getUriVariables()->willReturn([]);
 
@@ -65,6 +67,7 @@ class IdentifiersExtractorTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
+        $resourceClassResolverProphecy->isResourceClass(Argument::any())->willReturn(true);
         $resourceClassResolver = $resourceClassResolverProphecy->reveal();
 
         $identifiersExtractor = new IdentifiersExtractor(

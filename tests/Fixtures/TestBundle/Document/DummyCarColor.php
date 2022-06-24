@@ -31,7 +31,7 @@ class DummyCarColor
     private ?int $id = null;
     #[Assert\NotBlank]
     #[ODM\ReferenceOne(targetDocument: DummyCar::class, inversedBy: 'colors', storeAs: 'id')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCar $car = null;
+    private ?DummyCar $car = null;
     #[ApiFilter(SearchFilter::class)]
     #[Assert\NotBlank]
     #[Serializer\Groups(['colors'])]
