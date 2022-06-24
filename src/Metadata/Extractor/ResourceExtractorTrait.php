@@ -102,34 +102,13 @@ trait ResourceExtractorTrait
         $data = [];
         foreach ($resource->value as $value) {
             if (null !== $value->attributes()->name) {
-                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->buildValues($value->values) : $this->castValue($value->__toString());
+                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->buildValues($value->values) : XmlUtils::phpize($value->__toString());
                 continue;
             }
 
-            $data[] = isset($value->values) ? $this->buildValues($value->values) : $this->castValue($value->__toString());
+            $data[] = isset($value->values) ? $this->buildValues($value->values) : XmlUtils::phpize($value->__toString());
         }
 
         return $data;
-    }
-
-    private function castValue($value)
-    {
-        if (\in_array($value, ['1', 'true', 1, true], true)) {
-            return true;
-        }
-
-        if (\in_array($value, ['0', 'false', 0, false], true)) {
-            return false;
-        }
-
-        if (ctype_digit(trim($value))) {
-            return (int) $value;
-        }
-
-        if (is_numeric($value)) {
-            return (float) $value;
-        }
-
-        return (string) $value;
     }
 }
