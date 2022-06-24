@@ -60,7 +60,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     protected PropertyMetadataFactoryInterface $propertyMetadataFactory;
     protected IriConverterInterface $iriConverter;
     protected ResourceClassResolverInterface $resourceClassResolver;
-    protected ResourceAccessCheckerInterface $resourceAccessChecker;
+    protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
     protected PropertyAccessorInterface $propertyAccessor;
     protected $localCache = [];
 
@@ -118,7 +118,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     {
         $resourceClass = $this->getObjectClass($object);
         if ($outputClass = $this->getOutputClass($resourceClass, $context)) {
-            if (!$this->serializer instanceof DenormalizerInterface) {
+            if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
             }
 
@@ -418,10 +418,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
         }
 
         $options = $this->getFactoryOptions($context);
-        /** @var PropertyMetadata|ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
-        $security = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('security') : $propertyMetadata->getSecurity();
-        if ($this->resourceAccessChecker && $security) {
+        $security = $propertyMetadata->getSecurity();
+        if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
             ]);
@@ -439,9 +438,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     protected function canAccessAttributePostDenormalize($object, $previousObject, string $attribute, array $context = []): bool
     {
         $options = $this->getFactoryOptions($context);
-        /** @var PropertyMetadata|ApiProperty */
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
-        $security = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getAttribute('security_post_denormalize') : $propertyMetadata->getSecurityPostDenormalize();
+        $security = $propertyMetadata->getSecurityPostDenormalize();
         if ($this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
@@ -484,12 +482,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer implement
     /**
      * Denormalizes a collection of objects.
      *
-     * @param ApiProperty|PropertyMetadata $propertyMetadata
-     * @param mixed                        $value
+     * @param mixed $value
      *
      * @throws InvalidArgumentException
      */
-    protected function denormalizeCollection(string $attribute, $propertyMetadata, Type $type, string $className, $value, ?string $format, array $context): array
+    protected function denormalizeCollection(string $attribute, ApiProperty $propertyMetadata, Type $type, string $className, $value, ?string $format, array $context): array
     {
         if (!\is_array($value)) {
             throw new InvalidArgumentException(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)));

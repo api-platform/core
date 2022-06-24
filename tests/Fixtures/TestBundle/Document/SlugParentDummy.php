@@ -45,10 +45,10 @@ class SlugParentDummy
     private ?string $slug = null;
 
     /**
-     * @var \Collection<int,\SlugChildDummy>
+     * @var Collection<int,SlugChildDummy>
      */
     #[ODM\ReferenceMany(targetDocument: SlugChildDummy::class, mappedBy: 'parentDummy')]
-    private \Collection $childDummies;
+    private Collection $childDummies;
 
     public function __construct()
     {
@@ -71,7 +71,7 @@ class SlugParentDummy
     }
 
     /**
-     * @return Collection<int, SlugChildDummy>|SlugChildDummy[]
+     * @return Collection<int, SlugChildDummy>
      */
     public function getChildDummies(): Collection
     {

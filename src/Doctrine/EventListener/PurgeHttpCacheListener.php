@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
@@ -167,7 +166,7 @@ final class PurgeHttpCacheListener
         }
 
         try {
-            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($value) : $this->iriConverter->getIriFromResource($value);
+            $iri = $this->iriConverter->getIriFromResource($value);
             $this->tags[$iri] = $iri;
         } catch (RuntimeException|InvalidArgumentException $e) {
         }

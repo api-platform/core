@@ -63,11 +63,6 @@ final class Schema extends \ArrayObject
         return new \ArrayObject(array_merge($this->schema->getArrayCopy(true), $this->getArrayCopy()));
     }
 
-    public function getNullable(): bool
-    {
-        return $this->nullable;
-    }
-
     public function getDiscriminator()
     {
         return $this->discriminator;
@@ -101,14 +96,6 @@ final class Schema extends \ArrayObject
     public function getDeprecated(): bool
     {
         return $this->deprecated;
-    }
-
-    public function withNullable(bool $nullable): self
-    {
-        $clone = clone $this;
-        $clone->nullable = $nullable;
-
-        return $clone;
     }
 
     public function withDiscriminator($discriminator): self

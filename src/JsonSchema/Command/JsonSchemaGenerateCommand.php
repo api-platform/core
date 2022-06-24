@@ -33,10 +33,7 @@ final class JsonSchemaGenerateCommand extends Command
 {
     protected static $defaultName = 'api:json-schema:generate';
 
-    /**
-     * @var SchemaFactoryInterface|LegacySchemaFactoryInterface
-     */
-    private $schemaFactory;
+    private SchemaFactoryInterface $schemaFactory;
     private $formats;
 
     public function __construct($schemaFactory, array $formats)

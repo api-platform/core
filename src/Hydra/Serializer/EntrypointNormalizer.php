@@ -69,7 +69,7 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
                     }
 
                     try {
-                        $entrypoint[$key] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $operation);
+                        $entrypoint[$key] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $operation); // @phpstan-ignore-line phpstan issue as type is CollectionOperationInterface & Operation
                     } catch (InvalidArgumentException|OperationNotFoundException) {
                         // Ignore resources without GET operations
                     }

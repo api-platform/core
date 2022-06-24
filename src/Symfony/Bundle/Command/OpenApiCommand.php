@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Command;
 
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface as LegacyOpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -32,13 +31,10 @@ final class OpenApiCommand extends Command
 {
     protected static $defaultName = 'api:openapi:export';
 
-    private $openApiFactory;
-    private $normalizer;
+    private OpenApiFactoryInterface $openApiFactory;
+    private NormalizerInterface $normalizer;
 
-    /**
-     * @param LegacyOpenApiFactoryInterface|OpenApiFactoryInterface $openApiFactory
-     */
-    public function __construct($openApiFactory, NormalizerInterface $normalizer)
+    public function __construct(OpenApiFactoryInterface $openApiFactory, NormalizerInterface $normalizer)
     {
         parent::__construct();
         $this->openApiFactory = $openApiFactory;

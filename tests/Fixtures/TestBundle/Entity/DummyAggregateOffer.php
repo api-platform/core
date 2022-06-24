@@ -41,7 +41,7 @@ class DummyAggregateOffer
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     /**
-     * @var Collection<int,\DummyOffer>
+     * @var Collection<int,DummyOffer>
      */
     #[ORM\OneToMany(targetEntity: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
     private Collection $offers;
@@ -49,7 +49,7 @@ class DummyAggregateOffer
      * @var DummyProduct|null The dummy product
      */
     #[ORM\ManyToOne(targetEntity: DummyProduct::class, inversedBy: 'offers')]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct $product = null;
+    private ?DummyProduct $product = null;
     /**
      * @var int The dummy aggregate offer value
      */

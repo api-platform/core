@@ -41,7 +41,7 @@ class DummyDifferentGraphQlSerializationGroup
      */
     #[ORM\Column]
     #[Groups(['item_query', 'collection_query'])]
-    private ?string $name = null;
+    private string $name;
     /**
      * @var string|null The dummy title
      */

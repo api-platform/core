@@ -24,11 +24,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class VoDummyCar extends VoDummyVehicle
 {
     /**
-     * @var VoDummyInspection[]|Collection
+     * @var Collection<VoDummyInspection>
      */
     #[ORM\OneToMany(targetEntity: VoDummyInspection::class, mappedBy: 'car', cascade: ['persist'])]
     #[Groups(['car_read', 'car_write'])]
-    private array|Collection $inspections;
+    private Collection $inspections;
 
     public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, #[ORM\Column(type: 'integer')] #[Groups(['car_read', 'car_write'])] private readonly int $mileage, #[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $bodyType = 'coupe')
     {

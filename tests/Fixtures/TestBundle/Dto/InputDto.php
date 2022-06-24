@@ -31,7 +31,7 @@ class InputDto
     public $bar;
 
     /**
-     * @var RelatedDummy[]
+     * @var ?RelatedDummy[]
      */
     public $relatedDummies;
 }

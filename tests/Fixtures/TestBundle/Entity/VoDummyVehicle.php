@@ -23,7 +23,7 @@ abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
     /**
-     * @var VoDummyDriver[]|Collection
+     * @var Collection<VoDummyDriver>
      */
     #[ORM\ManyToMany(targetEntity: VoDummyDriver::class, cascade: ['persist'])]
     #[Groups(['car_read', 'car_write'])]
@@ -48,7 +48,7 @@ abstract class VoDummyVehicle
     }
 
     /**
-     * @return VoDummyDriver[]|Collection
+     * @return Collection<VoDummyDriver>
      */
     public function getDrivers()
     {

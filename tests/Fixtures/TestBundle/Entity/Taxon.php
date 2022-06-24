@@ -24,7 +24,7 @@ class Taxon implements TaxonInterface
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     #[ORM\Column(type: 'string', unique: true)]
-    private ?string $code = null;
+    private string $code;
 
     /**
      * {@inheritdoc}

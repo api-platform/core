@@ -21,7 +21,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 #[ORM\InheritanceType('JOINED')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
-#[ORM\DiscriminatorMap(['dummyTableInheritance' => 'DummyTableInheritance', 'dummyTableInheritanceChild' => 'DummyTableInheritanceChild', 'dummyTableInheritanceDifferentChild' => 'DummyTableInheritanceDifferentChild', 'dummyTableInheritanceNotApiResourceChild' => 'DummyTableInheritanceNotApiResourceChild'])]
+#[ORM\DiscriminatorMap([
+    'dummyTableInheritance' => DummyTableInheritance::class,
+    'dummyTableInheritanceChild' => DummyTableInheritanceChild::class,
+    'dummyTableInheritanceDifferentChild' => DummyTableInheritanceDifferentChild::class,
+    'dummyTableInheritanceNotApiResourceChild' => DummyTableInheritanceNotApiResourceChild::class,
+])]
 class DummyTableInheritance
 {
     /**
@@ -37,7 +42,7 @@ class DummyTableInheritance
      */
     #[ORM\Column]
     #[Groups(['default'])]
-    private ?string $name = null;
+    private string $name;
     #[ORM\ManyToOne(targetEntity: DummyTableInheritanceRelated::class, inversedBy: 'children')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated $parent = null;

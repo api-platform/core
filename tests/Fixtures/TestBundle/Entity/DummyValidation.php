@@ -52,7 +52,7 @@ class DummyValidation
      * @var string The dummy code
      */
     #[ORM\Column]
-    private ?string $code = null;
+    private string $code;
 
     public function getId(): ?int
     {

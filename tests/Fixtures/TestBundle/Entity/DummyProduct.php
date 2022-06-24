@@ -40,7 +40,7 @@ class DummyProduct
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     /**
-     * @var \Collection<int,\DummyAggregateOffer>
+     * @var Collection<int, DummyAggregateOffer>
      */
     #[ORM\OneToMany(targetEntity: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
     private Collection $offers;
@@ -50,11 +50,11 @@ class DummyProduct
     #[ORM\Column]
     private $name;
     /**
-     * @var \Collection<int,\DummyProduct>
+     * @var Collection<int,DummyProduct>
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     private Collection $relatedProducts;
-    #[ORM\ManyToOne(targetEntity: 'DummyProduct', inversedBy: 'relatedProducts')]
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
     public function __construct()

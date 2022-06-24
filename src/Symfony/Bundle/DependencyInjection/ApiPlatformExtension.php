@@ -127,7 +127,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMercureConfiguration($container, $config, $loader);
         $this->registerMessengerConfiguration($container, $config, $loader);
         $this->registerElasticsearchConfiguration($container, $config, $loader);
-        $this->registerDataTransformerConfiguration($container);
         $this->registerSecurityConfiguration($container, $loader, $config);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($container, $loader, $config);
@@ -702,15 +701,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
-    }
-
-    private function registerDataTransformerConfiguration(ContainerBuilder $container): void
-    {
-        $container->registerForAutoconfiguration(DataTransformerInterface::class)
-            ->addTag('api_platform.data_transformer');
-
-        $container->registerForAutoconfiguration(DataTransformerInitializerInterface::class)
-            ->addTag('api_platform.data_transformer');
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $config): void

@@ -61,7 +61,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if ($operation->getUriVariables()) {
             $context['uri_variables'] = [];
 
-            foreach (array_keys($operation->getUriVariables() ?? []) as $parameterName) {
+            foreach (array_keys($operation->getUriVariables()) as $parameterName) {
                 $context['uri_variables'][$parameterName] = $request->attributes->get($parameterName);
             }
         }

@@ -59,34 +59,15 @@ parameters:
 		-
 			message: '#Parameter \#1 \$objectValue of method GraphQL\\Type\\Definition\\InterfaceType::resolveType\(\) expects object, array(<string, string>)? given.#'
 			path: tests/GraphQl/Type/TypeBuilderTest.php
-		# https://github.com/phpstan/phpstan-phpunit/issues/62
-		-
-			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with 2 and int will always evaluate to false\.#'
-			path: tests/Core/Identifier/Normalizer/IntegerDenormalizerTest.php
-		-
-			message: '#Call to method PHPUnit\\Framework\\Assert::assertSame\(\) with array\{.+\} and array\{.+\} will always evaluate to false\.#'
-			path: tests/Util/SortTraitTest.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
 			path: tests/GraphQl/Type/TypesContainerTest.php
 
-		# Expected, due to PHP 8 attributes
-		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiResource has an unused parameter#'
-		- '#Constructor of class ApiPlatform\\Core\\Annotation\\ApiProperty has an unused parameter#'
-
 		# Expected, due to optional interfaces
-		- '#Method ApiPlatform\\Core\\Bridge\\Symfony\\Routing\\RouteNameResolverInterface::getRouteName\(\) invoked with 3 parameters, 2 required\.#'
-		- '#Method ApiPlatform\\Core\\DataPersister\\DataPersisterInterface::persist\(\) invoked with 2 parameters, 1 required\.#'
-		- '#Method ApiPlatform\\Core\\DataPersister\\DataPersisterInterface::remove\(\) invoked with 2 parameters, 1 required\.#'
-		- '#Method ApiPlatform\\Core\\DataPersister\\DataPersisterInterface::supports\(\) invoked with 2 parameters, 1 required\.#'
-		- '#Method ApiPlatform\\Core\\DataProvider\\CollectionDataProviderInterface::getCollection\(\) invoked with 3 parameters, 1-2 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::denormalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
 		- '#Method Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface::supportsNormalization\(\) invoked with 3 parameters, 1-2 required\.#'
-
-		# Expected, due to deprecations
-		- '#Method ApiPlatform\\PathResolver\\OperationPathResolverInterface::resolveOperationPath\(\) invoked with 4 parameters, 3 required\.#'
 
 		# Expected, due to backward compatibility
 		-

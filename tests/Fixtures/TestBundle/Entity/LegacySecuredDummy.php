@@ -41,7 +41,7 @@ class LegacySecuredDummy
      */
     #[ORM\Column]
     #[Assert\NotBlank]
-    private ?string $title = null;
+    private string $title;
     /**
      * @var string The description
      */
@@ -52,7 +52,7 @@ class LegacySecuredDummy
      */
     #[ORM\Column]
     #[Assert\NotBlank]
-    private ?string $owner = null;
+    private string $owner;
 
     public function getId(): ?int
     {

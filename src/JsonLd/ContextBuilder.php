@@ -87,7 +87,8 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
      */
     public function getResourceContext(string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
     {
-        $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
+        /** @var HttpOperation */
+        $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
         if (null === $shortName = $operation->getShortName()) {
             return [];
         }

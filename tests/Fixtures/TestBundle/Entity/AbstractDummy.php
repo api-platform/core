@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string', length: 16)]
-#[ORM\DiscriminatorMap(['concrete' => 'ConcreteDummy'])]
+#[ORM\DiscriminatorMap(['concrete' => ConcreteDummy::class])]
 abstract class AbstractDummy
 {
     /**

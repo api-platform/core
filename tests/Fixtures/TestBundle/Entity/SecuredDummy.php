@@ -46,7 +46,7 @@ class SecuredDummy
      */
     #[ORM\Column]
     #[Assert\NotBlank]
-    private ?string $title = null;
+    private string $title;
 
     /**
      * @var string The description
@@ -59,21 +59,21 @@ class SecuredDummy
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     #[ORM\Column]
-    private ?string $adminOnlyProperty = '';
+    private string $adminOnlyProperty = '';
 
     /**
      * @var string Secret property, only readable/writable by owners
      */
     #[ApiProperty(security: 'object == null or object.getOwner() == user', securityPostDenormalize: 'object.getOwner() == user')]
     #[ORM\Column]
-    private ?string $ownerOnlyProperty = '';
+    private string $ownerOnlyProperty = '';
 
     /**
      * @var string The owner
      */
     #[ORM\Column]
     #[Assert\NotBlank]
-    private ?string $owner = null;
+    private string $owner;
 
     /**
      * A collection of dummies that only admins can access.

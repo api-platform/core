@@ -44,7 +44,7 @@ class CustomNormalizedDummy
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['input', 'output'])]
-    private ?string $name = null;
+    private string $name;
 
     /**
      * @var string|null The dummy name alias

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer;
 
 use ApiPlatform\Metadata\GraphQl\Operation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -26,12 +25,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    private $resourceMetadataCollectionFactory;
     private $nameConverter;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?NameConverterInterface $nameConverter)
+    public function __construct(?NameConverterInterface $nameConverter)
     {
-        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->nameConverter = $nameConverter;
     }
 
@@ -49,7 +46,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 
         if ($normalization) {
-            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation instanceof Operation ? $operation : null, $resolverContext, $context);
+            $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation, $resolverContext, $context);
         }
 
         return $context;

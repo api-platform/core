@@ -36,7 +36,7 @@ class RelatedOwnedDummy
     #[ORM\Column(nullable: true)]
     public $name;
     /**
-     * @var \Dummy
+     * @var Dummy
      */
     #[ORM\OneToOne(targetEntity: Dummy::class, cascade: ['persist'], inversedBy: 'relatedOwnedDummy')]
     #[ORM\JoinColumn(nullable: false)]

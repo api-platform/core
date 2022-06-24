@@ -13,21 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 
-if (\PHP_VERSION_ID > 80000) {
-    #[Get]
-    #[Get('/alternate/{id}', uriVariables: ['id' => ['from_class' => AlternateResource::class, 'identifiers' => ['id']]])]
-    final class AlternateResource
+#[Get]
+#[Get('/alternate/{id}', uriVariables: ['id' => ['from_class' => AlternateResource::class, 'identifiers' => ['id']]])]
+final class AlternateResource
+{
+    public function __construct(#[ApiProperty(identifier: true)] public string $id)
     {
-        public function __construct(#[ApiProperty(identifier: true)] public string $id)
-        {
-        }
+    }
 
-        public function getId()
-        {
-            return $this->id;
-        }
+    public function getId()
+    {
+        return $this->id;
     }
 }

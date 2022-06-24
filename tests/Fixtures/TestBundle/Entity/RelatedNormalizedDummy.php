@@ -46,7 +46,7 @@ class RelatedNormalizedDummy
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['related_output', 'related_input'])]
-    private ?string $name = null;
+    private string $name;
     /**
      * @var Collection<int, CustomNormalizedDummy> Several Normalized dummies
      */

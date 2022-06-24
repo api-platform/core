@@ -28,12 +28,12 @@ class CustomWritableIdentifierDummy
      */
     #[ORM\Column(name: 'slug', type: 'string', length: 30)]
     #[ORM\Id]
-    private ?string $slug = null;
+    private string $slug;
     /**
      * @var string The dummy name
      */
     #[ORM\Column(name: 'name', type: 'string', length: 30)]
-    private ?string $name = null;
+    private string $name;
 
     /**
      * @param string $slug

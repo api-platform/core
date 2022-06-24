@@ -25,7 +25,7 @@ class Product implements ProductInterface
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     #[ORM\Column(type: 'string', unique: true)]
-    private ?string $code = null;
+    private string $code;
     #[ORM\ManyToOne(targetEntity: Taxon::class)]
     private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon $mainTaxon = null;
 

@@ -73,17 +73,17 @@ class DummyCar
 
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ORM\Column(type: 'string')]
-    private ?string $name = null;
+    private string $name;
     #[ORM\Column(type: 'boolean')]
-    private ?bool $canSell = null;
+    private bool $canSell;
     #[ORM\Column(type: 'datetime')]
-    private ?\DateTime $availableAt = null;
+    private \DateTime $availableAt;
     #[Serializer\Groups(['colors'])]
     #[Serializer\SerializedName('carBrand')]
     #[ORM\Column]
     private string $brand = 'DummyBrand';
     #[ORM\Embedded(class: 'DummyCarInfo')]
-    private \ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCarInfo $info;
+    private DummyCarInfo $info;
 
     public function __construct()
     {

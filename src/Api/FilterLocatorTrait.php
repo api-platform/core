@@ -24,17 +24,18 @@ use Psr\Container\ContainerInterface;
  */
 trait FilterLocatorTrait
 {
-    /** @var ContainerInterface */
-    private $filterLocator;
+    private ?ContainerInterface $filterLocator;
 
     /**
      * Sets a filter locator with a backward compatibility.
-     *
-     * @param ContainerInterface|null $filterLocator
      */
-    private function setFilterLocator($filterLocator, bool $allowNull = false): void
+    private function setFilterLocator(?ContainerInterface $filterLocator, bool $allowNull = false): void
     {
-        $this->filterLocator = $filterLocator;
+        if ($filterLocator instanceof ContainerInterface || (null === $filterLocator && $allowNull)) {
+            $this->filterLocator = $filterLocator;
+        } else {
+            throw new InvalidArgumentException(sprintf('The "$filterLocator" argument is expected to be an implementation of the "%s" interface%s.', ContainerInterface::class, $allowNull ? ' or null' : ''));
+        }
     }
 
     /**
@@ -42,7 +43,7 @@ trait FilterLocatorTrait
      */
     private function getFilter(string $filterId): ?FilterInterface
     {
-        if ($this->filterLocator instanceof ContainerInterface && $this->filterLocator->has($filterId)) {
+        if ($this->filterLocator && $this->filterLocator->has($filterId)) {
             return $this->filterLocator->get($filterId);
         }
 

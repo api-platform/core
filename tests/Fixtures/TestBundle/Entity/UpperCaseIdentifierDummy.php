@@ -30,12 +30,12 @@ class UpperCaseIdentifierDummy
      */
     #[ORM\Column(type: 'guid')]
     #[ORM\Id]
-    private ?string $Uuid = null;
+    private string $Uuid;
     /**
      * @var string The dummy name
      */
     #[ORM\Column(length: 30)]
-    private ?string $name = null;
+    private string $name;
 
     public function getUuid(): string
     {

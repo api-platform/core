@@ -14,12 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Core\Tests\GraphQl\Serializer;
 
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilder;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -34,23 +32,19 @@ class SerializerContextBuilderTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var SerializerContextBuilder */
-    private $serializerContextBuilder;
-    private $resourceMetadataCollectionFactoryProphecy;
+    private SerializerContextBuilder $serializerContextBuilder;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-
         $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
     }
 
     private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
     {
-        return new SerializerContextBuilder($this->resourceMetadataCollectionFactoryProphecy->reveal(), $advancedNameConverter ?? new CustomConverter());
+        return new SerializerContextBuilder($advancedNameConverter ?? new CustomConverter());
     }
 
     /**
@@ -77,7 +71,7 @@ class SerializerContextBuilderTest extends TestCase
         }
 
         if ($resourceClass) {
-            $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => $operation->withShortName('shortName')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass'])->withNormalizationContext(['groups' => ['normalization_group']])])]));
+            $operation = $operation->withShortName('shortName')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass'])->withNormalizationContext(['groups' => ['normalization_group']]);
         }
 
         if ($expectedExceptionClass) {
@@ -90,7 +84,8 @@ class SerializerContextBuilderTest extends TestCase
             $serializerContextBuilder = $this->buildSerializerContextBuilder($advancedNameConverter);
         }
 
-        $context = $serializerContextBuilder->create($resourceClass, $operationName, $resolverContext, true);
+        /** @var Operation $operation */
+        $context = $serializerContextBuilder->create($resourceClass, $operation, $resolverContext, true);
 
         $this->assertSame($expectedContext, $context);
     }
@@ -238,11 +233,14 @@ class SerializerContextBuilderTest extends TestCase
      */
     public function testCreateDenormalizationContext(?string $resourceClass, string $operationName, array $expectedContext): void
     {
+        $operation = new Mutation(name: $operationName);
+
         if ($resourceClass) {
-            $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operationName => (new Mutation())->withShortName('shortName')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass'])->withDenormalizationContext(['groups' => ['denormalization_group']])])]));
+            $operation = $operation->withShortName('shortName')->withInput(['class' => 'inputClass'])->withOutput(['class' => 'outputClass'])->withDenormalizationContext(['groups' => ['denormalization_group']]);
         }
 
-        $context = $this->serializerContextBuilder->create($resourceClass, $operationName, [], false);
+        /** @var Operation $operation */
+        $context = $this->serializerContextBuilder->create($resourceClass, $operation, [], false);
 
         $this->assertSame($expectedContext, $context);
     }

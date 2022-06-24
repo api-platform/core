@@ -33,7 +33,7 @@ class UuidIdentifierDummy
      * @var string The dummy name
      */
     #[ORM\Column(length: 30)]
-    private ?string $name = null;
+    private string $name;
 
     public function getUuid(): string
     {

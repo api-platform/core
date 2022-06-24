@@ -29,7 +29,7 @@ class Content implements \JsonSerializable
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     #[ORM\Column(type: 'string')]
-    private ?string $contentType = null;
+    private string $contentType;
     /**
      * @var Collection<Field>
      */

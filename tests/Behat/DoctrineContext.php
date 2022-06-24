@@ -43,8 +43,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDifferentGraphQlSerializ
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoCustom as DummyDtoCustomDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoInput as DummyDtoNoInputDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoNoOutput as DummyDtoNoOutputDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoOutputFallbackToSameClass as DummyDtoOutputFallbackToSameClassDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoOutputSameClass as DummyDtoOutputSameClassDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyFriend as DummyFriendDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyImmutableDate as DummyImmutableDateDocument;
@@ -118,8 +116,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDifferentGraphQlSerializat
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoOutput;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputFallbackToSameClass;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoOutputSameClass;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyImmutableDate;
@@ -174,6 +170,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\WithJsonDummy;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -1339,9 +1336,10 @@ final class DoctrineContext implements Context
         if ($this->isOrm()) {
             $count = $this->doctrine->getRepository(Program::class)->count(['author' => $author]);
         } else {
-            $count = $this->doctrine->getRepository(ProgramDocument::class)
-                ->createQueryBuilder('f')
-                ->field('author')->equals($author)
+            /** @var Builder */
+            $qb = $this->doctrine->getRepository(ProgramDocument::class)
+                ->createQueryBuilder('f');
+            $count = $qb->field('author')->equals($author)
                 ->count()->getQuery()->execute();
         }
 
@@ -1385,9 +1383,11 @@ final class DoctrineContext implements Context
         if ($this->isOrm()) {
             $count = $this->doctrine->getRepository(Comment::class)->count(['author' => $author]);
         } else {
-            $count = $this->doctrine->getRepository(CommentDocument::class)
-                ->createQueryBuilder()
-                ->field('author')->equals($author)
+            /** @var Builder */
+            $qb = $this->doctrine->getRepository(CommentDocument::class)
+                                 ->createQueryBuilder('f');
+
+            $count = $qb->field('author')->equals($author)
                 ->count()->getQuery()->execute();
         }
 
@@ -1723,32 +1723,6 @@ final class DoctrineContext implements Context
             $this->manager->persist($dto);
         }
 
-        $this->manager->flush();
-        $this->manager->clear();
-    }
-
-    /**
-     * @Given there is a DummyDtoOutputSameClass
-     */
-    public function thereIsADummyDtoOutputSameClass()
-    {
-        $dto = $this->isOrm() ? new DummyDtoOutputSameClass() : new DummyDtoOutputSameClassDocument();
-        $dto->lorem = 'test';
-        $dto->ipsum = '1';
-        $this->manager->persist($dto);
-        $this->manager->flush();
-        $this->manager->clear();
-    }
-
-    /**
-     * @Given there is a DummyDtoOutputFallbackToSameClass
-     */
-    public function thereIsADummyDtoOutputFallbackToSameClass()
-    {
-        $dto = $this->isOrm() ? new DummyDtoOutputFallbackToSameClass() : new DummyDtoOutputFallbackToSameClassDocument();
-        $dto->lorem = 'test';
-        $dto->ipsum = '1';
-        $this->manager->persist($dto);
         $this->manager->flush();
         $this->manager->clear();
     }

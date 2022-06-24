@@ -24,11 +24,11 @@ class Field implements \JsonSerializable
     private ?int $id = null;
     #[ORM\ManyToOne(targetEntity: Content::class, inversedBy: 'fields')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\Content $content = null;
+    private \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Content $content;
     #[ORM\Column(type: 'string')]
-    private ?string $name = null;
+    private string $name;
     #[ORM\Column(type: 'text')]
-    private ?string $value = null;
+    private string $value;
 
     public function getId(): ?int
     {

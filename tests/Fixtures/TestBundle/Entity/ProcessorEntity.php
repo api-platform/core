@@ -35,7 +35,7 @@ class ProcessorEntity
 
     #[ORM\Column]
     #[Assert\NotBlank]
-    private ?string $foo = null;
+    private string $foo;
 
     /**
      * @return int

@@ -34,7 +34,7 @@ class DummyCarColor
     #[ORM\ManyToOne(targetEntity: DummyCar::class, inversedBy: 'colors')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE', referencedColumnName: 'id_id')]
     #[Assert\NotBlank]
-    private ?\ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar $car = null;
+    private DummyCar $car;
     #[ApiFilter(SearchFilter::class)]
     #[ORM\Column(nullable: false)]
     #[Assert\NotBlank]

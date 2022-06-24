@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Action;
 
-use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface as SchemaBuilderLegacyInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
@@ -34,19 +33,18 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class EntrypointAction
 {
-    /** @var SchemaBuilderLegacyInterface|SchemaBuilderInterface */
-    private $schemaBuilder;
-    private $executor;
-    private $graphiQlAction;
-    private $graphQlPlaygroundAction;
-    private $normalizer;
-    private $errorHandler;
-    private $debug;
-    private $graphiqlEnabled;
-    private $graphQlPlaygroundEnabled;
-    private $defaultIde;
+    private SchemaBuilderInterface $schemaBuilder;
+    private ExecutorInterface $executor;
+    private GraphiQlAction $graphiQlAction;
+    private GraphQlPlaygroundAction $graphQlPlaygroundAction;
+    private NormalizerInterface $normalizer;
+    private ErrorHandlerInterface $errorHandler;
+    private int|bool $debug;
+    private bool $graphiqlEnabled;
+    private bool $graphQlPlaygroundEnabled;
+    private string|bool $defaultIde;
 
-    public function __construct($schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
+    public function __construct(SchemaBuilderInterface $schemaBuilder, ExecutorInterface $executor, GraphiQlAction $graphiQlAction, GraphQlPlaygroundAction $graphQlPlaygroundAction, NormalizerInterface $normalizer, ErrorHandlerInterface $errorHandler, bool $debug = false, bool $graphiqlEnabled = false, bool $graphQlPlaygroundEnabled = false, $defaultIde = false)
     {
         $this->schemaBuilder = $schemaBuilder;
         $this->executor = $executor;

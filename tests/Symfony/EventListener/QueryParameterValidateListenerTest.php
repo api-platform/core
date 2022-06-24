@@ -58,7 +58,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource(operations: [
-                'get' => new Get(),
+                'get' => new Get(queryParameterValidationEnabled: false),
             ])),
         ]));
 
@@ -73,7 +73,6 @@ class QueryParameterValidateListenerTest extends TestCase
         $listener = new QueryParameterValidateListener(
             $queryParameterValidator->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
-            false
         );
 
         $listener->onKernelRequest($eventProphecy->reveal());

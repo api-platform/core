@@ -35,7 +35,7 @@ class RelatedOwningDummy
     #[ODM\Field(type: 'string')]
     public $name;
     /**
-     * @var \Dummy
+     * @var Dummy
      */
     #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], mappedBy: 'relatedOwningDummy')]
     public $ownedDummy;

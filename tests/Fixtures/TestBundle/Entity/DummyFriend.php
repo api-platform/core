@@ -44,7 +44,7 @@ class DummyFriend
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Groups(['fakemanytomany', 'friends'])]
-    private ?string $name = null;
+    private string $name;
 
     /**
      * Get id.

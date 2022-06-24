@@ -29,18 +29,18 @@ class CustomMultipleIdentifierDummy
      */
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
-    private ?int $firstId = null;
+    private int $firstId;
     /**
      * @var int The custom identifier
      */
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
-    private ?int $secondId = null;
+    private int $secondId;
     /**
      * @var string The dummy name
      */
     #[ORM\Column(length: 30)]
-    private ?string $name = null;
+    private string $name;
 
     public function getFirstId(): int
     {

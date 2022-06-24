@@ -33,7 +33,7 @@ class IriOnlyDummy
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     #[ORM\Column(type: 'string')]
-    private ?string $foo = null;
+    private string $foo;
 
     public function getId(): ?int
     {

@@ -43,7 +43,7 @@ class DummyOffer
      * @var int The dummy aggregate offer value
      */
     #[ORM\Column(type: 'integer')]
-    private ?int $value = null;
+    private int $value;
     /**
      * @var DummyAggregateOffer|null The dummy aggregate offer value
      */

@@ -35,18 +35,17 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 {
     use FilterLocatorTrait;
     private $collectionNormalizer;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $resourceClassResolver;
 
     /**
-     * @param ContainerInterface $filterLocator           The new filter locator or the deprecated filter collection
-     * @param mixed              $resourceMetadataFactory
+     * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
     {
         $this->setFilterLocator($filterLocator);
         $this->collectionNormalizer = $collectionNormalizer;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
@@ -81,7 +80,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             return $data;
         }
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
+        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
         $resourceFilters = $operation->getFilters();
         if (!$resourceFilters) {
             return $data;

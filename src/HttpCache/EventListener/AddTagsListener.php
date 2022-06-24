@@ -74,23 +74,12 @@ final class AddTagsListener
             // Allows to purge collections
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
 
-            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
-                $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
-            } else {
-                $iri = $this->iriConverter->getIriFromResource($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
-            }
+            $iri = $this->iriConverter->getIriFromResource($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
 
             $resources[$iri] = $iri;
         }
 
         if (!$resources) {
-            return;
-        }
-
-        if ($this->purger instanceof LegacyPurgerInterface || !$this->purger) {
-            $response->headers->set('Cache-Tags', implode(',', $resources));
-            trigger_deprecation('api-platform/core', '2.7', sprintf('The interface "%s" is deprecated, use "%s" instead.', LegacyPurgerInterface::class, PurgerInterface::class));
-
             return;
         }
 

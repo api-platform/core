@@ -65,7 +65,6 @@ final class AddFormatListener
         $formats = $operation?->getOutputFormats() ?? $this->formats;
 
         $this->addRequestFormats($request, $formats);
-        $this->formatMatcher = new FormatMatcher($formats);
 
         // Empty strings must be converted to null because the Symfony router doesn't support parameter typing before 3.2 (_format)
         if (null === $routeFormat = $request->attributes->get('_format') ?: null) {
@@ -86,7 +85,8 @@ final class AddFormatListener
                 throw $this->getNotAcceptableHttpException($accept, $flattenedMimeTypes);
             }
 
-            $request->setRequestFormat($this->formatMatcher->getFormat($mediaType->getType()));
+            $formatMatcher = new FormatMatcher($formats);
+            $request->setRequestFormat($formatMatcher->getFormat($mediaType->getType()));
 
             return;
         }

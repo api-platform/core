@@ -18,6 +18,8 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 
 final class DummyDtoInputOutputProcessor implements ProcessorInterface
@@ -35,6 +37,7 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
     {
         // TODO: mongodb
         $entity = new DummyDtoInputOutput();
+        /** @var EntityManager */
         $manager = $this->registry->getManagerForClass(DummyDtoInputOutput::class);
 
         if (isset($context['previous_data'])) {
@@ -43,7 +46,7 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
 
         $entity->str = $data->foo;
         $entity->num = $data->bar;
-        $entity->relatedDummies = $data->relatedDummies;
+        $entity->relatedDummies = new ArrayCollection($data->relatedDummies);
 
         $manager->persist($entity);
         $manager->flush();
@@ -52,7 +55,7 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
         $outputDto->id = $entity->id;
         $outputDto->baz = $entity->num;
         $outputDto->bat = $entity->str;
-        $outputDto->relatedDummies = $data->relatedDummies ?? [];
+        $outputDto->relatedDummies = (array) $data->relatedDummies;
 
         return $outputDto;
     }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -35,15 +34,12 @@ final class DocumentNormalizer extends ObjectNormalizer
 {
     public const FORMAT = 'elasticsearch';
 
-    private $resourceMetadataFactory;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
 
-    /**
-     * @param ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface $resourceMetadataFactory
-     */
-    public function __construct($resourceMetadataFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, PropertyAccessorInterface $propertyAccessor = null, PropertyTypeExtractorInterface $propertyTypeExtractor = null, ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, callable $objectClassResolver = null, array $defaultContext = [])
     {
         parent::__construct($classMetadataFactory, $nameConverter, $propertyAccessor, $propertyTypeExtractor, $classDiscriminatorResolver, $objectClassResolver, $defaultContext);
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     /**
@@ -95,18 +91,14 @@ final class DocumentNormalizer extends ObjectNormalizer
     private function populateIdentifier(array $data, string $class): array
     {
         $identifier = 'id';
-        $resourceMetadata = $this->resourceMetadataFactory->create($class);
+        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($class);
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $identifier = $resourceMetadata->getItemOperationAttribute('get', 'identifiers');
-        } else {
-            $operation = $resourceMetadata->getOperation();
-            if ($operation instanceof HttpOperation) {
-                $uriVariable = $operation->getUriVariables()[0] ?? null;
+        $operation = $resourceMetadata->getOperation();
+        if ($operation instanceof HttpOperation) {
+            $uriVariable = $operation->getUriVariables()[0] ?? null;
 
-                if ($uriVariable) {
-                    $identifier = $uriVariable->getIdentifiers()[0] ?? 'id';
-                }
+            if ($uriVariable) {
+                $identifier = $uriVariable->getIdentifiers()[0] ?? 'id';
             }
         }
 

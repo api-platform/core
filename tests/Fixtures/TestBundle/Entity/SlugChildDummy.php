@@ -39,7 +39,7 @@ class SlugChildDummy
      */
     #[ApiProperty(identifier: true)]
     #[ORM\Column(type: 'string', length: 255, unique: true)]
-    private ?string $slug = null;
+    private string $slug;
 
     #[ORM\ManyToOne(targetEntity: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy::class, inversedBy: 'childDummies')]
     #[ORM\JoinColumn(name: 'parent_dummy_id', referencedColumnName: 'id')]

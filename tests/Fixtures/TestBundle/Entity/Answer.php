@@ -46,7 +46,7 @@ class Answer
     #[Serializer\Groups(['foobar'])]
     private $question;
     /**
-     * @var Collection<int,\Question>
+     * @var Collection<int, Question>
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'answer')]
     #[Serializer\Groups(['foobar'])]

@@ -23,11 +23,11 @@ abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
     /**
-     * @var VoDummyDriver[]|Collection
+     * @var Collection<VoDummyDriver>
      */
     #[Groups(['car_read', 'car_write'])]
     #[ODM\ReferenceMany(targetDocument: VoDummyDriver::class, cascade: ['persist'])]
-    private readonly array|\Doctrine\Common\Collections\Collection $drivers;
+    private \Doctrine\Common\Collections\Collection $drivers;
 
     public function __construct(
         #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $make,
@@ -48,7 +48,7 @@ abstract class VoDummyVehicle
     }
 
     /**
-     * @return VoDummyDriver[]|Collection
+     * @return Collection<VoDummyDriver>
      */
     public function getDrivers()
     {

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Serializer\SerializerContextBuilder;
@@ -43,7 +44,7 @@ class SerializerContextBuilderTest extends TestCase
             new ApiResource(operations: [
                 'get' => $this->operation,
                 'post' => $this->operation->withName('post'),
-                'put' => $this->operation->withName('put')->withMethod(HttpOperation::METHOD_PUT),
+                'put' => (new Put(name: 'put'))->withOperation($this->operation),
                 'get_collection' => $this->operation->withName('get_collection'),
             ]),
         ]);
@@ -86,7 +87,7 @@ class SerializerContextBuilderTest extends TestCase
 
         $request = Request::create('/foos', 'PUT');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'put', '_api_format' => 'xml', '_api_mime_type' => 'text/xml']);
-        $expected = ['bar' => 'baz', 'operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => $this->operation->withName('put')->withMethod(HttpOperation::METHOD_PUT)];
+        $expected = ['bar' => 'baz', 'operation_name' => 'put', 'resource_class' => 'Foo', 'request_uri' => '/foos', 'api_allow_update' => true, 'uri' => 'http://localhost/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'skip_null_values' => true, 'operation' => (new Put(name: 'put'))->withOperation($this->operation)];
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
 
         $request = Request::create('/bars/1/foos');

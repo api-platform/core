@@ -46,7 +46,7 @@ class Dummy
     #[ApiProperty(iris: ['http://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
-    private ?string $name = null;
+    private string $name;
 
     /**
      * @var string|null The dummy name alias
@@ -103,7 +103,7 @@ class Dummy
     public ?RelatedDummy $relatedDummy;
 
     /**
-     * @var \Collection<int, RelatedDummy> Several dummies
+     * @var ArrayCollection<int, RelatedDummy> Several dummies
      */
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     public $relatedDummies;
