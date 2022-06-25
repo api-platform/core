@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Bundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
@@ -50,7 +49,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new GraphQlTypePass());
         $container->addCompilerPass(new GraphQlQueryResolverPass());
         $container->addCompilerPass(new GraphQlMutationResolverPass());
-        $container->addCompilerPass(new DeprecateMercurePublisherPass());
         $container->addCompilerPass(new MetadataAwareNameConverterPass());
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());

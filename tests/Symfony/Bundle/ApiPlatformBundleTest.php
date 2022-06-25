@@ -16,7 +16,6 @@ namespace ApiPlatform\Tests\Symfony\Bundle;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DeprecateMercurePublisherPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
@@ -45,7 +44,6 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlQueryResolverPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlMutationResolverPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(DeprecateMercurePublisherPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(TestClientPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
