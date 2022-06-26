@@ -55,7 +55,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      *
      * @return bool
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
         return static::FORMAT === $format && is_iterable($data);
     }

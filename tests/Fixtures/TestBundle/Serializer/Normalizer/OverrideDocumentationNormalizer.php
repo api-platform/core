@@ -54,7 +54,7 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
      * @param mixed|null $format
      * @param mixed      $data
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
