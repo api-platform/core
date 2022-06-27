@@ -39,7 +39,7 @@ class DoctrineMongoDbOdmSetup
     public static function createAnnotationMetadataConfiguration(array $paths, bool $isDevMode = false, string $proxyDir = null, string $hydratorDir = null, Cache $cache = null): Configuration
     {
         $config = self::createConfiguration($isDevMode, $proxyDir, $hydratorDir, $cache);
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths));
+        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver($paths)); // @phpstan-ignore-line
 
         return $config;
     }
