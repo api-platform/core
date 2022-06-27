@@ -122,7 +122,6 @@
             <argument type="service" id="api_platform.elasticsearch.client" />
             <argument type="service" id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner" />
         </service>
-        <service id="ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface" alias="api_platform.elasticsearch.identifier_extractor" />
 
     </services>
 

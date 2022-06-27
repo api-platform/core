@@ -15,14 +15,6 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource as ApiResourceAnnotation;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter as DoctrineOrmAbstractContextAwareFilter;
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -143,20 +135,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader->load('symfony/events.xml');
         $loader->load('api.xml');
-        $loader->load('v3/state.xml');
-
-        if ($config['metadata_backward_compatibility_layer']) {
-            $loader->load('legacy/api.xml');
-            $loader->load('legacy/data_provider.xml');
-            $loader->load('legacy/backward_compatibility.xml');
-        } else {
-            $loader->load('v3/api.xml');
-            $loader->load('legacy/data_provider.xml');
-            $loader->load('v3/backward_compatibility.xml');
-        }
-
-        $loader->load('data_persister.xml');
-        $loader->load('data_provider.xml');
+        $loader->load('state.xml');
         $loader->load('filter.xml');
 
         if (class_exists(Uuid::class)) {
@@ -544,12 +523,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
 
         $loader->load('doctrine_mongodb_odm.xml');
-
-        if (!$config['metadata_backward_compatibility_layer']) {
-            $loader->load('v3/doctrine_odm.xml');
-        } else {
-            $loader->load('legacy/doctrine_odm.xml');
-        }
     }
 
     private function registerHttpCacheConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -694,7 +667,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('elasticsearch.xml');
-        $loader->load('legacy/elasticsearch.xml');
 
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');

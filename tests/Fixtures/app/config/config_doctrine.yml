@@ -56,41 +56,20 @@ services:
         arguments: [ { 'relatedToDummyFriend.dummyFriend': 'exact', 'name': 'partial', 'age': 'exact' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_dummy.friends' } ]
 
-    app.related_dummy_resource.complex_sub_query_filter:
-        class: ApiPlatform\Tests\Fixtures\TestBundle\Filter\LegacyComplexSubQueryFilter
-        arguments: ['@doctrine']
-        tags: [ { name: 'api_platform.filter', id: 'related_dummy.complex_sub_query' } ]
-
     app.related_dummy_to_friend_resource.search_filter:
         parent:    'api_platform.doctrine.orm.search_filter'
         arguments: [ { 'name': 'ipartial', 'description': 'ipartial' } ]
         tags:      [ { name: 'api_platform.filter', id: 'related_to_dummy_friend.name' } ]
 
-    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\ProductItemDataProvider:
-        public: false
-        arguments:
-            $managerRegistry: '@doctrine'
-        tags:
-            -   name: 'api_platform.item_data_provider'
-
     ApiPlatform\Tests\Fixtures\TestBundle\State\ProductProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\ProductProvider'
-        public: false
         arguments:
             $managerRegistry: '@doctrine'
         tags:
             -  name: 'api_platform.state_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\TaxonItemDataProvider:
-        public: false
-        arguments:
-            $managerRegistry: '@doctrine'
-        tags:
-            -   name: 'api_platform.item_data_provider'
-
     ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\TaxonItemProvider'
-        public: false
         arguments:
             $managerRegistry: '@doctrine'
         tags:
@@ -98,7 +77,87 @@ services:
 
     app.dummy_dto_no_input.data_provider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
-        public: false
         arguments: ['@doctrine']
         tags:
             -  { name: 'api_platform.collection_data_provider' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
+        arguments: [ '@doctrine' ]
+        tags:
+            - { name: 'api_platform.state_processor' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\LengthFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\PatternFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\EnumFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
+        arguments:
+            $registry: '@doctrine'
+        tags:
+            - name: 'api_platform.state_processor'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProvider: 
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProcessor:
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
+        tags:
+            - name: 'api_platform.state_processor'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor: 
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
+        tags:
+            - name: 'api_platform.state_processor'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider: 
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+

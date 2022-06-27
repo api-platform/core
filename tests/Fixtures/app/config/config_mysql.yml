@@ -1,5 +1,7 @@
 imports:
-    - { resource: config_test.yml }
+    - { resource: config_common.yml }
+    - { resource: config_doctrine.yml }
+    - { resource: config_behat_orm.yml }
 
 parameters:
     env(DATABASE_URL): mysql://root:@localhost/api_platform_test

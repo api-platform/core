@@ -91,7 +91,9 @@ class ConfigurationTest extends TestCase
                 'json' => ['mime_types' => ['application/json']],
                 'html' => ['mime_types' => ['text/html']],
             ],
-            'patch_formats' => [],
+            'patch_formats' => [
+                'json' => ['mime_types' => ['application/merge-patch+json']],
+            ],
             'error_formats' => [
                 'jsonproblem' => ['mime_types' => ['application/problem+json']],
                 'jsonld' => ['mime_types' => ['application/ld+json']],

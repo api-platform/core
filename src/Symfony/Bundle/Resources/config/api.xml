@@ -116,17 +116,22 @@
             <tag name="cache.pool" />
         </service>
 
-        <!-- Iri Converter -->
-        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
-            <argument type="service" id="api_platform.state_provider" />
-            <argument type="service" id="api_platform.router" />
-            <argument type="service" id="api_platform.api.identifiers_extractor" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
+        <service id="api_platform.route_loader" class="ApiPlatform\Symfony\Routing\ApiLoader" public="false">
+            <argument type="service" id="kernel" />
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.uri_variables.converter" />
+            <argument type="service" id="service_container" />
+            <argument>%api_platform.formats%</argument>
+            <argument>%api_platform.resource_class_directories%</argument>
+            <argument>%api_platform.graphql.enabled%</argument>
+            <argument>%api_platform.enable_entrypoint%</argument>
+            <argument>%api_platform.enable_docs%</argument>
+            <argument>%api_platform.graphql.graphiql.enabled%</argument>
+            <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
             <argument>null</argument>
+
+            <tag name="routing.loader" />
         </service>
-        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <!-- Identifiers -->
         <service id="api_platform.api.identifiers_extractor" class="ApiPlatform\Api\IdentifiersExtractor" public="false">
@@ -153,5 +158,17 @@
             <tag name="api_platform.uri_variables.transformer" priority="-100" />
         </service>
 
+        <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
+
+        <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
+            <argument type="service" id="api_platform.state_provider" />
+            <argument type="service" id="api_platform.router" />
+            <argument type="service" id="api_platform.api.identifiers_extractor" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.uri_variables.converter" />
+            <argument>null</argument>
+        </service>
+        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
     </services>
 </container>
