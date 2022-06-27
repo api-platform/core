@@ -31,8 +31,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    protected static $defaultName = 'api:json-schema:generate';
-
     private SchemaFactoryInterface $schemaFactory;
     private $formats;
 
@@ -93,5 +91,10 @@ final class JsonSchemaGenerateCommand extends Command
         $io->text((string) json_encode($schema, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return 0;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'api:json-schema:generate';
     }
 }

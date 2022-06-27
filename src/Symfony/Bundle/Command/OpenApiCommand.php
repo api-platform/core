@@ -29,8 +29,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class OpenApiCommand extends Command
 {
-    protected static $defaultName = 'api:openapi:export';
-
     private OpenApiFactoryInterface $openApiFactory;
     private NormalizerInterface $normalizer;
 
@@ -90,5 +88,10 @@ final class OpenApiCommand extends Command
         $output->writeln($content);
 
         return 0;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'api:openapi:export';
     }
 }
