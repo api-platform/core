@@ -44,7 +44,7 @@ class CollectionFiltersNormalizerTest extends TestCase
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
-        $decoratedProphecy->supportsNormalization('foo', 'abc')->willReturn(true)->shouldBeCalled();
+        $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
