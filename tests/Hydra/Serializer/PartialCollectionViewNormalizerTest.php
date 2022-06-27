@@ -162,7 +162,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
     {
         $decoratedNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedNormalizerProphecy->willImplement(CacheableSupportsMethodInterface::class);
-        $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null)->willReturn(true)->shouldBeCalled();
+        $decoratedNormalizerProphecy->supportsNormalization(Argument::any(), null, Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $decoratedNormalizerProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 

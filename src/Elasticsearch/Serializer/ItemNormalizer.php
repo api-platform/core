@@ -72,13 +72,13 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
      *
      * @throws LogicException
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
             throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
-        return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsDenormalization($data, $type, $format);
+        return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsDenormalization($data, $type, $format, $context);
     }
 
     /**
@@ -92,7 +92,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
     }
