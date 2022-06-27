@@ -33,8 +33,6 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class SwaggerCommand extends Command
 {
-    protected static $defaultName = 'api:swagger:export';
-
     private $normalizer;
     private $resourceNameCollectionFactory;
     private $apiTitle;
@@ -114,5 +112,10 @@ final class SwaggerCommand extends Command
         }
 
         return 0;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'api:swagger:export';
     }
 }
