@@ -185,12 +185,6 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 continue;
             }
 
-            // TODO: remove in 3.0
-            if ($operation instanceof HttpOperation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation instanceof CollectionOperationInterface && !$operation->getUriVariables()) {
-                trigger_deprecation('api-platform', '2.7', sprintf('Identifiers on "%s" are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 the collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.', $operation->getShortName()));
-                continue;
-            }
-
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
