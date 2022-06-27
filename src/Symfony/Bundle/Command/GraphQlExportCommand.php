@@ -29,8 +29,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class GraphQlExportCommand extends Command
 {
-    protected static $defaultName = 'api:graphql:export';
-
     /** @var SchemaBuilderLegacyInterface|SchemaBuilderInterface */
     private $schemaBuilder;
 
@@ -78,6 +76,11 @@ class GraphQlExportCommand extends Command
         }
 
         return 0;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'api:graphql:export';
     }
 }
 
