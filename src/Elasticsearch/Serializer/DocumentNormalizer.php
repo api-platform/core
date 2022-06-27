@@ -47,7 +47,7 @@ final class DocumentNormalizer extends ObjectNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context); // @phpstan-ignore-line symfony bc-layer
     }
 
     /**
