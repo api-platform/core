@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Factory;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Factory\ItemMutationResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\ReadStageInterface;
@@ -25,6 +24,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\ValidateStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;

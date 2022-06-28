@@ -56,7 +56,6 @@
         </service>
 
         <service id="api_platform.graphql.serializer.context_builder" class="ApiPlatform\GraphQl\Serializer\SerializerContextBuilder" public="false">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
         </service>
         <service id="ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface" alias="api_platform.graphql.serializer.context_builder" />
