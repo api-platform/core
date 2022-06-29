@@ -91,11 +91,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        if (($context['output']['class'] ?? null) === $this->getObjectClass($data)) {
+        $class = $this->getObjectClass($data);
+        if (($context['output']['class'] ?? null) === $class) {
             return true;
         }
 
-        return $this->resourceClassResolver->isResourceClass($this->getObjectClass($data));
+        return $this->resourceClassResolver->isResourceClass($class);
     }
 
     /**
@@ -190,7 +191,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
             }
 
-            // $class = $inputClass;
             unset($context['input']);
             unset($context['operation']);
             unset($context['operation_name']);
@@ -214,12 +214,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
             $context['resource_class'] = $resourceClass;
         }
-
-        // Are we in a Request context?
-        // if ($context['operation'] ?? $context['operation_type'] ?? false) {
-        //     $resourceClass = $inputClass;
-        //     $context['resource_class'] = $inputClass;
-        // }
 
         if (\is_string($data)) {
             try {

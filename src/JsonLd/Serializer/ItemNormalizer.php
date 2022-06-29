@@ -79,7 +79,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
         $previousResourceClass = $context['resource_class'] ?? null;
-
         $metadata = [];
         if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
