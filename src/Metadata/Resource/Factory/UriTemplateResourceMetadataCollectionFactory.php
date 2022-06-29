@@ -126,7 +126,11 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             [] === $operation->getUriVariables() ||
             ($operation instanceof CollectionOperationInterface && null === $operation->getUriTemplate())
         )) {
-            return $operation;
+            if (null === $operation->getUriVariables()) {
+                return $operation;
+            }
+
+            return $this->normalizeUriVariables($operation);
         }
 
         if (!$operation->getUriVariables()) {
@@ -178,6 +182,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
     private function normalizeUriVariables($operation)
     {
         $uriVariables = (array) ($operation->getUriVariables() ?? []);
+
         $normalizedUriVariables = [];
         $resourceClass = $operation->getClass();
 

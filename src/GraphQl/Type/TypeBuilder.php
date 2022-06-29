@@ -115,7 +115,8 @@ final class TypeBuilder implements TypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
+                    $queryOperation = $this->getQueryOperation($resourceMetadataCollection);
+                    $queryNormalizationContext = $queryOperation ? ($queryOperation->getNormalizationContext() ?? []) : [];
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];

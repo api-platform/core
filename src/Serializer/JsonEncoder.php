@@ -71,7 +71,7 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format): bool
+    public function supportsDecoding($format, array $context = []): bool
     {
         return $this->format === $format;
     }

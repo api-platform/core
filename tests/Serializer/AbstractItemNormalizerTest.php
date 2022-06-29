@@ -171,6 +171,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn($relatedDummies);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummies, RelatedDummy::class)->willReturn(RelatedDummy::class);
@@ -236,6 +237,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
@@ -415,6 +417,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -480,6 +483,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
@@ -548,6 +552,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -616,6 +621,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummies, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
@@ -733,10 +739,9 @@ class AbstractItemNormalizerTest extends TestCase
             'input' => ['class' => DummyForAdditionalFieldsInput::class],
             'output' => ['class' => DummyForAdditionalFields::class],
         ];
-        $augmentedContext = $context + ['api_denormalize' => true];
 
         $preHydratedDummy = new DummyForAdditionalFieldsInput('Name Dummy');
-        $cleanedContext = array_diff_key($augmentedContext, [
+        $cleanedContext = array_diff_key($context, [
             'input' => null,
             'resource_class' => null,
         ]);
@@ -760,8 +765,8 @@ class AbstractItemNormalizerTest extends TestCase
         $inputDataTransformerProphecy = $this->prophesize(DataTransformerInitializerInterface::class);
         $inputDataTransformerProphecy->willImplement(DataTransformerInitializerInterface::class);
         $inputDataTransformerProphecy->initialize(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
-        $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $augmentedContext)->willReturn(true);
-        $inputDataTransformerProphecy->transform($dummyInputDto, DummyForAdditionalFields::class, $augmentedContext)->willReturn($dummy);
+        $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $context)->willReturn(true);
+        $inputDataTransformerProphecy->transform($dummyInputDto, DummyForAdditionalFields::class, $context)->willReturn($dummy);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
@@ -1225,7 +1230,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'nickname')->willThrow(new NoSuchPropertyException())->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, DummyTableInheritance::class)->willReturn(DummyTableInheritance::class)->shouldBeCalled();
+        $resourceClassResolverProphecy->getResourceClass(null, DummyTableInheritance::class)->willReturn(DummyTableInheritance::class);
         $resourceClassResolverProphecy->isResourceClass(DummyTableInheritance::class)->willReturn(true)->shouldBeCalled();
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
