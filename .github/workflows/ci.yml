@@ -504,8 +504,8 @@ jobs:
         run: composer update --no-interaction --no-progress --ansi
       - name: Require Symfony components
         run: composer require symfony/uid --dev --no-interaction --no-progress --ansi
-      - name: Run PHPUnit
-        run: vendor/bin/simple-phpunit
+      - name: Install PHPUnit
+        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
