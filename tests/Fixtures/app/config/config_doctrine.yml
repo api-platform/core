@@ -75,60 +75,6 @@ services:
         tags:
             -  name: 'api_platform.state_provider'
 
-    app.dummy_dto_no_input.data_provider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
-        arguments: ['@doctrine']
-        tags:
-            -  { name: 'api_platform.collection_data_provider' }
-
-    ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
-        arguments: [ '@doctrine' ]
-        tags:
-            - { name: 'api_platform.state_processor' }
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
-        arguments: ['@doctrine']
-        tags: ['api_platform.filter']
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
-        arguments: ['@doctrine']
-        tags: ['api_platform.filter']
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\LengthFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\PatternFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\EnumFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter:
-        arguments: [ '@doctrine' ]
-        tags: [ 'api_platform.filter' ]
-
-    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
-        arguments:
-            $registry: '@doctrine'
-        tags:
-            - name: 'api_platform.state_processor'
-
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
         arguments:
             $decorated: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
@@ -142,6 +88,19 @@ services:
         tags:
             - name: 'api_platform.state_provider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider: 
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
+        arguments:
+            $registry: '@doctrine'
+        tags:
+            - name: 'api_platform.state_processor'
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProcessor:
         arguments:
             $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
@@ -153,11 +112,4 @@ services:
             $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
         tags:
             - name: 'api_platform.state_processor'
-
-    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider: 
-        arguments:
-            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
-            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
-        tags:
-            - name: 'api_platform.state_provider'
 

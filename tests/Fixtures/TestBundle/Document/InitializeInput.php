@@ -15,9 +15,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InitializeInputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\InitializeInputProcessor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[ApiResource(input: InitializeInputDto::class)]
+#[ApiResource(input: InitializeInputDto::class, processor: InitializeInputProcessor::class)]
 #[ODM\Document]
 class InitializeInput
 {

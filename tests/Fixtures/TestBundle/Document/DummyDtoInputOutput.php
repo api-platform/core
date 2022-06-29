@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\InputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -25,7 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(input: InputDto::class, output: OutputDto::class)]
+#[ApiResource(input: InputDto::class, output: OutputDto::class, processor: DummyDtoInputOutputProcessor::class, provider: DummyDtoInputOutputProvider::class)]
 #[ODM\Document]
 class DummyDtoInputOutput
 {

@@ -42,14 +42,14 @@ class Dummy
     /**
      * @var string|null The dummy name
      */
-    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ApiProperty(iris: ['https://schema.org/name'])]
     #[Assert\NotBlank]
     #[ODM\Field(type: 'string')]
     private $name;
     /**
      * @var string|null The dummy name alias
      */
-    #[ApiProperty(types: ['http://schema.org/alternateName'])]
+    #[ApiProperty(iris: ['https://schema.org/alternateName'])]
     #[ODM\Field(nullable: true)]
     private $alias;
     /**
@@ -59,7 +59,7 @@ class Dummy
     /**
      * @var string|null A short description of the item
      */
-    #[ApiProperty(types: ['http://schema.org/description'])]
+    #[ApiProperty(iris: ['https://schema.org/description'])]
     #[ODM\Field(type: 'string', nullable: true)]
     public $description;
     /**
@@ -75,7 +75,7 @@ class Dummy
     /**
      * @var \DateTime|null A dummy date
      */
-    #[ApiProperty(types: ['http://schema.org/DateTime'])]
+    #[ApiProperty(iris: ['https://schema.org/DateTime'])]
     #[ODM\Field(type: 'date', nullable: true)]
     public $dummyDate;
     /**

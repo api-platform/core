@@ -20,6 +20,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy with custom GraphQL query resolvers.
+ *
+ * @author Lukas Lücke <lukas@luecke.me>
  */
 #[ORM\Entity]
 #[ApiResource(graphQlOperations: [

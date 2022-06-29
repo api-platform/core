@@ -27,11 +27,11 @@ abstract class VoDummyVehicle
      */
     #[Groups(['car_read', 'car_write'])]
     #[ODM\ReferenceMany(targetDocument: VoDummyDriver::class, cascade: ['persist'])]
-    private \Doctrine\Common\Collections\Collection $drivers;
+    private Collection $drivers;
 
     public function __construct(
-        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private readonly string $make,
-        #[Groups(['car_read', 'car_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyInsuranceCompany::class, cascade: ['persist'])] private readonly VoDummyInsuranceCompany $insuranceCompany,
+        #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $make,
+        #[Groups(['car_read', 'car_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyInsuranceCompany::class, cascade: ['persist'])] private VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
         $this->drivers = new ArrayCollection($drivers);

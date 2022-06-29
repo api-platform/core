@@ -46,8 +46,8 @@ class DummyEntityWithConstructor
      * @param DummyObjectWithoutConstructor[] $items
      */
     public function __construct(
-        #[ODM\Field] private readonly string $foo,
-        #[ODM\Field] private readonly string $bar,
+        #[ODM\Field] private string $foo,
+        #[ODM\Field] private string $bar,
         private readonly array $items
     ) {
     }

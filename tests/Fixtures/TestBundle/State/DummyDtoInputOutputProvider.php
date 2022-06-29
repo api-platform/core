@@ -15,6 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDtoInputOutput as DummyDtoInputOutputDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\Document\OutputDto as OutputDtoDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 
@@ -32,7 +34,7 @@ final class DummyDtoInputOutputProvider implements ProviderInterface
         /** @var DummyDtoInputOutput */
         $data = $this->decorated->provide($operation, $uriVariables, $context);
 
-        $outputDto = new OutputDto();
+        $outputDto = DummyDtoInputOutputDocument::class === $operation->getClass() ? new OutputDtoDocument() : new OutputDto();
         $outputDto->id = $data->id;
         $outputDto->baz = $data->num;
         $outputDto->bat = $data->str;

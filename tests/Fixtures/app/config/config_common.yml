@@ -347,4 +347,44 @@ services:
         arguments: ['@doctrine']
         tags: [ { name: 'api_platform.filter', id: 'related_dummy.complex_sub_query' } ]
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter:
+        arguments: ['@doctrine']
+        tags: ['api_platform.filter']
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\RequiredAllowEmptyFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\BoundsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\LengthFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\PatternFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\EnumFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\MultipleOfFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayItemsFilter:
+        arguments: [ '@doctrine' ]
+        tags: [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor'
+        arguments: [ '@doctrine' ]
+        tags:
+            - { name: 'api_platform.state_processor' }

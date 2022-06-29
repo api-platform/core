@@ -27,14 +27,14 @@ class Content implements \JsonSerializable
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
     #[ODM\Field(type: 'string')]
-    private ?string $contentType = null;
+    private string $contentType;
     /**
      * @var Collection<Field>
      */
     #[ODM\ReferenceMany(targetDocument: Field::class, mappedBy: 'content', strategy: 'set', cascade: ['persist'])]
     private \Doctrine\Common\Collections\Collection $fields;
     #[ODM\Field(type: 'string')]
-    private readonly string $status;
+    private string $status;
 
     public function __construct()
     {

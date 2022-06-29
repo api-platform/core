@@ -43,7 +43,7 @@ class Dummy
     /**
      * @var string The dummy name
      */
-    #[ApiProperty(iris: ['http://schema.org/name'])]
+    #[ApiProperty(iris: ['https://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
     private string $name;
@@ -82,7 +82,7 @@ class Dummy
     /**
      * @var \DateTime|null A dummy date
      */
-    #[ApiProperty(iris: ['http://schema.org/DateTime'])]
+    #[ApiProperty(iris: ['https://schema.org/DateTime'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
     public $dummyDate;
 

@@ -239,6 +239,7 @@ Feature: Documentation support
     Then the response status code should be 200
     And I should see text matching "openapi"
 
+  @!mongodb
   Scenario: Retrieve the OpenAPI documentation with API Gateway compatibility
     Given I send a "GET" request to "/docs.json?api_gateway=true"
     Then the response status code should be 200

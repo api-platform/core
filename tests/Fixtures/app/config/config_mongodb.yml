@@ -22,6 +22,7 @@ doctrine_mongodb:
 
 api_platform:
     doctrine: false
+    doctrine_mongodb_odm: true
     mapping:
         paths:
             - '%kernel.project_dir%/../TestBundle/Model'
@@ -97,20 +98,6 @@ services:
         tags:
             -  { name: 'api_platform.state_provider' }
 
-    # app.dummy_dto_no_input.data_provider:
-    #     class: 'ApiPlatform\Tests\Fixtures\TestBundle\DataProvider\DummyDtoNoInputCollectionDataProvider'
-    #     public: false
-    #     arguments: ['@doctrine_mongodb']
-    #     tags:
-    #         -  { name: 'api_platform.collection_data_provider' }
-    #
-    # app.dummy_dto_no_output_data_persister:
-    #     class: ApiPlatform\Tests\Fixtures\TestBundle\DataPersister\DummyDtoNoOutputDataPersister
-    #     arguments: ['@doctrine_mongodb']
-    #     public: false
-    #     tags:
-    #         -  { name: 'api_platform.data_persister' }
-
     app.graphql.query_resolver.dummy_custom_not_retrieved_item_document:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryNotRetrievedItemDocumentResolver'
         public: false
@@ -134,3 +121,42 @@ services:
         public: false
         tags:
             -  { name: 'messenger.message_handler' }
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProvider: 
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Odm\State\ItemProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProvider: 
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Odm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Odm\State\CollectionProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider: 
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Odm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Odm\State\CollectionProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoInputOutputProcessor: 
+        arguments:
+            $registry: '@doctrine_mongodb'
+        tags:
+            - name: 'api_platform.state_processor'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\DummyDtoNoInputsProcessor:
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
+        tags:
+            - name: 'api_platform.state_processor'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor: 
+        arguments:
+            $decorated: '@ApiPlatform\Doctrine\Common\State\PersistProcessor'
+        tags:
+            - name: 'api_platform.state_processor'
+

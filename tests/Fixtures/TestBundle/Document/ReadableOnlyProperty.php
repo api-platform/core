@@ -32,7 +32,7 @@ class ReadableOnlyProperty
      */
     #[ApiProperty(writable: false)]
     #[ODM\Field]
-    private readonly string $name;
+    private string $name;
 
     public function __construct()
     {
