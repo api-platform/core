@@ -67,7 +67,7 @@ trait OrderFilterTrait
 
     abstract protected function getProperties(): ?array;
 
-    abstract protected function normalizePropertyName($property): string;
+    abstract protected function normalizePropertyName($property);
 
     private function normalizeValue($value, string $property): ?string
     {

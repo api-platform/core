@@ -27,11 +27,15 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 abstract class DoctrineOrmFilterTestCase extends KernelTestCase
 {
-    protected $managerRegistry;
-    protected $repository;
-    protected $resourceClass = Dummy::class;
-    protected $alias = 'o';
-    protected $filterClass;
+    protected ManagerRegistry $managerRegistry;
+
+    protected EntityRepository $repository;
+
+    protected string $resourceClass = Dummy::class;
+
+    protected string $alias = 'o';
+
+    protected string $filterClass;
 
     protected function setUp(): void
     {

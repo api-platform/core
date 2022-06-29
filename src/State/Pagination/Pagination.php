@@ -106,13 +106,8 @@ final class Pagination
     {
         $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
-        $limit = $this->options['items_per_page'];
-        $clientLimit = $this->options['client_items_per_page'];
-
-        if ($operation) {
-            $limit = $operation->getPaginationItemsPerPage() ?? $this->options['items_per_page'];
-            $clientLimit = $operation->getPaginationClientItemsPerPage() ?? $this->options['client_items_per_page'];
-        }
+        $limit = $operation?->getPaginationItemsPerPage() ?? $this->options['items_per_page'];
+        $clientLimit = $operation?->getPaginationClientItemsPerPage() ?? $this->options['client_items_per_page'];
 
         if ($graphql && null !== ($first = $this->getParameterFromContext($context, 'first'))) {
             $limit = $first;
@@ -129,11 +124,7 @@ final class Pagination
 
         if ($clientLimit) {
             $limit = (int) $this->getParameterFromContext($context, $this->options['items_per_page_parameter_name'], $limit);
-            $maxItemsPerPage = $this->options['maximum_items_per_page'];
-
-            if ($operation) {
-                $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
-            }
+            $maxItemsPerPage = $operation?->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
 
             if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
                 $limit = $maxItemsPerPage;
@@ -211,10 +202,8 @@ final class Pagination
         $enabled = $this->options[$partial ? 'partial' : 'enabled'];
         $clientEnabled = $this->options[$partial ? 'client_partial' : 'client_enabled'];
 
-        if ($operation) {
-            $enabled = ($partial ? $operation->getPaginationPartial() : $operation->getPaginationEnabled()) ?? $enabled;
-            $clientEnabled = ($partial ? $operation->getPaginationClientPartial() : $operation->getPaginationClientEnabled()) ?? $clientEnabled;
-        }
+        $enabled = ($partial ? $operation?->getPaginationPartial() : $operation?->getPaginationEnabled()) ?? $enabled;
+        $clientEnabled = ($partial ? $operation?->getPaginationClientPartial() : $operation?->getPaginationClientEnabled()) ?? $clientEnabled;
 
         if ($clientEnabled) {
             return filter_var($this->getParameterFromContext($context, $this->options[$partial ? 'partial_parameter_name' : 'enabled_parameter_name'], $enabled), \FILTER_VALIDATE_BOOLEAN);
@@ -227,11 +216,7 @@ final class Pagination
     {
         $enabled = $this->graphQlOptions['enabled'];
 
-        if (!$operation) {
-            return $enabled;
-        }
-
-        return $operation->getPaginationEnabled() ?? $enabled;
+        return $operation?->getPaginationEnabled() ?? $enabled;
     }
 
     /**

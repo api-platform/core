@@ -160,7 +160,8 @@ class CollectionProviderTest extends TestCase
 
         $this->managerRegistryProphecy->getManagerForClass(ProviderEntity::class)->willReturn($managerProphecy->reveal())->shouldBeCalled();
 
-        $operation = (new GetCollection())->withName('bar')->withClass(ProviderEntity::class);
+        $operation = new GetCollection(name: 'bar', class: ProviderEntity::class);
+
         $extensionProphecy = $this->prophesize(AggregationCollectionExtensionInterface::class);
         $extensionProphecy->applyToCollection($aggregationBuilder, ProviderEntity::class, $operation, [])->shouldBeCalled();
 

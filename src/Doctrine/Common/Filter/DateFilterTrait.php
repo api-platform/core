@@ -55,7 +55,7 @@ trait DateFilterTrait
 
     abstract protected function getProperties(): ?array;
 
-    abstract protected function normalizePropertyName($property): string;
+    abstract protected function normalizePropertyName($property);
 
     /**
      * Determines whether the given property refers to a date field.

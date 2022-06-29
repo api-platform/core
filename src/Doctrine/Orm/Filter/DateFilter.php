@@ -128,9 +128,6 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
 
     /**
      * Adds the where clause according to the chosen null management.
-     *
-     * @param mixed           $value
-     * @param DBALType|string $type
      */
     protected function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, string $operator, mixed $value, string $nullManagement = null, DBALType|string $type = null)
     {

@@ -84,13 +84,8 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
         $options = [];
 
-        $forceEager = $this->forceEager;
-        $fetchPartial = $this->fetchPartial;
-
-        if ($operation) {
-            $forceEager = $operation->getForceEager() ?? $this->forceEager;
-            $fetchPartial = $operation->getFetchPartial() ?? $this->fetchPartial;
-        }
+        $forceEager = $operation?->getForceEager() ?? $this->forceEager;
+        $fetchPartial = $operation?->getFetchPartial() ?? $this->fetchPartial;
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
@@ -136,7 +131,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $currentDepth = $currentDepth > 0 ? $currentDepth - 1 : $currentDepth;
         $entityManager = $queryBuilder->getEntityManager();
         $classMetadata = $entityManager->getClassMetadata($resourceClass);
-        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($resourceClass)->getAttributesMetadata() : [];
+        $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($resourceClass)->getAttributesMetadata();
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
             // Don't join if max depth is enabled and the current depth limit is reached

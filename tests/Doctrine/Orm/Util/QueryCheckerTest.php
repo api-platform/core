@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Util;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker as LegacyQueryChecker;
 use ApiPlatform\Doctrine\Orm\Util\QueryChecker;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -205,110 +204,7 @@ class QueryCheckerTest extends TestCase
         $this->assertTrue(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
-     */
-    public function testHasOrderByOnToManyJoinWithoutJoin()
-    {
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-
-        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select('d');
-        $queryBuilder->from(Dummy::class, 'd');
-        $queryBuilder->orderBy('d.name', 'ASC');
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-
-        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
-     */
-    public function testHasOrderByOnToManyJoinWithoutOrderBy()
-    {
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-
-        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select('d', 'a_1');
-        $queryBuilder->from(Dummy::class, 'd');
-        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-
-        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
-     */
-    public function testHasOrderByOnToManyJoinNotFetchJoined()
-    {
-        $dummyMetadata = new ClassMetadata(Dummy::class);
-        $dummyMetadata->mapManyToMany([
-            'fieldName' => 'relatedDummies',
-            'targetEntity' => RelatedDummy::class,
-        ]);
-        $dummyMetadata->mapManyToOne([
-            'fieldName' => 'relatedDummy',
-            'targetEntity' => RelatedDummy::class,
-        ]);
-
-        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
-
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
-        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
-
-        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select('d', 'a_2');
-        $queryBuilder->from(Dummy::class, 'd');
-        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
-        $queryBuilder->leftJoin('d.relatedDummy', 'a_2');
-        $queryBuilder->orderBy('a_1.name', 'ASC');
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
-        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
-
-        $this->assertFalse(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The use of "ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryChecker::hasOrderByOnToManyJoin()" is deprecated since 2.4 and will be removed in 3.0. Use "ApiPlatform\Doctrine\Orm\Util\QueryChecker::hasOrderByOnFetchJoinedToManyAssociation()" instead.
-     */
-    public function testHasOrderByOnToManyWithJoinByAssociation()
-    {
-        $dummyMetadata = new ClassMetadata(Dummy::class);
-        $dummyMetadata->mapManyToMany([
-            'fieldName' => 'relatedDummies',
-            'targetEntity' => RelatedDummy::class,
-        ]);
-
-        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
-
-        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
-        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
-        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
-
-        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
-        $queryBuilder->select('d', 'a_1');
-        $queryBuilder->from(Dummy::class, 'd');
-        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
-        $queryBuilder->orderBy('a_1.name', 'ASC');
-
-        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
-        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
-        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
-
-        $this->assertTrue(LegacyQueryChecker::hasOrderByOnToManyJoin($queryBuilder, $managerRegistryProphecy->reveal()));
-    }
-
-    public function testHasJoinedToManyAssociationWithoutJoin()
+    public function testHasJoinedToManyAssociationWithoutJoin(): void
     {
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
 

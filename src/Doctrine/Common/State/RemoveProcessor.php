@@ -23,8 +23,7 @@ final class RemoveProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
 
-    /** @var ManagerRegistry */
-    private $managerRegistry;
+    private ManagerRegistry $managerRegistry;
 
     public function __construct(ManagerRegistry $managerRegistry)
     {

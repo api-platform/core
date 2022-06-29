@@ -29,8 +29,8 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class FilterEagerLoadingExtension implements QueryCollectionExtensionInterface
 {
-    private $resourceClassResolver;
-    private $forceEager;
+    private ?ResourceClassResolverInterface $resourceClassResolver;
+    private bool $forceEager;
 
     public function __construct(bool $forceEager = true, ResourceClassResolverInterface $resourceClassResolver = null)
     {
@@ -50,10 +50,7 @@ final class FilterEagerLoadingExtension implements QueryCollectionExtensionInter
         $em = $queryBuilder->getEntityManager();
         $classMetadata = $em->getClassMetadata($resourceClass);
 
-        $forceEager = $this->forceEager;
-        if ($operation) {
-            $forceEager = $operation->getForceEager() ?? $this->forceEager;
-        }
+        $forceEager = $operation?->getForceEager() ?? $this->forceEager;
 
         if (!$forceEager && !$this->hasFetchEagerAssociation($em, $classMetadata)) {
             return;

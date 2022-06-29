@@ -33,8 +33,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 final class PaginationExtension implements AggregationResultCollectionExtensionInterface
 {
-    private $managerRegistry;
-    private $pagination;
+    private ManagerRegistry $managerRegistry;
+    private Pagination $pagination;
 
     public function __construct(ManagerRegistry $managerRegistry, Pagination $pagination)
     {
@@ -113,7 +113,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
-        $attribute = $operation ? ($operation->getExtraProperties()['doctrine_mongodb'] ?? []) : [];
+        $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
         return new Paginator($aggregationBuilder->execute($executeOptions), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());

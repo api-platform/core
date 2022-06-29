@@ -273,39 +273,6 @@ class CollectionFiltersNormalizerTest extends TestCase
         $filterLocatorProphecy->has('foo')->willReturn(true)->shouldBeCalled();
         $filterLocatorProphecy->get('foo')->willReturn($filterProphecy->reveal())->shouldBeCalled();
 
-        $this->normalize($filterLocatorProphecy->reveal());
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The ApiPlatform\Core\Api\FilterCollection class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of Psr\Container\ContainerInterface instead.
-     */
-    public function testNormalizeWithDeprecatedFilterCollection()
-    {
-        $filterProphecy = $this->prophesize(FilterInterface::class);
-        $filterProphecy->getDescription(Dummy::class)->willReturn(['a' => ['property' => 'name', 'required' => true]])->shouldBeCalled();
-
-        $this->normalize(new FilterCollection(['foo' => $filterProphecy->reveal()]));
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testConstructWithInvalidFilterLocator()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "$filterLocator" argument is expected to be an implementation of the "Psr\\Container\\ContainerInterface" interface.');
-
-        new CollectionFiltersNormalizer(
-            $this->prophesize(NormalizerInterface::class)->reveal(),
-            $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
-            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            new \ArrayObject() // @phpstan-ignore-line
-        );
-    }
-
-    private function normalize($filterLocator)
-    {
         $dummy = new Dummy();
 
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);

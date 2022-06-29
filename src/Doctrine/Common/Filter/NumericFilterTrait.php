@@ -69,7 +69,7 @@ trait NumericFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property): string;
+    abstract protected function normalizePropertyName($property);
 
     /**
      * Determines whether the given property refers to a numeric field.

@@ -50,7 +50,7 @@ class CatDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
 
-        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([(new Get())->withShortName('Foo')]))]);
+        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([new Get(shortName: 'Foo')]))]);
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();
@@ -121,7 +121,7 @@ class CatDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
 
-        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([(new Get())->withShortName('Foo')]))]);
+        $resourceMetadata = new ResourceMetadataCollection(Foo::class, [(new ApiResource())->withOperations(new Operations([new Get(shortName: 'Foo')]))]);
 
         $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactory->create(Foo::class)->willReturn($resourceMetadata)->shouldBeCalled();

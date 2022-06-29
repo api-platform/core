@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
+use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 
 /**

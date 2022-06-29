@@ -38,7 +38,7 @@ class FilterExtensionTest extends TestCase
 
         $queryBuilder = $queryBuilderProphecy->reveal();
 
-        $operation = (new GetCollection())->withFilters(['dummyFilter', 'dummyBadFilter']);
+        $operation = new GetCollection(filters: ['dummyFilter', 'dummyBadFilter']);
 
         $ormFilterProphecy = $this->prophesize(FilterInterface::class);
         $ormFilterProphecy->apply($queryBuilder, new QueryNameGenerator(), Dummy::class, $operation, ['filters' => []])->shouldBeCalled();
@@ -63,6 +63,6 @@ class FilterExtensionTest extends TestCase
         $filterLocatorProphecy->get(Argument::cetera())->shouldNotBeCalled();
 
         $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
-        $filterExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, (new GetCollection())->withFilters(['dummyFilter', 'dummyBadFilter']));
+        $filterExtensionTest->applyToCollection($this->prophesize(QueryBuilder::class)->reveal(), new QueryNameGenerator(), Dummy::class, new GetCollection(filters: ['dummyFilter', 'dummyBadFilter']));
     }
 }

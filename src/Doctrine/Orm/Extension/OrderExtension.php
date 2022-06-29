@@ -28,7 +28,7 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class OrderExtension implements QueryCollectionExtensionInterface
 {
-    private $order;
+    private ?string $order;
 
     public function __construct(string $order = null)
     {
@@ -54,7 +54,7 @@ final class OrderExtension implements QueryCollectionExtensionInterface
 
         $classMetaData = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $identifiers = $classMetaData->getIdentifier();
-        $defaultOrder = $operation ? ($operation->getOrder() ?? []) : [];
+        $defaultOrder = $operation?->getOrder() ?? [];
 
         if ([] !== $defaultOrder) {
             foreach ($defaultOrder as $field => $order) {

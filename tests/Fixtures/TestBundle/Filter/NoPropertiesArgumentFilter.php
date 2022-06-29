@@ -17,9 +17,7 @@ use ApiPlatform\Api\FilterInterface;
 
 final class NoPropertiesArgumentFilter implements FilterInterface
 {
-    private $foo;
-
-    public function __construct($foo = 'bar')
+    public function __construct(private readonly string $foo = 'bar')
     {
     }
 
