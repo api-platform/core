@@ -1,10 +1,29 @@
 # Changelog
+=======
+
+## 2.7.0-beta.3
+
+* Metadata: use the HTTP method instead of an interface for writability (#4785)
+* Cache: IriConverter gets called only for resources (#4796)
+* JsonApi: Use skolem IRIs (#4796)
+* Metadata: Merge defaults instead of overriding (#4796)
+* ApiTestCase: Fix JSON Schema assertions (#4796)
+* Metadata: Cast YAML/XML values properly (#4800)
+* Symfony: fix deprecations (#4795 #4801 #4802)
+* Input/Output: backport serializer changes to make input/output work as resource classes without data transformers (#4804)
+* GraphQl: the SerializerContextBuilder interface changes to reflect operation instead of the operation name **BC** (#4804)
+
+## 2.7.0-beta.2
+
+* Processor: adds `previous_data` to the context (#4776)
+* Doctrine: fix filter binding (#4789)
+* Cache: fix headers not being read from metadata (#4777)
 
 ## 2.7.0-beta
 
-Json-Ld: property metadata types and iris (#4769)
-Symfony: write listener uri variables converter (#4774)
-Metadata: extra properties operation inheritance (#4773)
+* Json-Ld: property metadata types and iris (#4769)
+* Symfony: write listener uri variables converter (#4774)
+* Metadata: extra properties operation inheritance (#4773)
 
 **BC**
 
@@ -14,17 +33,17 @@ Doctrine: new interfaces for Filters and Extensions ready, switch to the `ApiPla
 
 ## 2.7.0-alpha.7
 
-Metadata: defaults deprecation (#4772)
+* Metadata: defaults deprecation (#4772)
 
 ## 2.7.0-alpha.6
 
-GraphQl: output creates its own type in TypeBuilder (#4766)
-Metadata: clear missing metadata cache pools (#4770)
-Metadata: property override when value is set (#4767)
-Metadata: add read and write to extractor (#4760) 
-JsonSchema: factory backward compatibility layer (#4758)
-Metadata: defaults properly overrides metadata (#4759) 
-Metadata: Add missing processor and provider to extractor (#4754)
+* GraphQl: output creates its own type in TypeBuilder (#4766)
+* Metadata: clear missing metadata cache pools (#4770)
+* Metadata: property override when value is set (#4767)
+* Metadata: add read and write to extractor (#4760) 
+* JsonSchema: factory backward compatibility layer (#4758)
+* Metadata: defaults properly overrides metadata (#4759) 
+* Metadata: Add missing processor and provider to extractor (#4754)
 
 ## 2.7.0-alpha.5
 
