@@ -97,19 +97,16 @@ trait ResourceExtractorTrait
         return $data;
     }
 
-    /**
-     * @return string[]
-     */
     private function buildValues(SimpleXMLElement $resource): array
     {
         $data = [];
         foreach ($resource->value as $value) {
             if (null !== $value->attributes()->name) {
-                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->buildValues($value->values) : (string) $value;
+                $data[(string) $value->attributes()->name] = isset($value->values) ? $this->buildValues($value->values) : XmlUtils::phpize($value->__toString());
                 continue;
             }
 
-            $data[] = isset($value->values) ? $this->buildValues($value->values) : (string) $value;
+            $data[] = isset($value->values) ? $this->buildValues($value->values) : XmlUtils::phpize($value->__toString());
         }
 
         return $data;

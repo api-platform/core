@@ -65,7 +65,7 @@ trait BooleanFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Determines whether the given property refers to a boolean field.

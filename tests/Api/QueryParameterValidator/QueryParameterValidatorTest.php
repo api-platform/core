@@ -64,6 +64,7 @@ class QueryParameterValidatorTest extends TestCase
     {
         $request = [];
 
+        $this->filterLocatorProphecy->has('some_inexistent_filter')->willReturn(false);
         $this->assertNull(
             $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)
         );
