@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.7.0-beta.3
+
+Metadata: use the HTTP method instead of an interface for writability (#4785)
+Cache: IriConverter gets called only for resources (#4796)
+JsonApi: Use skolem IRIs (#4796)
+Metadata: Merge defaults instead of overriding (#4796)
+ApiTestCase: Fix JSON Schema assertions (#4796)
+Metadata: Cast YAML/XML values properly (#4800)
+Symfony: fix deprecations (#4795 #4801 #4802)
+Input/Output: backport serializer changes to make input/output work as resource classes without data transformers (#4804)
+GraphQl: the SerializerContextBuilder interface changes to reflect operation instead of the operation name **BC** (#4804)
+
+## 2.7.0-beta.2
+
 ## 2.7.0-beta
 
 Json-Ld: property metadata types and iris (#4769)
