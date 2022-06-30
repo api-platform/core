@@ -16,24 +16,13 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
+#[ODM\Document]
 class Taxon implements TaxonInterface
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
-    /**
-     * @var string|null
-     *
-     * @ODM\Field(type="string")
-     */
-    private $code;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[ODM\Field(type: 'string')]
+    private ?string $code = null;
 
     /**
      * {@inheritdoc}

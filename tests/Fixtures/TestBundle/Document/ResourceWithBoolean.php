@@ -13,28 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource
- * @ODM\Document
- */
+#[ApiResource]
+#[ODM\Document]
 class ResourceWithBoolean
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
-    /**
-     * @var bool
-     *
-     * @ODM\Field(type="bool")
-     */
-    private $myBooleanField = false;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[ODM\Field(type: 'bool')]
+    private bool $myBooleanField = false;
 
     public function getId()
     {

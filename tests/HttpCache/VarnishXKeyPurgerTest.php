@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\HttpCache;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
+use ApiPlatform\Tests\ProphecyTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;

@@ -14,10 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer;
 
 use ApiPlatform\Api\IdentifiersExtractorInterface;
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Serializer\ItemNormalizer as BaseItemNormalizer;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
@@ -43,13 +44,13 @@ final class ItemNormalizer extends BaseItemNormalizer
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
 
     /**
-     * @var IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface
+     * @var IdentifiersExtractorInterface
      */
     private $identifiersExtractor;
 
-    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, ItemDataProviderInterface $itemDataProvider = null, bool $allowPlainIdentifiers = false, LoggerInterface $logger = null, iterable $dataTransformers = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, LoggerInterface $logger = null, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $itemDataProvider, $allowPlainIdentifiers, $logger ?: new NullLogger(), $dataTransformers, $resourceMetadataCollectionFactory, $resourceAccessChecker);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $logger ?: new NullLogger(), $resourceMetadataCollectionFactory, $resourceAccessChecker);
 
         $this->identifiersExtractor = $identifiersExtractor;
     }
@@ -57,9 +58,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
@@ -71,22 +72,28 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (isset($context['operation_name'])) {
-            unset($context['operation_name']);
-        }
+        $resourceClass = $this->getObjectClass($object);
 
-        if (null !== $this->getOutputClass($this->getObjectClass($object), $context)) {
+        if ($outputClass = $this->getOutputClass($resourceClass, $context)) {
+            $context['graphql_identifiers'] = [
+                self::ITEM_RESOURCE_CLASS_KEY => $context['operation']->getClass(),
+                self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null),
+            ];
+
             return parent::normalize($object, $format, $context);
         }
 
+        unset($context['operation_name'], $context['operation']);
         $data = parent::normalize($object, $format, $context);
         if (!\is_array($data)) {
             throw new UnexpectedValueException('Expected data to be an array.');
         }
 
-        if (!($context['no_resolver_data'] ?? false)) {
-            $data[self::ITEM_RESOURCE_CLASS_KEY] = $this->getObjectClass($object);
-            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object);
+        if (isset($context['graphql_identifiers'])) {
+            $data = $data + $context['graphql_identifiers'];
+        } elseif (!($context['no_resolver_data'] ?? false)) {
+            $data[self::ITEM_RESOURCE_CLASS_KEY] = $resourceClass;
+            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null);
         }
 
         return $data;
@@ -95,7 +102,7 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function normalizeCollectionOfRelations($propertyMetadata, $attributeValue, string $resourceClass, ?string $format, array $context): array
+    protected function normalizeCollectionOfRelations(ApiProperty $propertyMetadata, iterable $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
         // to-many are handled directly by the GraphQL resolver
         return [];
@@ -104,9 +111,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, string $type, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
 
     /**

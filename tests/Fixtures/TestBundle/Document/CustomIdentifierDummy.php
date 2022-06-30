@@ -13,30 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Identifier Dummy.
- *
- * @ApiResource
- * @ODM\Document
  */
+#[ApiResource]
+#[ODM\Document]
 class CustomIdentifierDummy
 {
     /**
      * @var int The custom identifier
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $customId;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $customId = null;
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
-    private $name;
+    #[ODM\Field]
+    private ?string $name = null;
 
     public function getCustomId(): int
     {

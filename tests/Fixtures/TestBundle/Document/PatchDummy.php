@@ -13,29 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "patch"={"input_formats"={"json"={"application/merge-patch+json"}, "jsonapi"}}
- *     }
- * )
- * @ODM\Document
  */
+#[ApiResource(operations: [new Get(), new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'jsonapi'], normalizationContext: ['skip_null_values' => true]), new Post(), new GetCollection()])]
+#[ODM\Document]
 class PatchDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
-
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     public $name;
 }

@@ -13,69 +13,43 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithoutConstructor;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Dummy entity built with constructor.
+ *
  * https://github.com/api-platform/core/issues/1747.
  *
  * @author Maxime Veber <maxime.veber@nekland.fr>
- *
- * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "put"={"denormalization_context"={"groups"={"put"}}}
- *     }
- * )
- * @ODM\Document
  */
+#[ApiResource(operations: [new Get(), new Put(denormalizationContext: ['groups' => ['put']]), new Post(), new GetCollection()])]
+#[ODM\Document]
 class DummyEntityWithConstructor
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     */
-    private $foo;
-
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     */
-    private $bar;
-
-    /**
-     * @var string|null
-     *
-     * @ODM\Field(nullable=true)
-     * @Groups({"put"})
-     */
-    private $baz;
-
-    /**
-     * @var DummyObjectWithoutConstructor[]
-     */
-    private $items;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[Groups(['put'])]
+    #[ODM\Field(nullable: true)]
+    private ?string $baz = null;
 
     /**
      * @param DummyObjectWithoutConstructor[] $items
      */
-    public function __construct(string $foo, string $bar, array $items)
-    {
-        $this->foo = $foo;
-        $this->bar = $bar;
-        $this->items = $items;
+    public function __construct(
+        #[ODM\Field] private string $foo,
+        #[ODM\Field] private string $bar,
+        private readonly array $items
+    ) {
     }
 
     public function getId(): ?int

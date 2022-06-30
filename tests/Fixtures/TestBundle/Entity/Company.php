@@ -19,9 +19,6 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
 #[Get]
 #[Post]
@@ -38,22 +35,21 @@ use Doctrine\ORM\Mapping as ORM;
         'employeeId' => ['from_class' => Employee::class, 'from_property' => 'company'],
     ],
 )]
+#[ORM\Entity]
 class Company
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public string $name;
 
     /** @var Employee[] */

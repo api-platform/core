@@ -565,4 +565,4 @@ Feature: GraphQL introspection support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "errors[0].debugMessage" should be equal to 'Type with id "VoDummyInspectionCursorConnection" is not present in the types container'
     And the JSON node "data.typeNotAvailable" should be null
-    And the JSON node "data.typeOwner.fields[3].type.name" should be equal to "VoDummyInspectionCursorConnection"
+    And the JSON node "data.typeOwner.fields[1].type.name" should be equal to "VoDummyInspectionCursorConnection"

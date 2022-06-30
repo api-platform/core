@@ -13,34 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class DummyBoolean
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
-    /**
-     * @var bool|null
-     *
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isDummyBoolean;
-
-    public function __construct(bool $isDummyBoolean)
+    public function __construct(#[ORM\Column(type: 'boolean', nullable: true)] private readonly ?bool $isDummyBoolean)
     {
-        $this->isDummyBoolean = $isDummyBoolean;
     }
 
     public function getId()

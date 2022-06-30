@@ -34,5 +34,3 @@ final class FilterValidationException extends \Exception implements ExceptionInt
         return implode("\n", $this->constraintViolationList);
     }
 }
-
-class_alias(FilterValidationException::class, \ApiPlatform\Core\Exception\FilterValidationException::class);

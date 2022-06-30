@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ArrayRequiredFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
@@ -23,29 +23,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Julien Deniau <julien.deniau@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource(attributes={
- *     "filters"={
- *         ArrayRequiredFilter::class
- *     }
- * })
- * @ODM\Document
  */
+#[ApiResource(filters: [ArrayRequiredFilter::class])]
+#[ODM\Document]
 class ArrayFilterValidator
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
     /**
      * @var string A name
-     *
-     * @ODM\Field
-     * @ApiProperty(iri="http://schema.org/name")
      */
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ODM\Field]
     private $name;
 
     public function getId()

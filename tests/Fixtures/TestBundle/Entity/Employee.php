@@ -19,9 +19,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource]
 #[Post]
 #[ApiResource(
@@ -39,28 +36,25 @@ use Doctrine\ORM\Mapping as ORM;
     ]
 )]
 #[GetCollection]
+#[ORM\Entity]
 class Employee
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
-     */
-    public ?Company $company;
+    #[ORM\ManyToOne(targetEntity: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company::class)]
+    public ?Company $company = null;
 
     public function getId()
     {

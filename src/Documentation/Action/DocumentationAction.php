@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Documentation\Action;
 
-use ApiPlatform\Core\Api\FormatsProviderInterface;
-use ApiPlatform\Core\OpenApi\Factory\OpenApiFactoryInterface as LegacyOpenApiFactoryInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -29,51 +27,25 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class DocumentationAction
 {
-    private $resourceNameCollectionFactory;
-    private $title;
-    private $description;
-    private $version;
-    private $formats;
-    private $formatsProvider;
-    private $swaggerVersions;
-    private $openApiFactory;
+    private ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory;
+    private string $title;
+    private string $description;
+    private string $version;
+    private OpenApiFactoryInterface $openApiFactory;
 
-    /**
-     * @param int[]                                                 $swaggerVersions
-     * @param mixed|array|FormatsProviderInterface                  $formatsProvider
-     * @param LegacyOpenApiFactoryInterface|OpenApiFactoryInterface $openApiFactory
-     */
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', $formatsProvider = null, array $swaggerVersions = [2, 3], $openApiFactory = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, string $title = '', string $description = '', string $version = '', OpenApiFactoryInterface $openApiFactory = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->title = $title;
         $this->description = $description;
         $this->version = $version;
-        $this->swaggerVersions = $swaggerVersions;
         $this->openApiFactory = $openApiFactory;
-
-        if (null === $openApiFactory) {
-            @trigger_error(sprintf('Not passing an instance of "%s" as 7th parameter of the constructor of "%s" is deprecated since API Platform 2.6', OpenApiFactoryInterface::class, __CLASS__), \E_USER_DEPRECATED);
-        }
-
-        if (null === $formatsProvider) {
-            return;
-        }
-
-        @trigger_error(sprintf('Passing an array or an instance of "%s" as 5th parameter of the constructor of "%s" is deprecated since API Platform 2.5', FormatsProviderInterface::class, __CLASS__), \E_USER_DEPRECATED);
-        if (\is_array($formatsProvider)) {
-            $this->formats = $formatsProvider;
-
-            return;
-        }
-
-        $this->formatsProvider = $formatsProvider;
     }
 
     public function __invoke(Request $request = null): DocumentationInterface
     {
         if (null !== $request) {
-            $context = ['base_url' => $request->getBaseUrl(), 'spec_version' => $request->query->getInt('spec_version', $this->swaggerVersions[0] ?? 3)];
+            $context = ['base_url' => $request->getBaseUrl()];
             if ($request->query->getBoolean('api_gateway')) {
                 $context['api_gateway'] = true;
             }
@@ -82,17 +54,10 @@ final class DocumentationAction
             $attributes = RequestAttributesExtractor::extractAttributes($request);
         }
 
-        // BC check to be removed in 3.0
-        if (null !== $this->formatsProvider) {
-            $this->formats = $this->formatsProvider->getFormatsFromAttributes($attributes ?? []);
-        }
-
-        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory && 3 === ($context['spec_version'] ?? null)) {
+        if ('json' === $request->getRequestFormat() && null !== $this->openApiFactory) {
             return $this->openApiFactory->__invoke($context ?? []);
         }
 
-        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version, $this->formats);
+        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
     }
 }
-
-class_alias(DocumentationAction::class, \ApiPlatform\Core\Documentation\Action\DocumentationAction::class);

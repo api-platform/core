@@ -65,7 +65,7 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException || $data instanceof LegacyFlattenException);
     }
@@ -78,5 +78,3 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         return true;
     }
 }
-
-class_alias(ErrorNormalizer::class, \ApiPlatform\Core\Problem\Serializer\ErrorNormalizer::class);

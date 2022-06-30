@@ -13,36 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Item.
- *
- * @ApiResource
- * @ORM\Entity
  */
-class CompositeItem
+#[ApiResource]
+#[ORM\Entity]
+class CompositeItem implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
     private $field1;
-
-    /**
-     * @ORM\OneToMany(targetEntity="CompositeRelation", mappedBy="compositeItem", fetch="EAGER")
-     * @Groups({"default"})
-     */
+    #[ORM\OneToMany(targetEntity: CompositeRelation::class, mappedBy: 'compositeItem', fetch: 'EAGER')]
+    #[Groups(['default'])]
     private $compositeValues;
 
     /**

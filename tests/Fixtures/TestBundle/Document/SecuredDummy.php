@@ -13,8 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
@@ -25,135 +32,92 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource(
- *     attributes={"security"="is_granted('ROLE_USER')"},
- *     collectionOperations={
- *         "get"={"security"="is_granted('ROLE_USER') or is_granted('ROLE_ADMIN')"},
- *         "get_from_data_provider_generator"={
- *             "method"="GET",
- *             "path"="custom_data_provider_generator",
- *             "security"="is_granted('ROLE_USER')"
- *         },
- *         "post"={"security"="is_granted('ROLE_ADMIN')"}
- *     },
- *     itemOperations={
- *         "get"={"security"="is_granted('ROLE_USER') and object.getOwner() == user"},
- *         "put"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() == user"},
- *     },
- *     graphql={
- *         "item_query"={"security"="is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.getOwner() == user)"},
- *         "collection_query"={"security"="is_granted('ROLE_ADMIN')"},
- *         "delete"={},
- *         "update"={"security_post_denormalize"="is_granted('ROLE_USER') and previous_object.getOwner() ==  user"},
- *         "create"={"security"="is_granted('ROLE_ADMIN')", "security_message"="Only admins can create a secured dummy."}
- *     }
- * )
- * @ODM\Document
  */
+#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_USER\') and object.getOwner() == user'), new Put(securityPostDenormalize: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() == user'), new GetCollection(security: 'is_granted(\'ROLE_USER\') or is_granted(\'ROLE_ADMIN\')'), new GetCollection(uriTemplate: 'custom_data_provider_generator', security: 'is_granted(\'ROLE_USER\')'), new Post(security: 'is_granted(\'ROLE_ADMIN\')')], graphQlOperations: [new Query(name: 'item_query', security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_USER\') and object.getOwner() == user)'), new QueryCollection(name: 'collection_query', security: 'is_granted(\'ROLE_ADMIN\')'), new Mutation(name: 'delete'), new Mutation(name: 'update', securityPostDenormalize: 'is_granted(\'ROLE_USER\') and previous_object.getOwner() ==  user'), new Mutation(name: 'create', security: 'is_granted(\'ROLE_ADMIN\')', securityMessage: 'Only admins can create a secured dummy.')], security: 'is_granted(\'ROLE_USER\')')]
+#[ODM\Document]
 class SecuredDummy
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
     /**
      * @var string|null The title
-     *
-     * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $title;
+    #[Assert\NotBlank]
+    #[ODM\Field]
+    private ?string $title = null;
 
     /**
      * @var string The description
-     *
-     * @ODM\Field
      */
-    private $description = '';
+    #[ODM\Field]
+    private string $description = '';
 
     /**
      * @var string The dummy secret property, only readable/writable by specific users
-     *
-     * @ODM\Field
-     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
-    private $adminOnlyProperty = '';
+    #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    #[ODM\Field]
+    private ?string $adminOnlyProperty = '';
 
     /**
      * @var string Secret property, only readable/writable by owners
-     *
-     * @ODM\Field
-     * @ApiProperty(
-     *     security="object == null or object.getOwner() == user",
-     *     securityPostDenormalize="object.getOwner() == user",
-     * )
      */
-    private $ownerOnlyProperty = '';
+    #[ApiProperty(security: 'object == null or object.getOwner() == user', securityPostDenormalize: 'object.getOwner() == user')]
+    #[ODM\Field]
+    private ?string $ownerOnlyProperty = '';
 
     /**
      * @var string|null The owner
-     *
-     * @ODM\Field
-     * @Assert\NotBlank
      */
-    private $owner;
+    #[Assert\NotBlank]
+    #[ODM\Field]
+    private ?string $owner = null;
 
     /**
      * @var Collection<RelatedDummy> Several dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public $relatedDummies;
 
     /**
      * @var RelatedDummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_ADMIN')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
+    #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     protected $relatedDummy;
 
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
      * @var Collection<RelatedSecuredDummy> Several dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_USER')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_USER')")]
+    #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     public $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      *
      * @var RelatedSecuredDummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
-     * @ApiProperty(security="is_granted('ROLE_USER')")
      */
+    #[ApiProperty(security: "is_granted('ROLE_USER')")]
+    #[ODM\ReferenceOne(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     protected $relatedSecuredDummy;
-
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
      * @var Collection<RelatedSecuredDummy> Several dummies
-     *
-     * @ODM\ReferenceMany(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceMany(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     public $publicRelatedSecuredDummies;
-
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      *
      * @var RelatedSecuredDummy
-     *
-     * @ODM\ReferenceOne(targetDocument=RelatedSecuredDummy::class, storeAs="id", nullable=true)
      */
+    #[ODM\ReferenceOne(targetDocument: RelatedSecuredDummy::class, storeAs: 'id', nullable: true)]
     protected $publicRelatedSecuredDummy;
 
     public function __construct()

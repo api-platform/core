@@ -139,6 +139,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'paginationMaximumItemsPerPage' => $this->phpize($resource, 'paginationMaximumItemsPerPage', 'integer'),
             'paginationPartial' => $this->phpize($resource, 'paginationPartial', 'bool'),
             'paginationType' => $this->phpize($resource, 'paginationType', 'string'),
+            'processor' => $this->phpize($resource, 'processor', 'string'),
+            'provider' => $this->phpize($resource, 'provider', 'string'),
             'security' => $this->phpize($resource, 'security', 'string'),
             'securityMessage' => $this->phpize($resource, 'securityMessage', 'string'),
             'securityPostDenormalize' => $this->phpize($resource, 'securityPostDenormalize', 'string'),
@@ -155,6 +157,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'extraProperties' => $this->buildArrayValue($resource, 'extraProperties'),
             'mercure' => $this->buildMercure($resource),
             'messenger' => $this->buildMessenger($resource),
+            'read' => $this->phpize($resource, 'read', 'bool'),
+            'write' => $this->phpize($resource, 'write', 'bool'),
         ];
     }
 

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener\JsonApi;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\EventListener\JsonApi\TransformPaginationParametersListener;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -82,7 +82,7 @@ class TransformPaginationParametersListenerTest extends TestCase
 
         $filters = ['size' => 5, 'number' => 3, 'error' => -1];
 
-        $expectedRequest = new Request(['page' => $filters], [], ['_api_pagination' => $filters, '_api_filters' => $filters]);
+        $expectedRequest = new Request(['page' => $filters], [], ['_api_filters' => $filters]);
         $expectedRequest->setRequestFormat('jsonapi');
 
         $this->assertEquals($expectedRequest, $request);

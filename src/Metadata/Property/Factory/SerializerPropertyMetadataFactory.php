@@ -65,6 +65,10 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups);
 
+        if (!$this->isResourceClass($resourceClass) && ($builtinType = $propertyMetadata->getBuiltinTypes()[0] ?? null) && $builtinType->isCollection()) {
+            return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
+        }
+
         return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups);
     }
 
@@ -158,7 +162,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * Groups are extracted in the following order:
      *
      * - From the "serializer_groups" key of the $options array.
-     * - From metadata of the given operation ("collection_operation_name" and "item_operation_name" keys).
+     * - From metadata of the given operation ("operation_name" key).
      * - From metadata of the current resource.
      *
      * @throws ResourceClassNotFoundException

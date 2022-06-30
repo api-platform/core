@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Type;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Type\FieldsBuilderInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
@@ -28,6 +27,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\TestCase;

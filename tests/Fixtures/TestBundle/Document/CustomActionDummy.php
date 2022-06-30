@@ -13,41 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * @ODM\Document
- * @ApiResource(itemOperations={
- *     "get",
- *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies/{id}"},
- *     "custom_normalization"={"method"="GET", "route_name"="custom_normalization"},
- *     "short_custom_normalization"={"method"="GET", "route_name"="short_custom_normalization"},
- * },
- * collectionOperations={
- *     "get",
- *     "get_custom"={"method"="GET", "path"="custom_action_collection_dummies"},
- *     "custom_denormalization"={"method"="POST", "route_name"="custom_denormalization"},
- *     "short_custom_denormalization"={"method"="GET", "route_name"="short_custom_denormalization"},
- * })
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(operations: [new Get(), new Get(uriTemplate: 'custom_action_collection_dummies/{id}'), new Get(routeName: 'custom_normalization'), new Get(routeName: 'short_custom_normalization'), new GetCollection(), new GetCollection(uriTemplate: 'custom_action_collection_dummies'), new Post(routeName: 'custom_denormalization'), new GetCollection(routeName: 'short_custom_denormalization')])]
+#[ODM\Document]
 class CustomActionDummy
 {
-    /**
-     * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * @ODM\Field
-     */
-    private $foo = '';
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[ODM\Field]
+    private string $foo = '';
 
     public function getId(): ?int
     {

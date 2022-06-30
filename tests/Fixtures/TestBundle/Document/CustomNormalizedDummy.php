@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,41 +23,34 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Custom Normalized Dummy.
  *
  * @author Mikaël Labrut <labrut@gmail.com>
- *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"output"}},
- *     "denormalization_context"={"groups"={"input"}}
- * })
- * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['output']], denormalizationContext: ['groups' => ['input']])]
+#[ODM\Document]
 class CustomNormalizedDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     * @Groups({"input", "output"})
      */
-    private $id;
+    #[Groups(['input', 'output'])]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"input", "output"})
      */
-    private $name;
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[Assert\NotBlank]
+    #[Groups(['input', 'output'])]
+    #[ODM\Field]
+    private ?string $name = null;
 
     /**
      * @var string|null The dummy name alias
-     *
-     * @ODM\Field(nullable=true)
-     * @ApiProperty(iri="https://schema.org/alternateName")
-     * @Groups({"input", "output"})
      */
-    private $alias;
+    #[ApiProperty(types: ['http://schema.org/alternateName'])]
+    #[Groups(['input', 'output'])]
+    #[ODM\Field(nullable: true)]
+    private ?string $alias = null;
 
     public function getId(): ?int
     {

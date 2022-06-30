@@ -13,28 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource
- * @ORM\Entity
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource]
+#[ORM\Entity]
 class Relation2
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
     public $id;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Relation1", mappedBy="relation2")
-     */
+    #[ORM\OneToMany(targetEntity: Relation1::class, mappedBy: 'relation2')]
     public $relation1s;
 
     public function __construct()

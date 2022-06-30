@@ -19,7 +19,7 @@ namespace ApiPlatform\Tests\Doctrine\Common\Filter;
  */
 trait SearchFilterTestTrait
 {
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $filter = $this->buildSearchFilter($this->managerRegistry, [
             'id' => null,

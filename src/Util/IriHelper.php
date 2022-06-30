@@ -64,11 +64,6 @@ final class IriHelper
             $parameters[$pageParameterName] = $page;
         }
 
-        if (\is_bool($urlGenerationStrategy)) {
-            @trigger_error(sprintf('Passing a bool as 5th parameter to "%s::createIri()" is deprecated since API Platform 2.6. Pass an "%s" constant (int) instead.', __CLASS__, UrlGeneratorInterface::class), \E_USER_DEPRECATED);
-            $urlGenerationStrategy = $urlGenerationStrategy ? UrlGeneratorInterface::ABS_URL : UrlGeneratorInterface::ABS_PATH;
-        }
-
         $query = http_build_query($parameters, '', '&', \PHP_QUERY_RFC3986);
         $parts['query'] = preg_replace('/%5B\d+%5D/', '%5B%5D', $query);
 
@@ -113,5 +108,3 @@ final class IriHelper
         return $url;
     }
 }
-
-class_alias(IriHelper::class, \ApiPlatform\Core\Util\IriHelper::class);

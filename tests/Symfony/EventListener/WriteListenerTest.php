@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -31,6 +30,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Symfony\EventListener\WriteListener;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AttributeResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OperationResource;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,9 +63,6 @@ class WriteListenerTest extends TestCase
         $this->resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testOnKernelViewWithControllerResultAndPersist()
     {
         $operationResource = new OperationResource(1, 'foo');
@@ -95,15 +92,12 @@ class WriteListenerTest extends TestCase
             $request->setMethod($httpMethod);
             $request->attributes->set('_api_operation_name', sprintf('_api_%s_%s%s', 'OperationResource', strtolower($httpMethod), 'POST' === $httpMethod ? '_collection' : ''));
 
-            (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+            (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
             $this->assertSame($operationResource, $event->getControllerResult());
             $this->assertEquals('/operation_resources/1', $request->attributes->get('_api_write_item_iri'));
         }
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testOnKernelViewDoNotCallIriConverterWhenOutputClassDisabled()
     {
         $operationResource = new OperationResource(1, 'foo');
@@ -129,12 +123,9 @@ class WriteListenerTest extends TestCase
             $operationResource
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testOnKernelViewWithControllerResultAndRemove()
     {
         $operationResource = new OperationResource(1, 'foo');
@@ -158,27 +149,25 @@ class WriteListenerTest extends TestCase
             $operationResource
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testOnKernelViewWithSafeMethod()
     {
         $operationResource = new OperationResource(1, 'foo');
+        $operation = (new Get())->withName('_api_OperationResource_get');
 
-        $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], Argument::type('array'))->willReturn($operationResource)->shouldNotBeCalled();
+        $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], ['operation' => $operation, 'resource_class' => OperationResource::class, 'previous_data' => 'test'])->willReturn($operationResource)->shouldNotBeCalled();
 
         $this->iriConverterProphecy->getIriFromResource($operationResource)->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_get' => (new Get())->withName('_api_OperationResource_get'),
+            '_api_OperationResource_get' => $operation,
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
 
-        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_get']);
+        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_get', 'previous_data' => 'test']);
         $request->setMethod('GET');
 
         $event = new ViewEvent(
@@ -188,12 +177,9 @@ class WriteListenerTest extends TestCase
             $operationResource
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testDoNotWriteWhenControllerResultIsResponse()
     {
         $this->processorProphecy->process(Argument::cetera())->shouldNotBeCalled();
@@ -209,12 +195,9 @@ class WriteListenerTest extends TestCase
             $response
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testDoNotWriteWhenCant()
     {
         $operationResource = new OperationResource(1, 'foo');
@@ -237,12 +220,9 @@ class WriteListenerTest extends TestCase
             $operationResource
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testOnKernelViewWithNoResourceClass()
     {
         $operationResource = new OperationResource(1, 'foo');
@@ -262,12 +242,9 @@ class WriteListenerTest extends TestCase
             $operationResource
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 
-    /**
-     * @requires PHP 8.0
-     */
     public function testOnKernelViewInvalidIdentifiers()
     {
         $attributeResource = new AttributeResource(1, 'name');
@@ -296,6 +273,6 @@ class WriteListenerTest extends TestCase
             $attributeResource
         );
 
-        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal(), $this->resourceClassResolver->reveal()))->onKernelView($event);
+        (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
     }
 }

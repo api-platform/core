@@ -19,7 +19,6 @@ use ApiPlatform\Tests\Doctrine\Common\Filter\ExistsFilterTestTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
@@ -28,9 +27,9 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 {
     use ExistsFilterTestTrait;
 
-    protected $filterClass = ExistsFilter::class;
+    protected string $filterClass = ExistsFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 
@@ -95,11 +94,11 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 
     public function provideApplyTestData(): array
     {
-        $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists');
+        $existsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
+            return new ExistsFilter($managerRegistry, null, $properties, 'exists');
         };
-        $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-            return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'customExists');
+        $customExistsFilterFactory = function (ManagerRegistry $managerRegistry, array $properties = null): ExistsFilter {
+            return new ExistsFilter($managerRegistry, null, $properties, 'customExists');
         };
 
         return array_merge_recursive(
@@ -228,61 +227,8 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
         );
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The ExistsFilter syntax "description[exists]=true/false" is deprecated since 2.5. Use the syntax "exists[description]=true/false" instead.
-     */
-    public function testLegacyExistsAfterSyntax()
-    {
-        $args = [
-            [
-                'description' => null,
-            ],
-            [
-                'description' => [
-                    'exists' => 'true',
-                ],
-            ],
-            sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-            null,
-            function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists');
-            },
-        ];
-
-        $this->testApply(...$args);
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation Passing an instance of "Symfony\Component\HttpFoundation\RequestStack" is deprecated since 2.2. Use "filters" context key instead.
-     * @expectedDeprecation Using "ApiPlatform\Doctrine\Orm\Filter\AbstractFilter::apply()" is deprecated since 2.2. Use "ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter::apply()" with the "filters" context key instead.
-     * @expectedDeprecation The use of "ApiPlatform\Doctrine\Orm\Filter\AbstractFilter::extractProperties()" is deprecated since 2.2. Use the "filters" key of the context instead.
-     * @expectedDeprecation The ExistsFilter syntax "description[exists]=true/false" is deprecated since 2.5. Use the syntax "exists[description]=true/false" instead.
-     */
-    public function testLegacyRequest()
-    {
-        $args = [
-            [
-                'description' => null,
-            ],
-            [
-                'description' => [
-                    'exists' => 'true',
-                ],
-            ],
-            sprintf('SELECT o FROM %s o WHERE o.description IS NOT NULL', Dummy::class),
-            null,
-            function (ManagerRegistry $managerRegistry, array $properties = null, RequestStack $requestStack = null): ExistsFilter {
-                return new ExistsFilter($managerRegistry, $requestStack, null, $properties, 'exists', new CustomConverter());
-            },
-        ];
-
-        $this->testApplyRequest(...$args);
-    }
-
     protected function buildFilter(?array $properties = null)
     {
-        return new $this->filterClass($this->managerRegistry, null, null, $properties, 'exists', new CustomConverter());
+        return new $this->filterClass($this->managerRegistry, null, $properties, 'exists', new CustomConverter());
     }
 }

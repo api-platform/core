@@ -185,21 +185,6 @@
                     </div>
                 </div>
             </div>
-            <div class="tab">
-                <h3 class="tab-title data-provider-tab-title">Data Providers</h3>
-                <div class="tab-content data-provider-tab-content">
-                    {{ apiPlatform.providerTable(collector.collectionDataProviders, 'collection data provider') }}
-                    {{ apiPlatform.providerTable(collector.itemDataProviders, 'item data provider') }}
-                    {{ apiPlatform.providerTable(collector.subresourceDataProviders, 'subresource data provider') }}
-                </div>
-            </div>
-
-            <div class="tab">
-                <h3 class="tab-title data-persister-tab-title">Data Persisters</h3>
-                <div class="tab-content data-persister-tab-content">
-                    {{ apiPlatform.providerTable(collector.dataPersisters, 'data persister') }}
-                </div>
-            </div>
         </div>
     {% endif %}
 {% endblock %}

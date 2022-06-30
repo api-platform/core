@@ -13,43 +13,36 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy::class, identifiers: ['slug'], toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy/child_dummies.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], fromProperty: 'parentDummy'), 'parentDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy::class, identifiers: [], expandedValue: 'parent_dummy', toProperty: 'parentDummy')], status: 200, operations: [new GetCollection()])]
+#[ORM\Entity]
 class SlugChildDummy
 {
     /**
      * @var int|null The identifier
-     *
-     * @ApiProperty(identifier=false)
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ApiProperty(identifier: false)]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * @var string The slug used as API identifier
-     *
-     * @ApiProperty(identifier=true)
-     *
-     * @ORM\Column(type="string", length=255, unique=true)
      */
-    private $slug;
+    #[ApiProperty(identifier: true)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private string $slug;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy", inversedBy="childDummies")
-     * @ORM\JoinColumn(name="parent_dummy_id", referencedColumnName="id")
-     *
-     * @ApiSubresource
-     */
+    #[ORM\ManyToOne(targetEntity: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\SlugParentDummy::class, inversedBy: 'childDummies')]
+    #[ORM\JoinColumn(name: 'parent_dummy_id', referencedColumnName: 'id')]
     private $parentDummy;
 
     public function getId(): ?int

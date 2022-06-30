@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\GraphQl\Subscription;
 
 use ApiPlatform\Api\IriConverterInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;

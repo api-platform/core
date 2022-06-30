@@ -59,12 +59,6 @@ final class TypeBuilder implements TypeBuilderInterface
         $shortName = $operation->getShortName();
         $operationName = $operation->getName();
 
-        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
-            $shortName = $ioMetadata['name'];
-        }
-
         if ($operation instanceof Mutation) {
             $shortName = $operationName.ucfirst($shortName);
         }
@@ -108,6 +102,11 @@ final class TypeBuilder implements TypeBuilderInterface
             return $resourceObjectType;
         }
 
+        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
+        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
+            $resourceClass = $ioMetadata['class'];
+        }
+
         $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;
 
         $configuration = [
@@ -116,11 +115,7 @@ final class TypeBuilder implements TypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    try {
-                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
-                    } catch (OperationNotFoundException $e) {
-                        $queryNormalizationContext = [];
-                    }
+                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
@@ -221,10 +216,10 @@ final class TypeBuilder implements TypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, string $operationName): GraphQLType
+    public function getResourcePaginatedCollectionType(GraphQLType $resourceType, string $resourceClass, Operation $operation): GraphQLType
     {
         $shortName = $resourceType->name;
-        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $operationName);
+        $paginationType = $this->pagination->getGraphQlPaginationType($operation);
 
         $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
         if ($this->typesContainer->has($connectionTypeKey)) {
@@ -310,5 +305,19 @@ final class TypeBuilder implements TypeBuilderInterface
             'collection' => GraphQLType::listOf($resourceType),
             'paginationInfo' => GraphQLType::nonNull($paginationInfoObjectType),
         ];
+    }
+
+    private function getQueryOperation(ResourceMetadataCollection $resourceMetadataCollection): ?Operation
+    {
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getGraphQlOperations() as $operation) {
+                // Filter the custom queries.
+                if ($operation instanceof Query && !$operation->getResolver()) {
+                    return $operation;
+                }
+            }
+        }
+
+        return null;
     }
 }

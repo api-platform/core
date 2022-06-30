@@ -314,8 +314,8 @@ final class FieldsBuilder implements FieldsBuilderInterface
             }
 
             if (!$input && !$rootOperation instanceof Mutation && !$rootOperation instanceof Subscription && !$isStandardGraphqlType && $isCollectionType) {
-                if ($this->pagination->isGraphQlEnabled($resourceClass, $rootOperation->getName())) {
-                    $args = $this->getGraphQlPaginationArgs($resourceClass, $rootOperation->getName());
+                if ($this->pagination->isGraphQlEnabled($rootOperation)) {
+                    $args = $this->getGraphQlPaginationArgs($rootOperation);
                 }
 
                 // Find the collection operation to get filters, there might be a smarter way to do this
@@ -355,9 +355,9 @@ final class FieldsBuilder implements FieldsBuilderInterface
         return null;
     }
 
-    private function getGraphQlPaginationArgs(string $resourceClass, string $queryName): array
+    private function getGraphQlPaginationArgs(Operation $queryOperation): array
     {
-        $paginationType = $this->pagination->getGraphQlPaginationType($resourceClass, $queryName);
+        $paginationType = $this->pagination->getGraphQlPaginationType($queryOperation);
 
         if ('cursor' === $paginationType) {
             return [
@@ -522,7 +522,7 @@ final class FieldsBuilder implements FieldsBuilderInterface
         }
 
         if ($this->typeBuilder->isCollection($type)) {
-            return $this->pagination->isGraphQlEnabled($resourceClass, $rootOperation->getName()) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $rootOperation->getName()) : GraphQLType::listOf($graphqlType);
+            return $this->pagination->isGraphQlEnabled($rootOperation) && !$input ? $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $rootOperation) : GraphQLType::listOf($graphqlType);
         }
 
         return $forceNullable || !$graphqlType instanceof NullableType || $type->isNullable() || ($rootOperation instanceof Mutation && 'update' === $rootOperation->getName())

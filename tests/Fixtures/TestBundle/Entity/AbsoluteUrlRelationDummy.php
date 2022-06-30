@@ -14,28 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource(urlGenerationStrategy=UrlGeneratorInterface::ABS_URL)
- * @ORM\Entity
- */
+#[ApiResource(urlGenerationStrategy: UrlGeneratorInterface::ABS_URL)]
+#[ORM\Entity]
 class AbsoluteUrlRelationDummy
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
-
-    /**
-     * @ORM\OneToMany(targetEntity="AbsoluteUrlDummy", mappedBy="absoluteUrlRelationDummy")
-     * @ApiSubresource
-     */
+    #[ORM\OneToMany(targetEntity: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
     public $absoluteUrlDummies;
 
     public function __construct()

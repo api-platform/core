@@ -13,51 +13,44 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ODM\Document
- * @ApiResource(
- *     collectionOperations={
- *         "get"={"method"="GET"},
- *         "post"={"path"="dummy_validation.{_format}", "method"="POST"},
- *         "post_validation_groups"={"route_name"="post_validation_groups", "validation_groups"={"a"}, "method"="GET"},
- *         "post_validation_sequence"={"route_name"="post_validation_sequence", "validation_groups"="app.dummy_validation.group_generator", "method"="GET"}
- *     }
- * )
- */
+#[ApiResource(operations: [
+    new GetCollection(),
+    new Post(uriTemplate: 'dummy_validation.{_format}'),
+    new Post(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]),
+    new Post(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator']),
+]
+)]
+#[ODM\Document]
 class DummyValidation
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ODM\Field(nullable=true)
-     * @Assert\NotNull(groups={"a"})
      */
-    private $name;
-
+    #[Assert\NotNull(groups: ['a'])]
+    #[ODM\Field(nullable: true)]
+    private ?string $name = null;
     /**
      * @var string|null The dummy title
-     *
-     * @ODM\Field(nullable=true)
-     * @Assert\NotNull(groups={"b"})
      */
-    private $title;
-
+    #[Assert\NotNull(groups: ['b'])]
+    #[ODM\Field(nullable: true)]
+    private ?string $title = null;
     /**
      * @var string|null The dummy code
-     * @ODM\Field
      */
-    private $code;
+    #[ODM\Field]
+    private ?string $code = null;
 
     public function getId(): ?int
     {

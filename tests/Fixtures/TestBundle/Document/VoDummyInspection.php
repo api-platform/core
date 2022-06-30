@@ -13,57 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"inspection_read"}},
- *         "denormalization_context"={"groups"={"inspection_write"}}
- *     },
- *     graphql={}
- * )
- * @ODM\Document
- */
+#[ApiResource(graphQlOperations: [], normalizationContext: ['groups' => ['inspection_read']], denormalizationContext: ['groups' => ['inspection_write']])]
+#[ODM\Document]
 class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    #[ODM\Field(type: 'date')]
+    private \DateTime $performed;
 
-    /**
-     * @var bool
-     *
-     * @ODM\Field(type="bool")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $accepted;
-
-    /**
-     * @var VoDummyCar
-     *
-     * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
-     * @Groups({"inspection_read", "inspection_write"})
-     */
-    private $car;
-
-    /**
-     * @var DateTime
-     *
-     * @ODM\Field(type="date")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $performed;
-
-    private $attributeWithoutConstructorEquivalent;
-
-    public function __construct(bool $accepted, VoDummyCar $car, DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
+    public function __construct(#[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] #[ODM\Field(type: 'bool')] private bool $accepted, #[Groups(['inspection_read', 'inspection_write'])] #[ODM\ReferenceOne(targetDocument: VoDummyCar::class, inversedBy: 'inspections')] private VoDummyCar $car, DateTime $performed = null, private string $attributeWithoutConstructorEquivalent = '')
     {
-        $this->accepted = $accepted;
-        $this->car = $car;
         $this->performed = $performed ?: new DateTime();
-        $this->attributeWithoutConstructorEquivalent = $parameterWhichIsNotClassAttribute;
     }
 
     public function isAccepted()

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
@@ -56,6 +55,11 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
     public function getIdentifiersFromItem($item, Operation $operation = null, array $context = []): array
     {
         $identifiers = [];
+
+        if (!$this->isResourceClass($this->getObjectClass($item))) {
+            return ['id' => $this->propertyAccessor->getValue($item, 'id')];
+        }
+
         $resourceClass = $this->getResourceClass($item, true);
         $operation = $operation ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation(null, false, true);
 
@@ -72,7 +76,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                     $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $resourceClass, $identifier, $link->getParameterName());
                 }
 
-                $identifiers[($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) ? 'id' : $link->getParameterName()] = CompositeIdentifierParser::stringify($compositeIdentifiers);
+                $identifiers[$link->getParameterName()] = CompositeIdentifierParser::stringify($compositeIdentifiers);
                 continue;
             }
 

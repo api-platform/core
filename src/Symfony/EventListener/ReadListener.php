@@ -43,7 +43,7 @@ final class ReadListener
     private $serializerContextBuilder;
     private $provider;
 
-    public function __construct(ProviderInterface $provider, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
+    public function __construct(ProviderInterface $provider, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, SerializerContextBuilderInterface $serializerContextBuilder = null, UriVariablesConverterInterface $uriVariablesConverter = null)
     {
         $this->provider = $provider;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -65,7 +65,7 @@ final class ReadListener
             return;
         }
 
-        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe()) || ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) || ($operation->getExtraProperties()['is_legacy_subresource'] ?? false)) {
+        if (!$operation || !($operation->canRead() ?? true) || !$attributes['receive'] || (!$operation->getUriVariables() && !$request->isMethodSafe())) {
             return;
         }
 

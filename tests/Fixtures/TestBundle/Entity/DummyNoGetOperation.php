@@ -13,37 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * DummyNoGetOperation.
  *
  * @author Grégoire Hébert gregoire@les-tilleuls.coop
- *
- * @ORM\Entity
- *
- * @ApiResource(
- *     collectionOperations={"post"},
- *     itemOperations={"put"}
- * )
  */
+#[ApiResource(operations: [new Put(), new Post()])]
+#[ORM\Entity]
 class DummyNoGetOperation
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $lorem;
 
     public function setId($id)

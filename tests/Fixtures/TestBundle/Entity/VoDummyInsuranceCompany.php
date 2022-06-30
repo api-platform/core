@@ -13,29 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class VoDummyInsuranceCompany
 {
     use VoDummyIdAwareTrait;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
-     */
-    private $name;
-
-    public function __construct(string $name)
+    public function __construct(#[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $name)
     {
-        $this->name = $name;
     }
 
     public function getName()

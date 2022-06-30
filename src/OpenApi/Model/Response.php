@@ -82,5 +82,3 @@ final class Response
         return $clone;
     }
 }
-
-class_alias(Response::class, \ApiPlatform\Core\OpenApi\Model\Response::class);

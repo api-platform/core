@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\EventListener;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,7 +48,7 @@ class ExceptionListenerTest extends TestCase
     public function getRequest()
     {
         return [
-            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_collection_operation_name' => 'get'])],
+            [new Request([], [], ['_api_resource_class' => 'Foo', '_api_operation_name' => 'get'])],
             [new Request([], [], ['_api_respond' => true])],
         ];
     }

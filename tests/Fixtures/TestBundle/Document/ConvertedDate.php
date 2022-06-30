@@ -13,30 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource
- * @ODM\Document
- * @ApiFilter(DateFilter::class)
- */
+#[ApiFilter(DateFilter::class)]
+#[ApiResource]
+#[ODM\Document]
 class ConvertedDate
 {
-    /**
-     * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
     /**
      * @var \DateTime
-     *
-     * @ODM\Field(type="date")
      */
+    #[ODM\Field(type: 'date')]
     public $nameConverted;
 
     public function getId()

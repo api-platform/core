@@ -31,7 +31,7 @@ trait PropertyHelperTrait
     /**
      * Splits the given property into parts.
      */
-    abstract protected function splitPropertyParts(string $property/* , string $resourceClass */): array;
+    abstract protected function splitPropertyParts(string $property, string $resourceClass): array;
 
     /**
      * Gets class metadata for the given resource.
@@ -105,5 +105,3 @@ trait PropertyHelperTrait
         return [$property, $propertyParts['field'], $propertyParts['associations']];
     }
 }
-
-class_alias(PropertyHelperTrait::class, \ApiPlatform\Core\Bridge\Doctrine\MongoDbOdm\PropertyHelperTrait::class);

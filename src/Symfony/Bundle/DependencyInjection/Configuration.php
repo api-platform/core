@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Core\Annotation\ApiResource as LegacyApiResource;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
 use ApiPlatform\Exception\FilterValidationException;
 use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
@@ -221,7 +221,9 @@ final class Configuration implements ConfigurationInterface
             'json' => ['mime_types' => ['application/json']], // Swagger support
             'html' => ['mime_types' => ['text/html']], // Swagger UI support
         ]);
-        $this->addFormatSection($rootNode, 'patch_formats', []);
+        $this->addFormatSection($rootNode, 'patch_formats', [
+            'json' => ['mime_types' => ['application/merge-patch+json']],
+        ]);
         $this->addFormatSection($rootNode, 'error_formats', [
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'jsonld' => ['mime_types' => ['application/ld+json']],
@@ -678,4 +680,3 @@ final class Configuration implements ConfigurationInterface
     }
 }
 
-class_alias(Configuration::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\DependencyInjection\Configuration::class);

@@ -13,38 +13,29 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Composite Relation.
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class CompositeRelation
 {
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Groups({"default"})
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
+    #[Groups(['default'])]
     private $value;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="CompositeItem", inversedBy="compositeValues")
-     * @ORM\JoinColumn(name="composite_item_id", referencedColumnName="id", nullable=false)
-     * @Groups({"default"})
-     */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: CompositeItem::class, inversedBy: 'compositeValues')]
+    #[ORM\JoinColumn(name: 'composite_item_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups(['default'])]
     private $compositeItem;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="CompositeLabel")
-     * @ORM\JoinColumn(name="composite_label_id", referencedColumnName="id", nullable=false)
-     * @Groups({"default"})
-     */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: CompositeLabel::class)]
+    #[ORM\JoinColumn(name: 'composite_label_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups(['default'])]
     private $compositeLabel;
 
     /**

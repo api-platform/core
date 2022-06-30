@@ -41,5 +41,3 @@ final class Length implements ValidatorInterface
         return $errorList;
     }
 }
-
-class_alias(Length::class, \ApiPlatform\Core\Filter\Validator\Length::class);

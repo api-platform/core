@@ -13,13 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Pagination;
 
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\OperationNotFoundException;
-use ApiPlatform\Exception\ResourceClassNotFoundException;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Operation;
 
 /**
  * Pagination configuration.
@@ -28,21 +23,11 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class Pagination
 {
-    private $options;
-    private $graphQlOptions;
+    private array $options;
+    private array $graphQlOptions;
 
-    /**
-     * @var ResourceMetadataCollectionFactoryInterface|ResourceMetadataFactoryInterface|null
-     */
-    private $resourceMetadataFactory;
-
-    public function __construct($resourceMetadataFactory, array $options = [], array $graphQlOptions = [])
+    public function __construct(array $options = [], array $graphQlOptions = [])
     {
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
-
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->options = array_merge([
             'enabled' => true,
             'client_enabled' => false,
@@ -85,11 +70,11 @@ final class Pagination
     /**
      * Gets the current offset.
      */
-    public function getOffset(string $resourceClass = null, string $operationName = null, array $context = []): int
+    public function getOffset(Operation $operation = null, array $context = []): int
     {
         $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
-        $limit = $this->getLimit($resourceClass, $operationName, $context);
+        $limit = $this->getLimit($operation, $context);
 
         if ($graphql && null !== ($after = $this->getParameterFromContext($context, 'after'))) {
             return false === ($after = base64_decode($after, true)) ? 0 : (int) $after + 1;
@@ -117,33 +102,12 @@ final class Pagination
      *
      * @throws InvalidArgumentException
      */
-    public function getLimit(string $resourceClass = null, string $operationName = null, array $context = []): int
+    public function getLimit(Operation $operation = null, array $context = []): int
     {
         $graphql = (bool) ($context['graphql_operation_name'] ?? false);
 
-        $limit = $this->options['items_per_page'];
-        $clientLimit = $this->options['client_items_per_page'];
-
-        $resourceMetadata = null;
-        if (null !== $resourceClass) {
-            /**
-             * @var ResourceMetadata|ResourceMetadataCollection
-             */
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                $limit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_items_per_page', $limit, true);
-                $clientLimit = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_client_items_per_page', $clientLimit, true);
-            } else {
-                try {
-                    $operation = $resourceMetadata->getOperation($operationName);
-                    $limit = $operation->getPaginationItemsPerPage() ?? $limit;
-                    $clientLimit = $operation->getPaginationClientItemsPerPage() ?? $clientLimit;
-                } catch (OperationNotFoundException $e) {
-                    // GraphQl operation may not exist
-                }
-            }
-        }
+        $limit = $operation?->getPaginationItemsPerPage() ?? $this->options['items_per_page'];
+        $clientLimit = $operation?->getPaginationClientItemsPerPage() ?? $this->options['client_items_per_page'];
 
         if ($graphql && null !== ($first = $this->getParameterFromContext($context, 'first'))) {
             $limit = $first;
@@ -160,22 +124,7 @@ final class Pagination
 
         if ($clientLimit) {
             $limit = (int) $this->getParameterFromContext($context, $this->options['items_per_page_parameter_name'], $limit);
-            $maxItemsPerPage = null;
-
-            if ($resourceMetadata instanceof ResourceMetadata) {
-                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'maximum_items_per_page', null, true);
-                if (null !== $maxItemsPerPage) {
-                    @trigger_error('The "maximum_items_per_page" option has been deprecated since API Platform 2.5 in favor of "pagination_maximum_items_per_page" and will be removed in API Platform 3.', \E_USER_DEPRECATED);
-                }
-                $maxItemsPerPage = $resourceMetadata->getCollectionOperationAttribute($operationName, 'pagination_maximum_items_per_page', $maxItemsPerPage ?? $this->options['maximum_items_per_page'], true);
-            } elseif ($resourceMetadata instanceof ResourceMetadataCollection) {
-                try {
-                    $operation = $resourceMetadata->getOperation($operationName);
-                    $maxItemsPerPage = $operation->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
-                } catch (OperationNotFoundException $e) {
-                    $maxItemsPerPage = $this->options['maximum_items_per_page'];
-                }
-            }
+            $maxItemsPerPage = $operation?->getPaginationMaximumItemsPerPage() ?? $this->options['maximum_items_per_page'];
 
             if (null !== $maxItemsPerPage && $limit > $maxItemsPerPage) {
                 $limit = $maxItemsPerPage;
@@ -199,40 +148,40 @@ final class Pagination
      *
      * @throws InvalidArgumentException
      */
-    public function getPagination(string $resourceClass = null, string $operationName = null, array $context = []): array
+    public function getPagination(Operation $operation = null, array $context = []): array
     {
         $page = $this->getPage($context);
-        $limit = $this->getLimit($resourceClass, $operationName, $context);
+        $limit = $this->getLimit($operation, $context);
 
         if (0 === $limit && 1 < $page) {
             throw new InvalidArgumentException('Page should not be greater than 1 if limit is equal to 0');
         }
 
-        return [$page, $this->getOffset($resourceClass, $operationName, $context), $limit];
+        return [$page, $this->getOffset($operation, $context), $limit];
     }
 
     /**
      * Is the pagination enabled?
      */
-    public function isEnabled(string $resourceClass = null, string $operationName = null, array $context = []): bool
+    public function isEnabled(Operation $operation = null, array $context = []): bool
     {
-        return $this->getEnabled($context, $resourceClass, $operationName);
+        return $this->getEnabled($context, $operation);
     }
 
     /**
      * Is the pagination enabled for GraphQL?
      */
-    public function isGraphQlEnabled(?string $resourceClass = null, ?string $operationName = null, array $context = []): bool
+    public function isGraphQlEnabled(?Operation $operation = null, array $context = []): bool
     {
-        return $this->getGraphQlEnabled($resourceClass, $operationName);
+        return $this->getGraphQlEnabled($operation);
     }
 
     /**
      * Is the partial pagination enabled?
      */
-    public function isPartialEnabled(string $resourceClass = null, string $operationName = null, array $context = []): bool
+    public function isPartialEnabled(Operation $operation = null, array $context = []): bool
     {
-        return $this->getEnabled($context, $resourceClass, $operationName, true);
+        return $this->getEnabled($context, $operation, true);
     }
 
     public function getOptions(): array
@@ -240,49 +189,21 @@ final class Pagination
         return $this->options;
     }
 
-    public function getGraphQlPaginationType(string $resourceClass, string $operationName): string
+    public function getGraphQlPaginationType(Operation $operation): string
     {
-        try {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-            if ($resourceMetadata instanceof ResourceMetadataCollection) {
-                $operation = $resourceMetadata->getOperation($operationName);
-
-                return $operation->getPaginationType() ?? 'cursor';
-            }
-        } catch (ResourceClassNotFoundException $e) {
-            return 'cursor';
-        } catch (OperationNotFoundException $e) {
-            return 'cursor';
-        }
-
-        return (string) $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_type', 'cursor', true);
+        return $operation->getPaginationType() ?? 'cursor';
     }
 
     /**
      * Is the classic or partial pagination enabled?
      */
-    private function getEnabled(array $context, string $resourceClass = null, string $operationName = null, bool $partial = false): bool
+    private function getEnabled(array $context, Operation $operation = null, bool $partial = false): bool
     {
         $enabled = $this->options[$partial ? 'partial' : 'enabled'];
         $clientEnabled = $this->options[$partial ? 'client_partial' : 'client_enabled'];
 
-        if (null !== $resourceClass) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-            if ($resourceMetadata instanceof ResourceMetadataCollection) {
-                try {
-                    $operation = $resourceMetadata->getOperation($operationName);
-                    $enabled = ($partial ? $operation->getPaginationPartial() : $operation->getPaginationEnabled()) ?? $enabled;
-                    $clientEnabled = ($partial ? $operation->getPaginationClientPartial() : $operation->getPaginationClientEnabled()) ?? $clientEnabled;
-                } catch (OperationNotFoundException $e) {
-                    // GraphQl operation may not exist
-                }
-            } else {
-                $enabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_partial' : 'pagination_enabled', $enabled, true);
-                $clientEnabled = $resourceMetadata->getCollectionOperationAttribute($operationName, $partial ? 'pagination_client_partial' : 'pagination_client_enabled', $clientEnabled, true);
-            }
-        }
+        $enabled = ($partial ? $operation?->getPaginationPartial() : $operation?->getPaginationEnabled()) ?? $enabled;
+        $clientEnabled = ($partial ? $operation?->getPaginationClientPartial() : $operation?->getPaginationClientEnabled()) ?? $clientEnabled;
 
         if ($clientEnabled) {
             return filter_var($this->getParameterFromContext($context, $this->options[$partial ? 'partial_parameter_name' : 'enabled_parameter_name'], $enabled), \FILTER_VALIDATE_BOOLEAN);
@@ -291,29 +212,11 @@ final class Pagination
         return (bool) $enabled;
     }
 
-    private function getGraphQlEnabled(?string $resourceClass, ?string $operationName): bool
+    private function getGraphQlEnabled(?Operation $operation): bool
     {
         $enabled = $this->graphQlOptions['enabled'];
 
-        if (null !== $resourceClass) {
-            try {
-                $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
-                if ($resourceMetadata instanceof ResourceMetadataCollection) {
-                    $operation = $resourceMetadata->getOperation($operationName);
-
-                    return $operation->getPaginationEnabled() ?? $enabled;
-                }
-            } catch (ResourceClassNotFoundException $e) {
-                return $enabled;
-            } catch (OperationNotFoundException $e) {
-                return $enabled;
-            }
-
-            return (bool) $resourceMetadata->getGraphqlAttribute($operationName, 'pagination_enabled', $enabled, true);
-        }
-
-        return $enabled;
+        return $operation?->getPaginationEnabled() ?? $enabled;
     }
 
     /**

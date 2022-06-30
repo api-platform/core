@@ -29,7 +29,7 @@ trait OrderFilterTrait
     /**
      * @var string Keyword used to retrieve the value
      */
-    protected $orderParameterName;
+    protected string $orderParameterName;
 
     /**
      * {@inheritdoc}
@@ -84,5 +84,3 @@ trait OrderFilterTrait
         return $value;
     }
 }
-
-class_alias(OrderFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\OrderFilterTrait::class);

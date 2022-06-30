@@ -23,10 +23,7 @@ use Doctrine\ORM\Query;
  */
 final class Paginator extends AbstractPaginator implements PaginatorInterface, QueryAwareInterface
 {
-    /**
-     * @var int|null
-     */
-    private $totalItems;
+    private ?int $totalItems;
 
     /**
      * {@inheritdoc}
@@ -56,5 +53,3 @@ final class Paginator extends AbstractPaginator implements PaginatorInterface, Q
         return $this->paginator->getQuery();
     }
 }
-
-class_alias(Paginator::class, \ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator::class);

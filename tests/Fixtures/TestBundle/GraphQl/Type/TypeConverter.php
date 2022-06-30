@@ -27,11 +27,8 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class TypeConverter implements TypeConverterInterface
 {
-    private $defaultTypeConverter;
-
-    public function __construct(TypeConverterInterface $defaultTypeConverter)
+    public function __construct(private readonly TypeConverterInterface $defaultTypeConverter)
     {
-        $this->defaultTypeConverter = $defaultTypeConverter;
     }
 
     /**
@@ -44,7 +41,7 @@ final class TypeConverter implements TypeConverterInterface
             && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && is_a($type->getClassName(), \DateTimeInterface::class, true)
         ) {
-            return 'DateTime';
+            return \DateTime::class;
         }
 
         return $this->defaultTypeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);

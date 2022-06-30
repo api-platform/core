@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Bundle\EventListener;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Symfony\Bundle\EventListener\SwaggerUiListener;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -52,8 +52,8 @@ class SwaggerUiListenerTest extends TestCase
         $jsonRequest->setRequestFormat('json');
 
         return [
-            [$respondRequest, 'api_platform.swagger.action.ui'],
-            [$resourceClassRequest, 'api_platform.swagger.action.ui'],
+            [$respondRequest, 'api_platform.swagger_ui.action'],
+            [$resourceClassRequest, 'api_platform.swagger_ui.action'],
             [new Request(), null],
             [$jsonRequest, null],
         ];

@@ -13,53 +13,50 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Related To Dummy Friend represent an association table for a manytomany relation.
- *
- * @ApiResource(attributes={"normalization_context"={"groups"={"fakemanytomany"}}, "filters"={"related_to_dummy_friend.name"}})
- * @ORM\Entity
  */
+#[ApiResource(normalizationContext: ['groups' => ['fakemanytomany']], filters: ['related_to_dummy_friend.name'])]
+#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/id/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}/related_to_dummy_friends.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy::class, identifiers: ['id'], toProperty: 'relatedDummy')], status: 200, filters: ['related_to_dummy_friend.name'], normalizationContext: ['groups' => ['fakemanytomany']], operations: [new GetCollection()])]
+#[ORM\Entity]
 class RelatedToDummyFriend
 {
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany", "friends"})
      */
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['fakemanytomany', 'friends'])]
     private $name;
-
     /**
      * @var string|null The dummy description
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"fakemanytomany", "friends"})
      */
-    private $description;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="DummyFriend")
-     * @ORM\JoinColumn(name="dummyfriend_id", referencedColumnName="id", nullable=false)
-     * @Groups({"fakemanytomany", "friends"})
-     * @Assert\NotNull
-     */
+    #[ORM\Column(nullable: true)]
+    #[Groups(['fakemanytomany', 'friends'])]
+    private ?string $description = null;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: DummyFriend::class)]
+    #[ORM\JoinColumn(name: 'dummyfriend_id', referencedColumnName: 'id', nullable: false)]
+    #[Groups(['fakemanytomany', 'friends'])]
+    #[Assert\NotNull]
     private $dummyFriend;
-
-    /**
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="RelatedDummy", inversedBy="relatedToDummyFriend")
-     * @ORM\JoinColumn(name="relateddummy_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @Assert\NotNull
-     */
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: RelatedDummy::class, inversedBy: 'relatedToDummyFriend')]
+    #[ORM\JoinColumn(name: 'relateddummy_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull]
     private $relatedDummy;
 
     public function setName($name)

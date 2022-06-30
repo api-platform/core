@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Extractor\XmlPropertyExtractor;
 use ApiPlatform\Metadata\Extractor\YamlPropertyExtractor;
 use ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory;
-use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Comment;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\PropertyAdapterInterface;
 use ApiPlatform\Tests\Metadata\Extractor\Adapter\XmlPropertyAdapter;
@@ -34,8 +33,6 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class PropertyMetadataCompatibilityTest extends TestCase
 {
-    use DeprecationMetadataTrait;
-
     private const RESOURCE_CLASS = Comment::class;
     private const PROPERTY = 'comment';
     private const FIXTURES = [
@@ -62,6 +59,9 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'openapiContext' => [
             'foo' => 'bar',
         ],
+        'jsonSchemaContext' => [
+            'lorem' => 'ipsum',
+        ],
         'push' => true,
         'security' => 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
         'securityPostDenormalize' => 'is_granted(\'ROLE_CUSTOM_ADMIN\')',
@@ -71,7 +71,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'extraProperties' => [
             'custom_property' => 'Lorem ipsum dolor sit amet',
         ],
-        'iri' => false,
+        'iris' => ['https://schema.org/totalPrice'],
     ];
 
     /**

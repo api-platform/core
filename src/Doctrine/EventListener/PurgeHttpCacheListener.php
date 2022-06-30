@@ -16,12 +16,12 @@ namespace ApiPlatform\Doctrine\EventListener;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Util\ClassInfoTrait;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -39,20 +39,18 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 final class PurgeHttpCacheListener
 {
+    use ClassInfoTrait;
+
     private $purger;
     private $iriConverter;
     private $resourceClassResolver;
     private $propertyAccessor;
     private $tags = [];
 
-    public function __construct(PurgerInterface $purger, $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(PurgerInterface $purger, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->purger = $purger;
         $this->iriConverter = $iriConverter;
-        if ($iriConverter instanceof LegacyIriConverterInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use an implementation of "%s" instead of "%s".', IriConverterInterface::class, LegacyIriConverterInterface::class));
-        }
-
         $this->resourceClassResolver = $resourceClassResolver;
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -120,7 +118,7 @@ final class PurgeHttpCacheListener
     {
         try {
             $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
-            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromResourceClass($resourceClass) : $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+            $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, new GetCollection());
             $this->tags[$iri] = $iri;
 
             if ($purgeItem) {
@@ -163,13 +161,14 @@ final class PurgeHttpCacheListener
 
     private function addTagForItem($value): void
     {
+        if (!$this->resourceClassResolver->isResourceClass($this->getObjectClass($value))) {
+            return;
+        }
+
         try {
-            // TODO: test if this is a resource class
-            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($value) : $this->iriConverter->getIriFromResource($value);
+            $iri = $this->iriConverter->getIriFromResource($value);
             $this->tags[$iri] = $iri;
         } catch (RuntimeException|InvalidArgumentException $e) {
         }
     }
 }
-
-class_alias(PurgeHttpCacheListener::class, \ApiPlatform\Core\Bridge\Doctrine\EventListener\PurgeHttpCacheListener::class);

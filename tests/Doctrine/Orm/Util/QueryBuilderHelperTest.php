@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Orm\Util;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
@@ -32,7 +32,7 @@ class QueryBuilderHelperTest extends TestCase
     /**
      * @dataProvider provideAddJoinOnce
      */
-    public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias)
+    public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');
@@ -60,7 +60,7 @@ class QueryBuilderHelperTest extends TestCase
     /**
      * @dataProvider provideAddJoinOnce
      */
-    public function testAddJoinOnceWithSpecifiedNewAlias()
+    public function testAddJoinOnceWithSpecifiedNewAlias(): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
         $queryBuilder->from('foo', 'f');

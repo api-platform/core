@@ -15,41 +15,20 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Field implements \JsonSerializable
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var Content
-     *
-     * @ORM\ManyToOne(targetEntity=Content::class, inversedBy="fields")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $content;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $name;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="text")
-     */
-    private $value;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\ManyToOne(targetEntity: Content::class, inversedBy: 'fields')]
+    #[ORM\JoinColumn(nullable: false)]
+    private \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Content $content;
+    #[ORM\Column(type: 'string')]
+    private string $name;
+    #[ORM\Column(type: 'text')]
+    private string $value;
 
     public function getId(): ?int
     {

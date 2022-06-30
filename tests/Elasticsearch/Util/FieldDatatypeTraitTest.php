@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Elasticsearch\Util;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Elasticsearch\Util\FieldDatatypeTrait;
 use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Foo;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -27,7 +27,7 @@ class FieldDatatypeTraitTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testGetNestedFieldPath()
+    public function testGetNestedFieldPath(): void
     {
         $fieldDatatype = $this->getValidFieldDatatype();
 
@@ -35,7 +35,7 @@ class FieldDatatypeTraitTest extends TestCase
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'baz'));
     }
 
-    public function testGetNestedFieldPathWithPropertyNotFound()
+    public function testGetNestedFieldPathWithPropertyNotFound(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willThrow(new PropertyNotFoundException())->shouldBeCalled();
@@ -45,7 +45,7 @@ class FieldDatatypeTraitTest extends TestCase
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
 
-    public function testGetNestedFieldPathWithPropertyWithoutType()
+    public function testGetNestedFieldPathWithPropertyWithoutType(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn(new ApiProperty())->shouldBeCalled();
@@ -56,7 +56,7 @@ class FieldDatatypeTraitTest extends TestCase
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
 
-    public function testGetNestedFieldPathWithInvalidCollectionType()
+    public function testGetNestedFieldPathWithInvalidCollectionType(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
@@ -67,7 +67,7 @@ class FieldDatatypeTraitTest extends TestCase
         self::assertNull($fieldDatatype->getNestedFieldPath(Foo::class, 'foo.bar'));
     }
 
-    public function testIsNestedField()
+    public function testIsNestedField(): void
     {
         $fieldDatatype = $this->getValidFieldDatatype();
 

@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,30 +24,27 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Dummy Friend.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class DummyFriend
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"fakemanytomany", "friends"})
      */
-    private $name;
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['fakemanytomany', 'friends'])]
+    private string $name;
 
     /**
      * Get id.

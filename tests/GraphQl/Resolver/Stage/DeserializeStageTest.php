@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\DeserializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -76,7 +76,7 @@ class DeserializeStageTest extends TestCase
         $operation = (new Query())->withName($operationName)->withClass($resourceClass);
         $context = ['args' => ['input' => 'myInput']];
 
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, false)->shouldBeCalled()->willReturn($denormalizationContext);
 
         $denormalizedData = new \stdClass();
         $this->denormalizerProphecy->denormalize($context['args']['input'], $resourceClass, ItemNormalizer::FORMAT, $denormalizationContext)->shouldBeCalled()->willReturn($denormalizedData);

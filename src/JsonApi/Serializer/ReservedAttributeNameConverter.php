@@ -70,5 +70,3 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
         return $propertyName;
     }
 }
-
-class_alias(ReservedAttributeNameConverter::class, \ApiPlatform\Core\JsonApi\Serializer\ReservedAttributeNameConverter::class);

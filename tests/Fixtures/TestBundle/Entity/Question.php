@@ -13,33 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ApiResource
- */
+#[ApiResource]
+#[ApiResource(uriTemplate: '/answers/{id}/related_questions.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer::class, identifiers: ['id'], toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/questions/{id}/answer/related_questions.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'], fromProperty: 'answer'), 'answer' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer::class, identifiers: [], expandedValue: 'answer', toProperty: 'answer')], status: 200, operations: [new GetCollection()])]
+#[ORM\Entity]
 class Question
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-
-    /**
-     * @ORM\Column(nullable=true)
-     */
+    #[ORM\Column(nullable: true)]
     private $content;
-
-    /**
-     * @ORM\OneToOne(targetEntity="Answer", inversedBy="question")
-     * @ORM\JoinColumn(name="answer_id", referencedColumnName="id", unique=true)
-     * @ApiSubresource
-     */
+    #[ORM\OneToOne(targetEntity: Answer::class, inversedBy: 'question')]
+    #[ORM\JoinColumn(name: 'answer_id', referencedColumnName: 'id', unique: true)]
     private $answer;
 
     /**
@@ -72,8 +65,6 @@ class Question
 
     /**
      * Set answer.
-     *
-     * @param Answer $answer
      */
     public function setAnswer(Answer $answer = null): self
     {

@@ -13,9 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,73 +30,64 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related Dummy.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @ApiResource(graphql={"item_query", "update"={"normalization_context"={"groups"={"chicago", "fakemanytomany"}}, "denormalization_context"={"groups"={"friends"}}}}, iri="https://schema.org/Product", attributes={"normalization_context"={"groups"={"friends"}}, "filters"={"related_dummy.friends", "related_dummy.complex_sub_query"}})
- * @ORM\Entity
  */
+#[ApiResource(graphQlOperations: [new Query(name: 'item_query'), new Mutation(name: 'update', normalizationContext: ['groups' => ['chicago', 'fakemanytomany']], denormalizationContext: ['groups' => ['friends']])], types: ['https://schema.org/Product'], normalizationContext: ['groups' => ['friends']], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'])]
+#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_dummies/{id}/id.{_format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}.{_format}', uriVariables: ['id' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
+#[ORM\Entity]
 class RelatedDummy extends ParentDummy
 {
-    /**
-     * @ApiProperty(writable=false)
-     * @ApiSubresource
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"chicago", "friends"})
-     */
+    #[ApiProperty(writable: false)]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['chicago', 'friends'])]
     private $id;
 
     /**
      * @var string|null A name
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"friends"})
      */
+    #[ORM\Column(nullable: true)]
+    #[Groups(['friends'])]
     public $name;
 
-    /**
-     * @ORM\Column
-     * @Groups({"barcelona", "chicago", "friends"})
-     */
+    #[ORM\Column]
+    #[Groups(['barcelona', 'chicago', 'friends'])]
     protected $symfony = 'symfony';
 
     /**
      * @var \DateTime|null A dummy date
-     *
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Assert\DateTime
-     * @Groups({"friends"})
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Assert\DateTime]
+    #[Groups(['friends'])]
     public $dummyDate;
 
-    /**
-     * @ApiSubresource
-     * @ORM\ManyToOne(targetEntity="ThirdLevel", cascade={"persist"})
-     * @Groups({"barcelona", "chicago", "friends"})
-     */
+    #[ORM\ManyToOne(targetEntity: ThirdLevel::class, cascade: ['persist'])]
+    #[Groups(['barcelona', 'chicago', 'friends'])]
     public $thirdLevel;
 
-    /**
-     * @ApiSubresource
-     * @ORM\OneToMany(targetEntity="RelatedToDummyFriend", cascade={"persist"}, mappedBy="relatedDummy")
-     * @Groups({"fakemanytomany", "friends"})
-     */
+    #[ORM\OneToMany(targetEntity: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy')]
+    #[Groups(['fakemanytomany', 'friends'])]
     public $relatedToDummyFriend;
 
     /**
      * @var bool|null A dummy bool
-     *
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"friends"})
      */
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    #[Groups(['friends'])]
     public $dummyBoolean;
 
     /**
      * @var EmbeddableDummy
-     *
-     * @ORM\Embedded(class="EmbeddableDummy")
-     * @Groups({"friends"})
      */
+    #[ORM\Embedded(class: 'EmbeddableDummy')]
+    #[Groups(['friends'])]
     public $embeddedDummy;
 
     public function __construct()

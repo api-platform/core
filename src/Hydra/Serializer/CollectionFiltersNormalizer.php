@@ -16,9 +16,6 @@ namespace ApiPlatform\Hydra\Serializer;
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\FilterCollection;
-use ApiPlatform\Core\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -35,31 +32,26 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 {
     use FilterLocatorTrait;
     private $collectionNormalizer;
-    private $resourceMetadataFactory;
+    private $resourceMetadataCollectionFactory;
     private $resourceClassResolver;
 
     /**
-     * @param ContainerInterface|FilterCollection                                 $filterLocator           The new filter locator or the deprecated filter collection
-     * @param mixed                                                               $resourceMetadataFactory
-     * @param ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver
+     * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
      */
-    public function __construct(NormalizerInterface $collectionNormalizer, $resourceMetadataFactory, $resourceClassResolver, $filterLocator)
+    public function __construct(NormalizerInterface $collectionNormalizer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
     {
         $this->setFilterLocator($filterLocator);
         $this->collectionNormalizer = $collectionNormalizer;
-        $this->resourceMetadataFactory = $resourceMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->resourceClassResolver = $resourceClassResolver;
-        if (!$resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            trigger_deprecation('api-platform/core', '2.7', sprintf('Use "%s" instead of "%s".', ResourceMetadataCollectionFactoryInterface::class, ResourceMetadataFactoryInterface::class));
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return $this->collectionNormalizer->supportsNormalization($data, $format);
+        return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
     /**
@@ -85,19 +77,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             return $data;
         }
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
-        $resourceFilters = null;
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface) {
-            $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-            $operationName = $context['collection_operation_name'] ?? null;
-            if (null === $operationName) {
-                $resourceFilters = $resourceMetadata->getAttribute('filters', []);
-            } else {
-                $resourceFilters = $resourceMetadata->getCollectionOperationAttribute($operationName, 'filters', [], true);
-            }
-        } elseif ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
-            $resourceFilters = $operation->getFilters();
-        }
+        $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
+        $resourceFilters = $operation->getFilters();
         if (!$resourceFilters) {
             return $data;
         }
@@ -147,5 +128,3 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
     }
 }
-
-class_alias(CollectionFiltersNormalizer::class, \ApiPlatform\Core\Hydra\Serializer\CollectionFiltersNormalizer::class);

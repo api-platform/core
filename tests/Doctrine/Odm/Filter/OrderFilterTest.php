@@ -30,10 +30,10 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {
     use OrderFilterTestTrait;
 
-    protected $filterClass = OrderFilter::class;
-    protected $resourceClass = Dummy::class;
+    protected string $filterClass = OrderFilter::class;
+    protected string $resourceClass = Dummy::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 

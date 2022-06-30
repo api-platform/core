@@ -13,32 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @author Daniel West <daniel@silverback.is>
  *
  * Resource with an ID that will be URL encoded
- *
- * @ORM\Entity
- *
- * @ApiResource(
- *     itemOperations={
- *         "get"={
- *             "method"="GET",
- *             "requirements"={"id"=".+"}
- *         }
- *     }
- * )
  */
+#[ApiResource(operations: [new Get(requirements: ['id' => '.+']), new Post(), new GetCollection()])]
+#[ORM\Entity]
 class UrlEncodedId
 {
-    /**
-     * @ORM\Column(type="string")
-     * @ORM\Id
-     */
-    private $id = '%encode:id';
+    #[ORM\Column(type: 'string')]
+    #[ORM\Id]
+    private string $id = '%encode:id';
 
     public function getId()
     {

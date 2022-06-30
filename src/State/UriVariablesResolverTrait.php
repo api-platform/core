@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
+use ApiPlatform\Api\CompositeIdentifierParser;
 use ApiPlatform\Api\UriVariablesConverterInterface;
-use ApiPlatform\Core\Identifier\CompositeIdentifierParser;
-use ApiPlatform\Core\Identifier\ContextAwareIdentifierConverterInterface;
-use ApiPlatform\Core\Identifier\IdentifierConverterInterface;
 use ApiPlatform\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\HttpOperation;
 
@@ -25,8 +23,7 @@ use ApiPlatform\Metadata\HttpOperation;
  */
 trait UriVariablesResolverTrait
 {
-    /** @var ContextAwareIdentifierConverterInterface|IdentifierConverterInterface|UriVariablesConverterInterface|null */
-    private $uriVariablesConverter = null;
+    private ?UriVariablesConverterInterface $uriVariablesConverter = null;
 
     /**
      * Resolves an operation's UriVariables to their identifiers values.
@@ -67,7 +64,7 @@ trait UriVariablesResolverTrait
 
         if ($this->uriVariablesConverter) {
             $context = ['operation' => $operation];
-            $identifiers = $this->uriVariablesConverter instanceof IdentifierConverterInterface ? $this->uriVariablesConverter->convert($identifiers, $operation->getClass() ?? $resourceClass) : $this->uriVariablesConverter->convert($identifiers, $operation->getClass() ?? $resourceClass, $context);
+            $identifiers = $this->uriVariablesConverter->convert($identifiers, $operation->getClass() ?? $resourceClass, $context);
         }
 
         return $identifiers;

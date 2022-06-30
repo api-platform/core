@@ -13,44 +13,52 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomInputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\CustomInputDtoProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\CustomOutputDtoProvider;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * DummyDtoCustom.
- *
- * @ORM\Entity
- *
- * @ApiResource(
- *     collectionOperations={"post"={"input"=CustomInputDto::class}, "get", "custom_output"={"output"=CustomOutputDto::class, "path"="dummy_dto_custom_output", "method"="GET"}, "post_without_output"={"output"=false, "method"="POST", "path"="dummy_dto_custom_post_without_output"}},
- *     itemOperations={"get", "custom_output"={"output"=CustomOutputDto::class, "method"="GET", "path"="dummy_dto_custom_output/{id}"}, "put", "delete"}
- * )
  */
+#[ApiResource(
+    operations: [
+        new Get(),
+        new Put(),
+        new Delete(),
+        new Post(input: CustomInputDto::class, processor: CustomInputDtoProcessor::class),
+        new GetCollection(),
+        new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output', provider: CustomOutputDtoProvider::class),
+        new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}', provider: CustomOutputDtoProvider::class),
+        new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output'),
+    ]
+)]
+#[ORM\Entity]
 class DummyDtoCustom
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $lorem;
-
     /**
      * @var string
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     public $ipsum;
 
     public function getId()

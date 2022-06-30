@@ -15,8 +15,6 @@ namespace ApiPlatform\HttpCache\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Core\HttpCache\PurgerInterface as LegacyPurgerInterface;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -44,15 +42,10 @@ final class AddTagsListener
     use OperationRequestInitiatorTrait;
     use UriVariablesResolverTrait;
 
-    private $iriConverter;
-    private $purger;
+    private IriConverterInterface $iriConverter;
+    private ?PurgerInterface $purger;
 
-    /**
-     * @param LegacyPurgerInterface|PurgerInterface|null        $purger
-     * @param LegacyIriConverterInterface|IriConverterInterface $iriConverter
-     * @param mixed|null                                        $purger
-     */
-    public function __construct($iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, $purger = null)
+    public function __construct(IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, PurgerInterface $purger = null)
     {
         $this->iriConverter = $iriConverter;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -81,11 +74,7 @@ final class AddTagsListener
             // Allows to purge collections
             $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $attributes['resource_class']);
 
-            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
-                $iri = $this->iriConverter->getIriFromResourceClass($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH);
-            } else {
-                $iri = $this->iriConverter->getIriFromResource($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
-            }
+            $iri = $this->iriConverter->getIriFromResource($attributes['resource_class'], UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => $uriVariables]);
 
             $resources[$iri] = $iri;
         }
@@ -94,9 +83,8 @@ final class AddTagsListener
             return;
         }
 
-        if ($this->purger instanceof LegacyPurgerInterface || !$this->purger) {
+        if (!$this->purger) {
             $response->headers->set('Cache-Tags', implode(',', $resources));
-            trigger_deprecation('api-platform/core', '2.7', sprintf('The interface "%s" is deprecated, use "%s" instead.', LegacyPurgerInterface::class, PurgerInterface::class));
 
             return;
         }
@@ -108,5 +96,3 @@ final class AddTagsListener
         }
     }
 }
-
-class_alias(AddTagsListener::class, \ApiPlatform\Core\HttpCache\EventListener\AddTagsListener::class);

@@ -13,47 +13,42 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Custom Identifier Dummy With Subresource.
- *
- * @ApiResource(attributes={"identifiers"="slug"})
- * @ODM\Document
  */
+#[ApiResource(uriVariables: 'slug')]
+#[ApiResource(uriTemplate: '/slug_parent_dummies/{slug}/child_dummies/{childDummies}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: self::class, identifiers: ['slug'], toProperty: 'parentDummy'), 'childDummies' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
+#[ApiResource(uriTemplate: '/slug_child_dummies/{slug}/parent_dummy.{_format}', uriVariables: ['slug' => new Link(fromClass: \ApiPlatform\Tests\Fixtures\TestBundle\Document\SlugChildDummy::class, identifiers: ['slug'], fromProperty: 'parentDummy')], status: 200, operations: [new Get()])]
+#[ODM\Document]
 class SlugParentDummy
 {
     /**
      * @var int|null The database identifier
-     *
-     * @ApiProperty(identifier=false)
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
+    #[ApiProperty(identifier: false)]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
 
     /**
      * @var string|null The slug used a API identifier
-     *
-     * @ApiProperty(identifier=true)
-     *
-     * @ODM\Field
      */
-    private $slug;
+    #[ApiProperty(identifier: true)]
+    #[ODM\Field]
+    private ?string $slug = null;
 
     /**
-     * @ODM\ReferenceMany(targetDocument=SlugChildDummy::class, mappedBy="parentDummy")
-     *
-     * @var Collection<int, SlugChildDummy>
-     *
-     * @ApiSubresource
+     * @var Collection<int,SlugChildDummy>
      */
-    private $childDummies;
+    #[ODM\ReferenceMany(targetDocument: SlugChildDummy::class, mappedBy: 'parentDummy')]
+    private Collection $childDummies;
 
     public function __construct()
     {
@@ -76,7 +71,7 @@ class SlugParentDummy
     }
 
     /**
-     * @return Collection<int, SlugChildDummy>|SlugChildDummy[]
+     * @return Collection<int, SlugChildDummy>
      */
     public function getChildDummies(): Collection
     {

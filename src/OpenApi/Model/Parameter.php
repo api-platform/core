@@ -242,5 +242,3 @@ final class Parameter
         return $clone;
     }
 }
-
-class_alias(Parameter::class, \ApiPlatform\Core\OpenApi\Model\Parameter::class);

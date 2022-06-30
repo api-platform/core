@@ -28,11 +28,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\Util\AttributesExtractor;
+use ApiPlatform\Util\ClassInfoTrait;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -46,6 +46,7 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class IriConverter implements IriConverterInterface
 {
+    use ClassInfoTrait;
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
@@ -77,8 +78,7 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No route matches "%s".', $iri), $e->getCode(), $e);
         }
 
-        // TODO: 3.0 remove collection/item
-        $parameters['_api_operation_name'] = $parameters['_api_operation_name'] ?? $parameters['_api_collection_operation_name'] ?? $parameters['_api_item_operation_name'] ?? $parameters['_api_subresource_operation_name'] ?? null;
+        $parameters['_api_operation_name'] = $parameters['_api_operation_name'] ?? null;
 
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'])) {
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
@@ -115,10 +115,15 @@ final class IriConverter implements IriConverterInterface
      */
     public function getIriFromResource($item, int $referenceType = UrlGeneratorInterface::ABS_PATH, Operation $operation = null, array $context = []): ?string
     {
-        try {
-            $resourceClass = \is_string($item) ? $item : $this->getResourceClass($item, true);
-        } catch (InvalidArgumentException $e) {
-            return null;
+        $resourceClass = \is_string($item) ? $item : $this->getObjectClass($item);
+
+        if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
+            return $this->generateSkolemIri($context);
+        }
+
+        // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
+        if (!\is_string($item)) {
+            $resourceClass = $this->getResourceClass($item, true);
         }
 
         if (!$operation) {
@@ -130,17 +135,10 @@ final class IriConverter implements IriConverterInterface
             unset($context['uri_variables']);
         }
 
-        // Legacy subresources had bad IRIs but we don't want to break these, remove this in 3.0
-        $isLegacySubresource = ($operation->getExtraProperties()['is_legacy_subresource'] ?? false) && !$operation instanceof CollectionOperationInterface;
-        // Custom resources should have the same IRI as requested, it was not the case pre 2.7
-        $isLegacyCustomResource = ($operation->getExtraProperties()['is_legacy_resource_metadata'] ?? false) && ($operation->getExtraProperties()['user_defined_uri_template'] ?? false);
-
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()
-            || $operation instanceof Post
-            || $isLegacySubresource
-            || $isLegacyCustomResource
+            || ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod())
         ) {
             $forceCollection = $operation instanceof CollectionOperationInterface;
             try {
@@ -151,14 +149,10 @@ final class IriConverter implements IriConverterInterface
 
         $identifiers = $context['uri_variables'] ?? [];
 
-        if ($isLegacySubresource || $isLegacyCustomResource) {
-            $identifiers = [];
-        }
-
         if (\is_object($item)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
-            } catch (RuntimeException $e) {
+            } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
                     throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
@@ -166,9 +160,8 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        // TODO: call the Skolem IRI generator
         if (!$operation->getName()) {
-            return null;
+            return $this->generateSkolemIri($context);
         }
 
         try {
@@ -176,5 +169,10 @@ final class IriConverter implements IriConverterInterface
         } catch (RoutingExceptionInterface $e) {
             throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);
         }
+    }
+
+    private function generateSkolemIri(array $context = [])
+    {
+        return $context['iri'] ?? '/.well-known/genid/'.(bin2hex(random_bytes(10)));
     }
 }

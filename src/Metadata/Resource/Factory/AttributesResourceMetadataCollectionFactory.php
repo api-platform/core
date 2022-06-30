@@ -32,10 +32,10 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Creates a resource metadata from {@see ApiResource} annotations.
@@ -45,19 +45,19 @@ use Psr\Log\NullLogger;
  */
 final class AttributesResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    use DeprecationMetadataTrait;
-
     private $defaults;
     private $decorated;
     private $logger;
     private $graphQlEnabled;
+    private $camelCaseToSnakeCaseNameConverter;
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], bool $graphQlEnabled = false)
     {
-        $this->defaults = $defaults + ['attributes' => []];
+        $this->defaults = $defaults;
         $this->decorated = $decorated;
         $this->logger = $logger ?? new NullLogger();
         $this->graphQlEnabled = $graphQlEnabled;
+        $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**
@@ -185,14 +185,10 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 continue;
             }
 
-            // TODO: remove in 3.0
-            if ($operation instanceof HttpOperation && 'getUriVariables' === $methodName && !$operation->getUriTemplate() && $operation instanceof CollectionOperationInterface && !$operation->getUriVariables()) {
-                trigger_deprecation('api-platform', '2.7', 'Identifiers are declared on the default #[ApiResource] but you did not specify identifiers on the collection operation. In 3.0 the collection operations can have identifiers, you should specify identifiers on the operation not on the resource to avoid unwanted behavior.');
-                continue;
-            }
-
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
+
+        $operation = $operation->withExtraProperties(array_merge($resource->getExtraProperties(), $operation->getExtraProperties()));
 
         // Add global defaults attributes to the operation
         $operation = $this->addGlobalDefaults($operation);
@@ -224,7 +220,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
+            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : ''),
             $operation,
         ];
     }
@@ -234,22 +230,31 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function addGlobalDefaults($operation)
     {
-        $extraProperties = $operation->getExtraProperties();
-        foreach ($this->defaults['attributes'] as $key => $value) {
-            [$newKey, $value] = $this->getKeyValue($key, $value);
-            $upperKey = ucfirst($newKey);
+        $extraProperties = [];
+        foreach ($this->defaults as $key => $value) {
+            $upperKey = ucfirst($this->camelCaseToSnakeCaseNameConverter->denormalize($key));
             $getter = 'get'.$upperKey;
 
             if (!method_exists($operation, $getter)) {
                 if (!isset($extraProperties[$key])) {
                     $extraProperties[$key] = $value;
                 }
-            } elseif (null === $operation->{$getter}()) {
+            } else {
+                $currentValue = $operation->{$getter}();
+
+                if (\is_array($currentValue) && $currentValue) {
+                    $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+                }
+
+                if (null !== $currentValue) {
+                    continue;
+                }
+
                 $operation = $operation->{'with'.$upperKey}($value);
             }
         }
 
-        return $operation->withExtraProperties($extraProperties);
+        return $operation->withExtraProperties(array_merge($extraProperties, $operation->getExtraProperties()));
     }
 
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource

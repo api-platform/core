@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -23,35 +22,23 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Person.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(attributes={"normalization_context"={"groups"={"people.pets"}}})
- * @ODM\Document
  */
+#[ApiResource(normalizationContext: ['groups' => ['people.pets']])]
+#[ODM\Document]
 class Person
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\Field(type="string")
-     * @Groups({"people.pets"})
-     */
+    #[Groups(['people.pets'])]
+    #[ODM\Field(type: 'string')]
     public $name;
-
     /**
-     * @ODM\ReferenceMany(targetDocument=PersonToPet::class, mappedBy="person")
-     * @Groups({"people.pets"})
-     *
      * @var ArrayCollection
      */
+    #[Groups(['people.pets'])]
+    #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]
     public $pets;
-
-    /**
-     * @ApiSubresource
-     * @ODM\ReferenceMany(targetDocument=Greeting::class, mappedBy="sender")
-     */
+    #[ODM\ReferenceMany(targetDocument: Greeting::class, mappedBy: 'sender')]
     public $sentGreetings;
 
     public function __construct()

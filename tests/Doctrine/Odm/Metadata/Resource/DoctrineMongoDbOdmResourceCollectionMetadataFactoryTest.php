@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Odm\Metadata\Resource;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory;
@@ -28,6 +27,7 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         return $resourceMetadataCollectionFactory->reveal();
     }
 
-    public function testWithoutManager()
+    public function testWithoutManager(): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');
@@ -75,7 +75,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
     /**
      * @dataProvider operationProvider
      */
-    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null)
+    public function testWithProvider(Operation $operation, string $expectedProvider = null, string $expectedProcessor = null): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');

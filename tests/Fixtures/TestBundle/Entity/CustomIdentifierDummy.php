@@ -13,32 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom Identifier Dummy.
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class CustomIdentifierDummy
 {
     /**
      * @var int The custom identifier
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $customId;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $customId = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private string $name;
 
     public function getCustomId(): int
     {

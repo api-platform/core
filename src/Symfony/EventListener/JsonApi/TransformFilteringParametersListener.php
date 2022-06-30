@@ -41,5 +41,3 @@ final class TransformFilteringParametersListener
         $request->attributes->set('_api_filters', array_merge($filterParameter, $filters));
     }
 }
-
-class_alias(TransformFilteringParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformFilteringParametersListener::class);

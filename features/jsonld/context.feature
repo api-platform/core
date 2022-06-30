@@ -27,7 +27,7 @@ Feature: JSON-LD contexts generation
             "description": "https://schema.org/description",
             "dummy": "Dummy/dummy",
             "dummyBoolean": "Dummy/dummyBoolean",
-            "dummyDate": "http://schema.org/DateTime",
+            "dummyDate": "https://schema.org/DateTime",
             "dummyFloat": "Dummy/dummyFloat",
             "dummyPrice": "Dummy/dummyPrice",
             "relatedDummy": {
@@ -41,7 +41,7 @@ Feature: JSON-LD contexts generation
             "jsonData": "Dummy/jsonData",
             "arrayData": "Dummy/arrayData",
             "nameConverted": "Dummy/nameConverted",
-            "name": "http://schema.org/name",
+            "name": "https://schema.org/name",
             "alias": "https://schema.org/alternateName",
             "foo": "Dummy/foo"
         }
@@ -79,7 +79,7 @@ Feature: JSON-LD contexts generation
               "@vocab": "http://example.com/docs.jsonld#",
               "hydra": "http://www.w3.org/ns/hydra/core#",
               "person": {
-                  "@id": "http://example.com/id",
+                  "@id": "https://example.com/id",
                   "@type": "@id",
                   "foo": "bar"
               }

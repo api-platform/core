@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Command;
 
-use ApiPlatform\Core\GraphQl\Type\SchemaBuilderInterface as SchemaBuilderLegacyInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Utils\SchemaPrinter;
 use Symfony\Component\Console\Command\Command;
@@ -29,12 +28,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class GraphQlExportCommand extends Command
 {
-    protected static $defaultName = 'api:graphql:export';
+    private SchemaBuilderInterface $schemaBuilder;
 
-    /** @var SchemaBuilderLegacyInterface|SchemaBuilderInterface */
-    private $schemaBuilder;
-
-    public function __construct($schemaBuilder)
+    public function __construct(SchemaBuilderInterface $schemaBuilder)
     {
         $this->schemaBuilder = $schemaBuilder;
 
@@ -79,6 +75,9 @@ class GraphQlExportCommand extends Command
 
         return 0;
     }
-}
 
-class_alias(GraphQlExportCommand::class, \ApiPlatform\Core\Bridge\Symfony\Bundle\Command\GraphQlExportCommand::class);
+    public static function getDefaultName(): string
+    {
+        return 'api:graphql:export';
+    }
+}

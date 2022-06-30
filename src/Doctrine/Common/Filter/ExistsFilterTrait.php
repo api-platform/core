@@ -30,7 +30,7 @@ trait ExistsFilterTrait
     /**
      * @var string Keyword used to retrieve the value
      */
-    private $existsParameterName;
+    private string $existsParameterName;
 
     /**
      * {@inheritdoc}
@@ -100,5 +100,3 @@ trait ExistsFilterTrait
         return null;
     }
 }
-
-class_alias(ExistsFilterTrait::class, \ApiPlatform\Core\Bridge\Doctrine\Common\Filter\ExistsFilterTrait::class);

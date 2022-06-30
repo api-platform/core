@@ -25,8 +25,8 @@ use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
  */
 final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactoryInterface
 {
-    private $mapping;
-    private $decorated;
+    private array $mapping;
+    private ?DocumentMetadataFactoryInterface $decorated;
 
     public function __construct(array $mapping, ?DocumentMetadataFactoryInterface $decorated = null)
     {
@@ -69,5 +69,3 @@ final class ConfiguredDocumentMetadataFactory implements DocumentMetadataFactory
         return $documentMetadata;
     }
 }
-
-class_alias(ConfiguredDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\ConfiguredDocumentMetadataFactory::class);

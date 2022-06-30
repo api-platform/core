@@ -24,8 +24,6 @@ use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 
 final class DebugResourceCommand extends Command
 {
-    protected static $defaultName = 'debug:api-resource';
-
     private $resourceMetadataCollectionFactory;
     private $cloner;
     private $dumper;
@@ -119,5 +117,10 @@ final class DebugResourceCommand extends Command
         $output->writeln('Successfully dumped the selected operation');
 
         return Command::SUCCESS;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'debug:api-resource';
     }
 }

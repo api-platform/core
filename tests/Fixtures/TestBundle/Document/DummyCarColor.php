@@ -13,44 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource
- * @ODM\Document
- */
+#[ApiResource]
+#[ODM\Document]
 class DummyCarColor
 {
     /**
      * @var int The entity Id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
-    private $id;
-
-    /**
-     * @var DummyCar
-     *
-     * @ODM\ReferenceOne(targetDocument=DummyCar::class, inversedBy="colors", storeAs="id")
-     * @Assert\NotBlank
-     */
-    private $car;
-
-    /**
-     * @var string
-     *
-     * @ODM\Field(nullable=false)
-     * @ApiFilter(SearchFilter::class)
-     * @Assert\NotBlank
-     *
-     * @Serializer\Groups({"colors"})
-     */
-    private $prop = '';
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[Assert\NotBlank]
+    #[ODM\ReferenceOne(targetDocument: DummyCar::class, inversedBy: 'colors', storeAs: 'id')]
+    private ?DummyCar $car = null;
+    #[ApiFilter(SearchFilter::class)]
+    #[Assert\NotBlank]
+    #[Serializer\Groups(['colors'])]
+    #[ODM\Field(nullable: false)]
+    private string $prop = '';
 
     public function getId()
     {

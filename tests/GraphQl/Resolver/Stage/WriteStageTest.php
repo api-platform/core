@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStage;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -82,7 +82,7 @@ class WriteStageTest extends TestCase
         $operation = (new Mutation())->withName($operationName);
 
         $denormalizationContext = ['denormalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, false)->willReturn($denormalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, false)->willReturn($denormalizationContext);
 
         $data = new \stdClass();
         $processedData = new \stdClass();

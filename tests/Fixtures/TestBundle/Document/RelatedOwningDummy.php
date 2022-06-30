@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
@@ -22,30 +22,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Sergey V. Ryabov <sryabov@mhds.ru>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @ApiResource(iri="https://schema.org/Product")
- * @ODM\Document
  */
+#[ApiResource(types: ['https://schema.org/Product'])]
+#[ODM\Document]
 class RelatedOwningDummy
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
     /**
      * @var string A name
-     *
-     * @ODM\Field(type="string")
      */
+    #[ODM\Field(type: 'string')]
     public $name;
-
     /**
      * @var Dummy
-     *
-     * @ODM\ReferenceOne(targetDocument=Dummy::class, cascade={"persist"}, mappedBy="relatedOwningDummy")
-     * @ApiSubresource
      */
+    #[ODM\ReferenceOne(targetDocument: Dummy::class, cascade: ['persist'], mappedBy: 'relatedOwningDummy')]
     public $ownedDummy;
 
     public function getId()
@@ -84,7 +76,6 @@ class RelatedOwningDummy
     public function setOwnedDummy(Dummy $ownedDummy)
     {
         $this->ownedDummy = $ownedDummy;
-
         if ($this !== $this->ownedDummy->getRelatedOwningDummy()) {
             $this->ownedDummy->setRelatedOwningDummy($this);
         }

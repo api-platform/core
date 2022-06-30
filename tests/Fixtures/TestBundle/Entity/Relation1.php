@@ -13,26 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource
- * @ORM\Entity
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource]
+#[ORM\Entity]
 class Relation1
 {
-    /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
     public $id;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Relation2", inversedBy="relation1s")
-     */
+    #[ORM\ManyToOne(targetEntity: Relation2::class, inversedBy: 'relation1s')]
     public $relation2;
 }

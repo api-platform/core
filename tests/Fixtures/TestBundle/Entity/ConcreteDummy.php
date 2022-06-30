@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,18 +21,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Concrete Dummy.
  *
  * @author Jérémy Derusse <jeremy@derusse.com>
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class ConcreteDummy extends AbstractDummy
 {
     /**
      * @var string a concrete thing
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
      */
+    #[ORM\Column]
+    #[Assert\NotBlank]
     private $instance;
 
     public function setInstance($instance)

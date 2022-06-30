@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonSchema;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\PropertyInfo\Type;
@@ -375,10 +375,10 @@ class TypeFactoryTest extends TestCase
     {
         $schemaFactoryProphecy = $this->prophesize(SchemaFactoryInterface::class);
 
-        $schemaFactoryProphecy->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, Argument::type(Schema::class), ['foo' => 'bar'], false)->will(function (array $args) {
-            $args[5]['$ref'] = 'ref';
+        $schemaFactoryProphecy->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, Argument::type(Schema::class), ['foo' => 'bar'], false)->will(function (array $args) {
+            $args[4]['$ref'] = 'ref';
 
-            return $args[5];
+            return $args[4];
         });
 
         $typeFactory = new TypeFactory();

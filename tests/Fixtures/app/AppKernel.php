@@ -11,8 +11,8 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Core\Tests\Behat\DoctrineContext;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
+use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
@@ -111,8 +111,7 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
-        /* @TODO remove this check in 3.0 */
-        if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
+        if (class_exists(Uuid::class) && class_exists(UuidType::class)) {
             $loader->load(__DIR__.'/config/config_symfony_uid.yml');
         }
 
@@ -125,10 +124,6 @@ class AppKernel extends Kernel
             ],
         ];
 
-        // Symfony 5.4+
-        if (class_exists(SessionFactory::class)) {
-            $messengerConfig['reset_on_message'] = true;
-        }
         $c->prependExtensionConfig('framework', [
             'secret' => 'dunglas.fr',
             'validation' => ['enable_annotations' => true],
@@ -242,46 +237,16 @@ class AppKernel extends Kernel
             $c->prependExtensionConfig('api_platform', ['enable_nelmio_api_doc' => true]);
         }
 
-        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['METADATA_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
-        $c->prependExtensionConfig('api_platform', ['metadata_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
-        if ($metadataBackwardCompatibilityLayer) {
-            $loader->load(__DIR__.'/config/config_metadata_backward_compatibility_layer.yml');
-            $c->prependExtensionConfig('api_platform', [
-                'mapping' => [
-                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy'],
-                ],
-            ]);
-
-            if ('mongodb' === $this->environment) {
-                $c->prependExtensionConfig('api_platform', [
-                    'mapping' => [
-                        'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy_odm'],
-                    ],
-                ]);
-
-                return;
-            }
-
-            $c->prependExtensionConfig('api_platform', [
-                'mapping' => [
-                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_legacy_orm'],
-                ],
-            ]);
-
-            return;
-        }
-
-        $loader->load(__DIR__.'/config/config_v3.yml');
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
-                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3'],
+                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
             ],
         ]);
 
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [
                 'mapping' => [
-                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3_odm'],
+                    'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_odm'],
                 ],
             ]);
 
@@ -290,7 +255,7 @@ class AppKernel extends Kernel
 
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
-                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3_orm'],
+                'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_orm'],
             ],
         ]);
     }

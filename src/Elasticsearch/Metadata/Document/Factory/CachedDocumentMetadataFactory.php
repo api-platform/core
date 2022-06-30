@@ -29,9 +29,9 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
 {
     private const CACHE_KEY_PREFIX = 'index_metadata';
 
-    private $cacheItemPool;
-    private $decorated;
-    private $localCache = [];
+    private CacheItemPoolInterface $cacheItemPool;
+    private DocumentMetadataFactoryInterface $decorated;
+    private array $localCache = [];
 
     public function __construct(CacheItemPoolInterface $cacheItemPool, DocumentMetadataFactoryInterface $decorated)
     {
@@ -78,5 +78,3 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
         return $documentMetadata;
     }
 }
-
-class_alias(CachedDocumentMetadataFactory::class, \ApiPlatform\Core\Bridge\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory::class);

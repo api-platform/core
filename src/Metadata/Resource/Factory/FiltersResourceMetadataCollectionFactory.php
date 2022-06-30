@@ -15,8 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Util\AnnotationFilterExtractorTrait;
-use Doctrine\Common\Annotations\Reader;
+use ApiPlatform\Util\AttributeFilterExtractorTrait;
 
 /**
  * Creates a resource metadata from {@see Resource} annotations.
@@ -26,17 +25,13 @@ use Doctrine\Common\Annotations\Reader;
  */
 final class FiltersResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    use AnnotationFilterExtractorTrait;
+    use AttributeFilterExtractorTrait;
 
     private $decorated;
-    private $reader;
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, ?Reader $reader = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
         $this->decorated = $decorated;
-        if ($reader) {
-            $this->reader = $reader;
-        }
     }
 
     /**
@@ -56,11 +51,7 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        $filters = array_keys($this->readFilterAnnotations($reflectionClass, $this->reader));
-
-        if (\count($filters)) {
-            trigger_deprecation('api-platform/core', '2.7', 'Use php attributes instead of doctrine annotations to declare filters.');
-        }
+        $filters = array_keys($this->readFilterAttributes($reflectionClass));
 
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() as $operationName => $operation) {

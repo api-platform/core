@@ -33,7 +33,7 @@ final class AttributeResources implements IteratorAggregate
     /**
      * @var AttributeResource[]
      */
-    private $collection;
+    private readonly array $collection;
 
     public function __construct(AttributeResource ...$collection)
     {

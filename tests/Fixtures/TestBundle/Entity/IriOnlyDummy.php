@@ -13,39 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy with iri_only.
  *
  * @author Pierre Thibaudeau <pierre.thibaudeau@les-tilleuls.coop>
- *
- * @ApiResource(
- *     normalizationContext={
- *         "iri_only"=true,
- *         "jsonld_embed_context"=true
- *     }
- * )
- * @ORM\Entity
  */
+#[ApiResource(normalizationContext: ['iri_only' => true, 'jsonld_embed_context' => true])]
+#[ORM\Entity]
 class IriOnlyDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string")
-     */
-    private $foo;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string')]
+    private string $foo;
 
     public function getId(): ?int
     {

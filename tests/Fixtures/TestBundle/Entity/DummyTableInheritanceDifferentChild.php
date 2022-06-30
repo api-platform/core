@@ -13,23 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\Entity
- * @ApiResource
- */
+#[ApiResource]
+#[ORM\Entity]
 class DummyTableInheritanceDifferentChild extends DummyTableInheritance
 {
     /**
      * @var string The dummy email
-     *
-     * @ORM\Column
-     *
-     * @Groups({"default"})
      */
+    #[ORM\Column]
+    #[Groups(['default'])]
     private $email;
 
     public function getEmail()

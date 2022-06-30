@@ -15,19 +15,15 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
-class DummyCarIdentifier
+#[ORM\Entity]
+class DummyCarIdentifier implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->id;
     }

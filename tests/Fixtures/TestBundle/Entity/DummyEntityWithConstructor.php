@@ -13,71 +13,42 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\DummyObjectWithoutConstructor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * Dummy entity built with constructor.
+ *
  * https://github.com/api-platform/core/issues/1747.
  *
  * @author Maxime Veber <maxime.veber@nekland.fr>
- *
- * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "put"={"denormalization_context"={"groups"={"put"}}}
- *     }
- * )
- * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Put(denormalizationContext: ['groups' => ['put']]), new Post(), new GetCollection()])]
+#[ORM\Entity]
 class DummyEntityWithConstructor
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     */
-    private $foo;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column
-     */
-    private $bar;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"put"})
-     */
-    private $baz;
-
-    /**
-     * @var DummyObjectWithoutConstructor[]
-     */
-    private $items;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(nullable: true)]
+    #[Groups(['put'])]
+    private ?string $baz = null;
 
     /**
      * @param DummyObjectWithoutConstructor[] $items
      */
-    public function __construct(string $foo, string $bar, array $items)
+    public function __construct(#[ORM\Column] private readonly string $foo, #[ORM\Column] private readonly string $bar, private readonly array $items)
     {
-        $this->foo = $foo;
-        $this->bar = $bar;
-        $this->items = $items;
     }
 
     public function getId(): ?int

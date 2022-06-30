@@ -13,47 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Payment\VoidPaymentAction;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- *
- * @ApiResource(
- *     itemOperations={
- *         "get",
- *         "post_void"={
- *             "method"="POST",
- *             "path"="/payments/{id}/void",
- *             "controller"=VoidPaymentAction::class,
- *             "deserialize"=false,
- *         },
- *     },
- * )
- */
+#[ApiResource(operations: [new Get(), new Post(uriTemplate: '/payments/{id}/void', controller: VoidPaymentAction::class, deserialize: false), new Post(), new GetCollection()])]
+#[ODM\Document]
 class Payment
 {
-    /**
-     * @var int|null
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
-    private $id;
-
-    /**
-     * @var string|null
-     */
-    private $amount;
-
-    /**
-     * @ODM\ReferenceOne(targetDocument=VoidPayment::class, mappedBy="payment")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    private ?int $id = null;
+    #[ODM\ReferenceOne(targetDocument: VoidPayment::class, mappedBy: 'payment')]
     private $voidPayment;
 
-    public function __construct(string $amount)
+    public function __construct(private readonly ?string $amount)
     {
-        $this->amount = $amount;
     }
 
     public function getId(): ?int
@@ -71,7 +48,6 @@ class Payment
         if (null !== $this->voidPayment) {
             return;
         }
-
         $this->voidPayment = new VoidPayment($this);
     }
 

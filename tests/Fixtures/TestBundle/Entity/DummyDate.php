@@ -13,66 +13,54 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Dummy Date.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(attributes={
- *     "filters"={"my_dummy_date.date"}
- * })
- * @ApiFilter(SearchFilter::class, properties={"dummyDate"})
- * @ApiFilter(DateFilter::class, properties={
- *     "dateIncludeNullAfter"=DateFilter::INCLUDE_NULL_AFTER,
- *     "dateIncludeNullBefore"=DateFilter::INCLUDE_NULL_BEFORE,
- *     "dateIncludeNullBeforeAndAfter"=DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER
- * })
- *
- * @ORM\Entity
  */
+#[ApiFilter(DateFilter::class, properties: [
+    'dateIncludeNullAfter' => DateFilter::INCLUDE_NULL_AFTER,
+    'dateIncludeNullBefore' => DateFilter::INCLUDE_NULL_BEFORE,
+    'dateIncludeNullBeforeAndAfter' => DateFilter::INCLUDE_NULL_BEFORE_AND_AFTER,
+])]
+#[ApiFilter(SearchFilter::class, properties: ['dummyDate'])]
+#[ApiResource(filters: ['my_dummy_date.date'])]
+#[ORM\Entity]
 class DummyDate
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var \DateTime The dummy date
-     *
-     * @ORM\Column(type="date")
      */
+    #[ORM\Column(type: 'date')]
     public $dummyDate;
-
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(type="date", nullable=true)
      */
+    #[ORM\Column(type: 'date', nullable: true)]
     public $dateIncludeNullAfter;
-
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(type="date", nullable=true)
      */
+    #[ORM\Column(type: 'date', nullable: true)]
     public $dateIncludeNullBefore;
-
     /**
      * @var \DateTime|null
-     *
-     * @ORM\Column(type="date", nullable=true)
      */
+    #[ORM\Column(type: 'date', nullable: true)]
     public $dateIncludeNullBeforeAndAfter;
 
     /**

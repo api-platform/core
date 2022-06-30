@@ -38,10 +38,5 @@ final class TransformPaginationParametersListener
 
         $filters = $request->attributes->get('_api_filters', []);
         $request->attributes->set('_api_filters', array_merge($pageParameter, $filters));
-
-        /* @TODO remove the `_api_pagination` attribute in 3.0 (@meyerbaptiste) */
-        $request->attributes->set('_api_pagination', $pageParameter);
     }
 }
-
-class_alias(TransformPaginationParametersListener::class, \ApiPlatform\Core\JsonApi\EventListener\TransformPaginationParametersListener::class);

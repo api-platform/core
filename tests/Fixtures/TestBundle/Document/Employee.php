@@ -19,36 +19,31 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ODM\Document
- */
 #[ApiResource]
 #[Post]
 #[ApiResource(uriTemplate: '/companies/{companyId}/employees/{id}', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company'], 'id' => ['from_class' => Employee::class]])]
 #[Get]
 #[ApiResource(uriTemplate: '/companies/{companyId}/employees', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company']])]
 #[GetCollection]
+#[ODM\Document]
 class Employee
 {
     /**
      * @var int|null The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public $id;
 
     /**
      * @var string The dummy name
-     *
-     * @ODM\Field
      */
+    #[ODM\Field]
     public $name;
 
     /**
      * @var ?Company
-     *
-     * @ODM\ReferenceOne(targetDocument=Company::class, storeAs="id")
      */
+    #[ODM\ReferenceOne(targetDocument: Company::class, storeAs: 'id')]
     public $company;
 
     public function getId()

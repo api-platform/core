@@ -23,9 +23,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\OperationResourceProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 #[ApiResource(normalizationContext: ['skip_null_values' => true], processor: OperationResourceProcessor::class)]
 #[Get]
 #[Patch(inputFormats: ['json' => ['application/merge-patch+json']])]
@@ -34,11 +32,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[Delete]
 class OperationResource
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     #[ApiProperty(identifier: true)]
     private $identifier;
 

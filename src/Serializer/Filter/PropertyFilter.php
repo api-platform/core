@@ -168,5 +168,3 @@ final class PropertyFilter implements FilterInterface
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }
 }
-
-class_alias(PropertyFilter::class, \ApiPlatform\Core\Serializer\Filter\PropertyFilter::class);

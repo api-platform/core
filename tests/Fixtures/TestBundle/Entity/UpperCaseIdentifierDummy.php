@@ -13,33 +13,29 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * UpperCaseIdentifier dummy.
  *
  * @author Exploit.cz <insekticid@exploit.cz>
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class UpperCaseIdentifierDummy
 {
     /**
      * @var string The custom identifier
-     *
-     * @ORM\Column(type="guid")
-     * @ORM\Id
      */
-    private $Uuid;
-
+    #[ORM\Column(type: 'guid')]
+    #[ORM\Id]
+    private string $Uuid;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private string $name;
 
     public function getUuid(): string
     {

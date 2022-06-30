@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStage;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -70,23 +70,6 @@ class SecurityPostDenormalizeStageTest extends TestCase
         $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
 
         ($this->securityPostDenormalizeStage)($resourceClass, $operation, ['extra_variables' => $extraVariables]);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testGrantedLegacy(): void
-    {
-        self::markTestSkipped('The deprecation is handled in the Metadata transformation, this is not required anymore.'); // @phpstan-ignore-next-line
-        $operationName = 'item_query';
-        $resourceClass = 'myResource';
-        $isGranted = 'not_granted';
-        $extraVariables = ['extra' => false];
-        $operation = (new Query())->withSecurityPostDenormalize($isGranted)->withName($operationName);
-
-        $this->resourceAccessCheckerProphecy->isGranted($resourceClass, $isGranted, $extraVariables)->shouldBeCalled()->willReturn(true);
-
-        ($this->securityPostDenormalizeStage)($resourceClass, $operationName, ['extra_variables' => $extraVariables]);
     }
 
     public function testNotGranted(): void

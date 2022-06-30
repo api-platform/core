@@ -17,33 +17,17 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Model\ProductInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\TaxonInterface;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class Product implements ProductInterface
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", unique=true)
-     */
-    private $code;
-
-    /**
-     * @var Taxon|null
-     *
-     * @ORM\ManyToOne(targetEntity=Taxon::class)
-     */
-    private $mainTaxon;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[ORM\Column(type: 'string', unique: true)]
+    private string $code;
+    #[ORM\ManyToOne(targetEntity: Taxon::class)]
+    private ?Taxon $mainTaxon = null;
 
     /**
      * {@inheritdoc}

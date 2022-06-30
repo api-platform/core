@@ -64,7 +64,7 @@ Feature: Custom operation
     """
     {
         "@context": "/contexts/CustomActionDummy",
-        "@id": "/custom_action_dummies/1",
+        "@id": "/custom_action_collection_dummies/1",
         "@type": "CustomActionDummy",
         "id": 1,
         "foo": "custom!"

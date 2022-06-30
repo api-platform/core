@@ -37,10 +37,8 @@ final class UuidDenormalizer implements DenormalizerInterface
         }
     }
 
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
         return \is_string($data) && is_a($type, UuidInterface::class, true);
     }
 }
-
-class_alias(UuidDenormalizer::class, \ApiPlatform\Core\Bridge\RamseyUuid\Serializer\UuidDenormalizer::class);

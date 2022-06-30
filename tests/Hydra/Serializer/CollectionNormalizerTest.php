@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hydra\Serializer;
 
+use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\Api\IriConverterInterface;
-use ApiPlatform\Core\Api\OperationType;
-use ApiPlatform\Core\Tests\ProphecyTrait;
+use ApiPlatform\Api\UrlGeneratorInterface;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
@@ -25,6 +24,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\Tests\Fixtures\Foo;
 use ApiPlatform\Tests\Fixtures\NotAResource;
+use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -33,7 +33,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
- * @group legacy
  */
 class CollectionNormalizerTest extends TestCase
 {
@@ -45,7 +44,7 @@ class CollectionNormalizerTest extends TestCase
         $iriConvert = $this->prophesize(IriConverterInterface::class);
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foos');
+        $iriConvert->getIriFromResource('Foo', UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
 
         $normalizer = new CollectionNormalizer($contextBuilder->reveal(), $resourceClassResolverProphecy->reveal(), $iriConvert->reveal());
 
@@ -87,7 +86,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
         $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
@@ -103,8 +102,7 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
-            'operation_type' => OperationType::COLLECTION,
+            'operation_name' => 'get',
             'resource_class' => Foo::class,
         ]);
 
@@ -204,8 +202,7 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
-            'operation_type' => OperationType::COLLECTION,
+            'operation_name' => 'get',
             'resource_class' => Foo::class,
             'api_sub_level' => true,
         ]);
@@ -316,7 +313,7 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($paginatorProphecy, 'Foo')->willReturn('Foo');
 
         $iriConvert = $this->prophesize(IriConverterInterface::class);
-        $iriConvert->getIriFromResourceClass('Foo')->willReturn('/foo/1');
+        $iriConvert->getIriFromResource('Foo', UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foo/1');
 
         $contextBuilder = $this->prophesize(ContextBuilderInterface::class);
         $contextBuilder->getResourceContextUri('Foo')->willReturn('/contexts/Foo');
@@ -355,9 +352,9 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
-        $iriConverterProphecy->getIriFromItem($fooOne)->willReturn('/foos/1');
-        $iriConverterProphecy->getIriFromItem($fooThree)->willReturn('/foos/3');
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+        $iriConverterProphecy->getIriFromResource($fooOne)->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromResource($fooThree)->willReturn('/foos/3');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
@@ -365,7 +362,7 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
+            'operation_name' => 'get',
             'iri_only' => true,
             'resource_class' => Foo::class,
         ]);
@@ -407,9 +404,9 @@ class CollectionNormalizerTest extends TestCase
         $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResourceClass(Foo::class)->willReturn('/foos');
-        $iriConverterProphecy->getIriFromItem($fooOne)->willReturn('/foos/1');
-        $iriConverterProphecy->getIriFromItem($fooThree)->willReturn('/foos/3');
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+        $iriConverterProphecy->getIriFromResource($fooOne)->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromResource($fooThree)->willReturn('/foos/3');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
@@ -417,7 +414,7 @@ class CollectionNormalizerTest extends TestCase
         $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
 
         $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
-            'collection_operation_name' => 'get',
+            'operation_name' => 'get',
             'iri_only' => true,
             'jsonld_embed_context' => true,
             'resource_class' => Foo::class,

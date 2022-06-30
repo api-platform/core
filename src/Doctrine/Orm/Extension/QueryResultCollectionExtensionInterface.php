@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -24,10 +25,10 @@ use Doctrine\ORM\QueryBuilder;
  */
 interface QueryResultCollectionExtensionInterface extends QueryCollectionExtensionInterface
 {
-    public function supportsResult(string $resourceClass, string $operationName = null): bool;
+    public function supportsResult(string $resourceClass, Operation $operation = null, array $context = []): bool;
 
     /**
      * @return iterable
      */
-    public function getResult(QueryBuilder $queryBuilder);
+    public function getResult(QueryBuilder $queryBuilder, string $resourceClass = null, Operation $operation = null, array $context = []);
 }

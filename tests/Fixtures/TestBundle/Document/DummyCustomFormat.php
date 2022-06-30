@@ -13,29 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(attributes={"formats"={"xml", "jsonld", "csv"={"text/csv"}, "pdf"="application/pdf"}})
- * @ODM\Document
- */
+#[ApiResource(formats: ['xml', 'jsonld', 'csv' => ['text/csv'], 'pdf' => 'application/pdf'])]
+#[ODM\Document]
 class DummyCustomFormat
 {
     /**
      * @var int The id
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int")
      */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
     /**
      * @var string
-     *
-     * @ODM\Field
-     * @Assert\NotBlank
      */
+    #[Assert\NotBlank]
+    #[ODM\Field]
     private $name;
 
     public function getId()

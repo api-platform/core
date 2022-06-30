@@ -18,44 +18,22 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ORM\MappedSuperclass
- */
+#[ORM\MappedSuperclass]
 abstract class VoDummyVehicle
 {
     use VoDummyIdAwareTrait;
-
     /**
-     * @var string
-     *
-     * @ORM\Column
-     * @Groups({"car_read", "car_write"})
+     * @var Collection<VoDummyDriver>
      */
-    private $make;
-
-    /**
-     * @var VoDummyInsuranceCompany|null
-     *
-     * @ORM\ManyToOne(targetEntity="VoDummyInsuranceCompany", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $insuranceCompany;
-
-    /**
-     * @var VoDummyDriver[]|Collection
-     *
-     * @ORM\ManyToMany(targetEntity="VoDummyDriver", cascade={"persist"})
-     * @Groups({"car_read", "car_write"})
-     */
-    private $drivers;
+    #[ORM\ManyToMany(targetEntity: VoDummyDriver::class, cascade: ['persist'])]
+    #[Groups(['car_read', 'car_write'])]
+    private \Doctrine\Common\Collections\Collection $drivers;
 
     public function __construct(
-        string $make,
-        VoDummyInsuranceCompany $insuranceCompany,
+        #[ORM\Column] #[Groups(['car_read', 'car_write'])] private readonly string $make,
+        #[ORM\ManyToOne(targetEntity: VoDummyInsuranceCompany::class, cascade: ['persist'])] #[Groups(['car_read', 'car_write'])] private readonly ?VoDummyInsuranceCompany $insuranceCompany,
         array $drivers
     ) {
-        $this->make = $make;
-        $this->insuranceCompany = $insuranceCompany;
         $this->drivers = new ArrayCollection($drivers);
     }
 
@@ -70,7 +48,7 @@ abstract class VoDummyVehicle
     }
 
     /**
-     * @return VoDummyDriver[]|Collection
+     * @return Collection<VoDummyDriver>
      */
     public function getDrivers()
     {

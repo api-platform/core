@@ -13,31 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Custom identifier dummy.
- *
- * @ApiResource
- * @ORM\Entity
  */
+#[ApiResource]
+#[ORM\Entity]
 class UuidIdentifierDummy
 {
     /**
      * @var string The custom identifier
-     *
-     * @ORM\Column(type="guid")
-     * @ORM\Id
      */
+    #[ORM\Column(type: 'guid')]
+    #[ORM\Id]
     private $uuid;
-
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column(length=30)
      */
-    private $name;
+    #[ORM\Column(length: 30)]
+    private string $name;
 
     public function getUuid(): string
     {

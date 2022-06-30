@@ -13,55 +13,42 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Foo.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "order"={"bar", "name"="DESC"}
- *     },
- *     graphql={
- *         "item_query",
- *         "collection_query"={"pagination_enabled"=false},
- *         "create",
- *         "delete"
- *     },
- *     collectionOperations={
- *         "get",
- *         "get_desc_custom"={"method"="GET", "path"="custom_collection_desc_foos", "order"={"name"="DESC"}},
- *         "get_asc_custom"={"method"="GET", "path"="custom_collection_asc_foos", "order"={ "name"="ASC"}},
- *     }
- * )
- * @ORM\Entity
  */
+#[ApiResource(operations: [new Get(), new Put(), new Patch(), new Delete(), new GetCollection(), new GetCollection(uriTemplate: 'custom_collection_desc_foos', order: ['name' => 'DESC']), new GetCollection(uriTemplate: 'custom_collection_asc_foos', order: ['name' => 'ASC'])], graphQlOperations: [new Query(name: 'item_query'), new QueryCollection(name: 'collection_query', paginationEnabled: false), new Mutation(name: 'create'), new Mutation(name: 'delete')], order: ['bar', 'name' => 'DESC'])]
+#[ORM\Entity]
 class Foo
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
-
     /**
      * @var string The foo bar
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $bar;
 
     public function getId()

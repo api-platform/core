@@ -15,14 +15,10 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- */
+#[ORM\Entity]
 class InternalUser extends AbstractUser
 {
-    /**
-     * @ORM\Column
-     */
+    #[ORM\Column]
     private $internalId;
 
     public function getInternalId(): ?string

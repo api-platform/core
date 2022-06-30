@@ -13,39 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Model;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 
 /**
- * @ApiResource(
- *     iri="http://schema.org/MediaObject",
- *     graphql={
- *         "upload"={
- *             "mutation"="app.graphql.mutation_resolver.upload_media_object",
- *             "args"={
- *                 "file"={"type"="Upload!", "description"="Upload a file"}
- *             }
- *         },
- *         "uploadMultiple"={
- *             "mutation"="app.graphql.mutation_resolver.upload_multiple_media_object",
- *             "args"={
- *                 "files"={"type"="[Upload!]!", "description"="Upload multiple files"}
- *             }
- *         }
- *     }
- * )
- *
  * @author Mahmood Bazdar <mahmood@bazdar.me>
  */
+#[ApiResource(graphQlOperations: [new Mutation(name: 'upload', resolver: 'app.graphql.mutation_resolver.upload_media_object', args: ['file' => ['type' => 'Upload!', 'description' => 'Upload a file']]), new Mutation(name: 'uploadMultiple', resolver: 'app.graphql.mutation_resolver.upload_multiple_media_object', args: ['files' => ['type' => '[Upload!]!', 'description' => 'Upload multiple files']])], types: ['http://schema.org/MediaObject'])]
 class MediaObject
 {
-    /**
-     * @ApiProperty(identifier=true)
-     */
+    #[ApiProperty(identifier: true)]
     public $id;
 
-    /**
-     * @var string
-     */
-    public $contentUrl;
+    public string $contentUrl;
 }

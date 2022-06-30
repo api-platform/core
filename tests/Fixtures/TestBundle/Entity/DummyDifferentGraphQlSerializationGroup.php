@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -21,42 +23,31 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * Dummy with different serialization groups for item_query and collection_query.
  *
  * @author Mahmood Bazdar <mahmood@bazdar.me>
- *
- * @ApiResource(
- *     graphql={
- *         "item_query"={"normalization_context"={"groups"={"item_query"}}},
- *         "collection_query"={"normalization_context"={"groups"={"collection_query"}}}
- *     }
- * )
- * @ORM\Entity
  */
+#[ApiResource(graphQlOperations: [new Query(name: 'item_query', normalizationContext: ['groups' => ['item_query']]), new QueryCollection(name: 'collection_query', normalizationContext: ['groups' => ['collection_query']])])]
+#[ORM\Entity]
 class DummyDifferentGraphQlSerializationGroup
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer", nullable=true)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"item_query", "collection_query"})
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['item_query', 'collection_query'])]
+    private ?int $id = null;
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     * @Groups({"item_query", "collection_query"})
      */
-    private $name;
-
+    #[ORM\Column]
+    #[Groups(['item_query', 'collection_query'])]
+    private string $name;
     /**
      * @var string|null The dummy title
-     *
-     * @ORM\Column(nullable=true)
-     * @Groups({"item_query"})
      */
-    private $title;
+    #[ORM\Column(nullable: true)]
+    #[Groups(['item_query'])]
+    private ?string $title = null;
 
     public function getId(): ?int
     {

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
 use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -27,22 +26,19 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class UriVariablesConverter implements UriVariablesConverterInterface
 {
-    /**
-     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
-     */
-    private $propertyMetadataFactory;
+    private PropertyMetadataFactoryInterface $propertyMetadataFactory;
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    /** @var iterable<UriVariableTransformerInterface> */
     private $uriVariableTransformers;
-    private $resourceMetadataCollectionFactory;
 
     /**
      * @param iterable<UriVariableTransformerInterface> $uriVariableTransformers
-     * @param mixed                                     $propertyMetadataFactory
      */
-    public function __construct($propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, iterable $uriVariableTransformers)
+    public function __construct(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, iterable $uriVariableTransformers)
     {
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->uriVariableTransformers = $uriVariableTransformers;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->uriVariableTransformers = $uriVariableTransformers;
     }
 
     /**

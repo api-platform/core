@@ -13,31 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ApiResource(attributes={"formats"={"xml", "jsonld", "csv"={"text/csv"}, "pdf"="application/pdf"}})
- * @ORM\Entity
- */
+#[ApiResource(formats: ['xml', 'jsonld', 'csv' => ['text/csv'], 'pdf' => 'application/pdf'])]
+#[ORM\Entity]
 class DummyCustomFormat
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
-
     /**
      * @var string
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
      */
+    #[ORM\Column]
+    #[Assert\NotBlank]
     private $name;
 
     public function getId()

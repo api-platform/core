@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,41 +25,33 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Related to Normalized Dummy.
  *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
- *
- * @ApiResource(attributes={
- *     "normalization_context"={"groups"={"related_output", "output"}},
- *     "denormalization_context"={"groups"={"related_input", "input"}}
- * })
- * @ORM\Entity
  */
+#[ApiResource(normalizationContext: ['groups' => ['related_output', 'output']], denormalizationContext: ['groups' => ['related_input', 'input']])]
+#[ORM\Entity]
 class RelatedNormalizedDummy
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups({"related_output", "related_input"})
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['related_output', 'related_input'])]
+    private ?int $id = null;
 
     /**
      * @var string The dummy name
-     *
-     * @ORM\Column
-     * @Assert\NotBlank
-     * @ApiProperty(iri="http://schema.org/name")
-     * @Groups({"related_output", "related_input"})
      */
-    private $name;
-
+    #[ApiProperty(types: ['http://schema.org/name'])]
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['related_output', 'related_input'])]
+    private string $name;
     /**
      * @var Collection<int, CustomNormalizedDummy> Several Normalized dummies
-     *
-     * @ORM\ManyToMany(targetEntity="CustomNormalizedDummy")
-     * @Groups({"related_output", "related_input"})
      */
+    #[ORM\ManyToMany(targetEntity: CustomNormalizedDummy::class)]
+    #[Groups(['related_output', 'related_input'])]
     public $customNormalizedDummy;
 
     public function __construct()

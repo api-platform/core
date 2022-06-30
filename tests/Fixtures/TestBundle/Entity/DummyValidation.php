@@ -13,53 +13,46 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity
- * @ApiResource(
- *     collectionOperations={
- *         "get"={"method"="GET"},
- *         "post"={"path"="dummy_validation.{_format}", "method"="POST"},
- *         "post_validation_groups"={"route_name"="post_validation_groups", "validation_groups"={"a"}, "method"="GET"},
- *         "post_validation_sequence"={"route_name"="post_validation_sequence", "validation_groups"="app.dummy_validation.group_generator", "method"="GET"}
- *     }
- * )
- */
+#[ApiResource(operations: [
+    new GetCollection(),
+    new Post(uriTemplate: 'dummy_validation.{_format}'),
+    new Post(routeName: 'post_validation_groups', validationContext: ['groups' => ['a']]),
+    new Post(routeName: 'post_validation_sequence', validationContext: ['groups' => 'app.dummy_validation.group_generator']),
+]
+)]
+#[ORM\Entity]
 class DummyValidation
 {
     /**
      * @var int|null The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string|null The dummy name
-     *
-     * @ORM\Column(nullable=true)
-     * @Assert\NotNull(groups={"a"})
      */
-    private $name;
-
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(groups: ['a'])]
+    private ?string $name = null;
     /**
      * @var string|null The dummy title
-     *
-     * @ORM\Column(nullable=true)
-     * @Assert\NotNull(groups={"b"})
      */
-    private $title;
-
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(groups: ['b'])]
+    private ?string $title = null;
     /**
      * @var string The dummy code
-     * @ORM\Column
      */
-    private $code;
+    #[ORM\Column]
+    private string $code;
 
     public function getId(): ?int
     {

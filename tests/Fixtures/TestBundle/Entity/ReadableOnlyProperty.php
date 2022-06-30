@@ -13,32 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiProperty;
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ApiResource
- * @ORM\Entity
- */
+#[ApiResource]
+#[ORM\Entity]
 class ReadableOnlyProperty
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
 
     /**
      * @var string The foo name
-     *
-     * @ORM\Column
-     * @ApiProperty(writable=false)
      */
-    private $name;
+    #[ApiProperty(writable: false)]
+    #[ORM\Column]
+    private readonly string $name;
 
     public function __construct()
     {
@@ -50,7 +46,7 @@ class ReadableOnlyProperty
         return $this->id;
     }
 
-    public function setName($name)
+    public function setName($name): never
     {
         throw new \Exception('Can not write name.');
     }

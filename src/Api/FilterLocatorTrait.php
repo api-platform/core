@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Api;
 
-use ApiPlatform\Core\Api\FilterCollection;
 use ApiPlatform\Exception\InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 
@@ -26,20 +25,14 @@ use Psr\Container\ContainerInterface;
  */
 trait FilterLocatorTrait
 {
-    private $filterLocator;
+    private ?ContainerInterface $filterLocator;
 
     /**
      * Sets a filter locator with a backward compatibility.
-     *
-     * @param ContainerInterface|FilterCollection|null $filterLocator
      */
-    private function setFilterLocator($filterLocator, bool $allowNull = false): void
+    private function setFilterLocator(?ContainerInterface $filterLocator, bool $allowNull = false): void
     {
-        if ($filterLocator instanceof ContainerInterface || $filterLocator instanceof FilterCollection || (null === $filterLocator && $allowNull)) {
-            if ($filterLocator instanceof FilterCollection) {
-                @trigger_error(sprintf('The %s class is deprecated since version 2.1 and will be removed in 3.0. Provide an implementation of %s instead.', FilterCollection::class, ContainerInterface::class), \E_USER_DEPRECATED);
-            }
-
+        if ($filterLocator instanceof ContainerInterface || (null === $filterLocator && $allowNull)) {
             $this->filterLocator = $filterLocator;
         } else {
             throw new InvalidArgumentException(sprintf('The "$filterLocator" argument is expected to be an implementation of the "%s" interface%s.', ContainerInterface::class, $allowNull ? ' or null' : ''));
@@ -51,16 +44,10 @@ trait FilterLocatorTrait
      */
     private function getFilter(string $filterId): ?FilterInterface
     {
-        if ($this->filterLocator instanceof ContainerInterface && $this->filterLocator->has($filterId)) {
+        if ($this->filterLocator && $this->filterLocator->has($filterId)) {
             return $this->filterLocator->get($filterId);
-        }
-
-        if ($this->filterLocator instanceof FilterCollection && $this->filterLocator->offsetExists($filterId)) {
-            return $this->filterLocator->offsetGet($filterId);
         }
 
         return null;
     }
 }
-
-class_alias(FilterLocatorTrait::class, \ApiPlatform\Core\Api\FilterLocatorTrait::class);

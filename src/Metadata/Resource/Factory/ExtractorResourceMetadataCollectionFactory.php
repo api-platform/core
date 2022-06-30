@@ -24,8 +24,8 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\DeprecationMetadataTrait;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 /**
  * Creates a resource metadata from {@see Resource} extractors (XML, YAML).
@@ -35,16 +35,17 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class ExtractorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    use DeprecationMetadataTrait;
     private $extractor;
     private $decorated;
     private $defaults;
+    private $camelCaseToSnakeCaseNameConverter;
 
     public function __construct(ResourceExtractorInterface $extractor, ResourceMetadataCollectionFactoryInterface $decorated = null, array $defaults = [])
     {
         $this->extractor = $extractor;
         $this->decorated = $decorated;
         $this->defaults = $defaults;
+        $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**
@@ -130,7 +131,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                     continue;
                 }
 
-                [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
+                $camelCaseKey = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);
                 $methodName = 'with'.ucfirst($camelCaseKey);
 
                 if (method_exists($operation, $methodName)) {
@@ -164,7 +165,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
                     continue;
                 }
 
-                [$camelCaseKey, $value] = $this->getKeyValue($key, $value);
+                $camelCaseKey = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);
                 $methodName = 'with'.ucfirst($camelCaseKey);
 
                 if (method_exists($operation, $methodName)) {
@@ -184,7 +185,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
     private function getOperationWithDefaults(ApiResource $resource, HttpOperation $operation): HttpOperation
     {
         foreach (($this->defaults['attributes'] ?? []) as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
+            $key = $this->camelCaseToSnakeCaseNameConverter->denormalize($key);
             if (null === $operation->{'get'.ucfirst($key)}()) {
                 $operation = $operation->{'with'.ucfirst($key)}($value);
             }

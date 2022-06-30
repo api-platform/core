@@ -24,5 +24,3 @@ if (\PHP_VERSION_ID >= 80000) {
         use ClientTrait72;
     }
 }
-
-class_alias(ClientTrait::class, \ApiPlatform\Core\Util\ClientTrait::class);

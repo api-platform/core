@@ -22,7 +22,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * @author Anthony GRASSIOT <antograssiot@free.fr>
- * @group legacy
  */
 class ApiPlatformProfilerPanelTest extends WebTestCase
 {
@@ -32,14 +31,12 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
     private $manager;
     private $schemaTool;
     private $env;
-    private $legacy;
 
     protected function setUp(): void
     {
         parent::setUp();
         $kernel = self::bootKernel();
         $this->env = $kernel->getEnvironment();
-        $this->legacy = $kernel->getContainer()->getParameter('api_platform.metadata_backward_compatibility_layer');
 
         /** @var ManagerRegistry $doctrine */
         $doctrine = $kernel->getContainer()->get('doctrine');
@@ -65,12 +62,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testDebugBarContentNotResourceClass()
     {
-        if ($this->legacy) {
-            $this->markTestSkipped('Legacy test.');
-
-            return;
-        }
-
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
@@ -90,12 +81,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testDebugBarContent()
     {
-        if ($this->legacy) {
-            $this->markTestSkipped('Legacy test.');
-
-            return;
-        }
-
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
@@ -114,12 +99,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testProfilerGeneralLayoutNotResourceClass()
     {
-        if ($this->legacy) {
-            $this->markTestSkipped('Legacy test.');
-
-            return;
-        }
-
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
@@ -141,12 +120,6 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     public function testProfilerGeneralLayout()
     {
-        if ($this->legacy) {
-            $this->markTestSkipped('Legacy test.');
-
-            return;
-        }
-
         $client = static::createClient();
         $client->enableProfiler();
         $client->request('GET', '/dummies', [], [], ['HTTP_ACCEPT' => 'application/ld+json']);
@@ -162,7 +135,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame('mongodb' === $this->env ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(6, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
+        $this->assertCount(4, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
         // Metadata tab
         $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
@@ -173,13 +146,5 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
         $this->assertSame('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
         $this->assertSame('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
-
-        // Data providers tab
-        $this->assertSame('Data Providers', $crawler->filter('.data-provider-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.data-provider-tab-content'));
-
-        // Data persisters tab
-        $this->assertSame('Data Persisters', $crawler->filter('.data-persister-tab-title')->html());
-        $this->assertNotEmpty($crawler->filter('.data-persister-tab-content'));
     }
 }

@@ -55,7 +55,7 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsEncoding($format): bool
+    public function supportsEncoding($format, array $context = []): bool
     {
         return $this->format === $format;
     }
@@ -71,7 +71,7 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDecoding($format): bool
+    public function supportsDecoding($format, array $context = []): bool
     {
         return $this->format === $format;
     }
@@ -86,5 +86,3 @@ final class JsonEncoder implements EncoderInterface, DecoderInterface
         return $this->jsonEncoder->decode($data, $format, $context);
     }
 }
-
-class_alias(JsonEncoder::class, \ApiPlatform\Core\Serializer\JsonEncoder::class);

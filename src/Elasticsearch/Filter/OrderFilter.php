@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Filter;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -29,7 +30,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class OrderFilter extends AbstractFilter implements SortFilterInterface
 {
-    private $orderParameterName;
+    private string $orderParameterName;
 
     /**
      * {@inheritdoc}
@@ -44,7 +45,7 @@ final class OrderFilter extends AbstractFilter implements SortFilterInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(array $clauseBody, string $resourceClass, ?string $operationName = null, array $context = []): array
+    public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array
     {
         if (!\is_array($properties = $context['filters'][$this->orderParameterName] ?? [])) {
             return $clauseBody;

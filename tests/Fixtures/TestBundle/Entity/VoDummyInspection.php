@@ -13,48 +13,28 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-/**
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"inspection_read"}},
- *         "denormalization_context"={"groups"={"inspection_write"}}
- *     },
- *     graphql={}
- * )
- * @ORM\Entity
- */
+#[ApiResource(graphQlOperations: [], normalizationContext: ['groups' => ['inspection_read']], denormalizationContext: ['groups' => ['inspection_write']])]
+#[ORM\Entity]
 class VoDummyInspection
 {
     use VoDummyIdAwareTrait;
 
-    /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $accepted;
+    #[ORM\Column(type: 'boolean')]
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    private bool $accepted;
 
-    /**
-     * @var VoDummyCar|null
-     *
-     * @ORM\ManyToOne(targetEntity="VoDummyCar", inversedBy="inspections")
-     * @Groups({"inspection_read", "inspection_write"})
-     */
-    private $car;
+    #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')]
+    #[Groups(['inspection_read', 'inspection_write'])]
+    private ?VoDummyCar $car;
 
-    /**
-     * @var DateTime
-     *
-     * @ORM\Column(type="datetime")
-     * @Groups({"car_read", "car_write", "inspection_read", "inspection_write"})
-     */
-    private $performed;
+    #[ORM\Column(type: 'datetime')]
+    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
+    private \DateTime $performed;
 
     private $attributeWithoutConstructorEquivalent;
 

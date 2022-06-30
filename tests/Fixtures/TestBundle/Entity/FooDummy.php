@@ -13,48 +13,36 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FooDummy.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @ApiResource(
- *     attributes={
- *         "order"={"dummy.name"}
- *     },
- *     graphql={
- *         "collection_query"={"pagination_type"="page"}
- *     }
- * )
- * @ORM\Entity
  */
+#[ApiResource(graphQlOperations: [new QueryCollection(name: 'collection_query', paginationType: 'page')], order: ['dummy.name'])]
+#[ORM\Entity]
 class FooDummy
 {
     /**
      * @var int The id
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
-
+    #[ORM\Column(type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
     /**
      * @var string The foo name
-     *
-     * @ORM\Column
      */
+    #[ORM\Column]
     private $name;
-
     /**
      * @var Dummy|null The foo dummy
-     *
-     * @ORM\ManyToOne(targetEntity="Dummy", cascade={"persist"})
      */
-    private $dummy;
+    #[ORM\ManyToOne(targetEntity: Dummy::class, cascade: ['persist'])]
+    private ?Dummy $dummy = null;
 
     public function getId()
     {

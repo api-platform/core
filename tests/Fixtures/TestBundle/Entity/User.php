@@ -13,84 +13,58 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\PasswordResetRequestResult;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\RecoverPasswordOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Security\AbstractSecurityUser;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\RecoverPasswordProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * A User.
  *
- * @ORM\Entity
- * @ORM\Table(name="user_test")
- * @ApiResource(
- *     attributes={
- *         "normalization_context"={"groups"={"user", "user-read"}},
- *         "denormalization_context"={"groups"={"user", "user-write"}}
- *     },
- *     collectionOperations={
- *         "post",
- *         "get",
- *         "post_password_reset_request"={
- *             "method"="POST",
- *             "path"="/users/password_reset_request",
- *             "messenger"="input",
- *             "input"=PasswordResetRequest::class,
- *             "output"=PasswordResetRequestResult::class,
- *             "normalization_context"={
- *                 "groups"={"user_password_reset_request"},
- *             },
- *             "denormalization_context"={
- *                 "groups"={"user_password_reset_request"},
- *             },
- *         },
- *     },
- *     itemOperations={"get", "put", "delete",
- *         "recover_password"={
- *             "input"=RecoverPasswordInput::class, "output"=RecoverPasswordOutput::class, "method"="PUT", "path"="users/recover/{id}"
- *         }
- *     }
- * )
- *
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
+#[ApiResource(operations: [
+    new Get(),
+    new Put(),
+    new Delete(),
+    new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}', processor: RecoverPasswordProcessor::class),
+    new Post(),
+    new GetCollection(),
+    new Post(
+        uriTemplate: '/users/password_reset_request',
+        messenger: 'input',
+        input: PasswordResetRequest::class,
+        output: PasswordResetRequestResult::class,
+        normalizationContext: ['groups' => ['user_password_reset_request']],
+        denormalizationContext: ['groups' => ['user_password_reset_request']]
+    ),
+], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]
+#[ORM\Entity]
+#[ORM\Table(name: 'user_test')]
 class User extends AbstractSecurityUser
 {
-    /**
-     * @var int|null
-     *
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var string|null
-     *
-     * @Groups({"user"})
-     */
-    private $email;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"user"})
-     */
-    private $fullname;
-
-    /**
-     * @var string|null
-     *
-     * @Groups({"user-write"})
-     */
-    private $plainPassword;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    private ?int $id = null;
+    #[Groups(['user'])]
+    private ?string $email = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['user'])]
+    private ?string $fullname = null;
+    #[Groups(['user-write'])]
+    private ?string $plainPassword = null;
 
     public function getId(): ?int
     {

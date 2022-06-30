@@ -13,32 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * @ApiResource
- * @ODM\Document
- */
+#[ApiResource]
+#[ODM\Document]
 class DummyBoolean
 {
-    /**
-     * @var int
-     *
-     * @ODM\Id(strategy="INCREMENT", type="int", nullable=true)
-     */
-    private $id;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int', nullable: true)]
+    private ?int $id = null;
 
-    /**
-     * @var bool
-     *
-     * @ODM\Field(type="bool", nullable=true)
-     */
-    private $isDummyBoolean;
-
-    public function __construct(bool $isDummyBoolean)
-    {
-        $this->isDummyBoolean = $isDummyBoolean;
+    public function __construct(
+        #[ODM\Field(type: 'bool', nullable: true)] private readonly bool $isDummyBoolean
+    ) {
     }
 
     public function getId()

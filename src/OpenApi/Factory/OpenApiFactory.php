@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Factory;
 
 use ApiPlatform\Api\FilterLocatorTrait;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyMetadataFactoryInterface as LegacyPropertyMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface as LegacyPropertyNameCollectionFactoryInterface;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
@@ -23,7 +21,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -33,7 +30,7 @@ use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
-use ApiPlatform\PathResolver\OperationPathResolverInterface;
+use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -45,21 +42,15 @@ use Symfony\Component\Routing\RouterInterface;
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     use FilterLocatorTrait;
+    use NormalizeOperationNameTrait;
 
     public const BASE_URL = 'base_url';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
     private $resourceNameCollectionFactory;
     private $resourceMetadataFactory;
-    /**
-     * @var LegacyPropertyNameCollectionFactoryInterface|PropertyNameCollectionFactoryInterface
-     */
     private $propertyNameCollectionFactory;
-    /**
-     * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
-     */
     private $propertyMetadataFactory;
-    private $operationPathResolver;
     private $formats;
     private $jsonSchemaFactory;
     private $jsonSchemaTypeFactory;
@@ -68,7 +59,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private $router;
     private $routeCollection;
 
-    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, $propertyNameCollectionFactory, $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, OperationPathResolverInterface $operationPathResolver, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
+    public function __construct(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, SchemaFactoryInterface $jsonSchemaFactory, TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, array $formats = [], Options $openApiOptions = null, PaginationOptions $paginationOptions = null, RouterInterface $router = null)
     {
         $this->resourceNameCollectionFactory = $resourceNameCollectionFactory;
         $this->jsonSchemaFactory = $jsonSchemaFactory;
@@ -78,7 +69,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->propertyNameCollectionFactory = $propertyNameCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-        $this->operationPathResolver = $operationPathResolver;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
         $this->router = $router;
@@ -150,7 +140,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $this->routeCollection = $this->router->getRouteCollection();
             }
 
-            $path = $this->getPath($routeName && $this->routeCollection ? $this->routeCollection->get($routeName)->getPath() : ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate());
+            if ($this->routeCollection && $routeName && $route = $this->routeCollection->get($routeName)) {
+                $path = $route->getPath();
+            } else {
+                $path = ($operation->getRoutePrefix() ?? '').$operation->getUriTemplate();
+            }
+
+            $path = $this->getPath($path);
             $method = $operation->getMethod() ?? HttpOperation::METHOD_GET;
 
             if (!\in_array($method, Model\PathItem::$methods, true)) {
@@ -159,7 +155,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            $operationId = $operation->getOpenapiContext()['operationId'] ?? $operationName;
+            $operationId = $operation->getOpenapiContext()['operationId'] ?? $this->normalizeOperationName($operationName);
 
             if ($path) {
                 $pathItem = $paths->getPath($path) ?: new Model\PathItem();
@@ -174,7 +170,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $operationOutputSchemas = [];
 
             foreach ($responseMimeTypes as $operationFormat) {
-                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, null, $operationName, $schema, null, $forceSchemaCollection);
+                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
                 $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
             }
@@ -239,7 +235,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     break;
             }
 
-            if (!$operation instanceof CollectionOperationInterface && !$operation instanceof Post) {
+            if (!$operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $operation->getMethod()) {
                 $responses['404'] = new Model\Response('Resource not found');
             }
 
@@ -259,7 +255,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             } elseif (\in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
-                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, null, $operationName, $schema, null, $forceSchemaCollection);
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
                     $operationInputSchemas[$operationFormat] = $operationInputSchema;
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
@@ -289,8 +285,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
+    /**
+     * @return \ArrayObject<Model\MediaType>
+     */
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
     {
+        /** @var \ArrayObject<Model\MediaType> */
         $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
@@ -368,10 +368,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#linkObject.
      *
-     * return Model\Link[]
+     * @return \ArrayObject<Model\Link>
      */
     private function getLinks(ResourceMetadataCollection $resourceMetadataCollection, HttpOperation $currentOperation): \ArrayObject
     {
+        /** @var \ArrayObject<Model\Link> */
         $links = new \ArrayObject();
 
         // Only compute get links for now

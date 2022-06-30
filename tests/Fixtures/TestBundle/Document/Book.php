@@ -13,35 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Book.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @ApiResource(collectionOperations={}, itemOperations={
- *     "get",
- *     "get_by_isbn"={"method"="GET", "path"="/books/by_isbn/{isbn}.{_format}", "requirements"={"isbn"=".+"}, "identifiers"="isbn"}
- * })
- * @ODM\Document
  */
+#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}.{_format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
+#[ODM\Document]
 class Book
 {
-    /**
-     * @ODM\Id(strategy="INCREMENT", type="int")
-     */
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
-
-    /**
-     * @ODM\Field(type="string", nullable=true)
-     */
+    #[ODM\Field(type: 'string', nullable: true)]
     public $name;
-
-    /**
-     * @ODM\Field(type="string")
-     */
+    #[ODM\Field(type: 'string')]
     public $isbn;
 
     public function getId()
