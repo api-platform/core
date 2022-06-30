@@ -71,6 +71,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * @var LegacyPropertyMetadataFactoryInterface|PropertyMetadataFactoryInterface
      */
     protected $propertyMetadataFactory;
+    protected $resourceMetadataFactory;
     /**
      * @var LegacyIriConverterInterface|IriConverterInterface
      */
@@ -141,7 +142,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        return $this->resourceClassResolver->isResourceClass($this->getObjectClass($data));
+        $class = $this->getObjectClass($data);
+        if (($context['output']['class'] ?? null) === $class) {
+            return true;
+        }
+
+        return $this->resourceClassResolver->isResourceClass($class);
     }
 
     /**
@@ -161,27 +167,44 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (!($isTransformed = isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS])) && $outputClass = $this->getOutputClass($this->getObjectClass($object), $context)) {
+        $resourceClass = $this->getObjectClass($object);
+        if (!($isTransformed = isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS])) && $outputClass = $this->getOutputClass($resourceClass, $context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
             }
 
-            if ($object !== $transformed = $this->transformOutput($object, $context, $outputClass)) {
-                $context['api_normalize'] = true;
-                $context['api_resource'] = $object;
-                unset($context['output'], $context['resource_class']);
-            } else {
-                $context[self::IS_TRANSFORMED_TO_SAME_CLASS] = true;
+            // Data transformers are deprecated, this is removed from 3.0
+            if ($dataTransformer = $this->getDataTransformer($object, $outputClass, $context)) {
+                $transformed = $dataTransformer->transform($object, $outputClass, $context);
+
+                if ($object === $transformed) {
+                    $context[self::IS_TRANSFORMED_TO_SAME_CLASS] = true;
+                } else {
+                    $context['api_normalize'] = true;
+                    $context['api_resource'] = $object;
+                    unset($context['output'], $context['resource_class']);
+                }
+
+                return $this->serializer->normalize($transformed, $format, $context);
             }
 
-            return $this->serializer->normalize($transformed, $format, $context);
+            unset($context['output']);
+            unset($context['operation']);
+            unset($context['operation_name']);
+            $context['resource_class'] = $outputClass;
+            $context['api_sub_level'] = true;
+            $context[self::ALLOW_EXTRA_ATTRIBUTES] = false;
+
+            return $this->serializer->normalize($object, $format, $context);
         }
+
         if ($isTransformed) {
             unset($context[self::IS_TRANSFORMED_TO_SAME_CLASS]);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
-        $context = $this->initContext($resourceClass, $context);
+        if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $context = $this->initContext($resourceClass, $context);
+        }
 
         if (isset($context['iri'])) {
             $iri = $context['iri'];
@@ -224,6 +247,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
+        if (($context['input']['class'] ?? null) === $type) {
+            return true;
+        }
+
         return $this->localCache[$type] ?? $this->localCache[$type] = $this->resourceClassResolver->isResourceClass($type);
     }
 
@@ -234,14 +261,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        if (null === $objectToPopulate = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
-            $normalizedData = \is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
-            $class = $this->getClassDiscriminatorResolvedClass($normalizedData, $class);
-        }
-
-        $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
-        $context['api_denormalize'] = true;
-        $context['resource_class'] = $resourceClass;
+        $resourceClass = $class;
 
         if (null !== $inputClass = $this->getInputClass($resourceClass, $context)) {
             if (null !== $dataTransformer = $this->getDataTransformer($data, $resourceClass, $context)) {
@@ -272,11 +292,32 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return $dataTransformer->transform($denormalizedInput, $resourceClass, $dataTransformerContext);
             }
 
-            // Are we in a Request context?
-            if ($context['operation'] ?? $context['operation_type'] ?? false) {
-                $resourceClass = $inputClass;
-                $context['resource_class'] = $inputClass;
+            unset($context['input']);
+            unset($context['operation']);
+            unset($context['operation_name']);
+            $context['resource_class'] = $inputClass;
+
+            if (!$this->serializer instanceof DenormalizerInterface) {
+                throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
+
+            try {
+                return $this->serializer->denormalize($data, $inputClass, $format, $context);
+            } catch (NotNormalizableValueException $e) {
+                throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
+            }
+        }
+
+        if (null === $objectToPopulate = $this->extractObjectToPopulate($class, $context, static::OBJECT_TO_POPULATE)) {
+            $normalizedData = \is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
+            $class = $this->getClassDiscriminatorResolvedClass($normalizedData, $class);
+        }
+
+        $context['api_denormalize'] = true;
+
+        if ($this->resourceClassResolver->isResourceClass($class)) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
+            $context['resource_class'] = $resourceClass;
         }
 
         $supportsPlainIdentifiers = $this->supportsPlainIdentifiers();
@@ -443,12 +484,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
         }
 
+        $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
         $options = $this->getFactoryOptions($context);
-        $propertyNames = $this->propertyNameCollectionFactory->create($context['resource_class'], $options);
+        $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
 
             if (
                 $this->isAllowedAttribute($classOrObject, $propertyName, null, $context) &&
@@ -661,8 +703,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $options['serializer_groups'] = (array) $context[self::GROUPS];
         }
 
-        if ($this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
-            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($context['resource_class'])->getOperation($context['operation_name'] ?? null);
+        if (isset($context['resource_class']) && $this->resourceClassResolver->isResourceClass($context['resource_class']) && $this->resourceMetadataFactory instanceof ResourceMetadataCollectionFactoryInterface) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
+            // This is a hot spot, we should avoid calling this here but in many cases we can't
+            $operation = $context['operation'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
             $options['normalization_groups'] = $operation->getNormalizationContext()['groups'] ?? null;
             $options['denormalization_groups'] = $operation->getDenormalizationContext()['groups'] ?? null;
         }
@@ -881,15 +925,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function transformOutput($object, array $context = [], string $outputClass = null)
     {
-        if (null === $outputClass) {
-            $outputClass = $this->getOutputClass($this->getObjectClass($object), $context);
-        }
-
-        if (null !== $outputClass && null !== $dataTransformer = $this->getDataTransformer($object, $outputClass, $context)) {
-            return $dataTransformer->transform($object, $outputClass, $context);
-        }
-
-        return $object;
     }
 
     private function createAttributeValue($attribute, $value, $format = null, array $context = [])

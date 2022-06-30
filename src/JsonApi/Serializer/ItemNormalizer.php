@@ -72,7 +72,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        if (null !== $this->getOutputClass($this->getObjectClass($object), $context)) {
+        $resourceClass = $this->getObjectClass($object);
+        if ($this->getOutputClass($resourceClass, $context)) {
             return parent::normalize($object, $format, $context);
         }
 
@@ -80,7 +81,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+        if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
+        }
+
         $context = $this->initContext($resourceClass, $context);
         $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object);
         $context['iri'] = $iri;

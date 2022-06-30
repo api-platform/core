@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
-use ApiPlatform\Core\Tests\ProphecyTrait;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStage;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
@@ -27,6 +26,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
+use ApiPlatform\Tests\ProphecyTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -98,7 +98,7 @@ class SerializeStageTest extends TestCase
         $operation = $operation->withShortName('shortName')->withName($operationName)->withClass($resourceClass);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
@@ -142,7 +142,7 @@ class SerializeStageTest extends TestCase
         $operation = (new QueryCollection())->withShortName('shortName')->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(['normalized_item']);
 
@@ -187,7 +187,7 @@ class SerializeStageTest extends TestCase
         $operation = (new Query())->withName($operationName);
 
         $normalizationContext = ['normalization' => true];
-        $this->serializerContextBuilderProphecy->create($resourceClass, $operationName, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
+        $this->serializerContextBuilderProphecy->create($resourceClass, $operation, $context, true)->shouldBeCalled()->willReturn($normalizationContext);
 
         $this->normalizerProphecy->normalize(Argument::type('stdClass'), ItemNormalizer::FORMAT, $normalizationContext)->willReturn(new \stdClass());
 

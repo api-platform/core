@@ -115,11 +115,8 @@ final class TypeBuilder implements TypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    try {
-                        $queryNormalizationContext = $operation instanceof Query ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
-                    } catch (OperationNotFoundException $e) {
-                        $queryNormalizationContext = [];
-                    }
+                    $queryOperation = $this->getQueryOperation($resourceMetadataCollection);
+                    $queryNormalizationContext = $queryOperation ? ($queryOperation->getNormalizationContext() ?? []) : [];
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
@@ -309,5 +306,19 @@ final class TypeBuilder implements TypeBuilderInterface
             'collection' => GraphQLType::listOf($resourceType),
             'paginationInfo' => GraphQLType::nonNull($paginationInfoObjectType),
         ];
+    }
+
+    private function getQueryOperation(ResourceMetadataCollection $resourceMetadataCollection): ?Operation
+    {
+        foreach ($resourceMetadataCollection as $resourceMetadata) {
+            foreach ($resourceMetadata->getGraphQlOperations() as $operation) {
+                // Filter the custom queries.
+                if ($operation instanceof Query && !$operation->getResolver()) {
+                    return $operation;
+                }
+            }
+        }
+
+        return null;
     }
 }
