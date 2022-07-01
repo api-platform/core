@@ -81,9 +81,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                 continue;
             }
 
-            if (!$link->getParameterName()) {
-                dd($operation);
-            }
             $identifiers[$link->getParameterName()] = $this->getIdentifierValue($item, $link->getFromClass(), $link->getIdentifiers()[0], $link->getParameterName());
         }
 
