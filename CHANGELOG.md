@@ -1,6 +1,18 @@
 # Changelog
 =======
 
+## 3.0.0-beta.1
+
+Breaking changes:
+
+* Identifiers: Allow plain identifiers is removed, use a custom normalizer if needed (#4811)
+* Symfony: deprecated configuration was removed (#4811)
+* DataTransformers: concept got removed, input and output classes are handled as anonymous resources (#4805)
+* Doctrine: some interfaces have changed (extensions and filters), `string $operationName` got removed in favor of `ApiPlatform\Metadata\Operation $operation`. (#4779)
+* Doctrine: `ContextAware` interfaces were merged with their child interfaces you can safely remove them (#4779)
+* Metadata: the `Core` namespace got removed (#4805)
+* Mercure: deprecation removed (#4805)
+
 ## 2.7.0-beta.3
 
 * Metadata: use the HTTP method instead of an interface for writability (#4785)
