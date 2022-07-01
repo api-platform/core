@@ -188,4 +188,9 @@ class RelatedDummy extends ParentDummy
     {
         $this->embeddedDummy = $embeddedDummy;
     }
+
+    public function __toString()
+    {
+        return (string) $this->getId();
+    }
 }
