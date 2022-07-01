@@ -58,7 +58,7 @@ trait RangeFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Gets filter description.

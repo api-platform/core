@@ -152,6 +152,7 @@ class XmlExtractorTest extends TestCase
                     ],
                     'normalizationContext' => [
                         'groups' => ['comment:read', 'comment:custom-read'],
+                        'enabled' => true,
                     ],
                     'denormalizationContext' => [
                         'groups' => 'comment:write',
@@ -229,6 +230,7 @@ class XmlExtractorTest extends TestCase
                             ],
                             'normalizationContext' => [
                                 'groups' => ['comment:read', 'comment:custom-read'],
+                                'enabled' => true,
                             ],
                             'denormalizationContext' => [
                                 'groups' => 'comment:write',
@@ -321,6 +323,7 @@ class XmlExtractorTest extends TestCase
                             ],
                             'normalizationContext' => [
                                 'groups' => ['comment:read', 'comment:custom-read'],
+                                'enabled' => true,
                             ],
                             'denormalizationContext' => [
                                 'groups' => 'comment:write',

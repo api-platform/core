@@ -251,11 +251,14 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('foo')->willReturn(false);
+
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
+            $filterLocatorProphecy->reveal()
         );
 
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [

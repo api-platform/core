@@ -49,8 +49,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
-        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
         $this->identifiersExtractor = $identifiersExtractor;
+        $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
     protected function getIriConverter(): IriConverterInterface
