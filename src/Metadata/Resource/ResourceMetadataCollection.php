@@ -36,17 +36,17 @@ final class ResourceMetadataCollection extends \ArrayObject
 
     public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false): Operation
     {
-        if (isset($this->operationCache[$operationName ?? ''])) {
-            return $this->operationCache[$operationName ?? ''];
+        $operationName = $operationName ?? '';
+        if (isset($this->operationCache[$operationName])) {
+            return $this->operationCache[$operationName];
         }
 
-        if (isset($this->operationCache['graphql_'.($operationName ?? '')])) {
-            return $this->operationCache['graphql_'.($operationName ?? '')];
+        if (isset($this->operationCache['graphql_'.$operationName])) {
+            return $this->operationCache['graphql_'.$operationName];
         }
 
         $it = $this->getIterator();
         $metadata = null;
-        $operationName = $operationName ?? '';
 
         while ($it->valid()) {
             /** @var ApiResource */
