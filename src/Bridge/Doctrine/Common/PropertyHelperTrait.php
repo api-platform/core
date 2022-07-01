@@ -128,7 +128,7 @@ trait PropertyHelperTrait
     /**
      * Gets the Doctrine Type of a given property/resourceClass.
      *
-     * @return Type|string|null
+     * @return string|null
      */
     protected function getDoctrineFieldType(string $property, string $resourceClass)
     {
