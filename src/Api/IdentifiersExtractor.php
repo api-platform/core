@@ -141,36 +141,8 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             return $identifierValue;
         }
 
-        // TODO: php 8 remove method_exists
-        if (method_exists($identifierValue, '__toString') || $identifierValue instanceof \Stringable) {
+        if ($identifierValue instanceof \Stringable) {
             return (string) $identifierValue;
-        }
-
-        // TODO: remove this in 3.0
-        // we could recurse to find correct identifiers until there it is a scalar but this is not really supported and adds a lot of complexity
-        // instead we're deprecating this behavior in favor of something that can be transformed to a string
-        if ($this->isResourceClass($relatedResourceClass = $this->getObjectClass($identifierValue))) {
-            trigger_deprecation('api-platform/core', '2.7', 'Using a resource class as identifier is deprecated, please make this identifier Stringable');
-            $relatedOperation = $this->resourceMetadataFactory->create($relatedResourceClass)->getOperation();
-
-            $relatedLinks = [];
-            if ($relatedOperation instanceof GraphQlOperation) {
-                $relatedLinks = $relatedOperation->getLinks();
-            } elseif ($relatedOperation instanceof HttpOperation) {
-                $relatedLinks = $relatedOperation->getUriVariables();
-            }
-
-            if (1 === \count($relatedLinks)) {
-                $identifierValue = $this->getIdentifierValue($identifierValue, $relatedResourceClass, current($relatedLinks)->getIdentifiers()[0], $parameterName);
-
-                if (\is_scalar($identifierValue)) {
-                    return $identifierValue;
-                }
-
-                if ($identifierValue instanceof \Stringable || method_exists($identifierValue, '__toString')) {
-                    return (string) $identifierValue;
-                }
-            }
         }
 
         throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));

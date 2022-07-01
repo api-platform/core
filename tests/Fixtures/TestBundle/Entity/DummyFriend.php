@@ -81,4 +81,9 @@ class DummyFriend
     {
         $this->name = $name;
     }
+
+    public function __toString()
+    {
+        return (string) $this->getId();
+    }
 }

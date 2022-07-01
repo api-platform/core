@@ -250,7 +250,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.action.put_item',
             'api_platform.identifiers_extractor',
             'api_platform.iri_converter',
-            'api_platform.operation_path_resolver.default',
             'api_platform.path_segment_name_generator',
             'api_platform.property_accessor',
             'api_platform.property_info',
