@@ -56,14 +56,14 @@ class Employee
      * @var string The dummy name
      *
      * @ORM\Column
-     * @Groups({"company_employees_read"})
      */
+    #[Groups(['company_employees_read'])]
     public string $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
-     * @Groups({"company_employees_read"})
      */
+    #[Groups(['company_employees_read'])]
     public ?Company $company;
 
     public function getId()

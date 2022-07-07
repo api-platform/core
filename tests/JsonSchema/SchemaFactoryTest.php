@@ -92,7 +92,7 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame('example_bar', $definitions[$rootDefinitionKey]['properties']['bar']['example']);
     }
 
-    public function testBuildSchemaForOperationWithOverriddenSerializerGroups(): void
+    public function testBuildSchemaWithSerializerGroups(): void
     {
         $typeFactoryProphecy = $this->prophesize(TypeFactoryInterface::class);
         $typeFactoryProphecy->getType(Argument::allOf(
@@ -115,30 +115,20 @@ class SchemaFactoryTest extends TestCase
                                             ])
                                         );
 
-        $serializerGroup = 'overridden_operation_dummy_put';
-        $validationGroups = 'validation_groups_dummy_put';
+        $serializerGroup = 'custom_operation_dummy';
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::allOf(
-            Argument::type('array'),
-            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn(new PropertyNameCollection(['alias', 'description']));
+        $propertyNameCollectionFactoryProphecy->create(OverriddenOperationDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['alias', 'description']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::allOf(
-            Argument::type('array'),
-            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
-        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::allOf(
-            Argument::type('array'),
-            Argument::allOf(Argument::withEntry('serializer_groups', [$serializerGroup]), Argument::withEntry('validation_groups', [$validationGroups]))
-        ))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'alias', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(OverriddenOperationDummy::class, 'description', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
 
         $schemaFactory = new SchemaFactory($typeFactoryProphecy->reveal(), $resourceMetadataFactoryProphecy->reveal(), $propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), null, $resourceClassResolverProphecy->reveal());
-        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT);
+        $resultSchema = $schemaFactory->buildSchema(OverriddenOperationDummy::class, 'json', Schema::TYPE_OUTPUT, null, null, ['groups' => $serializerGroup, AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
 
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
         $definitions = $resultSchema->getDefinitions();

@@ -26,8 +26,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 #[ApiResource]
 #[GetCollection]
-#[Post]
 #[Get]
+#[Post]
 #[ApiResource(
     uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
     uriVariables: [
@@ -56,8 +56,8 @@ class Company
      * @var string The dummy name
      *
      * @ORM\Column
-     * @Groups({"company_employees_read"})
      */
+    #[Groups(['company_employees_read'])]
     public string $name;
 
     /** @var Employee[] */
