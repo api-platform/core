@@ -34,6 +34,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 final class DocumentNormalizer extends ObjectNormalizer
 {
     public const FORMAT = 'elasticsearch';
+    
+    public const JSON_ENCODER_FORMAT = self::FORMAT;
 
     private $resourceMetadataFactory;
 
