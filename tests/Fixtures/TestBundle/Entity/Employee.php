@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
@@ -36,7 +37,8 @@ use Doctrine\ORM\Mapping as ORM;
     uriTemplate: '/companies/{companyId}/employees',
     uriVariables: [
         'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
-    ]
+    ],
+    normalizationContext: ['groups' => ['company_employees_read']]
 )]
 #[GetCollection]
 class Employee
@@ -54,11 +56,13 @@ class Employee
      * @var string The dummy name
      *
      * @ORM\Column
+     * @Groups({"company_employees_read"})
      */
     public string $name;
 
     /**
      * @ORM\ManyToOne(targetEntity="ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company")
+     * @Groups({"company_employees_read"})
      */
     public ?Company $company;
 

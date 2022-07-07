@@ -15,16 +15,19 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity
  */
 #[ApiResource]
-#[Get]
+#[GetCollection]
 #[Post]
+#[Get]
 #[ApiResource(
     uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
     uriVariables: [
@@ -53,6 +56,7 @@ class Company
      * @var string The dummy name
      *
      * @ORM\Column
+     * @Groups({"company_employees_read"})
      */
     public string $name;
 
