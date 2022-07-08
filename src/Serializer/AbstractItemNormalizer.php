@@ -202,14 +202,19 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             unset($context[self::IS_TRANSFORMED_TO_SAME_CLASS]);
         }
 
+        $iri = null;
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
             $context = $this->initContext($resourceClass, $context);
+
+            if ($this->iriConverter instanceof LegacyIriConverterInterface) {
+                $iri = $this->iriConverter->getIriFromItem($object);
+            }
         }
 
         if (isset($context['iri'])) {
             $iri = $context['iri'];
-        } else {
-            $iri = $this->iriConverter instanceof LegacyIriConverterInterface ? $this->iriConverter->getIriFromItem($object) : $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
+        } elseif ($this->iriConverter instanceof IriConverterInterface) {
+            $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
         }
 
         $context['iri'] = $iri;
