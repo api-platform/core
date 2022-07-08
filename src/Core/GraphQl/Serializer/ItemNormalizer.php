@@ -56,7 +56,13 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+        if (!\is_object($data) || is_iterable($data)) {
+            return false;
+        }
+
+        $class = $this->getObjectClass($data);
+
+        return self::FORMAT === $format && $this->resourceClassResolver->isResourceClass($class);
     }
 
     /**
