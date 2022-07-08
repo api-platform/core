@@ -297,7 +297,7 @@ final class SchemaFactory implements SchemaFactoryInterface
                         }
 
                         if (!$operation) {
-                            $operation = $op;
+                            $operation = new HttpOperation();
                         }
                     }
                 }

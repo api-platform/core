@@ -112,16 +112,22 @@ Feature: Uri Variables
             {
                 "@id": "/companies/2/employees/2",
                 "@type": "Employee",
-                "id": 2,
                 "name": "foo2",
-                "company": "/companies/2"
+                "company": {
+                  "@id": "/companies/2",
+                  "@type": "Company",
+                  "name": "Foo Company 2"
+                }
             },
             {
                 "@id": "/companies/2/employees/3",
                 "@type": "Employee",
-                "id": 3,
                 "name": "foo3",
-                "company": "/companies/2"
+                "company": {
+                  "@id": "/companies/2",
+                  "@type": "Company",
+                  "name": "Foo Company 2"
+                }
             }
         ],
         "hydra:totalItems": 2

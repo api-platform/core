@@ -23,7 +23,6 @@ use ApiPlatform\Tests\Fixtures\DummyEntity;
 use ApiPlatform\Tests\ProphecyTrait;
 use PackageVersions\Versions;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -135,7 +134,8 @@ class RequestDataCollectorTest extends TestCase
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
 
-        $this->filterLocator->has(Argument::type('string'))->willReturn(false);
+        $this->filterLocator->has('a_filter')->willReturn(false);
+        $this->filterLocator->has('foo')->willReturn(false);
 
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal(),
@@ -152,7 +152,8 @@ class RequestDataCollectorTest extends TestCase
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
 
-        $this->filterLocator->has(Argument::type('string'))->willReturn(false);
+        $this->filterLocator->has('a_filter')->willReturn(false);
+        $this->filterLocator->has('foo')->willReturn(false);
 
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal(),
