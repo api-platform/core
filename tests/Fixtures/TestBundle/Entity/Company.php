@@ -15,11 +15,14 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
+#[GetCollection]
 #[Get]
 #[Post]
 #[ApiResource(
@@ -50,6 +53,7 @@ class Company
      * @var string The dummy name
      */
     #[ORM\Column]
+    #[Groups(['company_employees_read'])]
     public string $name;
 
     /** @var Employee[] */

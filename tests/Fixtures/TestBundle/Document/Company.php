@@ -15,11 +15,14 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
+#[GetCollection]
 #[Get]
 #[Post]
 #[ApiResource(uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
@@ -38,6 +41,7 @@ class Company
      * @var string The dummy name
      */
     #[ODM\Field]
+    #[Groups(['company_employees_read'])]
     public $name;
 
     /** @var Employee[] */
