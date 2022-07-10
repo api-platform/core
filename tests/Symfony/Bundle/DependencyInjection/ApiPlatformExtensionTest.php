@@ -54,6 +54,7 @@ use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface as GraphQlSerializerContextBuilderInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\TypeFactoryInterface;
@@ -409,10 +410,7 @@ class ApiPlatformExtensionTest extends TestCase
 
             // metadata/property.xml
             'api_platform.metadata.property.identifier_metadata_factory',
-
-            // metadata/property_name.xml
-            'api_platform.metadata.property.name_collection_factory',
-            PropertyNameCollectionFactoryInterface::class,
+            'api_platform.metadata.property.metadata_factory',
 
             // metadata/resource.xml
             'api_platform.metadata.resource.metadata_collection_factory',
@@ -422,9 +420,6 @@ class ApiPlatformExtensionTest extends TestCase
             // metadata/resource_name.xml
             'api_platform.metadata.resource.name_collection_factory',
             ResourceNameCollectionFactoryInterface::class,
-
-            // metadata/backward_compatibility.xml
-            'api_platform.metadata.property.metadata_factory',
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -481,9 +476,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.swagger.listener.ui',
             'api_platform.swagger_ui.context',
             'api_platform.swagger_ui.action',
-
-            // v3/swagger_ui.xml
-            'api_platform.swagger_ui.action',
         ];
 
         $aliases = [
@@ -494,12 +486,10 @@ class ApiPlatformExtensionTest extends TestCase
             // openapi.xml
             OpenApiNormalizer::class,
             Options::class,
+            OpenApiFactoryInterface::class,
 
             // swagger_ui.xml
             'api_platform.swagger_ui.listener',
-
-            // v3/openapi.xml
-            OpenApiFactoryInterface::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -667,8 +657,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.graphql.subscription.subscription_identifier_generator',
             'api_platform.graphql.cache.subscription',
             'api_platform.graphql.command.export_command',
-
-            // v3/graphql.xml
             'api_platform.graphql.resolver.stage.write',
             'api_platform.graphql.resolver.stage.read',
             'api_platform.graphql.type_converter',
@@ -697,8 +685,8 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $aliases = [
-            // v3/graphql.xml
-            \ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface::class,
+            // graphql.xml
+            GraphQlSerializerContextBuilderInterface::class,
         ];
 
         $this->assertContainerHas($services, $aliases);
@@ -712,81 +700,12 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.graphql.fields_builder_locator', ['container.service_locator']);
         $this->assertServiceHasTags('api_platform.graphql.cache.subscription', ['cache.pool']);
         $this->assertServiceHasTags('api_platform.graphql.command.export_command', ['console.command']);
-
-        // v3/graphql.xml
         $this->assertServiceHasTags('api_platform.graphql.normalizer.item', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.object', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.error', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.validation_exception', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.http_exception', ['serializer.normalizer']);
         $this->assertServiceHasTags('api_platform.graphql.normalizer.runtime_exception', ['serializer.normalizer']);
-    }
-
-    public function testGraphQlConfigurationMetadataBackwardCompatibilityLayer(): void
-    {
-        $config = self::DEFAULT_CONFIG;
-        $config['api_platform']['graphql']['enabled'] = true;
-        (new ApiPlatformExtension())->load($config, $this->container);
-
-        $services = [
-            // graphql.xml
-            'api_platform.graphql.executor',
-            'api_platform.graphql.resolver.factory.item',
-            'api_platform.graphql.resolver.factory.collection',
-            'api_platform.graphql.resolver.factory.item_mutation',
-            'api_platform.graphql.resolver.factory.item_subscription',
-            'api_platform.graphql.resolver.stage.read',
-            'api_platform.graphql.resolver.stage.security',
-            'api_platform.graphql.resolver.stage.security_post_denormalize',
-            'api_platform.graphql.resolver.stage.serialize',
-            'api_platform.graphql.resolver.stage.deserialize',
-            'api_platform.graphql.resolver.stage.write',
-            'api_platform.graphql.resolver.stage.validate',
-            'api_platform.graphql.resolver.resource_field',
-            'api_platform.graphql.query_resolver_locator',
-            'api_platform.graphql.mutation_resolver_locator',
-            'api_platform.graphql.iterable_type',
-            'api_platform.graphql.upload_type',
-            'api_platform.graphql.type_locator',
-            'api_platform.graphql.types_container',
-            'api_platform.graphql.type_converter',
-            'api_platform.graphql.type_builder',
-            'api_platform.graphql.fields_builder',
-            'api_platform.graphql.fields_builder_locator',
-            'api_platform.graphql.schema_builder',
-            'api_platform.graphql.action.entrypoint',
-            'api_platform.graphql.action.graphiql',
-            'api_platform.graphql.action.graphql_playground',
-            'api_platform.graphql.normalizer.item',
-            'api_platform.graphql.normalizer.object',
-            'api_platform.graphql.normalizer.error',
-            'api_platform.graphql.normalizer.validation_exception',
-            'api_platform.graphql.normalizer.http_exception',
-            'api_platform.graphql.normalizer.runtime_exception',
-            'api_platform.graphql.serializer.context_builder',
-            'api_platform.graphql.subscription.subscription_manager',
-            'api_platform.graphql.subscription.subscription_identifier_generator',
-            'api_platform.graphql.cache.subscription',
-            'api_platform.graphql.command.export_command',
-        ];
-
-        $this->assertContainerHas($services, []);
-
-        // graphql.xml
-        $this->assertServiceHasTags('api_platform.graphql.query_resolver_locator', ['container.service_locator']);
-        $this->assertServiceHasTags('api_platform.graphql.mutation_resolver_locator', ['container.service_locator']);
-        $this->assertServiceHasTags('api_platform.graphql.iterable_type', ['api_platform.graphql.type']);
-        $this->assertServiceHasTags('api_platform.graphql.upload_type', ['api_platform.graphql.type']);
-        $this->assertServiceHasTags('api_platform.graphql.type_locator', ['container.service_locator']);
-        $this->assertServiceHasTags('api_platform.graphql.fields_builder_locator', ['container.service_locator']);
-        $this->assertServiceHasTags('api_platform.graphql.normalizer.item', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.graphql.normalizer.object', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.graphql.normalizer.error', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.graphql.normalizer.validation_exception', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.graphql.normalizer.http_exception', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.graphql.normalizer.runtime_exception', ['serializer.normalizer']);
-        $this->assertServiceHasTags('api_platform.graphql.cache.subscription', ['cache.pool']);
-        $this->assertServiceHasTags('api_platform.graphql.command.export_command', ['console.command']);
     }
 
     public function testDoctrineOrmConfiguration(): void
@@ -1004,23 +923,21 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $services = [
-            // v3/data_collector.xml
+            // data_collector.xml
             'api_platform.data_collector.request',
 
             // debug.xml
             'debug.var_dumper.cloner',
             'debug.var_dumper.cli_dumper',
-
-            // v3/debug.xml
             'debug.api_platform.debug_resource.command',
         ];
 
         $this->assertContainerHas($services, []);
 
-        // v3/data_collector.xml
+        // data_collector.xml
         $this->assertServiceHasTags('api_platform.data_collector.request', ['data_collector']);
 
-        // v3/debug.xml
+        // debug.xml
         $this->assertServiceHasTags('debug.api_platform.debug_resource.command', ['console.command']);
     }
 
@@ -1037,13 +954,13 @@ class ApiPlatformExtensionTest extends TestCase
             // mercure.xml
             'api_platform.mercure.listener.response.add_link_header',
 
-            // v3/doctrine_orm_mercure_publisher
+            // doctrine_orm_mercure_publisher
             'api_platform.doctrine.orm.listener.mercure.publish',
 
-            // v3/doctrine_odm_mercure_publisher.xml
+            // doctrine_odm_mercure_publisher.xml
             'api_platform.doctrine_mongodb.odm.listener.mercure.publish',
 
-            // v3/graphql_mercure.xml
+            // graphql_mercure.xml
             'api_platform.graphql.subscription.mercure_iri_generator',
         ];
 
@@ -1052,10 +969,10 @@ class ApiPlatformExtensionTest extends TestCase
         // mercure.xml
         $this->assertServiceHasTags('api_platform.mercure.listener.response.add_link_header', ['kernel.event_listener']);
 
-        // v3/doctrine_orm_mercure_publisher
+        // doctrine_orm_mercure_publisher
         $this->assertServiceHasTags('api_platform.doctrine.orm.listener.mercure.publish', ['doctrine.event_listener']);
 
-        // v3/doctrine_odm_mercure_publisher.xml
+        // doctrine_odm_mercure_publisher.xml
         $this->assertServiceHasTags('api_platform.doctrine_mongodb.odm.listener.mercure.publish', ['doctrine_mongodb.odm.event_listener']);
 
         $this->assertEquals([
