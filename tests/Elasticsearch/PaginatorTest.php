@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\Bridge\Elasticsearch\DataProvider;
+namespace ApiPlatform\Tests\Elasticsearch\DataProvider;
 
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;

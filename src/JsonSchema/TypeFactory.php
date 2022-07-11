@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
-use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\Util\ResourceClassInfoTrait;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
@@ -42,12 +41,7 @@ final class TypeFactory implements TypeFactoryInterface
         $this->resourceClassResolver = $resourceClassResolver;
     }
 
-    /**
-     * SchemaFactoryInterface|LegacySchemaFactoryInterface.
-     *
-     * @param mixed $schemaFactory
-     */
-    public function setSchemaFactory($schemaFactory): void
+    public function setSchemaFactory(SchemaFactoryInterface $schemaFactory): void
     {
         $this->schemaFactory = $schemaFactory;
     }

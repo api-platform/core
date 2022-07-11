@@ -45,7 +45,7 @@ interface FilterInterface
      *     ]
      * The description can contain additional data specific to a filter.
      *
-     * @see \ApiPlatform\Core\Swagger\Serializer\DocumentationNormalizer::getFiltersParameters
+     * @see \ApiPlatform\OpenApi\Factory\OpenApiFactory::getFiltersParameters
      */
     public function getDescription(string $resourceClass): array;
 }

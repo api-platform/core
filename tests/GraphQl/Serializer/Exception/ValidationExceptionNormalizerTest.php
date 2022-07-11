@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Serializer\Exception;
+namespace ApiPlatform\Tests\GraphQl\Serializer\Exception;
 
 use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException;

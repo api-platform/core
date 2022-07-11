@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Core\Tests\GraphQl\Resolver\Stage;
+namespace ApiPlatform\Tests\GraphQl\Resolver\Stage;
 
 use ApiPlatform\GraphQl\Resolver\Stage\WriteStage;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
