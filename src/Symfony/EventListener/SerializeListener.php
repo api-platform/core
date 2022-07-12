@@ -75,13 +75,13 @@ final class SerializeListener
 
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 
-        // TODO: 3.0 remove condition
+        // TODO: 3.0 adapt condition (remove legacy part)
         if (
-            (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface)
-            &&
-            (
-                !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))
-                || ($attributes && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY))
+            !($attributes['respond'] ?? $request->attributes->getBoolean('_api_respond', false))
+            || (
+                (!$this->resourceMetadataFactory || $this->resourceMetadataFactory instanceof ResourceMetadataFactoryInterface)
+                && $attributes
+                && $this->isOperationAttributeDisabled($attributes, self::OPERATION_ATTRIBUTE_KEY)
             )
         ) {
             return;
