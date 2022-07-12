@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\Common;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\CustomObject;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -25,11 +24,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CustomController extends AbstractController
 {
-    public function customAction(int $id): JsonResponse
-    {
-        return new JsonResponse(sprintf('This is a custom action for %d.', $id), 200, ['Content-Type' => 'application/ld+json; charset=utf-8']);
-    }
-
     /**
      * Custom route for a non API Platform route.
      *
