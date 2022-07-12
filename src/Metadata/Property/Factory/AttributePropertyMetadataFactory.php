@@ -53,7 +53,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
 
         if ($reflectionClass->hasProperty($property)) {
             $reflectionProperty = $reflectionClass->getProperty($property);
-            if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
+            if ($attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
                 return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
         }
@@ -69,7 +69,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
                 continue;
             }
 
-            if (\PHP_VERSION_ID >= 80000 && $attributes = $reflectionMethod->getAttributes(ApiProperty::class)) {
+            if ($attributes = $reflectionMethod->getAttributes(ApiProperty::class)) {
                 return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
             }
         }

@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Util;
 
-if (\PHP_VERSION_ID < 80000) {
-    trait ResponseTrait
+trait ResponseTrait
+{
+    public function getInfo(?string $type = null): mixed
     {
-        use ResponseTrait71;
-    }
-} else {
-    trait ResponseTrait
-    {
-        use ResponseTrait80;
+        if ($type) {
+            return $this->info[$type] ?? null;
+        }
+
+        return $this->info;
     }
 }

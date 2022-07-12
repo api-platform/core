@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Util;
 
-if (\PHP_VERSION_ID >= 80000) {
-    trait ClientTrait
+trait ClientTrait
+{
+    public function withOptions(array $options): static
     {
-        use ClientTrait80;
-    }
-} else {
-    trait ClientTrait
-    {
-        use ClientTrait72;
+        $clone = clone $this;
+        $clone->defaultOptions = self::mergeDefaultOptions($options, $this->defaultOptions);
+
+        return $clone;
     }
 }

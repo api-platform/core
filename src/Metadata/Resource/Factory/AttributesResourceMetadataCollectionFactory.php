@@ -76,7 +76,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
         }
 
-        if (\PHP_VERSION_ID >= 80000 && $this->hasResourceAttributes($reflectionClass)) {
+        if ($this->hasResourceAttributes($reflectionClass)) {
             foreach ($this->buildResourceOperations($reflectionClass->getAttributes(), $resourceClass) as $i => $resource) {
                 $resourceMetadataCollection[] = $resource;
             }

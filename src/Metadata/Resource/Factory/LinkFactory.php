@@ -83,10 +83,6 @@ final class LinkFactory implements LinkFactoryInterface
      */
     public function createLinksFromAttributes($operation): array
     {
-        if (\PHP_VERSION_ID < 80000) {
-            return [];
-        }
-
         $links = [];
         try {
             $reflectionClass = new \ReflectionClass($resourceClass = $operation->getClass());

@@ -18,53 +18,12 @@ use GraphQL\Language\AST\BooleanValueNode;
 use GraphQL\Language\AST\FloatValueNode;
 use GraphQL\Language\AST\IntValueNode;
 use GraphQL\Language\AST\ListValueNode;
-use GraphQL\Language\AST\Node;
 use GraphQL\Language\AST\NullValueNode;
 use GraphQL\Language\AST\ObjectValueNode;
 use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Language\AST\ValueNode;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Utils\Utils;
-
-if (\PHP_VERSION_ID >= 70200) {
-    trait IterableTypeParseLiteralTrait
-    {
-        /**
-         * {@inheritdoc}
-         *
-         * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
-         *
-         * @return mixed
-         */
-        public function parseLiteral(/* Node */ $valueNode, ?array $variables = null)
-        {
-            if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
-                return $this->parseIterableLiteral($valueNode);
-            }
-
-            // Intentionally without message, as all information already in wrapped Exception
-            throw new \Exception();
-        }
-    }
-} else {
-    trait IterableTypeParseLiteralTrait
-    {
-        /**
-         * {@inheritdoc}
-         *
-         * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
-         */
-        public function parseLiteral(Node $valueNode, ?array $variables = null)
-        {
-            if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
-                return $this->parseIterableLiteral($valueNode);
-            }
-
-            // Intentionally without message, as all information already in wrapped Exception
-            throw new \Exception();
-        }
-    }
-}
 
 /**
  * Represents an iterable type.
@@ -73,14 +32,29 @@ if (\PHP_VERSION_ID >= 70200) {
  */
 final class IterableType extends ScalarType implements TypeInterface
 {
-    use IterableTypeParseLiteralTrait;
-
     public function __construct()
     {
         $this->name = 'Iterable';
         $this->description = 'The `Iterable` scalar type represents an array or a Traversable with any kind of data.';
 
         parent::__construct();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param ObjectValueNode|ListValueNode|IntValueNode|FloatValueNode|StringValueNode|BooleanValueNode|NullValueNode $valueNode
+     *
+     * @return mixed
+     */
+    public function parseLiteral(/* Node */ $valueNode, ?array $variables = null)
+    {
+        if ($valueNode instanceof ObjectValueNode || $valueNode instanceof ListValueNode) {
+            return $this->parseIterableLiteral($valueNode);
+        }
+
+        // Intentionally without message, as all information already in wrapped Exception
+        throw new \Exception();
     }
 
     public function getName(): string
