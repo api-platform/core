@@ -123,17 +123,17 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
             foreach ($this->subresourceMetadata['uri_variables'] as $identifier => $resource) {
                 $identifierNodes = [
                     'fromClass' => new Node\Expr\ClassConstFetch(
-                            new Node\Name(
-                                ($resource['from_class'] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource['from_class']
-                            ),
-                            'class'
+                        new Node\Name(
+                            ($resource['from_class'] === $this->subresourceMetadata['resource_class']) ? 'self' : '\\'.$resource['from_class']
                         ),
+                        'class'
+                    ),
                     'identifiers' => new Node\Expr\Array_(
-                            isset($resource['identifiers'][0]) ? [
-                                new Node\Expr\ArrayItem(new Node\Scalar\String_($resource['identifiers'][0])),
-                            ] : [],
-                            ['kind' => Node\Expr\Array_::KIND_SHORT]
-                        ),
+                        isset($resource['identifiers'][0]) ? [
+                            new Node\Expr\ArrayItem(new Node\Scalar\String_($resource['identifiers'][0])),
+                        ] : [],
+                        ['kind' => Node\Expr\Array_::KIND_SHORT]
+                    ),
                 ];
 
                 if (isset($resource['expanded_value'])) {
@@ -256,23 +256,23 @@ final class UpgradeApiSubresourceVisitor extends NodeVisitorAbstract
             }
 
             $arguments[] = new Node\Arg(
-                    new Node\Expr\Array_(
-                        [
-                            new Node\Expr\ArrayItem(
-                                new Node\Expr\New_(
-                                    new Node\Name($this->subresourceMetadata['collection'] ? 'GetCollection' : 'Get')
-                                ),
+                new Node\Expr\Array_(
+                    [
+                        new Node\Expr\ArrayItem(
+                            new Node\Expr\New_(
+                                new Node\Name($this->subresourceMetadata['collection'] ? 'GetCollection' : 'Get')
                             ),
-                        ],
-                        [
-                            'kind' => Node\Expr\Array_::KIND_SHORT,
-                        ]
-                    ),
-                    false,
-                    false,
-                    [],
-                    new Node\Identifier('operations')
-                );
+                        ),
+                    ],
+                    [
+                        'kind' => Node\Expr\Array_::KIND_SHORT,
+                    ]
+                ),
+                false,
+                false,
+                [],
+                new Node\Identifier('operations')
+            );
 
             $apiResourceAttribute =
                 new Node\AttributeGroup([

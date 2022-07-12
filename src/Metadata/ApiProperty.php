@@ -129,8 +129,8 @@ final class ApiProperty
         ?bool $required = null,
         ?bool $identifier = null,
 
-                $default = null,
-                $example = null,
+        $default = null,
+        $example = null,
 
         ?string $deprecationReason = null,
         ?bool $fetchable = null,
