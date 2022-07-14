@@ -17,7 +17,7 @@ use ApiPlatform\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 
 /**
- * Populates defaults values of the ressource properties using the default PHP values of properties.
+ * Populates defaults values of the resource properties using the default PHP values of properties.
  */
 final class DefaultPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
