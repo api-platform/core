@@ -1,6 +1,10 @@
 # Changelog
 =======
 
+## 3.0.0-beta.2
+
+* ExpressionLanguage: deprecated class `ApiPlatform\Symfony\Security\ExpressionLanguage` has been removed in favor of `Symfony\Component\Security\Core\Authorization\ExpressionLanguage`.
+
 ## 3.0.0-beta.1
 
 Breaking changes:
