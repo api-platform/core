@@ -57,13 +57,6 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
                 }
 
                 $newOperationName = sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : '');
-
-                // TODO: remove in 3.0 this is used in the IRI converter to avoid a bc break
-                if (($extraProperties = $operation->getExtraProperties()) && isset($extraProperties['is_legacy_subresource'])) {
-                    $extraProperties['legacy_subresource_operation_name'] = $newOperationName;
-                    $operation = $operation->withExtraProperties($extraProperties);
-                }
-
                 $operations->remove($operationName)->add($newOperationName, $operation->withName($newOperationName));
             }
 

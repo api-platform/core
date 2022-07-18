@@ -88,7 +88,6 @@
         <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
-        <service id="api_platform.action.get_subresource" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.not_found" class="ApiPlatform\Action\NotFoundAction" public="true" />
         <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
 

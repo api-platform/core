@@ -83,7 +83,6 @@
                 <argument>api_platform.cache.metadata.resource_collection</argument>
                 <argument>api_platform.cache.route_name_resolver</argument>
                 <argument>api_platform.cache.identifiers_extractor</argument>
-                <argument>api_platform.cache.subresource_operation_factory</argument>
                 <argument>api_platform.elasticsearch.cache.metadata.document</argument>
             </argument>
             <tag name="kernel.cache_warmer" priority="64" />

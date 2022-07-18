@@ -39,7 +39,7 @@ final class AlternateUriResourceMetadataCollectionFactory implements ResourceMet
         }
 
         foreach ($resourceMetadataCollection as $i => $resource) {
-            if (0 === $i || ($resource->getExtraProperties()['is_legacy_subresource'] ?? false) || ($resource->getExtraProperties()['is_legacy_resource_metadata'] ?? false)) {
+            if (0 === $i) {
                 continue;
             }
 
