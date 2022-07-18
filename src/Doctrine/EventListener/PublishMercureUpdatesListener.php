@@ -99,9 +99,9 @@ final class PublishMercureUpdatesListener
             $this->expressionLanguage->addFunction(
                 new ExpressionFunction('iri', static function (string $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL): string {
                     return sprintf('iri(%s, %d)', $apiResource, $referenceType);
-                    }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
-                        return $iriConverter->getIriFromResource($apiResource, $referenceType);
-                    })
+                }, static function (array $arguments, $apiResource, int $referenceType = UrlGeneratorInterface::ABS_URL) use ($iriConverter): string {
+                    return $iriConverter->getIriFromResource($apiResource, $referenceType);
+                })
             );
         }
     }

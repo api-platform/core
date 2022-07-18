@@ -157,7 +157,7 @@ final class SchemaFactory implements SchemaFactoryInterface
         ) {
             if (($resourceMetadata instanceof ResourceMetadata &&
                     ($operationType && $operationName ? $resourceMetadata->getTypedOperationAttribute($operationType, $operationName, 'deprecation_reason', null, true) : $resourceMetadata->getAttribute('deprecation_reason', null))
-                ) || ($operation && $operation->getDeprecationReason())
+            ) || ($operation && $operation->getDeprecationReason())
             ) {
                 $definition['deprecated'] = true;
             }
