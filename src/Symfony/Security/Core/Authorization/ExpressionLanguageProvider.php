@@ -28,9 +28,9 @@ final class ExpressionLanguageProvider implements ExpressionFunctionProviderInte
         return [
             new ExpressionFunction('is_granted', static function ($attributes, $object = 'null') {
                 return sprintf('$auth_checker->isGranted(%s, %s)', $attributes, $object);
-            }, static function (array $variables, $attributes, $object = null) {
-                return $variables['auth_checker']->isGranted($attributes, $object);
-            }),
+                }, static function (array $variables, $attributes, $object = null) {
+                    return $variables['auth_checker']->isGranted($attributes, $object);
+                }),
         ];
     }
 }

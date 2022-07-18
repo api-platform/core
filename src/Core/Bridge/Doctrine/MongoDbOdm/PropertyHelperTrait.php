@@ -61,7 +61,7 @@ trait PropertyHelperTrait
             }
 
             if ($classMetadata->hasReference($association)) {
-                $propertyAlias = "${association}_lkup";
+                $propertyAlias = "{$association}_lkup";
                 // previous_association_lkup.association
                 $localField = "$alias$association";
                 // previous_association_lkup.association_lkup

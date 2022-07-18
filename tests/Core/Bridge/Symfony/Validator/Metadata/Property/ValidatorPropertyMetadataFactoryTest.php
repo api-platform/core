@@ -257,8 +257,8 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $property = 'dummy';
         $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, $property, [])->willReturn(
-                new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING))
-            )->shouldBeCalled();
+            new PropertyMetadata(new Type(Type::BUILTIN_TYPE_STRING))
+        )->shouldBeCalled();
 
         $lengthRestrictions = new PropertySchemaLengthRestriction();
         $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
@@ -283,8 +283,8 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummy', [])->willReturn(
-                new PropertyMetadata()
-            )->shouldBeCalled();
+            new PropertyMetadata()
+        )->shouldBeCalled();
 
         $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
             $validatorMetadataFactory->reveal(), $decoratedPropertyMetadataFactory->reveal(),

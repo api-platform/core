@@ -42,11 +42,11 @@ class SchemaFactoryTest extends TestCase
         $typeFactory = $this->prophesize(TypeFactoryInterface::class);
         $resourceMetadataFactoryCollection = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryCollection->create(Dummy::class)->willReturn(
-                new ResourceMetadataCollection(Dummy::class, [
-                    (new ApiResource())->withOperations(new Operations([
-                        'get' => (new Get())->withName('get'),
-                    ])),
-                ])
+            new ResourceMetadataCollection(Dummy::class, [
+                (new ApiResource())->withOperations(new Operations([
+                    'get' => (new Get())->withName('get'),
+                ])),
+            ])
         );
 
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);

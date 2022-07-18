@@ -65,7 +65,7 @@ class ApiFilterTest extends TestCase
         $filter = eval(<<<'PHP'
 return new \ApiPlatform\Core\Annotation\ApiFilter(\ApiPlatform\Tests\Fixtures\DummyFilter::class, strategy: 'test', properties: ['one', 'two'], arguments: ['args']);
 PHP
-);
+        );
 
         $this->assertEquals($filter->filterClass, DummyFilter::class);
         $this->assertEquals($filter->strategy, 'test');

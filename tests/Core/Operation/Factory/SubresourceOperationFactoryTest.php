@@ -338,11 +338,11 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
-                $resourceMetadataFactoryProphecy->reveal(),
-                $propertyNameCollectionFactoryProphecy->reveal(),
-                $propertyMetadataFactoryProphecy->reveal(),
-                $pathSegmentNameGeneratorProphecy->reveal(),
-                $identifiersExtractorProphecy->reveal()
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $this->assertEquals([
@@ -708,11 +708,11 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
-                $resourceMetadataFactoryProphecy->reveal(),
-                $propertyNameCollectionFactoryProphecy->reveal(),
-                $propertyMetadataFactoryProphecy->reveal(),
-                $pathSegmentNameGeneratorProphecy->reveal(),
-                $identifiersExtractorProphecy->reveal()
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $result = $subresourceOperationFactory->create(DummyEntity::class);
@@ -776,11 +776,11 @@ class SubresourceOperationFactoryTest extends TestCase
         $identifiersExtractorProphecy->getIdentifiersFromResourceClass(Argument::type('string'))->willReturn(['id']);
 
         $subresourceOperationFactory = new SubresourceOperationFactory(
-                $resourceMetadataFactoryProphecy->reveal(),
-                $propertyNameCollectionFactoryProphecy->reveal(),
-                $propertyMetadataFactoryProphecy->reveal(),
-                $pathSegmentNameGeneratorProphecy->reveal(),
-                $identifiersExtractorProphecy->reveal()
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $pathSegmentNameGeneratorProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal()
         );
 
         $result = $subresourceOperationFactory->create(DummyEntity::class);

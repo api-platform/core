@@ -39,6 +39,6 @@ class ValidationExceptionTest extends TestCase
 message 1
 foo: message 2
 TXT
-), $e->__toString());
+        ), $e->__toString());
     }
 }

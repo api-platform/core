@@ -61,13 +61,13 @@ final class ValidationExceptionListener
         $format = ErrorFormatGuesser::guessErrorFormat($event->getRequest(), $this->errorFormats);
 
         $event->setResponse(new Response(
-                $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key']),
-                $statusCode,
-                [
-                    'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),
-                    'X-Content-Type-Options' => 'nosniff',
-                    'X-Frame-Options' => 'deny',
-                ]
+            $this->serializer->serialize($exception instanceof ConstraintViolationListAwareExceptionInterface ? $exception->getConstraintViolationList() : $exception, $format['key']),
+            $statusCode,
+            [
+                'Content-Type' => sprintf('%s; charset=utf-8', $format['value'][0]),
+                'X-Content-Type-Options' => 'nosniff',
+                'X-Frame-Options' => 'deny',
+            ]
         ));
     }
 }

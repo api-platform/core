@@ -223,17 +223,17 @@ final class UpgradeApiResourceVisitor extends NodeVisitorAbstract
                         $identifierNodes = [
                             'compositeIdentifier' => new Node\Expr\ConstFetch(new Node\Name('false')),
                             'fromClass' => new Node\Expr\ClassConstFetch(
-                                    new Node\Name(
-                                        'self'
-                                    ),
-                                    'class'
+                                new Node\Name(
+                                    'self'
                                 ),
+                                'class'
+                            ),
                             'identifiers' => new Node\Expr\Array_(
-                                    [
-                                        new Node\Expr\ArrayItem(new Node\Scalar\String_($identifier)),
-                                    ],
-                                    ['kind' => Node\Expr\Array_::KIND_SHORT]
-                                ),
+                                [
+                                    new Node\Expr\ArrayItem(new Node\Scalar\String_($identifier)),
+                                ],
+                                ['kind' => Node\Expr\Array_::KIND_SHORT]
+                            ),
                         ];
 
                         $identifierNodeItems[] = new Node\Expr\ArrayItem(
