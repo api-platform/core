@@ -134,7 +134,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     {
         $fetchJoinCollection = $operation?->getPaginationFetchJoinCollection();
 
-        if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($fetchJoinCollection)) {
+        if (isset($context['operation_name']) && isset($fetchJoinCollection)) {
             return $fetchJoinCollection;
         }
 
@@ -167,7 +167,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     {
         $useOutputWalkers = $operation?->getPaginationUseOutputWalkers();
 
-        if ((isset($context['collection_operation_name']) || isset($context['operation_name'])) && isset($useOutputWalkers)) {
+        if (isset($context['operation_name']) && isset($useOutputWalkers)) {
             return $useOutputWalkers;
         }
 

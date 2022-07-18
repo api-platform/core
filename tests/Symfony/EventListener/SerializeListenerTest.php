@@ -116,7 +116,7 @@ class SerializeListenerTest extends TestCase
 
     public function testSerializeCollectionOperation()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'get'];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'get'];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $serializerProphecy
@@ -129,7 +129,7 @@ class SerializeListenerTest extends TestCase
                     }),
                     Argument::withEntry('request_uri', ''),
                     Argument::withEntry('resource_class', 'Foo'),
-                    Argument::withEntry('collection_operation_name', 'get')
+                    Argument::withEntry('operation_name', 'get')
                 )
             )
             ->willReturn('bar')
@@ -155,7 +155,7 @@ class SerializeListenerTest extends TestCase
 
     public function testSerializeCollectionOperationWithOutputClassDisabled()
     {
-        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'collection_operation_name' => 'post', 'output' => ['class' => null]];
+        $expectedContext = ['request_uri' => '', 'resource_class' => 'Foo', 'operation_name' => 'post', 'output' => ['class' => null]];
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
 
         $serializerContextBuilderProphecy = $this->prophesize(SerializerContextBuilderInterface::class);

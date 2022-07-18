@@ -398,8 +398,8 @@ class PaginationExtensionTest extends TestCase
     public function fetchJoinCollectionProvider(): array
     {
         return [
-            'collection disabled' => [false, ['collection_operation_name' => 'get'], false],
-            'collection enabled' => [true, ['collection_operation_name' => 'get'], true],
+            'collection disabled' => [false, ['operation_name' => 'get'], false],
+            'collection enabled' => [true, ['operation_name' => 'get'], true],
             'graphql disabled' => [false, ['graphql_operation_name' => 'query'], false],
             'graphql enabled' => [true, ['graphql_operation_name' => 'query'], true],
         ];
@@ -448,8 +448,8 @@ class PaginationExtensionTest extends TestCase
     public function fetchUseOutputWalkersProvider(): array
     {
         return [
-            'collection disabled' => [false, ['collection_operation_name' => 'get'], false],
-            'collection enabled' => [true, ['collection_operation_name' => 'get'], true],
+            'collection disabled' => [false, ['operation_name' => 'get'], false],
+            'collection enabled' => [true, ['operation_name' => 'get'], true],
             'graphql disabled' => [false, ['graphql_operation_name' => 'query'], false],
             'graphql enabled' => [true, ['graphql_operation_name' => 'query'], true],
         ];
