@@ -41,7 +41,6 @@
             <argument type="service" id="api_platform.jsonapi.name_converter.reserved_attribute_name" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.retro_compatible" />
             <argument type="collection" />
-            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->

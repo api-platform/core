@@ -71,8 +71,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected $resourceClassResolver;
     protected $resourceAccessChecker;
     protected $propertyAccessor;
-    protected $allowPlainIdentifiers;
-    protected $dataTransformers = [];
     protected $localCache = [];
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, PropertyAccessorInterface $propertyAccessor = null, NameConverterInterface $nameConverter = null, ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ResourceAccessCheckerInterface $resourceAccessChecker = null)

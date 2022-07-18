@@ -15,12 +15,6 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
-use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
-use ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInitializerInterface;
-use ApiPlatform\Core\DataTransformer\DataTransformerInterface;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
@@ -331,141 +325,6 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $this->assertSame($aliasIsExected, $this->container->hasAlias('api_platform.name_converter'));
-    }
-
-    public function testCommonConfigurationWithMetadataBackwardCompatibilityLayer()
-    {
-        $config = self::DEFAULT_CONFIG;
-        $config['api_platform']['metadata_backward_compatibility_layer'] = true;
-
-        (new ApiPlatformExtension())->load($config, $this->container);
-
-        $services = [
-            // legacy/api.xml
-            'api_platform.operation_method_resolver',
-            'api_platform.formats_provider',
-            'api_platform.route_loader.legacy',
-            'api_platform.operation_path_resolver.router',
-            'api_platform.iri_converter.legacy',
-            'api_platform.listener.request.add_format',
-            'api_platform.listener.request.deserialize',
-            'api_platform.listener.view.serialize',
-            'api_platform.listener.view.respond',
-            'api_platform.listener.exception.validation',
-            'api_platform.listener.exception',
-            'api_platform.identifier.integer',
-            'api_platform.identifier.date_normalizer',
-            'api_platform.operation_path_resolver.underscore',
-            'api_platform.operation_path_resolver.dash',
-            'api_platform.listener.view.write.legacy',
-            'api_platform.listener.request.read.legacy',
-            'api_platform.operation_path_resolver.router',
-
-            // legacy/data_provider.xml
-            'api_platform.item_data_provider',
-            'api_platform.collection_data_provider',
-            'api_platform.subresource_data_provider',
-            'api_platform.pagination.legacy',
-        ];
-        $aliases = [
-            // legacy/api.xml
-            'api_platform.operation_path_resolver',
-            'api_platform.metadata.resource.metadata_collection_factory.retro_compatible',
-            'ApiPlatform\Core\Api\OperationAwareFormatsProviderInterface',
-            'ApiPlatform\Core\Api\IriConverterInterface',
-            'api_platform.operation_path_resolver.legacy',
-
-            // legacy/data_provider.xml
-            'ApiPlatform\Core\DataProvider\ItemDataProviderInterface',
-            'ApiPlatform\Core\DataProvider\CollectionDataProviderInterface',
-            'ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface',
-            'ApiPlatform\Core\DataProvider\Pagination',
-
-            // legacy/backward_compatibility.xml
-            'api_platform.metadata.property.metadata_factory',
-            'api_platform.metadata.resource.name_collection_factory',
-            'api_platform.route_loader',
-            'api_platform.iri_converter',
-            'api_platform.identifiers_extractor',
-            'api_platform.pagination',
-            'api_platform.cache.metadata.property',
-            'api_platform.openapi.factory',
-        ];
-
-        $this->assertContainerHas($services, $aliases);
-
-        // legacy/api.xml
-        $this->assertServiceHasTags('api_platform.route_loader.legacy', ['routing.loader']);
-        $this->assertServiceHasTags('api_platform.listener.request.add_format', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.request.deserialize', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.view.serialize', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.view.respond', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.exception.validation', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.exception', ['kernel.event_listener', 'monolog.logger']);
-        $this->assertServiceHasTags('api_platform.identifier.integer', ['api_platform.identifier.denormalizer']);
-        $this->assertServiceHasTags('api_platform.identifier.date_normalizer', ['api_platform.identifier.denormalizer']);
-        $this->assertServiceHasTags('api_platform.listener.view.write.legacy', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
-    }
-
-    public function testCommonConfigurationWithoutMetadataBackwardCompatibilityLayer()
-    {
-        $config = self::DEFAULT_CONFIG;
-        (new ApiPlatformExtension())->load($config, $this->container);
-
-        $services = [
-            // v3/api.xml
-            'api_platform.route_loader',
-            'api_platform.symfony.iri_converter',
-            'api_platform.api.identifiers_extractor',
-            'api_platform.uri_variables.converter',
-            'api_platform.uri_variables.transformer.integer',
-            'api_platform.uri_variables.transformer.date_time',
-
-            // legacy/data_provider.xml
-            'api_platform.item_data_provider',
-            'api_platform.collection_data_provider',
-            'api_platform.subresource_data_provider',
-            'api_platform.pagination.legacy',
-
-            // v3/state.xml
-            'api_platform.pagination.next',
-
-            // v3/backward_compatibility.xml
-            'api_platform.metadata.resource.metadata_collection_factory.legacy_resource_metadata',
-            'api_platform.metadata.resource.metadata_collection_factory.legacy_subresource_metadata',
-            'api_platform.listener.view.write.legacy',
-            'api_platform.listener.request.read.legacy',
-        ];
-
-        $aliases = [
-            // v3/api.xml
-            'api_platform.iri_converter',
-            'ApiPlatform\Api\IriConverterInterface',
-            'api_platform.identifiers_extractor',
-            'ApiPlatform\Api\IdentifiersExtractorInterface',
-
-            // legacy/data_provider.xml
-            'ApiPlatform\Core\DataProvider\ItemDataProviderInterface',
-            'ApiPlatform\Core\DataProvider\CollectionDataProviderInterface',
-            'ApiPlatform\Core\DataProvider\SubresourceDataProviderInterface',
-            'ApiPlatform\Core\DataProvider\Pagination',
-
-            // v3/state.xml
-            'ApiPlatform\State\Pagination\Pagination',
-            'api_platform.pagination',
-        ];
-
-        $this->assertContainerHas($services, $aliases);
-
-        // v3/api.xml
-        $this->assertServiceHasTags('api_platform.route_loader', ['routing.loader']);
-        $this->assertServiceHasTags('api_platform.uri_variables.transformer.integer', ['api_platform.uri_variables.transformer']);
-        $this->assertServiceHasTags('api_platform.uri_variables.transformer.date_time', ['api_platform.uri_variables.transformer']);
-
-        // v3/backward_compatibility.xml
-        $this->assertServiceHasTags('api_platform.listener.view.write.legacy', ['kernel.event_listener']);
-        $this->assertServiceHasTags('api_platform.listener.request.read.legacy', ['kernel.event_listener']);
     }
 
     public function testMetadataConfiguration(): void
@@ -1579,8 +1438,6 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHas($services, $aliases);
 
         // messenger.xml
-        $this->assertServiceHasTags('api_platform.messenger.data_persister', ['api_platform.data_persister']);
-        $this->assertServiceHasTags('api_platform.messenger.data_transformer', ['api_platform.data_transformer']);
         $this->assertServiceHasTags(MessengerProcessor::class, ['api_platform.state_processor']);
     }
 
@@ -1835,12 +1692,6 @@ class ApiPlatformExtensionTest extends TestCase
 
         $interfaces = [
             FilterInterface::class => 'api_platform.filter',
-            DataPersisterInterface::class => 'api_platform.data_persister',
-            ItemDataProviderInterface::class => 'api_platform.item_data_provider',
-            CollectionDataProviderInterface::class => 'api_platform.collection_data_provider',
-            SubresourceDataProviderInterface::class => 'api_platform.subresource_data_provider',
-            DataTransformerInterface::class => 'api_platform.data_transformer',
-            DataTransformerInitializerInterface::class => 'api_platform.data_transformer',
             ValidationGroupsGeneratorInterface::class => 'api_platform.validation_groups_generator',
             PropertySchemaRestrictionMetadataInterface::class => 'api_platform.metadata.property_schema_restriction',
             QueryItemResolverInterface::class => 'api_platform.graphql.query_resolver',

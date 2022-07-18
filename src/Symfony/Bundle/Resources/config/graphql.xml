@@ -229,9 +229,7 @@
             <argument type="service" id="api_platform.property_accessor" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_metadata_factory" on-invalid="ignore" />
-            <argument type="service" id="api_platform.item_data_provider" on-invalid="ignore" />
             <argument>null</argument>
-            <argument type="tagged" tag="api_platform.data_transformer" on-invalid="ignore" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
 
