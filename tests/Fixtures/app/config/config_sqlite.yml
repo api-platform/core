@@ -1,5 +1,6 @@
 imports:
     - { resource: config_test.yml }
+    - { resource: config_doctrine.yml }
 
 parameters:
     env(DATABASE_URL): sqlite:///%kernel.project_dir%/var/data.db

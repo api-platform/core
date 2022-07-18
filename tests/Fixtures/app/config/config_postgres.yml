@@ -1,5 +1,6 @@
 imports:
     - { resource: config_test.yml }
+    - { resource: config_doctrine.yml }
 
 parameters:
     env(DATABASE_URL): postgres://postgres:@localhost/api_platform_test

@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\RangeFilterTrait;
+use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -32,7 +33,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, string $operationName = null, array &$context = [])
+    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, Operation $operation = null, array &$context = []): void
     {
         if (
             !\is_array($values) ||
@@ -67,7 +68,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
     /**
      * Adds the match stage according to the operator.
      */
-    protected function addMatch(Builder $aggregationBuilder, string $field, string $matchField, string $operator, string $value)
+    protected function addMatch(Builder $aggregationBuilder, string $field, string $matchField, string $operator, string $value): void
     {
         switch ($operator) {
             case self::PARAMETER_BETWEEN:

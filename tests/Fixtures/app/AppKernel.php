@@ -111,6 +111,10 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
+        if ('test' === $this->getEnvironment()) {
+            $loader->load(__DIR__.'/config/config_doctrine.yml');
+        }
+
         /* @TODO remove this check in 3.0 */
         if (\PHP_VERSION_ID >= 70200 && class_exists(Uuid::class) && class_exists(UuidType::class)) {
             $loader->load(__DIR__.'/config/config_symfony_uid.yml');
@@ -244,6 +248,7 @@ class AppKernel extends Kernel
 
         $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['METADATA_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
         $c->prependExtensionConfig('api_platform', ['metadata_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer]);
+
         if ($metadataBackwardCompatibilityLayer) {
             $loader->load(__DIR__.'/config/config_metadata_backward_compatibility_layer.yml');
             $c->prependExtensionConfig('api_platform', [
@@ -272,6 +277,11 @@ class AppKernel extends Kernel
         }
 
         $loader->load(__DIR__.'/config/config_v3.yml');
+
+        if ('elasticsearch' === $this->environment) {
+            return;
+        }
+
         $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources_v3'],

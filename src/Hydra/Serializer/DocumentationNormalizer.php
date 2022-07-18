@@ -31,7 +31,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -353,7 +352,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             $hydraOperations = [];
             foreach ($resourceMetadataCollection as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    if (($operation instanceof Post || $operation instanceof CollectionOperationInterface) !== $collection) {
+                    if ((HttpOperation::METHOD_POST === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                         continue;
                     }
 
@@ -622,10 +621,20 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
      */
     private function getProperty($propertyMetadata, string $propertyName, string $prefixedShortName, string $shortName): array
     {
-        $iri = $propertyMetadata instanceof PropertyMetadata ? $propertyMetadata->getIri() : ($propertyMetadata->getTypes()[0] ?? null);
+        if ($propertyMetadata instanceof PropertyMetadata) {
+            $iri = $propertyMetadata->getIri();
+        } else {
+            if ($iri = $propertyMetadata->getIris()) {
+                $iri = 1 === \count($iri) ? $iri[0] : $iri;
+            }
+        }
+
+        if (!isset($iri)) {
+            $iri = "#$shortName/$propertyName";
+        }
 
         $propertyData = [
-            '@id' => $iri ?? "#$shortName/$propertyName",
+            '@id' => $iri,
             '@type' => false === $propertyMetadata->isReadableLink() ? 'hydra:Link' : 'rdf:Property',
             'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,

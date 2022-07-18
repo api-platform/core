@@ -52,7 +52,7 @@ trait NumericFilterTrait
                     'property' => $propertyName,
                     'type' => $this->getType((string) $this->getDoctrineFieldType($property, $resourceClass)),
                     'required' => false,
-                    'is_collection' => '[]' === substr((string) $filterParameterName, -2),
+                    'is_collection' => str_ends_with((string) $filterParameterName, '[]'),
                 ];
             }
         }
@@ -69,7 +69,7 @@ trait NumericFilterTrait
 
     abstract protected function getLogger(): LoggerInterface;
 
-    abstract protected function normalizePropertyName($property);
+    abstract protected function normalizePropertyName($property): string;
 
     /**
      * Determines whether the given property refers to a numeric field.

@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Command;
 
 use ApiPlatform\Core\Api\OperationType;
+use ApiPlatform\Core\JsonSchema\SchemaFactoryInterface as LegacySchemaFactoryInterface;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\HttpOperation;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,12 +33,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    protected static $defaultName = 'api:json-schema:generate';
-
+    /**
+     * @var SchemaFactoryInterface|LegacySchemaFactoryInterface
+     */
     private $schemaFactory;
     private $formats;
 
-    public function __construct(SchemaFactoryInterface $schemaFactory, array $formats)
+    public function __construct($schemaFactory, array $formats)
     {
         $this->schemaFactory = $schemaFactory;
         $this->formats = array_keys($formats);
@@ -102,7 +105,11 @@ final class JsonSchemaGenerateCommand extends Command
             $operationName = $itemOperation ?? $collectionOperation;
         }
 
-        $schema = $this->schemaFactory->buildSchema($resource, $format, $type, $operationType, $operationName);
+        if ($this->schemaFactory instanceof LegacySchemaFactoryInterface) {
+            $schema = $this->schemaFactory->buildSchema($resource, $format, $type, $operationType, $operationName);
+        } else {
+            $schema = $this->schemaFactory->buildSchema($resource, $format, $type, $operationName ? (new class() extends HttpOperation {})->withName($operationName) : null);
+        }
 
         if (null !== $operationType && null !== $operationName && !$schema->isDefined()) {
             $io->error(sprintf('There is no %s defined for the operation "%s" of the resource "%s".', $type, $operationName, $resource));
@@ -113,5 +120,10 @@ final class JsonSchemaGenerateCommand extends Command
         $io->text((string) json_encode($schema, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return 0;
+    }
+
+    public static function getDefaultName(): string
+    {
+        return 'api:json-schema:generate';
     }
 }

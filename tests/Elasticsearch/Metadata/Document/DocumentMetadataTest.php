@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class DocumentMetadataTest extends TestCase
 {
-    public function testValueObject()
+    public function testValueObject(): void
     {
         $documentMetadataOne = new DocumentMetadata('foo', 'bar');
 

@@ -119,6 +119,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn($relatedDummies);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummies, RelatedDummy::class)->willReturn(RelatedDummy::class);
@@ -181,6 +182,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
         $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
@@ -351,6 +353,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -413,6 +416,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
@@ -478,6 +482,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
         $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
@@ -543,6 +548,7 @@ class AbstractItemNormalizerTest extends TestCase
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->getResourceClass($relatedDummies, RelatedDummy::class)->willReturn(RelatedDummy::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
@@ -645,57 +651,50 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testCanDenormalizeInputClassWithDifferentFieldsThanResourceClass()
     {
-        // $data = [
-        //     'dummyName' => 'Dummy Name',
-        // ];
-        //
-        // $context = [
-        //     'resource_class' => DummyForAdditionalFields::class,
-        //     'input' => ['class' => DummyForAdditionalFieldsInput::class],
-        //     'output' => ['class' => DummyForAdditionalFields::class],
-        // ];
-        // $augmentedContext = $context + ['api_denormalize' => true];
-        //
-        // $preHydratedDummy = new DummyForAdditionalFieldsInput('Name Dummy');
-        // $cleanedContext = array_diff_key($augmentedContext, [
-        //     'input' => null,
-        //     'resource_class' => null,
-        // ]);
-        // $cleanedContextWithObjectToPopulate = array_merge($cleanedContext, [
-        //     AbstractObjectNormalizer::OBJECT_TO_POPULATE => $preHydratedDummy,
-        //     AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
-        // ]);
-        //
-        // $dummyInputDto = new DummyForAdditionalFieldsInput('Dummy Name');
-        // $dummy = new DummyForAdditionalFields('Dummy Name', 'name-dummy');
-        //
-        // $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        //
-        // $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        //
-        // $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        //
-        // $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        // $resourceClassResolverProphecy->getResourceClass(null, DummyForAdditionalFields::class)->willReturn(DummyForAdditionalFields::class);
-        //
-        // $inputDataTransformerProphecy = $this->prophesize(DataTransformerInitializerInterface::class);
-        // $inputDataTransformerProphecy->willImplement(DataTransformerInitializerInterface::class);
-        // $inputDataTransformerProphecy->initialize(DummyForAdditionalFieldsInput::class, $cleanedContext)->willReturn($preHydratedDummy);
-        // $inputDataTransformerProphecy->supportsTransformation($data, DummyForAdditionalFields::class, $augmentedContext)->willReturn(true);
-        // $inputDataTransformerProphecy->transform($dummyInputDto, DummyForAdditionalFields::class, $augmentedContext)->willReturn($dummy);
-        //
-        // $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        // $serializerProphecy->willImplement(DenormalizerInterface::class);
-        // $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContextWithObjectToPopulate)->willReturn($dummyInputDto);
-        //
-        // $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, [], null, null) extends AbstractItemNormalizer {
-        // };
-        // $normalizer->setSerializer($serializerProphecy->reveal());
-        //
-        // $actual = $normalizer->denormalize($data, DummyForAdditionalFields::class, 'json', $context);
-        //
-        // $this->assertInstanceOf(DummyForAdditionalFields::class, $actual);
-        // $this->assertEquals('Dummy Name', $actual->getName());
+        $data = [
+            'dummyName' => 'Dummy Name',
+        ];
+
+        $context = [
+            'resource_class' => DummyForAdditionalFields::class,
+            'input' => ['class' => DummyForAdditionalFieldsInput::class],
+            'output' => ['class' => DummyForAdditionalFields::class],
+        ];
+
+        $preHydratedDummy = new DummyForAdditionalFieldsInput('Name Dummy');
+        $cleanedContext = array_diff_key($context, [
+            'input' => null,
+            'resource_class' => null,
+        ]);
+        $cleanedContextWithObjectToPopulate = array_merge($cleanedContext, [
+            AbstractObjectNormalizer::OBJECT_TO_POPULATE => $preHydratedDummy,
+            AbstractObjectNormalizer::DEEP_OBJECT_TO_POPULATE => true,
+        ]);
+
+        $dummyInputDto = new DummyForAdditionalFieldsInput('Dummy Name');
+        $dummy = new DummyForAdditionalFields('Dummy Name', 'name-dummy');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyForAdditionalFields::class)->willReturn(DummyForAdditionalFields::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+        $serializerProphecy->denormalize($data, DummyForAdditionalFieldsInput::class, 'json', $cleanedContextWithObjectToPopulate)->willReturn($dummyInputDto);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), null, null, null, [], null, null) extends AbstractItemNormalizer {
+        };
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $actual = $normalizer->denormalize($data, DummyForAdditionalFields::class, 'json', $context);
+
+        $this->assertInstanceOf(DummyForAdditionalFields::class, $actual);
+        $this->assertEquals('Dummy Name', $actual->getName());
     }
 
     public function testDenormalizeWritableLinks()
@@ -1010,13 +1009,13 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])->withDescription('')->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
 
         $type = new Type(
-                    Type::BUILTIN_TYPE_OBJECT,
-                    false,
-                    ArrayCollection::class,
-                    true,
-                    new Type(Type::BUILTIN_TYPE_INT),
-                    new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
-                );
+            Type::BUILTIN_TYPE_OBJECT,
+            false,
+            ArrayCollection::class,
+            true,
+            new Type(Type::BUILTIN_TYPE_INT),
+            new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)
+        );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn((new ApiProperty())->withBuiltinTypes([$type])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true));
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

@@ -17,6 +17,7 @@ use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Tests\ProphecyTrait;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -68,8 +69,8 @@ final class ItemNormalizerTest extends TestCase
 
     public function testSupportsDenormalization(): void
     {
-        $this->normalizerProphecy->supportsDenormalization('foo', 'string', 'json')->willReturn(true)->shouldBeCalledOnce();
-        $this->normalizerProphecy->supportsDenormalization('foo', 'string', DocumentNormalizer::FORMAT)->shouldNotBeCalled();
+        $this->normalizerProphecy->supportsDenormalization('foo', 'string', 'json', Argument::type('array'))->willReturn(true)->shouldBeCalledOnce();
+        $this->normalizerProphecy->supportsDenormalization('foo', 'string', DocumentNormalizer::FORMAT, Argument::type('array'))->shouldNotBeCalled();
 
         self::assertTrue($this->itemNormalizer->supportsDenormalization('foo', 'string', 'json'));
         self::assertFalse($this->itemNormalizer->supportsDenormalization('foo', 'string', DocumentNormalizer::FORMAT));

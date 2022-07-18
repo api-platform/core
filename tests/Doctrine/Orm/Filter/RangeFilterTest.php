@@ -27,7 +27,7 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
 
     protected $filterClass = RangeFilter::class;
 
-    public function testGetDescriptionDefaultFields()
+    public function testGetDescriptionDefaultFields(): void
     {
         $filter = $this->buildFilter();
 

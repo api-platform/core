@@ -31,7 +31,7 @@ trait PropertyHelperTrait
     /**
      * Splits the given property into parts.
      */
-    abstract protected function splitPropertyParts(string $property/* , string $resourceClass */): array;
+    abstract protected function splitPropertyParts(string $property, string $resourceClass): array;
 
     /**
      * Gets class metadata for the given resource.
@@ -61,7 +61,7 @@ trait PropertyHelperTrait
             }
 
             if ($classMetadata->hasReference($association)) {
-                $propertyAlias = "${association}_lkup";
+                $propertyAlias = "{$association}_lkup";
                 // previous_association_lkup.association
                 $localField = "$alias$association";
                 // previous_association_lkup.association_lkup

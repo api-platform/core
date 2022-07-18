@@ -53,6 +53,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\ORM\OptimisticLockException;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -63,6 +64,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class ApiPlatformExtensionTest extends TestCase
 {
+    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public const DEFAULT_CONFIG = ['api_platform' => [
@@ -102,7 +104,7 @@ class ApiPlatformExtensionTest extends TestCase
             'enabled' => true,
         ],
         'defaults' => [
-            'attributes' => [],
+            'extra_properties' => [],
             'url_generation_strategy' => UrlGeneratorInterface::ABS_URL,
         ],
         'collection' => [
@@ -111,16 +113,9 @@ class ApiPlatformExtensionTest extends TestCase
             'order_parameter_name' => 'order',
             'order_nulls_comparison' => null,
             'pagination' => [
-                'client_enabled' => false,
-                'client_items_per_page' => false,
-                'enabled' => true,
-                'enabled_parameter_name' => 'pagination',
-                'items_per_page' => 30,
-                'items_per_page_parameter_name' => 'itemsPerPage',
-                'maximum_items_per_page' => 30,
                 'page_parameter_name' => 'page',
-                'partial' => false,
-                'client_partial' => false,
+                'enabled_parameter_name' => 'pagination',
+                'items_per_page_parameter_name' => 'itemsPerPage',
                 'partial_parameter_name' => 'partial',
             ],
         ],
@@ -136,8 +131,6 @@ class ApiPlatformExtensionTest extends TestCase
             OptimisticLockException::class => Response::HTTP_CONFLICT,
         ],
         'show_webby' => true,
-        // TODO: to remove in 3.0
-        'allow_plain_identifiers' => false,
         'eager_loading' => [
             'enabled' => true,
             'max_joins' => 30,
@@ -1036,6 +1029,55 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertServiceHasTags('api_platform.graphql.command.export_command', ['console.command']);
     }
 
+    /**
+     * @group legacy
+     */
+    public function testLegacyPlainIdentifier()
+    {
+        // There's an issue with deprecations being different on lower versions
+        if (\PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped();
+        }
+
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['allow_plain_identifiers'] = false;
+        $this->expectDeprecation('Since api-platform/core 2.7: The use of `allow_plain_identifiers` has been deprecated in 2.7 and will be removed in 3.0.');
+        (new ApiPlatformExtension())->load($config, $this->container);
+    }
+
+    /**
+     * @group legacy
+     */
+    public function testLegacyPaginationCollectionOptions()
+    {
+        // There's an issue with deprecations being different on lower versions
+        if (\PHP_VERSION_ID < 80000) {
+            $this->markTestSkipped();
+        }
+
+        $config = self::DEFAULT_CONFIG;
+
+        $config['api_platform']['collection']['pagination'] = [
+            'client_enabled' => false,
+            'client_items_per_page' => false,
+            'enabled' => true,
+            'items_per_page' => 30,
+            'maximum_items_per_page' => 30,
+            'partial' => false,
+            'client_partial' => false,
+        ];
+
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_enabled` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_partial` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.client_enabled` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_enabled` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.client_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_items_per_page` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.client_partial` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_client_partial` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_items_per_page` instead.');
+        $this->expectDeprecation('Since api-platform/core 2.6: The use of the `collection.pagination.maximum_items_per_page` has been deprecated in 2.6 and will be removed in 3.0. Use `defaults.pagination_maximum_items_per_page` instead.');
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+    }
+
     public function testLegacyBundlesConfigurationFosUserBundle(): void
     {
         $config = self::DEFAULT_CONFIG;
@@ -1044,7 +1086,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $bundles = $this->container->getParameter('kernel.bundles');
 
-        if (!isset($bundles['FOSUserBundle'])) {
+        if (!isset($bundles['FOSUserBundle'])) { // @phpstan-ignore-line
             $this->markTestSkipped('bundle FOSUserBundle does not exist');
         }
 
@@ -1067,7 +1109,7 @@ class ApiPlatformExtensionTest extends TestCase
 
         $bundles = $this->container->getParameter('kernel.bundles');
 
-        if (!isset($bundles['NelmioApiDocBundle'])) {
+        if (!isset($bundles['NelmioApiDocBundle'])) { // @phpstan-ignore-line
             $this->markTestSkipped('bundle NelmioApiDocBundle does not exist');
         }
 
@@ -1559,7 +1601,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.elasticsearch.metadata.document.metadata_factory.attribute',
             'api_platform.elasticsearch.metadata.document.metadata_factory.cat',
             'api_platform.elasticsearch.metadata.document.metadata_factory.cached',
-            'api_platform.elasticsearch.identifier_extractor',
             'api_platform.elasticsearch.name_converter.inner_fields',
             'api_platform.elasticsearch.normalizer.item',
             'api_platform.elasticsearch.normalizer.document',
@@ -1579,7 +1620,6 @@ class ApiPlatformExtensionTest extends TestCase
             // elasticsearch.xml
             'api_platform.elasticsearch.metadata.document.metadata_factory',
             'ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface',
-            'ApiPlatform\Core\Bridge\Elasticsearch\Api\IdentifierExtractorInterface',
             'ApiPlatform\Elasticsearch\Filter\TermFilter',
             'ApiPlatform\Elasticsearch\Filter\MatchFilter',
             'ApiPlatform\Elasticsearch\Filter\OrderFilter',
@@ -1823,5 +1863,18 @@ class ApiPlatformExtensionTest extends TestCase
         }
 
         $this->assertEmpty(array_diff(array_keys($interfaces), $has), 'Not all expected interfaces are autoconfigurable.');
+    }
+
+    public function testDefaults()
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults'] = [
+            'something' => 'test',
+            'extra_properties' => ['else' => 'foo'],
+        ];
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertEquals($this->container->getParameter('api_platform.defaults'), ['extra_properties' => ['else' => 'foo', 'something' => 'test']]);
     }
 }

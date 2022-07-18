@@ -44,7 +44,7 @@ class CollectionFiltersNormalizerTest extends TestCase
     {
         $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
         $decoratedProphecy->willImplement(CacheableSupportsMethodInterface::class);
-        $decoratedProphecy->supportsNormalization('foo', 'abc')->willReturn(true)->shouldBeCalled();
+        $decoratedProphecy->supportsNormalization('foo', 'abc', Argument::type('array'))->willReturn(true)->shouldBeCalled();
         $decoratedProphecy->hasCacheableSupportsMethod()->willReturn(true)->shouldBeCalled();
 
         $normalizer = new CollectionFiltersNormalizer(
@@ -239,11 +239,14 @@ class CollectionFiltersNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
 
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('foo')->willReturn(false);
+
         $normalizer = new CollectionFiltersNormalizer(
             $decoratedProphecy->reveal(),
             $resourceMetadataFactoryProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
-            $this->prophesize(ContainerInterface::class)->reveal()
+            $filterLocatorProphecy->reveal()
         );
 
         $this->assertEquals(['name' => 'foo'], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
@@ -287,7 +290,7 @@ class CollectionFiltersNormalizerTest extends TestCase
             $this->prophesize(NormalizerInterface::class)->reveal(),
             $this->prophesize(ResourceMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
-            new \ArrayObject()
+            new \ArrayObject() // @phpstan-ignore-line
         );
     }
 

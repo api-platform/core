@@ -93,6 +93,10 @@ class XmlExtractorTest extends TestCase
                     'operations' => null,
                     'graphQlOperations' => null,
                     'class' => Comment::class,
+                    'processor' => null,
+                    'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments.{_format}',
@@ -148,6 +152,7 @@ class XmlExtractorTest extends TestCase
                     ],
                     'normalizationContext' => [
                         'groups' => ['comment:read', 'comment:custom-read'],
+                        'enabled' => true,
                     ],
                     'denormalizationContext' => [
                         'groups' => 'comment:write',
@@ -225,6 +230,7 @@ class XmlExtractorTest extends TestCase
                             ],
                             'normalizationContext' => [
                                 'groups' => ['comment:read', 'comment:custom-read'],
+                                'enabled' => true,
                             ],
                             'denormalizationContext' => [
                                 'groups' => 'comment:write',
@@ -254,6 +260,8 @@ class XmlExtractorTest extends TestCase
                             'collection' => null,
                             'method' => null,
                             'priority' => null,
+                            'processor' => null,
+                            'provider' => null,
                         ],
                         [
                             'name' => null,
@@ -315,6 +323,7 @@ class XmlExtractorTest extends TestCase
                             ],
                             'normalizationContext' => [
                                 'groups' => ['comment:read', 'comment:custom-read'],
+                                'enabled' => true,
                             ],
                             'denormalizationContext' => [
                                 'groups' => 'comment:write',
@@ -346,10 +355,16 @@ class XmlExtractorTest extends TestCase
                             'collection' => null,
                             'method' => null,
                             'priority' => null,
+                            'processor' => null,
+                            'provider' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
                     'class' => Comment::class,
+                    'processor' => null,
+                    'provider' => null,
+                    'read' => null,
+                    'write' => null,
                 ],
             ],
         ], $extractor->getResources());

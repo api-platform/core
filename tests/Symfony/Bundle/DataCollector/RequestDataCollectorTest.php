@@ -167,6 +167,9 @@ class RequestDataCollectorTest extends TestCase
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
 
+        $this->filterLocator->has('a_filter')->willReturn(false);
+        $this->filterLocator->has('foo')->willReturn(false);
+
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal(),
             $this->filterLocator->reveal(),
@@ -219,6 +222,9 @@ class RequestDataCollectorTest extends TestCase
     public function testVersionCollection()
     {
         $this->apiResourceClassWillReturn(DummyEntity::class);
+
+        $this->filterLocator->has('a_filter')->willReturn(false);
+        $this->filterLocator->has('foo')->willReturn(false);
 
         $dataCollector = new RequestDataCollector(
             $this->metadataFactory->reveal(),

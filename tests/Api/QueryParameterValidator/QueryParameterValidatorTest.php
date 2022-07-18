@@ -58,11 +58,13 @@ class QueryParameterValidatorTest extends TestCase
     }
 
     /**
-     * If the tested filter is non-existant, then nothing should append.
+     * If the tested filter is non-existent, then nothing should append.
      */
     public function testOnKernelRequestWithWrongFilter()
     {
         $request = [];
+
+        $this->filterLocatorProphecy->has('some_inexistent_filter')->willReturn(false);
 
         $this->assertNull(
             $this->testedInstance->validateFilters(Dummy::class, ['some_inexistent_filter'], $request)

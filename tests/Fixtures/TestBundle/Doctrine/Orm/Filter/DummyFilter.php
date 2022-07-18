@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use Doctrine\ORM\QueryBuilder;
 
 class DummyFilter extends AbstractFilter
@@ -24,10 +26,10 @@ class DummyFilter extends AbstractFilter
 
     public function doSplitPropertiesWithoutResourceClass($property)
     {
-        return $this->splitPropertyParts($property, null);
+        return $this->splitPropertyParts($property, Dummy::class);
     }
 
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
+    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = [])
     {
     }
 

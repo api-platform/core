@@ -59,7 +59,7 @@ final class ReadStage implements ReadStageInterface
         }
 
         $args = $context['args'];
-        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation->getName(), $context, true);
+        $normalizationContext = $this->serializerContextBuilder->create($resourceClass, $operation, $context, true);
 
         if (!$context['is_collection']) {
             $identifier = $this->getIdentifierFromContext($context);

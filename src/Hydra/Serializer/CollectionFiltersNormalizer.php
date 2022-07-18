@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Api\FilterInterface;
-use ApiPlatform\Api\FilterLocatorTrait;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Core\Api\FilterCollection;
+use ApiPlatform\Core\Api\FilterLocatorTrait;
 use ApiPlatform\Core\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -57,9 +57,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return $this->collectionNormalizer->supportsNormalization($data, $format);
+        return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
     /**

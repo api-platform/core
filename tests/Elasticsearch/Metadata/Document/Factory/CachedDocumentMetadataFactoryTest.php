@@ -29,7 +29,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         self::assertInstanceOf(
             DocumentMetadataFactoryInterface::class,
@@ -40,7 +40,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
         );
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $originalDocumentMetadata = new DocumentMetadata('foo');
 
@@ -63,7 +63,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithLocalCache()
+    public function testCreateWithLocalCache(): void
     {
         $originalDocumentMetadata = new DocumentMetadata('foo');
 
@@ -89,7 +89,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithCacheException()
+    public function testCreateWithCacheException(): void
     {
         $originalDocumentMetadata = new DocumentMetadata('foo');
 
@@ -112,7 +112,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithCacheHit()
+    public function testCreateWithCacheHit(): void
     {
         $originalDocumentMetadata = new DocumentMetadata('foo');
 
@@ -135,7 +135,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
         self::assertSame(DocumentMetadata::DEFAULT_TYPE, $documentMetadata->getType());
     }
 
-    public function testCreateWithIndexNotDefined()
+    public function testCreateWithIndexNotDefined(): void
     {
         $this->expectException(IndexNotFoundException::class);
         $this->expectExceptionMessage(sprintf('No index associated with the "%s" resource class.', Foo::class));

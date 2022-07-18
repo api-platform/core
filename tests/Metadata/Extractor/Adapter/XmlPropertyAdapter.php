@@ -41,7 +41,7 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'security',
         'securityPostDenormalize',
         'initializable',
-        'iri',
+        'iris',
     ];
 
     /**
@@ -107,6 +107,14 @@ XML
         }
     }
 
+    private function buildIris(\SimpleXMLElement $resource, array $values): void
+    {
+        $node = $resource->addChild('iris');
+        foreach ($values as $value) {
+            $node->addChild('iri', $value);
+        }
+    }
+
     private function buildJsonldContext(\SimpleXMLElement $resource, array $values): void
     {
         $this->buildValues($resource->addChild('jsonldContext'), $values);
@@ -115,6 +123,11 @@ XML
     private function buildOpenapiContext(\SimpleXMLElement $resource, array $values): void
     {
         $this->buildValues($resource->addChild('openapiContext'), $values);
+    }
+
+    private function buildJsonSchemaContext(\SimpleXMLElement $resource, array $values): void
+    {
+        $this->buildValues($resource->addChild('jsonSchemaContext'), $values);
     }
 
     private function buildExtraProperties(\SimpleXMLElement $resource, array $values): void

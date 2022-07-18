@@ -56,7 +56,11 @@ final class ReflectionClassRecursiveIterator
             }
         }
 
-        $declared = array_merge(get_declared_classes(), get_declared_interfaces());
+        $sortedClasses = get_declared_classes();
+        sort($sortedClasses);
+        $sortedInterfaces = get_declared_interfaces();
+        sort($sortedInterfaces);
+        $declared = array_merge($sortedClasses, $sortedInterfaces);
         foreach ($declared as $className) {
             $reflectionClass = new \ReflectionClass($className);
             $sourceFile = $reflectionClass->getFileName();

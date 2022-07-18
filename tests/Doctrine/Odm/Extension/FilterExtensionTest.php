@@ -16,15 +16,12 @@ namespace ApiPlatform\Tests\Doctrine\Odm\Extension;
 use ApiPlatform\Api\FilterInterface as ApiFilterInterface;
 use ApiPlatform\Doctrine\Odm\Extension\FilterExtension;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operations;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy;
 use ApiPlatform\Tests\ProphecyTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -36,18 +33,16 @@ class FilterExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testApplyToCollectionWithValidFilters()
+    public function testApplyToCollectionWithValidFilters(): void
     {
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
 
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withFilters(['dummyFilter', 'dummyBadFilter'])]))]);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
+        $operation = (new GetCollection())->withFilters(['dummyFilter', 'dummyBadFilter']);
+
         $mongoDbOdmFilterProphecy = $this->prophesize(FilterInterface::class);
-        $mongoDbOdmFilterProphecy->apply($aggregationBuilder, Dummy::class, 'get', ['filters' => []])->shouldBeCalled();
+        $mongoDbOdmFilterProphecy->apply($aggregationBuilder, Dummy::class, $operation, ['filters' => []])->shouldBeCalled();
 
         $ordinaryFilterProphecy = $this->prophesize(ApiFilterInterface::class);
 
@@ -57,17 +52,18 @@ class FilterExtensionTest extends TestCase
         $filterLocatorProphecy->get('dummyFilter')->willReturn($mongoDbOdmFilterProphecy->reveal())->shouldBeCalled();
         $filterLocatorProphecy->get('dummyBadFilter')->willReturn($ordinaryFilterProphecy->reveal())->shouldBeCalled();
 
-        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $filterLocatorProphecy->reveal());
-        $orderExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, 'get');
+        $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
+        $filterExtensionTest->applyToCollection($aggregationBuilder, Dummy::class, $operation);
     }
 
-    public function testApplyToCollectionWithoutFilters()
+    public function testApplyToCollectionWithoutFilters(): void
     {
-        $dummyMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations(['get' => (new GetCollection())->withFilters(['dummyFilter', 'dummyBadFilter'])]))]);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
 
-        $orderExtensionTest = new FilterExtension($resourceMetadataFactoryProphecy->reveal(), $this->prophesize(ContainerInterface::class)->reveal());
-        $orderExtensionTest->applyToCollection($this->prophesize(Builder::class)->reveal(), Dummy::class, 'get');
+        $filterLocatorProphecy->has(Argument::cetera())->willReturn(false);
+        $filterLocatorProphecy->get(Argument::cetera())->shouldNotBeCalled();
+
+        $filterExtensionTest = new FilterExtension($filterLocatorProphecy->reveal());
+        $filterExtensionTest->applyToCollection($this->prophesize(Builder::class)->reveal(), Dummy::class, (new GetCollection())->withFilters(['dummyFilter', 'dummyBadFilter']));
     }
 }

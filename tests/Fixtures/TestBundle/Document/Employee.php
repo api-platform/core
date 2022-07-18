@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ODM\Document
@@ -26,7 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[Post]
 #[ApiResource(uriTemplate: '/companies/{companyId}/employees/{id}', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company'], 'id' => ['from_class' => Employee::class]])]
 #[Get]
-#[ApiResource(uriTemplate: '/companies/{companyId}/employees', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company']])]
+#[ApiResource(uriTemplate: '/companies/{companyId}/employees', uriVariables: ['companyId' => ['from_class' => Company::class, 'to_property' => 'company']], normalizationContext: ['groups' => ['company_employees_read']])]
 #[GetCollection]
 class Employee
 {
@@ -42,6 +43,7 @@ class Employee
      *
      * @ODM\Field
      */
+    #[Groups(['company_employees_read'])]
     public $name;
 
     /**
@@ -49,6 +51,7 @@ class Employee
      *
      * @ODM\ReferenceOne(targetDocument=Company::class, storeAs="id")
      */
+    #[Groups(['company_employees_read'])]
     public $company;
 
     public function getId()

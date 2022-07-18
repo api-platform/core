@@ -22,7 +22,7 @@ use ApiPlatform\Doctrine\Orm\Extension\EagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Extension\FilterEagerLoadingExtension;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as DoctrineQueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
-use ApiPlatform\Doctrine\Orm\Filter\AbstractContextAwareFilter as DoctrineOrmAbstractContextAwareFilter;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
@@ -102,7 +102,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
-        $this->registerOpenApiConfiguration($container, $config);
+        $this->registerOpenApiConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
         $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config['enable_docs']);
@@ -157,8 +157,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.formats', $formats);
         $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
-        // TODO: to remove in 3.0
-        $container->setParameter('api_platform.allow_plain_identifiers', $config['allow_plain_identifiers']);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
@@ -378,8 +376,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             throw new RuntimeException('You can not enable the Swagger UI without enabling Swagger, fix this by enabling swagger via the configuration "enable_swagger: true".');
         }
 
-        $loader->load('json_schema.xml');
-
         if (!$config['enable_swagger']) {
             return;
         }
@@ -497,8 +493,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.doctrine.orm.query_extension.item');
         $container->registerForAutoconfiguration(DoctrineQueryCollectionExtensionInterface::class)
             ->addTag('api_platform.doctrine.orm.query_extension.collection');
-        $container->registerForAutoconfiguration(DoctrineOrmAbstractContextAwareFilter::class)
-            ->setBindings(['$requestStack' => null]);
+        $container->registerForAutoconfiguration(DoctrineOrmAbstractFilter::class);
 
         $loader->load('doctrine_orm.xml');
 
@@ -699,7 +694,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('security.xml');
     }
 
-    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config): void
+    private function registerOpenApiConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         $container->setParameter('api_platform.openapi.termsOfService', $config['openapi']['termsOfService']);
         $container->setParameter('api_platform.openapi.contact.name', $config['openapi']['contact']['name']);
@@ -707,6 +702,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.contact.email', $config['openapi']['contact']['email']);
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
+
+        $loader->load('json_schema.xml');
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

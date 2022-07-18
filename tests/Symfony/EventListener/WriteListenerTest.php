@@ -167,18 +167,19 @@ class WriteListenerTest extends TestCase
     public function testOnKernelViewWithSafeMethod()
     {
         $operationResource = new OperationResource(1, 'foo');
+        $operation = (new Get())->withName('_api_OperationResource_get');
 
-        $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], Argument::type('array'))->willReturn($operationResource)->shouldNotBeCalled();
+        $this->processorProphecy->process($operationResource, Argument::type(Operation::class), [], ['operation' => $operation, 'resource_class' => OperationResource::class, 'previous_data' => 'test'])->willReturn($operationResource)->shouldNotBeCalled();
 
         $this->iriConverterProphecy->getIriFromResource($operationResource)->shouldNotBeCalled();
 
         $operationResourceMetadata = new ResourceMetadataCollection(OperationResource::class, [(new ApiResource())->withOperations(new Operations([
-            '_api_OperationResource_get' => (new Get())->withName('_api_OperationResource_get'),
+            '_api_OperationResource_get' => $operation,
         ]))]);
 
         $this->resourceMetadataCollectionFactory->create(OperationResource::class)->willReturn($operationResourceMetadata);
 
-        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_get']);
+        $request = new Request([], [], ['_api_resource_class' => OperationResource::class, '_api_operation_name' => '_api_OperationResource_get', 'previous_data' => 'test']);
         $request->setMethod('GET');
 
         $event = new ViewEvent(

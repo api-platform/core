@@ -188,7 +188,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
 
         if (!isset($context['iri']) || false !== $context['iri']) {
-            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.(bin2hex(random_bytes(10)));
+            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
         }
 
         if ($context['has_context'] ?? false) {
@@ -230,7 +230,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 $id = $propertyMetadata->getIri();
             } else {
                 $jsonldContext = $propertyMetadata->getJsonldContext() ?? [];
-                $id = $propertyMetadata->getTypes()[0] ?? null;
+
+                if ($id = $propertyMetadata->getIris()) {
+                    $id = 1 === \count($id) ? $id[0] : $id;
+                }
             }
 
             if (!$id) {

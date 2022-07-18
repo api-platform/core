@@ -28,7 +28,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
@@ -138,7 +137,7 @@ final class IriConverter implements IriConverterInterface
         // In symfony the operation name is the route name, try to find one if none provided
         if (
             !$operation->getName()
-            || $operation instanceof Post
+            || ($operation instanceof HttpOperation && HttpOperation::METHOD_POST === $operation->getMethod())
             || $isLegacySubresource
             || $isLegacyCustomResource
         ) {
@@ -158,7 +157,7 @@ final class IriConverter implements IriConverterInterface
         if (\is_object($item)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item, $operation);
-            } catch (RuntimeException $e) {
+            } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
                     throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass), $e->getCode(), $e);

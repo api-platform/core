@@ -54,7 +54,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $decorated = null, LoggerInterface $logger = null, array $defaults = [], bool $graphQlEnabled = false)
     {
-        $this->defaults = $defaults + ['attributes' => []];
+        $this->defaults = $defaults;
         $this->decorated = $decorated;
         $this->logger = $logger ?? new NullLogger();
         $this->graphQlEnabled = $graphQlEnabled;
@@ -194,6 +194,8 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             $operation = $operation->{'with'.substr($methodName, 3)}($value);
         }
 
+        $operation = $operation->withExtraProperties(array_merge($resource->getExtraProperties(), $operation->getExtraProperties()));
+
         // Add global defaults attributes to the operation
         $operation = $this->addGlobalDefaults($operation);
 
@@ -224,7 +226,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         }
 
         return [
-            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof GetCollection ? '_collection' : ''),
+            sprintf('_api_%s_%s%s', $operation->getUriTemplate() ?: $operation->getShortName(), strtolower($operation->getMethod() ?? HttpOperation::METHOD_GET), $operation instanceof CollectionOperationInterface ? '_collection' : ''),
             $operation,
         ];
     }
@@ -234,16 +236,32 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
      */
     private function addGlobalDefaults($operation)
     {
-        foreach ($this->defaults['attributes'] as $key => $value) {
-            [$key, $value] = $this->getKeyValue($key, $value);
-            $upperKey = ucfirst($key);
+        $extraProperties = $operation->getExtraProperties();
+        foreach ($this->defaults as $key => $value) {
+            [$newKey, $value] = $this->getKeyValue($key, $value);
+            $upperKey = ucfirst($newKey);
             $getter = 'get'.$upperKey;
-            if (method_exists($operation, $getter) && null === $operation->{$getter}()) {
+
+            if (!method_exists($operation, $getter)) {
+                if (!isset($extraProperties[$key])) {
+                    $extraProperties[$key] = $value;
+                }
+            } else {
+                $currentValue = $operation->{$getter}();
+
+                if (\is_array($currentValue) && $currentValue) {
+                    $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
+                }
+
+                if (null !== $currentValue) {
+                    continue;
+                }
+
                 $operation = $operation->{'with'.$upperKey}($value);
             }
         }
 
-        return $operation;
+        return $operation->withExtraProperties($extraProperties);
     }
 
     private function getResourceWithDefaults(string $resourceClass, string $shortName, ApiResource $resource): ApiResource

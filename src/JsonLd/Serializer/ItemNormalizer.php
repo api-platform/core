@@ -16,6 +16,7 @@ namespace ApiPlatform\JsonLd\Serializer;
 use ApiPlatform\Api\IriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Api\UrlGeneratorInterface;
+use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -56,9 +57,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format);
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
     /**
@@ -70,17 +71,23 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function normalize($object, $format = null, array $context = [])
     {
-        $objectClass = $this->getObjectClass($object);
-        $outputClass = $this->getOutputClass($objectClass, $context);
-        if (null !== $outputClass && !isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS])) {
+        $resourceClass = $this->getObjectClass($object);
+
+        if ($this->getOutputClass($resourceClass, $context) && !isset($context[self::IS_TRANSFORMED_TO_SAME_CLASS])) {
             return parent::normalize($object, $format, $context);
         }
 
         // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
         $previousResourceClass = $context['resource_class'] ?? null;
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null);
-        $context = $this->initContext($resourceClass, $context);
-        $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
+        $metadata = [];
+        if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $resourceClass);
+            $context = $this->initContext($resourceClass, $context);
+            $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
+        } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {
+            // We should improve what's behind the context creation, its probably more complicated then it should
+            $metadata = $this->createJsonLdContext($this->contextBuilder, $object, $context);
+        }
 
         if (isset($context['operation']) && $previousResourceClass !== $resourceClass) {
             unset($context['operation'], $context['operation_name']);
@@ -109,9 +116,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null): bool
+    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format);
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
 
     /**

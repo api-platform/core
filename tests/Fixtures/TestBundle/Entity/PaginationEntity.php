@@ -34,7 +34,12 @@ class PaginationEntity
     #[ORM\Column(type: 'integer', nullable: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private ?int $id = null;
+    private ?int $id;
+
+    public function __construct(int $id = null)
+    {
+        $this->id = $id;
+    }
 
     /**
      * @return int

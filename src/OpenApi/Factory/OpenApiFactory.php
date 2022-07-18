@@ -21,7 +21,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -163,7 +162,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $operationOutputSchemas = [];
 
             foreach ($responseMimeTypes as $operationFormat) {
-                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, null, $operationName, $schema, null, $forceSchemaCollection);
+                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
                 $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
             }
@@ -228,7 +227,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     break;
             }
 
-            if (!$operation instanceof CollectionOperationInterface && !$operation instanceof Post) {
+            if (!$operation instanceof CollectionOperationInterface && HttpOperation::METHOD_POST !== $operation->getMethod()) {
                 $responses['404'] = new Model\Response('Resource not found');
             }
 
@@ -248,7 +247,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             } elseif (\in_array($method, [HttpOperation::METHOD_PATCH, HttpOperation::METHOD_PUT, HttpOperation::METHOD_POST], true)) {
                 $operationInputSchemas = [];
                 foreach ($requestMimeTypes as $operationFormat) {
-                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, null, $operationName, $schema, null, $forceSchemaCollection);
+                    $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
                     $operationInputSchemas[$operationFormat] = $operationInputSchema;
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
@@ -278,8 +277,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
+    /**
+     * @return \ArrayObject<Model\MediaType>
+     */
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
     {
+        /** @var \ArrayObject<Model\MediaType> */
         $content = new \ArrayObject();
 
         foreach ($responseMimeTypes as $mimeType => $format) {
@@ -357,10 +360,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#linkObject.
      *
-     * return Model\Link[]
+     * @return \ArrayObject<Model\Link>
      */
     private function getLinks(ResourceMetadataCollection $resourceMetadataCollection, HttpOperation $currentOperation): \ArrayObject
     {
+        /** @var \ArrayObject<Model\Link> */
         $links = new \ArrayObject();
 
         // Only compute get links for now

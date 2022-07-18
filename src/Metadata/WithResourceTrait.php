@@ -39,6 +39,6 @@ trait WithResourceTrait
             }
         }
 
-        return $self;
+        return $self->withExtraProperties(array_merge($resource->getExtraProperties(), $self->getExtraProperties()));
     }
 }
