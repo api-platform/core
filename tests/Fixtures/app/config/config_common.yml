@@ -5,6 +5,7 @@ doctrine:
         charset:                      'UTF8'
         types:
             uuid:  Ramsey\Uuid\Doctrine\UuidType
+            symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType
 
     orm:
         auto_generate_proxy_classes:   '%kernel.debug%'

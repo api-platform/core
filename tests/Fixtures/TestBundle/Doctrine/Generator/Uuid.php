@@ -27,11 +27,7 @@ class Uuid implements \JsonSerializable, \Stringable
         return $this->id;
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange] // TODO: remove this and add the typehint in API Platform 3
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->id;
     }
