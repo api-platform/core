@@ -100,6 +100,11 @@ services:
         autowire: true
         autoconfigure: true
 
+    ApiPlatform\Tests\Fixtures\TestBundle\EventSubscriber\:
+        resource: '../../TestBundle/EventSubscriber'
+        autowire: true
+        autoconfigure: true
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\AttributeResourceProvider'
         tags:

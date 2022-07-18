@@ -103,7 +103,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
                 continue;
             }
 
-            foreach ([$property, "${property}[]"] as $filterParameterName) {
+            foreach ([$property, "{$property}[]"] as $filterParameterName) {
                 $description[$filterParameterName] = [
                     'property' => $property,
                     'type' => $hasAssociation ? 'string' : $this->getPhpType($type),
@@ -137,7 +137,7 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
                     return \DateTimeInterface::class;
                 }
 
-            // no break
+                // no break
             default:
                 return 'string';
         }

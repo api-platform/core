@@ -83,3 +83,15 @@ Feature: Operation support
         "id": 1
     }
     """
+
+  Scenario: Call a non API Platform route
+    When I send a "GET" request to "/common/custom/object"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+        "id": 1,
+        "text": "Lorem ipsum dolor sit amet"
+    }
+    """

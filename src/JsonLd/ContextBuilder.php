@@ -135,7 +135,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         ];
 
         if (!isset($context['iri']) || false !== $context['iri']) {
-            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.(bin2hex(random_bytes(10)));
+            $jsonLdContext['@id'] = $context['iri'] ?? '/.well-known/genid/'.bin2hex(random_bytes(10));
         }
 
         if ($context['has_context'] ?? false) {

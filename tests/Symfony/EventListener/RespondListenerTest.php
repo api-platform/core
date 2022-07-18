@@ -240,7 +240,7 @@ class RespondListenerTest extends TestCase
 
         $response = new Response();
         $event = new ViewEvent(
-          $this->prophesize(HttpKernelInterface::class)->reveal(),
+            $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_respond' => true]),
             \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
             $response

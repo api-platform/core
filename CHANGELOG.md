@@ -13,6 +13,16 @@ Breaking changes:
 * Metadata: the `Core` namespace got removed (#4805)
 * Mercure: deprecation removed (#4805)
 
+## 2.7.0-beta.5
+
+* Serializer: ignore no-operation on SerializeListener (#4828)
+* Schema: schema generation with default operation (#4818)
+
+## 2.7.0-beta.4
+
+* Metadata: reduce coalescing operator call (#4810)
+* Api: remove dump (#4809)
+
 ## 2.7.0-beta.3
 
 * Metadata: use the HTTP method instead of an interface for writability (#4785)
