@@ -426,7 +426,7 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testMetadataConfigurationDocBlockFactoryInterface()
     {
-        if (!class_exists(DocBlockFactoryInterface::class)) {
+        if (!interface_exists(DocBlockFactoryInterface::class)) {
             $this->markTestSkipped('class phpDocumentor\Reflection\DocBlockFactoryInterface does not exist');
         }
 
@@ -1162,7 +1162,6 @@ class ApiPlatformExtensionTest extends TestCase
 
     public function testMakerConfiguration(): void
     {
-        $this->markTestSkipped('Missing maker feature');
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['maker']['enabled'] = true;
         (new ApiPlatformExtension())->load($config, $this->container);
