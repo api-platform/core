@@ -36,10 +36,10 @@ class VoDummyCar extends VoDummyVehicle
     public function __construct(string $make, VoDummyInsuranceCompany $insuranceCompany, array $drivers, /**
      * @ODM\Field(type="int")
      */
-    #[Groups(['car_read', 'car_write'])] private readonly int $mileage, /**
+        #[Groups(['car_read', 'car_write'])] private readonly int $mileage, /**
      * @ODM\Field
      */
-    #[Groups(['car_read', 'car_write'])] private readonly string $bodyType = 'coupe')
+        #[Groups(['car_read', 'car_write'])] private readonly string $bodyType = 'coupe')
     {
         parent::__construct($make, $insuranceCompany, $drivers);
         $this->inspections = new ArrayCollection();

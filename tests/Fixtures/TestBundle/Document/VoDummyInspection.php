@@ -34,10 +34,10 @@ class VoDummyInspection
     public function __construct(/**
      * @ODM\Field(type="bool")
      */
-    #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private readonly bool $accepted, /**
+        #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private readonly bool $accepted, /**
      * @ODM\ReferenceOne(targetDocument=VoDummyCar::class, inversedBy="inspections")
      */
-    #[Groups(['inspection_read', 'inspection_write'])] private readonly VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
+        #[Groups(['inspection_read', 'inspection_write'])] private readonly VoDummyCar $car, DateTime $performed = null, private readonly string $attributeWithoutConstructorEquivalent = '')
     {
         $this->performed = $performed ?: new DateTime();
     }
