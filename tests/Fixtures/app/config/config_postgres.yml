@@ -15,3 +15,4 @@ doctrine:
         server_version: '%env(POSTGRES_VERSION)%'
         types:
             uuid: Ramsey\Uuid\Doctrine\UuidType
+            symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType

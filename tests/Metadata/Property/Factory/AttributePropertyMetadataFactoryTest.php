@@ -86,7 +86,6 @@ class AttributePropertyMetadataFactoryTest extends TestCase
         $this->assertFalse($metadata->isIdentifier());
         $this->assertSame('Default', $metadata->getDefault());
         $this->assertSame('Example', $metadata->getExample());
-        // TODO need https://github.com/api-platform/core/pull/4422
-        // $this->assertSame(['https://example.com'], $metadata->getTypes());
+        $this->assertSame(['https://example.com'], $metadata->getTypes());
     }
 }
