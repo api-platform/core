@@ -44,16 +44,12 @@ final class TypeConverter implements TypeConverterInterface
     private $resourceMetadataCollectionFactory;
     private $propertyMetadataFactory;
 
-    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory = null)
+    public function __construct(TypeBuilderInterface $typeBuilder, TypesContainerInterface $typesContainer, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
         $this->typeBuilder = $typeBuilder;
         $this->typesContainer = $typesContainer;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->propertyMetadataFactory = $propertyMetadataFactory;
-
-        if (null === $this->propertyMetadataFactory) {
-            @trigger_error(sprintf('Not injecting %s in the TypeConverter is deprecated since 2.7 and will not be supported in 3.0.', PropertyMetadataFactoryInterface::class), \E_USER_DEPRECATED);
-        }
     }
 
     /**

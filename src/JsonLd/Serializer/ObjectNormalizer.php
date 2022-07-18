@@ -73,9 +73,9 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
          * normalized data array is empty.
          *
          * This is useful when traversing from a non-resource towards an attribute
-         * which is a resource, as we do not have the benefit of {@see PropertyMetadata::isReadableLink}.
+         * which is a resource, as we do not have the benefit of {@see ApiProperty::isReadableLink}.
          *
-         * It must not be propagated to subresources, as {@see PropertyMetadata::isReadableLink}
+         * It must not be propagated to resources, as {@see ApiProperty::isReadableLink}
          * should take effect.
          */
         $context['api_empty_resource_as_iri'] = true;

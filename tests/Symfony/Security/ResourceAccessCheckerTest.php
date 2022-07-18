@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Security;
 
-use ApiPlatform\Symfony\Security\ExpressionLanguage;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -24,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverIn
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
