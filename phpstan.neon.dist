@@ -73,7 +73,6 @@ parameters:
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
 			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
-		# TODO: remove in v3.0
 		-
 			message: "#Dead catch - JsonException is never thrown in the try block.#"
 			path: src/Symfony/Bundle/Test/Response.php
@@ -91,9 +90,6 @@ parameters:
 			message: '#Call to an undefined method Symfony\\Component\\PropertyInfo\\Type::getCollectionKeyType\(\)#'
 			path: src
 		# Skipped tests, we do this on purpose
-		-
-			message: "#^Unreachable statement - code above always terminates.$#"
-			path: tests
 		-
 			message: "#Access to an undefined static property static\\([^)]+\\)::\\$container.$#"
 			path: tests

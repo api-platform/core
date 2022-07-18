@@ -140,7 +140,7 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         $propertyMetadata = null;
-        if ($property && $this->propertyMetadataFactory) {
+        if ($property) {
             $context = [
                 'normalization_groups' => $rootOperation->getNormalizationContext()['groups'] ?? null,
                 'denormalization_groups' => $rootOperation->getDenormalizationContext()['groups'] ?? null,
